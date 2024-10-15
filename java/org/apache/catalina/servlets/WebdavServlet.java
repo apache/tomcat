@@ -515,6 +515,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
                 // Get the root element of the document
                 Element rootElement = document.getDocumentElement();
+                if (!"propfind".equals(getDAVNode(rootElement))) {
+                    resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                    return;
+                }
                 NodeList childList = rootElement.getChildNodes();
 
                 for (int i = 0; i < childList.getLength(); i++) {
@@ -523,14 +527,15 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         case Node.TEXT_NODE:
                             break;
                         case Node.ELEMENT_NODE:
-                            if (currentNode.getNodeName().endsWith("prop")) {
+                            String nodeName = getDAVNode(currentNode);
+                            if ("prop".equals(nodeName)) {
                                 type = FIND_BY_PROPERTY;
                                 propNode = currentNode;
                             }
-                            if (currentNode.getNodeName().endsWith("propname")) {
+                            if ("propname".equals(nodeName)) {
                                 type = FIND_PROPERTY_NAMES;
                             }
-                            if (currentNode.getNodeName().endsWith("allprop")) {
+                            if ("allprop".equals(nodeName)) {
                                 type = FIND_ALL_PROP;
                             }
                             break;
@@ -555,15 +560,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     case Node.TEXT_NODE:
                         break;
                     case Node.ELEMENT_NODE:
-                        String nodeName = currentNode.getNodeName();
-                        String propertyName = null;
-                        if (nodeName.indexOf(':') != -1) {
-                            propertyName = nodeName.substring(nodeName.indexOf(':') + 1);
-                        } else {
-                            propertyName = nodeName;
-                        }
                         // href is a live property which is handled differently
-                        properties.add(propertyName);
+                        String propertyName = getDAVNode(currentNode);
+                        // No support for non DAV: properties
+                        if (propertyName != null) {
+                            properties.add(propertyName);
+                        }
                         break;
                 }
             }
@@ -691,6 +693,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
+        // FIXME
         resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
     }
 
@@ -728,19 +731,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         if (req.getContentLengthLong() > 0) {
-            DocumentBuilder documentBuilder = getDocumentBuilder();
-            try {
-                // Document document =
-                documentBuilder.parse(new InputSource(req.getInputStream()));
-                // TODO : Process this request body
-                resp.sendError(WebdavStatus.SC_NOT_IMPLEMENTED);
-                return;
-
-            } catch (SAXException saxe) {
-                // Parse error - assume invalid content
-                resp.sendError(WebdavStatus.SC_UNSUPPORTED_MEDIA_TYPE);
-                return;
-            }
+            // No support for MKCOL bodies, which are non standard
+            resp.sendError(WebdavStatus.SC_UNSUPPORTED_MEDIA_TYPE);
+            return;
         }
 
         if (resources.mkdir(path)) {
@@ -923,6 +916,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
             // Get the root element of the document
             Element rootElement = document.getDocumentElement();
+            if (!"lockinfo".equals(getDAVNode(rootElement))) {
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return;
+            }
             lockInfoNode = rootElement;
         } catch (IOException | SAXException e) {
             lockRequestType = LOCK_REFRESH;
@@ -946,14 +943,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     case Node.TEXT_NODE:
                         break;
                     case Node.ELEMENT_NODE:
-                        String nodeName = currentNode.getNodeName();
-                        if (nodeName.endsWith("lockscope")) {
+                        if ("lockscope".equals(getDAVNode(currentNode))) {
                             lockScopeNode = currentNode;
                         }
-                        if (nodeName.endsWith("locktype")) {
+                        if ("locktype".equals(getDAVNode(currentNode))) {
                             lockTypeNode = currentNode;
                         }
-                        if (nodeName.endsWith("owner")) {
+                        if ("owner".equals(getDAVNode(currentNode))) {
                             lockOwnerNode = currentNode;
                         }
                         break;
@@ -969,12 +965,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         case Node.TEXT_NODE:
                             break;
                         case Node.ELEMENT_NODE:
-                            String tempScope = currentNode.getNodeName();
-                            if (tempScope.indexOf(':') != -1) {
-                                lock.scope = tempScope.substring(tempScope.indexOf(':') + 1);
-                            } else {
-                                lock.scope = tempScope;
-                            }
+                            lock.scope = getDAVNode(currentNode);
                             break;
                     }
                 }
@@ -998,12 +989,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         case Node.TEXT_NODE:
                             break;
                         case Node.ELEMENT_NODE:
-                            String tempType = currentNode.getNodeName();
-                            if (tempType.indexOf(':') != -1) {
-                                lock.type = tempType.substring(tempType.indexOf(':') + 1);
-                            } else {
-                                lock.type = tempType;
-                            }
+                            lock.type = getDAVNode(currentNode);
                             break;
                     }
                 }
@@ -2246,6 +2232,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 }
             }
         }
+    }
+
+
+    private String getDAVNode(Node node) {
+        if (node.getNamespaceURI().equals(DEFAULT_NAMESPACE)) {
+            return node.getLocalName();
+        }
+        return null;
     }
 
 
