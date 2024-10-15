@@ -2603,7 +2603,7 @@ class Generator {
                 out.print(".reuse(");
                 out.print(tagHandlerVar);
                 out.println(");");
-
+            } else {
                 // Clean-up
                 out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.releaseTag(");
                 out.print(tagHandlerVar);
