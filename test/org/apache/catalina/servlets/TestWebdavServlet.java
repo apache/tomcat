@@ -197,6 +197,93 @@ public class TestWebdavServlet extends TomcatBaseTest {
             "  <D:owner>someone</D:owner>\n" +
             "</D:lockinfo>";
 
+    private static final String PROPFIND_PROP =
+            "<?xml version=\"1.0\" encoding=\"utf-8\" ?> \n" +
+            "<D:propfind xmlns:D=\"DAV:\">\n" +
+            "  <D:prop>\n" +
+            "    <D:getcontenttype/>\n" +
+            "    <D:getcontentlength/>\n" +
+            "  </D:prop>\n" +
+            "</D:propfind>";
+
+    private static final String PROPFIND_PROPNAME =
+            "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
+            "<D:propfind xmlns:D=\"DAV:\">\n" +
+            "  <D:propname/>\n" +
+            "</D:propfind>";
+
+    @Test
+    public void testBasicProperties() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-properties");
+        Assert.assertTrue(tempWebapp.mkdirs());
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("listings", "true");
+        webdavServlet.addInitParameter("secret", "foo");
+        webdavServlet.addInitParameter("readonly", "false");
+        ctxt.addServletMappingDecoded("/*", "webdav");
+        ctxt.addMimeMapping("txt", "text/plain");
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+
+        // Create a test file
+        client.setRequest(new String[] { "PUT /file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        // Add lock to check for lock discovery
+        client.setRequest(new String[] { "LOCK /file2.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: " + LOCK_BODY.length() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + LOCK_BODY });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+
+        client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+
+        client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: " + PROPFIND_PROPNAME.length() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + PROPFIND_PROPNAME });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("<D:getcontenttype/>"));
+
+        client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: " + PROPFIND_PROP.length() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + PROPFIND_PROP });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("<D:getcontenttype>"));
+        Assert.assertFalse(client.getResponseBody().contains("<D:getlastmodified>"));
+
+    }
+
     @Test
     public void testBasicOperations() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -258,6 +345,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
                 SimpleHttpClient.CRLF });
         client.connect();
         client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("<D:getcontentlength>12<"));
 
         // Lock /myfolder
