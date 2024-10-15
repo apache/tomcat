@@ -227,7 +227,7 @@ do let us know.</p>
     </p>
     <p>
       For advanced configuration information, see the
-      <a href="https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt">
+      <a href="RUNNING.txt">
         RUNNING.txt
       </a> file.
     </p>
@@ -275,7 +275,6 @@ only to earlier versions.</p>
     the answer was right in front of you all along!</li>
 <li><a href="https://cwiki.apache.org/confluence/display/TOMCAT/FAQ">Tomcat FAQ</a></li>
 <li><a href="https://cwiki.apache.org/confluence/display/TOMCAT/">Tomcat WIKI</a></li>
-<li>Tomcat FAQ at <a href="http://www.jguru.com/faq/home.jsp?topic=Tomcat">jGuru</a></li>
 <li>Tomcat mailing list archives - numerous sites archive the Tomcat mailing
     lists. Since the links change over time, clicking here will search
     <a href="https://www.google.com/search?q=tomcat+mailing+list+archives">Google</a>.
