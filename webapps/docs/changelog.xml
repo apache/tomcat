@@ -145,6 +145,13 @@
         Verify that destination is not locked for a WebDAV copy operation.
         (remm)
       </fix>
+      <fix>
+        Send 415 response to WebDAV MKCOL operations that include a request
+        body since this is optional and unsupported. (remm)
+      </fix>
+      <fix>
+        Enforce <code>DAV:</code> namespace on WebDAV XML elements. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
