@@ -212,6 +212,12 @@
         21 being the minimum Java version required for Tomcat 12. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69399</bug>: Fix regression caused by the improvement
+        <bug>69333</bug> which caused the tag <code>release</code> to be called
+        when using tag pooling, and to be skipped when not using it.
+        Patch submitted by Michal Sobkiewicz. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
