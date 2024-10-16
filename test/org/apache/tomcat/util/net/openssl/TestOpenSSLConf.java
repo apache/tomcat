@@ -107,7 +107,8 @@ public class TestOpenSSLConf extends TomcatBaseTest {
             } else if ("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName)) {
                 LifecycleListener listener = new OpenSSLLifecycleListener();
                 Assume.assumeTrue(OpenSSLLifecycleListener.isAvailable());
-                Assume.assumeFalse(Class.forName("org.apache.tomcat.util.openssl.openssl_h_Compatibility").getField("LIBRESSL").getBoolean(null));
+                Assume.assumeFalse("LibreSSL does not support OpenSSLConf",
+                        Class.forName("org.apache.tomcat.util.openssl.openssl_h_Compatibility").getField("LIBRESSL").getBoolean(null));
                 StandardServer server = (StandardServer) tomcat.getServer();
                 server.addLifecycleListener(listener);
             }
@@ -136,7 +137,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         tomcat.start();
 
         Assume.assumeFalse("BoringSSL does not support OpenSSLConf",
-                OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName()));
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
 
         sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
         Assert.assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
