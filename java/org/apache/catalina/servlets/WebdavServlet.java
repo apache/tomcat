@@ -1180,9 +1180,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
                 } else {
 
-                    lock.tokens.add(lockToken);
-                    resourceLocks.put(lock.path, lock);
-
                     // Checking if a resource exists at this path
                     if (!resource.exists()) {
 
@@ -1192,6 +1189,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
                         lockNullResources.computeIfAbsent(parentPath, k -> new CopyOnWriteArrayList<>()).add(lock.path);
                     }
+
+                    lock.tokens.add(lockToken);
+                    resourceLocks.put(lock.path, lock);
 
                     // Add the Lock-Token header as by RFC 2518 8.10.1
                     // - only do this for newly created locks
@@ -1729,6 +1729,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 sendNotAllowed(req, resp);
                 return false;
             }
+            resourceLocks.remove(path);
         } else {
 
             Map<String,Integer> errorList = new LinkedHashMap<>();
@@ -1750,6 +1751,16 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                      */
                     errorList.put(path, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
                 }
+            } else {
+                Iterator<LockInfo> collectionLocksList = collectionLocks.iterator();
+                while (collectionLocksList.hasNext()) {
+                    LockInfo lock = collectionLocksList.next();
+                    if (path.equals(lock.path)) {
+                        collectionLocks.remove(lock);
+                        break;
+                    }
+                }
+                resourceLocks.remove(path);
             }
 
             if (!errorList.isEmpty()) {
@@ -1828,6 +1839,18 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                          */
                         errorList.put(childName, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
                     }
+                } else {
+                    if (childResource.isDirectory()) {
+                        Iterator<LockInfo> collectionLocksList = collectionLocks.iterator();
+                        while (collectionLocksList.hasNext()) {
+                            LockInfo lock = collectionLocksList.next();
+                            if (childName.equals(lock.path)) {
+                                collectionLocks.remove(lock);
+                                break;
+                            }
+                        }
+                    }
+                    resourceLocks.remove(childName);
                 }
             }
         }
