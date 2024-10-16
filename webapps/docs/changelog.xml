@@ -152,6 +152,10 @@
       <fix>
         Enforce <code>DAV:</code> namespace on WebDAV XML elements. (remm)
       </fix>
+      <fix>
+        Do not allow a new WebDAV lock on a child resource if a parent
+        collection is locked (RFC 4918 section 6.1). (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

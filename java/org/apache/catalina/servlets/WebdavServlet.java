@@ -403,11 +403,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     protected boolean checkIfHeaders(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        if (!super.checkIfHeaders(request, response, resource)) {
+        // Skip regular HTTP evaluation for a null resource
+        if (resource != null && !super.checkIfHeaders(request, response, resource)) {
             return false;
         }
 
-        // TODO : Checking the WebDAV If header
+        // FIXME : Process the WebDAV If header
+
         return true;
     }
 
@@ -483,7 +485,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         // Properties which are to be displayed.
-        List<String> properties = null;
+        List<String> properties = new ArrayList<>();
         // Propfind depth
         int depth = maxDepth;
         // Propfind type
@@ -502,8 +504,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 depth = maxDepth;
             }
         }
-
-        Node propNode = null;
 
         if (req.getContentLengthLong() > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
@@ -528,7 +528,22 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                             String nodeName = getDAVNode(currentNode);
                             if ("prop".equals(nodeName)) {
                                 type = FIND_BY_PROPERTY;
-                                propNode = currentNode;
+                                NodeList propChildList = currentNode.getChildNodes();
+                                for (int j = 0; j < propChildList.getLength(); j++) {
+                                    Node currentNode2 = propChildList.item(j);
+                                    switch (currentNode2.getNodeType()) {
+                                        case Node.TEXT_NODE:
+                                            break;
+                                        case Node.ELEMENT_NODE:
+                                            // href is a live property which is handled differently
+                                            String propertyName = getDAVNode(currentNode2);
+                                            // No support for non DAV: properties
+                                            if (propertyName != null) {
+                                                properties.add(propertyName);
+                                            }
+                                            break;
+                                    }
+                                }
                             }
                             if ("propname".equals(nodeName)) {
                                 type = FIND_PROPERTY_NAMES;
@@ -546,30 +561,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             }
         }
 
-        if (type == FIND_BY_PROPERTY) {
-            properties = new ArrayList<>();
-            // propNode must be non-null if type == FIND_BY_PROPERTY
-            @SuppressWarnings("null")
-            NodeList childList = propNode.getChildNodes();
-
-            for (int i = 0; i < childList.getLength(); i++) {
-                Node currentNode = childList.item(i);
-                switch (currentNode.getNodeType()) {
-                    case Node.TEXT_NODE:
-                        break;
-                    case Node.ELEMENT_NODE:
-                        // href is a live property which is handled differently
-                        String propertyName = getDAVNode(currentNode);
-                        // No support for non DAV: properties
-                        if (propertyName != null) {
-                            properties.add(propertyName);
-                        }
-                        break;
-                }
-            }
-        }
-
         WebResource resource = resources.getResource(path);
+        if (!checkIfHeaders(req, resp, resource)) {
+            return;
+        }
 
         if (!resource.exists()) {
             int slash = path.lastIndexOf('/');
@@ -672,7 +667,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
-     * PROPPATCH Method.
+     * PROPPATCH Method. Dead properties support is a SHOULD in the specification and are not implemented.
      *
      * @param req  The Servlet request
      * @param resp The Servlet response
@@ -681,18 +676,25 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doProppatch(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
+        String path = getRelativePath(req);
+
+        WebResource resource = resources.getResource(path);
+        if (!checkIfHeaders(req, resp, resource)) {
+            return;
+        }
+
         if (readOnly) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
 
-        if (isLocked(null, req)) {
+        if (isLocked(path, req)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
 
-        // FIXME
-        resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED);
+        // FIXME: Compliant PROPPATCH processing
+        resp.sendError(HttpServletResponse.SC_FORBIDDEN);
     }
 
 
@@ -710,6 +712,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         String path = getRelativePath(req);
 
         WebResource resource = resources.getResource(path);
+        if (!checkIfHeaders(req, resp, resource)) {
+            return;
+        }
 
         // Can't create a collection if a resource already exists at the given
         // path
@@ -769,6 +774,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         WebResource resource = resources.getResource(path);
+        if (!checkIfHeaders(req, resp, resource)) {
+            return;
+        }
         if (resource.isDirectory()) {
             sendNotAllowed(req, resp);
             return;
@@ -850,6 +858,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         if (isLocked(path, req)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
+            return;
+        }
+        WebResource resource = resources.getResource(path);
+        if (!checkIfHeaders(req, resp, resource)) {
             return;
         }
 
@@ -1032,9 +1044,22 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         lock.path = path;
 
-        WebResource resource = resources.getResource(path);
-
         if (lockRequestType == LOCK_CREATION) {
+
+            // Check if a parent is already locked
+            Iterator<LockInfo> collectionLocksIterator = collectionLocks.iterator();
+            while (collectionLocksIterator.hasNext()) {
+                LockInfo currentLock = collectionLocksIterator.next();
+                if (currentLock.hasExpired()) {
+                    collectionLocksIterator.remove();
+                    continue;
+                }
+                if (lock.path.startsWith(currentLock.path + "/") && (currentLock.isExclusive() || lock.isExclusive())) {
+                    // A parent collection of this collection is locked
+                    resp.setStatus(WebdavStatus.SC_LOCKED);
+                    return;
+                }
+            }
 
             // Generating lock id
             String lockTokenStr = req.getServletPath() + "-" + lock.type + "-" + lock.scope + "-" +
@@ -1050,14 +1075,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 // Checking if a child resource of this collection is
                 // already locked
                 List<String> lockPaths = new ArrayList<>();
-                Iterator<LockInfo> collectionLocksIterator = collectionLocks.iterator();
+                collectionLocksIterator = collectionLocks.iterator();
                 while (collectionLocksIterator.hasNext()) {
                     LockInfo currentLock = collectionLocksIterator.next();
                     if (currentLock.hasExpired()) {
                         collectionLocksIterator.remove();
                         continue;
                     }
-                    if (currentLock.path.startsWith(lock.path) && (currentLock.isExclusive() || lock.isExclusive())) {
+                    if (currentLock.path.startsWith(lock.path + "/") && (currentLock.isExclusive() || lock.isExclusive())) {
                         // A child collection of this collection is locked
                         lockPaths.add(currentLock.path);
                     }
@@ -1067,7 +1092,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         resourceLocks.remove(currentLock.path);
                         continue;
                     }
-                    if (currentLock.path.startsWith(lock.path) && (currentLock.isExclusive() || lock.isExclusive())) {
+                    if (currentLock.path.startsWith(lock.path + "/") && (currentLock.isExclusive() || lock.isExclusive())) {
                         // A child resource of this collection is locked
                         lockPaths.add(currentLock.path);
                     }
@@ -1078,7 +1103,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     // One of the child paths was locked
                     // We generate a multistatus error report
 
-                    resp.setStatus(WebdavStatus.SC_CONFLICT);
+                    resp.setStatus(WebdavStatus.SC_MULTI_STATUS);
 
                     XMLWriter generatedXML = new XMLWriter();
                     generatedXML.writeXMLHeader();
@@ -1247,9 +1272,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         String path = getRelativePath(req);
-
-        if (isLocked(path, req)) {
-            resp.sendError(WebdavStatus.SC_LOCKED);
+        WebResource resource = resources.getResource(path);
+        if (!checkIfHeaders(req, resp, resource)) {
             return;
         }
 
@@ -1310,7 +1334,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
     /**
      * Check to see if a resource is currently write locked. The method will look at the "If" header to make sure the
-     * client has give the appropriate lock tokens.
+     * client has demonstrated knowledge of the appropriate lock tokens.
      *
      * @param path The relative path
      * @param req Servlet request
@@ -1329,6 +1353,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             ifHeader = "";
         }
 
+        // Normally a lock token is not sent using this header
         String lockTokenHeader = req.getHeader("Lock-Token");
         if (lockTokenHeader == null) {
             lockTokenHeader = "";
@@ -1411,6 +1436,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         WebResource source = resources.getResource(path);
         if (!source.exists()) {
             resp.sendError(WebdavStatus.SC_NOT_FOUND);
+            return false;
+        }
+        if (!checkIfHeaders(req, resp, source)) {
             return false;
         }
 
@@ -1661,6 +1689,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * @throws IOException If an IO error occurs
      */
     private boolean deleteResource(String path, HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        WebResource resource = resources.getResource(path);
+        if (!checkIfHeaders(req, resp, resource)) {
+            return false;
+        }
         return deleteResource(path, req, resp, true);
     }
 
