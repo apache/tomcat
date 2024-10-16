@@ -81,7 +81,7 @@ public class TestClientCertTls13 extends TomcatBaseTest {
         tomcat.start();
 
         Assume.assumeFalse("LibreSSL does not allow PHA",
-                OpenSSLStatus.Name.LIBRESSL.equals(OpenSSLStatus.getName()));
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
 
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/protected");
         Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
@@ -93,7 +93,7 @@ public class TestClientCertTls13 extends TomcatBaseTest {
         tomcat.start();
 
         Assume.assumeFalse("LibreSSL does not allow PHA",
-                OpenSSLStatus.Name.LIBRESSL.equals(OpenSSLStatus.getName()));
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
 
         int size = 32 * 1024;
 
