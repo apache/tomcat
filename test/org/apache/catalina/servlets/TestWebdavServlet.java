@@ -423,6 +423,15 @@ public class TestWebdavServlet extends TomcatBaseTest {
         }
         Assert.assertNotNull(lockTokenFile);
 
+        client.setRequest(new String[] { "PUT /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_LOCKED, client.getStatusCode());
+
         // Same but with lock token and lock null
         client.setRequest(new String[] { "PUT /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
@@ -434,15 +443,24 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
 
-        // Unlock for /myfolder/file5.txt
-        client.setRequest(new String[] { "UNLOCK /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+        // Verify that this also removes the lock by doing another PUT without the token
+        client.setRequest(new String[] { "DELETE /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                "Lock-Token: " + lockTokenFile + SimpleHttpClient.CRLF +
+                "If: " + lockTokenFile + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
                 SimpleHttpClient.CRLF });
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_NO_CONTENT, client.getStatusCode());
+
+        client.setRequest(new String[] { "PUT /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
 
         // Lock /myfolder again
         client.setRequest(new String[] { "LOCK /myfolder HTTP/1.1" + SimpleHttpClient.CRLF +

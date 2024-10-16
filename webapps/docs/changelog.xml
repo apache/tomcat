@@ -156,6 +156,10 @@
         Do not allow a new WebDAV lock on a child resource if a parent
         collection is locked (RFC 4918 section 6.1). (remm)
       </fix>
+      <fix>
+        WebDAV Delete should remove any existing lock on successfully deleted
+        resources. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
