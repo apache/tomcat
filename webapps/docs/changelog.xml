@@ -160,6 +160,11 @@
         WebDAV Delete should remove any existing lock on successfully deleted
         resources. (remm)
       </fix>
+      <update>
+        Remove WebDAV lock null support in accordance with RFC 4918 section 7.3
+        and annex D. Instead a lock on a non existing resource will create an
+        empty file locked with a regular lock. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
