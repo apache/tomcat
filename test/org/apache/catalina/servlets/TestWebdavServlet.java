@@ -442,7 +442,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
                 SimpleHttpClient.CRLF + CONTENT });
         client.connect();
         client.processRequest(true);
-        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+        Assert.assertEquals(HttpServletResponse.SC_NO_CONTENT, client.getStatusCode());
 
         // Verify that this also removes the lock by doing another PUT without the token
         client.setRequest(new String[] { "DELETE /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
