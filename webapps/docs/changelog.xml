@@ -126,6 +126,11 @@
         Remove default value (was <code>catalina</code>) for the
         <code>secret</code> init parameter of the WebDAV Servlet. (remm)
       </update>
+      <update>
+        Remove WebDAV lock null support in accordance with RFC 4918 section 7.3
+        and annex D. Instead a lock on a non existing resource will create an
+        empty file locked with a regular lock. (remm)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <update>
         <bug>69374</bug>: Properly separate between table header and body
