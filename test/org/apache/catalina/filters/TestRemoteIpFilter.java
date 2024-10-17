@@ -37,6 +37,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.connector.XForwardedRequest;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -179,11 +180,11 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
     @Test
     public void testHeaderNamesCaseInsensitivity() {
-        RemoteIpFilter.XForwardedRequest request = new RemoteIpFilter.XForwardedRequest(new MockHttpServletRequest());
+        XForwardedRequest request = new XForwardedRequest(new MockHttpServletRequest());
         request.setHeader("myheader", "lower Case");
         request.setHeader("MYHEADER", "UPPER CASE");
         request.setHeader("MyHeader", "Camel Case");
-        Assert.assertEquals(1, request.headers.size());
+        Assert.assertEquals(1, request.getHeaderCount());
         Assert.assertEquals("Camel Case", request.getHeader("myheader"));
     }
 
