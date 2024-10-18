@@ -180,6 +180,12 @@
         WebDAV Delete should remove any existing lock on successfully deleted
         resources. (remm)
       </fix>
+      <update>
+        Add base WebDAV <code>PROPPATCH</code> implementation, to be extended
+        by overriding the <code>proppatchResource</code> and
+        <code>propfindResource</code> methods of the WebDAV Servlet to
+        provide the desired level of support for dead properties. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
