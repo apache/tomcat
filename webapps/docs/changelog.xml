@@ -165,6 +165,12 @@
         and annex D. Instead a lock on a non existing resource will create an
         empty file locked with a regular lock. (remm)
       </update>
+      <update>
+        Add base WebDAV <code>PROPPATCH</code> implementation, to be extended
+        by overriding the <code>proppatchResource</code> and
+        <code>propfindResource</code> methods of the WebDAV Servlet to
+        provide the desired level of support for dead properties. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
