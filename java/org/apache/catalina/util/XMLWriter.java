@@ -165,6 +165,28 @@ public class XMLWriter {
                     lastWriteWasOpen = false;
                     break;
             }
+        } else if ((namespaceInfo != null) && (namespaceInfo.length() > 0)) {
+            switch (type) {
+                case OPENING:
+                    if (lastWriteWasOpen) {
+                        buffer.append('\n');
+                    }
+                    buffer.append("<" + name + " xmlns=\"" + namespaceInfo + "\">");
+                    lastWriteWasOpen = true;
+                    break;
+                case CLOSING:
+                    buffer.append("</" + name + ">\n");
+                    lastWriteWasOpen = false;
+                    break;
+                case NO_CONTENT:
+                default:
+                    if (lastWriteWasOpen) {
+                        buffer.append('\n');
+                    }
+                    buffer.append("<" + name + " xmlns=\"" + namespaceInfo + "\"/>\n");
+                    lastWriteWasOpen = false;
+                    break;
+            }
         } else {
             switch (type) {
                 case OPENING:
