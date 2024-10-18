@@ -107,6 +107,27 @@
 <section name="Tomcat 11.0.1 (markt)" rtext="in development">
   <subsection name="Catalina">
     <changelog>
+<<<<<<< HEAD
+=======
+      <add>
+        Add support for the new Servlet API method
+        <code>HttpServletResponse.sendEarlyHints()</code>. (markt)
+      </add>
+      <update>
+        Remove default value (was <code>catalina</code>) for the
+        <code>secret</code> init parameter of the WebDAV Servlet. (remm)
+      </update>
+      <update>
+        Remove WebDAV lock null support in accordance with RFC 4918 section 7.3
+        and annex D. Instead a lock on a non existing resource will create an
+        empty file locked with a regular lock. (remm)
+      </update>
+      <update>
+        Rewrite implementation of WebDAV shared locks to comply with RFC 4918.
+        (remm)
+      </update>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+>>>>>>> ac76965a76 (Rewrite implementation of WebDAV shared locks)
       <update>
         <bug>69374</bug>: Properly separate between table header and body
         in <code>DefaultServlet</code>'s listing. (michaelo)
