@@ -250,19 +250,51 @@ public class ResponseFacade implements HttpServletResponse {
         response.sendEarlyHints();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * <i>Deprecated functionality</i>: calling <code>sendError</code> with a status
+     * code of 103 differs from the usual behavior. Sending 103 will trigger
+     * the container to send a "103 Early Hints" informational response
+     * including all current headers. The application can continue to use
+     * the request and response after calling sendError with a 103 status code,
+     * including triggering a more typical response of any type.
+     *
+     * Starting with Tomcat 12, applications should use {@link #sendEarlyHints}.
+     */
     @Override
     public void sendError(int sc, String msg) throws IOException {
         checkCommitted("coyoteResponse.sendError.ise");
-        response.setAppCommitted(true);
-        response.sendError(sc, msg);
+        if (HttpServletResponse.SC_EARLY_HINTS == sc) {
+            sendEarlyHints();
+        } else {
+            response.setAppCommitted(true);
+            response.sendError(sc, msg);
+        }
     }
 
 
+    /**
+     * {@inheritDoc}
+     *
+     * <i>Deprecated functionality</i>: calling <code>sendError</code> with a status
+     * code of 103 differs from the usual behavior. Sending 103 will trigger
+     * the container to send a "103 Early Hints" informational response
+     * including all current headers. The application can continue to use
+     * the request and response after calling sendError with a 103 status code,
+     * including triggering a more typical response of any type.
+     *
+     * Starting with Tomcat 12, applications should use {@link #sendEarlyHints}.
+     */
     @Override
     public void sendError(int sc) throws IOException {
         checkCommitted("coyoteResponse.sendError.ise");
-        response.setAppCommitted(true);
-        response.sendError(sc);
+        if (HttpServletResponse.SC_EARLY_HINTS == sc) {
+            sendEarlyHints();
+        } else {
+            response.setAppCommitted(true);
+            response.sendError(sc);
+        }
     }
 
 
