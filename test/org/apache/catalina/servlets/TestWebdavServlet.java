@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +35,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.util.XMLWriter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.websocket.server.WsContextListener;
 import org.xml.sax.InputSource;
@@ -230,7 +228,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
             "<D:propertyupdate xmlns:D=\"DAV:\" xmlns:T=\"http://tomcat.apache.org/testsuite\">\n" +
             "  <D:set>\n" +
             "    <D:prop>\n" +
-            "      <T:customprop xmlns:T=\"http://tomcat.apache.org/testsuite\">\n" +
+            "      <T:customprop>\n" +
             "        <T:myvalue/>\n" +
             "      </T:customprop>\n" +
             "    </D:prop>\n" +
@@ -248,7 +246,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         File tempWebapp = new File(getTemporaryDirectory(), "webdav-properties");
         Assert.assertTrue(tempWebapp.mkdirs());
         Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
-        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new CustomWebdavServlet());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new TransientPropertiesWebdavServlet());
         webdavServlet.addInitParameter("listings", "true");
         webdavServlet.addInitParameter("secret", "foo");
         webdavServlet.addInitParameter("readonly", "false");
@@ -289,7 +287,17 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
 
-        client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
+        client.setRequest(new String[] { "PROPPATCH /file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: " + PROPPATCH_PROPNAME.length() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + PROPPATCH_PROPNAME });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("<T:othercustomprop"));
+
+        client.setRequest(new String[] { "PROPFIND /file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
                 "Content-Length: " + PROPFIND_PROPNAME.length() + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
@@ -299,7 +307,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("<D:getcontenttype/>"));
 
-        client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
+        client.setRequest(new String[] { "PROPFIND /file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
                 "Content-Length: " + PROPFIND_PROP.length() + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
@@ -309,18 +317,28 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("<D:getcontenttype>"));
         Assert.assertFalse(client.getResponseBody().contains("<D:getlastmodified>"));
-        Assert.assertTrue(client.getResponseBody().contains("<T:myvalue/>"));
+        Assert.assertTrue(client.getResponseBody().contains("<myvalue xmlns=\"http://tomcat.apache.org/testsuite\">"));
 
-        client.setRequest(new String[] { "PROPPATCH /file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+        client.setRequest(new String[] { "MOVE /file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                "Content-Length: " + PROPPATCH_PROPNAME.length() + SimpleHttpClient.CRLF +
+                "Destination: /file3.txt" + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF + PROPPATCH_PROPNAME });
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        client.setRequest(new String[] { "PROPFIND /file3.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: " + PROPFIND_PROP.length() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + PROPFIND_PROP });
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
-        Assert.assertTrue(proppatchSuccess);
-        Assert.assertTrue(client.getResponseBody().contains("<T:othercustomprop"));
+        Assert.assertTrue(client.getResponseBody().contains("<D:getcontenttype>"));
+        Assert.assertFalse(client.getResponseBody().contains("<D:getlastmodified>"));
+        Assert.assertTrue(client.getResponseBody().contains("<myvalue xmlns=\"http://tomcat.apache.org/testsuite\">"));
 
     }
 
@@ -977,48 +995,6 @@ public class TestWebdavServlet extends TomcatBaseTest {
         public boolean isResponseBodyOK() {
             return true;
         }
-    }
-
-    private static boolean proppatchSuccess = false;
-
-    private class CustomWebdavServlet extends WebdavServlet {
-
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        protected void proppatchResource(String path, ArrayList<ProppatchOperation> operations) {
-            for (ProppatchOperation operation : operations) {
-                if (operation.getUpdateType().equals(PropertyUpdateType.SET)
-                        && operation.getPropertyNode().getLocalName().equals("customprop")) {
-                    proppatchSuccess = true;
-                }
-                operation.setStatusCode(HttpServletResponse.SC_OK);
-            }
-        }
-
-        @Override
-        protected boolean propfindResource(String path, org.w3c.dom.Node property, boolean nameOnly, XMLWriter generatedXML) {
-            if (nameOnly) {
-                generatedXML.writeElement("T", "http://tomcat.apache.org/testsuite", "customprop", XMLWriter.NO_CONTENT);
-                generatedXML.writeElement("T", "http://tomcat.apache.org/testsuite", "othercustomprop", XMLWriter.NO_CONTENT);
-            } else if (property == null) {
-                generatedXML.writeElement("T", "http://tomcat.apache.org/testsuite", "customprop", XMLWriter.OPENING);
-                generatedXML.writeElement("T", "myvalue", XMLWriter.NO_CONTENT);
-                generatedXML.writeElement("T", "customprop", XMLWriter.CLOSING);
-                generatedXML.writeElement("T", "http://tomcat.apache.org/testsuite", "othercustomprop", XMLWriter.OPENING);
-                generatedXML.writeElement("T", "myothervalue", XMLWriter.NO_CONTENT);
-                generatedXML.writeElement("T", "othercustomprop", XMLWriter.CLOSING);
-            } else if (property.getLocalName().equals("customprop")) {
-                generatedXML.writeElement("T", "http://tomcat.apache.org/testsuite", "customprop", XMLWriter.OPENING);
-                generatedXML.writeElement("T", "myvalue", XMLWriter.NO_CONTENT);
-                generatedXML.writeElement("T", "customprop", XMLWriter.CLOSING);
-                return true;
-            } else if (property.getLocalName().equals("othercustomprop")) {
-                return false;
-            }
-            return false;
-        }
-
     }
 
 }
