@@ -126,6 +126,10 @@
         Rewrite implementation of WebDAV shared locks to comply with RFC 4918.
         (remm)
       </update>
+      <update>
+        Implement WebDAV <code>If</code> header using code from the Apache
+        Jackrabbit project. (remm)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
 >>>>>>> ac76965a76 (Rewrite implementation of WebDAV shared locks)
       <update>
