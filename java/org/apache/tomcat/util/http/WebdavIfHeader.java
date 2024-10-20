@@ -142,10 +142,7 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Return {@link DavConstants#HEADER_IF If}
-     *
-     * @return {@link DavConstants#HEADER_IF If}
-     * @see DavConstants#HEADER_IF
+     * @return If String.
      */
     public String getHeaderName() {
         return "If";
