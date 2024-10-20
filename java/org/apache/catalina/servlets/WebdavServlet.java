@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -60,6 +61,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.RequestUtil;
+import org.apache.tomcat.util.http.WebdavIfHeader;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -205,6 +207,19 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
+     * Supported locks.
+     */
+    protected static final String SUPPORTED_LOCKS =
+            "<D:lockentry>" +
+            "<D:lockscope><D:exclusive/></D:lockscope>" +
+            "<D:locktype><D:write/></D:locktype>" +
+            "</D:lockentry>" +
+            "<D:lockentry>" +
+            "<D:lockscope><D:shared/></D:lockscope>" +
+            "<D:locktype><D:write/></D:locktype>" +
+            "</D:lockentry>";
+
+    /**
      * Simple date format for the creation date ISO representation (partial).
      */
     protected static final ConcurrentDateFormat creationDateFormat =
@@ -243,6 +258,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private boolean allowSpecialPaths = false;
 
 
+    /**
+     * Is the if header processing strict.
+     */
+    private boolean strictIfProcessing = false;
+
+
     // --------------------------------------------------------- Public Methods
 
     @Override
@@ -272,6 +293,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         if (getServletConfig().getInitParameter("allowSpecialPaths") != null) {
             allowSpecialPaths = Boolean.parseBoolean(getServletConfig().getInitParameter("allowSpecialPaths"));
         }
+
+        if (getServletConfig().getInitParameter("strictIfProcessing") != null) {
+            strictIfProcessing = Boolean.parseBoolean(getServletConfig().getInitParameter("strictIfProcessing"));
+        }
     }
 
 
@@ -300,7 +325,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             }
         }
     }
-
 
     // ------------------------------------------------------ Protected Methods
 
@@ -403,7 +427,97 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return false;
         }
 
-        // FIXME : Process the WebDAV If header
+        // Process the WebDAV If header using Apache Jackrabbit code
+        String ifHeaderValue = request.getHeader("If");
+        if (ifHeaderValue != null) {
+            WebdavIfHeader ifHeader = new WebdavIfHeader(getUriPrefix(request), ifHeaderValue);
+            if (!ifHeader.hasValue()) {
+                // Allow bad if syntax, will only be used for lock tokens
+                return !strictIfProcessing;
+            }
+            String path = getRelativePath(request);
+            // Get all hrefs from the if header
+            Iterator<String> hrefs = ifHeader.getResources();
+
+            String currentPath = null;
+            String currentHref = null;
+            WebResource currentWebResource = null;
+            if (hrefs.hasNext()) {
+                currentHref = hrefs.next();
+                currentPath = getPathFromHref(currentHref, request);
+                currentWebResource = resources.getResource(currentPath);
+            } else {
+                currentPath = path;
+                currentHref = getEncodedPath(path, resource, request);
+                currentWebResource = resource;
+            }
+
+            // Iterate over all resources
+            do {
+                boolean exists = currentWebResource != null && currentWebResource.exists();
+                String eTag = exists ? generateETag(currentWebResource) : "";
+
+                // Collect all locks active on resource
+                ArrayList<String> lockTokens = new ArrayList<>();
+                // No lock evaluation for non existing paths in strict mode
+                // Problem: when doing a put with a locked parent folder, need to submit a tagged production with
+                // the parent path and the token, simply submitting the token in the if would fail the precondition.
+                if (!strictIfProcessing || exists) {
+                    String parentPath = currentPath;
+                    do {
+                        LockInfo parentLock = resourceLocks.get(parentPath);
+                        if (parentLock != null) {
+                            if (parentLock.hasExpired()) {
+                                resourceLocks.remove(parentPath);
+                            } else {
+                                if ((parentPath != currentPath && parentLock.depth > 0) || parentPath == currentPath) {
+                                    if (parentLock.isExclusive()) {
+                                        lockTokens.add("opaquelocktoken:" + parentLock.token);
+                                    } else {
+                                        for (String token : parentLock.sharedTokens) {
+                                            if (sharedLocks.get(token) == null) {
+                                                parentLock.sharedTokens.remove(token);
+                                            }
+                                        }
+                                        if (parentLock.sharedTokens.isEmpty()) {
+                                            resourceLocks.remove(parentLock.path);
+                                        }
+                                        for (String token : parentLock.sharedTokens) {
+                                            LockInfo sharedLock = sharedLocks.get(token);
+                                            if (sharedLock != null) {
+                                                if ((parentPath != currentPath && sharedLock.depth > 0) || parentPath == currentPath) {
+                                                    lockTokens.add("opaquelocktoken:" + token);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        int slash = parentPath.lastIndexOf('/');
+                        if (slash < 0) {
+                            break;
+                        }
+                        parentPath = parentPath.substring(0, slash);
+                    } while (true);
+                }
+
+                // Evaluation
+                if (ifHeader.matches(currentHref, lockTokens, eTag)) {
+                    return true;
+                }
+
+                if (hrefs.hasNext()) {
+                    currentHref = hrefs.next();
+                    currentPath = getPathFromHref(currentHref, request);
+                    currentWebResource = resources.getResource(currentPath);
+                } else {
+                    break;
+                }
+            } while (true);
+
+            return false;
+       }
 
         return true;
     }
@@ -465,6 +579,61 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         return rewriteUrl(href);
+    }
+
+    private String getUriPrefix(HttpServletRequest request) {
+        return request.getScheme() + "://" + request.getServerName();
+    }
+
+    private String getPathFromHref(String href, HttpServletRequest req) {
+
+        if (href == null || href.isEmpty()) {
+            return null;
+        }
+
+        URI hrefUri;
+        try {
+            hrefUri = new URI(href);
+        } catch (URISyntaxException e) {
+            return null;
+        }
+
+        String hrefPath = hrefUri.getPath();
+
+        // Avoid path traversals
+        if (!hrefPath.equals(RequestUtil.normalize(hrefPath))) {
+            return null;
+        }
+
+        if (hrefUri.isAbsolute()) {
+            if (!req.getServerName().equals(hrefUri.getHost())) {
+                return null;
+            }
+        }
+
+        if (hrefPath.length() > 1 && hrefPath.endsWith("/")) {
+            hrefPath = hrefPath.substring(0, hrefPath.length() - 1);
+        }
+
+        // Verify context path
+        String reqContextPath = getPathPrefix(req);
+        if (!hrefPath.startsWith(reqContextPath + "/")) {
+            return null;
+        }
+
+        // Remove context path & servlet path
+        hrefPath = hrefPath.substring(reqContextPath.length());
+
+        if (debug > 0) {
+            log(href + " Href path: " + hrefPath);
+        }
+
+        // Protect special subdirectories
+        if (isSpecialPath(hrefPath)) {
+            return null;
+        }
+
+        return hrefPath;
     }
 
     @Override
@@ -573,6 +742,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         WebResource resource = resources.getResource(path);
         if (!checkIfHeaders(req, resp, resource)) {
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
             return;
         }
 
@@ -670,6 +840,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         WebResource resource = resources.getResource(path);
         if (!checkIfHeaders(req, resp, resource)) {
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
             return;
         }
         if (!resource.exists()) {
@@ -882,6 +1053,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         WebResource resource = resources.getResource(path);
         if (!checkIfHeaders(req, resp, resource)) {
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
             return;
         }
 
@@ -935,15 +1107,17 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         String path = getRelativePath(req);
 
+        WebResource resource = resources.getResource(path);
+        if (!checkIfHeaders(req, resp, resource)) {
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+            return;
+        }
+
         if (isLocked(path, req)) {
             resp.sendError(WebdavStatus.SC_LOCKED);
             return;
         }
 
-        WebResource resource = resources.getResource(path);
-        if (!checkIfHeaders(req, resp, resource)) {
-            return;
-        }
         if (resource.isDirectory()) {
             sendNotAllowed(req, resp);
             return;
@@ -1023,6 +1197,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         WebResource resource = resources.getResource(path);
         if (!checkIfHeaders(req, resp, resource)) {
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
             return;
         }
 
@@ -1312,6 +1487,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     if (!resources.write(path, new ByteArrayInputStream(new byte[0]), false)) {
                         resp.sendError(WebdavStatus.SC_CONFLICT);
                         return;
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_CREATED);
                     }
                 }
 
@@ -1324,8 +1501,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 // Checking if there is already a shared lock on this path
                 LockInfo sharedLock = resourceLocks.get(path);
                 if (sharedLock == null) {
-                    resourceLocks.put(path, lock);
-                    sharedLock = lock;
+                    sharedLock = new LockInfo(maxDepth);
+                    sharedLock.scope = "shared";
+                    sharedLock.path = path;
+                    sharedLock.lockroot = lock.lockroot;
+                    sharedLock.depth = maxDepth;
+                    resourceLocks.put(path, sharedLock);
                 }
                 sharedLock.sharedTokens.add(lockToken);
                 sharedLocks.put(lockToken, lock);
@@ -1345,28 +1526,53 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 return;
             }
 
-            // Checking resource locks
-
-            LockInfo toRenew = resourceLocks.get(path);
-
-            if (toRenew != null) {
-                if (toRenew.isExclusive()) {
-                    if (ifHeader.contains(toRenew.token)) {
-                        toRenew.expiresAt = lock.expiresAt;
-                        lock = toRenew;
-                    }
-                } else {
-                    for (String token : toRenew.sharedTokens) {
-                        if (ifHeader.contains(token)) {
-                            toRenew = sharedLocks.get(token);
-                            if (toRenew != null) {
-                                toRenew.expiresAt = lock.expiresAt;
-                                lock = toRenew;
+            LockInfo toRenew = null;
+            String parentPath = path;
+            do {
+                LockInfo parentLock = resourceLocks.get(parentPath);
+                if (parentLock != null) {
+                    if (parentLock.hasExpired()) {
+                        resourceLocks.remove(parentPath);
+                    } else {
+                        if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
+                            if (parentLock.isExclusive()) {
+                                if (ifHeader.contains(parentLock.token)
+                                        && (parentLock.principal == null || parentLock.principal.equals(req.getRemoteUser()))) {
+                                    toRenew = parentLock;
+                                    break;
+                                }
+                            } else {
+                                for (String token : parentLock.sharedTokens) {
+                                    if (ifHeader.contains(token)) {
+                                        LockInfo sharedLock = sharedLocks.get(token);
+                                        if (sharedLock != null
+                                                && (sharedLock.principal == null || sharedLock.principal.equals(req.getRemoteUser()))) {
+                                            if ((parentPath != path && sharedLock.depth > 0) || parentPath == path) {
+                                                toRenew = sharedLock;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                int slash = parentPath.lastIndexOf('/');
+                if (slash < 0) {
+                    break;
+                }
+                parentPath = parentPath.substring(0, slash);
+            } while (true);
+
+            if (toRenew != null) {
+                if (!toRenew.hasExpired()) {
+                    toRenew.expiresAt = lock.expiresAt;
+                } else {
+                    toRenew = null;
+                }
             }
+            lock = toRenew;
         }
 
         // Set the status, then generate the XML response containing
@@ -1377,7 +1583,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         generatedXML.writeElement("D", "lockdiscovery", XMLWriter.OPENING);
 
-        lock.toXML(generatedXML);
+        if (lock != null) {
+            lock.toXML(generatedXML);
+        }
 
         generatedXML.writeElement("D", "lockdiscovery", XMLWriter.CLOSING);
 
@@ -1409,6 +1617,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         WebResource resource = resources.getResource(path);
         if (!checkIfHeaders(req, resp, resource)) {
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
             return;
         }
 
@@ -1438,13 +1647,15 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                 if (lockTokenHeader.contains(token)) {
                                     LockInfo lock = sharedLocks.get(token);
                                     if (lock == null || lock.principal == null || lock.principal.equals(req.getRemoteUser())) {
-                                        parentLock.sharedTokens.remove(token);
-                                        if (parentLock.sharedTokens.isEmpty()) {
-                                            resourceLocks.remove(parentPath);
+                                        if ((parentPath != path && lock.depth > 0) || parentPath == path) {
+                                            parentLock.sharedTokens.remove(token);
+                                            if (parentLock.sharedTokens.isEmpty()) {
+                                                resourceLocks.remove(parentPath);
+                                            }
+                                            sharedLocks.remove(token);
+                                            unlocked = true;
+                                            break;
                                         }
-                                        sharedLocks.remove(token);
-                                        unlocked = true;
-                                        break;
                                     }
                                 }
                             }
@@ -1511,6 +1722,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     private boolean isLocked(String path, String principal, String ifHeader) {
 
+        boolean unmatchedSharedLock = false;
         // Check if the resource or a parent is already locked
         String parentPath = path;
         do {
@@ -1521,26 +1733,26 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 } else {
                     if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
                         if (parentLock.isExclusive()) {
-                            if (ifHeader.contains(parentLock.token)
+                            if (ifHeader.contains(":" + parentLock.token + ">")
                                     && (parentLock.principal == null || parentLock.principal.equals(principal))) {
                                 return false;
                             }
+                            return true;
                         } else {
                             for (String token : parentLock.sharedTokens) {
-                                if (ifHeader.contains(token)) {
-                                    if (principal == null) {
-                                        return false;
-                                    } else {
-                                        LockInfo lock = sharedLocks.get(token);
-                                        if (lock == null || lock.principal == null || lock.principal.equals(principal)) {
+                                LockInfo lock = sharedLocks.get(token);
+                                if (lock != null) {
+                                    if ((parentPath != path && lock.depth > 0) || parentPath == path) {
+                                        if (ifHeader.contains(":" + token + ">")
+                                                && (lock == null || lock.principal == null || lock.principal.equals(principal))) {
                                             return false;
                                         }
+                                        unmatchedSharedLock = true;
                                     }
                                 }
                             }
                         }
                     }
-                    return true;
                 }
             }
             int slash = parentPath.lastIndexOf('/');
@@ -1550,7 +1762,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             parentPath = parentPath.substring(0, slash);
         } while (true);
 
-        return false;
+        return unmatchedSharedLock;
     }
 
 
@@ -1574,6 +1786,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return false;
         }
         if (!checkIfHeaders(req, resp, source)) {
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
             return false;
         }
 
@@ -1826,6 +2039,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private boolean deleteResource(String path, HttpServletRequest req, HttpServletResponse resp) throws IOException {
         WebResource resource = resources.getResource(path);
         if (!checkIfHeaders(req, resp, resource)) {
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
             return false;
         }
         return deleteResource(path, req, resp, true);
@@ -2111,12 +2325,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 }
                 propfindResource(path, null, false, generatedXML);
 
-                String supportedLocks = "<D:lockentry>" + "<D:lockscope><D:exclusive/></D:lockscope>" +
-                        "<D:locktype><D:write/></D:locktype>" + "</D:lockentry>" + "<D:lockentry>" +
-                        "<D:lockscope><D:shared/></D:lockscope>" + "<D:locktype><D:write/></D:locktype>" +
-                        "</D:lockentry>";
                 generatedXML.writeElement("D", "supportedlock", XMLWriter.OPENING);
-                generatedXML.writeRaw(supportedLocks);
+                generatedXML.writeRaw(SUPPORTED_LOCKS);
                 generatedXML.writeElement("D", "supportedlock", XMLWriter.CLOSING);
 
                 generateLockDiscovery(path, generatedXML);
@@ -2216,17 +2426,11 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                             generatedXML.writeElement("D", "resourcetype", XMLWriter.CLOSING);
                         }
                     } else if (property.equals("supportedlock")) {
-                        supportedLocks = "<D:lockentry>" + "<D:lockscope><D:exclusive/></D:lockscope>" +
-                                "<D:locktype><D:write/></D:locktype>" + "</D:lockentry>" + "<D:lockentry>" +
-                                "<D:lockscope><D:shared/></D:lockscope>" + "<D:locktype><D:write/></D:locktype>" +
-                                "</D:lockentry>";
                         generatedXML.writeElement("D", "supportedlock", XMLWriter.OPENING);
-                        generatedXML.writeRaw(supportedLocks);
+                        generatedXML.writeRaw(SUPPORTED_LOCKS);
                         generatedXML.writeElement("D", "supportedlock", XMLWriter.CLOSING);
                     } else if (property.equals("lockdiscovery")) {
-                        if (!generateLockDiscovery(path, generatedXML)) {
-                            propertiesNotFound.add(propertyNode);
-                        }
+                        generateLockDiscovery(path, generatedXML);
                     } else {
                         propertiesNotFound.add(propertyNode);
                     }
@@ -2289,12 +2493,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      *
      * @param path         Path
      * @param generatedXML XML data to which the locks info will be appended
-     *
-     * @return <code>true</code> if at least one lock was displayed
      */
-    private boolean generateLockDiscovery(String path, XMLWriter generatedXML) {
+    private void generateLockDiscovery(String path, XMLWriter generatedXML) {
 
-        boolean wroteStart = false;
+        generatedXML.writeElement("D", "lockdiscovery", XMLWriter.OPENING);
 
         String parentPath = path;
         do {
@@ -2305,23 +2507,17 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 } else {
                     if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
                         if (parentLock.isExclusive()) {
-                            if (!wroteStart) {
-                                wroteStart = true;
-                                generatedXML.writeElement("D", "lockdiscovery", XMLWriter.OPENING);
-                            }
                             parentLock.toXML(generatedXML);
                         } else {
                             for (String lockToken : parentLock.sharedTokens) {
-                                parentLock = sharedLocks.get(lockToken);
-                                if (parentLock != null) {
-                                    if (parentLock.hasExpired()) {
+                                LockInfo sharedLock = sharedLocks.get(lockToken);
+                                if (sharedLock != null) {
+                                    if (sharedLock.hasExpired()) {
                                         sharedLocks.remove(lockToken);
                                     } else {
-                                        if (!wroteStart) {
-                                            wroteStart = true;
-                                            generatedXML.writeElement("D", "lockdiscovery", XMLWriter.OPENING);
+                                        if ((parentPath != path && sharedLock.depth > 0) || parentPath == path) {
+                                            sharedLock.toXML(generatedXML);
                                         }
-                                        parentLock.toXML(generatedXML);
                                     }
                                 }
                             }
@@ -2336,13 +2532,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             parentPath = parentPath.substring(0, slash);
         } while (true);
 
-        if (wroteStart) {
-            generatedXML.writeElement("D", "lockdiscovery", XMLWriter.CLOSING);
-        } else {
-            return false;
-        }
-
-        return true;
+        generatedXML.writeElement("D", "lockdiscovery", XMLWriter.CLOSING);
     }
 
 
@@ -2455,7 +2645,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
          * @return true if the lock has expired.
          */
         public boolean hasExpired() {
-            return System.currentTimeMillis() > expiresAt;
+            return sharedTokens.size() == 0 && System.currentTimeMillis() > expiresAt;
         }
 
 
