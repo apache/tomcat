@@ -996,7 +996,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
-     * Apply proppatch to the specified path. This should be overriden by subclasses to provide
+     * Apply proppatch to the specified path. This should be overridden by subclasses to provide
      * useful behavior. The default implementation prevents setting protected properties
      * (anything from the DAV: namespace), and sets 507 for a set attempt on dead properties.
      *
@@ -1970,6 +1970,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     errorList.put(dest, Integer.valueOf(WebdavStatus.SC_CONFLICT));
                     return false;
                 }
+            } else {
+                copyResource(source, dest);
             }
 
             if (infiniteCopy) {
@@ -2012,6 +2014,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (!resources.write(dest, is, false)) {
                     errorList.put(source, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                     return false;
+                } else {
+                    copyResource(source, dest);
                 }
             } catch (IOException e) {
                 log(sm.getString("webdavservlet.inputstreamclosefail", source), e);
@@ -2023,6 +2027,16 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         return true;
     }
 
+    /**
+     * Copy resource. This should be overridden by subclasses to provide
+     * useful behavior. The default implementation prevents setting protected properties
+     * (anything from the DAV: namespace), and sets 507 for a set attempt on dead properties.
+     *
+     * @param source the copy source path
+     * @param dest the copy destination path
+     */
+    protected void copyResource(String source, String dest) {
+    }
 
     /**
      * Delete a resource.
@@ -2077,7 +2091,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 sendNotAllowed(req, resp);
                 return false;
             }
-            unlockResource(path, null);
+            deleteResource(path);
         } else {
 
             Map<String,Integer> errorList = new LinkedHashMap<>();
@@ -2100,7 +2114,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     errorList.put(path, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
                 }
             } else {
-                unlockResource(path, null);
+                deleteResource(path);
             }
 
             if (!errorList.isEmpty()) {
@@ -2112,6 +2126,17 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             resp.setStatus(WebdavStatus.SC_NO_CONTENT);
         }
         return true;
+    }
+
+    /**
+     * Delete specified resource. This should be overridden by subclasses to provide
+     * useful behavior. The default implementation prevents setting protected properties
+     * (anything from the DAV: namespace), and sets 507 for a set attempt on dead properties.
+     *
+     * @param path the path of the resource to delete
+     */
+    protected void deleteResource(String path) {
+        unlockResource(path, null);
     }
 
     private void unlockResource(String path, String lockToken) {
@@ -2201,7 +2226,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         errorList.put(childName, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
                     }
                 } else {
-                    unlockResource(childName, null);
+                    deleteResource(childName);
                 }
             }
         }
@@ -2305,9 +2330,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
 
                 generatedXML.writeProperty("D", "creationdate", getISOCreationDate(created));
-                generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
-                generatedXML.writeData(resourceName);
-                generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
                 if (isFile) {
                     generatedXML.writeProperty("D", "getlastmodified", FastHttpDateFormat.formatDate(lastModified));
                     generatedXML.writeProperty("D", "getcontentlength", Long.toString(contentLength));
@@ -2344,7 +2366,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
 
                 generatedXML.writeElement("D", "creationdate", XMLWriter.NO_CONTENT);
-                generatedXML.writeElement("D", "displayname", XMLWriter.NO_CONTENT);
                 if (isFile) {
                     generatedXML.writeElement("D", "getcontentlanguage", XMLWriter.NO_CONTENT);
                     generatedXML.writeElement("D", "getcontentlength", XMLWriter.NO_CONTENT);
@@ -2474,7 +2495,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
-     * Generate propfind XML fragments for dead properties.
+     * Generate propfind XML fragments for dead properties. This should be overridden by subclasses to provide
+     * useful behavior. The default implementation prevents setting protected properties
+     * (anything from the DAV: namespace), and sets 507 for a set attempt on dead properties.
      *
      * @param path the resource path
      * @param property the dead property, if null then all dead properties must be written
@@ -2483,6 +2506,30 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * @return true if property was specified and a corresponding dead property was found on the resource, false otherwise
      */
     protected boolean propfindResource(String path, Node property, boolean nameOnly, XMLWriter generatedXML) {
+        if (nameOnly) {
+            generatedXML.writeElement("D", "displayname", XMLWriter.NO_CONTENT);
+        } else if (property == null) {
+            String resourceName = path;
+            int lastSlash = path.lastIndexOf('/');
+            if (lastSlash != -1) {
+                resourceName = resourceName.substring(lastSlash + 1);
+            }
+            generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
+            generatedXML.writeData(resourceName);
+            generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
+        } else {
+            String davName = getDAVNode(property);
+            if ("displayname".equals(davName)) {
+                String resourceName = path;
+                int lastSlash = path.lastIndexOf('/');
+                if (lastSlash != -1) {
+                    resourceName = resourceName.substring(lastSlash + 1);
+                }
+                generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
+                generatedXML.writeData(resourceName);
+                generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
+            }
+        }
         return false;
     }
 
@@ -2581,7 +2628,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     private static String getDAVNode(Node node) {
-        if (node.getNamespaceURI().equals(DEFAULT_NAMESPACE)) {
+        if (DEFAULT_NAMESPACE.equals(node.getNamespaceURI())) {
             return node.getLocalName();
         }
         return null;
@@ -2737,7 +2784,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         public ProppatchOperation(PropertyUpdateType updateType, Node propertyNode) {
             this.updateType = updateType;
             this.propertyNode = propertyNode;
-            protectedProperty = getDAVNode(propertyNode) != null;
+            String davName = getDAVNode(propertyNode);
+            protectedProperty = davName != null
+                    && (!(davName.equals("displayname") || davName.equals("getcontentlanguage")));
         }
         /**
          * @return the updateType
