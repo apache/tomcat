@@ -437,7 +437,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.setRequest(new String[] { "PUT /myfolder/file4.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
                 "Content-Length: 6" + SimpleHttpClient.CRLF +
-                "If: (" + lockToken + ")" + SimpleHttpClient.CRLF +
+                "If: </myfolder/> (" + lockToken + ")" + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
                 SimpleHttpClient.CRLF + CONTENT });
         client.connect();
@@ -454,8 +454,18 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(WebdavStatus.SC_LOCKED, client.getStatusCode());
 
+        client.setRequest(new String[] { "UNLOCK /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Lock-Token: <my:locktoken>" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CONFLICT, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("<D:href>/myfolder</D:href>"));
+
         // Unlock /myfolder
-        client.setRequest(new String[] { "UNLOCK /myfolder HTTP/1.1" + SimpleHttpClient.CRLF +
+        client.setRequest(new String[] { "UNLOCK /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
                 "Lock-Token: " + lockToken + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
@@ -534,6 +544,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // Lock /myfolder again
         client.setRequest(new String[] { "LOCK /myfolder HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Timeout: Second-20" + SimpleHttpClient.CRLF +
                 "Content-Length: " + LOCK_BODY.length() + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
                 SimpleHttpClient.CRLF + LOCK_BODY });
@@ -598,6 +609,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         Assert.assertFalse(client.getResponseBody().contains("/myfolder/file4.txt"));
         Assert.assertTrue(client.getResponseBody().contains("/file7.txt"));
+        Assert.assertTrue(client.getResponseBody().contains("Second-"));
+        String timeoutValue = client.getResponseBody().substring(client.getResponseBody().indexOf("Second-"));
+        timeoutValue = timeoutValue.substring("Second-".length(), timeoutValue.indexOf('<'));
+        Assert.assertTrue(Integer.valueOf(timeoutValue) <= 20);
 
         // Unlock /myfolder again
         client.setRequest(new String[] { "UNLOCK /myfolder/ HTTP/1.1" + SimpleHttpClient.CRLF +
@@ -755,6 +770,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // Lock refresh /myfolder
         client.setRequest(new String[] { "LOCK /myfolder HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Timeout: Infinite" + SimpleHttpClient.CRLF +
                 "If: (" + lockToken + ")" + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
                 SimpleHttpClient.CRLF });
@@ -805,6 +821,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("Second-"));
+        String timeoutValue = client.getResponseBody().substring(client.getResponseBody().indexOf("Second-"));
+        timeoutValue = timeoutValue.substring("Second-".length(), timeoutValue.indexOf('<'));
+        Assert.assertTrue(Integer.valueOf(timeoutValue) > 100000);
 
         client.setRequest(new String[] { "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
@@ -823,7 +843,27 @@ public class TestWebdavServlet extends TomcatBaseTest {
                 SimpleHttpClient.CRLF + CONTENT });
         client.connect();
         client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_PRECONDITION_FAILED, client.getStatusCode());
+
+        client.setRequest(new String[] { "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "If: </myfolder/myfolder2/myfolder4/myfolder5> (" + lockToken + ")" + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        client.setRequest(new String[] { "UNLOCK /myfolder/myfolder3 HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Lock-Token: " + lockToken2 + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CONFLICT, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("<D:lock-token-matches-request-uri/>"));
 
         client.setRequest(new String[] { "UNLOCK /myfolder/myfolder2/myfolder4/myfolder5 HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
