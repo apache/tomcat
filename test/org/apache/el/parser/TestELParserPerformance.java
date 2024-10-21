@@ -342,6 +342,7 @@ public class TestELParserPerformance {
         BeanClassA beanA = new BeanClassA();
         BeanClassB beanB = new BeanClassB();
         beanA.setBean(beanB);
+        beanA.setName("name");
         beanB.setName("name");
         beanA.setStringMap(new HashMap<>());
         beanA.setValList(new ArrayList<>(Arrays.asList("a", "b", "c")));
