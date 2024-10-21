@@ -530,6 +530,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * normal viewing.
      *
      * @param request The servlet request we are processing
+     * @param allowEmptyPath Used only to identify a call from DefaultServlet, to avoid removing the trailing slash
+     * @return the relative path
      */
     @Override
     protected String getRelativePath(HttpServletRequest request, boolean allowEmptyPath) {
@@ -550,7 +552,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             result.append('/');
         }
         String resultString = result.toString();
-        if (resultString.length() > 1 && resultString.endsWith("/")) {
+        if (!allowEmptyPath && resultString.length() > 1 && resultString.endsWith("/")) {
             resultString = resultString.substring(0, resultString.length() - 1);
         }
         return resultString;
