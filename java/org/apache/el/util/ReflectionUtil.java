@@ -16,6 +16,7 @@
  */
 package org.apache.el.util;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -25,6 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.el.ELException;
 import javax.el.MethodNotFoundException;
@@ -45,6 +47,8 @@ public class ReflectionUtil {
 
     protected static final Class<?>[] PRIMITIVES = new Class[] { boolean.class, byte.class, char.class, double.class,
             float.class, int.class, long.class, short.class, Void.TYPE };
+
+    private static final Map<String, WeakReference<Method[]>> METHODS_BY_CLASS_NAME = new ConcurrentHashMap<>();
 
     private ReflectionUtil() {
         super();
@@ -151,7 +155,7 @@ public class ReflectionUtil {
             paramCount = paramTypes.length;
         }
 
-        Method[] methods = base.getClass().getMethods();
+        Method[] methods = getMethodsFromCache(base.getClass());
         Map<Method,MatchResult> candidates = new HashMap<>();
 
         for (Method m : methods) {
@@ -601,5 +605,28 @@ public class ReflectionUtil {
             result = prime * result + varArgsCount;
             return result;
         }
+    }
+
+
+    /**
+     * Accesses cached copies of Class.getMethods() (when available) to avoid the JVM's expensive duplication of the
+     * Method[] and Method objects. Avoids ClassLoader memory leaks by keying off the class name (String) and keeping
+     * WeakReferences to the data.
+     * 
+     * @param clazz
+     * @return Method[]
+     */
+    private static Method[] getMethodsFromCache(Class<?> clazz) {
+        WeakReference<Method[]> weakRef = METHODS_BY_CLASS_NAME.get(clazz.getName());
+        Method[] methods;
+        // Check if cache contains a value - entry must exist, and weak ref must be
+        // populated
+        if (weakRef == null || (methods = weakRef.get()) == null) {
+            // no data found - either key is not present, or the weak ref is empty
+            methods = clazz.getMethods();
+            weakRef = new WeakReference<>(methods);
+            METHODS_BY_CLASS_NAME.put(clazz.getName(), weakRef);
+        }
+        return methods;
     }
 }
