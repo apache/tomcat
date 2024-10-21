@@ -261,7 +261,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Is the if header processing strict.
      */
-    private boolean strictIfProcessing = false;
+    private boolean strictIfProcessing = true;
 
 
     // --------------------------------------------------------- Public Methods
@@ -1225,23 +1225,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         int lockDuration = DEFAULT_TIMEOUT;
         String lockDurationStr = req.getHeader("Timeout");
         if (lockDurationStr != null) {
-            int commaPos = lockDurationStr.indexOf(',');
-            // If multiple timeouts, just use the first
-            if (commaPos != -1) {
-                lockDurationStr = lockDurationStr.substring(0, commaPos);
-            }
             if (lockDurationStr.startsWith("Second-")) {
-                lockDuration = Integer.parseInt(lockDurationStr.substring(7));
-            } else {
-                if (lockDurationStr.equalsIgnoreCase("infinity")) {
-                    lockDuration = MAX_TIMEOUT;
-                } else {
-                    try {
-                        lockDuration = Integer.parseInt(lockDurationStr);
-                    } catch (NumberFormatException e) {
-                        lockDuration = MAX_TIMEOUT;
-                    }
+                try {
+                    lockDuration = Integer.parseInt(lockDurationStr.substring("Second-".length()));
+                } catch (NumberFormatException e) {
+                    // Ignore
                 }
+            } else if (lockDurationStr.equals("Infinite")) {
+                lockDuration = MAX_TIMEOUT;
             }
             if (lockDuration == 0) {
                 lockDuration = DEFAULT_TIMEOUT;
@@ -1640,6 +1631,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                     && (parentLock.principal == null || parentLock.principal.equals(req.getRemoteUser()))) {
                                 resourceLocks.remove(parentPath);
                                 unlocked = true;
+                                break;
+                            } else {
+                                // No parent exclusive lock will be found
+                                unlocked = false;
                                 break;
                             }
                         } else {
