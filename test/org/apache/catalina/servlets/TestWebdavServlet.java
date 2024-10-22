@@ -295,6 +295,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("<T:othercustomprop"));
+        validateXml(client.getResponseBody());
 
         client.setRequest(new String[] { "PROPFIND /file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
@@ -338,6 +339,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertTrue(client.getResponseBody().contains("<D:getcontenttype>"));
         Assert.assertFalse(client.getResponseBody().contains("<D:getlastmodified>"));
         Assert.assertTrue(client.getResponseBody().contains("<myvalue xmlns=\"http://tomcat.apache.org/testsuite\">"));
+        validateXml(client.getResponseBody());
 
     }
 
@@ -649,6 +651,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         Assert.assertFalse(client.getResponseBody().contains("/myfolder"));
+        validateXml(client.getResponseBody());
 
     }
 
@@ -812,6 +815,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
             }
         }
         Assert.assertNotNull(lockToken3);
+        validateXml(client.getResponseBody());
 
         client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
@@ -825,6 +829,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         String timeoutValue = client.getResponseBody().substring(client.getResponseBody().indexOf("Second-"));
         timeoutValue = timeoutValue.substring("Second-".length(), timeoutValue.indexOf('<'));
         Assert.assertTrue(Integer.valueOf(timeoutValue).intValue() > 100000);
+        validateXml(client.getResponseBody());
 
         client.setRequest(new String[] { "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
@@ -919,6 +924,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         // Verify all the shared locks are cleared
         Assert.assertFalse(client.getResponseBody().contains("opaquelocktoken:"));
+        validateXml(client.getResponseBody());
 
     }
 
@@ -1026,6 +1032,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(WebdavStatus.SC_CREATED, client.getStatusCode());
 
+    }
+
+    private void validateXml(String xmlContent) throws Exception {
+        SAXParserFactory.newInstance().newSAXParser().getXMLReader().parse(new InputSource(new StringReader(xmlContent)));
     }
 
     private static final class Client extends SimpleHttpClient {
