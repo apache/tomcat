@@ -1734,7 +1734,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                 if (lock != null) {
                                     if ((parentPath != path && lock.depth > 0) || parentPath == path) {
                                         if (ifHeader.contains(":" + token + ">")
-                                                && (lock == null || lock.principal == null || lock.principal.equals(principal))) {
+                                                && (lock.principal == null || lock.principal.equals(principal))) {
                                             return false;
                                         }
                                         unmatchedSharedLock = true;
