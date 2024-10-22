@@ -260,6 +260,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
     // --------------------------------------------------------- Public Methods
 
+
     @Override
     public void init() throws ServletException {
 
@@ -320,7 +321,112 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
     }
 
+
     // ------------------------------------------------------ Protected Methods
+
+
+    /**
+     * Copy resource. This should be overridden by subclasses to provide useful behavior. The default implementation
+     * prevents setting protected properties (anything from the DAV: namespace), and sets 507 for a set attempt on dead
+     * properties.
+     *
+     * @param source the copy source path
+     * @param dest   the copy destination path
+     */
+    protected void copyResource(String source, String dest) {
+    }
+
+
+    /**
+     * Delete specified resource. This should be overridden by subclasses to provide useful behavior. The default
+     * implementation prevents setting protected properties (anything from the DAV: namespace), and sets 507 for a set
+     * attempt on dead properties.
+     *
+     * @param path the path of the resource to delete
+     */
+    protected void deleteResource(String path) {
+        unlockResource(path, null);
+    }
+
+
+    /**
+     * Generate propfind XML fragments for dead properties. This should be overridden by subclasses to provide useful
+     * behavior. The default implementation prevents setting protected properties (anything from the DAV: namespace),
+     * and sets 507 for a set attempt on dead properties.
+     *
+     * @param path         the resource path
+     * @param property     the dead property, if null then all dead properties must be written
+     * @param nameOnly     true if only the property name element should be generated
+     * @param generatedXML the current generated XML for the PROPFIND response
+     *
+     * @return true if property was specified and a corresponding dead property was found on the resource, false
+     *             otherwise
+     */
+    protected boolean propfindResource(String path, Node property, boolean nameOnly, XMLWriter generatedXML) {
+        if (nameOnly) {
+            generatedXML.writeElement("D", "displayname", XMLWriter.NO_CONTENT);
+        } else if (property == null) {
+            String resourceName = path;
+            int lastSlash = path.lastIndexOf('/');
+            if (lastSlash != -1) {
+                resourceName = resourceName.substring(lastSlash + 1);
+            }
+            generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
+            generatedXML.writeData(resourceName);
+            generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
+        } else {
+            String davName = getDAVNode(property);
+            if ("displayname".equals(davName)) {
+                String resourceName = path;
+                int lastSlash = path.lastIndexOf('/');
+                if (lastSlash != -1) {
+                    resourceName = resourceName.substring(lastSlash + 1);
+                }
+                generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
+                generatedXML.writeData(resourceName);
+                generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
+            }
+        }
+        return false;
+    }
+
+
+    /**
+     * Apply proppatch to the specified path. This should be overridden by subclasses to provide useful behavior. The
+     * default implementation prevents setting protected properties (anything from the DAV: namespace), and sets 507 for
+     * a set attempt on dead properties.
+     *
+     * @param path       the resource path on which to apply the proppatch
+     * @param operations the set and remove to apply, the final status codes of the result should be set on each
+     *                       operation
+     */
+    protected void proppatchResource(String path, ArrayList<ProppatchOperation> operations) {
+        boolean setProperty = false;
+        boolean protectedProperty = false;
+        // Check for the protected properties
+        for (ProppatchOperation operation : operations) {
+            if (operation.getUpdateType() == PropertyUpdateType.SET) {
+                setProperty = true;
+            }
+            if (operation.getProtectedProperty()) {
+                protectedProperty = true;
+                operation.setStatusCode(HttpServletResponse.SC_FORBIDDEN);
+            }
+        }
+        if (protectedProperty) {
+            for (ProppatchOperation operation : operations) {
+                if (!operation.getProtectedProperty()) {
+                    operation.setStatusCode(WebdavStatus.SC_FAILED_DEPENDENCY);
+                }
+            }
+        } else if (setProperty) {
+            // No dead property support
+            for (ProppatchOperation operation : operations) {
+                operation.setStatusCode(WebdavStatus.SC_INSUFFICIENT_STORAGE);
+            }
+        }
+    }
+
 
     /**
      * Return JAXP document builder instance.
@@ -346,9 +452,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
 
-    /**
-     * Handles the special WebDAV methods.
-     */
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -396,19 +499,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             // DefaultServlet processing
             super.service(req, resp);
         }
-    }
-
-
-    /**
-     * Checks whether a given path refers to a resource under <code>WEB-INF</code> or <code>META-INF</code>.
-     *
-     * @param path the full path of the resource being accessed
-     *
-     * @return <code>true</code> if the resource specified is under a special path
-     */
-    private boolean isSpecialPath(final String path) {
-        return !allowSpecialPaths && (path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
-                path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"));
     }
 
 
@@ -565,74 +655,40 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
 
-    private String getEncodedPath(String path, WebResource resource, HttpServletRequest request) {
-        String href = getPathPrefix(request);
-        if ((href.endsWith("/")) && (path.startsWith("/"))) {
-            href += path.substring(1);
-        } else {
-            href += path;
-        }
-        if (resource != null && resource.isDirectory() && (!href.endsWith("/"))) {
-            href += "/";
-        }
+    @Override
+    protected String determineMethodsAllowed(HttpServletRequest req) {
 
-        return rewriteUrl(href);
-    }
+        WebResource resource = resources.getResource(getRelativePath(req));
 
-    private String getUriPrefix(HttpServletRequest request) {
-        return request.getScheme() + "://" + request.getServerName();
-    }
+        // These methods are always allowed. They may return a 404 (not a 405)
+        // if the resource does not exist.
+        StringBuilder methodsAllowed = new StringBuilder("OPTIONS, GET, POST, HEAD");
 
-    private String getPathFromHref(String href, HttpServletRequest req) {
-
-        if (href == null || href.isEmpty()) {
-            return null;
-        }
-
-        URI hrefUri;
-        try {
-            hrefUri = new URI(href);
-        } catch (URISyntaxException e) {
-            return null;
-        }
-
-        String hrefPath = hrefUri.getPath();
-
-        // Avoid path traversals
-        if (!hrefPath.equals(RequestUtil.normalize(hrefPath))) {
-            return null;
-        }
-
-        if (hrefUri.isAbsolute()) {
-            if (!req.getServerName().equals(hrefUri.getHost())) {
-                return null;
+        if (!readOnly) {
+            methodsAllowed.append(", DELETE");
+            if (!resource.isDirectory()) {
+                methodsAllowed.append(", PUT");
             }
         }
 
-        if (hrefPath.length() > 1 && hrefPath.endsWith("/")) {
-            hrefPath = hrefPath.substring(0, hrefPath.length() - 1);
+        // Trace - assume disabled unless we can prove otherwise
+        if (req instanceof RequestFacade && ((RequestFacade) req).getAllowTrace()) {
+            methodsAllowed.append(", TRACE");
         }
 
-        // Verify context path
-        String reqContextPath = getPathPrefix(req);
-        if (!hrefPath.startsWith(reqContextPath + "/")) {
-            return null;
+        methodsAllowed.append(", LOCK, UNLOCK, PROPPATCH, COPY, MOVE");
+
+        if (listings) {
+            methodsAllowed.append(", PROPFIND");
         }
 
-        // Remove context path & servlet path
-        hrefPath = hrefPath.substring(reqContextPath.length());
-
-        if (debug > 0) {
-            log(href + " Href path: " + hrefPath);
+        if (!resource.exists()) {
+            methodsAllowed.append(", MKCOL");
         }
 
-        // Protect special subdirectories
-        if (isSpecialPath(hrefPath)) {
-            return null;
-        }
-
-        return hrefPath;
+        return methodsAllowed.toString();
     }
+
 
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -991,43 +1047,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         generatedXML.sendData();
 
-    }
-
-
-    /**
-     * Apply proppatch to the specified path. This should be overridden by subclasses to provide useful behavior. The
-     * default implementation prevents setting protected properties (anything from the DAV: namespace), and sets 507 for
-     * a set attempt on dead properties.
-     *
-     * @param path       the resource path on which to apply the proppatch
-     * @param operations the set and remove to apply, the final status codes of the result should be set on each
-     *                       operation
-     */
-    protected void proppatchResource(String path, ArrayList<ProppatchOperation> operations) {
-        boolean setProperty = false;
-        boolean protectedProperty = false;
-        // Check for the protected properties
-        for (ProppatchOperation operation : operations) {
-            if (operation.getUpdateType() == PropertyUpdateType.SET) {
-                setProperty = true;
-            }
-            if (operation.getProtectedProperty()) {
-                protectedProperty = true;
-                operation.setStatusCode(HttpServletResponse.SC_FORBIDDEN);
-            }
-        }
-        if (protectedProperty) {
-            for (ProppatchOperation operation : operations) {
-                if (!operation.getProtectedProperty()) {
-                    operation.setStatusCode(WebdavStatus.SC_FAILED_DEPENDENCY);
-                }
-            }
-        } else if (setProperty) {
-            // No dead property support
-            for (ProppatchOperation operation : operations) {
-                operation.setStatusCode(WebdavStatus.SC_INSUFFICIENT_STORAGE);
-            }
-        }
     }
 
 
@@ -1673,7 +1692,94 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
     }
 
+
     // -------------------------------------------------------- Private Methods
+
+
+    /**
+     * Checks whether a given path refers to a resource under <code>WEB-INF</code> or <code>META-INF</code>.
+     *
+     * @param path the full path of the resource being accessed
+     *
+     * @return <code>true</code> if the resource specified is under a special path
+     */
+    private boolean isSpecialPath(final String path) {
+        return !allowSpecialPaths && (path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
+                path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"));
+    }
+
+
+    private String getEncodedPath(String path, WebResource resource, HttpServletRequest request) {
+        String href = getPathPrefix(request);
+        if ((href.endsWith("/")) && (path.startsWith("/"))) {
+            href += path.substring(1);
+        } else {
+            href += path;
+        }
+        if (resource != null && resource.isDirectory() && (!href.endsWith("/"))) {
+            href += "/";
+        }
+
+        return rewriteUrl(href);
+    }
+
+
+    private String getUriPrefix(HttpServletRequest request) {
+        return request.getScheme() + "://" + request.getServerName();
+    }
+
+
+    private String getPathFromHref(String href, HttpServletRequest req) {
+
+        if (href == null || href.isEmpty()) {
+            return null;
+        }
+
+        URI hrefUri;
+        try {
+            hrefUri = new URI(href);
+        } catch (URISyntaxException e) {
+            return null;
+        }
+
+        String hrefPath = hrefUri.getPath();
+
+        // Avoid path traversals
+        if (!hrefPath.equals(RequestUtil.normalize(hrefPath))) {
+            return null;
+        }
+
+        if (hrefUri.isAbsolute()) {
+            if (!req.getServerName().equals(hrefUri.getHost())) {
+                return null;
+            }
+        }
+
+        if (hrefPath.length() > 1 && hrefPath.endsWith("/")) {
+            hrefPath = hrefPath.substring(0, hrefPath.length() - 1);
+        }
+
+        // Verify context path
+        String reqContextPath = getPathPrefix(req);
+        if (!hrefPath.startsWith(reqContextPath + "/")) {
+            return null;
+        }
+
+        // Remove context path & servlet path
+        hrefPath = hrefPath.substring(reqContextPath.length());
+
+        if (debug > 0) {
+            log(href + " Href path: " + hrefPath);
+        }
+
+        // Protect special subdirectories
+        if (isSpecialPath(hrefPath)) {
+            return null;
+        }
+
+        return hrefPath;
+    }
+
 
     /**
      * Check to see if a resource is currently write locked. The method will look at the "If" header to make sure the
@@ -2024,16 +2130,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         return true;
     }
 
-    /**
-     * Copy resource. This should be overridden by subclasses to provide useful behavior. The default implementation
-     * prevents setting protected properties (anything from the DAV: namespace), and sets 507 for a set attempt on dead
-     * properties.
-     *
-     * @param source the copy source path
-     * @param dest   the copy destination path
-     */
-    protected void copyResource(String source, String dest) {
-    }
 
     /**
      * Delete a resource.
@@ -2125,17 +2221,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         return true;
     }
 
-    /**
-     * Delete specified resource. This should be overridden by subclasses to provide useful behavior. The default
-     * implementation prevents setting protected properties (anything from the DAV: namespace), and sets 507 for a set
-     * attempt on dead properties.
-     *
-     * @param path the path of the resource to delete
-     */
-    protected void deleteResource(String path) {
-        unlockResource(path, null);
-    }
-
     private void unlockResource(String path, String lockToken) {
         LockInfo lock = resourceLocks.get(path);
         if (lock != null) {
@@ -2157,6 +2242,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             }
         }
     }
+
 
     /**
      * Deletes a collection.
@@ -2492,48 +2578,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
-     * Generate propfind XML fragments for dead properties. This should be overridden by subclasses to provide useful
-     * behavior. The default implementation prevents setting protected properties (anything from the DAV: namespace),
-     * and sets 507 for a set attempt on dead properties.
-     *
-     * @param path         the resource path
-     * @param property     the dead property, if null then all dead properties must be written
-     * @param nameOnly     true if only the property name element should be generated
-     * @param generatedXML the current generated XML for the PROPFIND response
-     *
-     * @return true if property was specified and a corresponding dead property was found on the resource, false
-     *             otherwise
-     */
-    protected boolean propfindResource(String path, Node property, boolean nameOnly, XMLWriter generatedXML) {
-        if (nameOnly) {
-            generatedXML.writeElement("D", "displayname", XMLWriter.NO_CONTENT);
-        } else if (property == null) {
-            String resourceName = path;
-            int lastSlash = path.lastIndexOf('/');
-            if (lastSlash != -1) {
-                resourceName = resourceName.substring(lastSlash + 1);
-            }
-            generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
-            generatedXML.writeData(resourceName);
-            generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
-        } else {
-            String davName = getDAVNode(property);
-            if ("displayname".equals(davName)) {
-                String resourceName = path;
-                int lastSlash = path.lastIndexOf('/');
-                if (lastSlash != -1) {
-                    resourceName = resourceName.substring(lastSlash + 1);
-                }
-                generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
-                generatedXML.writeData(resourceName);
-                generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
-            }
-        }
-        return false;
-    }
-
-
-    /**
      * Print the lock discovery information associated with a path.
      *
      * @param path         Path
@@ -2588,41 +2632,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     private String getISOCreationDate(long creationDate) {
         return creationDateFormat.format(new Date(creationDate));
-    }
-
-
-    @Override
-    protected String determineMethodsAllowed(HttpServletRequest req) {
-
-        WebResource resource = resources.getResource(getRelativePath(req));
-
-        // These methods are always allowed. They may return a 404 (not a 405)
-        // if the resource does not exist.
-        StringBuilder methodsAllowed = new StringBuilder("OPTIONS, GET, POST, HEAD");
-
-        if (!readOnly) {
-            methodsAllowed.append(", DELETE");
-            if (!resource.isDirectory()) {
-                methodsAllowed.append(", PUT");
-            }
-        }
-
-        // Trace - assume disabled unless we can prove otherwise
-        if (req instanceof RequestFacade && ((RequestFacade) req).getAllowTrace()) {
-            methodsAllowed.append(", TRACE");
-        }
-
-        methodsAllowed.append(", LOCK, UNLOCK, PROPPATCH, COPY, MOVE");
-
-        if (listings) {
-            methodsAllowed.append(", PROPFIND");
-        }
-
-        if (!resource.exists()) {
-            methodsAllowed.append(", MKCOL");
-        }
-
-        return methodsAllowed.toString();
     }
 
 
@@ -2754,6 +2763,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     // --------------------------------------------- WebdavResolver Inner Class
+
     /**
      * Work around for XML parsers that don't fully respect
      * {@link DocumentBuilderFactory#setExpandEntityReferences(boolean)} when called with <code>false</code>. External
@@ -2773,59 +2783,70 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
     }
 
-    enum PropertyUpdateType {
-        SET,
-        REMOVE
-    }
+    // ----------------------------------------- ProppatchOperation Inner Class
 
+    /**
+     * Represents a PROPPATCH sub operation to be performed.
+     */
     protected static class ProppatchOperation {
         private final PropertyUpdateType updateType;
         private final Node propertyNode;
         private final boolean protectedProperty;
         private int statusCode = HttpServletResponse.SC_OK;
 
+        /**
+         * PROPPATCH operation constructor.
+         * @param updateType the update type, either SET or REMOVE
+         * @param propertyNode the XML node that contains the property name (and value if SET)
+         */
         public ProppatchOperation(PropertyUpdateType updateType, Node propertyNode) {
             this.updateType = updateType;
             this.propertyNode = propertyNode;
             String davName = getDAVNode(propertyNode);
+            // displayname and getcontentlanguage are the DAV: properties that should not be protected
             protectedProperty =
                     davName != null && (!(davName.equals("displayname") || davName.equals("getcontentlanguage")));
         }
 
         /**
-         * @return the updateType
+         * @return the updateType for this operation
          */
         public PropertyUpdateType getUpdateType() {
             return this.updateType;
         }
 
         /**
-         * @return the propertyNode
+         * @return the propertyNode the XML node that contains the property name (and value if SET)
          */
         public Node getPropertyNode() {
             return this.propertyNode;
         }
 
         /**
-         * @return the statusCode
+         * @return the statusCode the statusCode to set as a result of the operation
          */
         public int getStatusCode() {
             return this.statusCode;
         }
 
         /**
-         * @param statusCode the statusCode to set
+         * @param statusCode the statusCode to set as a result of the operation
          */
         public void setStatusCode(int statusCode) {
             this.statusCode = statusCode;
         }
 
         /**
-         * @return the protectedProperty
+         * @return <code>true</code> if the property is protected
          */
         public boolean getProtectedProperty() {
             return this.protectedProperty;
         }
+    }
+
+    enum PropertyUpdateType {
+        SET,
+        REMOVE
     }
 
 }
