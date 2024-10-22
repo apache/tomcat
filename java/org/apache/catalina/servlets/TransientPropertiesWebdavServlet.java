@@ -83,7 +83,8 @@ public class TransientPropertiesWebdavServlet extends WebdavServlet {
                         if (!found) {
                             properties.add(node);
                         }
-                    } if (operation.getUpdateType() == PropertyUpdateType.REMOVE) {
+                    }
+                    if (operation.getUpdateType() == PropertyUpdateType.REMOVE) {
                         Node node = operation.getPropertyNode();
                         for (int i = 0; i < properties.size(); i++) {
                             Node propertyNode = properties.get(i);
@@ -106,9 +107,8 @@ public class TransientPropertiesWebdavServlet extends WebdavServlet {
                 if (nameOnly) {
                     // Add the names of all properties
                     for (Node node : properties) {
-                        generatedXML.writeElement(node.getPrefix(),
-                                node.getNamespaceURI(),
-                                node.getLocalName(), XMLWriter.NO_CONTENT);
+                        generatedXML.writeElement(node.getPrefix(), node.getNamespaceURI(), node.getLocalName(),
+                                XMLWriter.NO_CONTENT);
                     }
                 } else if (property != null) {
                     // Add a single property
@@ -176,9 +176,9 @@ public class TransientPropertiesWebdavServlet extends WebdavServlet {
     }
 
     private boolean propertyEquals(Node node1, Node node2) {
-        if (node1.getLocalName().equals(node2.getLocalName())
-                && ((node1.getNamespaceURI() == null && node2.getNamespaceURI() == null)
-                        || (node1.getNamespaceURI() != null && node1.getNamespaceURI().equals(node2.getNamespaceURI())))) {
+        if (node1.getLocalName().equals(node2.getLocalName()) &&
+                ((node1.getNamespaceURI() == null && node2.getNamespaceURI() == null) ||
+                        (node1.getNamespaceURI() != null && node1.getNamespaceURI().equals(node2.getNamespaceURI())))) {
             return true;
         }
         return false;
