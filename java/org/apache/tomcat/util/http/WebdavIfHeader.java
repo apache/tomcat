@@ -869,6 +869,7 @@ public class WebdavIfHeader {
          * @return <code>True</code> if any of the {@link IfList}s matches the token
          *      and etag, else <code>false</code> is returned.
          */
+        @Override
         public boolean matches(String resource, List<String> tokens, String etag) {
             if (log.isTraceEnabled()) {
                 log.trace("matches: Trying to match token=" + tokens + ", etag=" + etag);
@@ -913,6 +914,7 @@ public class WebdavIfHeader {
          * @return <code>true</code> if either no entry exists for the resource
          *      or if the entry for the resource matches the token and etag.
          */
+        @Override
         public boolean matches(String resource, List<String> tokens, String etag) {
             if (log.isTraceEnabled()) {
                 log.trace("matches: Trying to match resource=" + resource + ", token=" + tokens + "," + etag);
