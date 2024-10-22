@@ -22,6 +22,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
@@ -61,7 +62,7 @@ public class CheckEol extends Task {
      * @param mode The line ending mode (either LF or CRLF)
      */
     public void setMode( String mode ) {
-        this.mode = Mode.valueOf( mode.toUpperCase() );
+        this.mode = Mode.valueOf( mode.toUpperCase(Locale.ENGLISH) );
     }
 
     private Mode getMode() {

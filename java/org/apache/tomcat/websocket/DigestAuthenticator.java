@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.tomcat.util.buf.HexUtils;
@@ -127,7 +128,7 @@ public class DigestAuthenticator extends Authenticator {
         preDigest.append(':');
         preDigest.append(nonce);
 
-        if (qop.toLowerCase().contains("auth")) {
+        if (qop.toLowerCase(Locale.ENGLISH).contains("auth")) {
             preDigest.append(':');
             preDigest.append(String.format("%08X", Integer.valueOf(nonceCount)));
             preDigest.append(':');
