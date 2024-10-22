@@ -64,7 +64,7 @@ public class TransientPropertiesWebdavServlet extends WebdavServlet {
         } else {
             ArrayList<Node> properties = deadProperties.get(path);
             if (properties == null) {
-                properties = new ArrayList<Node>();
+                properties = new ArrayList<>();
                 deadProperties.put(path, properties);
             }
             synchronized (properties) {
@@ -145,7 +145,7 @@ public class TransientPropertiesWebdavServlet extends WebdavServlet {
         ArrayList<Node> propertiesDest = deadProperties.get(dest);
         if (properties != null) {
             if (propertiesDest == null) {
-                propertiesDest = new ArrayList<Node>();
+                propertiesDest = new ArrayList<>();
                 deadProperties.put(dest, propertiesDest);
             }
             synchronized (properties) {
