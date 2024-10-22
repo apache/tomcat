@@ -97,17 +97,17 @@ public class WebdavIfHeader {
     /**
      * The list of resources present in the If header.
      */
-    private List<String> resources = new ArrayList<String>();
+    private List<String> resources = new ArrayList<>();
 
     /**
      * The list of all positive tokens present in the If header.
      */
-    private List<String> allTokens = new ArrayList<String>();
+    private List<String> allTokens = new ArrayList<>();
 
     /**
      * The list of all NOT tokens present in the If header.
      */
-    private List<String> allNotTokens = new ArrayList<String>();
+    private List<String> allNotTokens = new ArrayList<>();
 
     private String uriPrefix;
 
