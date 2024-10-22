@@ -115,6 +115,8 @@ public class WebdavIfHeader {
      * Create a Untagged <code>IfHeader</code> if the given lock tokens.
      *
      * @param tokens the tokens
+     *
+     * @throws IOException If the parsing of the <code>IfHeader</code> fails
      */
     public WebdavIfHeader(String[] tokens) throws IOException {
         allTokens.addAll(Arrays.asList(tokens));
@@ -134,6 +136,8 @@ public class WebdavIfHeader {
      *
      * @param uriPrefix The uri prefix to use for the absolute href
      * @param ifHeaderValue the if header
+     *
+     * @throws IOException If the parsing of the <code>IfHeader</code> fails
      */
     public WebdavIfHeader(String uriPrefix, String ifHeaderValue) throws IOException {
         this.uriPrefix = uriPrefix;
