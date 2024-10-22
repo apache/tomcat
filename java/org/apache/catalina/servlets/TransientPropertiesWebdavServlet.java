@@ -107,7 +107,7 @@ public class TransientPropertiesWebdavServlet extends WebdavServlet {
                 if (nameOnly) {
                     // Add the names of all properties
                     for (Node node : properties) {
-                        generatedXML.writeElement(node.getPrefix(), node.getNamespaceURI(), node.getLocalName(),
+                        generatedXML.writeElement(null, node.getNamespaceURI(), node.getLocalName(),
                                 XMLWriter.NO_CONTENT);
                     }
                 } else if (property != null) {
