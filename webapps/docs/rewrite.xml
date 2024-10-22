@@ -457,7 +457,7 @@ public class UpperCaseMap implements RewriteMap {
     if (key == null) {
       return null;
     }
-    return key.toUpperCase();
+    return key.toUpperCase(Locale.ENGLISH);
   }
 
 }]]></source>

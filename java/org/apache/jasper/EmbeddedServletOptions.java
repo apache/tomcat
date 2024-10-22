@@ -18,6 +18,7 @@ package org.apache.jasper;
 
 import java.io.File;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -430,7 +431,7 @@ public final class EmbeddedServletOptions implements Options {
         String trimsp = config.getInitParameter("trimSpaces");
         if (trimsp != null) {
             try {
-                trimSpaces = TrimSpacesOption.valueOf(trimsp.toUpperCase());
+                trimSpaces = TrimSpacesOption.valueOf(trimsp.toUpperCase(Locale.ENGLISH));
             } catch (IllegalArgumentException iae) {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage("jsp.warning.trimspaces"), iae);

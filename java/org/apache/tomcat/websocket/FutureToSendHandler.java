@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.util.Locale;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -98,8 +99,8 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
 
         }
         if (retval == false) {
-            throw new TimeoutException(
-                    sm.getString("futureToSendHandler.timeout", Long.valueOf(timeout), unit.toString().toLowerCase()));
+            throw new TimeoutException(sm.getString("futureToSendHandler.timeout", Long.valueOf(timeout),
+                    unit.toString().toLowerCase(Locale.ENGLISH)));
         }
         if (result.get().getException() != null) {
             throw new ExecutionException(result.get().getException());

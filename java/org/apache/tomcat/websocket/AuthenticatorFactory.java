@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.util.Locale;
 import java.util.ServiceLoader;
 
 /**
@@ -33,7 +34,7 @@ public class AuthenticatorFactory {
     public static Authenticator getAuthenticator(String authScheme) {
 
         Authenticator auth = null;
-        switch (authScheme.toLowerCase()) {
+        switch (authScheme.toLowerCase(Locale.ENGLISH)) {
 
             case BasicAuthenticator.schemeName:
                 auth = new BasicAuthenticator();
