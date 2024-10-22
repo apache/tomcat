@@ -982,12 +982,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
                 if (lock.scope == null) {
                     // Bad request
-                    resp.setStatus(WebdavStatus.SC_BAD_REQUEST);
+                    resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                    return;
                 }
 
             } else {
                 // Bad request
-                resp.setStatus(WebdavStatus.SC_BAD_REQUEST);
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return;
             }
 
             if (lockTypeNode != null) {
@@ -1006,12 +1008,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
                 if (lock.type == null) {
                     // Bad request
-                    resp.setStatus(WebdavStatus.SC_BAD_REQUEST);
+                    resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                    return;
                 }
 
             } else {
                 // Bad request
-                resp.setStatus(WebdavStatus.SC_BAD_REQUEST);
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return;
             }
 
             if (lockOwnerNode != null) {
@@ -1034,7 +1038,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
                 if (lock.owner == null) {
                     // Bad request
-                    resp.setStatus(WebdavStatus.SC_BAD_REQUEST);
+                    resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                    return;
                 }
 
             } else {
@@ -1205,7 +1210,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             String ifHeader = req.getHeader("If");
             if (ifHeader == null) {
                 // Bad request
-                resp.setStatus(WebdavStatus.SC_BAD_REQUEST);
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return;
             }
 
             // Checking resource locks
