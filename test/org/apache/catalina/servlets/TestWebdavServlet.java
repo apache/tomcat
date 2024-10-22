@@ -612,7 +612,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertTrue(client.getResponseBody().contains("Second-"));
         String timeoutValue = client.getResponseBody().substring(client.getResponseBody().indexOf("Second-"));
         timeoutValue = timeoutValue.substring("Second-".length(), timeoutValue.indexOf('<'));
-        Assert.assertTrue(Integer.valueOf(timeoutValue) <= 20);
+        Assert.assertTrue(Integer.valueOf(timeoutValue).intValue() <= 20);
 
         // Unlock /myfolder again
         client.setRequest(new String[] { "UNLOCK /myfolder/ HTTP/1.1" + SimpleHttpClient.CRLF +
@@ -824,7 +824,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertTrue(client.getResponseBody().contains("Second-"));
         String timeoutValue = client.getResponseBody().substring(client.getResponseBody().indexOf("Second-"));
         timeoutValue = timeoutValue.substring("Second-".length(), timeoutValue.indexOf('<'));
-        Assert.assertTrue(Integer.valueOf(timeoutValue) > 100000);
+        Assert.assertTrue(Integer.valueOf(timeoutValue).intValue() > 100000);
 
         client.setRequest(new String[] { "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
