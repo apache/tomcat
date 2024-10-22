@@ -135,8 +135,8 @@ import org.xml.sax.SAXException;
  * http://host:port/context/webdavedit/content
  * <p>
  * There are some known limitations of this Servlet due to it not implementing PROPPATCH and PROPFIND methods support
- * for dead properties. The Servlet does provide extension points to add support for some as required by user. Details of these
- * limitations and progress towards addressing them are being tracked under
+ * for dead properties. The Servlet does provide extension points to add support for some as required by user. Details
+ * of these limitations and progress towards addressing them are being tracked under
  * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=69046">bug 69046</a>.
  * </p>
  *
@@ -209,15 +209,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Supported locks.
      */
-    protected static final String SUPPORTED_LOCKS =
-            "<D:lockentry>" +
-            "<D:lockscope><D:exclusive/></D:lockscope>" +
-            "<D:locktype><D:write/></D:locktype>" +
-            "</D:lockentry>" +
-            "<D:lockentry>" +
-            "<D:lockscope><D:shared/></D:lockscope>" +
-            "<D:locktype><D:write/></D:locktype>" +
-            "</D:lockentry>";
+    protected static final String SUPPORTED_LOCKS = "<D:lockentry>" + "<D:lockscope><D:exclusive/></D:lockscope>" +
+            "<D:locktype><D:write/></D:locktype>" + "</D:lockentry>" + "<D:lockentry>" +
+            "<D:lockscope><D:shared/></D:lockscope>" + "<D:locktype><D:write/></D:locktype>" + "</D:lockentry>";
 
     /**
      * Simple date format for the creation date ISO representation (partial).
@@ -231,13 +225,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Repository of all locks, keyed by path.
      */
-    private final ConcurrentHashMap<String, LockInfo> resourceLocks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,LockInfo> resourceLocks = new ConcurrentHashMap<>();
 
 
     /**
      * Map of all shared locks, keyed by lock token.
      */
-    private final ConcurrentHashMap<String, LockInfo> sharedLocks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String,LockInfo> sharedLocks = new ConcurrentHashMap<>();
 
 
     /**
@@ -485,7 +479,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                         for (String token : parentLock.sharedTokens) {
                                             LockInfo sharedLock = sharedLocks.get(token);
                                             if (sharedLock != null) {
-                                                if ((parentPath != currentPath && sharedLock.depth > 0) || parentPath == currentPath) {
+                                                if ((parentPath != currentPath && sharedLock.depth > 0) ||
+                                                        parentPath == currentPath) {
                                                     lockTokens.add("opaquelocktoken:" + token);
                                                 }
                                             }
@@ -517,7 +512,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             } while (true);
 
             return false;
-       }
+        }
 
         return true;
     }
@@ -528,8 +523,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * because the WebDAV servlet has been mapped to a url other than /* to configure editing at different url than
      * normal viewing.
      *
-     * @param request The servlet request we are processing
+     * @param request        The servlet request we are processing
      * @param allowEmptyPath Used only to identify a call from DefaultServlet, to avoid removing the trailing slash
+     *
      * @return the relative path
      */
     @Override
@@ -764,9 +760,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         generatedXML.writeElement("D", DEFAULT_NAMESPACE, "multistatus", XMLWriter.OPENING);
 
         if (depth == 0) {
-            propfindResource(generatedXML, getEncodedPath(path, resource, req),
-                    path, type, properties, resource.isFile(),
-                    resource.getCreation(), resource.getLastModified(), resource.getContentLength(),
+            propfindResource(generatedXML, getEncodedPath(path, resource, req), path, type, properties,
+                    resource.isFile(), resource.getCreation(), resource.getLastModified(), resource.getContentLength(),
                     getServletContext().getMimeType(resource.getName()), generateETag(resource));
         } else {
             // The stack always contains the object of the current level
@@ -789,10 +784,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 // File is in directory listing but doesn't appear to exist
                 // Broken symlink or odd permission settings?
                 if (resource.exists()) {
-                    propfindResource(generatedXML, getEncodedPath(currentPath, resource, req),
-                            currentPath, type, properties, resource.isFile(),
-                            resource.getCreation(), resource.getLastModified(), resource.getContentLength(),
-                            getServletContext().getMimeType(resource.getName()), generateETag(resource));
+                    propfindResource(generatedXML, getEncodedPath(currentPath, resource, req), currentPath, type,
+                            properties, resource.isFile(), resource.getCreation(), resource.getLastModified(),
+                            resource.getContentLength(), getServletContext().getMimeType(resource.getName()),
+                            generateETag(resource));
                 }
 
                 if (resource.isDirectory() && (depth > 0)) {
@@ -834,7 +829,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * @param resp The Servlet response
      *
      * @throws ServletException If an error occurs
-     * @throws IOException If an IO error occurs
+     * @throws IOException      If an IO error occurs
      */
     protected void doProppatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -903,7 +898,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                                 }
                                             }
                                             if (property != null) {
-                                                operations.add(new ProppatchOperation(PropertyUpdateType.SET, property));
+                                                operations
+                                                        .add(new ProppatchOperation(PropertyUpdateType.SET, property));
                                             } else {
                                                 resp.sendError(WebdavStatus.SC_BAD_REQUEST);
                                                 return;
@@ -935,7 +931,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                                 }
                                             }
                                             if (property != null) {
-                                                operations.add(new ProppatchOperation(PropertyUpdateType.REMOVE, property));
+                                                operations.add(
+                                                        new ProppatchOperation(PropertyUpdateType.REMOVE, property));
                                             } else {
                                                 resp.sendError(WebdavStatus.SC_BAD_REQUEST);
                                                 return;
@@ -975,8 +972,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         for (ProppatchOperation operation : operations) {
             generatedXML.writeElement("D", "propstat", XMLWriter.OPENING);
             generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
-            generatedXML.writeElement(operation.propertyNode.getPrefix(),
-                    operation.propertyNode.getNamespaceURI(),
+            generatedXML.writeElement(operation.propertyNode.getPrefix(), operation.propertyNode.getNamespaceURI(),
                     operation.propertyNode.getLocalName(), XMLWriter.NO_CONTENT);
             generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
             generatedXML.writeElement("D", "status", XMLWriter.OPENING);
@@ -999,12 +995,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
-     * Apply proppatch to the specified path. This should be overridden by subclasses to provide
-     * useful behavior. The default implementation prevents setting protected properties
-     * (anything from the DAV: namespace), and sets 507 for a set attempt on dead properties.
+     * Apply proppatch to the specified path. This should be overridden by subclasses to provide useful behavior. The
+     * default implementation prevents setting protected properties (anything from the DAV: namespace), and sets 507 for
+     * a set attempt on dead properties.
      *
-     * @param path the resource path on which to apply the proppatch
-     * @param operations the set and remove to apply, the final status codes of the result should be set on each operation
+     * @param path       the resource path on which to apply the proppatch
+     * @param operations the set and remove to apply, the final status codes of the result should be set on each
+     *                       operation
      */
     protected void proppatchResource(String path, ArrayList<ProppatchOperation> operations) {
         boolean setProperty = false;
@@ -1529,8 +1526,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     } else {
                         if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
                             if (parentLock.isExclusive()) {
-                                if (ifHeader.contains(parentLock.token)
-                                        && (parentLock.principal == null || parentLock.principal.equals(req.getRemoteUser()))) {
+                                if (ifHeader.contains(parentLock.token) && (parentLock.principal == null ||
+                                        parentLock.principal.equals(req.getRemoteUser()))) {
                                     toRenew = parentLock;
                                     break;
                                 }
@@ -1538,8 +1535,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                 for (String token : parentLock.sharedTokens) {
                                     if (ifHeader.contains(token)) {
                                         LockInfo sharedLock = sharedLocks.get(token);
-                                        if (sharedLock != null
-                                                && (sharedLock.principal == null || sharedLock.principal.equals(req.getRemoteUser()))) {
+                                        if (sharedLock != null && (sharedLock.principal == null ||
+                                                sharedLock.principal.equals(req.getRemoteUser()))) {
                                             if ((parentPath != path && sharedLock.depth > 0) || parentPath == path) {
                                                 toRenew = sharedLock;
                                                 break;
@@ -1629,8 +1626,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 } else {
                     if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
                         if (parentLock.isExclusive()) {
-                            if (lockTokenHeader.contains(parentLock.token)
-                                    && (parentLock.principal == null || parentLock.principal.equals(req.getRemoteUser()))) {
+                            if (lockTokenHeader.contains(parentLock.token) && (parentLock.principal == null ||
+                                    parentLock.principal.equals(req.getRemoteUser()))) {
                                 resourceLocks.remove(parentPath);
                                 unlocked = true;
                                 break;
@@ -1643,8 +1640,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                             for (String token : parentLock.sharedTokens) {
                                 if (lockTokenHeader.contains(token)) {
                                     LockInfo lock = sharedLocks.get(token);
-                                    if (lock == null || lock.principal == null || lock.principal.equals(req.getRemoteUser())) {
-                                        if ((parentPath != path && lock != null && lock.depth > 0) || parentPath == path) {
+                                    if (lock == null || lock.principal == null ||
+                                            lock.principal.equals(req.getRemoteUser())) {
+                                        if ((parentPath != path && lock != null && lock.depth > 0) ||
+                                                parentPath == path) {
                                             parentLock.sharedTokens.remove(token);
                                             if (parentLock.sharedTokens.isEmpty()) {
                                                 resourceLocks.remove(parentPath);
@@ -1710,9 +1709,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Check to see if a resource is currently write locked.
      *
-     * @param path     Path of the resource
+     * @param path      Path of the resource
      * @param principal The authenticated principal name
-     * @param ifHeader "If" HTTP header which was included in the request
+     * @param ifHeader  "If" HTTP header which was included in the request
      *
      * @return <code>true</code> if the resource is locked (and no appropriate lock token has been found for at least
      *             one of the non-shared locks which are present on the resource).
@@ -1730,8 +1729,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 } else {
                     if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
                         if (parentLock.isExclusive()) {
-                            if (ifHeader.contains(":" + parentLock.token + ">")
-                                    && (parentLock.principal == null || parentLock.principal.equals(principal))) {
+                            if (ifHeader.contains(":" + parentLock.token + ">") &&
+                                    (parentLock.principal == null || parentLock.principal.equals(principal))) {
                                 return false;
                             }
                             return true;
@@ -1740,8 +1739,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                 LockInfo lock = sharedLocks.get(token);
                                 if (lock != null) {
                                     if ((parentPath != path && lock.depth > 0) || parentPath == path) {
-                                        if (ifHeader.contains(":" + token + ">")
-                                                && (lock.principal == null || lock.principal.equals(principal))) {
+                                        if (ifHeader.contains(":" + token + ">") &&
+                                                (lock.principal == null || lock.principal.equals(principal))) {
                                             return false;
                                         }
                                         unmatchedSharedLock = true;
@@ -2026,12 +2025,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
     /**
-     * Copy resource. This should be overridden by subclasses to provide
-     * useful behavior. The default implementation prevents setting protected properties
-     * (anything from the DAV: namespace), and sets 507 for a set attempt on dead properties.
+     * Copy resource. This should be overridden by subclasses to provide useful behavior. The default implementation
+     * prevents setting protected properties (anything from the DAV: namespace), and sets 507 for a set attempt on dead
+     * properties.
      *
      * @param source the copy source path
-     * @param dest the copy destination path
+     * @param dest   the copy destination path
      */
     protected void copyResource(String source, String dest) {
     }
@@ -2127,9 +2126,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
     /**
-     * Delete specified resource. This should be overridden by subclasses to provide
-     * useful behavior. The default implementation prevents setting protected properties
-     * (anything from the DAV: namespace), and sets 507 for a set attempt on dead properties.
+     * Delete specified resource. This should be overridden by subclasses to provide useful behavior. The default
+     * implementation prevents setting protected properties (anything from the DAV: namespace), and sets 507 for a set
+     * attempt on dead properties.
      *
      * @param path the path of the resource to delete
      */
@@ -2275,8 +2274,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     }
 
 
-    private void sendReport(HttpServletRequest req, HttpServletResponse resp, String errorPath, int errorCode, String error)
-            throws IOException  {
+    private void sendReport(HttpServletRequest req, HttpServletResponse resp, String errorPath, int errorCode,
+            String error) throws IOException {
         resp.setStatus(errorCode);
 
         XMLWriter generatedXML = new XMLWriter();
@@ -2303,8 +2302,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     private void propfindResource(XMLWriter generatedXML, String rewrittenUrl, String path, int propFindType,
-            List<Node> properties, boolean isFile, long created, long lastModified,
-            long contentLength, String contentType, String eTag) {
+            List<Node> properties, boolean isFile, long created, long lastModified, long contentLength,
+            String contentType, String eTag) {
 
         generatedXML.writeElement("D", "response", XMLWriter.OPENING);
         String status = "HTTP/1.1 " + WebdavStatus.SC_OK + " ";
@@ -2473,8 +2472,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                             generatedXML.writeElement("D", propertyNotFound, XMLWriter.NO_CONTENT);
                         } else {
                             generatedXML.writeElement(propertyNotFoundNode.getPrefix(),
-                                    propertyNotFoundNode.getNamespaceURI(),
-                                    propertyNotFoundNode.getLocalName(), XMLWriter.NO_CONTENT);
+                                    propertyNotFoundNode.getNamespaceURI(), propertyNotFoundNode.getLocalName(),
+                                    XMLWriter.NO_CONTENT);
                         }
                     }
 
@@ -2493,15 +2492,17 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
-     * Generate propfind XML fragments for dead properties. This should be overridden by subclasses to provide
-     * useful behavior. The default implementation prevents setting protected properties
-     * (anything from the DAV: namespace), and sets 507 for a set attempt on dead properties.
+     * Generate propfind XML fragments for dead properties. This should be overridden by subclasses to provide useful
+     * behavior. The default implementation prevents setting protected properties (anything from the DAV: namespace),
+     * and sets 507 for a set attempt on dead properties.
      *
-     * @param path the resource path
-     * @param property the dead property, if null then all dead properties must be written
-     * @param nameOnly true if only the property name element should be generated
+     * @param path         the resource path
+     * @param property     the dead property, if null then all dead properties must be written
+     * @param nameOnly     true if only the property name element should be generated
      * @param generatedXML the current generated XML for the PROPFIND response
-     * @return true if property was specified and a corresponding dead property was found on the resource, false otherwise
+     *
+     * @return true if property was specified and a corresponding dead property was found on the resource, false
+     *             otherwise
      */
     protected boolean propfindResource(String path, Node property, boolean nameOnly, XMLWriter generatedXML) {
         if (nameOnly) {
@@ -2772,44 +2773,53 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
     }
 
-    enum PropertyUpdateType { SET, REMOVE }
+    enum PropertyUpdateType {
+        SET,
+        REMOVE
+    }
 
     protected static class ProppatchOperation {
         private final PropertyUpdateType updateType;
         private final Node propertyNode;
         private final boolean protectedProperty;
         private int statusCode = HttpServletResponse.SC_OK;
+
         public ProppatchOperation(PropertyUpdateType updateType, Node propertyNode) {
             this.updateType = updateType;
             this.propertyNode = propertyNode;
             String davName = getDAVNode(propertyNode);
-            protectedProperty = davName != null
-                    && (!(davName.equals("displayname") || davName.equals("getcontentlanguage")));
+            protectedProperty =
+                    davName != null && (!(davName.equals("displayname") || davName.equals("getcontentlanguage")));
         }
+
         /**
          * @return the updateType
          */
         public PropertyUpdateType getUpdateType() {
             return this.updateType;
         }
+
         /**
          * @return the propertyNode
          */
         public Node getPropertyNode() {
             return this.propertyNode;
         }
+
         /**
          * @return the statusCode
          */
         public int getStatusCode() {
             return this.statusCode;
         }
+
         /**
          * @param statusCode the statusCode to set
          */
         public void setStatusCode(int statusCode) {
             this.statusCode = statusCode;
         }
+
         /**
          * @return the protectedProperty
          */
