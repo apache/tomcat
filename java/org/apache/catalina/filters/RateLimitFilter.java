@@ -48,8 +48,8 @@ import org.apache.tomcat.util.res.StringManager;
  * some configured values to more efficient values. For example, a configuration of a 60 seconds time bucket is
  * converted to 65.536 seconds. That allows for very fast bucket calculation using bit shift arithmetic. In order to
  * remain true to the user intent, the configured number of requests is then multiplied by the same ratio, so a
- * configuration of 100 Requests per 60 seconds, has the real values of 109 Requests per 65 seconds. You can specify
- * a different class as long as it implements the <code>org.apache.catalina.util.RateLimiter</code> interface.
+ * configuration of 100 Requests per 60 seconds, has the real values of 109 Requests per 65 seconds. You can specify a
+ * different class as long as it implements the <code>org.apache.catalina.util.RateLimiter</code> interface.
  * </p>
  * <p>
  * It is common to set up different restrictions for different URIs. For example, a login page or authentication script
@@ -164,7 +164,7 @@ public class RateLimitFilter extends FilterBase {
         super.init(filterConfig);
 
         try {
-            rateLimiter = (RateLimiter)Class.forName(rateLimitClassName).getConstructor().newInstance();
+            rateLimiter = (RateLimiter) Class.forName(rateLimitClassName).getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new ServletException(e);
         }
@@ -175,10 +175,9 @@ public class RateLimitFilter extends FilterBase {
 
         filterName = filterConfig.getFilterName();
 
-        log.info(sm.getString("rateLimitFilter.initialized", filterName,
-            Integer.valueOf(bucketRequests), Integer.valueOf(bucketDuration),
-            Integer.valueOf(rateLimiter.getRequests()), Integer.valueOf(rateLimiter.getDuration()),
-            (!enforce ? "Not " : "") + "enforcing"));
+        log.info(sm.getString("rateLimitFilter.initialized", filterName, Integer.valueOf(bucketRequests),
+                Integer.valueOf(bucketDuration), Integer.valueOf(rateLimiter.getRequests()),
+                Integer.valueOf(rateLimiter.getDuration()), (!enforce ? "Not " : "") + "enforcing"));
     }
 
     @Override
@@ -192,9 +191,8 @@ public class RateLimitFilter extends FilterBase {
 
         if (reqCount > rateLimiter.getRequests()) {
 
-            log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", filterName,
-                Integer.valueOf(reqCount), ipAddr, Integer.valueOf(rateLimiter.getRequests()),
-                Integer.valueOf(rateLimiter.getDuration())));
+            log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", filterName, Integer.valueOf(reqCount), ipAddr,
+                    Integer.valueOf(rateLimiter.getRequests()), Integer.valueOf(rateLimiter.getDuration())));
 
             if (enforce) {
                 ((HttpServletResponse) response).sendError(statusCode, statusMessage);
