@@ -1644,7 +1644,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                 if (lockTokenHeader.contains(token)) {
                                     LockInfo lock = sharedLocks.get(token);
                                     if (lock == null || lock.principal == null || lock.principal.equals(req.getRemoteUser())) {
-                                        if ((parentPath != path && lock.depth > 0) || parentPath == path) {
+                                        if ((parentPath != path && lock != null && lock.depth > 0) || parentPath == path) {
                                             parentLock.sharedTokens.remove(token);
                                             if (parentLock.sharedTokens.isEmpty()) {
                                                 resourceLocks.remove(parentPath);
