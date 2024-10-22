@@ -265,7 +265,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         // Validate that the Servlet is only mapped to wildcard mappings
         String servletName = getServletConfig().getServletName();
-        ServletRegistration servletRegistration = getServletConfig().getServletContext().getServletRegistration(servletName);
+        ServletRegistration servletRegistration =
+                getServletConfig().getServletContext().getServletRegistration(servletName);
         Collection<String> servletMappings = servletRegistration.getMappings();
         for (String mapping : servletMappings) {
             if (!mapping.endsWith("/*")) {
@@ -1087,7 +1088,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         collectionLocksIterator.remove();
                         continue;
                     }
-                    if (currentLock.path.startsWith(lock.path + "/") && (currentLock.isExclusive() || lock.isExclusive())) {
+                    if (currentLock.path.startsWith(lock.path + "/") &&
+                            (currentLock.isExclusive() || lock.isExclusive())) {
                         // A child collection of this collection is locked
                         lockPaths.add(currentLock.path);
                     }
@@ -1097,7 +1099,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         resourceLocks.remove(currentLock.path);
                         continue;
                     }
-                    if (currentLock.path.startsWith(lock.path + "/") && (currentLock.isExclusive() || lock.isExclusive())) {
+                    if (currentLock.path.startsWith(lock.path + "/") &&
+                            (currentLock.isExclusive() || lock.isExclusive())) {
                         // A child resource of this collection is locked
                         lockPaths.add(currentLock.path);
                     }
@@ -1343,7 +1346,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * client has demonstrated knowledge of the appropriate lock tokens.
      *
      * @param path The relative path
-     * @param req Servlet request
+     * @param req  Servlet request
      *
      * @return <code>true</code> if the resource is locked (and no appropriate lock token has been found for at least
      *             one of the non-shared locks which are present on the resource).
@@ -1428,7 +1431,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Copy a resource.
      *
-     * @param path  Path of the resource to copy
+     * @param path Path of the resource to copy
      * @param req  Servlet request
      * @param resp Servlet response
      *
@@ -1686,7 +1689,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Delete a resource.
      *
-     * @param path      Path of the resource which is to be deleted
+     * @param path Path of the resource which is to be deleted
      * @param req  Servlet request
      * @param resp Servlet response
      *
@@ -1746,8 +1749,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                  * See RFC 4918, section 9.6.1, last paragraph.
                  *
                  * If a child resource can't be deleted then the parent resource SHOULD NOT be included in the
-                 * multi-status response since the notice of the failure to delete the child implies that all
-                 * parent resources could also not be deleted.
+                 * multi-status response since the notice of the failure to delete the child implies that all parent
+                 * resources could also not be deleted.
                  */
                 if (resources.list(path).length == 0) {
                     /*
@@ -1834,8 +1837,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                      * See RFC 4918, section 9.6.1, last paragraph.
                      *
                      * If a child resource can't be deleted then the parent resource SHOULD NOT be included in the
-                     * multi-status response since the notice of the failure to delete the child implies that all
-                     * parent resources could also not be deleted.
+                     * multi-status response since the notice of the failure to delete the child implies that all parent
+                     * resources could also not be deleted.
                      */
                     if (!childResource.isDirectory() || resources.list(childName).length == 0) {
                         /*

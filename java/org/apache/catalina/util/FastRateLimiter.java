@@ -72,7 +72,7 @@ public class FastRateLimiter implements RateLimiter {
     public void setFilterConfig(FilterConfig filterConfig) {
 
         ScheduledExecutorService executorService = (ScheduledExecutorService) filterConfig.getServletContext()
-            .getAttribute(ScheduledThreadPoolExecutor.class.getName());
+                .getAttribute(ScheduledThreadPoolExecutor.class.getName());
 
         if (executorService == null) {
             executorService = new java.util.concurrent.ScheduledThreadPoolExecutor(1);
