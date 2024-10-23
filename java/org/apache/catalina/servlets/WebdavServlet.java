@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Deque;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -56,6 +58,7 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.DOMWriter;
 import org.apache.catalina.util.XMLWriter;
 import org.apache.tomcat.PeriodicEventListener;
+import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
@@ -72,7 +75,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Servlet which adds support for <a href="https://tools.ietf.org/html/rfc4918">WebDAV</a>
- * <a href="https://tools.ietf.org/html/rfc4918#section-18">level 2</a>. All the basic HTTP requests are handled by the
+ * <a href="https://tools.ietf.org/html/rfc4918#section-18">level 3</a>. All the basic HTTP requests are handled by the
  * DefaultServlet. The WebDAVServlet must not be used as the default servlet (ie mapped to '/') as it will not work in
  * this configuration.
  * <p>
@@ -257,6 +260,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private boolean strictIfProcessing = true;
 
 
+    /**
+     * Property store used for storage of dead properties.
+     */
+    private PropertyStore store = null;
+
+
     // --------------------------------------------------------- Public Methods
 
 
@@ -291,6 +300,41 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         if (getServletConfig().getInitParameter("strictIfProcessing") != null) {
             strictIfProcessing = Boolean.parseBoolean(getServletConfig().getInitParameter("strictIfProcessing"));
         }
+
+        String propertyStore = getServletConfig().getInitParameter("propertyStore");
+        if (propertyStore != null) {
+            try {
+                Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(propertyStore);
+                store = (PropertyStore) clazz.getConstructor().newInstance();
+                // Set init parameters as properties on the store
+                Enumeration<String> parameterNames = getServletConfig().getInitParameterNames();
+                while (parameterNames.hasMoreElements()) {
+                    String parameterName = parameterNames.nextElement();
+                    if (parameterName.startsWith("store.")) {
+                        StringBuilder actualMethod = new StringBuilder();
+                        String parameterValue = getServletConfig().getInitParameter(parameterName);
+                        parameterName = parameterName.substring("store.".length());
+                        if (!IntrospectionUtils.setProperty(store, parameterName, parameterValue, true, actualMethod)) {
+                            log(sm.getString("webdavservlet.noStoreParameter", parameterName, parameterValue));
+                        }
+                    }
+                }
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                    | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                log(sm.getString("webdavservlet.storeError"), e);
+            }
+        }
+        if (store == null) {
+            log(sm.getString("webdavservlet.memorystore"));
+            store = new MemoryPropertyStore();
+        }
+        store.init();
+    }
+
+
+    @Override
+    public void destroy() {
+        store.destroy();
     }
 
 
@@ -318,113 +362,143 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 }
             }
         }
+        store.periodicEvent();
+    }
+
+
+    // ------------------------------------------------ PropertyStore Interface
+
+
+    /**
+     * Handling of dead properties on resources. This interface allows
+     * providing storage for dead properties. Store configuration is done
+     * through the <code>propertyStore</code> init parameter of the WebDAV
+     * Servlet, which should contain the class name of the store.
+     */
+    public interface PropertyStore {
+
+        /**
+         * Initialize the store. This is tied to the Servlet lifecycle and is called by its init method.
+         */
+        void init();
+
+        /**
+         * Destroy the store. This is tied to the Servlet lifecycle and is called by its destroy method.
+         */
+        void destroy();
+
+        /**
+         * Periodic event for maintenance tasks.
+         */
+        void periodicEvent();
+
+        /**
+         * Copy resource. Dead properties should be copied to the destination path.
+         *
+         * @param source the copy source path
+         * @param destination the copy destination path
+         */
+        void copy(String source, String destination);
+
+        /**
+         * Delete specified resource. Dead properties on a deleted resource should be deleted.
+         *
+         * @param resource the path of the resource to delete
+         */
+        void delete(String resource);
+
+        /**
+         * Generate propfind XML fragments for dead properties.
+         *
+         * @param resource the resource path
+         * @param property the dead property, if null then all dead properties must be written
+         * @param nameOnly true if only the property name element should be generated
+         * @param generatedXML the current generated XML for the PROPFIND response
+         * @return true if a property was specified and a corresponding dead property was found on the resource,
+         *     false otherwise
+         */
+        boolean propfind(String resource, Node property, boolean nameOnly, XMLWriter generatedXML);
+
+        /**
+         * Apply proppatch to the specified resource.
+         *
+         * @param resource the resource path on which to apply the proppatch
+         * @param operations the set and remove to apply, the final status codes of the result should be set on each
+         *                       operation
+         */
+        void proppatch(String resource, ArrayList<ProppatchOperation> operations);
+
+    }
+
+    // ----------------------------------------- ProppatchOperation Inner Class
+
+
+    /**
+     * Represents a PROPPATCH sub operation to be performed.
+     */
+    public static class ProppatchOperation {
+        private final PropertyUpdateType updateType;
+        private final Node propertyNode;
+        private final boolean protectedProperty;
+        private int statusCode = HttpServletResponse.SC_OK;
+
+        /**
+         * PROPPATCH operation constructor.
+         * @param updateType the update type, either SET or REMOVE
+         * @param propertyNode the XML node that contains the property name (and value if SET)
+         */
+        public ProppatchOperation(PropertyUpdateType updateType, Node propertyNode) {
+            this.updateType = updateType;
+            this.propertyNode = propertyNode;
+            String davName = getDAVNode(propertyNode);
+            // displayname and getcontentlanguage are the DAV: properties that should not be protected
+            protectedProperty =
+                    davName != null && (!(davName.equals("displayname") || davName.equals("getcontentlanguage")));
+        }
+
+        /**
+         * @return the updateType for this operation
+         */
+        public PropertyUpdateType getUpdateType() {
+            return this.updateType;
+        }
+
+        /**
+         * @return the propertyNode the XML node that contains the property name (and value if SET)
+         */
+        public Node getPropertyNode() {
+            return this.propertyNode;
+        }
+
+        /**
+         * @return the statusCode the statusCode to set as a result of the operation
+         */
+        public int getStatusCode() {
+            return this.statusCode;
+        }
+
+        /**
+         * @param statusCode the statusCode to set as a result of the operation
+         */
+        public void setStatusCode(int statusCode) {
+            this.statusCode = statusCode;
+        }
+
+        /**
+         * @return <code>true</code> if the property is protected
+         */
+        public boolean getProtectedProperty() {
+            return this.protectedProperty;
+        }
+    }
+
+    enum PropertyUpdateType {
+        SET,
+        REMOVE
     }
 
 
     // ------------------------------------------------------ Protected Methods
-
-
-    /**
-     * Copy resource. This should be overridden by subclasses to provide useful behavior. The default implementation
-     * prevents setting protected properties (anything from the DAV: namespace), and sets 507 for a set attempt on dead
-     * properties.
-     *
-     * @param source the copy source path
-     * @param dest   the copy destination path
-     */
-    protected void copyResource(String source, String dest) {
-    }
-
-
-    /**
-     * Delete specified resource. This should be overridden by subclasses to provide useful behavior. The default
-     * implementation prevents setting protected properties (anything from the DAV: namespace), and sets 507 for a set
-     * attempt on dead properties.
-     *
-     * @param path the path of the resource to delete
-     */
-    protected void deleteResource(String path) {
-        unlockResource(path, null);
-    }
-
-
-    /**
-     * Generate propfind XML fragments for dead properties. This should be overridden by subclasses to provide useful
-     * behavior. The default implementation prevents setting protected properties (anything from the DAV: namespace),
-     * and sets 507 for a set attempt on dead properties.
-     *
-     * @param path         the resource path
-     * @param property     the dead property, if null then all dead properties must be written
-     * @param nameOnly     true if only the property name element should be generated
-     * @param generatedXML the current generated XML for the PROPFIND response
-     *
-     * @return true if property was specified and a corresponding dead property was found on the resource, false
-     *             otherwise
-     */
-    protected boolean propfindResource(String path, Node property, boolean nameOnly, XMLWriter generatedXML) {
-        if (nameOnly) {
-            generatedXML.writeElement("D", "displayname", XMLWriter.NO_CONTENT);
-        } else if (property == null) {
-            String resourceName = path;
-            int lastSlash = path.lastIndexOf('/');
-            if (lastSlash != -1) {
-                resourceName = resourceName.substring(lastSlash + 1);
-            }
-            generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
-            generatedXML.writeData(resourceName);
-            generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
-        } else {
-            String davName = getDAVNode(property);
-            if ("displayname".equals(davName)) {
-                String resourceName = path;
-                int lastSlash = path.lastIndexOf('/');
-                if (lastSlash != -1) {
-                    resourceName = resourceName.substring(lastSlash + 1);
-                }
-                generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
-                generatedXML.writeData(resourceName);
-                generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Apply proppatch to the specified path. This should be overridden by subclasses to provide useful behavior. The
-     * default implementation prevents setting protected properties (anything from the DAV: namespace), and sets 507 for
-     * a set attempt on dead properties.
-     *
-     * @param path       the resource path on which to apply the proppatch
-     * @param operations the set and remove to apply, the final status codes of the result should be set on each
-     *                       operation
-     */
-    protected void proppatchResource(String path, ArrayList<ProppatchOperation> operations) {
-        boolean setProperty = false;
-        boolean protectedProperty = false;
-        // Check for the protected properties
-        for (ProppatchOperation operation : operations) {
-            if (operation.getUpdateType() == PropertyUpdateType.SET) {
-                setProperty = true;
-            }
-            if (operation.getProtectedProperty()) {
-                protectedProperty = true;
-                operation.setStatusCode(HttpServletResponse.SC_FORBIDDEN);
-            }
-        }
-        if (protectedProperty) {
-            for (ProppatchOperation operation : operations) {
-                if (!operation.getProtectedProperty()) {
-                    operation.setStatusCode(WebdavStatus.SC_FAILED_DEPENDENCY);
-                }
-            }
-        } else if (setProperty) {
-            // No dead property support
-            for (ProppatchOperation operation : operations) {
-                operation.setStatusCode(WebdavStatus.SC_INSUFFICIENT_STORAGE);
-            }
-        }
-    }
 
 
     /**
@@ -691,7 +765,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("DAV", "1,2");
+        resp.addHeader("DAV", "1,2,3");
         resp.addHeader("Allow", determineMethodsAllowed(req));
         resp.addHeader("MS-Author-Via", "DAV");
     }
@@ -1006,7 +1080,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        proppatchResource(path, operations);
+        store.proppatch(path, operations);
 
         resp.setStatus(WebdavStatus.SC_MULTI_STATUS);
 
@@ -2073,7 +2147,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     return false;
                 }
             } else {
-                copyResource(source, dest);
+                store.copy(source, dest);
             }
 
             if (infiniteCopy) {
@@ -2117,7 +2191,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     errorList.put(source, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));
                     return false;
                 } else {
-                    copyResource(source, dest);
+                    store.copy(source, dest);
                 }
             } catch (IOException e) {
                 log(sm.getString("webdavservlet.inputstreamclosefail", source), e);
@@ -2183,7 +2257,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 sendNotAllowed(req, resp);
                 return false;
             }
-            deleteResource(path);
+            unlockResource(path, null);
         } else {
 
             Map<String,Integer> errorList = new LinkedHashMap<>();
@@ -2206,7 +2280,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     errorList.put(path, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
                 }
             } else {
-                deleteResource(path);
+                unlockResource(path, null);
             }
 
             if (!errorList.isEmpty()) {
@@ -2240,6 +2314,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 }
             }
         }
+        store.delete(path);
     }
 
 
@@ -2308,7 +2383,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         errorList.put(childName, Integer.valueOf(WebdavStatus.SC_METHOD_NOT_ALLOWED));
                     }
                 } else {
-                    deleteResource(childName);
+                    unlockResource(childName, null);
                 }
             }
         }
@@ -2426,7 +2501,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     generatedXML.writeElement("D", "collection", XMLWriter.NO_CONTENT);
                     generatedXML.writeElement("D", "resourcetype", XMLWriter.CLOSING);
                 }
-                propfindResource(path, null, false, generatedXML);
+                store.propfind(path, null, false, generatedXML);
 
                 generatedXML.writeElement("D", "supportedlock", XMLWriter.OPENING);
                 generatedXML.writeRaw(SUPPORTED_LOCKS);
@@ -2457,7 +2532,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 }
                 generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
                 generatedXML.writeElement("D", "lockdiscovery", XMLWriter.NO_CONTENT);
-                propfindResource(path, null, true, generatedXML);
+                store.propfind(path, null, true, generatedXML);
 
                 generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
                 generatedXML.writeElement("D", "status", XMLWriter.OPENING);
@@ -2479,7 +2554,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 for (Node propertyNode : properties) {
                     String property = getDAVNode(propertyNode);
                     if (property == null) {
-                        if (!propfindResource(path, propertyNode, false, generatedXML)) {
+                        if (!store.propfind(path, propertyNode, false, generatedXML)) {
                             propertiesNotFound.add(propertyNode);
                         }
                     } else if (property.equals("creationdate")) {
@@ -2629,7 +2704,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      *
      * @return the formatted creation date
      */
-    private String getISOCreationDate(long creationDate) {
+    private static String getISOCreationDate(long creationDate) {
         return creationDateFormat.format(new Date(creationDate));
     }
 
@@ -2639,6 +2714,16 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return node.getLocalName();
         }
         return null;
+    }
+
+
+    private static boolean propertyEquals(Node node1, Node node2) {
+        if (node1.getLocalName().equals(node2.getLocalName()) &&
+                ((node1.getNamespaceURI() == null && node2.getNamespaceURI() == null) ||
+                        (node1.getNamespaceURI() != null && node1.getNamespaceURI().equals(node2.getNamespaceURI())))) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -2763,6 +2848,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
     // --------------------------------------------- WebdavResolver Inner Class
 
+
     /**
      * Work around for XML parsers that don't fully respect
      * {@link DocumentBuilderFactory#setExpandEntityReferences(boolean)} when called with <code>false</code>. External
@@ -2782,71 +2868,161 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
     }
 
-    // ----------------------------------------- ProppatchOperation Inner Class
+
+    // ------------------------------------- TransientPropertyStore Inner Class
+
 
     /**
-     * Represents a PROPPATCH sub operation to be performed.
+     * Default property store, which provides memory storage without persistence.
      */
-    protected static class ProppatchOperation {
-        private final PropertyUpdateType updateType;
-        private final Node propertyNode;
-        private final boolean protectedProperty;
-        private int statusCode = HttpServletResponse.SC_OK;
+    private class MemoryPropertyStore implements PropertyStore {
 
-        /**
-         * PROPPATCH operation constructor.
-         * @param updateType the update type, either SET or REMOVE
-         * @param propertyNode the XML node that contains the property name (and value if SET)
-         */
-        public ProppatchOperation(PropertyUpdateType updateType, Node propertyNode) {
-            this.updateType = updateType;
-            this.propertyNode = propertyNode;
-            String davName = getDAVNode(propertyNode);
-            // displayname and getcontentlanguage are the DAV: properties that should not be protected
-            protectedProperty =
-                    davName != null && (!(davName.equals("displayname") || davName.equals("getcontentlanguage")));
+        private final ConcurrentHashMap<String,ArrayList<Node>> deadProperties = new ConcurrentHashMap<>();
+
+        @Override
+        public void init() {
         }
 
-        /**
-         * @return the updateType for this operation
-         */
-        public PropertyUpdateType getUpdateType() {
-            return this.updateType;
+        @Override
+        public void destroy() {
         }
 
-        /**
-         * @return the propertyNode the XML node that contains the property name (and value if SET)
-         */
-        public Node getPropertyNode() {
-            return this.propertyNode;
+        @Override
+        public void periodicEvent() {
         }
 
-        /**
-         * @return the statusCode the statusCode to set as a result of the operation
-         */
-        public int getStatusCode() {
-            return this.statusCode;
+        @Override
+        public void copy(String source, String destination) {
+            ArrayList<Node> properties = deadProperties.get(source);
+            ArrayList<Node> propertiesDest = deadProperties.get(destination);
+            if (properties != null) {
+                if (propertiesDest == null) {
+                    propertiesDest = new ArrayList<>();
+                    deadProperties.put(destination, propertiesDest);
+                }
+                synchronized (properties) {
+                    synchronized (propertiesDest) {
+                        for (Node node : properties) {
+                            node = node.cloneNode(true);
+                            boolean found = false;
+                            for (int i = 0; i < propertiesDest.size(); i++) {
+                                Node propertyNode = propertiesDest.get(i);
+                                if (propertyEquals(node, propertyNode)) {
+                                    found = true;
+                                    propertiesDest.set(i, node);
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                propertiesDest.add(node);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        /**
-         * @param statusCode the statusCode to set as a result of the operation
-         */
-        public void setStatusCode(int statusCode) {
-            this.statusCode = statusCode;
+        @Override
+        public void delete(String resource) {
+            deadProperties.remove(resource);
         }
 
-        /**
-         * @return <code>true</code> if the property is protected
-         */
-        public boolean getProtectedProperty() {
-            return this.protectedProperty;
+        @Override
+        public boolean propfind(String resource, Node property, boolean nameOnly, XMLWriter generatedXML) {
+            ArrayList<Node> properties = deadProperties.get(resource);
+            if (properties != null) {
+                synchronized (properties) {
+                    if (nameOnly) {
+                        // Add the names of all properties
+                        for (Node node : properties) {
+                            generatedXML.writeElement(null, node.getNamespaceURI(), node.getLocalName(),
+                                    XMLWriter.NO_CONTENT);
+                        }
+                    } else if (property != null) {
+                        // Add a single property
+                        Node foundNode = null;
+                        for (Node node : properties) {
+                            if (propertyEquals(node, property)) {
+                                foundNode = node;
+                            }
+                        }
+                        if (foundNode != null) {
+                            StringWriter strWriter = new StringWriter();
+                            DOMWriter domWriter = new DOMWriter(strWriter);
+                            domWriter.print(foundNode);
+                            generatedXML.writeRaw(strWriter.toString());
+                            return true;
+                        }
+                    } else {
+                        StringWriter strWriter = new StringWriter();
+                        DOMWriter domWriter = new DOMWriter(strWriter);
+                        // Add all properties
+                        for (Node node : properties) {
+                            domWriter.print(node);
+                        }
+                        generatedXML.writeRaw(strWriter.toString());
+                    }
+                }
+            }
+            return false;
         }
+
+        @Override
+        public void proppatch(String resource, ArrayList<ProppatchOperation> operations) {
+            boolean protectedProperty = false;
+            // Check for the protected properties
+            for (ProppatchOperation operation : operations) {
+                if (operation.getProtectedProperty()) {
+                    protectedProperty = true;
+                    operation.setStatusCode(HttpServletResponse.SC_FORBIDDEN);
+                }
+            }
+            if (protectedProperty) {
+                for (ProppatchOperation operation : operations) {
+                    if (!operation.getProtectedProperty()) {
+                        operation.setStatusCode(WebdavStatus.SC_FAILED_DEPENDENCY);
+                    }
+                }
+            } else {
+                ArrayList<Node> properties = deadProperties.get(resource);
+                if (properties == null) {
+                    properties = new ArrayList<>();
+                    deadProperties.put(resource, properties);
+                }
+                synchronized (properties) {
+                    for (ProppatchOperation operation : operations) {
+                        if (operation.getUpdateType() == PropertyUpdateType.SET) {
+                            Node node = operation.getPropertyNode().cloneNode(true);
+                            boolean found = false;
+                            for (int i = 0; i < properties.size(); i++) {
+                                Node propertyNode = properties.get(i);
+                                if (propertyEquals(node, propertyNode)) {
+                                    found = true;
+                                    properties.set(i, node);
+                                    break;
+                                }
+                            }
+                            if (!found) {
+                                properties.add(node);
+                            }
+                        }
+                        if (operation.getUpdateType() == PropertyUpdateType.REMOVE) {
+                            Node node = operation.getPropertyNode();
+                            for (int i = 0; i < properties.size(); i++) {
+                                Node propertyNode = properties.get(i);
+                                if (propertyEquals(node, propertyNode)) {
+                                    properties.remove(i);
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
-    enum PropertyUpdateType {
-        SET,
-        REMOVE
-    }
 
 }
 

@@ -177,12 +177,16 @@
         Implement WebDAV <code>If</code> header using code from the Apache
         Jackrabbit project. (remm)
       </update>
+      <add>
+        Add <code>PropertyStore</code> interface in the WebDAV Servlet,
+        to allow implementation of dead properties storage. The store used
+        can be configured using the 'propertyStore' init parameter of the
+        WebDAV servlet. A simple non persistent implementation is used if no
+        custom store is configured. (remm)
+      </add>
       <update>
-        Add base WebDAV <code>PROPPATCH</code> implementation, to be extended
-        by overriding the <code>proppatchResource</code>,
-        <code>propfindResource</code>, <code>copyResource</code> and
-        <code>deleteResource</code> methods of the WebDAV Servlet to
-        provide the desired level of support for dead properties. (remm)
+        Implement WebDAV <code>PROPPATCH</code> method using the newly added
+        <code>PropertyStore</code>. (remm)
       </update>
     </changelog>
   </subsection>
