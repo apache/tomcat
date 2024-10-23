@@ -21,13 +21,9 @@ import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayDeque;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
@@ -36,16 +32,14 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletRequestWrapper;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
-import org.apache.catalina.util.RequestUtil;
+import org.apache.catalina.connector.XForwardedRequest;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
-import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -105,6 +99,14 @@ import org.apache.tomcat.util.res.StringManager;
  * <td>RemoteIPHeader</td>
  * <td>Compliant http header name</td>
  * <td>x-forwarded-for</td>
+ * </tr>
+ * <tr>
+ * <td>requestIdHeader</td>
+ * <td>Name of the Http Header read by this servlet filter that holds a request ID passed by a proxy or the requesting
+ * client</td>
+ * <td>RequestIdHeader</td>
+ * <td>Compliant http header name</td>
+ * <td>x-request-id</td>
  * </tr>
  * <tr>
  * <td>internalProxies</td>
@@ -209,6 +211,10 @@ import org.apache.tomcat.util.res.StringManager;
  *    &lt;init-param&gt;
  *       &lt;param-name&gt;protocolHeader&lt;/param-name&gt;
  *       &lt;param-value&gt;x-forwarded-proto&lt;/param-value&gt;
+ *    &lt;/init-param&gt;
+ *    &lt;init-param&gt;
+ *       &lt;param-name&gt;requestIdHeader&lt;/param-name&gt;
+ *       &lt;param-value&gt;x-request-id&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  * &lt;/filter&gt;
  *
@@ -456,190 +462,6 @@ public class RemoteIpFilter extends GenericFilter {
 
     private static final long serialVersionUID = 1L;
 
-    public static class XForwardedRequest extends HttpServletRequestWrapper {
-
-        protected final Map<String,List<String>> headers;
-
-        protected String localName;
-
-        protected int localPort;
-
-        protected String remoteAddr;
-
-        protected String remoteHost;
-
-        protected String scheme;
-
-        protected boolean secure;
-
-        protected String serverName;
-
-        protected int serverPort;
-
-        public XForwardedRequest(HttpServletRequest request) {
-            super(request);
-            this.localName = request.getLocalName();
-            this.localPort = request.getLocalPort();
-            this.remoteAddr = request.getRemoteAddr();
-            this.remoteHost = request.getRemoteHost();
-            this.scheme = request.getScheme();
-            this.secure = request.isSecure();
-            this.serverName = request.getServerName();
-            this.serverPort = request.getServerPort();
-
-            headers = new HashMap<>();
-            for (Enumeration<String> headerNames = request.getHeaderNames(); headerNames.hasMoreElements();) {
-                String header = headerNames.nextElement();
-                headers.put(header, Collections.list(request.getHeaders(header)));
-            }
-        }
-
-        @Override
-        public long getDateHeader(String name) {
-            String value = getHeader(name);
-            if (value == null) {
-                return -1;
-            }
-            long date = FastHttpDateFormat.parseDate(value);
-            if (date == -1) {
-                throw new IllegalArgumentException(value);
-            }
-            return date;
-        }
-
-        @Override
-        public String getHeader(String name) {
-            Map.Entry<String,List<String>> header = getHeaderEntry(name);
-            if (header == null || header.getValue() == null || header.getValue().isEmpty()) {
-                return null;
-            }
-            return header.getValue().get(0);
-        }
-
-        protected Map.Entry<String,List<String>> getHeaderEntry(String name) {
-            for (Map.Entry<String,List<String>> entry : headers.entrySet()) {
-                if (entry.getKey().equalsIgnoreCase(name)) {
-                    return entry;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        public Enumeration<String> getHeaderNames() {
-            return Collections.enumeration(headers.keySet());
-        }
-
-        @Override
-        public Enumeration<String> getHeaders(String name) {
-            Map.Entry<String,List<String>> header = getHeaderEntry(name);
-            if (header == null || header.getValue() == null) {
-                return Collections.enumeration(Collections.<String>emptyList());
-            }
-            return Collections.enumeration(header.getValue());
-        }
-
-        @Override
-        public int getIntHeader(String name) {
-            String value = getHeader(name);
-            if (value == null) {
-                return -1;
-            }
-            return Integer.parseInt(value);
-        }
-
-        @Override
-        public String getLocalName() {
-            return localName;
-        }
-
-        @Override
-        public int getLocalPort() {
-            return localPort;
-        }
-
-        @Override
-        public String getRemoteAddr() {
-            return this.remoteAddr;
-        }
-
-        @Override
-        public String getRemoteHost() {
-            return this.remoteHost;
-        }
-
-        @Override
-        public String getScheme() {
-            return scheme;
-        }
-
-        @Override
-        public String getServerName() {
-            return serverName;
-        }
-
-        @Override
-        public int getServerPort() {
-            return serverPort;
-        }
-
-        public void removeHeader(String name) {
-            Map.Entry<String,List<String>> header = getHeaderEntry(name);
-            if (header != null) {
-                headers.remove(header.getKey());
-            }
-        }
-
-        public void setHeader(String name, String value) {
-            List<String> values = Collections.singletonList(value);
-            Map.Entry<String,List<String>> header = getHeaderEntry(name);
-            if (header == null) {
-                headers.put(name, values);
-            } else {
-                header.setValue(values);
-            }
-
-        }
-
-        public void setLocalName(String localName) {
-            this.localName = localName;
-        }
-
-        public void setLocalPort(int localPort) {
-            this.localPort = localPort;
-        }
-
-        public void setRemoteAddr(String remoteAddr) {
-            this.remoteAddr = remoteAddr;
-        }
-
-        public void setRemoteHost(String remoteHost) {
-            this.remoteHost = remoteHost;
-        }
-
-        public void setScheme(String scheme) {
-            this.scheme = scheme;
-        }
-
-        public void setSecure(boolean secure) {
-            super.getRequest().setAttribute(Globals.REMOTE_IP_FILTER_SECURE, Boolean.valueOf(secure));
-        }
-
-        public void setServerName(String serverName) {
-            this.serverName = serverName;
-        }
-
-        public void setServerPort(int serverPort) {
-            this.serverPort = serverPort;
-        }
-
-        @Override
-        public StringBuffer getRequestURL() {
-            return RequestUtil.getRequestURL(this);
-        }
-    }
-
-
     protected static final String HTTP_SERVER_PORT_PARAMETER = "httpServerPort";
 
     protected static final String HTTPS_SERVER_PORT_PARAMETER = "httpsServerPort";
@@ -666,6 +488,8 @@ public class RemoteIpFilter extends GenericFilter {
     protected static final String PROXIES_HEADER_PARAMETER = "proxiesHeader";
 
     protected static final String REMOTE_IP_HEADER_PARAMETER = "remoteIpHeader";
+
+    protected static final String REQUEST_ID_HEADER_PARAMETER = "requestIdHeader";
 
     protected static final String TRUSTED_PROXIES_PARAMETER = "trustedProxies";
 
@@ -716,6 +540,11 @@ public class RemoteIpFilter extends GenericFilter {
      * @see #setRemoteIpHeader(String)
      */
     private String remoteIpHeader = "X-Forwarded-For";
+
+    /**
+     * @see #setRequestIdHeader(String)
+     */
+    private String requestIdHeader = "";
 
     /**
      * @see #setRequestAttributesEnabled(boolean)
@@ -843,6 +672,14 @@ public class RemoteIpFilter extends GenericFilter {
                     }
                 }
             }
+
+            if (!requestIdHeader.isEmpty()) {
+                String requestIdHeaderValue = request.getHeader(requestIdHeader);
+                if (requestIdHeaderValue != null) {
+                    xRequest.setRequestId(requestIdHeaderValue);
+                }
+            }
+
             request.setAttribute(Globals.REQUEST_FORWARDED_ATTRIBUTE, Boolean.TRUE);
 
             if (log.isTraceEnabled()) {
@@ -1014,6 +851,10 @@ public class RemoteIpFilter extends GenericFilter {
 
         if (getInitParameter(REMOTE_IP_HEADER_PARAMETER) != null) {
             setRemoteIpHeader(getInitParameter(REMOTE_IP_HEADER_PARAMETER));
+        }
+
+        if (getInitParameter(REQUEST_ID_HEADER_PARAMETER) != null) {
+            setRequestIdHeader(getInitParameter(REQUEST_ID_HEADER_PARAMETER));
         }
 
         if (getInitParameter(TRUSTED_PROXIES_PARAMETER) != null) {
@@ -1219,6 +1060,17 @@ public class RemoteIpFilter extends GenericFilter {
      */
     public void setRemoteIpHeader(String remoteIpHeader) {
         this.remoteIpHeader = remoteIpHeader;
+    }
+
+    /**
+     * <p>Name of the http header from which the request id is extracted.</p>
+     *
+     * <p>Request id propagation is disabled by default. Set a value, e.g. <code>X-Request-Id</code>, to enable it.</p>
+     *
+     * @param requestIdHeader The header name
+     */
+    public void setRequestIdHeader(String requestIdHeader) {
+        this.requestIdHeader = requestIdHeader;
     }
 
     /**
