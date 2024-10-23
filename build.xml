@@ -2685,9 +2685,11 @@ skip.installer property in build.properties" />
     <jsign file="${tomcat.dist}/Uninstall.exe"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
+        keypass="${codesigning.keypass}"
         alias="${codesigning.alias}"
         alg="${codesigning.digest}"
-        tsaurl="http://timestamp.digicert.com"
+        tsaurl="http://ts.ssl.com"
+        tsmode="RFC3161"
         detached="true"/>
     <!-- Copy detached signature to source tree -->
     <copy file="${tomcat.dist}/Uninstall.exe.sig" todir="res/install-win"/>
@@ -2720,9 +2722,11 @@ skip.installer property in build.properties" />
     <jsign file="${tomcat.release}/v${version}/bin/${final.name}.exe"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
+        keypass="${codesigning.keypass}"
         alias="${codesigning.alias}"
         alg="${codesigning.digest}"
-        tsaurl="http://timestamp.digicert.com"
+        tsaurl="http://ts.ssl.com"
+        tsmode="RFC3161"
         detached="true" />
     <!-- Copy detached signature to source tree -->
     <copy file="${tomcat.release}/v${version}/bin/${final.name}.exe.sig"
