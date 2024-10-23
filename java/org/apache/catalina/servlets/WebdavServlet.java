@@ -23,7 +23,6 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
@@ -137,11 +136,26 @@ import org.xml.sax.SAXException;
  * access will be able to edit content available via http://host:port/context/content using
  * http://host:port/context/webdavedit/content
  * <p>
- * There are some known limitations of this Servlet due to it not implementing PROPPATCH and PROPFIND methods support
- * for dead properties. The Servlet does provide extension points to add support for some as required by user. Details
- * of these limitations and progress towards addressing them are being tracked under
- * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=69046">bug 69046</a>.
- * </p>
+ * The Servlet provides support for arbitrary dead properties on all resources (dead properties are properties
+ * whose values are not protected by the server, such as the content length of a resource). By default the Servlet
+ * will use non persistent memory storage for them. Persistence can be achieved by implementing
+ * the <code>PropertyStore</code> interface and configuring the Servlet to use that store.
+ * The <code>propertyStore</code> init-param allows configuring the classname of the store to use, while the
+ * parameters in the form of <code>store.xxx</code> will be set on the store object as bean properties.
+ * For example, this would configure a store with class <code>com.MyPropertyStore</code>, and set its field
+ * <code>myName</code> to value <code>myValue</code>:
+ *
+ * <pre>
+ *  &lt;init-param&gt;
+ *    &lt;param-name&gt;propertyStore&lt;/param-name&gt;
+ *    &lt;param-value&gt;com.MyPropertyStore&lt;/param-value&gt;
+ *  &lt;/init-param&gt;
+ *  &lt;init-param&gt;
+ *    &lt;param-name&gt;store.myName&lt;/param-name&gt;
+ *    &lt;param-value&gt;myValue&lt;/param-value&gt;
+ *  &lt;/init-param&gt;
+ * </pre>
+ * <p>
  *
  * @see <a href="https://tools.ietf.org/html/rfc4918">RFC 4918</a>
  */
@@ -322,8 +336,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         }
                     }
                 }
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
-                    | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+            } catch (Exception e) {
                 log(sm.getString("webdavservlet.storeError"), e);
             }
         }
