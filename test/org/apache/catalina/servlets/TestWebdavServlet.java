@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,11 +33,15 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.servlets.WebdavServlet.PropertyStore;
+import org.apache.catalina.servlets.WebdavServlet.ProppatchOperation;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.XMLWriter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.websocket.server.WsContextListener;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 
 public class TestWebdavServlet extends TomcatBaseTest {
@@ -246,7 +251,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         File tempWebapp = new File(getTemporaryDirectory(), "webdav-properties");
         Assert.assertTrue(tempWebapp.mkdirs());
         Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
-        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new TransientPropertiesWebdavServlet());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
         webdavServlet.addInitParameter("listings", "true");
         webdavServlet.addInitParameter("secret", "foo");
         webdavServlet.addInitParameter("readonly", "false");
@@ -1032,6 +1037,107 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(WebdavStatus.SC_CREATED, client.getStatusCode());
+
+    }
+
+    @Test
+    public void testPropertyStore() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-store");
+        Assert.assertTrue(tempWebapp.mkdirs());
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("listings", "true");
+        webdavServlet.addInitParameter("secret", "foo");
+        webdavServlet.addInitParameter("readonly", "false");
+        webdavServlet.addInitParameter("propertyStore", "org.apache.catalina.servlets.TestWebdavServlet$CustomPropertyStore");
+        webdavServlet.addInitParameter("store.propertyName", "mytestproperty");
+        webdavServlet.addInitParameter("store.propertyValue", "testvalue");
+        ctxt.addServletMappingDecoded("/*", "webdav");
+        ctxt.addMimeMapping("txt", "text/plain");
+        tomcat.start();
+
+        Client client = new Client();
+        client.setPort(getPort());
+
+        client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains(">testvalue</mytestproperty>"));
+        validateXml(client.getResponseBody());
+
+    }
+
+    public static class CustomPropertyStore implements PropertyStore {
+
+        private String propertyName = null;
+        private String propertyValue = null;
+
+        @Override
+        public void init() {
+        }
+
+        @Override
+        public void destroy() {
+        }
+
+        @Override
+        public void periodicEvent() {
+        }
+
+        @Override
+        public void copy(String source, String destination) {
+        }
+
+        @Override
+        public void delete(String resource) {
+        }
+
+        @Override
+        public boolean propfind(String resource, Node property, boolean nameOnly, XMLWriter generatedXML) {
+            generatedXML.writeElement(null, "https://tomcat.apache.org/testsuite", propertyName, XMLWriter.OPENING);
+            generatedXML.writeText(propertyValue);
+            generatedXML.writeElement(null, propertyName, XMLWriter.CLOSING);
+            return true;
+        }
+
+        @Override
+        public void proppatch(String resource, ArrayList<ProppatchOperation> operations) {
+        }
+
+        /**
+         * @return the propertyName
+         */
+        public String getPropertyName() {
+            return this.propertyName;
+        }
+
+        /**
+         * @param propertyName the propertyName to set
+         */
+        public void setPropertyName(String propertyName) {
+            this.propertyName = propertyName;
+        }
+
+        /**
+         * @return the propertyValue
+         */
+        public String getPropertyValue() {
+            return this.propertyValue;
+        }
+
+        /**
+         * @param propertyValue the propertyValue to set
+         */
+        public void setPropertyValue(String propertyValue) {
+            this.propertyValue = propertyValue;
+        }
 
     }
 
