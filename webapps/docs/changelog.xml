@@ -207,10 +207,6 @@
         Add back tag release method as deprecated in the runtime for compat
         with old generated code. (remm)
       </fix>
-    </changelog>
-  </subsection>
-  <subsection name="Jasper">
-    <changelog>
       <fix>
         <bug>69399</bug>: Fix regression caused by the improvement
         <bug>69333</bug> which caused the tag <code>release</code> to be called
