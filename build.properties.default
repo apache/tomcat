@@ -95,11 +95,13 @@ gpg.exec=/path/to/gpg
 # Code signing of Windows installer
 # See https://infra.apache.org/digicert-use.html for setup instructions
 do.codesigning=false
-codesigning.alias=Tomcat-PMC-cert-2023-11
-codesigning.digest=SHA-512
-codesigning.storetype=DIGICERTONE
+codesigning.alias=d97c5110-c66a-4c0c-ac0c-1cd6af812ee6
+codesigning.digest=SHA256
+codesigning.storetype=ESIGNER
 # Set codesigning.storepass in build.properties with the following syntax
-#codesigning.storepass=<api-key>|/path/to/Certificate_pkcs12.p12|<password>
+#codesigning.storepass=<ssl.com user name>|<ssl.com password>
+# Set codesigning.keypass in build.properties with the following syntax
+#codesigning.keypass=<ssl.com TOTP secret>
 
 # ----- Settings to control downloading of files -----
 execute.download=true
