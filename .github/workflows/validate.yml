@@ -43,6 +43,8 @@ jobs:
     - name: Build
       run: |
         ant -noinput validate
+      env:
+        ANT_OPTS: -Dexecute.validate=true
 
       continue-on-error:
         false
