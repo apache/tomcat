@@ -13,7 +13,7 @@ public class RateLimitFilterOfPerformance extends RateLimitFilter {
         super.init(filterConfig);
     }
     @Override
-    protected String parseQuotaIdentifier(ServletRequest request) {
+    protected String getLimitByIdentifier(ServletRequest request) {
         return ((HttpServletRequest)request).getHeader(X_CUST_IP);
     }
     

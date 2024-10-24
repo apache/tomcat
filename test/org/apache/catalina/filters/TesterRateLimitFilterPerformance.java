@@ -63,7 +63,7 @@ public class TesterRateLimitFilterPerformance extends TomcatBaseTest {
         filterDef.addInitParameter("bucketDuration", String.valueOf(durationUnit));
         filterDef.addInitParameter("enforce", String.valueOf(true));
         filterDef.addInitParameter("exposeHeaders", String.valueOf(false));
-        filterDef.addInitParameter("rateLimiterClassName", rateLimiterClassName);
+        filterDef.addInitParameter("rateLimitClassName", rateLimiterClassName);
         filterDef.setFilterClass(RateLimitFilterOfPerformance.class.getName());
         filterDef.setFilterName(filterName);
         root.addFilterDef(filterDef);

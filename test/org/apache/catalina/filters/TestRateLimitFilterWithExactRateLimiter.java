@@ -46,7 +46,7 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
         filterDef.addInitParameter("bucketDuration", String.valueOf(bucketDuration));
         filterDef.addInitParameter("enforce", String.valueOf(enforce));
         filterDef.addInitParameter("exposeHeaders", String.valueOf(exposeHeaders));
-        filterDef.addInitParameter("rateLimiterClassName", "org.apache.catalina.util.ExactRateLimiter");
+        filterDef.addInitParameter("rateLimitClassName", "org.apache.catalina.util.ExactRateLimiter");
 
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
