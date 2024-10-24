@@ -416,7 +416,8 @@
 
     <attribute name="connectionUploadTimeout" required="false">
       <p>Specifies the timeout, in milliseconds, to use while a data upload is
-      in progress. This only takes effect if
+      in progress. If not specified the default
+      value is 300000 (i.e. 300 seconds). This only takes effect if
       <strong>disableUploadTimeout</strong> is set to <code>false</code>.
       </p>
     </attribute>
@@ -792,19 +793,19 @@
       </attribute>
       <attribute name="socket.performanceConnectionTime" required="false">
         <p>(int)The first value for the performance settings. See
-        <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">Socket Performance Options</a>.
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">Socket Performance Options</a>.
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
       <attribute name="socket.performanceLatency" required="false">
         <p>(int)The second value for the performance settings. See
-        <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">Socket Performance Options</a>.
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">Socket Performance Options</a>.
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>
       <attribute name="socket.performanceBandwidth" required="false">
         <p>(int)The third value for the performance settings. See
-        <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">Socket Performance Options</a>.
+        <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">Socket Performance Options</a>.
         All three performance attributes must be set else the JVM defaults will
         be used for all three.</p>
       </attribute>

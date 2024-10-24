@@ -160,9 +160,9 @@
   <!--                       pages.  See the jasper documentation for more  -->
   <!--                       information.                                   -->
   <!--                                                                      -->
-  <!--   compilerSourceVM    Compiler source VM. [17]                       -->
+  <!--   compilerSourceVM    Compiler source VM. [21]                       -->
   <!--                                                                      -->
-  <!--   compilerTargetVM    Compiler target VM. [17]                       -->
+  <!--   compilerTargetVM    Compiler target VM. [21]                       -->
   <!--                                                                      -->
   <!--   development         Is Jasper used in development mode? If true,   -->
   <!--                       the frequency at which JSPs are checked for    -->

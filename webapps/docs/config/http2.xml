@@ -215,7 +215,7 @@
       <strong>useAsyncIO</strong> attribute of the associated
       <strong>Connector</strong> is set to <code>false</code>.</p>
       <p>The HTTP/2 sendfile capability uses <a
-      href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/MappedByteBuffer.html"
+      href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/MappedByteBuffer.html"
       >MappedByteBuffer</a> which is known to cause file locking on Windows.</p>
     </attribute>
 

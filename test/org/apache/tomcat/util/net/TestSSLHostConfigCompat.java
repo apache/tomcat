@@ -299,7 +299,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         tomcat.start();
 
         Assume.assumeFalse("BoringSSL removes support for many ciphers",
-                OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName()));
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
 
         // Check a request can be made
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/");

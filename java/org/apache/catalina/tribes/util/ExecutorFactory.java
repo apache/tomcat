@@ -38,8 +38,8 @@ public class ExecutorFactory {
     public static ExecutorService newThreadPool(int minThreads, int maxThreads, long maxIdleTime, TimeUnit unit,
             ThreadFactory threadFactory) {
         TaskQueue taskqueue = new TaskQueue();
-        ThreadPoolExecutor service = new TribesThreadPoolExecutor(minThreads, maxThreads, maxIdleTime, unit, taskqueue,
-                threadFactory);
+        ThreadPoolExecutor service =
+                new TribesThreadPoolExecutor(minThreads, maxThreads, maxIdleTime, unit, taskqueue, threadFactory);
         taskqueue.setParent(service);
         return service;
     }

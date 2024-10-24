@@ -111,6 +111,9 @@
         This release contains all of the changes up to and including those in
         Apache Tomcat 11.0.0 plus the additional changes listed below. (markt)
       </scode>
+      <update>
+        The minimum Java version has been updated to Java 21. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Catalina">
@@ -123,6 +126,7 @@
         Remove default value (was <code>catalina</code>) for the
         <code>secret</code> init parameter of the WebDAV Servlet. (remm)
       </update>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <update>
         <bug>69374</bug>: Properly separate between table header and body
         in <code>DefaultServlet</code>'s listing. (michaelo)
@@ -133,6 +137,67 @@
       </update>
       <update>
         Improve HTML output of <code>DefaultServlet</code>. (michaelo)
+      </update>
+      <update>
+        <bug>69370</bug>: <code>DefaultServlet</code>'s HTML listing
+        uses incorrect labels. (michaelo)
+      </update>
+      <fix>
+        Avoid NPE in <code>CrawlerSessionManagerValve</code> for partially
+        mapped requests. (remm)
+      </fix>
+      <fix>
+        Add missing WebDAV <code>Lock-Token</code> header in the response when
+        locking a folder. (remm)
+      </fix>
+      <fix>
+        Invalid WebDAV lock requests should be rejected with 400. (remm)
+      </fix>
+      <fix>
+        Fix regression in WebDAV when attempting to unlock a collection. (remm)
+      </fix>
+      <fix>
+        Verify that destination is not locked for a WebDAV copy operation.
+        (remm)
+      </fix>
+      <fix>
+        Send 415 response to WebDAV MKCOL operations that include a request
+        body since this is optional and unsupported. (remm)
+      </fix>
+      <fix>
+        Enforce <code>DAV:</code> namespace on WebDAV XML elements. (remm)
+      </fix>
+      <fix>
+        Do not allow a new WebDAV lock on a child resource if a parent
+        collection is locked (RFC 4918 section 6.1). (remm)
+      </fix>
+      <fix>
+        WebDAV Delete should remove any existing lock on successfully deleted
+        resources. (remm)
+      </fix>
+      <update>
+        Remove WebDAV lock null support in accordance with RFC 4918 section 7.3
+        and annex D. Instead a lock on a non existing resource will create an
+        empty file locked with a regular lock. (remm)
+      </update>
+      <update>
+        Rewrite implementation of WebDAV shared locks to comply with RFC 4918.
+        (remm)
+      </update>
+      <update>
+        Implement WebDAV <code>If</code> header using code from the Apache
+        Jackrabbit project. (remm)
+      </update>
+      <add>
+        Add <code>PropertyStore</code> interface in the WebDAV Servlet,
+        to allow implementation of dead properties storage. The store used
+        can be configured using the 'propertyStore' init parameter of the
+        WebDAV servlet. A simple non persistent implementation is used if no
+        custom store is configured. (remm)
+      </add>
+      <update>
+        Implement WebDAV <code>PROPPATCH</code> method using the newly added
+        <code>PropertyStore</code>. (remm)
       </update>
     </changelog>
   </subsection>
@@ -148,6 +213,7 @@
         <code>certificateKeystorePassword</code> attribute of a certificate.
         (remm)
       </update>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Return null SSL session id on zero length byte array returned from the
         SSL implementation. (remm)
@@ -172,6 +238,29 @@
         Language to support mergin <code>Map</code>Map and <code>Set</code>Set
         and concatenating <code>List</code>s. (markt)
       </add>
+      <update>
+        The defaults for <code>compilerSourceVM</code> and
+        <code>compilerTargetVM</code> have been updated to 21 to align with Java
+        21 being the minimum Java version required for Tomcat 12. (markt)
+      </update>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69399</bug>: Fix regression caused by the improvement
+        <bug>69333</bug> which caused the tag <code>release</code> to be called
+        when using tag pooling, and to be skipped when not using it.
+        Patch submitted by Michal Sobkiewicz. (remm)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Derby to 10.17.1.0. (markt)
+      </update>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Update Byte Buddy to 1.15.4. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>

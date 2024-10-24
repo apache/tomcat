@@ -175,10 +175,17 @@ public class CrawlerSessionManagerValve extends ValveBase {
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
+        Host host = request.getHost();
+        if (host == null) {
+            // Request will have no session
+            getNext().invoke(request, response);
+            return;
+        }
+
         boolean isBot = false;
         String sessionId = null;
         String clientIp = request.getRemoteAddr();
-        String clientIdentifier = getClientIdentifier(request.getHost(), request.getContext(), clientIp);
+        String clientIdentifier = getClientIdentifier(host, request.getContext(), clientIp);
 
         if (log.isTraceEnabled()) {
             log.trace(request.hashCode() + ": ClientIdentifier=" + clientIdentifier + ", RequestedSessionId=" +

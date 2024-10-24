@@ -170,7 +170,7 @@ public class StringManager {
     // STATIC SUPPORT METHODS
     // --------------------------------------------------------------
 
-    private static final Map<String, Map<Locale, StringManager>> managers = new HashMap<>();
+    private static final Map<String,Map<Locale,StringManager>> managers = new HashMap<>();
 
 
     /**
@@ -210,7 +210,7 @@ public class StringManager {
      */
     public static final synchronized StringManager getManager(String packageName, Locale locale) {
 
-        Map<Locale, StringManager> map = managers.get(packageName);
+        Map<Locale,StringManager> map = managers.get(packageName);
         if (map == null) {
             /*
              * Don't want the HashMap size to exceed LOCALE_CACHE_SIZE. Expansion occurs when size() exceeds capacity.
@@ -221,7 +221,7 @@ public class StringManager {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                protected boolean removeEldestEntry(Map.Entry<Locale, StringManager> eldest) {
+                protected boolean removeEldestEntry(Map.Entry<Locale,StringManager> eldest) {
                     if (size() > (LOCALE_CACHE_SIZE - 1)) {
                         return true;
                     }
