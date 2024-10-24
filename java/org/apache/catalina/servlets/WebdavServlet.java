@@ -581,8 +581,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         } else if (method.equals(METHOD_MOVE)) {
             doMove(req, resp);
         } else if (method.equals(METHOD_LOCK)) {
+            disableCacheable(resp);
             doLock(req, resp);
         } else if (method.equals(METHOD_UNLOCK)) {
+            disableCacheable(resp);
             doUnlock(req, resp);
         } else {
             // DefaultServlet processing
@@ -776,6 +778,20 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         return methodsAllowed.toString();
+    }
+    
+    /**
+     * Explicitly prevent the response from being cached by middle tier, e.g., <type>ExpiresFilter</type>, http server, or
+     * proxy server, browser.
+     * @param resp The HTTP Servlet response
+     * @see <a href="https://datatracker.ietf.org/doc/html/rfc7234">RFC 7234</a>
+     */
+    protected void disableCacheable(HttpServletResponse resp) {
+        resp.setHeader("Cache-Control", "no-cache, no-store, max-age=0"); // HTTP 1.1
+        /*
+         * Typically other components follow 'Expires' header.
+         */
+        resp.setDateHeader("Expires", 0);
     }
 
 
