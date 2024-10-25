@@ -159,6 +159,7 @@ public class Http11Processor extends AbstractProcessor {
 
         HttpParser httpParser = protocol.getHttpParser();
         if (httpParser == null) {
+            log.info(sm.getString("http11processor.noParser"));
             httpParser = new HttpParser(protocol.getRelaxedPathChars(), protocol.getRelaxedQueryChars());
         }
         this.httpParser = httpParser;
