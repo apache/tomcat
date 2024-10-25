@@ -219,6 +219,13 @@
         behavior was introduced on a previous refactoring to improve HTTP/2
         performance. (remm)
       </fix>
+      <fix>
+        <code>OpenSSLContext</code> will now throw a
+        <code>KeyManagementException</code> is something is known to have gone
+        wrong in the <code>init</code> method, which is the behavior
+        documented by <code>javax.net.ssl.SSLContext.init</code>. This makes
+        error handling more consistent. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
