@@ -188,6 +188,15 @@
         Implement WebDAV <code>PROPPATCH</code> method using the newly added
         <code>PropertyStore</code>. (remm)
       </update>
+      <fix>
+        Cache not found results when searching for web application class loader
+        resources. This addresses performance problems casued by components such
+        as <code>java.sql.DriverManager</code> which, in some circumstances,
+        will search for the same class repeatedly. In a large web application
+        this can cause performance problems. The size of the cache can be
+        controlled via the new <code>notFoundClassResourceCacheSize</code> on
+        the StandardContext. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

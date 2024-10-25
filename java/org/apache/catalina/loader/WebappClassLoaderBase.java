@@ -73,6 +73,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.collections.ConcurrentLruCache;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.PermissionCheck;
@@ -387,8 +388,25 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     private volatile LifecycleState state = LifecycleState.NEW;
 
+    /*
+     * Class resources are not cached since they are loaded on first use and the resource is then no longer required.
+     * It does help, however, to cache classes that are not found as in some scenarios the same class will be searched
+     * for many times and the greater the number of JARs/classes, the longer that lookup will take.
+     */
+    private final ConcurrentLruCache<String> notFoundClassResources = new ConcurrentLruCache<>(1000);
+
 
     // ------------------------------------------------------------- Properties
+
+    public void setNotFoundClassResourceCacheSize(int notFoundClassResourceCacheSize) {
+        notFoundClassResources.setLimit(notFoundClassResourceCacheSize);
+    }
+
+
+    public int getNotFoundClassResourceCacheSize() {
+        return notFoundClassResources.getLimit();
+    }
+
 
     /**
      * Unused. Always returns {@code null}.
@@ -869,14 +887,20 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         String path = nameToPath(name);
 
-        WebResource resource = resources.getClassLoaderResource(path);
-        if (resource.exists()) {
-            url = resource.getURL();
-            trackLastModified(path, resource);
-        }
+        if (!notFoundClassResources.contains(path)) {
+            WebResource resource = resources.getClassLoaderResource(path);
+            if (resource.exists()) {
+                url = resource.getURL();
+                trackLastModified(path, resource);
+            }
 
-        if (url == null && hasExternalRepositories) {
-            url = super.findResource(name);
+            if (url == null && hasExternalRepositories) {
+                url = super.findResource(name);
+            }
+
+            if (url == null) {
+                notFoundClassResources.add(path);
+            }
         }
 
         if (log.isTraceEnabled()) {
@@ -1063,26 +1087,29 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             log.trace("  Searching local repositories");
         }
         String path = nameToPath(name);
-        WebResource resource = resources.getClassLoaderResource(path);
-        if (resource.exists()) {
-            stream = resource.getInputStream();
-            trackLastModified(path, resource);
-        }
-        try {
-            if (hasExternalRepositories && stream == null) {
-                URL url = super.findResource(name);
-                if (url != null) {
-                    stream = url.openStream();
+        if (!notFoundClassResources.contains(path)) {
+            WebResource resource = resources.getClassLoaderResource(path);
+            if (resource.exists()) {
+                stream = resource.getInputStream();
+                trackLastModified(path, resource);
+            }
+            try {
+                if (hasExternalRepositories && stream == null) {
+                    URL url = super.findResource(name);
+                    if (url != null) {
+                        stream = url.openStream();
+                    }
                 }
+            } catch (IOException e) {
+                // Ignore
             }
-        } catch (IOException e) {
-            // Ignore
-        }
-        if (stream != null) {
-            if (log.isTraceEnabled()) {
-                log.trace("  --> Returning stream from local");
+            if (stream != null) {
+                if (log.isTraceEnabled()) {
+                    log.trace("  --> Returning stream from local");
+                }
+                return stream;
             }
-            return stream;
+            notFoundClassResources.add(path);
         }
 
         // (3) Delegate to parent unconditionally
@@ -1465,6 +1492,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         state = LifecycleState.STOPPING;
 
         resourceEntries.clear();
+        notFoundClassResources.clear();
         jarModificationTimes.clear();
         resources = null;
 
@@ -2167,9 +2195,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         WebResource resource = null;
 
         if (entry == null) {
+            if (notFoundClassResources.contains(path)) {
+                return null;
+            }
             resource = resources.getClassLoaderResource(path);
 
             if (!resource.exists()) {
+                notFoundClassResources.add(path);
                 return null;
             }
 
@@ -2202,10 +2234,14 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             if (resource == null) {
+                if (notFoundClassResources.contains(path)) {
+                    return null;
+                }
                 resource = resources.getClassLoaderResource(path);
             }
 
             if (!resource.exists()) {
+                notFoundClassResources.add(path);
                 return null;
             }
 
