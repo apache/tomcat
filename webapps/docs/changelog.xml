@@ -199,6 +199,12 @@
         Implement WebDAV <code>PROPPATCH</code> method using the newly added
         <code>PropertyStore</code>. (remm)
       </update>
+      <update>
+        Add new <code>lifecycleState.FAILED_INIT</code> to identify failures
+        during initialization. Otherwise, start and stop could be attempted
+        on a <code>Lifecycle</code> that did not go through initialization.
+        (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

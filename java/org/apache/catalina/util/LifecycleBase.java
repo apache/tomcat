@@ -153,9 +153,14 @@ public abstract class LifecycleBase implements Lifecycle {
 
         if (state.equals(LifecycleState.NEW)) {
             init();
-        } else if (state.equals(LifecycleState.FAILED)) {
+        }
+        if (state.equals(LifecycleState.FAILED)) {
             stop();
-        } else if (!state.equals(LifecycleState.INITIALIZED) && !state.equals(LifecycleState.STOPPED)) {
+        } else if (state.equals(LifecycleState.FAILED_INIT)) {
+            destroy();
+            return;
+        }
+        if (!state.equals(LifecycleState.INITIALIZED) && !state.equals(LifecycleState.STOPPED)) {
             invalidTransition(BEFORE_START_EVENT);
         }
 
@@ -285,7 +290,8 @@ public abstract class LifecycleBase implements Lifecycle {
         }
 
         if (!state.equals(LifecycleState.STOPPED) && !state.equals(LifecycleState.FAILED) &&
-                !state.equals(LifecycleState.NEW) && !state.equals(LifecycleState.INITIALIZED)) {
+                !state.equals(LifecycleState.NEW) && !state.equals(LifecycleState.INITIALIZED) &&
+                !state.equals(LifecycleState.FAILED_INIT)) {
             invalidTransition(BEFORE_DESTROY_EVENT);
         }
 
@@ -371,9 +377,12 @@ public abstract class LifecycleBase implements Lifecycle {
             // stopInternal() permits STOPPING_PREP to STOPPING and FAILED to
             // STOPPING
             if (!(state == LifecycleState.FAILED ||
+                    (this.state == LifecycleState.INITIALIZING && state == LifecycleState.FAILED_INIT) ||
+                    (this.state == LifecycleState.DESTROYING && state == LifecycleState.FAILED_INIT) ||
                     (this.state == LifecycleState.STARTING_PREP && state == LifecycleState.STARTING) ||
                     (this.state == LifecycleState.STOPPING_PREP && state == LifecycleState.STOPPING) ||
-                    (this.state == LifecycleState.FAILED && state == LifecycleState.STOPPING))) {
+                    (this.state == LifecycleState.FAILED && state == LifecycleState.STOPPING) ||
+                    (this.state == LifecycleState.FAILED_INIT && state == LifecycleState.DESTROYING))) {
                 // No other transition permitted
                 invalidTransition(state.name());
             }
@@ -394,7 +403,11 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     private void handleSubClassException(Throwable t, String key, Object... args) throws LifecycleException {
-        setStateInternal(LifecycleState.FAILED, null, false);
+        if (LifecycleState.INITIALIZING.equals(state) || LifecycleState.DESTROYING.equals(state)) {
+            setStateInternal(LifecycleState.FAILED_INIT, null, false);
+        } else {
+            setStateInternal(LifecycleState.FAILED, null, false);
+        }
         ExceptionUtils.handleThrowable(t);
         String msg = sm.getString(key, args);
         if (getThrowOnFailure()) {
