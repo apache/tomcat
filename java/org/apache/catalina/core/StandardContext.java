@@ -798,8 +798,20 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     private boolean parallelAnnotationScanning = false;
 
+    private int notFoundClassResourceCacheSize = 1000;
+
 
     // ----------------------------------------------------- Context Properties
+
+    public int getNotFoundClassResourceCacheSize() {
+        return notFoundClassResourceCacheSize;
+    }
+
+
+    public void setNotFoundClassResourceCacheSize(int notFoundClassResourceCacheSize) {
+        this.notFoundClassResourceCacheSize = notFoundClassResourceCacheSize;
+    }
+
 
     @Override
     public void setCreateUploadTargets(boolean createUploadTargets) {
@@ -4258,6 +4270,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     cl.setClearReferencesHttpClientKeepAliveThread(getClearReferencesHttpClientKeepAliveThread());
                     cl.setClearReferencesThreadLocals(getClearReferencesThreadLocals());
                     cl.setSkipMemoryLeakChecksOnJvmShutdown(getSkipMemoryLeakChecksOnJvmShutdown());
+                    cl.setNotFoundClassResourceCacheSize(getNotFoundClassResourceCacheSize());
                 }
 
                 // By calling unbindThread and bindThread in a row, we setup the
