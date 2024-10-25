@@ -70,6 +70,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     public void init() throws Exception {
+        httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
+
         // Upgrade protocols have to be configured first since the endpoint
         // init (triggered via super.init() below) uses this list to configure
         // the list of ALPN protocols to advertise
@@ -85,8 +87,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
             upgradeProtocol.setHttp11Protocol(this);
         }
-
-        httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
     }
 
 
