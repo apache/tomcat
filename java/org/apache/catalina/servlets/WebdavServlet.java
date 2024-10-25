@@ -1718,7 +1718,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         String lockTokenHeader = req.getHeader("Lock-Token");
         if (lockTokenHeader == null) {
-            lockTokenHeader = "";
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
 
         boolean unlocked = false;
