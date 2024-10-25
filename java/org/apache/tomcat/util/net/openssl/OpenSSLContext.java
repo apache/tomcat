@@ -22,6 +22,7 @@ import java.io.InputStreamReader;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
@@ -289,9 +290,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
      * @param tms Must contain a TrustManager of the type
      *            {@code X509TrustManager}
      * @param sr Is not used for this implementation.
+     * @throws KeyManagementException if an error occurs
      */
     @Override
-    public void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) {
+    public void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr)
+        throws KeyManagementException {
         if (initialized) {
             log.warn(sm.getString("openssl.doubleInit"));
             return;
@@ -454,8 +457,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             sslHostConfig.setOpenSslContext(Long.valueOf(state.ctx));
             initialized = true;
         } catch (Exception e) {
-            log.warn(sm.getString("openssl.errorSSLCtxInit"), e);
             destroy();
+            throw new KeyManagementException(sm.getString("openssl.errorSSLCtxInit"), e);
         }
     }
 
