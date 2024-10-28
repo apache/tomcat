@@ -19,6 +19,7 @@ package org.apache.catalina.filters;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Enumeration;
@@ -41,6 +42,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletResponseWrapper;
 import jakarta.servlet.http.MappingMatch;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -163,6 +165,21 @@ import org.apache.tomcat.util.buf.StringUtils;
  * syntax, described earlier in this document.
  * </p>
  * <h4>
+ * {@code ExpiresIncludedMethods}</h4>
+ * <p>
+ * This directive defines the http request methods list of cacheable. For request out of list, the
+ * {@code ExpiresFilter} will not generate expiration headers. By default, GET and HEAD. The value is a comma separated list of http methods.
+ * </p>
+ * <h4>
+ * {@code ExpiresIncludedResponseStatusCodes}</h4>
+ * <p>
+ * This directive defines the cacheable http response status codes list. For request out of list, the
+ * {@code ExpiresFilter} will not generate expiration headers. By default, per rfc9110 
+ * section 15.1 heuristically cacheable response status codes typically includes 
+ * sc (200, 203, 204, 206, 300, 301, 308, 404, 405, 410, 414, 
+ * and 501). The value is a comma separated list of http status codes.
+ * </p>
+ * <h4>
  * {@code ExpiresExcludedResponseStatusCodes}</h4>
  * <p>
  * This directive defines the http response status codes for which the
@@ -180,7 +197,22 @@ import org.apache.tomcat.util.buf.StringUtils;
  * <p>
  * Configuration sample :
  * </p>
- *
+ * <pre>
+ * {@code
+ * <init-param>
+ *    <param-name>ExpiresIncludedMethods</param-name>
+ *    <param-value>GET, HEAD</param-value>
+ * </init-param>
+ * }
+ * </pre>
+ * <pre>
+ * {@code
+ * <init-param>
+ *    <param-name>ExpiresIncludedResponseStatusCodes</param-name>
+ *    <param-value>200, 203, 204, 206, 300, 301, 308, 404, 405, 410, 414, 501</param-value>
+ * </init-param>
+ * }
+ * </pre>
  * <pre>
  * {@code
  * <init-param>
@@ -291,8 +323,13 @@ import org.apache.tomcat.util.buf.StringUtils;
  * A response is eligible to be enriched by {@code ExpiresFilter} if :
  * </p>
  * <ol>
+ * <li>the request method is understood by the cache, included by the directive
+ * {@code ExpiresIncludedMethods},</li>
+ * <li>the no-store cache directive is not present ({@code no-store} directive of the {@code Cache-Control} header),</li>
  * <li>no expiration header is defined ({@code Expires} header or the
  * {@code max-age} directive of the {@code Cache-Control} header),</li>
+ * <li>the response status code is included by the directive
+ * {@code ExpiresIncludedResponseStatusCodes},</li>
  * <li>the response status code is not excluded by the directive
  * {@code ExpiresExcludedResponseStatusCodes},</li>
  * <li>the {@code Content-Type} of the response matches one of the types
@@ -1024,7 +1061,16 @@ public class ExpiresFilter extends FilterBase {
 
     private static final String PARAMETER_EXPIRES_DEFAULT = "ExpiresDefault";
 
+    private static final String PARAMETER_EXPIRES_INCLUDED_RESPONSE_STATUS_CODES = "ExpiresIncludedResponseStatusCodes";
+    
     private static final String PARAMETER_EXPIRES_EXCLUDED_RESPONSE_STATUS_CODES = "ExpiresExcludedResponseStatusCodes";
+    
+    /*
+     * RFC 9111
+     */
+    private static final String PARAMETER_EXPIRES_INCLUDED_METHODS = "ExpiresIncludedMethods";
+    
+    private static final int[] CACHEABLE_STATUS_CODES = new int[] {200, 203, 204, 206, 300, 301, 308, 404, 405, 410, 414, 501};
 
     /**
      * Convert a comma delimited list of numbers into an {@code int[]}.
@@ -1153,6 +1199,9 @@ public class ExpiresFilter extends FilterBase {
      */
     private int[] excludedResponseStatusCodes = new int[] { HttpServletResponse.SC_NOT_MODIFIED };
 
+    private int[] includedResponseStatusCodes = Arrays.copyOf(CACHEABLE_STATUS_CODES, CACHEABLE_STATUS_CODES.length);
+    
+    private String[] expiresByMethods = new String[] {"GET", "HEAD"};
     /**
      * Expires configuration by content type. Visible for test.
      */
@@ -1356,9 +1405,13 @@ public class ExpiresFilter extends FilterBase {
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_DEFAULT)) {
                     ExpiresConfiguration expiresConfiguration = parseExpiresConfiguration(value);
                     this.defaultExpiresConfiguration = expiresConfiguration;
+                } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_INCLUDED_RESPONSE_STATUS_CODES)) {
+                    this.includedResponseStatusCodes = commaDelimitedListToIntArray(value);
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_EXCLUDED_RESPONSE_STATUS_CODES)) {
                     this.excludedResponseStatusCodes = commaDelimitedListToIntArray(value);
-                } else {
+                } else if(name.equalsIgnoreCase(PARAMETER_EXPIRES_INCLUDED_METHODS)) {
+                    this.expiresByMethods = StringUtils.splitCommaSeparated(value.toUpperCase());
+                } else  {
                     log.warn(sm.getString("expiresFilter.unknownParameterIgnored", name, value));
                 }
             } catch (RuntimeException e) {
@@ -1383,24 +1436,46 @@ public class ExpiresFilter extends FilterBase {
      */
     protected boolean isEligibleToExpirationHeaderGeneration(HttpServletRequest request,
             XHttpServletResponse response) {
-        boolean expirationHeaderHasBeenSet =
-                response.containsHeader(HEADER_EXPIRES) || contains(response.getCacheControlHeader(), "max-age");
-        if (expirationHeaderHasBeenSet) {
+        String uri = request.getRequestURI();
+        String contentType = response.getContentType();
+        String method = request.getMethod();
+        Integer sc = Integer.valueOf(response.getStatus());
+
+        if (!ArrayUtils.contains(expiresByMethods, method)) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("expiresFilter.expirationHeaderAlreadyDefined", request.getRequestURI(),
-                        Integer.valueOf(response.getStatus()), response.getContentType()));
+                log.debug(sm.getString("expiresFilter.skippedMethod", uri, sc, contentType, method));
             }
             return false;
         }
 
-        for (int skippedStatusCode : this.excludedResponseStatusCodes) {
-            if (response.getStatus() == skippedStatusCode) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("expiresFilter.skippedStatusCode", request.getRequestURI(),
-                            Integer.valueOf(response.getStatus()), response.getContentType()));
-                }
-                return false;
+        boolean cacheNoStoreHasBeenSet = contains(response.getCacheControlHeader(), "no-store");
+        if (cacheNoStoreHasBeenSet) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("expiresFilter.noStoreAlreadyDefined", uri, sc, contentType));
             }
+            return false;
+        }
+
+        boolean expirationHeaderHasBeenSet =
+                response.containsHeader(HEADER_EXPIRES) || contains(response.getCacheControlHeader(), "max-age");
+        if (expirationHeaderHasBeenSet) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("expiresFilter.expirationHeaderAlreadyDefined", uri, sc, contentType));
+            }
+            return false;
+        }
+
+        if (!ArrayUtils.contains(this.includedResponseStatusCodes, sc)) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("expiresFilter.notCacheableStatusCode", uri, sc, contentType));
+            }
+            return false;
+        }
+        if (ArrayUtils.contains(this.excludedResponseStatusCodes, sc)) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("expiresFilter.skippedStatusCode", uri, sc, contentType));
+            }
+            return false;
         }
 
         return true;

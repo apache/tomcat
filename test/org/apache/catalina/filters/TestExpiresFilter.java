@@ -16,8 +16,10 @@
  */
 package org.apache.catalina.filters;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,7 @@ import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,10 +38,13 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.filters.ExpiresFilter.Duration;
 import org.apache.catalina.filters.ExpiresFilter.DurationUnit;
 import org.apache.catalina.filters.ExpiresFilter.ExpiresConfiguration;
 import org.apache.catalina.filters.ExpiresFilter.StartingPoint;
+import org.apache.catalina.servlets.DefaultServlet;
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -520,5 +526,176 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
         Assert.assertNotNull(actualMaxAgeInSeconds);
         Assert.assertTrue(Math.abs(actualMaxAgeInSeconds.intValue() - 420) < 3);
+    }
+
+    @Test
+    public void testBug69415() throws Exception {
+
+        String filename="index.html";
+         
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, false);
+        Context ctxt = (Context) tomcat.getHost().findChild("/test");
+
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("ExpiresByType text", "access plus 30 days");
+        filterDef.addInitParameter("ExpiresExcludedResponseStatusCodes", "");
+        filterDef.addInitParameter("ExpiresIncludedMethods", "GET");
+        filterDef.addInitParameter("ExpiresIncludedResponseStatusCodes", "200,204,301");
+        filterDef.setFilterClass(ExpiresFilter.class.getName());
+        filterDef.setFilterName(ExpiresFilter.class.getName());
+
+        ctxt.addFilterDef(filterDef);
+
+        FilterMap filterMap = new FilterMap();
+        filterMap.setFilterName(ExpiresFilter.class.getName());
+        filterMap.addURLPatternDecoded("*");
+        ctxt.addFilterMap(filterMap);
+
+        HttpServlet customizedServlet = new MyServletOfTestExpiresFilter();
+        Tomcat.addServlet(ctxt, customizedServlet.getClass().getName(), customizedServlet);
+
+        ctxt.addServletMappingDecoded("/"+filename, customizedServlet.getClass().getName());
+        ctxt.addMimeMapping("html", "text/html");
+
+        tomcat.start();
+
+        Map<String,List<String>> resHeaders = new HashMap<>();
+        String path = "http://localhost:" + getPort() + "/test/"+filename;
+        ByteChunk out = new ByteChunk();
+
+        int rc;
+        /*GET*/
+        rc = getUrl(path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertNotNull("Expires expected for GET / sc=200",resHeaders.get("Expires"));
+        
+        out.recycle();
+        resHeaders.clear();
+
+        path = "http://localhost:" + getPort() + "/test/"+filename+"?cache-control=no-store";
+        out = new ByteChunk();
+
+        rc = getUrl(path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertNull("Expires not expected for GET / sc=200 / cache-control=no-store",resHeaders.get("Expires"));
+        
+        out.recycle();
+        resHeaders.clear();
+        
+        path = "http://localhost:" + getPort() + "/test/"+filename+"?sc=304";
+        out = new ByteChunk();
+
+        rc = getUrl(path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_NOT_MODIFIED, rc);
+        Assert.assertNull("Expires not expected for GET / sc=304",resHeaders.get("Expires"));
+        
+        out.recycle();
+        resHeaders.clear();
+        
+        path = "http://localhost:" + getPort() + "/test/"+filename+"?sc=200";
+        out = new ByteChunk();
+
+        rc = getUrl(path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertNotNull("Expires expected for GET / sc=200",resHeaders.get("Expires"));
+        
+        out.recycle();
+        resHeaders.clear();
+        
+        path = "http://localhost:" + getPort() + "/test/"+filename+"?sc=204";
+        out = new ByteChunk();
+
+        rc = getUrl(path, out, resHeaders);
+        Assert.assertEquals(204, rc);
+        Assert.assertNotNull("Expires expected for GET / sc=204",resHeaders.get("Expires"));
+        
+        out.recycle();
+        resHeaders.clear();
+        
+        /*POST*/
+        path = "http://localhost:" + getPort() + "/test/"+filename;
+        
+        rc = postUrl("".getBytes(),path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertNull("Expires not expected for POST",resHeaders.get("Expires"));
+        
+        out.recycle();
+        resHeaders.clear();
+        
+        /*HEAD*/
+        rc = headUrl(path, out, resHeaders);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        Assert.assertNull("Expires not expected for HEAD",resHeaders.get("Expires"));
+    }
+
+    static class MyServletOfTestExpiresFilter extends DefaultServlet {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+        private static final String CC_KEY = "cache-control";
+        private static final String SC_KEY = "sc";
+        private long lastModified = System.currentTimeMillis();
+        public MyServletOfTestExpiresFilter() {
+            super();
+        }
+
+        @Override
+        public void init() throws ServletException {
+            // TODO Auto-generated method stub
+            super.init();
+        }
+
+        @Override
+        public void init(ServletConfig config) throws ServletException {
+            // TODO Auto-generated method stub
+            super.init(config);
+        }
+
+        @Override
+        protected void doHead(HttpServletRequest request, HttpServletResponse response)
+                throws IOException, ServletException {
+            super.doHead(request, response);
+        }
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain; charset=utf-8");
+
+            String cc = req.getParameter(CC_KEY);
+            if ("no-store".equals(cc)) {
+                resp.setHeader("Cache-Control", "no-store");
+            }
+            String sc = req.getParameter(SC_KEY);
+            if (sc != null) {
+                try {
+                    int rc = Integer.parseInt(sc);
+                    resp.setStatus(rc);
+                } catch (Exception e) {
+                }
+            }
+            super.doGet(req, resp);
+        }
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            String content = "doPost";
+            resp.setContentType("text/plain; charset=utf-8");
+            
+            String cc = req.getParameter(CC_KEY);
+            if ("no-store".equals(cc)) {
+                resp.setHeader("Cache-Control", "no-store");
+            }
+            String sc = req.getParameter(SC_KEY);
+
+            if (sc != null) {
+                try {
+                    int rc = Integer.parseInt(sc);
+                    resp.setStatus(rc);
+                } catch (Exception e) {
+                }
+            }
+            resp.setContentLength(content.length());
+            resp.getWriter().write(content);
+        }
     }
 }
