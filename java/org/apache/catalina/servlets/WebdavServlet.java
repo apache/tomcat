@@ -816,7 +816,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         // Propfind depth
         int depth = maxDepth;
         // Propfind type
-        int type = FIND_ALL_PROP;
+        int type = -1;
 
         String depthStr = req.getHeader("Depth");
 
@@ -829,10 +829,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 depth = 1;
             } else if (depthStr.equals("infinity")) {
                 depth = maxDepth;
+            } else {
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return;
             }
         }
 
-        if (req.getContentLengthLong() > 0) {
+        if (req.getContentLengthLong() > 0 || "chunked".equalsIgnoreCase(req.getHeader("Transfer-Encoding"))) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
 
             try {
@@ -854,6 +857,11 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         case Node.ELEMENT_NODE:
                             String nodeName = getDAVNode(currentNode);
                             if ("prop".equals(nodeName)) {
+                                if (type >= 0) {
+                                    // Another was already defined
+                                    resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                                    return;
+                                }
                                 type = FIND_BY_PROPERTY;
                                 NodeList propChildList = currentNode.getChildNodes();
                                 for (int j = 0; j < propChildList.getLength(); j++) {
@@ -868,9 +876,19 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                 }
                             }
                             if ("propname".equals(nodeName)) {
+                                if (type >= 0) {
+                                    // Another was already defined
+                                    resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                                    return;
+                                }
                                 type = FIND_PROPERTY_NAMES;
                             }
                             if ("allprop".equals(nodeName)) {
+                                if (type >= 0) {
+                                    // Another was already defined
+                                    resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                                    return;
+                                }
                                 type = FIND_ALL_PROP;
                             }
                             break;
@@ -881,6 +899,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 resp.sendError(WebdavStatus.SC_BAD_REQUEST);
                 return;
             }
+            if (type == -1) {
+                // Nothing meaningful in the propfind element
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return;
+            }
+        } else {
+            type = FIND_ALL_PROP;
         }
 
         WebResource resource = resources.getResource(path);
@@ -1322,8 +1347,11 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         } else {
             if (depthStr.equals("0")) {
                 lock.depth = 0;
-            } else {
+            } else if (depthStr.equals("infinity")) {
                 lock.depth = maxDepth;
+            } else {
+                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                return;
             }
         }
 
