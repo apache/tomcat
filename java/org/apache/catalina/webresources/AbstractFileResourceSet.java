@@ -102,8 +102,8 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         /*
          * Ensure that the file is not outside the fileBase. This should not be possible for standard requests (the
          * request is normalized early in the request processing) but might be possible for some access via the Servlet
-         * API (e.g. RequestDispatcher) therefore these checks are retained as an additional safety measure absoluteBase
-         * has been normalized so absPath needs to be normalized as well.
+         * API (e.g. RequestDispatcher) therefore these checks are retained as an additional safety measure.
+         * absoluteBase has been normalized so absPath needs to be normalized as well.
          */
         String absPath = normalize(file.getAbsolutePath());
         if (absPath == null || absoluteBase.length() > absPath.length()) {
