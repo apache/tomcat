@@ -18,14 +18,21 @@ package org.apache.catalina.startup;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.util.Enumeration;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleState;
 import org.apache.catalina.startup.TestTomcat.HelloWorld;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -94,12 +101,60 @@ public class TestTomcatStandalone extends LoggingBaseTest {
         ctx.addServletMappingDecoded("/", "myServlet");
 
         tomcat.start();
+        // Emulate Tomcat main thread
+        new Thread() {
+            @Override
+            public void run() {
+                tomcat.getServer().await();
+                try {
+                    tomcat.stop();
+                } catch (LifecycleException e) {
+                }
+            }
+        }.start();
+        InetAddress localAddress = null;
+        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+        while (networkInterfaces.hasMoreElements()) {
+            NetworkInterface ni = networkInterfaces.nextElement();
+            if (!ni.isLoopback() && ni.isUp()) {
+                Enumeration<InetAddress> addresses = ni.getInetAddresses();
+                while (addresses.hasMoreElements()) {
+                    InetAddress address = addresses.nextElement();
+                    if (address instanceof Inet4Address) {
+                        localAddress = address;
+                    }
+                }
+            }
+        }
 
         ByteChunk res = TomcatBaseTest.getUrl("http://localhost:" + tomcat.getConnector().getLocalPort() + "/");
         Assert.assertEquals("Hello world", res.toString());
 
-        tomcat.stop();
-        tomcat.destroy();
+        // Use the shutdown command
+        if (localAddress != null) {
+            // Don't listen to non loopback
+            Exception ex = null;
+            try (Socket s = new Socket(localAddress, 8005)) {
+                s.getOutputStream().write("GOAWAY".getBytes(StandardCharsets.ISO_8859_1));
+            } catch (Exception e) {
+                ex = e;
+            }
+            Assert.assertNotNull(ex);
+        }
+
+        try (Socket s = new Socket(InetAddress.getLoopbackAddress(), 8005)) {
+            // Bad command
+            s.getOutputStream().write("GOAWAY".getBytes(StandardCharsets.ISO_8859_1));
+        }
+        Thread.sleep(100);
+        Assert.assertEquals(LifecycleState.STARTED, tomcat.getService().getState());
+
+        try (Socket s = new Socket(InetAddress.getLoopbackAddress(), 8005)) {
+            s.getOutputStream().write("SHUTDOWN".getBytes(StandardCharsets.ISO_8859_1));
+        }
+        Thread.sleep(100);
+        Assert.assertNotEquals(LifecycleState.STARTED, tomcat.getService().getState());
+
     }
 
 }
