@@ -31,6 +31,10 @@ public class TestUtil {
         public int getN(Integer n) {
             return n;
         }
+
+        private int privateMethodNoArgs() {
+            return 0;
+        }
     }
 
     @Test
@@ -44,6 +48,18 @@ public class TestUtil {
         Method method = Util.findMethod(null, TestBean.class, new TestBean(), "getN", new Class[] { Integer.class },
                 new Object[] { 2 });
         Assert.assertEquals(TestBean.class.getMethod("getN", new Class[] { Integer.class }), method);
+    }
+
+    @Test
+    public void testFindPrivateMethod() throws Exception {
+        // verifies that private methods are not located
+        try {
+            Util.findMethod(null, TestBean.class, new TestBean(), "privateMethodNoArgs",
+                    new Class[0], new Object[0]);
+            Assert.fail();
+        } catch (MethodNotFoundException mnfe) {
+            // success, sort of
+        }
     }
 
     @Test
