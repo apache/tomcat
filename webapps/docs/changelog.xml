@@ -202,6 +202,10 @@
         possible for subcomponents to be in <code>FAILED</code> after init.
         (remm)
       </fix>
+      <fix>
+        Fix incorrect cache size calculations when there is a concurrent PUT and
+        DELETE for the same resource. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
