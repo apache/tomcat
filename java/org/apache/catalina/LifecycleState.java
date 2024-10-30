@@ -32,8 +32,7 @@ public enum LifecycleState {
     STOPPED(false, Lifecycle.AFTER_STOP_EVENT),
     DESTROYING(false, Lifecycle.BEFORE_DESTROY_EVENT),
     DESTROYED(false, Lifecycle.AFTER_DESTROY_EVENT),
-    FAILED(false, null),
-    FAILED_INIT(false, null);
+    FAILED(false, null);
 
     private final boolean available;
     private final String lifecycleEvent;
