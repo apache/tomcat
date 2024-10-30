@@ -199,6 +199,11 @@
         Implement WebDAV <code>PROPPATCH</code> method using the newly added
         <code>PropertyStore</code>. (remm)
       </update>
+      <fix>
+        Stop after <code>INITIALIZED</code> state should be a noop since it is
+        possible for subcomponents to be in <code>FAILED</code> after init.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
