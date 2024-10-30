@@ -42,8 +42,6 @@ class Util {
     private static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
-    private static final Map<String, WeakReference<Method[]>> METHODS_BY_CLASS_NAME = new ConcurrentHashMap<>();
-
     private static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
 
     private static final boolean GET_CLASSLOADER_USE_PRIVILEGED;
@@ -228,6 +226,7 @@ class Util {
         }
 
         if (paramTypes.length == 0) {
+            // fast path: when no arguments exist, look for the method by itself
             try {
                 Method method = clazz.getMethod(methodName, paramTypes);
                 return method;
@@ -235,36 +234,13 @@ class Util {
                 // fall through to broader, slower logic
             }
         }
-
-        Method[] methods = getMethodsFromCache(clazz);
+        Method[] methods = clazz.getMethods();
 
         List<Wrapper<Method>> wrappers = Wrapper.wrap(methods, methodName);
 
         Wrapper<Method> result = findWrapper(context, clazz, wrappers, methodName, paramTypes, paramValues);
 
         return getMethod(clazz, base, result.unWrap());
-    }
-
-    /**
-     * Accesses cached copies of Class.getMethods() (when available) to avoid the JVM's expensive duplication of the
-     * Method[] and Method objects. Avoids ClassLoader memory leaks by keying off the class name (String) and keeping
-     * WeakReferences to the data.
-     * 
-     * @param clazz
-     * @return Method[]
-     */
-    private static Method[] getMethodsFromCache(Class<?> clazz) {
-        WeakReference<Method[]> weakRef = METHODS_BY_CLASS_NAME.get(clazz.getName());
-        Method[] methods;
-        // Check if cache contains a value - entry must exist, and weak ref must be
-        // populated
-        if (weakRef == null || (methods = weakRef.get()) == null) {
-            // no data found - either key is not present, or the weak ref is empty
-            methods = clazz.getMethods();
-            weakRef = new WeakReference<>(methods);
-            METHODS_BY_CLASS_NAME.put(clazz.getName(), weakRef);
-        }
-        return methods;
     }
 
     /*

@@ -16,12 +16,46 @@
  */
 package javax.el;
 
+import java.lang.reflect.Method;
 import java.util.Date;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class TestUtil {
+    public static class TestBean {
+        public int get1() {
+            return 1;
+        }
+
+        public int getN(Integer n) {
+            return n;
+        }
+    }
+
+    @Test
+    public void testFindMethodWithNoArgs() throws Exception {
+        Method method = Util.findMethod(null, TestBean.class, new TestBean(), "get1", new Class[0], new Object[0]);
+        Assert.assertEquals(TestBean.class.getMethod("get1"), method);
+    }
+
+    @Test
+    public void testFindMethodWithOneArg() throws Exception {
+        Method method = Util.findMethod(null, TestBean.class, new TestBean(), "getN", new Class[] { Integer.class },
+                new Object[] { 2 });
+        Assert.assertEquals(TestBean.class.getMethod("getN", new Class[] { Integer.class }), method);
+    }
+
+    @Test
+    public void testFindMethodNoSuchMethod() throws Exception {
+        try {
+            Util.findMethod(null, TestBean.class, new TestBean(), "getNonExistentMethod",
+                    new Class[] { Integer.class }, new Object[] { 2 });
+            Assert.fail();
+        } catch (MethodNotFoundException mnfe) {
+            // as expected
+        }
+    }
 
     @Test
     public void test01() {
@@ -53,4 +87,6 @@ public class TestUtil {
         processor.defineBean("string", "Not used. Any value is fine here");
         Assert.assertEquals("5", processor.eval("string.valueOf(5)"));
     }
+    
+    
 }
