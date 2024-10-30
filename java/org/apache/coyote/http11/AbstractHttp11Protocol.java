@@ -78,13 +78,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
             configureUpgradeProtocol(upgradeProtocol);
         }
 
-        super.init();
-
-        // Set the Http11Protocol (i.e. this) for any upgrade protocols once
-        // this has completed initialisation as the upgrade protocols may expect this
-        // to be initialised when the call is made
-        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
-            upgradeProtocol.setHttp11Protocol(this);
+        try {
+            super.init();
+        } finally {
+            // Set the Http11Protocol (i.e. this) for any upgrade protocols once
+            // this has completed initialisation as the upgrade protocols may expect this
+            // to be initialised when the call is made
+            for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
+                upgradeProtocol.setHttp11Protocol(this);
+            }
         }
     }
 
