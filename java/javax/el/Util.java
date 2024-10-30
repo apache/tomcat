@@ -227,6 +227,15 @@ class Util {
             paramTypes = getTypesFromValues(paramValues);
         }
 
+        if (paramTypes.length == 0) {
+            try {
+                Method method = clazz.getMethod(methodName, paramTypes);
+                return method;
+            } catch (NoSuchMethodException | SecurityException e) {
+                // fall through to broader, slower logic
+            }
+        }
+
         Method[] methods = getMethodsFromCache(clazz);
 
         List<Wrapper<Method>> wrappers = Wrapper.wrap(methods, methodName);
