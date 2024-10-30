@@ -203,9 +203,14 @@
         (remm)
       </fix>
       <fix>
-        Fix incorrect cache size calculations when there is a concurrent PUT and
-        DELETE for the same resource. (markt)
+        Fix incorrect web resource cache size calculations when there are
+        concurrent <code>PUT</code> and <code>DELETE</code> requests for the
+        same resource. (markt)
       </fix>
+      <add>
+        Add debug logging for the web resource cache so the current size can be
+        tracked as resources are added and removed. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
