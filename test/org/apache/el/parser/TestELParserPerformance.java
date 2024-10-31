@@ -17,6 +17,10 @@
 package org.apache.el.parser;
 
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.concurrent.Callable;
 
 import javax.el.ELContext;
 import javax.el.ELManager;
@@ -34,20 +38,16 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
  */
 public class TestELParserPerformance {
 
+    private static final long DEFAULT_TEST_ITERATIONS = 1000000;
+
     /*
      * Test to explore if re-using Parser instances is faster.
      *
-     * Tests on my laptop show:
-     * - overhead by introducing the stack is in the noise for parsing even the
-     *   simplest expression
-     * - efficiency from re-using the ELParser is measurable for even a single
-     *   reuse of the parser
-     * - with large numbers of parses (~10k) performance for a trivial parse is
-     *   three times faster
-     * - around the 100 iterations mark GC overhead adds significant noise to
-     *   the results - for consistent results you either need fewer parses to
-     *   avoid triggering GC or more parses so the GC effects are evenly
-     *   distributed between the runs
+     * Tests on my laptop show: - overhead by introducing the stack is in the noise for parsing even the simplest
+     * expression - efficiency from re-using the ELParser is measurable for even a single reuse of the parser - with
+     * large numbers of parses (~10k) performance for a trivial parse is three times faster - around the 100 iterations
+     * mark GC overhead adds significant noise to the results - for consistent results you either need fewer parses to
+     * avoid triggering GC or more parses so the GC effects are evenly distributed between the runs
      *
      * Note that the test is single threaded.
      */
@@ -59,11 +59,11 @@ public class TestELParserPerformance {
         long reinitTotalTime = 0;
         long newTotalTime = 0;
 
-        for (int j = 0; j < runs; j ++) {
+        for (int j = 0; j < runs; j++) {
             long start = System.nanoTime();
             SynchronizedStack<ELParser> stack = new SynchronizedStack<>();
 
-            for (int i = 0; i < parseIterations; i ++) {
+            for (int i = 0; i < parseIterations; i++) {
                 ELParser parser = stack.pop();
                 if (parser == null) {
                     parser = new ELParser(new StringReader("${'foo'}"));
@@ -74,23 +74,21 @@ public class TestELParserPerformance {
                 stack.push(parser);
             }
             long end = System.nanoTime();
-            reinitTotalTime +=  (end - start);
+            reinitTotalTime += (end - start);
 
-            System.out.println(parseIterations +
-                    " iterations using ELParser.ReInit(...) took " + (end - start) + "ns");
+            System.out.println(parseIterations + " iterations using ELParser.ReInit(...) took " + (end - start) + "ns");
         }
 
-        for (int j = 0; j < runs; j ++) {
+        for (int j = 0; j < runs; j++) {
             long start = System.nanoTime();
-            for (int i = 0; i < parseIterations; i ++) {
+            for (int i = 0; i < parseIterations; i++) {
                 ELParser parser = new ELParser(new StringReader("${'foo'}"));
                 parser.CompositeExpression();
             }
             long end = System.nanoTime();
-            newTotalTime +=  (end - start);
+            newTotalTime += (end - start);
 
-            System.out.println(parseIterations +
-                    " iterations using    new ELParser(...) took " + (end - start) + "ns");
+            System.out.println(parseIterations + " iterations using    new ELParser(...) took " + (end - start) + "ns");
         }
 
         Assert.assertTrue("Using new ElParser() was faster then using ELParser.ReInit", reinitTotalTime < newTotalTime);
@@ -111,7 +109,7 @@ public class TestELParserPerformance {
 
         long durations[] = new long[9];
         for (int j = 0; j < 5; j++) {
-            for (int operandCount = 2; operandCount < 11; operandCount ++) {
+            for (int operandCount = 2; operandCount < 11; operandCount++) {
 
                 StringBuilder sb = new StringBuilder("${true");
                 for (int i = 2; i <= operandCount; i++) {
@@ -136,8 +134,8 @@ public class TestELParserPerformance {
                 }
             }
         }
-        for (int operandCount = 2; operandCount < 11; operandCount ++) {
-            System.out.println("Operand count [" + operandCount + "], duration [" + durations[operandCount -2] + "]");
+        for (int operandCount = 2; operandCount < 11; operandCount++) {
+            System.out.println("Operand count [" + operandCount + "], duration [" + durations[operandCount - 2] + "]");
         }
         System.out.println("");
     }
@@ -172,5 +170,80 @@ public class TestELParserPerformance {
 
         }
         System.out.println("");
+    }
+
+
+    /*
+     * Utility method for running tasks provided by the test*() methods.
+     *
+     * @param c           Callable to be executed.
+     * @param description Label to be displayed in the results.
+     *
+     * @return Arbitrary response data provided by the Callable.
+     */
+    private Object runTest(Callable<Object> c, String description) throws Exception {
+
+        Object result = null;
+        for (int j = 0; j < 5; j++) {
+
+            System.gc();
+            long start = System.currentTimeMillis();
+
+            for (int i = 0; i < DEFAULT_TEST_ITERATIONS; i++) {
+                result = c.call();
+            }
+
+            long duration = System.currentTimeMillis() - start;
+            System.out.println(description + " duration=[" + duration + "ms] or " +
+                    (duration * 1000000 / DEFAULT_TEST_ITERATIONS + " ns each"));
+
+        }
+        System.out.println("Result: " + result);
+
+        return result;
+    }
+
+
+    /*
+     * Performance test of various expressions. This can be easily modified to explore the performance of other
+     * expressions.
+     *
+     * The operations tested in this method allocate many objects. For most consistent results, use runtime arguments
+     * such as these: -Xms3g -Xmx3g -XX:+UseParallelGC
+     *
+     * Ignored by default since this is an absolute test primarily for
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=69381
+     */
+    @Ignore
+    @Test
+    public void testExpressions() throws Exception {
+
+        ELManager manager = new ELManager();
+        ELContext context = manager.getELContext();
+        ExpressionFactory factory = ELManager.getExpressionFactory();
+        TesterBeanD beanD = new TesterBeanD();
+        TesterBeanE beanE = new TesterBeanE();
+        beanD.setBean(beanE);
+        beanD.setName("name");
+        beanE.setName("name");
+        beanD.setStringMap(new HashMap<>());
+        beanD.setValList(new ArrayList<>(Arrays.asList("a", "b", "c")));
+
+        ValueExpression var = factory.createValueExpression(beanD, TesterBeanD.class);
+        context.getVariableMapper().setVariable("beanD", var);
+
+        ValueExpression varB = factory.createValueExpression(beanE, TesterBeanE.class);
+        context.getVariableMapper().setVariable("beanE", varB);
+
+        var = factory.createValueExpression(TesterEnum.ONE, TesterEnum.class);
+        context.getVariableMapper().setVariable("enumOne", var);
+
+        String[] expressions = new String[] { "${beanD.name}", "${beanD.getName()}", "${beanE.getName()}" };
+        for (String expression : expressions) {
+            runTest(() -> {
+                ValueExpression ve = factory.createValueExpression(context, expression, Object.class);
+                return ve.getValue(context);
+            }, expression);
+        }
     }
 }
