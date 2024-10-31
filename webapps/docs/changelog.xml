@@ -204,6 +204,11 @@
         possible for subcomponents to be in <code>FAILED</code> after init.
         (remm)
       </fix>
+      <update>
+        Replace legacy WebDAV <code>opaquelocktoken:</code> scheme for lock
+        tokens with <code>urn:uuid:</code> as recommended by RFC 4918, and
+        remove <code>secret</code> init parameter. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
