@@ -261,6 +261,12 @@
         code rather than repeating them. Patch provided by John Engebretson.
         (markt)
       </fix>
+      <fix>
+        <bug>69381</bug>: Improve method lookup performance in expression
+        language. When the required method has no arguments there is no need to
+        consider casting or coercion and the method lookup process can be
+        simplified. Based on pull request <pr>770</pr> by John Engebretson.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
