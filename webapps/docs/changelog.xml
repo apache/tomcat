@@ -211,6 +211,11 @@
         Add debug logging for the web resource cache so the current size can be
         tracked as resources are added and removed. (markt)
       </add>
+      <update>
+        Replace legacy WebDAV <code>opaquelocktoken:</code> scheme for lock
+        tokens with <code>urn:uuid:</code> as recommended by RFC 4918, and
+        remove <code>secret</code> init parameter. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
