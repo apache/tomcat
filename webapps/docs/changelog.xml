@@ -256,16 +256,21 @@
         Patch submitted by Michal Sobkiewicz. (remm)
       </fix>
       <fix>
+        <bug>69381</bug>: Improve method lookup performance in expression
+        language. When the required method has no arguments there is no need to
+        consider casting or coercion and the method lookup process can be
+        simplified. Based on pull request <pr>770</pr> by John Engebretson.
+      </fix>
+      <fix>
         <bug>69382</bug>: Improve the performance of the JSP include action by
         re-using results of relatively expensive method calls in the generated
         code rather than repeating them. Patch provided by John Engebretson.
         (markt)
       </fix>
       <fix>
-        <bug>69381</bug>: Improve method lookup performance in expression
-        language. When the required method has no arguments there is no need to
-        consider casting or coercion and the method lookup process can be
-        simplified. Based on pull request <pr>770</pr> by John Engebretson.
+        <bug>69398</bug>: Avoid unnecessary object allocation in
+        <code>PageContextImpl</code>. Based on a suggestion by John Engebretson.
+        (markt)
       </fix>
     </changelog>
   </subsection>
