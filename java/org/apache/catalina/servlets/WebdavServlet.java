@@ -2621,9 +2621,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                         if (propertyNotFound != null) {
                             generatedXML.writeElement("D", propertyNotFound, XMLWriter.NO_CONTENT);
                         } else {
-                            generatedXML.writeElement(propertyNotFoundNode.getPrefix(),
-                                    propertyNotFoundNode.getNamespaceURI(), propertyNotFoundNode.getLocalName(),
-                                    XMLWriter.NO_CONTENT);
+                            generatedXML.writeElement(null, propertyNotFoundNode.getNamespaceURI(),
+                                    propertyNotFoundNode.getLocalName(), XMLWriter.NO_CONTENT);
                         }
                     }
 
