@@ -202,6 +202,16 @@ class Util {
             paramTypes = getTypesFromValues(paramValues);
         }
 
+        // Fast path: when no arguments exist, there can only be one matching method and no need for coercion.
+        if (paramTypes.length == 0) {
+            try {
+                Method method = clazz.getMethod(methodName, paramTypes);
+                return getMethod(clazz, base, method);
+            } catch (NoSuchMethodException | SecurityException e) {
+                // Fall through to broader, slower logic
+            }
+        }
+
         Method[] methods = clazz.getMethods();
 
         List<Wrapper<Method>> wrappers = Wrapper.wrap(methods, methodName);
