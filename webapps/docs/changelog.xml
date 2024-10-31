@@ -255,6 +255,12 @@
         when using tag pooling, and to be skipped when not using it.
         Patch submitted by Michal Sobkiewicz. (remm)
       </fix>
+      <fix>
+        <bug>69382</bug>: Improve the performance of the JSP include action by
+        re-using results of relatively expensive method calls in the generated
+        code rather than repeating them. Patch provided by John Engebretson.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
