@@ -2488,8 +2488,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 generatedXML.writeElement("D", "prop", XMLWriter.OPENING);
 
                 generatedXML.writeProperty("D", "creationdate", getISOCreationDate(created));
+                generatedXML.writeProperty("D", "getlastmodified", FastHttpDateFormat.formatDate(lastModified));
                 if (isFile) {
-                    generatedXML.writeProperty("D", "getlastmodified", FastHttpDateFormat.formatDate(lastModified));
                     generatedXML.writeProperty("D", "getcontentlength", Long.toString(contentLength));
                     if (contentType != null) {
                         generatedXML.writeProperty("D", "getcontenttype", contentType);
@@ -2497,11 +2497,11 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     generatedXML.writeProperty("D", "getetag", eTag);
                     generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
                 } else {
-                    generatedXML.writeProperty("D", "getlastmodified", FastHttpDateFormat.formatDate(lastModified));
                     generatedXML.writeElement("D", "resourcetype", XMLWriter.OPENING);
                     generatedXML.writeElement("D", "collection", XMLWriter.NO_CONTENT);
                     generatedXML.writeElement("D", "resourcetype", XMLWriter.CLOSING);
                 }
+
                 store.propfind(path, null, false, generatedXML);
 
                 generatedXML.writeElement("D", "supportedlock", XMLWriter.OPENING);
@@ -2525,14 +2525,16 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
                 generatedXML.writeElement("D", "creationdate", XMLWriter.NO_CONTENT);
                 if (isFile) {
-                    generatedXML.writeElement("D", "getcontentlanguage", XMLWriter.NO_CONTENT);
                     generatedXML.writeElement("D", "getcontentlength", XMLWriter.NO_CONTENT);
-                    generatedXML.writeElement("D", "getcontenttype", XMLWriter.NO_CONTENT);
+                    if (contentType != null) {
+                        generatedXML.writeElement("D", "getcontenttype", XMLWriter.NO_CONTENT);
+                    }
                     generatedXML.writeElement("D", "getetag", XMLWriter.NO_CONTENT);
-                    generatedXML.writeElement("D", "getlastmodified", XMLWriter.NO_CONTENT);
                 }
+                generatedXML.writeElement("D", "getlastmodified", XMLWriter.NO_CONTENT);
                 generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
                 generatedXML.writeElement("D", "lockdiscovery", XMLWriter.NO_CONTENT);
+                generatedXML.writeElement("D", "supportedlock", XMLWriter.NO_CONTENT);
                 store.propfind(path, null, true, generatedXML);
 
                 generatedXML.writeElement("D", "prop", XMLWriter.CLOSING);
@@ -2554,22 +2556,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
                 for (Node propertyNode : properties) {
                     String property = getDAVNode(propertyNode);
-                    if (property == null) {
+                    boolean protectedProperty =
+                            property != null && (!(property.equals("displayname") || property.equals("getcontentlanguage")));
+                    if (property == null || !protectedProperty) {
                         if (!store.propfind(path, propertyNode, false, generatedXML)) {
                             propertiesNotFound.add(propertyNode);
                         }
                     } else if (property.equals("creationdate")) {
                         generatedXML.writeProperty("D", "creationdate", getISOCreationDate(created));
-                    } else if (property.equals("displayname")) {
-                        generatedXML.writeElement("D", "displayname", XMLWriter.OPENING);
-                        generatedXML.writeData(resourceName);
-                        generatedXML.writeElement("D", "displayname", XMLWriter.CLOSING);
-                    } else if (property.equals("getcontentlanguage")) {
-                        if (isFile) {
-                            generatedXML.writeElement("D", "getcontentlanguage", XMLWriter.NO_CONTENT);
-                        } else {
-                            propertiesNotFound.add(propertyNode);
-                        }
                     } else if (property.equals("getcontentlength")) {
                         if (isFile) {
                             generatedXML.writeProperty("D", "getcontentlength", Long.toString(contentLength));
@@ -2577,7 +2571,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                             propertiesNotFound.add(propertyNode);
                         }
                     } else if (property.equals("getcontenttype")) {
-                        if (isFile) {
+                        if (isFile && contentType != null) {
                             generatedXML.writeProperty("D", "getcontenttype", contentType);
                         } else {
                             propertiesNotFound.add(propertyNode);
@@ -2589,12 +2583,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                             propertiesNotFound.add(propertyNode);
                         }
                     } else if (property.equals("getlastmodified")) {
-                        if (isFile) {
-                            generatedXML.writeProperty("D", "getlastmodified",
-                                    FastHttpDateFormat.formatDate(lastModified));
-                        } else {
-                            propertiesNotFound.add(propertyNode);
-                        }
+                        generatedXML.writeProperty("D", "getlastmodified", FastHttpDateFormat.formatDate(lastModified));
                     } else if (property.equals("resourcetype")) {
                         if (isFile) {
                             generatedXML.writeElement("D", "resourcetype", XMLWriter.NO_CONTENT);
