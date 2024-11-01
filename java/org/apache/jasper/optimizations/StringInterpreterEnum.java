@@ -16,20 +16,30 @@
  */
 package org.apache.jasper.optimizations;
 
+import org.apache.jasper.compiler.Localizer;
 import org.apache.jasper.compiler.StringInterpreterFactory.DefaultStringInterpreter;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 
 /**
- * Provides an optimised conversion of string values to Enums. It bypasses the
- * check for registered PropertyEditor.
+ * Provides an optimised conversion of string values to Enums. It bypasses the check for registered PropertyEditor.
  */
 public class StringInterpreterEnum extends DefaultStringInterpreter {
+
+    // Can't be static
+    private final Log log = LogFactory.getLog(ELInterpreterTagSetters.class);
 
     @Override
     protected String coerceToOtherType(Class<?> c, String s, boolean isNamedAttribute) {
         if (c.isEnum() && !isNamedAttribute) {
-            @SuppressWarnings({ "unchecked", "rawtypes" })
-            Enum<?> enumValue = Enum.valueOf((Class<? extends Enum>) c, s);
-            return c.getName() + "." + enumValue.name();
+            try {
+                @SuppressWarnings({ "unchecked", "rawtypes" })
+                Enum<?> enumValue = Enum.valueOf((Class<? extends Enum>) c, s);
+                return c.getName() + "." + enumValue.name();
+            } catch (IllegalArgumentException iae) {
+                log.debug(Localizer.getMessage("jsp.error.typeConversion", s, "Enum[" + c.getName() + "]"), iae);
+                // Continue and resolve the value at runtime
+            }
         }
 
         return null;
