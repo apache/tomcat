@@ -272,6 +272,12 @@
         <code>PageContextImpl</code>. Based on a suggestion by John Engebretson.
         (markt)
       </fix>
+      <fix>
+        <bug>69406</bug>: When using <code>StringInterpreterEnum</code>, do not
+        throw an <code>IllegalArgumentException</code> when an invalid
+        <code>Enum</code> is encountered. Instead, resolve the value at runtime.
+        Patch provided by John Engebretson. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
