@@ -1383,11 +1383,27 @@ public class ExpiresFilter extends FilterBase {
      */
     protected boolean isEligibleToExpirationHeaderGeneration(HttpServletRequest request,
             XHttpServletResponse response) {
-        boolean expirationHeaderHasBeenSet =
-                response.containsHeader(HEADER_EXPIRES) || contains(response.getCacheControlHeader(), "max-age");
-        if (expirationHeaderHasBeenSet) {
+
+        // Don't add cache headers unless the request is a GET or a HEAD request
+        String method = request.getMethod();
+        if (!"GET".equals(method) && !"HEAD".equals(method)) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("expiresFilter.invalidMethod", request.getRequestURI(), method));
+            }
+            return false;
+        }
+
+        if (response.containsHeader(HEADER_EXPIRES) || contains(response.getCacheControlHeader(), "max-age")) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.expirationHeaderAlreadyDefined", request.getRequestURI(),
+                        Integer.valueOf(response.getStatus()), response.getContentType()));
+            }
+            return false;
+        }
+
+        if (contains(response.getCacheControlHeader(), "no-store")) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("expiresFilter.cacheControlNoStore", request.getRequestURI(),
                         Integer.valueOf(response.getStatus()), response.getContentType()));
             }
             return false;

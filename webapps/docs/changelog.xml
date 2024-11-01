@@ -223,6 +223,12 @@
         file exists and some as set as if it does not. This resulted in
         inconsistent metadata. (markt)
       </fix>
+      <fix>
+        <bug>69415</bug>: Ensure that the <code>ExpiresFilter</code> only sets
+        cache headers on <code>GET</code> and <code>HEAD</code> requests. Also
+        skip requests where the application has set <code>Cache-Control:
+        no-store</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
