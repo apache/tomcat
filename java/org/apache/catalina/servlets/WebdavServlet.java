@@ -3171,25 +3171,13 @@ class WebdavStatus {
      * Status code (207) indicating that the response requires providing status for multiple independent operations.
      */
     public static final int SC_MULTI_STATUS = 207;
-    // This one collides with HTTP 1.1
-    // "207 Partial Update OK"
 
 
     /**
-     * Status code (418) indicating the entity body submitted with the PATCH method was not understood by the resource.
+     * Status code (422) indicating that the server understands the content type of the request but is unable to process
+     * the contained instructions.
      */
-    public static final int SC_UNPROCESSABLE_ENTITY = 418;
-    // This one collides with HTTP 1.1
-    // "418 Reauthentication Required"
-
-
-    /**
-     * Status code (419) indicating that the resource does not have sufficient space to record the state of the resource
-     * after the execution of this method.
-     */
-    public static final int SC_INSUFFICIENT_SPACE_ON_RESOURCE = 419;
-    // This one collides with HTTP 1.1
-    // "419 Proxy Reauthentication Required"
+    public static final int SC_UNPROCESSABLE_CONTENT = HttpServletResponse.SC_UNPROCESSABLE_CONTENT;
 
 
     /**
