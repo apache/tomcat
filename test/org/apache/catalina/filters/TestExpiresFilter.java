@@ -328,6 +328,24 @@ public class TestExpiresFilter extends TomcatBaseTest {
     }
 
     @Test
+    public void testUseDefaultConfiguration3() throws Exception {
+        HttpServlet servlet = new HttpServlet() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
+                response.setContentType("image/jpeg");
+                response.addHeader("Cache-Control", "no-store");
+
+                response.getWriter().print("Hello world");
+            }
+        };
+
+        validate(servlet, null);
+    }
+
+    @Test
     public void testUseMajorTypeExpiresConfiguration() throws Exception {
         HttpServlet servlet = new HttpServlet() {
             private static final long serialVersionUID = 1L;
