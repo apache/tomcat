@@ -216,6 +216,13 @@
         tokens with <code>urn:uuid:</code> as recommended by RFC 4918, and
         remove <code>secret</code> init parameter. (remm)
       </update>
+      <fix>
+        Concurrent reads and writes (e.g. <code>GET</code> and <code>PUT</code>
+        / <code>DELETE</code>) for the same path caused corruption of the
+        <code>FileResource</code> where some of the fields were set as if the
+        file exists and some as set as if it does not. This resulted in
+        inconsistent metadata. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
