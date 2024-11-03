@@ -256,7 +256,7 @@
       </fix>
     </changelog>
   </subsection>
-  <subsection name="Japser">
+  <subsection name="Jasper">
     <changelog>
       <fix>
         Add back tag release method as deprecated in the runtime for compat
