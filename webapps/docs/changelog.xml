@@ -229,6 +229,12 @@
         skip requests where the application has set <code>Cache-Control:
         no-store</code>. (markt)
       </fix>
+      <fix>
+        <bug>69419</bug>: Improve the performance of
+        <code>ServletRequest.getAttribute()</code> when there are multiple
+        levels of nested includes. Based on a patch provided by John
+        Engebretson. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
