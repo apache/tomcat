@@ -146,10 +146,9 @@ public interface WebResource {
      * @return the code base for this resource that will be used when looking up the assigned permissions for the code
      *             base in the security policy file when running under a security manager.
      */
-    URL getCodeBase();
-    //default URL getCodeBase() {
-    //    return null;
-    //}
+    default URL getCodeBase() {
+        return null;
+    }
 
     /**
      * @return a reference to the WebResourceRoot of which this WebResource is a part.
