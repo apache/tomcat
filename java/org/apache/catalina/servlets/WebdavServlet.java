@@ -3177,7 +3177,7 @@ class WebdavStatus {
      * Status code (422) indicating that the server understands the content type of the request but is unable to process
      * the contained instructions.
      */
-    public static final int SC_UNPROCESSABLE_CONTENT = HttpServletResponse.SC_UNPROCESSABLE_CONTENT;
+    public static final int SC_UNPROCESSABLE_CONTENT = 422;
 
 
     /**
