@@ -24,17 +24,24 @@ import org.apache.el.lang.EvaluationContext;
 
 public final class AstMethodParameters extends SimpleNode {
 
+    private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+
     public AstMethodParameters(int id) {
         super(id);
     }
 
 
     public Object[] getParameters(EvaluationContext ctx) {
+        int numChildren = this.jjtGetNumChildren();
+        // Optimise simple case
+        if (numChildren == 0) {
+            return EMPTY_OBJECT_ARRAY;
+        }
         List<Object> params = new ArrayList<>();
-        for (int i = 0; i < this.jjtGetNumChildren(); i++) {
+        for (int i = 0; i < numChildren; i++) {
             params.add(this.jjtGetChild(i).getValue(ctx));
         }
-        return params.toArray(new Object[0]);
+        return params.toArray(EMPTY_OBJECT_ARRAY);
     }
 
 
