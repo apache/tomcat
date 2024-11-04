@@ -369,6 +369,11 @@ public class CachedResource implements WebResource {
     }
 
     @Override
+    public URL getCodeBase() {
+        return webResource.getCodeBase();
+    }
+
+    @Override
     public Certificate[] getCertificates() {
         return webResource.getCertificates();
     }

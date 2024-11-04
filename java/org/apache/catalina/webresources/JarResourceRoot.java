@@ -134,6 +134,18 @@ public class JarResourceRoot extends AbstractResource {
     }
 
     @Override
+    public URL getCodeBase() {
+        try {
+            return new URI(baseUrl).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("fileResource.getUrlFail", baseUrl), e);
+            }
+            return null;
+        }
+    }
+
+    @Override
     protected Log getLog() {
         return log;
     }

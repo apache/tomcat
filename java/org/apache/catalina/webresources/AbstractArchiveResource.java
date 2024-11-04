@@ -35,23 +35,33 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     private final AbstractArchiveResourceSet archiveResourceSet;
     private final String baseUrl;
     private final JarEntry resource;
+    private final String codeBaseUrl;
     private final String name;
     private boolean readCerts = false;
     private Certificate[] certificates;
 
-
+    /*
+     * Deprecated even though this is the "new" constructor as code needs to call the old constructor for now.
+     */
     @Deprecated
     protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
-            JarEntry jarEntry, @SuppressWarnings("unused") String codeBaseUrl) {
-        this(archiveResourceSet, webAppPath, baseUrl, jarEntry);
+            JarEntry jarEntry) {
+        this(archiveResourceSet, webAppPath, baseUrl, jarEntry, null);
     }
 
+    /*
+     * The expectation is that this will be deprecated and then removed once the SecurityManager has been fully removed
+     * from the JRE and it has been confirmed that the JRE no longer depends on code base.
+     *
+     * See https://bz.apache.org/bugzilla/show_bug.cgi?id=69426
+     */
     protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
-            JarEntry jarEntry) {
+            JarEntry jarEntry, String codeBaseUrl) {
         super(archiveResourceSet.getRoot(), webAppPath);
         this.archiveResourceSet = archiveResourceSet;
         this.baseUrl = baseUrl;
         this.resource = jarEntry;
+        this.codeBaseUrl = codeBaseUrl;
 
         String resourceName = resource.getName();
         if (resourceName.charAt(resourceName.length() - 1) == '/') {
@@ -152,6 +162,18 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("fileResource.getUrlFail", url), e);
+            }
+            return null;
+        }
+    }
+
+    @Override
+    public URL getCodeBase() {
+        try {
+            return new URI(codeBaseUrl).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("fileResource.getUrlFail", codeBaseUrl), e);
             }
             return null;
         }
