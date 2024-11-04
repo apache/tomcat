@@ -32,6 +32,7 @@ import java.util.NoSuchElementException;
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRequest;
 import jakarta.servlet.http.HttpServletMapping;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
@@ -235,7 +236,17 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         int pos = getSpecial(name);
         if (pos == -1) {
-            return getRequest().getAttribute(name);
+            /*
+             * With nested includes there will be nested ApplicationHttpRequests. The calls to getSpecial() are
+             * relatively expensive and it is known at this point that the attribute is not special. Therefore, jump to
+             * the first wrapped request that isn't an instance of ApplicationHttpRequest before calling getAttribute()
+             * to avoid a call to getSpecial() for each nested ApplicationHttpRequest.
+             */
+            ServletRequest wrappedRequest = getRequest();
+            while (wrappedRequest instanceof ApplicationHttpRequest) {
+                wrappedRequest = ((ApplicationHttpRequest) wrappedRequest).getRequest();
+            }
+            return wrappedRequest.getAttribute(name);
         } else {
             if ((specialAttributes[pos] == null) && (specialAttributes[SPECIALS_FIRST_FORWARD_INDEX] == null) &&
                     (pos >= SPECIALS_FIRST_FORWARD_INDEX)) {
