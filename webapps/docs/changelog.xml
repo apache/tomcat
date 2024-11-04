@@ -235,6 +235,12 @@
         levels of nested includes. Based on a patch provided by John
         Engebretson. (markt)
       </fix>
+      <fix>
+        <bug>69426</bug>: Restore providing a value (rather than null) for
+        <code>Class.getProtectionDomain().getCodeSource().getLocation()</code>
+        as a number of libraries and JRE features depend on this being non-null
+        even when a SecurityManager is not is use. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

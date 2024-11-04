@@ -358,9 +358,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private volatile LifecycleState state = LifecycleState.NEW;
 
     /*
-     * Class resources are not cached since they are loaded on first use and the resource is then no longer required.
-     * It does help, however, to cache classes that are not found as in some scenarios the same class will be searched
-     * for many times and the greater the number of JARs/classes, the longer that lookup will take.
+     * Class resources are not cached since they are loaded on first use and the resource is then no longer required. It
+     * does help, however, to cache classes that are not found as in some scenarios the same class will be searched for
+     * many times and the greater the number of JARs/classes, the longer that lookup will take.
      */
     private final ConcurrentLruCache<String> notFoundClassResources = new ConcurrentLruCache<>(1000);
 
@@ -2095,6 +2095,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 return null;
             }
             Manifest manifest = resource.getManifest();
+            URL codeBase = resource.getCodeBase();
             Certificate[] certificates = resource.getCertificates();
 
             if (transformers.size() > 0) {
@@ -2136,7 +2137,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         if (manifest == null) {
                             definePackage(packageName, null, null, null, null, null, null, null);
                         } else {
-                            definePackage(packageName, manifest, null);
+                            definePackage(packageName, manifest, codeBase);
                         }
                     } catch (IllegalArgumentException e) {
                         // Ignore: normal error due to dual definition of package
@@ -2146,7 +2147,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             try {
-                clazz = defineClass(name, binaryContent, 0, binaryContent.length, new CodeSource(null, certificates));
+                clazz = defineClass(name, binaryContent, 0, binaryContent.length,
+                        new CodeSource(codeBase, certificates));
             } catch (UnsupportedClassVersionError ucve) {
                 throw new UnsupportedClassVersionError(
                         ucve.getLocalizedMessage() + " " + sm.getString("webappClassLoader.wrongVersion", name));
