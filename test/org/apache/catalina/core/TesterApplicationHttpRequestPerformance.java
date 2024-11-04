@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.core;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 import org.junit.Test;
 
 import org.apache.catalina.connector.Request;
@@ -31,7 +33,7 @@ public class TesterApplicationHttpRequestPerformance {
         org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
         Request request = new Request(null);
         request.setCoyoteRequest(coyoteRequest);
-        ApplicationHttpRequest applicationHttpRequest = new ApplicationHttpRequest(request, null ,false);
+        ApplicationHttpRequest applicationHttpRequest = new ApplicationHttpRequest(request, null, false);
 
         // Warm-up
         doTestGetAttribute(applicationHttpRequest);
@@ -44,9 +46,37 @@ public class TesterApplicationHttpRequestPerformance {
     }
 
 
-    private void doTestGetAttribute(ApplicationHttpRequest request) {
+    private void doTestGetAttribute(HttpServletRequest request) {
         for (int i = 0; i < 100000000; i++) {
             request.getAttribute("Unknown");
+        }
+    }
+
+    private static HttpServletRequest getRequest(int depth) {
+        if (depth <= 0) {
+            org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
+            Request request = new Request(null);
+            request.setCoyoteRequest(coyoteRequest);
+            return request;
+        }
+        return new ApplicationHttpRequest(getRequest(depth - 1), null, false);
+    }
+
+
+    @Test
+    public void testGetAttributeNested() {
+        int[] depths = { 0, 1, 4, 7 };
+        for (int depth : depths) {
+            HttpServletRequest httpRequest = getRequest(depth);
+
+            // Warm-up
+            doTestGetAttribute(httpRequest);
+
+            long start = System.nanoTime();
+            doTestGetAttribute(httpRequest);
+            long duration = System.nanoTime() - start;
+
+            System.out.println("Depth " + depth + ": " + duration + "ns");
         }
     }
 }
