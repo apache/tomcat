@@ -73,6 +73,8 @@ public class Response implements HttpServletResponse {
 
     private static final MediaTypeCache MEDIA_TYPE_CACHE = new MediaTypeCache(100);
 
+    protected static final int SC_EARLY_HINTS = 103;
+
     /**
      * Coyote response.
      */
@@ -1051,12 +1053,32 @@ public class Response implements HttpServletResponse {
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Calling <code>sendError</code> with a status code of 103 differs from the usual
+     * behavior. Sending 103 will trigger the container to send a "103 Early Hints" informational response including all
+     * current headers. The application can continue to use the request and response after calling sendError with a 103
+     * status code, including triggering a more typical response of any type.
+     * <p>
+     * Starting with Tomcat 12, applications should use {@link #sendEarlyHints}.
+     */
     @Override
     public void sendError(int status) throws IOException {
         sendError(status, null);
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Calling <code>sendError</code> with a status code of 103 differs from the usual
+     * behavior. Sending 103 will trigger the container to send a "103 Early Hints" informational response including all
+     * current headers. The application can continue to use the request and response after calling sendError with a 103
+     * status code, including triggering a more typical response of any type.
+     * <p>
+     * Starting with Tomcat 12, applications should use {@link #sendEarlyHints}.
+     */
     @Override
     public void sendError(int status, String message) throws IOException {
 
@@ -1069,16 +1091,20 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        setError();
+        if (SC_EARLY_HINTS == status) {
+            sendEarlyHints();
+        } else {
+            setError();
 
-        getCoyoteResponse().setStatus(status);
-        getCoyoteResponse().setMessage(message);
+            getCoyoteResponse().setStatus(status);
+            getCoyoteResponse().setMessage(message);
 
-        // Clear any data content that has been buffered
-        resetBuffer();
+            // Clear any data content that has been buffered
+            resetBuffer();
 
-        // Cause the response to be finished (from the application perspective)
-        setSuspended(true);
+            // Cause the response to be finished (from the application perspective)
+            setSuspended(true);
+        }
     }
 
 

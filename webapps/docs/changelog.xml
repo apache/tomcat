@@ -246,6 +246,11 @@
         as a number of libraries and JRE features depend on this being non-null
         even when a SecurityManager is not is use. (markt)
       </fix>
+      <add>
+        All applications to send an early hints informational response by
+        calling <code>HttpServletResponse.sendError()</code> with a status code
+        of 103. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
