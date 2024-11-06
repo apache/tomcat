@@ -325,6 +325,9 @@
       <update>
         Update CheckStyle to 10.20.0. (markt)
       </update>
+      <add>
+        Improvements to German translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
