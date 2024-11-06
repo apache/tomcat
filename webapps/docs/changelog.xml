@@ -240,6 +240,11 @@
         levels of nested includes. Based on a patch provided by John
         Engebretson. (markt)
       </fix>
+      <add>
+        All applications to send an early hints informational response by
+        calling <code>HttpServletResponse.sendError()</code> with a status code
+        of 103. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
