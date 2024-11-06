@@ -84,9 +84,12 @@ public class ToStringUtil {
                     result.append("\n");
                 }
             }
-        } else if (classLoader == ClassLoader.getPlatformClassLoader()) {
-            // From Java 9 the internal class loaders no longer extend
-            // URLCLassLoader
+        } else if (classLoader == ClassLoader.getSystemClassLoader().getParent()) {
+            /*
+             * ClassLoader.getPlatformClassLoader() is not available in Java 8. When running on Java 9 onwards where
+             * the internal class loaders no longer extend URLCLassLoaderthe platform class loader is the parent of the
+             * system class loader.
+             */
             result.append(INDENT);
             result.append(INDENT);
             result.append(sm.getString("toStringUtil.classpath.platform"));
