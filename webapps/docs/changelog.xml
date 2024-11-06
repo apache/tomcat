@@ -111,6 +111,11 @@
         Add support for the new Servlet API method
         <code>HttpServletResponse.sendEarlyHints()</code>. (markt)
       </add>
+      <add>
+        <fix>55470</fix>: Add debug logging that reports the class path when a
+        <code>ClassNotFoundException</code> occurs in the digester or the web
+        application class loader. Based on a patch by Ralf Hauser. (markt)
+      </add>
       <update>
         <bug>69374</bug>: Properly separate between table header and body
         in <code>DefaultServlet</code>'s listing. (michaelo)

@@ -73,6 +73,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.ToStringUtil;
 import org.apache.tomcat.util.collections.ConcurrentLruCache;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
@@ -1332,6 +1333,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug(ToStringUtil.classPathForCNFE(this));
+        }
         throw new ClassNotFoundException(name);
     }
 
