@@ -146,11 +146,24 @@ public class Http11Processor extends AbstractProcessor {
     private SendfileDataBase sendfileData = null;
 
 
+    /**
+     * Http parser.
+     */
+    private final HttpParser httpParser;
+
+
     public Http11Processor(AbstractHttp11Protocol<?> protocol, Adapter adapter) {
         super(adapter);
         this.protocol = protocol;
 
-        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpRequestHeaderSize(), protocol.getHttpParser());
+        HttpParser httpParser = protocol.getHttpParser();
+        if (httpParser == null) {
+            log.info(sm.getString("http11processor.noParser"));
+            httpParser = new HttpParser(protocol.getRelaxedPathChars(), protocol.getRelaxedQueryChars());
+        }
+        this.httpParser = httpParser;
+
+        inputBuffer = new Http11InputBuffer(request, protocol.getMaxHttpRequestHeaderSize(), httpParser);
         request.setInputBuffer(inputBuffer);
 
         outputBuffer = new Http11OutputBuffer(response, protocol.getMaxHttpResponseHeaderSize());
@@ -752,7 +765,7 @@ public class Http11Processor extends AbstractProcessor {
         // Validate the characters in the URI. %nn decoding will be checked at
         // the point of decoding.
         for (int i = uriBC.getStart(); i < uriBC.getEnd(); i++) {
-            if (!protocol.getHttpParser().isAbsolutePathRelaxed(uriB[i])) {
+            if (!httpParser.isAbsolutePathRelaxed(uriB[i])) {
                 badRequest("http11processor.request.invalidUri");
                 break;
             }

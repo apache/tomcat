@@ -281,7 +281,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
 
         client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
@@ -290,7 +290,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
 
         client.setRequest(new String[] { "PROPPATCH /file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
@@ -422,7 +422,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
         String lockToken = null;
         for (String header : client.getResponseHeaders()) {
             if (header.startsWith("Lock-Token: ")) {
@@ -490,7 +490,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
         String lockTokenFile = null;
         for (String header : client.getResponseHeaders()) {
             if (header.startsWith("Lock-Token: ")) {
@@ -559,7 +559,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
         lockToken = null;
         for (String header : client.getResponseHeaders()) {
             if (header.startsWith("Lock-Token: ")) {
@@ -756,7 +756,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
         String lockToken = null;
         for (String header : client.getResponseHeaders()) {
             if (header.startsWith("Lock-Token: ")) {
@@ -795,7 +795,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
         String lockToken2 = null;
         for (String header : client.getResponseHeaders()) {
             if (header.startsWith("Lock-Token: ")) {
@@ -813,7 +813,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
         String lockToken3 = null;
         for (String header : client.getResponseHeaders()) {
             if (header.startsWith("Lock-Token: ")) {
@@ -830,7 +830,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
         Assert.assertTrue(client.getResponseBody().contains("Second-"));
         String timeoutValue = client.getResponseBody().substring(client.getResponseBody().indexOf("Second-"));
         timeoutValue = timeoutValue.substring("Second-".length(), timeoutValue.indexOf('<'));
@@ -929,7 +929,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         // Verify all the shared locks are cleared
-        Assert.assertFalse(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertFalse(client.getResponseBody().contains("urn:uuid:"));
         validateXml(client.getResponseBody());
 
     }
@@ -969,7 +969,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
         String lockToken = null;
         for (String header : client.getResponseHeaders()) {
             if (header.startsWith("Lock-Token: ")) {
@@ -986,7 +986,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
         String lockToken2 = null;
         for (String header : client.getResponseHeaders()) {
             if (header.startsWith("Lock-Token: ")) {
@@ -1003,7 +1003,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("opaquelocktoken:"));
+        Assert.assertTrue(client.getResponseBody().contains("urn:uuid:"));
         String lockToken3 = null;
         for (String header : client.getResponseHeaders()) {
             if (header.startsWith("Lock-Token: ")) {
@@ -1014,9 +1014,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] { "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                "If: </myfolder/myfolder3/myfolder6> (<opaquelocktoken:5e1e2275b1cd9c17845e7e08>)" + // Obvious wrong token
+                "If: </myfolder/myfolder3/myfolder6> (<urn:uuid:5e1e2275b1cd9c17845e7e08>)" + // Obvious wrong token
                 " </myfolder/myfolder7/myfolder8/myfolder9> (" + lockToken + " " + lockToken2 + " " + lockToken3 + ")" + // lockToken is not there
-                " </myfolder/myfolder2/myfolder4> (<opaquelocktoken:7329872398754923752> [W/\"4-1729375899470\"])" + // Not locked
+                " </myfolder/myfolder2/myfolder4> (<urn:uuid:7329872398754923752> [W/\"4-1729375899470\"])" + // Not locked
                 " </myfolder/myfolder7/myfolder8> (" + lockToken + ")" + SimpleHttpClient.CRLF + // lockToken is not there
                 "Content-Length: 6" + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
@@ -1027,8 +1027,8 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] { "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                "If: </myfolder/myfolder3/myfolder6> (<opaquelocktoken:5e1e2275b1cd9c17845e7e08>)" + // Obvious wrong token
-                " </myfolder/myfolder2/myfolder4> (<opaquelocktoken:7329872398754923752> [W/\"4-1729375899470\"])" + // Not locked
+                "If: </myfolder/myfolder3/myfolder6> (<urn:uuid:5e1e2275b1cd9c17845e7e08>)" + // Obvious wrong token
+                " </myfolder/myfolder2/myfolder4> (<urn:uuid:7329872398754923752> [W/\"4-1729375899470\"])" + // Not locked
                 " </myfolder/myfolder7/myfolder8> (" + lockToken + ")" + // lockToken is not there
                 " </myfolder/myfolder7/myfolder8/myfolder9> (" + lockToken2 + " " + lockToken3 + ")" + SimpleHttpClient.CRLF + // Correct
                 "Content-Length: 6" + SimpleHttpClient.CRLF +

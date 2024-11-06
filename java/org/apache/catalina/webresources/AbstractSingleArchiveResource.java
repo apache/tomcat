@@ -23,13 +23,15 @@ import java.util.jar.JarFile;
 
 public abstract class AbstractSingleArchiveResource extends AbstractArchiveResource {
 
-
-    @Deprecated
     protected AbstractSingleArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
-            String baseUrl, JarEntry jarEntry, @SuppressWarnings("unused") String codeBaseUrl) {
-        this(archiveResourceSet, webAppPath, baseUrl, jarEntry);
+            String baseUrl, JarEntry jarEntry, String codeBaseUrl) {
+        super(archiveResourceSet, webAppPath, baseUrl, jarEntry, codeBaseUrl);
     }
 
+    /*
+     * Deprecated even though this is the "new" constructor as code needs to call the old constructor for now.
+     */
+    @Deprecated
     protected AbstractSingleArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath,
             String baseUrl, JarEntry jarEntry) {
         super(archiveResourceSet, webAppPath, baseUrl, jarEntry);

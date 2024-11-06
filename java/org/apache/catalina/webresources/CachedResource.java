@@ -73,6 +73,7 @@ public class CachedResource implements WebResource {
     private volatile Boolean cachedExists = null;
     private volatile Boolean cachedIsVirtual = null;
     private volatile Long cachedContentLength = null;
+    private final Object cachedContentLengthLock = new Object();
 
 
     public CachedResource(Cache cache, StandardRoot root, String path, long ttl, int objectMaxSizeBytes,
@@ -243,13 +244,29 @@ public class CachedResource implements WebResource {
 
     @Override
     public long getContentLength() {
+        /*
+         * Cache the content length for two reasons.
+         *
+         * 1. It is relatively expensive to calculate, it shouldn't change and this method is called multiple times
+         * during cache validation. Caching, therefore, offers a performance benefit.
+         *
+         * 2. There is a race condition if concurrent threads are trying to PUT and DELETE the same resource. If the
+         * DELETE thread removes the cache entry after the PUT thread has created it but before validation is complete
+         * the DELETE thread sees a content length for a non-existant resource but the PUT thread sees the actual
+         * content length. While that isn't an issue for the individual requests it, does corrupt the cache size
+         * tracking as the size used for the resource is different between when it is added to the cache and when it is
+         * removed. Caching combined with locking ensures that a consistent content length is reported for the resource.
+         */
         if (cachedContentLength == null) {
-            long result = 0;
-            if (webResource != null) {
-                result = webResource.getContentLength();
-                cachedContentLength = Long.valueOf(result);
+            synchronized (cachedContentLengthLock) {
+                if (cachedContentLength == null) {
+                    if (webResource == null) {
+                        cachedContentLength = Long.valueOf(0);
+                    } else {
+                        cachedContentLength = Long.valueOf(webResource.getContentLength());
+                    }
+                }
             }
-            return result;
         }
         return cachedContentLength.longValue();
     }
@@ -349,6 +366,11 @@ public class CachedResource implements WebResource {
             log.error(sm.getString("cachedResource.invalidURL", resourceURL.toExternalForm()), e);
             return null;
         }
+    }
+
+    @Override
+    public URL getCodeBase() {
+        return webResource.getCodeBase();
     }
 
     @Override

@@ -67,6 +67,8 @@ public class PageContextImpl extends PageContext {
 
     private static final JspFactory jspf = JspFactory.getDefaultFactory();
 
+    private static final BodyContentImpl[] EMPTY_BODY_CONTENT_IMPL_ARRAY = new BodyContentImpl[0];
+
     private BodyContentImpl[] outs;
 
     private int depth;
@@ -104,11 +106,8 @@ public class PageContextImpl extends PageContext {
 
     private transient JspWriterImpl baseOut;
 
-    /*
-     * Constructor.
-     */
     PageContextImpl() {
-        this.outs = new BodyContentImpl[0];
+        this.outs = EMPTY_BODY_CONTENT_IMPL_ARRAY;
         this.attributes = new HashMap<>(16);
         this.depth = -1;
     }

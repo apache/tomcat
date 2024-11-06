@@ -14,30 +14,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.webresources;
+package org.apache.jasper.optimizations;
 
-import java.util.jar.JarEntry;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.buf.UriUtil;
+import org.junit.Test;
 
-/**
- * Represents a single resource (file or directory) that is located within a WAR.
- */
-public class WarResource extends AbstractSingleArchiveResource {
+public class TestStringInterpreterEnum {
 
-    private static final Log log = LogFactory.getLog(WarResource.class);
+    private static class TestInterpreter extends StringInterpreterEnum {
 
-
-    public WarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
-            JarEntry jarEntry) {
-        super(archiveResourceSet, webAppPath, "war:" + baseUrl + UriUtil.getWarSeparator(), jarEntry, baseUrl);
+        public String evaluate(Class<?> enumType, String term) {
+            return coerceToOtherType(enumType, term, false);
+        }
     }
 
 
-    @Override
-    protected Log getLog() {
-        return log;
+    @Test
+    public void testBadTerms() {
+        String[] badTerms = new String[] { "", "mis format", "fudge", ";", ".", "\"", " " };
+        for (String badTerm : badTerms) {
+            new TestInterpreter().evaluate(TimeUnit.class, badTerm);
+        }
     }
 }

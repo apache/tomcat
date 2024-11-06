@@ -138,12 +138,14 @@ public interface WebResource {
     URL getURL();
 
     /**
+     * Returns the code base for this resource.
+     * <p>
+     * The expectation is that this will be deprecated and then removed once the SecurityManager has been fully removed
+     * from the JRE and it has been confirmed that the JRE no longer depends on code base.
+     *
      * @return the code base for this resource that will be used when looking up the assigned permissions for the code
      *             base in the security policy file when running under a security manager.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
      */
-    @Deprecated
     default URL getCodeBase() {
         return null;
     }
