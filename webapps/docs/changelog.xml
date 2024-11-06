@@ -317,9 +317,6 @@
   <subsection name="Other">
     <changelog>
       <update>
-        Update Byte Buddy to 1.15.4. (remm)
-      </update>
-      <update>
         Switch from DigiCert ONE to ssl.com eSigner for code signing. (markt)
       </update>
       <update>
