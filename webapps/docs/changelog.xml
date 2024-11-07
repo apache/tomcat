@@ -155,8 +155,8 @@
         (remm)
       </fix>
       <fix>
-        Send 415 response to WebDAV MKCOL operations that include a request
-        body since this is optional and unsupported. (remm)
+        Send 415 response to WebDAV <code>MKCOL</code> operations that include
+        a request body since this is optional and unsupported. (remm)
       </fix>
       <fix>
         Enforce <code>DAV:</code> namespace on WebDAV XML elements. (remm)
@@ -166,8 +166,8 @@
         collection is locked (RFC 4918 section 6.1). (remm)
       </fix>
       <fix>
-        WebDAV Delete should remove any existing lock on successfully deleted
-        resources. (remm)
+        WebDAV <code>DELETE</code>> should remove any existing lock on
+        successfully deleted resources. (remm)
       </fix>
       <update>
         Remove WebDAV lock null support in accordance with RFC 4918 section 7.3
@@ -185,13 +185,15 @@
       <add>
         Add <code>PropertyStore</code> interface in the WebDAV Servlet,
         to allow implementation of dead properties storage. The store used
-        can be configured using the 'propertyStore' init parameter of the
-        WebDAV servlet. A simple non persistent implementation is used if no
-        custom store is configured. (remm)
+        can be configured using the <code>propertyStore</code> init parameter
+        of the WebDAV servlet by specifying the class name of the store. A
+        simple non persistent implementation is used if no custom store is
+        configured. (remm)
       </add>
       <update>
         Implement WebDAV <code>PROPPATCH</code> method using the newly added
-        <code>PropertyStore</code>. (remm)
+        <code>PropertyStore</code>, and update <code>PROPFIND</code> to support
+        it. (remm)
       </update>
       <fix>
         Cache not found results when searching for web application class loader
@@ -265,7 +267,7 @@
       </fix>
       <fix>
         <code>OpenSSLContext</code> will now throw a
-        <code>KeyManagementException</code> is something is known to have gone
+        <code>KeyManagementException</code> if something is known to have gone
         wrong in the <code>init</code> method, which is the behavior
         documented by <code>javax.net.ssl.SSLContext.init</code>. This makes
         error handling more consistent. (remm)
@@ -293,6 +295,7 @@
         language. When the required method has no arguments there is no need to
         consider casting or coercion and the method lookup process can be
         simplified. Based on pull request <pr>770</pr> by John Engebretson.
+        (markt)
       </fix>
       <fix>
         <bug>69382</bug>: Improve the performance of the JSP include action by
