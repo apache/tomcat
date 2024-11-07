@@ -87,9 +87,9 @@ public class TestClientCert extends TomcatBaseTest {
         getTomcatInstance().start();
 
         Assume.assumeFalse("LibreSSL does not allow renegotiation",
-                OpenSSLStatus.Name.LIBRESSL.equals(OpenSSLStatus.getName()));
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
         Assume.assumeFalse("BoringSSL does not allow TLS renegotiation",
-                OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName()));
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
 
         // Unprotected resource
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/unprotected");
@@ -164,9 +164,9 @@ public class TestClientCert extends TomcatBaseTest {
         tomcat.start();
 
         Assume.assumeFalse("LibreSSL does not allow renegotiation",
-                OpenSSLStatus.Name.LIBRESSL.equals(OpenSSLStatus.getName()));
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
         Assume.assumeFalse("BoringSSL does not allow TLS renegotiation",
-                OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName()));
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
 
         byte[] body = new byte[bodySize];
         Arrays.fill(body, TesterSupport.DATA);

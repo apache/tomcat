@@ -401,7 +401,7 @@ java.util.logging.ConsoleHandler.encoding = UTF-8]]></source>
           package.
         </li>
         <li>Oracle Java 11 Javadoc for the
-          <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.logging/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
+          <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.logging/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
           package.
         </li>
       </ul>

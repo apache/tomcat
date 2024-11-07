@@ -1666,7 +1666,7 @@ public class DefaultServlet extends HttpServlet {
          */
         sb.append("<head>\r\n");
         sb.append("<title>");
-        sb.append(sm.getString("directory.title", directoryWebappPath));
+        sb.append(sm.getString("defaultServlet.directory.title", directoryWebappPath));
         sb.append("</title>\r\n");
         sb.append("<style>");
         sb.append(org.apache.catalina.util.TomcatCSS.TOMCAT_CSS);
@@ -1674,7 +1674,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("</head>\r\n");
         sb.append("<body>\r\n");
         sb.append("<h1>");
-        sb.append(sm.getString("directory.title", directoryWebappPath));
+        sb.append(sm.getString("defaultServlet.directory.title", directoryWebappPath));
 
         // Render the link to our parent (if required)
         String parentDirectory = directoryWebappPath;
@@ -1684,7 +1684,7 @@ public class DefaultServlet extends HttpServlet {
         int slash = parentDirectory.lastIndexOf('/');
         if (slash >= 0) {
             String parent = directoryWebappPath.substring(0, slash);
-            sb.append(" - <a href=\"");
+            sb.append(" \u2013 <a href=\"");
             sb.append(rewrittenContextPath);
             if (parent.equals("")) {
                 parent = "/";
@@ -1695,7 +1695,7 @@ public class DefaultServlet extends HttpServlet {
             }
             sb.append("\">");
             sb.append("<b>");
-            sb.append(sm.getString("directory.parent", parent));
+            sb.append(sm.getString("defaultServlet.directory.parent", parent));
             sb.append("</b>");
             sb.append("</a>");
         }
@@ -1719,10 +1719,10 @@ public class DefaultServlet extends HttpServlet {
             sb.append("<a href=\"?C=N;O=");
             sb.append(getOrderChar(order, 'N'));
             sb.append("\">");
-            sb.append(sm.getString("directory.filename"));
+            sb.append(sm.getString("defaultServlet.resource.name"));
             sb.append("</a>");
         } else {
-            sb.append(sm.getString("directory.filename"));
+            sb.append(sm.getString("defaultServlet.resource.name"));
         }
         sb.append("</strong></font></th>\r\n");
         sb.append("<th align=\"center\"><font size=\"+1\"><strong>");
@@ -1730,10 +1730,10 @@ public class DefaultServlet extends HttpServlet {
             sb.append("<a href=\"?C=S;O=");
             sb.append(getOrderChar(order, 'S'));
             sb.append("\">");
-            sb.append(sm.getString("directory.size"));
+            sb.append(sm.getString("defaultServlet.resource.size"));
             sb.append("</a>");
         } else {
-            sb.append(sm.getString("directory.size"));
+            sb.append(sm.getString("defaultServlet.resource.size"));
         }
         sb.append("</strong></font></th>\r\n");
         sb.append("<th align=\"right\"><font size=\"+1\"><strong>");
@@ -1741,10 +1741,10 @@ public class DefaultServlet extends HttpServlet {
             sb.append("<a href=\"?C=M;O=");
             sb.append(getOrderChar(order, 'M'));
             sb.append("\">");
-            sb.append(sm.getString("directory.lastModified"));
+            sb.append(sm.getString("defaultServlet.resource.lastModified"));
             sb.append("</a>");
         } else {
-            sb.append(sm.getString("directory.lastModified"));
+            sb.append(sm.getString("defaultServlet.resource.lastModified"));
         }
         sb.append("</strong></font></th>\r\n");
         sb.append("</tr>\r\n");

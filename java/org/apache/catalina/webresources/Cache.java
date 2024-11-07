@@ -99,7 +99,11 @@ public class Cache {
                 // there is still benefit in caching the resource metadata
 
                 long delta = cacheEntry.getSize();
-                size.addAndGet(delta);
+                long result = size.addAndGet(delta);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("cache.sizeTracking.add", Long.toString(delta), cacheEntry, path,
+                            Long.toString(result)));
+                }
 
                 if (size.get() > maxSize) {
                     // Process resources unordered for speed. Trades cache
@@ -175,7 +179,11 @@ public class Cache {
 
                 // Content will not be cached but we still need metadata size
                 long delta = cacheEntry.getSize();
-                size.addAndGet(delta);
+                long result = size.addAndGet(delta);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("cache.sizeTracking.add", Long.toString(delta), cacheEntry, path,
+                            Long.toString(result)));
+                }
 
                 if (size.get() > maxSize) {
                     // Process resources unordered for speed. Trades cache
@@ -261,7 +269,11 @@ public class Cache {
         CachedResource cachedResource = resourceCache.remove(path);
         if (cachedResource != null) {
             long delta = cachedResource.getSize();
-            size.addAndGet(-delta);
+            long result = size.addAndGet(-delta);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("cache.sizeTracking.remove", Long.toString(delta), cachedResource, path,
+                        Long.toString(result)));
+            }
         }
     }
 

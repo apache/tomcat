@@ -189,6 +189,11 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     protected final Object[] specialAttributes = new Object[specials.length];
 
 
+    /*
+     * Used to speed up getAttribute(). See that method for details.
+     */
+    private ApplicationHttpRequest wrappedApplicationHttpRequest;
+
     /**
      * Construct a new wrapped request around the specified servlet request.
      *
@@ -235,7 +240,17 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
 
         int pos = getSpecial(name);
         if (pos == -1) {
-            return getRequest().getAttribute(name);
+            /*
+             * With nested includes there will be nested ApplicationHttpRequests. The calls to getSpecial() are
+             * relatively expensive and it is known at this point that the attribute is not special. Therefore, jump to
+             * the first wrapped request that isn't an instance of ApplicationHttpRequest before calling getAttribute()
+             * to avoid a call to getSpecial() for each nested ApplicationHttpRequest.
+             */
+            ApplicationHttpRequest request = this;
+            while (request.wrappedApplicationHttpRequest != null) {
+                request = request.wrappedApplicationHttpRequest;
+            }
+            return request.getRequest().getAttribute(name);
         } else {
             if ((specialAttributes[pos] == null) && (specialAttributes[SPECIALS_FIRST_FORWARD_INDEX] == null) &&
                     (pos >= SPECIALS_FIRST_FORWARD_INDEX)) {
@@ -657,6 +672,13 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
     void setRequest(HttpServletRequest request) {
 
         super.setRequest(request);
+
+        // Type specific version of the wrapped request to speed up getAttribute()
+        if (request instanceof ApplicationHttpRequest) {
+            wrappedApplicationHttpRequest = (ApplicationHttpRequest) request;
+        } else {
+            wrappedApplicationHttpRequest = null;
+        }
 
         // Initialize the attributes for this request
         dispatcherType = (DispatcherType) request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);

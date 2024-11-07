@@ -64,12 +64,20 @@ public class DOMWriter {
                 out.print('<');
                 out.print(node.getLocalName());
                 Attr attrs[] = sortAttributes(node.getAttributes());
+                boolean xmlns = false;
                 for (Attr attr : attrs) {
                     out.print(' ');
                     out.print(attr.getLocalName());
-
+                    if ("xmlns".equals(attr.getLocalName())) {
+                        xmlns = true;
+                    }
                     out.print("=\"");
                     out.print(Escape.xml("", true, attr.getNodeValue()));
+                    out.print('"');
+                }
+                if (!xmlns && node.getNamespaceURI() != null) {
+                    out.print(" xmlns=\"");
+                    out.print(Escape.xml(node.getNamespaceURI()));
                     out.print('"');
                 }
                 out.print('>');
@@ -88,7 +96,7 @@ public class DOMWriter {
 
             // print text
             case Node.TEXT_NODE:
-                out.print(Escape.xml("", true, node.getNodeValue()));
+                out.print(Escape.xml("", false, node.getNodeValue()));
                 break;
 
             // print processing instruction

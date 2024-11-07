@@ -72,7 +72,7 @@ the section about Automatic Application Deployment in the latter reference.
 <section name="DriverManager, the service provider mechanism and memory leaks">
 
 <p><code>java.sql.DriverManager</code> supports the
-<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/java/sql/DriverManager.html">service
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/DriverManager.html">service
 provider</a> mechanism. This feature is that all the available JDBC drivers
 that announce themselves by providing a <code>META-INF/services/java.sql.Driver</code>
 file are automatically discovered, loaded and registered,

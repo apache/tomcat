@@ -870,6 +870,17 @@
         of <code>true</code> will be used.</p>
       </attribute>
 
+      <attribute name="notFoundClassResourceCacheSize" required="false">
+        <p>Class resources are not cached by the standard resources
+        implementation since they are loaded on first use and then the resource
+        is then no longer required. It does help, however, to cache classes that
+        are not found as in some scenarios the same class will be searched for
+        many times and the greater the number of JARs/classes, the longer that
+        search will take. An LRU cache is used and this attribute controls the
+        size of that cache. A value of less than 1 disables the cache. If not
+        specified, the default value of 1000 will be used.</p>
+      </attribute>
+
       <attribute name="renewThreadsWhenStoppingContext" required="false">
         <p>If <code>true</code>, when this context is stopped, Tomcat renews all
         the threads from the thread pool that was used to serve this context.
@@ -1364,8 +1375,8 @@
        two additional attributes to allow a shared data source to be used with different credentials.
        When these two additional attributes are used in combination with the <code>javax.sql.DataSource</code>
        type, different contexts can share a global data source with different credentials.
-       Under the hood, what happens is that a call to <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/javax/sql/DataSource.html#getConnection())"><code>getConnection()</code></a>
-       is simply translated to a call <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.sql/javax/sql/DataSource.html#getConnection(java.lang.String,java.lang.String)">
+       Under the hood, what happens is that a call to <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/javax/sql/DataSource.html#getConnection())"><code>getConnection()</code></a>
+       is simply translated to a call <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/javax/sql/DataSource.html#getConnection(java.lang.String,java.lang.String)">
        <code>getConnection(username, password)</code></a> on the global data source. This is an easy way to get code to be transparent to what schemas are being used,
        yet be able to control connections (or pools) in the global configuration.
     </p>

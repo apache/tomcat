@@ -899,6 +899,8 @@ class Generator {
      */
     private class GenerateVisitor extends Node.Visitor {
 
+        private static final String REQUEST_CHARACTER_ENCODING_TEXT = "request.getCharacterEncoding()";
+
         /*
          * Map containing introspection information on tag handlers:
          * <key>: tag prefix <value>: Map containing introspection on tag
@@ -971,11 +973,36 @@ class Generator {
          */
         private String attributeValue(Node.JspAttribute attr, boolean encode,
                 Class<?> expectedType) {
+            // Use the explicit lookup for character encoding
+            return attributeValue(attr, encode, expectedType, REQUEST_CHARACTER_ENCODING_TEXT);
+        }
+
+        /**
+         * Returns an attribute value, optionally URL encoded. If the value is a
+         * runtime expression, the result is the expression itself, as a string.
+         * If the result is an EL expression, we insert a call to the
+         * interpreter. If the result is a Named Attribute we insert the
+         * generated variable name. Otherwise the result is a string literal,
+         * quoted and escaped.
+         *
+         * @param attr
+         *            An JspAttribute object
+         * @param encode
+         *            true if to be URL encoded
+         * @param expectedType
+         *            the expected type for an EL evaluation (ignored for
+         *            attributes that aren't EL expressions)
+         * @param requestEncodingText
+         *            text referring to the request encoding, either a local variable
+         *            or a call to the request
+         */
+        private String attributeValue(Node.JspAttribute attr, boolean encode,
+                Class<?> expectedType, String requestEncodingText) {
             String v = attr.getValue();
             if (attr.isExpression()) {
                 if (encode) {
                     return "org.apache.jasper.runtime.JspRuntimeLibrary.URLEncode(String.valueOf("
-                            + v + "), request.getCharacterEncoding())";
+                            + v + "), " + requestEncodingText + ")";
                 }
                 return v;
             } else if (attr.isELInterpreterInput()) {
@@ -983,7 +1010,7 @@ class Generator {
                         expectedType, attr.getEL().getMapName());
                 if (encode) {
                     return "org.apache.jasper.runtime.JspRuntimeLibrary.URLEncode("
-                            + v + ", request.getCharacterEncoding())";
+                            + v + ", " + requestEncodingText + ")";
                 }
                 return v;
             } else if (attr.isNamedAttribute()) {
@@ -991,7 +1018,7 @@ class Generator {
             } else {
                 if (encode) {
                     return "org.apache.jasper.runtime.JspRuntimeLibrary.URLEncode("
-                            + quote(v) + ", request.getCharacterEncoding())";
+                            + quote(v) + ", " + requestEncodingText + ")";
                 }
                 return quote(v);
             }
@@ -1006,6 +1033,24 @@ class Generator {
          *            the parent node for the param action nodes.
          */
         private void printParams(Node n, String pageParam, boolean literal)
+                throws JasperException {
+            printParams(n, pageParam, literal, REQUEST_CHARACTER_ENCODING_TEXT);
+        }
+        /**
+         * Prints the attribute value specified in the param action, in the form
+         * of name=value string.
+         *
+         * @param n
+         *            the parent node for the param action nodes.
+         * @param pageParam
+         *            text identifying the JSP to forward/include
+         * @param literal
+         *            whether the pageParam is a literal expression (not EL)
+         * @param requestEncodingText
+         *            text referring to the request encoding, either a local variable
+         *            or a call to the request
+         */
+        private void printParams(Node n, String pageParam, boolean literal, String requestEncodingText)
                 throws JasperException {
 
             class ParamVisitor extends Node.Visitor {
@@ -1023,9 +1068,9 @@ class Generator {
                     out.print(" + ");
                     out.print("org.apache.jasper.runtime.JspRuntimeLibrary."
                             + "URLEncode(" + quote(n.getTextAttribute("name"))
-                            + ", request.getCharacterEncoding())");
+                            + ", " + requestEncodingText + ")");
                     out.print("+ \"=\" + ");
-                    out.print(attributeValue(n.getValue(), true, String.class));
+                    out.print(attributeValue(n.getValue(), true, String.class, requestEncodingText));
 
                     // The separator is '&' after the second use
                     separator = "\"&\"";
@@ -1101,12 +1146,37 @@ class Generator {
                 prepareParams(n);
             }
 
+            if (n.getBody() != null) {
+                generateIncludeWithParameters(n, page, isFlush, pageParam);
+            } else {
+                generateInclude(n, page, isFlush, pageParam);
+            }
+
+            n.setEndJavaLine(out.getJavaLine());
+        }
+
+        private void generateInclude(Node.IncludeAction n, Node.JspAttribute page, boolean isFlush, String pageParam)
+                throws JasperException {
             out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.include(request, response, "
                     + pageParam);
             printParams(n, pageParam, page.isLiteral());
             out.println(", out, " + isFlush + ");");
+        }
 
-            n.setEndJavaLine(out.getJavaLine());
+        private void generateIncludeWithParameters(Node.IncludeAction n, Node.JspAttribute page, boolean isFlush,
+                String pageParam) throws JasperException {
+            // jsp:include contains jsp:param - reuse some calculations
+            String temporaryVariableName = n.getRoot().nextTemporaryVariableName();
+            String urlVariableName = temporaryVariableName + "_url";
+            out.printin("String " + urlVariableName + " = " + pageParam + ";");
+            out.println();
+            String requestEncodingVariableName = temporaryVariableName + "_requestEncoding";
+            out.printin("String " + requestEncodingVariableName + " = " + REQUEST_CHARACTER_ENCODING_TEXT + ";");
+            out.println();
+            out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.include(request, response, "
+                    + urlVariableName);
+            printParams(n, urlVariableName, page.isLiteral(), requestEncodingVariableName);
+            out.println(", out, " + isFlush + ");");
         }
 
         /**
@@ -2352,7 +2422,7 @@ class Generator {
                 out.print(".reuse(");
                 out.print(tagHandlerVar);
                 out.println(");");
-
+            } else {
                 // Clean-up
                 out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.releaseTag(");
                 out.print(tagHandlerVar);

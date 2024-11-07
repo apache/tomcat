@@ -352,7 +352,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                         redirectLocation = path.resolve(redirectLocation);
                     }
 
-                    String redirectScheme = redirectLocation.getScheme().toLowerCase();
+                    String redirectScheme = redirectLocation.getScheme().toLowerCase(Locale.ENGLISH);
 
                     if (redirectScheme.startsWith("http")) {
                         redirectLocation = new URI(redirectScheme.replace("http", "ws"), redirectLocation.getUserInfo(),

@@ -55,12 +55,12 @@ public class TestTimeBucketCounter {
         int tb1, tb2;
 
         TimeBucketCounter tbc = new TimeBucketCounter(2, new java.util.concurrent.ScheduledThreadPoolExecutor(1));
-        tb1 = tbc.getCurrentBucketPrefix();
+        tb1 = tbc.getBucketPrefix(System.currentTimeMillis());
         millis = tbc.getMillisUntilNextBucket();
 
         // sleep millis and get bucket
         Thread.sleep(millis);
-        tb2 = tbc.getCurrentBucketPrefix();
+        tb2 = tbc.getBucketPrefix(System.currentTimeMillis());
 
         // ensure the new time bucket is one more than the previous one
         Assert.assertEquals(1, tb2 - tb1);
@@ -70,7 +70,7 @@ public class TestTimeBucketCounter {
 
         // sleep again
         Thread.sleep(millis);
-        tb2 = tbc.getCurrentBucketPrefix();
+        tb2 = tbc.getBucketPrefix(System.currentTimeMillis());
 
         // ensure again
         Assert.assertEquals(1, tb2 - tb1);
