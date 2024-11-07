@@ -974,12 +974,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     for very fast bucket calculation using bit shift arithmetic. In order to remain
     true to the user intent, the configured number of requests is then multiplied
     by the same ratio, so a configuration of 100 Requests per 60 seconds, has the
-    real values of 109 Requests per 65 seconds. An alternative implementation, 
-    <code>org.apache.catalina.util.ExactRateLimiter</code>, is intended to provide 
-    a less efficient but more accurate control, whose effective duration in seconds 
-    and number of requests configuration are consist with the user declared. You can 
-    specify a different class as long as it implements the 
-    <code>org.apache.catalina.util.RateLimiter</code> interface.</p>
+    real values of 109 Requests per 65 seconds.</p>
 
     <p>It is common to set up different restrictions for different URIs.
     For example, a login page or authentication script is typically expected
@@ -994,10 +989,6 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     how to handle the request based on other information that it has, e.g. allow
     more requests to certain users based on roles, etc.</p>
 
-	<p>The <code>exposeHeaders</code> allows output runtime information of rate 
-    limiter via response header, is disabled by default, only for http-api or 
-    debugging purpose.</p>
-    
     <p><strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must
     make sure that the Rate Limit Filter sees the client IP address, so if for
     example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>,
@@ -1047,12 +1038,6 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         Default is &quot;org.apache.catalina.util.FastRateLimiter&quot;.</p>
       </attribute>
 
-      <attribute name="exposeHeaders" required="false">
-        <p>Set to true to expose runtime information of rate limiter to 
-        http response header, only for http-api or debugging purpose.
-        Default is <code>false</code>.</p>
-      </attribute>
-      
       <attribute name="statusCode" required="false">
         <p>The status code to return when a request is dropped.
         Default is <code>429</code>.</p>

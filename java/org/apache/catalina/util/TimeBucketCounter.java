@@ -97,22 +97,23 @@ public class TimeBucketCounter {
      * Increments the counter for the passed identifier in the current time bucket and returns the new value.
      *
      * @param identifier an identifier for which we want to maintain count, e.g. IP Address
+     *
      * @return the count within the current time bucket
      */
     public final int increment(String identifier) {
-        String key = getBucketPrefix(System.currentTimeMillis()) + "-" + identifier;
+        String key = getCurrentBucketPrefix() + "-" + identifier;
         AtomicInteger ai = map.computeIfAbsent(key, v -> new AtomicInteger());
         return ai.incrementAndGet();
     }
 
     /**
-     * Calculates the time bucket prefix by shifting bits for fast division, e.g. shift 16 bits is the same as
+     * Calculates the current time bucket prefix by shifting bits for fast division, e.g. shift 16 bits is the same as
      * dividing by 65,536 which is about 1:05m.
-     * @param timestamp in millis
+     *
      * @return The current bucket prefix.
      */
-    public final int getBucketPrefix(long timestamp) {
-        return (int) (timestamp >> this.numBits);
+    public final int getCurrentBucketPrefix() {
+        return (int) (System.currentTimeMillis() >> this.numBits);
     }
 
     public int getNumBits() {
@@ -190,7 +191,7 @@ public class TimeBucketCounter {
     private class Maintenance implements Runnable {
         @Override
         public void run() {
-            String currentBucketPrefix = String.valueOf(getBucketPrefix(System.currentTimeMillis()));
+            String currentBucketPrefix = String.valueOf(getCurrentBucketPrefix());
             ConcurrentHashMap.KeySetView<String,AtomicInteger> keys = map.keySet();
             // remove obsolete keys
             keys.removeIf(k -> !k.startsWith(currentBucketPrefix));

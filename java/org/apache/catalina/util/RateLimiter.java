@@ -19,36 +19,7 @@ package org.apache.catalina.util;
 
 import jakarta.servlet.FilterConfig;
 
-/**
- * Rate limiter interface.
- * @see <a HREF=
- *          "https://www.ietf.org/archive/id/draft-ietf-httpapi-ratelimit-headers-08.html">ietf
- *          Ratelimit Headers Draft</a>
- */
 public interface RateLimiter {
-
-    /**
-     * @return full representation of current policy
-     * @see https://www.ietf.org/archive/id/draft-ietf-httpapi-ratelimit-headers-08.html#name-ratelimit-policy-field
-     */
-    default String getPolicy() {
-        StringBuffer buf = new StringBuffer();
-        buf.append('"').append(getPolicyName()).append('"').append(";q=").append(getRequests()).append(";w=")
-                .append(getDuration());
-        return buf.toString();
-    }
-
-    /**
-     * @return policy name
-     */
-    String getPolicyName();
-
-    /**
-     * Sets the name of rate limit policy.
-     * 
-     * @param policy name of rate limiter
-     */
-    void setPolicyName(String name);
 
     /**
      * @return the actual duration of a time window in seconds
@@ -77,11 +48,11 @@ public interface RateLimiter {
     /**
      * Increments the number of requests by the given ipAddress in the current time window.
      *
-     * @param identifier of quota unit
-     * 
+     * @param ipAddress the ip address
+     *
      * @return the new value after incrementing
      */
-    int increment(String identifier);
+    int increment(String ipAddress);
 
     /**
      * Cleanup no longer needed resources.
@@ -94,33 +65,4 @@ public interface RateLimiter {
      * @param filterConfig The FilterConfig used to configure the associated filter
      */
     void setFilterConfig(FilterConfig filterConfig);
-
-    /**
-     * Minimum set of rate limit header fields.
-     * 
-     * @see <a HREF=
-     *          "https://www.ietf.org/archive/id/draft-ietf-httpapi-ratelimit-headers-08.html#name-service-limit-item">ietf
-     *          Ratelimit Headers Draft</a>
-     */
-    public static class RateLimitItem {
-        private String policyName;
-        private int remainingQuota;
-
-        /**
-         * @param name               of policy associated
-         * @param remaining          quota units for the identified policy
-         * @param timeLeftUntilReset number of seconds until the quota associated with the quota policy resets
-         */
-        public RateLimitItem(String policyName, int remainingQuota) {
-            this.policyName = policyName;
-            this.remainingQuota = remainingQuota;
-        }
-
-        @Override
-        public String toString() {
-            StringBuffer buf = new StringBuffer();
-            buf.append('"').append(this.policyName).append('"').append(";r=").append(this.remainingQuota);
-            return buf.toString();
-        }
-    }
 }
