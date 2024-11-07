@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.2 (markt)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Further optimise EL evaluation of method parameters. Patch provided by
+        Paolo B. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.1 (markt)" rtext="release in progress">
   <subsection name="Catalina">
