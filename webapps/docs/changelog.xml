@@ -104,7 +104,7 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.1.33 (schultz)" rtext="in development">
+<section name="Tomcat 10.1.34 (schultz)" rtext="in development">
 </section>
 <section name="Tomcat 10.1.33 (schultz)" rtext="release in progress">
   <subsection name="Other">
@@ -206,7 +206,7 @@
       </update>
       <fix>
         Cache not found results when searching for web application class loader
-        resources. This addresses performance problems casued by components such
+        resources. This addresses performance problems caused by components such
         as <code>java.sql.DriverManager</code> which, in some circumstances,
         will search for the same class repeatedly. In a large web application
         this can cause performance problems. The size of the cache can be
@@ -236,7 +236,7 @@
         Concurrent reads and writes (e.g. <code>GET</code> and <code>PUT</code>
         / <code>DELETE</code>) for the same path caused corruption of the
         <code>FileResource</code> where some of the fields were set as if the
-        file exists and some as set as if it does not. This resulted in
+        file exists and some were set as if it does not. This resulted in
         inconsistent metadata. (markt)
       </fix>
       <fix>
