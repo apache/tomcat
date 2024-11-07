@@ -106,7 +106,9 @@
 -->
 <section name="Tomcat 10.1.33 (schultz)" rtext="">
   <subsection name="Other">
-    <fix>Fix release build issue.</fix>
+    <changelog>
+      <fix>Fix release build issue.</fix>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 10.1.32 (schultz)" rtext="not released">
