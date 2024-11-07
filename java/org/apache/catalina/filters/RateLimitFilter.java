@@ -18,7 +18,6 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicLong;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -44,16 +43,13 @@ import org.apache.tomcat.util.res.StringManager;
  * the bucket time ends and a new bucket starts.
  * </p>
  * <p>
- * The RateLimiter implementation can be set via the <code>rateLimiterClassName</code> init param. The default
- * implementation, <code>org.apache.catalina.util.FastRateLimiter</code>, is optimized for efficiency and low overhead
- * so it converts some configured values to more efficient values. For example, a configuration of a 60 seconds time
- * bucket is converted to 65.536 seconds. That allows for very fast bucket calculation using bit shift arithmetic. In
- * order to remain true to the user intent, the configured number of requests is then multiplied by the same ratio, so a
- * configuration of 100 Requests per 60 seconds, has the real values of 109 Requests per 65 seconds. An alternative
- * implementation, <code>org.apache.catalina.util.FastRateLimiter</code>, is intended to provide an accurate request
- * control, whose effective duration in seconds and number of requests configuration are consist with the user declared.
- * You can specify a different class as long as it implements the <code>org.apache.catalina.util.RateLimiter</code>
- * interface.
+ * The RateLimiter implementation can be set via the <code>className</code> init param. The default implementation,
+ * <code>org.apache.catalina.util.FastRateLimiter</code>, is optimized for efficiency and low overhead so it converts
+ * some configured values to more efficient values. For example, a configuration of a 60 seconds time bucket is
+ * converted to 65.536 seconds. That allows for very fast bucket calculation using bit shift arithmetic. In order to
+ * remain true to the user intent, the configured number of requests is then multiplied by the same ratio, so a
+ * configuration of 100 Requests per 60 seconds, has the real values of 109 Requests per 65 seconds. You can specify
+ * a different class as long as it implements the <code>org.apache.catalina.util.RateLimiter</code> interface.
  * </p>
  * <p>
  * It is common to set up different restrictions for different URIs. For example, a login page or authentication script
@@ -66,9 +62,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>org.apache.catalina.filters.RateLimitFilter.Count</code> and decide how to handle the request based on other
  * information that it has, e.g. allow more requests to certain users based on roles, etc.
  * </p>
- * <p>
- * The <code>exposeHeaders</code> allows output runtime information of rate limiter via response header, is disabled by
- * default, for debugging purpose only.
  * <p>
  * <strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must make sure that the Rate Limit Filter sees
  * the client IP address, so if for example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>, then the
@@ -95,10 +88,6 @@ public class RateLimitFilter extends FilterBase {
     public static final boolean DEFAULT_ENFORCE = true;
 
     /**
-     * default value of expose headers flag
-     */
-    public static final boolean DEFAULT_EXPOSE_HEADERS = false;
-    /**
      * default status code to return if requests per duration exceeded
      */
     public static final int DEFAULT_STATUS_CODE = 429;
@@ -115,23 +104,13 @@ public class RateLimitFilter extends FilterBase {
 
     transient RateLimiter rateLimiter;
 
-    private String rateLimiterClassName = "org.apache.catalina.util.FastRateLimiter";
+    private String rateLimitClassName = "org.apache.catalina.util.FastRateLimiter";
 
     private int bucketRequests = DEFAULT_BUCKET_REQUESTS;
 
     private int bucketDuration = DEFAULT_BUCKET_DURATION;
 
     private boolean enforce = DEFAULT_ENFORCE;
-
-    private boolean exposeHeaders = DEFAULT_EXPOSE_HEADERS;
-
-    public static final String HEADER_WINDOW_SECOND = "X-RateLimit-Window-Second";
-
-    public static final String HEADER_WINDOW_REQUESTS = "X-RateLimit-Window-NrOfRequests";
-
-    public static final String HEADER_REMAINING = "X-RateLimit-NrOfRemaining";
-
-    public static final String HEADER_CURRENT = "X-RateLimit-NrOfCurrent";
 
     private int statusCode = DEFAULT_STATUS_CODE;
 
@@ -145,17 +124,11 @@ public class RateLimitFilter extends FilterBase {
 
 
     public void setBucketDuration(int bucketDuration) {
-        if (bucketDuration <= 0) {
-            throw new IllegalArgumentException(sm.getString("rateLimitFilter.invalidBucketDuration", bucketDuration));
-        }
         this.bucketDuration = bucketDuration;
     }
 
 
     public void setBucketRequests(int bucketRequests) {
-        if (bucketRequests <= 0) {
-            throw new IllegalArgumentException(sm.getString("rateLimitFilter.invalidBucketRequests", bucketRequests));
-        }
         this.bucketRequests = bucketRequests;
     }
 
@@ -175,25 +148,23 @@ public class RateLimitFilter extends FilterBase {
     }
 
 
-    public void setRateLimiterClassName(String rateLimiterClassName) {
-        this.rateLimiterClassName = rateLimiterClassName;
+    public void setRateLimitClassName(String rateLimitClassName) {
+        this.rateLimitClassName = rateLimitClassName;
     }
 
-    public void setExposeHeaders(boolean exposeHeaders) {
-        this.exposeHeaders = exposeHeaders;
-    }
 
     @Override
     protected boolean isConfigProblemFatal() {
         return true;
     }
 
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
 
         try {
-            rateLimiter = (RateLimiter) Class.forName(rateLimiterClassName).getConstructor().newInstance();
+            rateLimiter = (RateLimiter)Class.forName(rateLimitClassName).getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new ServletException(e);
         }
@@ -204,41 +175,29 @@ public class RateLimitFilter extends FilterBase {
 
         filterName = filterConfig.getFilterName();
 
-        log.info(sm.getString("rateLimitFilter.initialized", filterName, Integer.valueOf(bucketRequests),
-                Integer.valueOf(bucketDuration), Integer.valueOf(rateLimiter.getRequests()),
-                Integer.valueOf(rateLimiter.getDuration()), (!enforce ? "Not " : "") + "enforcing"));
+        log.info(sm.getString("rateLimitFilter.initialized", filterName,
+            Integer.valueOf(bucketRequests), Integer.valueOf(bucketDuration),
+            Integer.valueOf(rateLimiter.getRequests()), Integer.valueOf(rateLimiter.getDuration()),
+            (!enforce ? "Not " : "") + "enforcing"));
     }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        HttpServletResponse httpServletResp = (HttpServletResponse) response;
 
         String ipAddr = request.getRemoteAddr();
         int reqCount = rateLimiter.increment(ipAddr);
 
         request.setAttribute(RATE_LIMIT_ATTRIBUTE_COUNT, Integer.valueOf(reqCount));
 
-        int rateLimiterMaxRequests = rateLimiter.getRequests();
-        int rateLimiterDuration = rateLimiter.getDuration();
-        if (exposeHeaders) {
+        if (reqCount > rateLimiter.getRequests()) {
 
-            httpServletResp.setIntHeader(HEADER_WINDOW_SECOND, rateLimiterDuration);
-            httpServletResp.setIntHeader(HEADER_WINDOW_REQUESTS, rateLimiterMaxRequests);
-            if (enforce) {
-                int remaining =
-                        (reqCount < 0 || reqCount > rateLimiterMaxRequests) ? -1 : (rateLimiterMaxRequests - reqCount);
-                httpServletResp.setIntHeader(HEADER_REMAINING, remaining);
-            }
-            httpServletResp.setIntHeader(HEADER_CURRENT, reqCount);
-        }
-
-        if (reqCount > rateLimiterMaxRequests) {
-            log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", filterName, Integer.valueOf(reqCount), ipAddr,
-                    Integer.valueOf(rateLimiterMaxRequests), Integer.valueOf(rateLimiterDuration)));
+            log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", filterName,
+                Integer.valueOf(reqCount), ipAddr, Integer.valueOf(rateLimiter.getRequests()),
+                Integer.valueOf(rateLimiter.getDuration())));
 
             if (enforce) {
-                httpServletResp.sendError(statusCode, statusMessage);
+                ((HttpServletResponse) response).sendError(statusCode, statusMessage);
                 return;
             }
         }
