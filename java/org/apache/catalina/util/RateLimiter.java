@@ -65,4 +65,45 @@ public interface RateLimiter {
      * @param filterConfig The FilterConfig used to configure the associated filter
      */
     void setFilterConfig(FilterConfig filterConfig);
+
+    /**
+     * Sets policy name, otherwise auto-generated name used
+     * @param name of rate limit policy
+     */
+    void setPolicyName(String name);
+
+    /**
+     * @return name of RateLimit policy
+     */
+    String getPolicyName();
+
+    /**
+     * @return full representation of current policy
+     * @see <a href=
+     *          "https://www.ietf.org/archive/id/draft-ietf-httpapi-ratelimit-headers-08.html#name-ratelimit-policy-field">name-ratelimit-policy-field</a>
+     */
+    default String getPolicy() {
+        // enclose policy name with double quotes. e.g. "fixed-01";q=3000;w=60
+        return "\"" + getPolicyName() + "\";q=" + getRequests() + ";w=" + getDuration();
+    }
+
+    class RateLimitItem {
+        private String policyName;
+        private int remaining;
+
+        /**
+         * @param policyName specifying the RateLimit policy name.
+         * @param remaining usage in runtime.
+         */
+        public RateLimitItem(String policyName, int remaining) {
+            this.policyName = policyName;
+            this.remaining = remaining;
+        }
+
+        @Override
+        public String toString() {
+            // enclose policy name with double quotes. e.g. "fixed-01";r=30
+            return "\"" + policyName + "\";r=" + remaining;
+        }
+    }
 }

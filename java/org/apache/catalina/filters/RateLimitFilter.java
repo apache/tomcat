@@ -27,6 +27,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.util.RateLimiter;
+import org.apache.catalina.util.RateLimiter.RateLimitItem;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -63,6 +64,10 @@ import org.apache.tomcat.util.res.StringManager;
  * information that it has, e.g. allow more requests to certain users based on roles, etc.
  * </p>
  * <p>
+ * The <code>exposeHeaders</code> allows output runtime information of rate limiter via response header, is disabled by
+ * default, only for http-api or debugging purpose. Those runtime information should not be accessible to the attackers.
+ * </p>
+ * <p>
  * <strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must make sure that the Rate Limit Filter sees
  * the client IP address, so if for example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>, then the
  * filter mapping for the Rate Limit Filter must come <em>after</em> the mapping of the Remote IP Filter to ensure that
@@ -86,6 +91,22 @@ public class RateLimitFilter extends FilterBase {
      * default value for enforce
      */
     public static final boolean DEFAULT_ENFORCE = true;
+
+    /**
+     * default value of expose headers flag
+     */
+    public static final boolean DEFAULT_EXPOSE_HEADERS = false;
+
+    /**
+     * RateLimit header fields defined at
+     * <a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/">ietf rate limit headers</a>
+     */
+    public static final String HEADER_RATE_LIMIT_POLICY = "RateLimit-Policy";
+    /**
+     * RateLimit header fields defined at
+     * <a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/">ietf rate limit headers</a>
+     */
+    public static final String HEADER_RATE_LIMIT = "RateLimit";
 
     /**
      * default status code to return if requests per duration exceeded
@@ -117,6 +138,13 @@ public class RateLimitFilter extends FilterBase {
     private String statusMessage = DEFAULT_STATUS_MESSAGE;
 
     private String filterName;
+
+    /**
+     * determines output rate limit header fields defined at "draft-ietf-httpapi-ratelimit-headers-08"
+     */
+    private boolean exposeHeaders = DEFAULT_EXPOSE_HEADERS;
+
+    private String policyName = null;
 
     private transient Log log = LogFactory.getLog(RateLimitFilter.class);
 
@@ -152,6 +180,13 @@ public class RateLimitFilter extends FilterBase {
         this.rateLimitClassName = rateLimitClassName;
     }
 
+    public void setExposeHeaders(boolean exposeHeaders) {
+        this.exposeHeaders = exposeHeaders;
+    }
+
+    public void setPolicyName(String policyName) {
+        this.policyName = policyName;
+    }
 
     @Override
     protected boolean isConfigProblemFatal() {
@@ -173,6 +208,10 @@ public class RateLimitFilter extends FilterBase {
         rateLimiter.setRequests(bucketRequests);
         rateLimiter.setFilterConfig(filterConfig);
 
+        if (policyName != null && !policyName.isEmpty()) {
+            rateLimiter.setPolicyName(policyName.trim());
+        }
+
         filterName = filterConfig.getFilterName();
 
         log.info(sm.getString("rateLimitFilter.initialized", filterName, Integer.valueOf(bucketRequests),
@@ -189,6 +228,16 @@ public class RateLimitFilter extends FilterBase {
 
         request.setAttribute(RATE_LIMIT_ATTRIBUTE_COUNT, Integer.valueOf(reqCount));
 
+        if (exposeHeaders) {
+            ((HttpServletResponse) response).addHeader(HEADER_RATE_LIMIT_POLICY, rateLimiter.getPolicy());
+            int rateLimiterMaxRequests = rateLimiter.getRequests();
+            if (enforce) {
+                int remaining =
+                        (reqCount < 0 || reqCount > rateLimiterMaxRequests) ? 0 : (rateLimiterMaxRequests - reqCount);
+                RateLimitItem current = new RateLimitItem(rateLimiter.getPolicyName(), remaining);
+                ((HttpServletResponse) response).addHeader(HEADER_RATE_LIMIT, current.toString());
+            }
+        }
         if (reqCount > rateLimiter.getRequests()) {
 
             log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", filterName, Integer.valueOf(reqCount), ipAddr,

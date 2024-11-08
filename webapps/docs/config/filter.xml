@@ -989,6 +989,10 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     how to handle the request based on other information that it has, e.g. allow
     more requests to certain users based on roles, etc.</p>
 
+    <p>The <code>exposeHeaders</code> allows output runtime information of rate
+    limiter via response header, is disabled by default, only for http-api or
+    debugging purpose.</p>
+
     <p><strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must
     make sure that the Rate Limit Filter sees the client IP address, so if for
     example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>,
@@ -1031,6 +1035,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
         org.apache.catalina.filters.RateLimitFilter.Count to retrieve
         the number of Requests made from that IP within the time window.
         Default is <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="exposeHeaders" required="false">
+        <p>Set to true to expose runtime information of rate limiter to
+        http response header, only for http-api or debugging purpose.
+        Default is <code>false</code>.</p>
       </attribute>
 
       <attribute name="rateLimitClassName" required="false">

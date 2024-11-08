@@ -39,8 +39,7 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 
 public class TestRateLimitFilter extends TomcatBaseTest {
 
-    @Test
-    public void testRateLimitWith4Clients() throws Exception {
+    private void testRateLimitWith4Clients(boolean exposeHeaders, boolean enforce) throws Exception {
 
         int bucketRequests = 40;
         int bucketDuration = 4;
@@ -48,6 +47,8 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         FilterDef filterDef = new FilterDef();
         filterDef.addInitParameter("bucketRequests", String.valueOf(bucketRequests));
         filterDef.addInitParameter("bucketDuration", String.valueOf(bucketDuration));
+        filterDef.addInitParameter("enforce", String.valueOf(enforce));
+        filterDef.addInitParameter("exposeHeaders", String.valueOf(exposeHeaders));
 
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
@@ -83,10 +84,46 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         Assert.assertEquals(200, tc2.results[49]); // only 25 requests made, all allowed
 
         Assert.assertEquals(200, tc3.results[allowedRequests - 1]); // first allowedRequests allowed
-        Assert.assertEquals(429, tc3.results[allowedRequests]); // subsequent requests dropped
 
         Assert.assertEquals(200, tc4.results[allowedRequests - 1]); // first allowedRequests allowed
-        Assert.assertEquals(429, tc4.results[allowedRequests]); // subsequent requests dropped
+        if (enforce) {
+            Assert.assertEquals(429, tc3.results[allowedRequests]); // subsequent requests dropped
+            Assert.assertEquals(429, tc4.results[allowedRequests]); // subsequent requests dropped
+        }
+        if (exposeHeaders) {
+            Assert.assertTrue(tc3.rlpHeader[24].contains("q=" + allowedRequests));
+            Assert.assertTrue(tc3.rlpHeader[allowedRequests].contains("q=" + allowedRequests));
+            if (enforce) {
+                Assert.assertTrue(tc3.rlHeader[24].contains("r="));
+                Assert.assertFalse(tc3.rlHeader[24].contains("r=0"));
+                Assert.assertTrue(tc3.rlHeader[allowedRequests].contains("r=0"));
+            }
+        } else {
+            Assert.assertTrue(tc3.rlpHeader[24] == null);
+            Assert.assertTrue(tc3.rlHeader[24] == null);
+            Assert.assertTrue(tc3.rlpHeader[allowedRequests] == null);
+            Assert.assertTrue(tc3.rlHeader[allowedRequests] == null);
+        }
+    }
+
+    @Test
+    public void testExposeHeaderAndRerferenceRateLimitWith4Clients() throws Exception {
+        testRateLimitWith4Clients(true, false);
+    }
+
+    @Test
+    public void testUnexposeHeaderAndRerferenceRateLimitWith4Clients() throws Exception {
+        testRateLimitWith4Clients(false, false);
+    }
+
+    @Test
+    public void testExposeHeaderAndEnforceRateLimitWith4Clients() throws Exception {
+        testRateLimitWith4Clients(true, true);
+    }
+
+    @Test
+    public void testUnexposeHeaderAndEnforceRateLimitWith4Clients() throws Exception {
+        testRateLimitWith4Clients(false, true);
     }
 
     private RateLimitFilter testRateLimitFilter(FilterDef filterDef, Context root) throws ServletException {
@@ -118,6 +155,8 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         int sleep;
 
         int[] results;
+        volatile String[] rlpHeader;
+        volatile String[] rlHeader;
 
         TestClient(RateLimitFilter filter, FilterChain filterChain, String ip, int requests, int rps) {
             this.filter = filter;
@@ -126,6 +165,8 @@ public class TestRateLimitFilter extends TomcatBaseTest {
             this.requests = requests;
             this.sleep = 1000 / rps;
             this.results = new int[requests];
+            this.rlpHeader = new String[requests];
+            this.rlHeader = new String[requests];
             super.setDaemon(true);
             super.start();
         }
@@ -140,8 +181,10 @@ public class TestRateLimitFilter extends TomcatBaseTest {
                     response.setRequest(request);
                     filter.doFilter(request, response, filterChain);
                     results[i] = response.getStatus();
-                    System.out.printf("%s %s: %s %d\n", ip, Instant.now(), Integer.valueOf(i + 1),
-                            Integer.valueOf(response.getStatus()));
+                    rlpHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT_POLICY);
+                    rlHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT);
+                    System.out.printf("%s %s: %s %d, Policy:%s, Current:%s\n", ip, Instant.now(), Integer.valueOf(i + 1),
+                            Integer.valueOf(response.getStatus()),rlpHeader[i],rlHeader[i]);
                     sleep(sleep);
                 }
             } catch (Exception ex) {
