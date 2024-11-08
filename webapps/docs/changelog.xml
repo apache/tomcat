@@ -176,7 +176,7 @@
         collection is locked (RFC 4918 section 6.1). (remm)
       </fix>
       <fix>
-        WebDAV <code>DELETE</code>> should remove any existing lock on
+        WebDAV <code>DELETE</code> should remove any existing lock on
         successfully deleted resources. (remm)
       </fix>
       <update>
