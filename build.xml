@@ -3226,6 +3226,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       <include name="bin/*.sh" />
       <include name=".travis/*.sh" />
       <include name="res/graal/*.sh" />
+      <include name="res/openssl/*.sh" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
