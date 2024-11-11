@@ -145,6 +145,23 @@ public final class UDecoder {
                             buff[idx] = buff[j];
                         }
                     }
+                } else if (res == '%') {
+                    /*
+                     * If encoded '/' is going to be left encoded then so must encoded '%' else the subsequent %nn
+                     * decoding will either fail or corrupt the output.
+                     */
+                    switch (encodedSolidusHandling) {
+                        case DECODE:
+                        case REJECT: {
+                            buff[idx] = (byte) res;
+                            break;
+                        }
+                        case PASS_THROUGH: {
+                            buff[idx++] = buff[j - 2];
+                            buff[idx++] = buff[j - 1];
+                            buff[idx] = buff[j];
+                        }
+                    }
                 } else {
                     buff[idx] = (byte) res;
                 }
