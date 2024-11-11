@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.34 (schultz)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Align <code>encodedSolidusHandling</code> with the Servlet
+        specification. If the pass-through mode is used, any
+        <code>%25</code> sequences will now also be passed through to avoid
+        errors and/or corruption when the application decodes the path. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
