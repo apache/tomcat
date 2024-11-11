@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.34 (schultz)" rtext="in development">
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        Follow-up to the fix for <bug>69381</bug>. Apply the optimisation for
+        method lookup performance in expression language to an additional
+        location. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.33 (schultz)" rtext="release in progress">
   <subsection name="Other">
