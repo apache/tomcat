@@ -149,7 +149,19 @@ public class ReflectionUtil {
             paramCount = paramTypes.length;
         }
 
-        Method[] methods = base.getClass().getMethods();
+        Class<?> clazz = base.getClass();
+
+        // Fast path: when no arguments exist, there can only be one matching method and no need for coercion.
+        if (paramCount == 0) {
+            try {
+                Method method = clazz.getMethod(methodName, paramTypes);
+                return getMethod(clazz, base, method);
+            } catch (NoSuchMethodException | SecurityException e) {
+                // Fall through to broader, slower logic
+            }
+        }
+
+        Method[] methods = clazz.getMethods();
         Map<Method,MatchResult> candidates = new HashMap<>();
 
         for (Method m : methods) {
@@ -250,7 +262,7 @@ public class ReflectionUtil {
             // If a method is found where every parameter matches exactly,
             // and no vars args are present, return it
             if (exactMatch == paramCount && varArgsMatch == 0) {
-                Method result = getMethod(base.getClass(), base, m);
+                Method result = getMethod(clazz, base, m);
                 if (result == null) {
                     throw new MethodNotFoundException(
                             MessageFactory.get("error.method.notfound", base, property, paramString(paramTypes)));
@@ -300,7 +312,7 @@ public class ReflectionUtil {
                     MessageFactory.get("error.method.notfound", base, property, paramString(paramTypes)));
         }
 
-        Method result = getMethod(base.getClass(), base, match);
+        Method result = getMethod(clazz, base, match);
         if (result == null) {
             throw new MethodNotFoundException(
                     MessageFactory.get("error.method.notfound", base, property, paramString(paramTypes)));
