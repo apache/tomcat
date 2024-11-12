@@ -52,6 +52,8 @@ import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.ContainerEvent;
+import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -1065,5 +1067,49 @@ public class TestStandardContext extends TomcatBaseTest {
         String result = (String) m.invoke(context);
 
         Assert.assertEquals("/engine/hostcontext", result);
+    }
+
+    @Test
+    public void testWrapperListeners() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("/test", null);
+        ctx.setWrapperClass("org.apache.catalina.core.TestStandardContext$MyWrapperClass");
+        ctx.addWrapperLifecycle("org.apache.catalina.core.TestStandardContext$MyWrapperLifecycleListener");
+        ctx.addWrapperListener("org.apache.catalina.core.TestStandardContext$MyWrapperContainerListener");
+        Wrapper w = Tomcat.addServlet(ctx, "something", "org.apache.catalina.core.TestStandardContext$Bug51376Servlet");
+
+        tomcat.start();
+
+        w.addInitParameter("foo", "bar");
+
+        Assert.assertTrue(customWrapperClassOk);
+        Assert.assertTrue(containerListenerOk);
+        Assert.assertTrue(lifecycleListenerOk);
+    }
+
+    private static boolean customWrapperClassOk = false;
+    public static class MyWrapperClass extends StandardWrapper {
+        @Override
+        protected void startInternal() throws LifecycleException {
+            super.startInternal();
+            customWrapperClassOk = true;
+        }
+    }
+    private static boolean containerListenerOk = false;
+    public static class MyWrapperContainerListener implements ContainerListener {
+        @Override
+        public void containerEvent(ContainerEvent event) {
+            containerListenerOk = true;
+        }
+    }
+    private static boolean lifecycleListenerOk = false;
+    public static class MyWrapperLifecycleListener implements LifecycleListener {
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            lifecycleListenerOk = true;
+        }
     }
 }
