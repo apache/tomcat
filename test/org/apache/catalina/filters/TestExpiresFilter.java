@@ -42,6 +42,7 @@ import org.apache.catalina.filters.ExpiresFilter.StartingPoint;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
@@ -226,7 +227,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
         };
 
-        validate(servlet, null, HttpServletResponse.SC_NOT_MODIFIED);
+        validate(servlet, null, null,HttpServletResponse.SC_NOT_MODIFIED);
     }
 
     @Test
@@ -362,10 +363,12 @@ public class TestExpiresFilter extends TomcatBaseTest {
     }
 
     protected void validate(HttpServlet servlet, Integer expectedMaxAgeInSeconds) throws Exception {
-        validate(servlet, expectedMaxAgeInSeconds, HttpServletResponse.SC_OK);
+        validate(servlet, expectedMaxAgeInSeconds, null, HttpServletResponse.SC_OK);
     }
-
-    protected void validate(HttpServlet servlet, Integer expectedMaxAgeInSeconds, int expectedResponseStatusCode)
+    protected void validate(HttpServlet servlet, Integer expectedMaxAgeInSeconds,Boolean expectedGreaterExpireDate) throws Exception {
+        validate(servlet, expectedMaxAgeInSeconds, expectedGreaterExpireDate, HttpServletResponse.SC_OK);
+    }
+    protected void validate(HttpServlet servlet, Integer expectedMaxAgeInSeconds, Boolean expectedGreaterExpireDate, int expectedResponseStatusCode)
             throws Exception {
 
         // SETUP
@@ -417,7 +420,7 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
             Integer actualMaxAgeInSeconds;
 
-            String cacheControlHeader = getSingleHeader("Cache-Control", responseHeaders);
+            String cacheControlHeader = StringUtils.join(responseHeaders.get("Cache-Control"));//getSingleHeader("Cache-Control", responseHeaders);
 
             if (cacheControlHeader == null) {
                 actualMaxAgeInSeconds = null;
@@ -438,20 +441,38 @@ public class TestExpiresFilter extends TomcatBaseTest {
             }
 
             if (expectedMaxAgeInSeconds == null) {
-                Assert.assertNull("actualMaxAgeInSeconds '" + actualMaxAgeInSeconds + "' should be null",
-                        actualMaxAgeInSeconds);
-                return;
+                Assert.assertTrue("actualMaxAgeInSeconds '" + actualMaxAgeInSeconds + "' should be null or no-store exists",
+                        actualMaxAgeInSeconds==null||cacheControlHeader.contains("no-store"));
+            } else {
+                Assert.assertNotNull(actualMaxAgeInSeconds);
+                String contentType = getSingleHeader("Content-Type", responseHeaders);
+                int deltaInSeconds = Math.abs(actualMaxAgeInSeconds.intValue() - expectedMaxAgeInSeconds.intValue());
+                Assert.assertTrue("actualMaxAgeInSeconds: " + actualMaxAgeInSeconds + ", expectedMaxAgeInSeconds: " +
+                        expectedMaxAgeInSeconds + ", request time: " + timeBeforeInMillis + " for content type " +
+                        contentType, deltaInSeconds < 3);
             }
 
-            Assert.assertNotNull(actualMaxAgeInSeconds);
-
-            String contentType = getSingleHeader("Content-Type", responseHeaders);
-
-            int deltaInSeconds = Math.abs(actualMaxAgeInSeconds.intValue() - expectedMaxAgeInSeconds.intValue());
-            Assert.assertTrue("actualMaxAgeInSeconds: " + actualMaxAgeInSeconds + ", expectedMaxAgeInSeconds: " +
-                    expectedMaxAgeInSeconds + ", request time: " + timeBeforeInMillis + " for content type " +
-                    contentType, deltaInSeconds < 3);
-
+            if (expectedGreaterExpireDate != null) {
+                if (expectedGreaterExpireDate) {
+                    // Ensure expires date > current date
+                    Assert.assertNotNull(responseHeaders.get("Expires"));
+                    // First expires > current date
+                    String possibleEffectiveExpires = responseHeaders.get("Expires").get(0);
+                    long possibleEffectiveExpiresInMilli = FastHttpDateFormat.parseDate(possibleEffectiveExpires);
+                    Assert.assertTrue(
+                            "Expires with future value expected. Current value is " + possibleEffectiveExpires,
+                            possibleEffectiveExpiresInMilli > System.currentTimeMillis());
+                } else {
+                    // absence of expires header, or value < current date
+                    if (responseHeaders.get("Expires") != null && responseHeaders.get("Expires").size() == 1) {
+                        String possibleEffectiveExpires = responseHeaders.get("Expires").get(0);
+                        long possibleEffectiveExpiresInMilli = FastHttpDateFormat.parseDate(possibleEffectiveExpires);
+                        Assert.assertTrue(
+                                "Expires with past value expected. Current value is " + possibleEffectiveExpires,
+                                possibleEffectiveExpiresInMilli < System.currentTimeMillis());
+                    }
+                }
+            }
         } finally {
             tomcat.stop();
         }
@@ -538,5 +559,59 @@ public class TestExpiresFilter extends TomcatBaseTest {
 
         Assert.assertNotNull(actualMaxAgeInSeconds);
         Assert.assertTrue(Math.abs(actualMaxAgeInSeconds.intValue() - 420) < 3);
+    }
+
+    @Test
+    public void testBug69439_cache_control_directive_conflict() throws Exception {
+        HttpServlet servlet = new HttpServlet() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
+                response.setContentType("image/jpeg");
+                response.addHeader("Cache-Control", "public");
+                response.addHeader("Cache-Control", "no-store");
+                response.addHeader("Cache-Control", "max-age=300");
+                response.getWriter().print("Hello world");
+            }
+        };
+        //rfc9111 - 4.2.1 - If directives conflict (e.g., both max-age and no-cache are present), the most restrictive directive should be honored.
+        // final effective Cache-Control: no-store
+        // skip ExpiresFilter
+        validate(servlet, null, Boolean.FALSE);
+    }
+    @Test
+    public void testBug69439_cache_control_max_age_predefined() throws Exception {
+        HttpServlet servlet = new HttpServlet() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
+                response.setContentType("image/jpeg");
+                response.addHeader("Cache-Control", "public");
+                response.addHeader("Cache-Control", "max-age=600");
+                response.getWriter().print("Hello world");
+            }
+        };
+        //rfc9111 - 4.2.1 - If directives conflict (e.g., both max-age and no-cache are present), the most restrictive directive should be honored.
+        // final effective Cache-Control: public, max-age=600
+        // skip ExpiresFilter
+        validate(servlet, 600, Boolean.FALSE);
+    }
+    @Test
+    public void testBug69439_cache_control_undefined() throws Exception {
+        HttpServlet servlet = new HttpServlet() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            protected void service(HttpServletRequest request, HttpServletResponse response)
+                    throws ServletException, IOException {
+                response.setContentType("image/jpeg");
+                response.getWriter().print("Hello world");
+            }
+        };
+        //rfc9111 - 4.2.1 - If directives conflict (e.g., both max-age and no-cache are present), the most restrictive directive should be honored.
+        // final effective Cache-Control: public, max-age=600
+        // apply ExpiresFilter
+        validate(servlet, 60, Boolean.TRUE);
     }
 }

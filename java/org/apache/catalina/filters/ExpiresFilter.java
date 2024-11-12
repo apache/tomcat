@@ -528,11 +528,6 @@ public class ExpiresFilter extends FilterBase {
     public class XHttpServletResponse extends HttpServletResponseWrapper {
 
         /**
-         * Value of the {@code Cache-Control} http response header if it has been set.
-         */
-        private String cacheControlHeader;
-
-        /**
          * Value of the {@code Last-Modified} http response header if it has been set.
          */
         private long lastModifiedHeader;
@@ -568,13 +563,6 @@ public class ExpiresFilter extends FilterBase {
         @Override
         public void addHeader(String name, String value) {
             super.addHeader(name, value);
-            if (HEADER_CACHE_CONTROL.equalsIgnoreCase(name) && cacheControlHeader == null) {
-                cacheControlHeader = value;
-            }
-        }
-
-        public String getCacheControlHeader() {
-            return cacheControlHeader;
         }
 
         public long getLastModifiedHeader() {
@@ -610,7 +598,6 @@ public class ExpiresFilter extends FilterBase {
             super.reset();
             this.lastModifiedHeader = 0;
             this.lastModifiedHeaderSet = false;
-            this.cacheControlHeader = null;
         }
 
         @Override
@@ -619,14 +606,6 @@ public class ExpiresFilter extends FilterBase {
             if (HEADER_LAST_MODIFIED.equalsIgnoreCase(name)) {
                 this.lastModifiedHeader = date;
                 this.lastModifiedHeaderSet = true;
-            }
-        }
-
-        @Override
-        public void setHeader(String name, String value) {
-            super.setHeader(name, value);
-            if (HEADER_CACHE_CONTROL.equalsIgnoreCase(name)) {
-                this.cacheControlHeader = value;
             }
         }
 
@@ -1393,7 +1372,7 @@ public class ExpiresFilter extends FilterBase {
             return false;
         }
 
-        if (response.containsHeader(HEADER_EXPIRES) || contains(response.getCacheControlHeader(), "max-age")) {
+        if (response.containsHeader(HEADER_EXPIRES) || contains(StringUtils.join(response.getHeaders(HEADER_CACHE_CONTROL)), "max-age")) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.expirationHeaderAlreadyDefined", request.getRequestURI(),
                         Integer.valueOf(response.getStatus()), response.getContentType()));
@@ -1401,7 +1380,7 @@ public class ExpiresFilter extends FilterBase {
             return false;
         }
 
-        if (contains(response.getCacheControlHeader(), "no-store")) {
+        if (contains(StringUtils.join(response.getHeaders(HEADER_CACHE_CONTROL)), "no-store")) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.cacheControlNoStore", request.getRequestURI(),
                         Integer.valueOf(response.getStatus()), response.getContentType()));
@@ -1459,8 +1438,7 @@ public class ExpiresFilter extends FilterBase {
             }
 
             String maxAgeDirective = "max-age=" + ((expirationDate.getTime() - System.currentTimeMillis()) / 1000);
-
-            String cacheControlHeader = response.getCacheControlHeader();
+            String cacheControlHeader = StringUtils.join(response.getHeaders(HEADER_CACHE_CONTROL));
             String newCacheControlHeader =
                     (cacheControlHeader == null) ? maxAgeDirective : cacheControlHeader + ", " + maxAgeDirective;
             response.setHeader(HEADER_CACHE_CONTROL, newCacheControlHeader);
