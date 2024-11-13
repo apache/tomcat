@@ -74,11 +74,12 @@ import org.xml.sax.SAXException;
 /**
  * Servlet which adds support for <a href="https://tools.ietf.org/html/rfc4918">WebDAV</a>
  * <a href="https://tools.ietf.org/html/rfc4918#section-18">level 3</a>. All the basic HTTP requests are handled by the
- * DefaultServlet. The WebDAVServlet must not be used as the default servlet (ie mapped to '/') as it will not work in
+ * DefaultServlet. The WebdavServlet must not be used as the default servlet (ie mapped to '/') as it will not work in
  * this configuration.
  * <p>
  * Mapping a subpath (e.g. <code>/webdav/*</code> to this servlet has the effect of re-mounting the entire web
- * application under that sub-path, with WebDAV access to all the resources. The <code>WEB-INF</code> and
+ * application under that sub-path, with WebDAV access to all the resources. To restore the DefaultServlet
+ * behavior set <code>serveSubpathOnly</code> to <code>true</code>. The <code>WEB-INF</code> and
  * <code>META-INF</code> directories are protected in this re-mounted resource tree.
  * <p>
  * To enable WebDAV for a context add the following to web.xml:
@@ -247,6 +248,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     private boolean strictIfProcessing = true;
 
+    /**
+     * Serve resources from the mounted subpath only, restoring the behavior of
+     * {@code DefaultServlet}.
+     */
+    private boolean serveSubpathOnly = false;
+
 
     /**
      * Property store used for storage of dead properties.
@@ -283,6 +290,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         if (getServletConfig().getInitParameter("strictIfProcessing") != null) {
             strictIfProcessing = Boolean.parseBoolean(getServletConfig().getInitParameter("strictIfProcessing"));
+        }
+
+        if (getServletConfig().getInitParameter("serveSubpathOnly") != null) {
+            serveSubpathOnly = Boolean.parseBoolean(getServletConfig().getInitParameter("serveSubpathOnly"));
         }
 
         String propertyStore = getServletConfig().getInitParameter("propertyStore");
@@ -686,6 +697,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     @Override
     protected String getRelativePath(HttpServletRequest request, boolean allowEmptyPath) {
+        if (serveSubpathOnly) {
+            return super.getRelativePath(request, allowEmptyPath);
+        }
+
         String pathInfo;
 
         if (request.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI) != null) {
@@ -712,6 +727,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
     @Override
     protected String getPathPrefix(final HttpServletRequest request) {
+        if (serveSubpathOnly) {
+            return super.getPathPrefix(request);
+        }
+
         // Repeat the servlet path (e.g. /webdav/) in the listing path
         String contextPath = request.getContextPath();
         if (request.getServletPath() != null) {
