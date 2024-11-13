@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.98 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add option to serve resources from subpath only with WebDAV Servlet like
+        with DefaultServlet. (michaelo)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <fix>
