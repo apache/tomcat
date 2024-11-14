@@ -111,6 +111,10 @@
         Add option to serve resources from subpath only with WebDAV Servlet like
         with DefaultServlet. (michaelo)
       </add>
+      <fix>
+        Add special handling for the <code>protocols</code> attribute of
+        <code>SSLHostConfig</code> in storeconfig. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
