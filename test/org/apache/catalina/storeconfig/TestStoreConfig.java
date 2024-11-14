@@ -84,6 +84,7 @@ public class TestStoreConfig extends TomcatBaseTest {
         org.apache.catalina.ha.tcp.SimpleTcpCluster tc_SimpleTcpCluster_51 = new org.apache.catalina.ha.tcp.SimpleTcpCluster();
 
         org.apache.catalina.tribes.group.GroupChannel tc_GroupChannel_52 = new org.apache.catalina.tribes.group.GroupChannel();
+        ((org.apache.catalina.tribes.transport.ReceiverBase) tc_GroupChannel_52.getChannelReceiver()).setHost("localhost");
 
         org.apache.catalina.tribes.membership.cloud.CloudMembershipService tc_CloudMembershipService_53 =
                 new org.apache.catalina.tribes.membership.cloud.CloudMembershipService();
