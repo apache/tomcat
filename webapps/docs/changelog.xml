@@ -122,14 +122,6 @@
         Add support for the new Servlet API method
         <code>HttpServletResponse.sendEarlyHints()</code>. (markt)
       </add>
-      <update>
-        Remove default value (was <code>catalina</code>) for the
-        <code>secret</code> init parameter of the WebDAV Servlet. (remm)
-      </update>
-      <add>
-        Add option to serve resources from subpath only with WebDAV Servlet like
-        with DefaultServlet. (michaelo)
-      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
