@@ -52,9 +52,7 @@ public class SSLHostConfigSF extends StoreFactoryBase {
                     for (String protocol : sslHostConfig.getProtocols()) {
                         protocolsValue.append('+').append(protocol);
                     }
-                    if (!protocolsValue.isEmpty()) {
-                        getStoreAppender().printValue(aWriter, indent, "protocols", protocolsValue.toString());
-                    }
+                    getStoreAppender().printValue(aWriter, indent, "protocols", protocolsValue.toString());
                 }
                 getStoreAppender().printAttributes(aWriter, indent, aElement, elementDesc);
             }
