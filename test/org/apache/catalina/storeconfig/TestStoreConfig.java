@@ -77,7 +77,7 @@ public class TestStoreConfig extends TomcatBaseTest {
                 new org.apache.tomcat.util.net.SSLHostConfigCertificate(tc_SSLHostConfig_22,
                         org.apache.tomcat.util.net.SSLHostConfigCertificate.Type.RSA);
         tc_SSLHostConfigCertificate_23.setCertificateKeystoreFile("conf/localhost-rsa.jks");
-        tc_SSLHostConfigCertificate_23.setCertificateKeystorePassword("changeit");
+        tc_SSLHostConfigCertificate_23.setCertificateKeystorePassword("mypassword");
         tc_SSLHostConfig_22.addCertificate(tc_SSLHostConfigCertificate_23);
         tomcat.getConnector().addSslHostConfig(tc_SSLHostConfig_22);
 
