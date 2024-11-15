@@ -382,6 +382,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
             resourceLock = resourceLocksByPath.get(key);
             if (resourceLock == null) {
                 resourceLock = new ResourceLock(key);
+                resourceLocksByPath.put(key, resourceLock);
             }
             resourceLock.count.incrementAndGet();
         }
@@ -419,6 +420,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
             resourceLock = resourceLocksByPath.get(key);
             if (resourceLock == null) {
                 resourceLock = new ResourceLock(key);
+                resourceLocksByPath.put(key, resourceLock);
             }
             resourceLock.count.incrementAndGet();
         }
