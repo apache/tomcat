@@ -1225,12 +1225,6 @@ public class DefaultServlet extends HttpServlet {
                 contentType.contains("/javascript");
     }
 
-    private static boolean validate(ContentRange range) {
-        // bytes is the only range unit supported
-        return (range != null) && ("bytes".equals(range.getUnits())) && (range.getStart() >= 0) &&
-                (range.getEnd() >= 0) && (range.getStart() <= range.getEnd()) && (range.getLength() > 0);
-    }
-
     private static boolean validate(Ranges.Entry range, long length) {
         long start = getStart(range, length);
         long end = getEnd(range, length);
@@ -1388,8 +1382,8 @@ public class DefaultServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return null;
         }
-
-        if (!validate(contentRange)) {
+        // bytes is the only range unit supported
+        if (!"bytes".equals(contentRange.getUnits())) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return null;
         }
