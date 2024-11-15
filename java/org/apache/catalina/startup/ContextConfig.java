@@ -513,7 +513,7 @@ public class ContextConfig implements LifecycleListener {
         code.append("public void load(");
         code.append(Context.class.getName());
         String contextArgument = digester.toVariableName(context);
-        code.append(' ').append(contextArgument).append(") {").append(System.lineSeparator());
+        code.append(' ').append(contextArgument).append(") throws Exception {").append(System.lineSeparator());
         // Create a new variable with the concrete type
         digester.setKnown(context);
         code.append(context.getClass().getName()).append(' ').append(digester.toVariableName(context));
@@ -530,7 +530,7 @@ public class ContextConfig implements LifecycleListener {
 
 
     public interface ContextXml {
-        void load(Context context);
+        void load(Context context) throws Exception;
     }
 
 
@@ -573,7 +573,11 @@ public class ContextConfig implements LifecycleListener {
                 contextXml = (ContextXml) Digester.loadGeneratedClass(contextXmlClassName);
             }
             if (contextXml != null) {
-                contextXml.load(context);
+                try {
+                    contextXml.load(context);
+                } catch (Exception e) {
+                    log.warn(sm.getString("contextConfig.loadError"), e);
+                }
                 contextXml = null;
             } else if (!useGeneratedCode) {
                 try (ConfigurationSource.Resource contextXmlResource =
@@ -614,7 +618,11 @@ public class ContextConfig implements LifecycleListener {
                 contextXml = (ContextXml) Digester.loadGeneratedClass(contextXmlClassName);
             }
             if (contextXml != null) {
-                contextXml.load(context);
+                try {
+                    contextXml.load(context);
+                } catch (Exception e) {
+                    log.warn(sm.getString("contextConfig.loadError"), e);
+                }
                 contextXml = null;
             } else if (!useGeneratedCode) {
                 String hostContextFile = Container.getConfigPath(context, Constants.HostContextXml);
@@ -654,7 +662,11 @@ public class ContextConfig implements LifecycleListener {
                 contextXml = (ContextXml) Digester.loadGeneratedClass(contextXmlClassName);
             }
             if (contextXml != null) {
-                contextXml.load(context);
+                try {
+                    contextXml.load(context);
+                } catch (Exception e) {
+                    log.warn(sm.getString("contextConfig.loadError"), e);
+                }
                 contextXml = null;
             } else if (!useGeneratedCode) {
                 if (generateCode) {
