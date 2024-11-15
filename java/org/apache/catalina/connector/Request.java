@@ -2952,6 +2952,7 @@ public class Request implements HttpServletRequest {
             } else {
                 contentType = contentType.trim();
             }
+            contentType = contentType.toLowerCase(Locale.ENGLISH);
 
             if ("multipart/form-data".equals(contentType)) {
                 parseParts(false);
