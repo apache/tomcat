@@ -115,6 +115,10 @@
         Add special handling for the <code>protocols</code> attribute of
         <code>SSLHostConfig</code> in storeconfig. (remm)
       </fix>
+      <fix>
+        <bug>69442</bug>: Fix case sensitive check on <code>content-type</code>
+        when parsing request parameters. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
