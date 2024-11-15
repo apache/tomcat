@@ -39,6 +39,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.ResponseUtil;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -566,7 +567,7 @@ public class CorsFilter extends GenericFilter {
                     } else if ("GET".equals(method) || "HEAD".equals(method)) {
                         requestType = CORSRequestType.SIMPLE;
                     } else if ("POST".equals(method)) {
-                        String mediaType = getMediaType(request.getContentType());
+                        String mediaType = MediaType.parseMediaTypeOnly(request.getContentType());
                         if (mediaType == null) {
                             requestType = CORSRequestType.SIMPLE;
                         } else {
@@ -588,22 +589,6 @@ public class CorsFilter extends GenericFilter {
         return requestType;
     }
 
-
-    /**
-     * Return the lower case, trimmed value of the media type from the content type.
-     */
-    private String getMediaType(String contentType) {
-        if (contentType == null) {
-            return null;
-        }
-        String result = contentType.toLowerCase(Locale.ENGLISH);
-        int firstSemiColonIndex = result.indexOf(';');
-        if (firstSemiColonIndex > -1) {
-            result = result.substring(0, firstSemiColonIndex);
-        }
-        result = result.trim();
-        return result;
-    }
 
     /**
      * Checks if the Origin is allowed to make a CORS request.
