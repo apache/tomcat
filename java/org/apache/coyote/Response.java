@@ -574,8 +574,6 @@ public final class Response {
             return;
         }
 
-        this.contentType = m.toStringNoCharset();
-
         String charsetValue = m.getCharset();
 
         if (charsetValue == null) {
