@@ -123,6 +123,11 @@
         Refactor duplicate code for extracting media type and subtype from
         <code>content-type</code> into a single method. (markt)
       </scode>
+      <fix>
+        Compatibility of generated embedded code with components where
+        constructors or property related methods throw a checked exception.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

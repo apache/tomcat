@@ -105,7 +105,11 @@ public final class IntrospectionUtils {
                             ok = false;
                         }
                         if (actualMethod != null) {
-                            actualMethod.append(method.getName()).append("(Integer.valueOf(\"").append(value).append("\"))");
+                            if ("java.lang.Integer".equals(paramType.getName())) {
+                                actualMethod.append(method.getName()).append("(Integer.valueOf(\"").append(value).append("\"))");
+                            } else {
+                                actualMethod.append(method.getName()).append("(Integer.parseInt(\"").append(value).append("\"))");
+                            }
                         }
                         // Try a setFoo ( long )
                     } else if ("java.lang.Long".equals(paramType.getName())
@@ -116,14 +120,22 @@ public final class IntrospectionUtils {
                             ok = false;
                         }
                         if (actualMethod != null) {
-                            actualMethod.append(method.getName()).append("(Long.valueOf(\"").append(value).append("\"))");
+                            if ("java.lang.Long".equals(paramType.getName())) {
+                                actualMethod.append(method.getName()).append("(Long.valueOf(\"").append(value).append("\"))");
+                            } else {
+                                actualMethod.append(method.getName()).append("(Long.parseLong(\"").append(value).append("\"))");
+                            }
                         }
                         // Try a setFoo ( boolean )
                     } else if ("java.lang.Boolean".equals(paramType.getName())
                             || "boolean".equals(paramType.getName())) {
                         params[0] = Boolean.valueOf(value);
                         if (actualMethod != null) {
-                            actualMethod.append(method.getName()).append("(Boolean.valueOf(\"").append(value).append("\"))");
+                            if ("java.lang.Boolean".equals(paramType.getName())) {
+                                actualMethod.append(method.getName()).append("(Boolean.valueOf(\"").append(value).append("\"))");
+                            } else {
+                                actualMethod.append(method.getName()).append("(Boolean.parseBoolean(\"").append(value).append("\"))");
+                            }
                         }
                         // Try a setFoo ( InetAddress )
                     } else if ("java.net.InetAddress".equals(paramType
