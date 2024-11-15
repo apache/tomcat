@@ -18,8 +18,11 @@ package jakarta.servlet;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -32,6 +35,7 @@ import org.junit.runners.Parameterized.Parameter;
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 @RunWith(Parameterized.class)
 public class TestServletRequestParametersFormUrlEncoded extends ServletRequestParametersBaseTest {
@@ -100,5 +104,35 @@ public class TestServletRequestParametersFormUrlEncoded extends ServletRequestPa
         client.processRequest();
 
         Assert.assertEquals(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, client.getStatusCode());
+    }
+
+    @Test
+    public void testBug69442_lowercase_content_type() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+        tomcat.start();
+        ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> reqHeaders = new HashMap<String,List<String>>();
+        reqHeaders.put("Content-Type", Arrays.asList("application/x-www-form-urlencoded"));
+        postUrl("username=Tomcat1&usertype=biz".getBytes(),
+                "http://localhost:" + getPort() + "/test/bug6nnnn/bug69442.jsp", bc, reqHeaders,
+                new HashMap<String,List<String>>());
+        String responseBody = bc.toString();
+        Assert.assertTrue(responseBody.contains("username=Tomcat1"));
+        Assert.assertTrue(responseBody.contains("usertype=biz"));
+    }
+
+    @Test
+    public void testBug69442_uppercase_content_type() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+        tomcat.start();
+        ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> reqHeaders = new HashMap<String,List<String>>();
+        reqHeaders.put("Content-Type", Arrays.asList("application/x-www-form-urlencoded".toUpperCase()));
+        postUrl("username=Tomcat1&usertype=biz".getBytes(),
+                "http://localhost:" + getPort() + "/test/bug6nnnn/bug69442.jsp", bc, reqHeaders,
+                new HashMap<String,List<String>>());
+        String responseBody = bc.toString();
+        Assert.assertTrue(responseBody.contains("username=Tomcat1"));
+        Assert.assertTrue(responseBody.contains("usertype=biz"));
     }
 }
