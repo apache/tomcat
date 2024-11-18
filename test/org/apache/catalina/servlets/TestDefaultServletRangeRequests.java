@@ -76,6 +76,8 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         parameterSets.add(new Object[] {
                 "bytes=0-9", null, Integer.valueOf(206), "10", "0-9/" + len });
         parameterSets.add(new Object[] {
+                "bytes=0-9,10-10", null, Integer.valueOf(206), null, "0-9/" + len });
+        parameterSets.add(new Object[] {
                 "bytes=-100", null, Integer.valueOf(206), "100", (len - 100) + "-" + (len - 1) + "/" + len });
         parameterSets.add(new Object[] {
                 "bytes=100-", null, Integer.valueOf(206), "" + (len - 100), "100-" + (len - 1) + "/" + len });
@@ -140,7 +142,7 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         // Check the result
         Assert.assertEquals(responseCodeExpected, rc);
 
-        if (contentLengthExpected.length() > 0) {
+        if (contentLengthExpected != null && contentLengthExpected.length() > 0) {
             String contentLength = responseHeaders.get("Content-Length").get(0);
             Assert.assertEquals(contentLengthExpected, contentLength);
         }
@@ -151,7 +153,14 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
             if (headerValues != null && headerValues.size() == 1) {
                 responseRange = headerValues.get(0);
             }
-            Assert.assertEquals("bytes " + responseRangeExpected, responseRange);
+            if (responseRange != null) {
+                Assert.assertEquals("bytes " + responseRangeExpected, responseRange);
+            } else {
+                Assert.assertTrue(
+                        "Expected `Content-Range: " + "bytes " + responseRangeExpected +
+                                "` in multipart/byteranges response body not found!",
+                        responseBody.toString().contains("bytes " + responseRangeExpected));
+            }
         }
     }
 
