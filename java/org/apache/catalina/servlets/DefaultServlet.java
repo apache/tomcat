@@ -2415,7 +2415,7 @@ public class DefaultServlet extends HttpServlet {
                 }
                 long start = getStart(range, length);
                 long end = getEnd(range, length);
-                ostream.println("Content-Range: bytes " + start + "-" + end + "/" + (end - start));
+                ostream.println("Content-Range: bytes " + start + "-" + end + "/" + length);
                 ostream.println();
 
                 // Printing content
