@@ -114,6 +114,7 @@ import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
 import org.apache.tomcat.util.http.fileupload.impl.SizeException;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
 import org.apache.tomcat.util.http.parser.AcceptLanguage;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.http.parser.Upgrade;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.res.StringManager;
@@ -2792,18 +2793,9 @@ public class Request implements HttpServletRequest {
             return;
         }
 
-        String contentType = getContentType();
-        if (contentType == null) {
-            contentType = "";
-        }
-        int semicolon = contentType.indexOf(';');
-        if (semicolon >= 0) {
-            contentType = contentType.substring(0, semicolon).trim();
-        } else {
-            contentType = contentType.trim();
-        }
+        String mediaType = MediaType.parseMediaTypeOnly(getContentType());
 
-        if ("multipart/form-data".equals(contentType)) {
+        if ("multipart/form-data".equals(mediaType)) {
             parseParts();
             if (partsParseException instanceof IllegalStateException) {
                 parametersParseException = (IllegalStateException) partsParseException;
@@ -2817,7 +2809,7 @@ public class Request implements HttpServletRequest {
             return;
         }
 
-        if (!("application/x-www-form-urlencoded".equals(contentType))) {
+        if (!("application/x-www-form-urlencoded".equals(mediaType))) {
             return;
         }
 

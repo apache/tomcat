@@ -127,6 +127,19 @@
         Add special handling for the <code>protocols</code> attribute of
         <code>SSLHostConfig</code> in storeconfig. (remm)
       </fix>
+      <fix>
+        <bug>69442</bug>: Fix case sensitive check on <code>content-type</code>
+        when parsing request parameters. (remm)
+      </fix>
+      <fix>
+        Compatibility of generated embedded code with components where
+        constructors or property related methods throw a checked exception.
+        (remm)
+      </fix>
+      <fix>
+        The previous fix for incosistent resource metadata during concurrent
+        reads and writes was incomplete. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
