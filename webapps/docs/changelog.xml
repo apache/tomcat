@@ -136,6 +136,11 @@
         <pr>780</pr>: Fix <code>content-range</code> header length. Submitted
         by Justin Chen. (remm)
       </fix>
+      <fix>
+        <bug>69444</bug>: Ensure that the
+        <code>jakarta.servlet.error.message</code> request attribute is set when
+        an application defined error page is called. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
