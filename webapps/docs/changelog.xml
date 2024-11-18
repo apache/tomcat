@@ -132,6 +132,11 @@
         The previous fix for incosistent resource metadata during concurrent
         reads and writes was incomplete. (markt)
       </fix>
+      <fix>
+        <bug>69444</bug>: Ensure that the
+        <code>javax.servlet.error.message</code> request attribute is set when
+        an application defined error page is called. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
