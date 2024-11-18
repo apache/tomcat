@@ -140,6 +140,10 @@
         The previous fix for incosistent resource metadata during concurrent
         reads and writes was incomplete. (markt)
       </fix>
+      <fix>
+        <pr>780</pr>: Fix <code>content-range</code> header length. Submitted
+        by Justin Chen. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
