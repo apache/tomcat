@@ -107,12 +107,12 @@ public class TestServletRequestParametersFormUrlEncoded extends ServletRequestPa
     }
 
     @Test
-    public void testBug69442_lowercase_content_type() throws Exception {
+    public void testBug69442_lowercase_media_type() throws Exception {
         Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
         tomcat.start();
         ByteChunk bc = new ByteChunk();
         Map<String,List<String>> reqHeaders = new HashMap<String,List<String>>();
-        reqHeaders.put("Content-Type", Arrays.asList("application/x-www-form-urlencoded"));
+        reqHeaders.put("Content-Type", Arrays.asList("application/x-www-form-urlencoded".toLowerCase()));
         postUrl("username=Tomcat1&usertype=biz".getBytes(),
                 "http://localhost:" + getPort() + "/test/bug6nnnn/bug69442.jsp", bc, reqHeaders,
                 new HashMap<String,List<String>>());
@@ -122,7 +122,7 @@ public class TestServletRequestParametersFormUrlEncoded extends ServletRequestPa
     }
 
     @Test
-    public void testBug69442_uppercase_content_type() throws Exception {
+    public void testBug69442_uppercase_media_type() throws Exception {
         Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
         tomcat.start();
         ByteChunk bc = new ByteChunk();
