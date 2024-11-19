@@ -1231,10 +1231,25 @@ public class DefaultServlet extends HttpServlet {
                 (range.getEnd() >= 0) && (range.getStart() <= range.getEnd()) && (range.getLength() > 0);
     }
 
-    private static boolean validate(Ranges.Entry range, long length) {
-        long start = getStart(range, length);
-        long end = getEnd(range, length);
-        return (start >= 0) && (end >= 0) && (start <= end);
+    private static boolean validate(Ranges ranges, long length) {
+        List<long[]> rangeContext = new ArrayList<long[]>();
+        for (Ranges.Entry range : ranges.getEntries()) {
+            long start = getStart(range, length);
+            long end = getEnd(range, length);
+            if (start < 0 || start > end) {
+                // illegal entry
+                return false;
+            }
+            // see rfc9110 #status.416
+            for (long[] e : rangeContext) {
+                if (Long.min(end, e[1]) - Long.max(start, e[0]) >= 0) {
+                    // overlapping ranges: [10,30] intersect with [15,25]; [10,30] intersect with [5,15]
+                    return false;
+                }
+            }
+            rangeContext.add(new long[] { start, end });
+        }
+        return true;
     }
 
     private static long getStart(Ranges.Entry range, long length) {
@@ -1484,12 +1499,10 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        for (Ranges.Entry range : ranges.getEntries()) {
-            if (!validate(range, fileLength)) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
-            }
+        if (!validate(ranges, fileLength)) {
+            response.addHeader("Content-Range", "bytes */" + fileLength);
+            response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+            return null;
         }
 
         return ranges;

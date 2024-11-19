@@ -63,6 +63,9 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         parameterSets.add(new Object[] { "bytes=b-10", null, Integer.valueOf(416), "", "*/" + len });
         // Invalid ranges (out of range)
         parameterSets.add(new Object[] { "bytes=1000-2000", null, Integer.valueOf(416), "", "*/" + len });
+        // Invalid overlapping ranges
+        parameterSets.add(new Object[] { "bytes=1-100, 30-50", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=1-100, 90-150", null, Integer.valueOf(416), "", "*/" + len });
         // Invalid no equals
         parameterSets.add(new Object[] { "bytes 1-10", null, Integer.valueOf(416), "", "*/" + len });
         parameterSets.add(new Object[] { "bytes1-10", null, Integer.valueOf(416), "", "*/" + len });
