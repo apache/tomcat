@@ -361,6 +361,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         webdavServlet.addInitParameter("listings", "true");
         webdavServlet.addInitParameter("secret", "foo");
         webdavServlet.addInitParameter("readonly", "false");
+        webdavServlet.addInitParameter("useStrongETags", "true");
         ctxt.addServletMappingDecoded("/*", "webdav");
         tomcat.start();
 
@@ -607,6 +608,19 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
 
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3000; i++) {
+            sb.append(CONTENT);
+        }
+        client.setRequest(new String[] { "PUT /file6.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: " + String.valueOf(sb.length()) +  SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + sb.toString() });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
         // Verify that everything created is there
         client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
@@ -618,6 +632,8 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertFalse(client.getResponseBody().contains("/myfolder/file4.txt"));
         Assert.assertTrue(client.getResponseBody().contains("/file7.txt"));
         Assert.assertTrue(client.getResponseBody().contains("Second-"));
+        Assert.assertTrue(client.getResponseBody().contains("d1dc021f456864e84f9a37b7a6f51c51301128a0"));
+        Assert.assertTrue(client.getResponseBody().contains("f3390fe2e5546dac3d1968970df1a222a3a39c00"));
         String timeoutValue = client.getResponseBody().substring(client.getResponseBody().indexOf("Second-"));
         timeoutValue = timeoutValue.substring("Second-".length(), timeoutValue.indexOf('<'));
         Assert.assertTrue(Integer.valueOf(timeoutValue).intValue() <= 20);
