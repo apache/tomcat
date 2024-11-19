@@ -292,6 +292,11 @@ public class CachedResource implements WebResource {
     }
 
     @Override
+    public String getStrongETag() {
+        return webResource.getStrongETag();
+    }
+
+    @Override
     public void setMimeType(String mimeType) {
         webResource.setMimeType(mimeType);
     }
