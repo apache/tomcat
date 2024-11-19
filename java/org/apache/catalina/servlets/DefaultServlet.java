@@ -260,6 +260,11 @@ public class DefaultServlet extends HttpServlet {
      */
     private boolean allowPartialPut = true;
 
+    /**
+     * Use strong etags whenever possible.
+     */
+    private boolean useStrongETags = false;
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -394,6 +399,11 @@ public class DefaultServlet extends HttpServlet {
         if (getServletConfig().getInitParameter("allowPartialPut") != null) {
             allowPartialPut = Boolean.parseBoolean(getServletConfig().getInitParameter("allowPartialPut"));
         }
+
+        if (getServletConfig().getInitParameter("useStrongETags") != null) {
+            useStrongETags = Boolean.parseBoolean(getServletConfig().getInitParameter("useStrongETags"));
+        }
+
     }
 
     private CompressionFormat[] parseCompressionFormats(String precompressed, String gzip) {
@@ -2229,7 +2239,11 @@ public class DefaultServlet extends HttpServlet {
      * @return The result of calling {@link WebResource#getETag()} on the given resource
      */
     protected String generateETag(WebResource resource) {
-        return resource.getETag();
+        if (useStrongETags) {
+            return resource.getStrongETag();
+        } else {
+            return resource.getETag();
+        }
     }
 
 
