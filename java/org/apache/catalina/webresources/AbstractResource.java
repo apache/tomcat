@@ -16,13 +16,11 @@
  */
 package org.apache.catalina.webresources;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
-import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
@@ -89,34 +87,29 @@ public abstract class AbstractResource implements WebResource {
                     long contentLength = getContentLength();
                     long lastModified = getLastModified();
                     if (contentLength > 0 && lastModified > 0) {
-                        try (InputStream is = getInputStream()) {
-                            if (contentLength <= 16 * 1024) {
-                                byte[] buf = new byte[(int) contentLength];
-                                int n = IOTools.readFully(is, buf);
-                                if (n > 0) {
-                                    buf = ConcurrentMessageDigest.digest("SHA-1", buf);
-                                    strongETag = HexUtils.toHexString(buf);
-                                } else {
-                                    strongETag = getETag();
-                                }
+                        if (contentLength <= 16 * 1024) {
+                            byte[] buf = getContent();
+                            if (buf != null) {
+                                buf = ConcurrentMessageDigest.digest("SHA-1", buf);
+                                strongETag = HexUtils.toHexString(buf);
                             } else {
-                                byte[] buf = new byte[4096];
-                                try {
-                                    MessageDigest digest = MessageDigest.getInstance("SHA-1");
-                                    while (true) {
-                                        int n = is.read(buf);
-                                        if (n <= 0) {
-                                            break;
-                                        }
-                                        digest.update(buf, 0, n);
-                                    }
-                                    strongETag = HexUtils.toHexString(digest.digest());
-                                } catch (Exception e) {
-                                    strongETag = getETag();
-                                }
+                                strongETag = getETag();
                             }
-                        } catch (IOException e) {
-                            strongETag = getETag();
+                        } else {
+                            byte[] buf = new byte[4096];
+                            try (InputStream is = getInputStream()) {
+                                MessageDigest digest = MessageDigest.getInstance("SHA-1");
+                                while (true) {
+                                    int n = is.read(buf);
+                                    if (n <= 0) {
+                                        break;
+                                    }
+                                    digest.update(buf, 0, n);
+                                }
+                                strongETag = HexUtils.toHexString(digest.digest());
+                            } catch (Exception e) {
+                                strongETag = getETag();
+                            }
                         }
                     } else {
                         strongETag = getETag();
