@@ -1741,7 +1741,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<table width=\"100%\" cellspacing=\"0\"" + " cellpadding=\"5\" align=\"center\">\r\n");
 
         SortManager.Order order;
-        if (sortListings && null != request) {
+        if (sortListings) {
             order = sortManager.getOrder(request.getQueryString());
         } else {
             order = null;
@@ -1750,7 +1750,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<thead>\r\n");
         sb.append("<tr>\r\n");
         sb.append("<th align=\"left\"><font size=\"+1\"><strong>");
-        if (sortListings && null != request) {
+        if (sortListings) {
             sb.append("<a href=\"?C=N;O=");
             sb.append(getOrderChar(order, 'N'));
             sb.append("\">");
@@ -1761,7 +1761,7 @@ public class DefaultServlet extends HttpServlet {
         }
         sb.append("</strong></font></th>\r\n");
         sb.append("<th align=\"center\"><font size=\"+1\"><strong>");
-        if (sortListings && null != request) {
+        if (sortListings) {
             sb.append("<a href=\"?C=S;O=");
             sb.append(getOrderChar(order, 'S'));
             sb.append("\">");
@@ -1772,7 +1772,7 @@ public class DefaultServlet extends HttpServlet {
         }
         sb.append("</strong></font></th>\r\n");
         sb.append("<th align=\"right\"><font size=\"+1\"><strong>");
-        if (sortListings && null != request) {
+        if (sortListings) {
             sb.append("<a href=\"?C=M;O=");
             sb.append(getOrderChar(order, 'M'));
             sb.append("\">");
@@ -1785,7 +1785,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("</tr>\r\n");
         sb.append("</thead>\r\n");
 
-        if (null != sortManager && null != request) {
+        if (null != sortManager) {
             sortManager.sort(entries, request.getQueryString());
         }
 
