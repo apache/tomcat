@@ -836,7 +836,7 @@ public class StatusTransformer {
             indent(writer, 2).append('{').println();
             appendJSonValue(indent(writer, 3), "name", JSONFilter.escape(JSONFilter.escape(name))).append(',');
             appendJSonValue(writer, "startTime",
-                    new Date(((Long) mBeanServer.getAttribute(objectName, "startTime"))).toString())
+                    new Date(((Long) mBeanServer.getAttribute(objectName, "startTime")).longValue()).toString())
                     .append(',');
             appendJSonValue(writer, "startupTime", mBeanServer.getAttribute(objectName, "startupTime"))
                     .append(',');
