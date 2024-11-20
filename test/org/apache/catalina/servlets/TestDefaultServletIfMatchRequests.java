@@ -16,7 +16,10 @@
  */
 package org.apache.catalina.servlets;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,10 +34,12 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.WebResource;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.HexUtils;
 
 @RunWith(Parameterized.class)
 public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
@@ -54,8 +59,13 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         // Get the length of the file used for this test
         // It varies by platform due to line-endings
         File index = new File("test/webapp/index.html");
-        resourceETagStrong = "\"" + index.length() + "-" + index.lastModified() + "\"";
-        resourceETagWeak = "W/" + resourceETagStrong;
+        try (FileInputStream is = new FileInputStream(index)) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            IOTools.flow(is, os);
+            resourceETagStrong = "\"" + HexUtils.toHexString(MessageDigest.getInstance("SHA-1").digest(os.toByteArray())) + "\"";
+        } catch (Exception e) {
+        }
+        resourceETagWeak = "W/" + "\"" + index.length() + "-" + index.lastModified() + "\"";
 
         String otherETagStrong = "\"123456789\"";
         String otherETagWeak = "W/\"123456789\"";
@@ -90,15 +100,21 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
             parameterSets.add(new Object[] { resourceWithStrongETag, otherETagWeak, RC_412, RC_200 });
 
             // match header includes weak tag
-            parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagWeak, RC_412, RC_304 });
+            String etag;
+            if (resourceWithStrongETag.booleanValue()) {
+                etag = "W/" + resourceETagStrong;
+            } else {
+                etag = resourceETagWeak;
+            }
+            parameterSets.add(new Object[] { resourceWithStrongETag, etag, RC_412, RC_304 });
             for (String concat : CONCAT) {
-                parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagWeak + concat + otherETagWeak,
+                parameterSets.add(new Object[] { resourceWithStrongETag, etag + concat + otherETagWeak,
                         RC_412, RC_304 });
-                parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagWeak + concat + otherETagStrong,
+                parameterSets.add(new Object[] { resourceWithStrongETag, etag + concat + otherETagStrong,
                         RC_412, RC_304 });
-                parameterSets.add(new Object[] { resourceWithStrongETag, otherETagWeak + concat + resourceETagWeak,
+                parameterSets.add(new Object[] { resourceWithStrongETag, otherETagWeak + concat + etag,
                         RC_412, RC_304 });
-                parameterSets.add(new Object[] { resourceWithStrongETag, otherETagStrong + concat + resourceETagWeak,
+                parameterSets.add(new Object[] { resourceWithStrongETag, otherETagStrong + concat + etag,
                         RC_412, RC_304 });
             }
 
@@ -107,18 +123,20 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
             Integer rcIfMatch;
             if (resourceWithStrongETag.booleanValue()) {
                 rcIfMatch = RC_200;
+                etag = resourceETagStrong;
             } else {
                 rcIfMatch = RC_412;
+                etag = resourceETagWeak.substring(2);
             }
-            parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong, rcIfMatch, RC_304 });
+            parameterSets.add(new Object[] { resourceWithStrongETag, etag, rcIfMatch, RC_304 });
             for (String concat : CONCAT) {
-                parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong + concat + otherETagWeak,
+                parameterSets.add(new Object[] { resourceWithStrongETag, etag + concat + otherETagWeak,
                         rcIfMatch, RC_304 });
-                parameterSets.add(new Object[] { resourceWithStrongETag, resourceETagStrong + concat + otherETagStrong,
+                parameterSets.add(new Object[] { resourceWithStrongETag, etag + concat + otherETagStrong,
                         rcIfMatch, RC_304 });
-                parameterSets.add(new Object[] { resourceWithStrongETag, otherETagWeak + concat + resourceETagStrong,
+                parameterSets.add(new Object[] { resourceWithStrongETag, otherETagWeak + concat + etag,
                         rcIfMatch, RC_304 });
-                parameterSets.add(new Object[] { resourceWithStrongETag, otherETagStrong + concat + resourceETagStrong,
+                parameterSets.add(new Object[] { resourceWithStrongETag, otherETagStrong + concat + etag,
                         rcIfMatch, RC_304 });
             }
         }
@@ -156,10 +174,9 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         File appDir = new File("test/webapp");
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
 
+        Wrapper wrapper = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
         if (resourceHasStrongETag) {
-            Tomcat.addServlet(ctxt, "default", DefaultWithStrongETag.class.getName());
-        } else {
-            Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+            wrapper.addInitParameter("useStrongETags", "true");
         }
         ctxt.addServletMappingDecoded("/", "default");
 
@@ -189,16 +206,4 @@ public class TestDefaultServletIfMatchRequests extends TomcatBaseTest {
         }
     }
 
-
-    public static class DefaultWithStrongETag extends DefaultServlet {
-
-        private static final long serialVersionUID = 1L;
-
-        @Override
-        protected String generateETag(WebResource resource) {
-            String weakETag = super.generateETag(resource);
-            // Make it a strong ETag
-            return weakETag.substring(2);
-        }
-    }
 }
