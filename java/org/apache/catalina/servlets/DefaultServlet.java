@@ -1748,7 +1748,7 @@ public class DefaultServlet extends HttpServlet {
         StringBuilder sb = new StringBuilder();
 
         // Get the right strings
-        StringManager sm = StringManager.getManager(DefaultServlet.class.getPackageName(), request.getLocales());
+        StringManager sm = StringManager.getManager(DefaultServlet.class.getPackage().getName(), request.getLocales());
 
         String directoryWebappPath = resource.getWebappPath();
         WebResource[] entries = resources.listResources(directoryWebappPath);
