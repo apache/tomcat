@@ -679,4 +679,44 @@ public class TestDefaultServlet extends TomcatBaseTest {
         Assert.assertEquals(0, out.getLength());
         Assert.assertEquals(length, resHeaders.get("Content-Length").get(0));
     }
+
+    @Test
+    public void testDirectoryListing() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp");
+        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
+
+        Wrapper defaultServlet = Tomcat.addServlet(ctxt, "default", new DefaultServlet());
+        defaultServlet.addInitParameter("listings", "true");
+        defaultServlet.addInitParameter("sortListings", "true");
+        defaultServlet.addInitParameter("sortDirectoriesFirst", "true");
+
+        ctxt.addServletMappingDecoded("/", "default");
+
+        tomcat.start();
+
+        TestCompressedClient client = new TestCompressedClient(getPort());
+
+        client.setRequest(new String[] { "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Accept-Language: fr-FR, fr, en" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue(client.getResponseBody().contains("Taille"));
+        Assert.assertTrue(client.getResponseBody().contains("<tt>bug43nnn/"));
+
+        client.setRequest(new String[] { "GET /bug43nnn/ HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Accept-Language: fr-FR, fr, en" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+    }
 }
