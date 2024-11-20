@@ -300,7 +300,7 @@ public class CachedResource implements WebResource {
             byte[] buf = getContent();
             if (buf != null) {
                 buf = ConcurrentMessageDigest.digest("SHA-1", buf);
-                cachedStrongETag = HexUtils.toHexString(buf);
+                cachedStrongETag = "\"" + HexUtils.toHexString(buf) + "\"";
             } else {
                 cachedStrongETag = webResource.getStrongETag();
             }
