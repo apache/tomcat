@@ -657,17 +657,17 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     throw e;
                 }
             }
-            if (clazz == null) {
-                if (log.isTraceEnabled()) {
-                    log.trace("    --> Returning ClassNotFoundException");
-                }
-                throw new ClassNotFoundException(name);
-            }
         } catch (ClassNotFoundException e) {
             if (log.isTraceEnabled()) {
                 log.trace("    --> Passing on ClassNotFoundException");
             }
             throw e;
+        }
+        if (clazz == null) {
+            if (log.isTraceEnabled()) {
+                log.trace("    --> Returning ClassNotFoundException");
+            }
+            throw new ClassNotFoundException(name);
         }
 
         // Return the class we have located
