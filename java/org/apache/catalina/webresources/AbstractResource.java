@@ -91,7 +91,7 @@ public abstract class AbstractResource implements WebResource {
                             byte[] buf = getContent();
                             if (buf != null) {
                                 buf = ConcurrentMessageDigest.digest("SHA-1", buf);
-                                strongETag = HexUtils.toHexString(buf);
+                                strongETag = "\"" + HexUtils.toHexString(buf) + "\"";
                             } else {
                                 strongETag = getETag();
                             }
@@ -106,7 +106,7 @@ public abstract class AbstractResource implements WebResource {
                                     }
                                     digest.update(buf, 0, n);
                                 }
-                                strongETag = HexUtils.toHexString(digest.digest());
+                                strongETag = "\"" + HexUtils.toHexString(digest.digest()) + "\"";
                             } catch (Exception e) {
                                 strongETag = getETag();
                             }
