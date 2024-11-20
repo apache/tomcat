@@ -39,7 +39,9 @@ import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 /**
  * This class is designed to wrap a 'raw' WebResource and providing caching for expensive operations. Inexpensive
@@ -74,6 +76,7 @@ public class CachedResource implements WebResource {
     private volatile Boolean cachedIsVirtual = null;
     private volatile Long cachedContentLength = null;
     private final Object cachedContentLengthLock = new Object();
+    private volatile String cachedStrongETag = null;
 
 
     public CachedResource(Cache cache, StandardRoot root, String path, long ttl, int objectMaxSizeBytes,
@@ -293,7 +296,16 @@ public class CachedResource implements WebResource {
 
     @Override
     public String getStrongETag() {
-        return webResource.getStrongETag();
+        if (cachedStrongETag == null) {
+            byte[] buf = getContent();
+            if (buf != null) {
+                buf = ConcurrentMessageDigest.digest("SHA-1", buf);
+                cachedStrongETag = HexUtils.toHexString(buf);
+            } else {
+                cachedStrongETag = webResource.getStrongETag();
+            }
+        }
+        return cachedStrongETag;
     }
 
     @Override

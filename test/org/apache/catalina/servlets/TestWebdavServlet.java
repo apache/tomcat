@@ -365,6 +365,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         ctxt.addServletMappingDecoded("/*", "webdav");
         tomcat.start();
 
+        ctxt.getResources().setCacheMaxSize(10);
+        ctxt.getResources().setCacheObjectMaxSize(1);
+
         Client client = new Client();
         client.setPort(getPort());
 
@@ -383,6 +386,19 @@ public class TestWebdavServlet extends TomcatBaseTest {
                 "Content-Length: 12" + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
                 SimpleHttpClient.CRLF + CONTENT + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 100; i++) {
+            sb.append(CONTENT);
+        }
+        client.setRequest(new String[] { "PUT /file12.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: " + String.valueOf(sb.length()) + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + sb.toString() });
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
@@ -608,15 +624,15 @@ public class TestWebdavServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb2 = new StringBuilder();
         for (int i = 0; i < 3000; i++) {
-            sb.append(CONTENT);
+            sb2.append(CONTENT);
         }
         client.setRequest(new String[] { "PUT /file6.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                "Content-Length: " + String.valueOf(sb.length()) +  SimpleHttpClient.CRLF +
+                "Content-Length: " + String.valueOf(sb2.length()) +  SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF + sb.toString() });
+                SimpleHttpClient.CRLF + sb2.toString() });
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
