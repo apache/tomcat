@@ -773,6 +773,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         checkStateForClassLoading(name);
 
+        if (name == null) {
+            throw new ClassNotFoundException("null");
+        }
+
+        String path = binaryNameToPath(name, true);
+
         // (1) Permission to define this class when using a SecurityManager
         if (securityManager != null) {
             int i = name.lastIndexOf('.');
@@ -798,25 +804,14 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (log.isTraceEnabled()) {
                 log.trace("      findClassInternal(" + name + ")");
             }
-            try {
-                if (securityManager != null) {
-                    PrivilegedAction<Class<?>> dp = new PrivilegedFindClassByName(name);
-                    clazz = AccessController.doPrivileged(dp);
-                } else {
-                    clazz = findClassInternal(name);
-                }
-            } catch (AccessControlException ace) {
-                log.warn(sm.getString("webappClassLoader.securityException", name, ace.getMessage()), ace);
-                throw new ClassNotFoundException(name, ace);
-            } catch (RuntimeException e) {
-                if (log.isTraceEnabled()) {
-                    log.trace("      -->RuntimeException Rethrown", e);
-                }
-                throw e;
-            }
-            if (clazz == null && hasExternalRepositories) {
+            if (!notFoundClassResources.contains(path)) {
                 try {
-                    clazz = super.findClass(name);
+                    if (securityManager != null) {
+                        PrivilegedAction<Class<?>> dp = new PrivilegedFindClassByName(name);
+                        clazz = AccessController.doPrivileged(dp);
+                    } else {
+                        clazz = findClassInternal(name);
+                    }
                 } catch (AccessControlException ace) {
                     log.warn(sm.getString("webappClassLoader.securityException", name, ace.getMessage()), ace);
                     throw new ClassNotFoundException(name, ace);
@@ -826,17 +821,32 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                     }
                     throw e;
                 }
+                if (clazz == null && hasExternalRepositories) {
+                    try {
+                        clazz = super.findClass(name);
+                    } catch (AccessControlException ace) {
+                        log.warn(sm.getString("webappClassLoader.securityException", name, ace.getMessage()), ace);
+                        throw new ClassNotFoundException(name, ace);
+                    } catch (RuntimeException e) {
+                        if (log.isTraceEnabled()) {
+                            log.trace("      -->RuntimeException Rethrown", e);
+                        }
+                        throw e;
+                    }
+                }
             }
         } catch (ClassNotFoundException e) {
             if (log.isTraceEnabled()) {
                 log.trace("    --> Passing on ClassNotFoundException");
             }
+            notFoundClassResources.add(path);
             throw e;
         }
         if (clazz == null) {
             if (log.isTraceEnabled()) {
                 log.trace("    --> Returning ClassNotFoundException");
             }
+            notFoundClassResources.add(path);
             throw new ClassNotFoundException(name);
         }
 
@@ -2197,11 +2207,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      *
      * @return the loaded class, or null if the class isn't found
      */
-    /*
-     * The use of getPackage() is appropriate given that the code is checking if the package is sealed. Therefore,
-     * parent class loaders need to be checked.
-     */
-    @SuppressWarnings("deprecation")
     protected Class<?> findClassInternal(String name) {
 
         checkStateForResourceLoading(name);
@@ -2211,17 +2216,23 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         String path = binaryNameToPath(name, true);
 
+        return findClassInternal(name, path);
+    }
+
+
+    /*
+     * The use of getPackage() is appropriate given that the code is checking if the package is sealed. Therefore,
+     * parent class loaders need to be checked.
+     */
+    @SuppressWarnings("deprecation")
+    private Class<?> findClassInternal(String name, String path) {
         ResourceEntry entry = resourceEntries.get(path);
         WebResource resource = null;
 
         if (entry == null) {
-            if (notFoundClassResources.contains(path)) {
-                return null;
-            }
             resource = resources.getClassLoaderResource(path);
 
             if (!resource.exists()) {
-                notFoundClassResources.add(path);
                 return null;
             }
 
@@ -2254,14 +2265,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             if (resource == null) {
-                if (notFoundClassResources.contains(path)) {
-                    return null;
-                }
                 resource = resources.getClassLoaderResource(path);
             }
 
             if (!resource.exists()) {
-                notFoundClassResources.add(path);
                 return null;
             }
 
