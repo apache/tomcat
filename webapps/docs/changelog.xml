@@ -151,6 +151,9 @@
         a value set to <code>true</code>. The ETag generated will be a SHA-1
         checksum of the resource content. (remm)
       </add>
+      <fix>
+        Use client locale for directory listings. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

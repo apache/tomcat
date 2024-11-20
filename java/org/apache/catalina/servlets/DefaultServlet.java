@@ -1661,6 +1661,9 @@ public class DefaultServlet extends HttpServlet {
 
         StringBuilder sb = new StringBuilder();
 
+        // Get the right strings
+        StringManager sm = StringManager.getManager(DefaultServlet.class.getPackageName(), request.getLocales());
+
         String directoryWebappPath = resource.getWebappPath();
         WebResource[] entries = resources.listResources(directoryWebappPath);
 
@@ -1669,11 +1672,7 @@ public class DefaultServlet extends HttpServlet {
 
         // Render the page header
         sb.append("<!doctype html>\r\n");
-        sb.append("<html>\r\n");
-        /*
-         * TODO Activate this as soon as we use smClient with the request locales
-         * sb.append("<!doctype html><html lang=\""); sb.append(smClient.getLocale().getLanguage()).append("\">\r\n");
-         */
+        sb.append("<html lang=\"").append(sm.getLocale().getLanguage()).append("\">\r\n");
         sb.append("<head>\r\n");
         sb.append("<title>");
         sb.append(sm.getString("defaultServlet.directory.title", directoryWebappPath));
