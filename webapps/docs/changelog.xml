@@ -162,6 +162,11 @@
       <fix>
         Use client locale for directory listings. (remm)
       </fix>
+      <fix>
+        <bug>69439</bug>: Improve the handling of multiple
+        <code>Cache-Control</code> headers in the <code>ExpiresFilter</code>.
+        Based on pull request <pr>777</pr> by Chenjp. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
