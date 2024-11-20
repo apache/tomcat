@@ -1747,8 +1747,13 @@ public class DefaultServlet extends HttpServlet {
 
         StringBuilder sb = new StringBuilder();
 
-        // Get the right strings
-        StringManager sm = StringManager.getManager(DefaultServlet.class.getPackage().getName(), request.getLocales());
+        // Get the right strings if request is available
+        StringManager sm;
+        if (request == null) {
+            sm = DefaultServlet.sm;
+        } else {
+            sm = StringManager.getManager(DefaultServlet.class.getPackage().getName(), request.getLocales());
+        }
 
         String directoryWebappPath = resource.getWebappPath();
         WebResource[] entries = resources.listResources(directoryWebappPath);
