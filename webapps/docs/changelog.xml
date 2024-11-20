@@ -155,6 +155,12 @@
         <code>Cache-Control</code> headers in the <code>ExpiresFilter</code>.
         Based on pull request <pr>777</pr> by Chenjp. (markt)
       </fix>
+      <fix>
+        <bug>69447</bug>: Update the support for caching classes the web
+        application class loader cannot find to take account of classes loaded
+        from external repositories. Prior to this fix, these classes could be
+        incorrectly marked as not found. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
