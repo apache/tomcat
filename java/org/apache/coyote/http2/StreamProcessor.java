@@ -255,13 +255,6 @@ class StreamProcessor extends AbstractProcessor {
                 headers.setValue("Server").setString(server);
             }
         }
-
-        // Exclude some HTTP header fields where the value is determined only
-        // while generating the content as per section 9.3.2 of RFC 9110.
-        if (coyoteRequest != null && coyoteRequest.method().equals("HEAD")) {
-            headers.removeHeader("content-length");
-            headers.removeHeader("content-range");
-        }
     }
 
 
