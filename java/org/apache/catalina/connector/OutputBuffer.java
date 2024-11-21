@@ -232,13 +232,14 @@ public class OutputBuffer extends Writer {
             flushCharBuffer();
         }
 
+        // Content length can be calculated if:
+        // - the response has not been committed
+        // AND
+        // - the content length has not been explicitly set
+        // AND
+        // - some content has been written OR this is NOT a HEAD request
         if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1) &&
-                !coyoteResponse.getRequest().method().equals("HEAD")) {
-            // If this didn't cause a commit of the response, the final content
-            // length can be calculated. Only do this if this is not a HEAD
-            // request since in that case no body should have been written and
-            // setting a value of zero here will result in an explicit content
-            // length of zero being set on the response.
+                ((bb.remaining() > 0 || !coyoteResponse.getRequest().method().equals("HEAD")))) {
             coyoteResponse.setContentLength(bb.remaining());
         }
 

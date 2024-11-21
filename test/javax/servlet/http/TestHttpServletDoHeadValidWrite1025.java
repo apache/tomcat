@@ -30,16 +30,21 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class TestHttpServletDoHeadValidWrite1025 extends HttpServletDoHeadBaseTest {
 
-    @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4} {5}")
+    @Parameterized.Parameters(name = "{index}: {0} {1} {2} {3} {4} {5} {6} {7}")
     public static Collection<Object[]> parameters() {
+        Collection<Object[]> baseData = data();
 
         List<Object[]> parameterSets = new ArrayList<>();
-        for (Integer buf : BUFFERS) {
-            for (Boolean w : booleans) {
-                for (Integer c1 : COUNTS) {
-                    for (ResetType rt : ResetType.values()) {
-                        for (Boolean f : booleans) {
-                            parameterSets.add(new Object[] { buf, w, c1, rt, Integer.valueOf(1025), f });
+        for (Object[] base : baseData) {
+            for (Integer buf : BUFFERS) {
+                for (Boolean w : booleans) {
+                    for (Integer c1 : COUNTS) {
+                        for (ResetType rt : ResetType.values()) {
+                            for (Boolean f : booleans) {
+                                        parameterSets.add(new Object[] {
+                                                base[0], base[1],
+                                                buf, w, c1, rt, Integer.valueOf(1025), f });
+                            }
                         }
                     }
                 }

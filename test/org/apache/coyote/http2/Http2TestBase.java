@@ -446,6 +446,34 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
+    protected void buildHeadRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, int streamId, String path) {
+        MimeHeaders headers = new MimeHeaders();
+        headers.addValue(":method").setString("HEAD");
+        headers.addValue(":scheme").setString("http");
+        headers.addValue(":path").setString(path);
+        headers.addValue(":authority").setString("localhost:" + getPort());
+        hpackEncoder.encode(headers, headersPayload);
+
+        headersPayload.flip();
+
+        ByteUtil.setThreeBytes(headersFrameHeader, 0, headersPayload.limit());
+        headersFrameHeader[3] = FrameType.HEADERS.getIdByte();
+        // Flags. end of headers (0x04)
+        headersFrameHeader[4] = 0x04;
+        // Stream id
+        ByteUtil.set31Bits(headersFrameHeader, 5, streamId);
+    }
+
+
+    protected void sendHeadRequest(int streamId, String path) throws IOException {
+        byte[] frameHeader = new byte[9];
+        ByteBuffer headersPayload = ByteBuffer.allocate(128);
+
+        buildHeadRequest(frameHeader, headersPayload, streamId, path);
+        writeFrame(frameHeader, headersPayload);
+    }
+
+
     protected void writeFrame(byte[] header, ByteBuffer payload) throws IOException {
         writeFrame(header, payload, 0, payload.limit());
     }
@@ -1031,7 +1059,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    class TestOutput implements Output, HeaderEmitter {
+    public class TestOutput implements Output, HeaderEmitter {
 
         private StringBuffer trace = new StringBuffer();
         private String lastStreamId = "0";
@@ -1299,7 +1327,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    protected static class SimpleServlet extends HttpServlet {
+    public static class SimpleServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
 

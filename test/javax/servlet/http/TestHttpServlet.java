@@ -64,8 +64,7 @@ public class TestHttpServlet extends TomcatBaseTest {
                resHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals(LargeBodyServlet.RESPONSE_LENGTH,
-                resHeaders.get("Content-Length").get(0));
+        Assert.assertEquals(LargeBodyServlet.RESPONSE_LENGTH, resHeaders.get("Content-Length").get(0));
     }
 
 
@@ -180,17 +179,27 @@ public class TestHttpServlet extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         out.recycle();
 
-        Map<String,List<String>> headHeaders = new HashMap<>();
+        Map<String,List<String>> headHeaders = new CaseInsensitiveKeyMap<>();
         rc = headUrl(path, out, headHeaders);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        // Date header is likely to be different so just remove it from both GET and HEAD.
+        getHeaders.remove("date");
+        headHeaders.remove("date");
+        /*
+         * There are some headers that are optional for HEAD. See RFC 9110, section 9.3.2. If present, they must be the
+         * same for both GET and HEAD. If not present in HEAD, remove them from GET.
+         */
+        for (String header : TesterConstants.OPTIONAL_HEADERS_WITH_HEAD) {
+            if (!headHeaders.containsKey(header)) {
+                getHeaders.remove(header);
+            }
+        }
 
         // Headers should be the same (apart from Date)
         Assert.assertEquals(getHeaders.size(), headHeaders.size());
         for (Map.Entry<String, List<String>> getHeader : getHeaders.entrySet()) {
             String headerName = getHeader.getKey();
-            if ("date".equalsIgnoreCase(headerName)) {
-                continue;
-            }
             Assert.assertTrue(headerName, headHeaders.containsKey(headerName));
             List<String> getValues = getHeader.getValue();
             List<String> headValues = headHeaders.get(headerName);
