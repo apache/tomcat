@@ -173,6 +173,13 @@
         from external repositories. Prior to this fix, these classes could be
         incorrectly marked as not found. (markt)
       </fix>
+      <fix>
+        <bug>69466</bug>: Rework handling of HEAD requests. Headers explicitly
+        set by users will not be removed and any header present in a HEAD
+        request will also be present in the equivalent GET request. There may be
+        some headers, as per RFC 9110, section 9.3.2, that are present in a GET
+        request that are not present in the equivalent HEAD request. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
