@@ -1044,22 +1044,27 @@ href="config/listeners.html#StoreConfig_Lifecycle_Listener_-_org.apache.catalina
 <section name="Server Status">
 
 <p>From the following links you can view Status information about the server.
-Any one of <strong>manager-xxx</strong> roles allows access to this page.</p>
+The <code>manager-status</code> role or any one of the other
+<strong>manager-xxx</strong> roles allow access to this page.</p>
 
 <source>http://localhost:8080/manager/status
 http://localhost:8080/manager/status/all</source>
 
 <p>Displays server status information in HTML format.</p>
 
-<source>http://localhost:8080/manager/status?XML=true
-http://localhost:8080/manager/status/all?XML=true</source>
+<source>http://localhost:8080/manager/status?XML=true</source>
 
-<p>Displays server status information in XML format.</p>
+<p>Displays server status information in XML format. The XML format does
+not include the detailed per web application statistics.</p>
 
 <source>http://localhost:8080/manager/status?JSON=true
 http://localhost:8080/manager/status/all?JSON=true</source>
 
-<p>Displays server status information in JSON format.</p>
+<p>Displays server status information in JSON format. The JSON format does
+not include the per thread state information. If using a client visualization
+tool for active monitoring and server status alerts (such as Grafana), the JSON
+output provided by the Manager will likely provide the easiest and most secure
+solution.</p>
 
 <p>First, you have the server and JVM version number, JVM provider, OS name
 and number followed by the architecture type.</p>
@@ -1074,8 +1079,9 @@ The same information is available for both of them :
     current thread count and current thread busy.</p></li>
     <li><p>Request information : Max processing time and processing time,
     request and error count, bytes received and sent.</p></li>
-    <li><p>A table showing Stage, Time, Bytes Sent, Bytes Receive, Client,
-    VHost and Request. All existing threads are listed in the table.
+    <li><p>If not using the JSON format, the state of threads with Stage,
+    Time, Bytes Sent, Bytes Receive, Client, VHost and Request.
+    All existing threads are listed in the table.
     Here is the list of the possible thread stages :</p>
     <ul>
         <li><p><em>"Parse and Prepare Request"</em> : The request headers are
@@ -1102,7 +1108,8 @@ The same information is available for both of them :
 </ul>
 
 <p>If you are using <code>/status/all</code> command, additional information
-on each of deployed web applications will be available.</p>
+on each of deployed web applications will be available, except for the XML
+format.</p>
 
 </section>
 
