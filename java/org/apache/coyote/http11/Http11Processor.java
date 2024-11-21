@@ -908,7 +908,7 @@ public class Http11Processor extends AbstractProcessor {
         MessageBytes methodMB = request.method();
         boolean head = methodMB.equals("HEAD");
         if (head) {
-            // No entity body
+            // Any entity body, if present, should not be sent
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
             contentDelimitation = true;
         }
@@ -948,6 +948,13 @@ public class Http11Processor extends AbstractProcessor {
             headers.setValue("Content-Length").setLong(contentLength);
             outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
             contentDelimitation = true;
+        } else if (head) {
+            /*
+             * The OutputBuffer can't differentiate between a zero length response because GET would have produced a
+             * zero length body and a zero length response because HEAD didn't write any content. Therefore skip setting
+             * the "transfer-encoding: chunked" header as that may not be consistent with what would be seen with the
+             * equivalent GET.
+             */
         } else {
             // If the response code supports an entity body and we're on
             // HTTP 1.1 then we chunk unless we have a Connection: close header
@@ -1045,13 +1052,6 @@ public class Http11Processor extends AbstractProcessor {
         } else {
             // server always overrides anything the app might set
             headers.setValue("Server").setString(server);
-        }
-
-        if (head) {
-            headers.removeHeader("content-length");
-            headers.removeHeader("content-range");
-            headers.removeHeader("trailer");
-            headers.removeHeader("transfer-encoding");
         }
 
         writeHeaders(response.getStatus(), headers);
