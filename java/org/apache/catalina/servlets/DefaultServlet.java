@@ -302,7 +302,7 @@ public class DefaultServlet extends HttpServlet {
                     directoryRedirectStatusCode = statusCode;
                     break;
                 default:
-                    log("Invalid redirectStatusCode of " + statusCode);
+                    log(sm.getString("defaultServlet.invalidRedirectStatusCode", Integer.valueOf(statusCode)));
             }
         }
 
@@ -1960,7 +1960,7 @@ public class DefaultServlet extends HttpServlet {
             if (f != null) {
                 long globalXsltFileSize = f.length();
                 if (globalXsltFileSize > Integer.MAX_VALUE) {
-                    log("globalXsltFile [" + f.getAbsolutePath() + "] is too big to buffer");
+                    log(sm.getString("defaultServlet.globalXSLTTooBig", f.getAbsolutePath()));
                 } else {
                     try (FileInputStream fis = new FileInputStream(f)) {
                         byte b[] = new byte[(int) f.length()];
