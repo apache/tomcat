@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.CloseNowException;
@@ -68,6 +69,12 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private static final Integer HTTP_UPGRADE_STREAM = Integer.valueOf(1);
 
     private static final Set<String> HTTP_CONNECTION_SPECIFIC_HEADERS = new HashSet<>();
+
+    /**
+     * early hints related header fields
+     * see https://html.spec.whatwg.org/multipage/semantics.html#early-hints
+     */
+    private static final Set<String> HTTP_EARLY_HINTS_HEADERS = Set.of("Link","Content-Security-Policy");
 
     static {
         Response response = new Response();
@@ -604,10 +611,23 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     final void writeEarlyHints() throws IOException {
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
         String originalStatus = headers.getHeader(":status");
-        headers.setValue(":status").setString("103");
+        headers.setValue(":status").setString(String.valueOf(HttpServletResponse.SC_EARLY_HINTS));
+
         try {
-            handler.writeHeaders(this, headers, false, Constants.DEFAULT_HEADERS_FRAME_SIZE);
+            MimeHeaders earlyHintsHeaders = new MimeHeaders();
+            earlyHintsHeaders.duplicate(headers);
+            earlyHintsHeaders.filter(HTTP_EARLY_HINTS_HEADERS);
+            earlyHintsHeaders.setValue(":status").setString(String.valueOf(HttpServletResponse.SC_EARLY_HINTS));
+            handler.writeHeaders(this, earlyHintsHeaders, false, Constants.DEFAULT_HEADERS_FRAME_SIZE);
+            // to take advantage of the Early Hints feature, the server-think-time is needed between the Early Hints
+            // headers and the final response. Therefore, we need emit early hints status and headers via flush.
+            flush(false);
         } finally {
+            // Once early hints emitted, clean up early hints relative headers.
+            // The final response is responsible for resetting Link/CSP/etc related headers
+            for(String header:HTTP_EARLY_HINTS_HEADERS) {
+                headers.removeHeader(header);
+            }
             if (originalStatus == null) {
                 headers.removeHeader(":status");
             } else {
