@@ -70,11 +70,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     private static final Set<String> HTTP_CONNECTION_SPECIFIC_HEADERS = new HashSet<>();
 
-    /**
-     * early hints related header fields
-     * see https://html.spec.whatwg.org/multipage/semantics.html#early-hints
-     */
-    private static final Set<String> HTTP_EARLY_HINTS_HEADERS = Set.of("Link","Content-Security-Policy");
+    private static final String HTTP_STATUS_HEADER = ":status";
 
     static {
         Response response = new Response();
@@ -610,28 +606,19 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     final void writeEarlyHints() throws IOException {
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
-        String originalStatus = headers.getHeader(":status");
-        headers.setValue(":status").setString(Integer.toString(HttpServletResponse.SC_EARLY_HINTS));
+        String originalStatus = headers.getHeader(HTTP_STATUS_HEADER);
+        headers.setValue(HTTP_STATUS_HEADER).setString(Integer.toString(HttpServletResponse.SC_EARLY_HINTS));
 
         try {
-            MimeHeaders earlyHintsHeaders = new MimeHeaders();
-            earlyHintsHeaders.duplicate(headers);
-            earlyHintsHeaders.filter(HTTP_EARLY_HINTS_HEADERS);
-            earlyHintsHeaders.setValue(":status").setString(Integer.toString(HttpServletResponse.SC_EARLY_HINTS));
-            handler.writeHeaders(this, earlyHintsHeaders, false, Constants.DEFAULT_HEADERS_FRAME_SIZE);
+            handler.writeHeaders(this, headers, false, Constants.DEFAULT_HEADERS_FRAME_SIZE);
             // to take advantage of the Early Hints feature, the server-think-time is needed between the Early Hints
             // headers and the final response. Therefore, we need emit early hints status and headers via flush.
             flush(false);
         } finally {
-            // Once early hints emitted, clean up early hints relative headers.
-            // The final response is responsible for resetting Link/CSP/etc related headers
-            for(String header:HTTP_EARLY_HINTS_HEADERS) {
-                headers.removeHeader(header);
-            }
             if (originalStatus == null) {
-                headers.removeHeader(":status");
+                headers.removeHeader(HTTP_STATUS_HEADER);
             } else {
-                headers.setValue(":status").setString(originalStatus);
+                headers.setValue(HTTP_STATUS_HEADER).setString(originalStatus);
             }
         }
     }
