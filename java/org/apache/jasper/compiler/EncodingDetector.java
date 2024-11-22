@@ -206,7 +206,7 @@ class EncodingDetector {
         public final String encoding;
         public final int skip;
 
-        BomResult(String encoding,  int skip) {
+        BomResult(String encoding, int skip) {
             this.encoding = encoding;
             this.skip = skip;
         }
