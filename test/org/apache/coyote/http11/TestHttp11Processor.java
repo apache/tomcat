@@ -1938,12 +1938,46 @@ public class TestHttp11Processor extends TomcatBaseTest {
         client.setRequest(new String[] { request });
 
         client.connect(600000, 600000);
-        client.processRequest(false);
 
+        long now = System.currentTimeMillis();
+
+        client.processRequest(false);
         Assert.assertEquals(103, client.getStatusCode());
+        Assert.assertTrue("Presence of early hints header 'Link: </style.css>; rel=preload; as=style' is expected.",
+                client.getResponseHeaders().contains("Link: </style.css>; rel=preload; as=style"));
+        Assert.assertFalse("Absence of header 'X-servlet-name: EarlyHintsServlet' is expected.",
+                client.getResponseHeaders().contains("X-servlet-name: EarlyHintsServlet"));
 
         client.readResponse(false);
+        Assert.assertEquals(103, client.getStatusCode());
+        Assert.assertFalse("Absence of early hints header 'Link: </style.css>; rel=preload; as=style' is expected.",
+                client.getResponseHeaders().contains("Link: </style.css>; rel=preload; as=style"));
+        Assert.assertTrue("Presence of early hints header 'Link: </main.js>; rel=preload; as=script' is expected.",
+                client.getResponseHeaders().contains("Link: </main.js>; rel=preload; as=script"));
+        Assert.assertTrue("Presence of early hints header 'Link: </image.png>; rel=preload; as=image' is expected.",
+                client.getResponseHeaders().contains("Link: </image.png>; rel=preload; as=image"));
+        Assert.assertTrue("Presence of early hints header 'Content-Security-Policy: style-src: self;' is expected.",
+                client.getResponseHeaders().contains("Content-Security-Policy: style-src: self;"));
+        Assert.assertFalse("Absence of header 'X-servlet-name: EarlyHintsServlet' is expected.",
+                client.getResponseHeaders().contains("X-servlet-name: EarlyHintsServlet"));
+        Assert.assertTrue("Server side think time after early hints > 50 ms expected.",
+                (System.currentTimeMillis() - now) > 50L);
+
+        now = System.currentTimeMillis();
+        client.readResponse(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertFalse("Absence of early hints header 'Link: </image.png>; rel=preload; as=image' is expected.",
+                client.getResponseHeaders().contains("Link: </image.png>; rel=preload; as=image"));
+        Assert.assertTrue("Presence of early hints header 'Link: </style.css>; rel=preload; as=style' is expected.",
+                client.getResponseHeaders().contains("Link: </style.css>; rel=preload; as=style"));
+        Assert.assertTrue("Presence of early hints header 'Link: </main.js>; rel=preload; as=script' is expected.",
+                client.getResponseHeaders().contains("Link: </main.js>; rel=preload; as=script"));
+        Assert.assertTrue("Presence of early hints header 'Content-Security-Policy: style-src: self;' is expected.",
+                client.getResponseHeaders().contains("Content-Security-Policy: style-src: self;"));
+        Assert.assertTrue("Presence of header 'X-servlet-name: EarlyHintsServlet' is expected.",
+                client.getResponseHeaders().contains("X-servlet-name: EarlyHintsServlet"));
+        Assert.assertTrue("Server side think time after early hints > 50 ms expected.",
+                (System.currentTimeMillis() - now) > 50L);
     }
 
     @Test
@@ -1967,12 +2001,45 @@ public class TestHttp11Processor extends TomcatBaseTest {
         client.setRequest(new String[] { request });
 
         client.connect(600000, 600000);
-        client.processRequest(false);
+        long now = System.currentTimeMillis();
 
+        client.processRequest(false);
         Assert.assertEquals(103, client.getStatusCode());
+        Assert.assertTrue("Presence of early hints header 'Link: </style.css>; rel=preload; as=style' is expected.",
+                client.getResponseHeaders().contains("Link: </style.css>; rel=preload; as=style"));
+        Assert.assertFalse("Absence of header 'X-servlet-name: EarlyHintsServlet' is expected.",
+                client.getResponseHeaders().contains("X-servlet-name: EarlyHintsServlet"));
 
         client.readResponse(false);
+        Assert.assertEquals(103, client.getStatusCode());
+        Assert.assertFalse("Absence of early hints header 'Link: </style.css>; rel=preload; as=style' is expected.",
+                client.getResponseHeaders().contains("Link: </style.css>; rel=preload; as=style"));
+        Assert.assertTrue("Presence of early hints header 'Link: </main.js>; rel=preload; as=script' is expected.",
+                client.getResponseHeaders().contains("Link: </main.js>; rel=preload; as=script"));
+        Assert.assertTrue("Presence of early hints header 'Link: </image.png>; rel=preload; as=image' is expected.",
+                client.getResponseHeaders().contains("Link: </image.png>; rel=preload; as=image"));
+        Assert.assertTrue("Presence of early hints header 'Content-Security-Policy: style-src: self;' is expected.",
+                client.getResponseHeaders().contains("Content-Security-Policy: style-src: self;"));
+        Assert.assertFalse("Absence of header 'X-servlet-name: EarlyHintsServlet' is expected.",
+                client.getResponseHeaders().contains("X-servlet-name: EarlyHintsServlet"));
+        Assert.assertTrue("Server side think time after early hints > 50 ms expected.",
+                (System.currentTimeMillis() - now) > 50L);
+
+        now = System.currentTimeMillis();
+        client.readResponse(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertFalse("Absence of early hints header 'Link: </image.png>; rel=preload; as=image' is expected.",
+                client.getResponseHeaders().contains("Link: </image.png>; rel=preload; as=image"));
+        Assert.assertTrue("Presence of early hints header 'Link: </style.css>; rel=preload; as=style' is expected.",
+                client.getResponseHeaders().contains("Link: </style.css>; rel=preload; as=style"));
+        Assert.assertTrue("Presence of early hints header 'Link: </main.js>; rel=preload; as=script' is expected.",
+                client.getResponseHeaders().contains("Link: </main.js>; rel=preload; as=script"));
+        Assert.assertTrue("Presence of early hints header 'Content-Security-Policy: style-src: self;' is expected.",
+                client.getResponseHeaders().contains("Content-Security-Policy: style-src: self;"));
+        Assert.assertTrue("Presence of header 'X-servlet-name: EarlyHintsServlet' is expected.",
+                client.getResponseHeaders().contains("X-servlet-name: EarlyHintsServlet"));
+        Assert.assertTrue("Server side think time after early hints > 50 ms expected.",
+                (System.currentTimeMillis() - now) > 50L);
     }
 
 
@@ -1997,12 +2064,45 @@ public class TestHttp11Processor extends TomcatBaseTest {
         client.setRequest(new String[] { request });
 
         client.connect(600000, 600000);
-        client.processRequest(false);
+        long now = System.currentTimeMillis();
 
+        client.processRequest(false);
         Assert.assertEquals(103, client.getStatusCode());
+        Assert.assertTrue("Presence of early hints header 'Link: </style.css>; rel=preload; as=style' is expected.",
+                client.getResponseHeaders().contains("Link: </style.css>; rel=preload; as=style"));
+        Assert.assertFalse("Absence of header 'X-servlet-name: EarlyHintsServlet' is expected.",
+                client.getResponseHeaders().contains("X-servlet-name: EarlyHintsServlet"));
 
         client.readResponse(false);
+        Assert.assertEquals(103, client.getStatusCode());
+        Assert.assertFalse("Absence of early hints header 'Link: </style.css>; rel=preload; as=style' is expected.",
+                client.getResponseHeaders().contains("Link: </style.css>; rel=preload; as=style"));
+        Assert.assertTrue("Presence of early hints header 'Link: </main.js>; rel=preload; as=script' is expected.",
+                client.getResponseHeaders().contains("Link: </main.js>; rel=preload; as=script"));
+        Assert.assertTrue("Presence of early hints header 'Link: </image.png>; rel=preload; as=image' is expected.",
+                client.getResponseHeaders().contains("Link: </image.png>; rel=preload; as=image"));
+        Assert.assertTrue("Presence of early hints header 'Content-Security-Policy: style-src: self;' is expected.",
+                client.getResponseHeaders().contains("Content-Security-Policy: style-src: self;"));
+        Assert.assertFalse("Absence of header 'X-servlet-name: EarlyHintsServlet' is expected.",
+                client.getResponseHeaders().contains("X-servlet-name: EarlyHintsServlet"));
+        Assert.assertTrue("Server side think time after early hints > 50 ms expected.",
+                (System.currentTimeMillis() - now) > 50L);
+
+        now = System.currentTimeMillis();
+        client.readResponse(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertFalse("Absence of early hints header 'Link: </image.png>; rel=preload; as=image' is expected.",
+                client.getResponseHeaders().contains("Link: </image.png>; rel=preload; as=image"));
+        Assert.assertTrue("Presence of early hints header 'Link: </style.css>; rel=preload; as=style' is expected.",
+                client.getResponseHeaders().contains("Link: </style.css>; rel=preload; as=style"));
+        Assert.assertTrue("Presence of early hints header 'Link: </main.js>; rel=preload; as=script' is expected.",
+                client.getResponseHeaders().contains("Link: </main.js>; rel=preload; as=script"));
+        Assert.assertTrue("Presence of early hints header 'Content-Security-Policy: style-src: self;' is expected.",
+                client.getResponseHeaders().contains("Content-Security-Policy: style-src: self;"));
+        Assert.assertTrue("Presence of header 'X-servlet-name: EarlyHintsServlet' is expected.",
+                client.getResponseHeaders().contains("X-servlet-name: EarlyHintsServlet"));
+        Assert.assertTrue("Server side think time after early hints > 50 ms expected.",
+                (System.currentTimeMillis() - now) > 50L);
     }
 
 
@@ -2022,8 +2122,10 @@ public class TestHttp11Processor extends TomcatBaseTest {
             this.useSendError = useSendError;
             this.errorString = errorString;
         }
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.addHeader("X-servlet-name", "EarlyHintsServlet");
             resp.addHeader("Link", "</style.css>; rel=preload; as=style");
 
             if (useSendError) {
@@ -2035,11 +2137,38 @@ public class TestHttp11Processor extends TomcatBaseTest {
             } else {
                 ((ResponseFacade) resp).sendEarlyHints();
             }
+            try {
+                Thread.sleep(100); // simulate server side think time
+            } catch (InterruptedException e) {
+            }
+
+            resp.addHeader("Content-Security-Policy", "style-src: self;");
+            resp.addHeader("Link", "</main.js>; rel=preload; as=script");
+            resp.addHeader("Link", "</image.png>; rel=preload; as=image");
+
+            if (useSendError) {
+                if (null == errorString) {
+                    resp.sendError(103);
+                } else {
+                    resp.sendError(103, errorString);
+                }
+            } else {
+                ((ResponseFacade) resp).sendEarlyHints();
+            }
+            try {
+                Thread.sleep(100); // simulate server side think time
+            } catch (InterruptedException e) {
+            }
+
+            resp.addHeader("Content-Security-Policy", "style-src: self;");
+            resp.addHeader("Link", "</main.js>; rel=preload; as=script");
+            resp.addHeader("Link", "</style.css>; rel=preload; as=style");
 
             resp.setCharacterEncoding(StandardCharsets.UTF_8);
             resp.setContentType("text/plain");
 
             resp.getWriter().write("OK");
+
         }
     }
 }
