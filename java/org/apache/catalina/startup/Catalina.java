@@ -930,7 +930,8 @@ public class Catalina {
         code.append(" implements ");
         code.append(ServerXml.class.getName().replace('$', '.')).append(" {").append(System.lineSeparator());
         code.append("public void load(").append(Catalina.class.getName());
-        code.append(' ').append(digester.toVariableName(this)).append(") throws Exception {").append(System.lineSeparator());
+        code.append(' ').append(digester.toVariableName(this)).append(") throws Exception {")
+                .append(System.lineSeparator());
     }
 
 
