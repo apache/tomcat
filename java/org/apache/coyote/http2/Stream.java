@@ -611,13 +611,13 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     final void writeEarlyHints() throws IOException {
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
         String originalStatus = headers.getHeader(":status");
-        headers.setValue(":status").setString(String.valueOf(HttpServletResponse.SC_EARLY_HINTS));
+        headers.setValue(":status").setString(Integer.toString(HttpServletResponse.SC_EARLY_HINTS));
 
         try {
             MimeHeaders earlyHintsHeaders = new MimeHeaders();
             earlyHintsHeaders.duplicate(headers);
             earlyHintsHeaders.filter(HTTP_EARLY_HINTS_HEADERS);
-            earlyHintsHeaders.setValue(":status").setString(String.valueOf(HttpServletResponse.SC_EARLY_HINTS));
+            earlyHintsHeaders.setValue(":status").setString(Integer.toString(HttpServletResponse.SC_EARLY_HINTS));
             handler.writeHeaders(this, earlyHintsHeaders, false, Constants.DEFAULT_HEADERS_FRAME_SIZE);
             // to take advantage of the Early Hints feature, the server-think-time is needed between the Early Hints
             // headers and the final response. Therefore, we need emit early hints status and headers via flush.
