@@ -25,7 +25,7 @@ import jakarta.servlet.jsp.tagext.FunctionInfo;
 import org.apache.jasper.JasperException;
 
 /**
- * This class defines internal representation for an EL Expression
+ * This class defines internal representation for an EL Expression.
  *
  * It currently only defines functions.  It can be expanded to define
  * all the components of an EL expression, if need to.
@@ -88,7 +88,7 @@ abstract class ELNode {
 
     /**
      * Represents anything in EL expression, other than functions, including
-     * function arguments etc
+     * function arguments etc.
      */
     public static class ELText extends ELNode {
 
@@ -109,7 +109,7 @@ abstract class ELNode {
     }
 
     /**
-     * Represents a function
+     * Represents a function.
      * Currently only include the prefix and function name, but not its
      * arguments.
      */
