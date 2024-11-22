@@ -53,8 +53,7 @@ public class ELInterpreterFactory {
         ELInterpreter result = null;
 
         // Search for an implementation
-        // 1. ServletContext attribute (set by application or cached by a
-        //    previous call to this method).
+        // 1. ServletContext attribute (set by application or cached by a previous call to this method).
         Object attribute = context.getAttribute(EL_INTERPRETER_CLASS_NAME);
         if (attribute instanceof ELInterpreter) {
             return (ELInterpreter) attribute;

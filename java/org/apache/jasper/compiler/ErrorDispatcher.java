@@ -31,10 +31,10 @@ import org.xml.sax.SAXException;
 /**
  * Class responsible for dispatching JSP parse and javac compilation errors
  * to the configured error handler.
- *
+ * <p>
  * This class is also responsible for localizing any error codes before they
  * are passed on to the configured error handler.
- *
+ * <p>
  * In the case of a Java compilation error, the compiler error message is
  * parsed into an array of JavacErrorDetail instances, which is passed on to
  * the configured error handler.
@@ -230,9 +230,6 @@ public class ErrorDispatcher {
     }
 
 
-    //*********************************************************************
-    // Private utility methods
-
     /**
      * Dispatches the given JSP parse error to the configured error handler.
      *
@@ -279,8 +276,7 @@ public class ErrorDispatcher {
                     file = where.getFile();
                 }
             } else {
-                // Get the context-relative resource path, so as to not
-                // disclose any local filesystem details
+                // Get the context-relative resource path, so as to not disclose any local file system details
                 file = where.getFile();
             }
             line = where.getLineNumber();
@@ -305,7 +301,7 @@ public class ErrorDispatcher {
     /**
      * Parses the given Java compilation error message, which may contain one
      * or more compilation errors, into an array of JavacErrorDetail instances.
-     *
+     * <p>
      * Each JavacErrorDetail instance contains the information about a single
      * compilation error.
      *
@@ -342,6 +338,7 @@ public class ErrorDispatcher {
             /*
              * Error line number is delimited by set of colons.
              * Ignore colon following drive letter on Windows (fromIndex = 2).
+             *
              * XXX Handle deprecation warnings that don't have line info
              */
             int beginColon = line.indexOf(':', 2);
@@ -422,8 +419,7 @@ public class ErrorDispatcher {
         page.visit(errVisitor);
         Node errNode = errVisitor.getJspSourceNode();
         if ((errNode != null) && (errNode.getStart() != null)) {
-            // If this is a scriplet node then there is a one to one mapping
-            // between JSP lines and Java lines
+            // If this is a scriplet node then there is a one to one mapping between JSP lines and Java lines
             if (errVisitor.getJspSourceNode() instanceof Node.Scriptlet ||
                     errVisitor.getJspSourceNode() instanceof Node.Declaration) {
                 javacError = new JavacErrorDetail(
@@ -455,6 +451,7 @@ public class ErrorDispatcher {
              * generated for the scriptlet, and therefore cannot be
              * mapped to the start line number of the scriptlet in the
              * JSP page.
+             *
              * Include just the javac error info in the error detail.
              */
             javacError = new JavacErrorDetail(
