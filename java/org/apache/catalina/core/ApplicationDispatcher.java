@@ -46,6 +46,7 @@ import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.connector.ResponseFacade;
 import org.apache.coyote.BadRequestException;
+import org.apache.coyote.CloseNowException;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -641,7 +642,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 filterChain.doFilter(request, response);
             }
             // Servlet Service Method is called by the FilterChain
-        } catch (BadRequestException e) {
+        } catch (BadRequestException | CloseNowException e) {
             ioException = e;
         } catch (IOException e) {
             wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException", wrapper.getName()), e);
