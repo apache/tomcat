@@ -1265,6 +1265,9 @@ public class Http11Processor extends AbstractProcessor {
             response.getMimeHeaders().removeHeader(header);
         }
         outputBuffer.writeHeaders();
+        // to take advantage of the Early Hints feature, the server-think-time is needed between the Early Hints
+        // headers and the final response. Therefore, we need emit early hints status and headers via flush.
+        outputBuffer.flush();
         outputBuffer.resetHeaderBuffer();
     }
 
