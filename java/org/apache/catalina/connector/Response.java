@@ -1080,10 +1080,10 @@ public class Response implements HttpServletResponse {
     /**
      * {@inheritDoc}
      * <p>
-     * Calling <code>sendError</code> with a status code of 103 differs from the usual
-     * behavior. Sending 103 will trigger the container to send a "103 Early Hints" informational response including all
-     * current headers. The application can continue to use the request and response after calling sendError with a 103
-     * status code, including triggering a more typical response of any type.
+     * Calling <code>sendError</code> with a status code of 103 differs from the usual behavior. Sending 103 will
+     * trigger the container to send a "103 Early Hints" informational response including all current headers. The
+     * application can continue to use the request and response after calling sendError with a 103 status code,
+     * including triggering a more typical response of any type.
      * <p>
      * Starting with Tomcat 12, applications should use {@link #sendEarlyHints}.
      */
@@ -1096,10 +1096,10 @@ public class Response implements HttpServletResponse {
     /**
      * {@inheritDoc}
      * <p>
-     * Calling <code>sendError</code> with a status code of 103 differs from the usual
-     * behavior. Sending 103 will trigger the container to send a "103 Early Hints" informational response including all
-     * current headers. The application can continue to use the request and response after calling sendError with a 103
-     * status code, including triggering a more typical response of any type.
+     * Calling <code>sendError</code> with a status code of 103 differs from the usual behavior. Sending 103 will
+     * trigger the container to send a "103 Early Hints" informational response including all current headers. The
+     * application can continue to use the request and response after calling sendError with a 103 status code,
+     * including triggering a more typical response of any type.
      * <p>
      * Starting with Tomcat 12, applications should use {@link #sendEarlyHints}.
      */
