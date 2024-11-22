@@ -28,27 +28,25 @@ import jakarta.servlet.jsp.tagext.FunctionInfo;
 import org.apache.jasper.JasperException;
 
 /**
- * This class generates functions mappers for the EL expressions in the page.
- * Instead of a global mapper, a mapper is used for each call to EL
- * evaluator, thus avoiding the prefix overlapping and redefinition
- * issues.
+ * This class generates functions mappers for the EL expressions in the page. Instead of a global mapper, a mapper is
+ * used for each call to EL evaluator, thus avoiding the prefix overlapping and redefinition issues.
  *
  * @author Kin-man Chung
  */
 
 public class ELFunctionMapper {
     private int currFunc = 0;
-    private StringBuilder ds;  // Contains codes to initialize the functions mappers.
-    private StringBuilder ss;  // Contains declarations of the functions mappers.
+    private StringBuilder ds; // Contains codes to initialize the functions mappers.
+    private StringBuilder ss; // Contains declarations of the functions mappers.
 
     /**
      * Creates the functions mappers for all EL expressions in the JSP page.
      *
      * @param page The current compilation unit.
+     *
      * @throws JasperException EL error
      */
-    public static void map(Node.Nodes page)
-                throws JasperException {
+    public static void map(Node.Nodes page) throws JasperException {
 
         ELFunctionMapper map = new ELFunctionMapper();
         map.ds = new StringBuilder();
@@ -62,22 +60,20 @@ public class ELFunctionMapper {
             Node root = page.getRoot();
             @SuppressWarnings("unused")
             Node unused = new Node.Declaration(map.ss.toString(), null, root);
-            unused = new Node.Declaration(
-                    "static {\n" + ds + "}\n", null, root);
+            unused = new Node.Declaration("static {\n" + ds + "}\n", null, root);
         }
     }
 
     /**
-     * A visitor for the page.  The places where EL is allowed are scanned
-     * for functions, and if found functions mappers are created.
+     * A visitor for the page. The places where EL is allowed are scanned for functions, and if found functions mappers
+     * are created.
      */
     private class ELFunctionVisitor extends Node.Visitor {
 
         /**
-         * Use a global name map to facilitate reuse of function maps.
-         * The key used is prefix:function:uri.
+         * Use a global name map to facilitate reuse of function maps. The key used is prefix:function:uri.
          */
-        private final Map<String, String> gMap = new HashMap<>();
+        private final Map<String,String> gMap = new HashMap<>();
 
         @Override
         public void visit(Node.ParamAction n) throws JasperException {
@@ -144,8 +140,7 @@ public class ELFunctionMapper {
             doMap(n.getEL());
         }
 
-        private void doMap(Node.JspAttribute attr)
-                throws JasperException {
+        private void doMap(Node.JspAttribute attr) throws JasperException {
             if (attr != null) {
                 doMap(attr.getEL());
             }
@@ -154,13 +149,13 @@ public class ELFunctionMapper {
         /**
          * Creates function mappers, if needed, from ELNodes
          */
-        private void doMap(ELNode.Nodes el)
-                throws JasperException {
+        private void doMap(ELNode.Nodes el) throws JasperException {
 
             // Only care about functions in ELNode's
             class Fvisitor extends ELNode.Visitor {
                 private final List<ELNode.Function> funcs = new ArrayList<>();
                 private final Set<String> keySet = new HashSet<>();
+
                 @Override
                 public void visit(ELNode.Function n) throws JasperException {
                     String key = n.getPrefix() + ":" + n.getName();
@@ -215,10 +210,8 @@ public class ELFunctionMapper {
                     // function mapper even if one isn't used so just pass null
                     ds.append(funcMethod + "(null, null, null, null);\n");
                 } else {
-                    ds.append(funcMethod + "(\"" + fnQName + "\", " +
-                            getCanonicalName(funcInfo.getFunctionClass()) +
-                            ".class, " + '\"' + f.getMethodName() + "\", " +
-                            "new Class[] {");
+                    ds.append(funcMethod + "(\"" + fnQName + "\", " + getCanonicalName(funcInfo.getFunctionClass()) +
+                            ".class, " + '\"' + f.getMethodName() + "\", " + "new Class[] {");
                     String params[] = f.getParameters();
                     for (int k = 0; k < params.length; k++) {
                         if (k != 0) {
@@ -235,7 +228,7 @@ public class ELFunctionMapper {
 
                             // Count the number of array dimension
                             int aCount = 0;
-                            for (int jj = iArray; jj < params[k].length(); jj++ ) {
+                            for (int jj = iArray; jj < params[k].length(); jj++) {
                                 if (params[k].charAt(jj) == '[') {
                                     aCount++;
                                 }
@@ -256,19 +249,17 @@ public class ELFunctionMapper {
         }
 
         /**
-         * Find the name of the function mapper for an EL.  Reuse a
-         * previously generated one if possible.
-         * @param functions A List of ELNode.Function instances that
-         *                  represents the functions in an EL
-         * @return A previous generated function mapper name that can be used
-         *         by this EL; null if none found.
+         * Find the name of the function mapper for an EL. Reuse a previously generated one if possible.
+         *
+         * @param functions A List of ELNode.Function instances that represents the functions in an EL
+         *
+         * @return A previous generated function mapper name that can be used by this EL; null if none found.
          */
         private String matchMap(List<ELNode.Function> functions) {
 
             String mapName = null;
             for (ELNode.Function f : functions) {
-                String temName = gMap.get(f.getPrefix() + ':' + f.getName() +
-                        ':' + f.getUri());
+                String temName = gMap.get(f.getPrefix() + ':' + f.getName() + ':' + f.getUri());
                 if (temName == null) {
                     return null;
                 }
@@ -290,11 +281,11 @@ public class ELFunctionMapper {
         }
 
         /**
-         * Convert a binary class name into a canonical one that can be used
-         * when generating Java source code.
+         * Convert a binary class name into a canonical one that can be used when generating Java source code.
          *
          * @param className Binary class name
-         * @return          Canonical equivalent
+         *
+         * @return Canonical equivalent
          */
         private String getCanonicalName(String className) throws JasperException {
             Class<?> clazz;
