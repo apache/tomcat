@@ -621,31 +621,37 @@ public class TestStreamProcessor extends Http2TestBase {
 
         parser.readFrame();
         long now = System.currentTimeMillis();
-        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[103]\n" +
-                "3-Header-[link]-[</style.css>; rel=preload; as=style]\n" + "3-HeadersEnd\n", output.getTrace());
+        Assert.assertEquals(
+                "3-HeadersStart\n" + "3-Header-[:status]-[103]\n" +
+                        "3-Header-[link]-[</style.css>; rel=preload; as=style]\n" + "3-HeadersEnd\n",
+                output.getTrace());
         output.clearTrace();
 
         parser.readFrame();
-        Assert.assertTrue("Server side think time after early hints > 50 ms expected.", (System.currentTimeMillis()-now)>50L);
+        Assert.assertTrue("Server side think time after early hints > 50 ms expected.",
+                (System.currentTimeMillis() - now) > 50L);
         now = System.currentTimeMillis();
 
-        Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[103]\n" +
-                "3-Header-[content-security-policy]-[style-src: self;]\n" +
-                "3-Header-[link]-[</main.js>; rel=preload; as=script]\n" +
-                "3-Header-[link]-[</image.png>; rel=preload; as=image]\n" +
-                "3-HeadersEnd\n", output.getTrace());
+        Assert.assertEquals(
+                "3-HeadersStart\n" + "3-Header-[:status]-[103]\n" +
+                        "3-Header-[link]-[</style.css>; rel=preload; as=style]\n" +
+                        "3-Header-[content-security-policy]-[style-src: self;]\n" +
+                        "3-Header-[link]-[</main.js>; rel=preload; as=script]\n" +
+                        "3-Header-[link]-[</image.png>; rel=preload; as=image]\n" + "3-HeadersEnd\n",
+                output.getTrace());
         output.clearTrace();
 
         parser.readFrame();
-        Assert.assertTrue("Server side think time after early hints > 50 ms expected.", (System.currentTimeMillis()-now)>50L);
+        Assert.assertTrue("Server side think time after early hints > 50 ms expected.",
+                (System.currentTimeMillis() - now) > 50L);
         now = System.currentTimeMillis();
         parser.readFrame();
         Assert.assertEquals("3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                "3-Header-[link]-[</style.css>; rel=preload; as=style]\n" +
                 "3-Header-[content-security-policy]-[style-src: self;]\n" +
                 "3-Header-[link]-[</main.js>; rel=preload; as=script]\n" +
-                "3-Header-[link]-[</style.css>; rel=preload; as=style]\n" +
-                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" +
-                "3-Header-[content-length]-[2]\n" +
+                "3-Header-[link]-[</image.png>; rel=preload; as=image]\n" +
+                "3-Header-[content-type]-[text/plain;charset=UTF-8]\n" + "3-Header-[content-length]-[2]\n" +
                 "3-Header-[date]-[" + DEFAULT_DATE + "]\n" + "3-HeadersEnd\n" + "3-Body-2\n" + "3-EndOfStream\n",
                 output.getTrace());
     }
@@ -674,10 +680,6 @@ public class TestStreamProcessor extends Http2TestBase {
                 Thread.sleep(100); // simulate server side think time
             } catch (InterruptedException e) {
             }
-
-            resp.addHeader("Content-Security-Policy","style-src: self;");
-            resp.addHeader("Link", "</main.js>; rel=preload; as=script");
-            resp.addHeader("Link", "</style.css>; rel=preload; as=style");
 
             resp.setCharacterEncoding(StandardCharsets.UTF_8);
             resp.setContentType("text/plain");
