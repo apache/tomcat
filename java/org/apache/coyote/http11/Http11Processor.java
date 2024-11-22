@@ -1250,7 +1250,7 @@ public class Http11Processor extends AbstractProcessor {
 
     @Override
     protected void earlyHints() throws IOException {
-        writeHeaders(103, response.getMimeHeaders());
+        writeHeaders(HttpServletResponse.SC_EARLY_HINTS, response.getMimeHeaders());
         outputBuffer.writeHeaders();
         outputBuffer.resetHeaderBuffer();
     }
