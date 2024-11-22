@@ -117,6 +117,8 @@ public class AttributeParser {
     }
 
     /*
+     * @formatter:off
+     *
      * This method gets the next unquoted character and looks for
      * - literals that need to be converted for EL processing
      *   \ -> type{'\\'}
@@ -125,8 +127,9 @@ public class AttributeParser {
      * - start of EL
      *   ${
      *   #{
-     * Note all the examples above *do not* include the escaping required to use
-     * the values in Java code.
+     * Note all the examples above *do not* include the escaping required to use the values in Java code.
+     *
+     * @formatter:on
      */
     private void parseLiteral() {
         boolean foundEL = false;
@@ -225,8 +228,9 @@ public class AttributeParser {
     }
 
     /*
-     * Returns the next unquoted character and sets the lastChEscaped flag to
-     * indicate if it was quoted/escaped or not.
+     * @formatter:off
+     *
+     * Returns the next unquoted character and sets the lastChEscaped flag to indicate if it was quoted/escaped or not.
      * &apos; is always unquoted to '
      * &quot; is always unquoted to "
      * \" is always unquoted to "
@@ -236,6 +240,8 @@ public class AttributeParser {
      * \# is unquoted to # if EL is not being ignored
      * <\% is always unquoted to <%
      * %\> is always unquoted to %>
+     *
+     * @formatter:on
      */
     private char nextChar() {
         lastChEscaped = false;
@@ -271,16 +277,14 @@ public class AttributeParser {
         } else if (ch == '<' && (i + 2 < size) && input.charAt(i + 1) == '\\' &&
                 input.charAt(i + 2) == '%') {
             // Note this is a hack since nextChar only returns a single char
-            // It is safe since <% does not require special treatment for EL
-            // or for literals
+            // It is safe since <% does not require special treatment for EL or for literals
             result.append('<');
             i+=3;
             return '%';
         } else if (ch == '%' && i + 2 < size && input.charAt(i + 1) == '\\' &&
                 input.charAt(i + 2) == '>') {
             // Note this is a hack since nextChar only returns a single char
-            // It is safe since %> does not require special treatment for EL
-            // or for literals
+            // It is safe since %> does not require special treatment for EL or for literals
             result.append('%');
             i+=3;
             return '>';
