@@ -99,8 +99,8 @@ public interface WebResource {
     String getETag();
 
     /**
-     * Return the strong ETag if available else return the weak ETag calculated from the
-     * content length and last modified.
+     * Return the strong ETag if available else return the weak ETag calculated from the content length and last
+     * modified.
      *
      * @return The ETag for this resource
      */
