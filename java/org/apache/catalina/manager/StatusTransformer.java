@@ -517,12 +517,10 @@ public class StatusTransformer {
             }
             appendJSonValue(writer, "name", jsonName).append(',').println();
             indent(writer, 3).append('"').append("threadInfo").append('"').append(':').append('{');
-            appendJSonValue(writer, "maxThreads", mBeanServer.getAttribute(tpName, "maxThreads"))
+            appendJSonValue(writer, "maxThreads", mBeanServer.getAttribute(tpName, "maxThreads")).append(',');
+            appendJSonValue(writer, "currentThreadCount", mBeanServer.getAttribute(tpName, "currentThreadCount"))
                     .append(',');
-            appendJSonValue(writer, "currentThreadCount",
-                    mBeanServer.getAttribute(tpName, "currentThreadCount")).append(',');
-            appendJSonValue(writer, "currentThreadsBusy",
-                    mBeanServer.getAttribute(tpName, "currentThreadsBusy"));
+            appendJSonValue(writer, "currentThreadsBusy", mBeanServer.getAttribute(tpName, "currentThreadsBusy"));
             writer.append('}');
 
             ObjectName grpName = null;
@@ -537,12 +535,10 @@ public class StatusTransformer {
                 writer.append(',').println();
                 indent(writer, 3).append('"').append("requestInfo").append('"').append(':').append('{');
                 appendJSonValue(writer, "maxTime", mBeanServer.getAttribute(grpName, "maxTime")).append(',');
-                appendJSonValue(writer, "processingTime",
-                        mBeanServer.getAttribute(grpName, "processingTime")).append(',');
-                appendJSonValue(writer, "requestCount", mBeanServer.getAttribute(grpName, "requestCount"))
+                appendJSonValue(writer, "processingTime", mBeanServer.getAttribute(grpName, "processingTime"))
                         .append(',');
-                appendJSonValue(writer, "errorCount", mBeanServer.getAttribute(grpName, "errorCount"))
-                        .append(',');
+                appendJSonValue(writer, "requestCount", mBeanServer.getAttribute(grpName, "requestCount")).append(',');
+                appendJSonValue(writer, "errorCount", mBeanServer.getAttribute(grpName, "errorCount")).append(',');
                 appendJSonValue(writer, "bytesReceived", mBeanServer.getAttribute(grpName, "bytesReceived"))
                         .append(',');
                 appendJSonValue(writer, "bytesSent", mBeanServer.getAttribute(grpName, "bytesSent"));
@@ -904,8 +900,7 @@ public class StatusTransformer {
             appendJSonValue(writer, "startTime",
                     new Date(((Long) mBeanServer.getAttribute(objectName, "startTime")).longValue()).toString())
                     .append(',');
-            appendJSonValue(writer, "startupTime", mBeanServer.getAttribute(objectName, "startupTime"))
-                    .append(',');
+            appendJSonValue(writer, "startupTime", mBeanServer.getAttribute(objectName, "startupTime")).append(',');
             appendJSonValue(writer, "tldScanTime", mBeanServer.getAttribute(objectName, "tldScanTime"));
             if (managerON != null) {
                 writeManager(writer, managerON, mBeanServer, mode);
@@ -975,18 +970,16 @@ public class StatusTransformer {
                     .append(',');
             appendJSonValue(writer, "sessionCounter", mBeanServer.getAttribute(objectName, "sessionCounter"))
                     .append(',');
-            appendJSonValue(writer, "maxActive", mBeanServer.getAttribute(objectName, "maxActive"))
+            appendJSonValue(writer, "maxActive", mBeanServer.getAttribute(objectName, "maxActive")).append(',');
+            appendJSonValue(writer, "rejectedSessions", mBeanServer.getAttribute(objectName, "rejectedSessions"))
                     .append(',');
-            appendJSonValue(writer, "rejectedSessions",
-                    mBeanServer.getAttribute(objectName, "rejectedSessions")).append(',');
-            appendJSonValue(writer, "expiredSessions",
-                    mBeanServer.getAttribute(objectName, "expiredSessions")).append(',');
-            appendJSonValue(writer, "sessionMaxAliveTime",
-                    mBeanServer.getAttribute(objectName, "sessionMaxAliveTime")).append(',');
+            appendJSonValue(writer, "expiredSessions", mBeanServer.getAttribute(objectName, "expiredSessions"))
+                    .append(',');
+            appendJSonValue(writer, "sessionMaxAliveTime", mBeanServer.getAttribute(objectName, "sessionMaxAliveTime"))
+                    .append(',');
             appendJSonValue(writer, "sessionAverageAliveTime",
                     mBeanServer.getAttribute(objectName, "sessionAverageAliveTime")).append(',');
-            appendJSonValue(writer, "processingTime",
-                    mBeanServer.getAttribute(objectName, "processingTime"));
+            appendJSonValue(writer, "processingTime", mBeanServer.getAttribute(objectName, "processingTime"));
             writer.append('}');
         }
 
@@ -1088,12 +1081,9 @@ public class StatusTransformer {
             appendJSonValue(writer, "processingTime", mBeanServer.getAttribute(objectName, "processingTime"))
                     .append(',');
             appendJSonValue(writer, "maxTime", mBeanServer.getAttribute(objectName, "maxTime")).append(',');
-            appendJSonValue(writer, "requestCount", mBeanServer.getAttribute(objectName, "requestCount"))
-                    .append(',');
-            appendJSonValue(writer, "errorCount", mBeanServer.getAttribute(objectName, "errorCount"))
-                    .append(',');
-            appendJSonValue(writer, "loadTime", mBeanServer.getAttribute(objectName, "loadTime"))
-                    .append(',');
+            appendJSonValue(writer, "requestCount", mBeanServer.getAttribute(objectName, "requestCount")).append(',');
+            appendJSonValue(writer, "errorCount", mBeanServer.getAttribute(objectName, "errorCount")).append(',');
+            appendJSonValue(writer, "loadTime", mBeanServer.getAttribute(objectName, "loadTime")).append(',');
             appendJSonValue(writer, "classLoadTime", mBeanServer.getAttribute(objectName, "classLoadTime"));
             writer.append('}');
         }

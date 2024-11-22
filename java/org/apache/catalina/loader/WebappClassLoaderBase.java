@@ -390,9 +390,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     private volatile LifecycleState state = LifecycleState.NEW;
 
     /*
-     * Class resources are not cached since they are loaded on first use and the resource is then no longer required.
-     * It does help, however, to cache classes that are not found as in some scenarios the same class will be searched
-     * for many times and the greater the number of JARs/classes, the longer that lookup will take.
+     * Class resources are not cached since they are loaded on first use and the resource is then no longer required. It
+     * does help, however, to cache classes that are not found as in some scenarios the same class will be searched for
+     * many times and the greater the number of JARs/classes, the longer that lookup will take.
      */
     private final ConcurrentLruCache<String> notFoundClassResources = new ConcurrentLruCache<>(1000);
 

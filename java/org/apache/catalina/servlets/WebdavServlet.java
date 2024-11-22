@@ -77,9 +77,9 @@ import org.xml.sax.SAXException;
  * this configuration.
  * <p>
  * Mapping a subpath (e.g. <code>/webdav/*</code> to this servlet has the effect of re-mounting the entire web
- * application under that sub-path, with WebDAV access to all the resources. To restore the DefaultServlet
- * behavior set <code>serveSubpathOnly</code> to <code>true</code>. The <code>WEB-INF</code> and
- * <code>META-INF</code> directories are protected in this re-mounted resource tree.
+ * application under that sub-path, with WebDAV access to all the resources. To restore the DefaultServlet behavior set
+ * <code>serveSubpathOnly</code> to <code>true</code>. The <code>WEB-INF</code> and <code>META-INF</code> directories
+ * are protected in this re-mounted resource tree.
  * <p>
  * To enable WebDAV for a context add the following to web.xml:
  *
@@ -134,14 +134,13 @@ import org.xml.sax.SAXException;
  * access will be able to edit content available via http://host:port/context/content using
  * http://host:port/context/webdavedit/content
  * <p>
- * The Servlet provides support for arbitrary dead properties on all resources (dead properties are properties
- * whose values are not protected by the server, such as the content length of a resource). By default the Servlet
- * will use non persistent memory storage for them. Persistence can be achieved by implementing
- * the <code>PropertyStore</code> interface and configuring the Servlet to use that store.
- * The <code>propertyStore</code> init-param allows configuring the classname of the store to use, while the
- * parameters in the form of <code>store.xxx</code> will be set on the store object as bean properties.
- * For example, this would configure a store with class <code>com.MyPropertyStore</code>, and set its field
- * <code>myName</code> to value <code>myValue</code>:
+ * The Servlet provides support for arbitrary dead properties on all resources (dead properties are properties whose
+ * values are not protected by the server, such as the content length of a resource). By default the Servlet will use
+ * non persistent memory storage for them. Persistence can be achieved by implementing the <code>PropertyStore</code>
+ * interface and configuring the Servlet to use that store. The <code>propertyStore</code> init-param allows configuring
+ * the classname of the store to use, while the parameters in the form of <code>store.xxx</code> will be set on the
+ * store object as bean properties. For example, this would configure a store with class
+ * <code>com.MyPropertyStore</code>, and set its field <code>myName</code> to value <code>myValue</code>:
  *
  * <pre>
  *  &lt;init-param&gt;
@@ -202,7 +201,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected static final String SUPPORTED_LOCKS =
             "\n  <D:lockentry><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>\n" +
-            "  <D:lockentry><D:lockscope><D:shared/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>\n";
+                    "  <D:lockentry><D:lockscope><D:shared/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>\n";
 
     /**
      * Simple date format for the creation date ISO representation (partial).
@@ -248,8 +247,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private boolean strictIfProcessing = true;
 
     /**
-     * Serve resources from the mounted subpath only, restoring the behavior of
-     * {@code DefaultServlet}.
+     * Serve resources from the mounted subpath only, restoring the behavior of {@code DefaultServlet}.
      */
     private boolean serveSubpathOnly = false;
 
@@ -363,10 +361,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
-     * Handling of dead properties on resources. This interface allows
-     * providing storage for dead properties. Store configuration is done
-     * through the <code>propertyStore</code> init parameter of the WebDAV
-     * Servlet, which should contain the class name of the store.
+     * Handling of dead properties on resources. This interface allows providing storage for dead properties. Store
+     * configuration is done through the <code>propertyStore</code> init parameter of the WebDAV Servlet, which should
+     * contain the class name of the store.
      */
     public interface PropertyStore {
 
@@ -388,7 +385,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         /**
          * Copy resource. Dead properties should be copied to the destination path.
          *
-         * @param source the copy source path
+         * @param source      the copy source path
          * @param destination the copy destination path
          */
         void copy(String source, String destination);
@@ -403,19 +400,20 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         /**
          * Generate propfind XML fragments for dead properties.
          *
-         * @param resource the resource path
-         * @param property the dead property, if null then all dead properties must be written
-         * @param nameOnly true if only the property name element should be generated
+         * @param resource     the resource path
+         * @param property     the dead property, if null then all dead properties must be written
+         * @param nameOnly     true if only the property name element should be generated
          * @param generatedXML the current generated XML for the PROPFIND response
-         * @return true if a property was specified and a corresponding dead property was found on the resource,
-         *     false otherwise
+         *
+         * @return true if a property was specified and a corresponding dead property was found on the resource, false
+         *             otherwise
          */
         boolean propfind(String resource, Node property, boolean nameOnly, XMLWriter generatedXML);
 
         /**
          * Apply proppatch to the specified resource.
          *
-         * @param resource the resource path on which to apply the proppatch
+         * @param resource   the resource path on which to apply the proppatch
          * @param operations the set and remove to apply, the final status codes of the result should be set on each
          *                       operation
          */
@@ -437,7 +435,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         /**
          * PROPPATCH operation constructor.
-         * @param updateType the update type, either SET or REMOVE
+         *
+         * @param updateType   the update type, either SET or REMOVE
          * @param propertyNode the XML node that contains the property name (and value if SET)
          */
         public ProppatchOperation(PropertyUpdateType updateType, Node propertyNode) {
@@ -489,7 +488,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Type of PROPFIND request.
      */
     enum PropfindType {
-        FIND_BY_PROPERTY, FIND_ALL_PROP, FIND_PROPERTY_NAMES
+        FIND_BY_PROPERTY,
+        FIND_ALL_PROP,
+        FIND_PROPERTY_NAMES
     }
 
 
@@ -497,7 +498,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * Type of property update in a PROPPATCH.
      */
     enum PropertyUpdateType {
-        SET, REMOVE
+        SET,
+        REMOVE
     }
 
 
@@ -1757,8 +1759,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 } else {
                     if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
                         if (parentLock.isExclusive()) {
-                            if (lockTokenHeader.contains(":" + parentLock.token + ">") && (parentLock.principal == null ||
-                                    parentLock.principal.equals(req.getRemoteUser()))) {
+                            if (lockTokenHeader.contains(":" + parentLock.token + ">") &&
+                                    (parentLock.principal == null ||
+                                            parentLock.principal.equals(req.getRemoteUser()))) {
                                 resourceLocks.remove(parentPath);
                                 unlocked = true;
                                 break;
@@ -1958,7 +1961,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                                 (lock.principal == null || lock.principal.equals(principal))) {
                                             return false;
                                         }
-                                        // Since it is a shared lock, continue to look up the tree but note that there was a lock
+                                        // Since it is a shared lock, continue to look up the tree but note that there
+                                        // was a lock
                                         unmatchedSharedLock = true;
                                     }
                                 }
@@ -2575,8 +2579,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
                 for (Node propertyNode : properties) {
                     String property = getDAVNode(propertyNode);
-                    boolean protectedProperty =
-                            property != null && (!(property.equals("displayname") || property.equals("getcontentlanguage")));
+                    boolean protectedProperty = property != null &&
+                            (!(property.equals("displayname") || property.equals("getcontentlanguage")));
                     if (property == null || !protectedProperty) {
                         if (!store.propfind(path, propertyNode, false, generatedXML)) {
                             propertiesNotFound.add(propertyNode);
