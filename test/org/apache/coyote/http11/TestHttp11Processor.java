@@ -1918,7 +1918,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
 
     @Test
-    public void testEarlyHints() throws Exception {
+    public void testEarlyHints_noop() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
@@ -1938,16 +1938,15 @@ public class TestHttp11Processor extends TomcatBaseTest {
         client.setRequest(new String[] { request });
 
         client.connect(600000, 600000);
-        client.processRequest(false);
-
-        Assert.assertEquals(103, client.getStatusCode());
-
-        client.readResponse(false);
+        client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue("presence of header[Content-Security-Policy: style-src: self;] expected.",client.getResponseHeaders().contains("Content-Security-Policy: style-src: self;"));
+        Assert.assertFalse("absence of header[Content-Security-Policy: script-src: self;] expected.",client.getResponseHeaders().contains("Content-Security-Policy: script-src: self;"));
+        Assert.assertFalse("absence of header[Link: </main.js>; rel=preload; as=script] expected.",client.getResponseHeaders().contains("Link: </main.js>; rel=preload; as=script"));        
     }
 
     @Test
-    public void testEarlyHintsSendError() throws Exception {
+    public void testEarlyHintsSendError_noop() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
@@ -1967,17 +1966,16 @@ public class TestHttp11Processor extends TomcatBaseTest {
         client.setRequest(new String[] { request });
 
         client.connect(600000, 600000);
-        client.processRequest(false);
-
-        Assert.assertEquals(103, client.getStatusCode());
-
-        client.readResponse(false);
+        client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue("presence of header[Content-Security-Policy: style-src: self;] expected.",client.getResponseHeaders().contains("Content-Security-Policy: style-src: self;"));
+        Assert.assertFalse("absence of header[Content-Security-Policy: script-src: self;] expected.",client.getResponseHeaders().contains("Content-Security-Policy: script-src: self;"));
+        Assert.assertFalse("absence of header[Link: </main.js>; rel=preload; as=script] expected.",client.getResponseHeaders().contains("Link: </main.js>; rel=preload; as=script"));
     }
 
 
     @Test
-    public void testEarlyHintsSendErrorWithMessage() throws Exception {
+    public void testEarlyHintsSendErrorWithMessage_noop() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
@@ -1997,12 +1995,13 @@ public class TestHttp11Processor extends TomcatBaseTest {
         client.setRequest(new String[] { request });
 
         client.connect(600000, 600000);
-        client.processRequest(false);
-
-        Assert.assertEquals(103, client.getStatusCode());
-
-        client.readResponse(false);
+        client.processRequest(true);
+        
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+        Assert.assertTrue("presence of header[Content-Security-Policy: style-src: self;] expected.",client.getResponseHeaders().contains("Content-Security-Policy: style-src: self;"));
+        Assert.assertFalse("absence of header[Content-Security-Policy: script-src: self;] expected.",client.getResponseHeaders().contains("Content-Security-Policy: script-src: self;"));
+        Assert.assertFalse("absence of header[Link: </main.js>; rel=preload; as=script] expected.",client.getResponseHeaders().contains("Link: </main.js>; rel=preload; as=script"));
+        
     }
 
 
@@ -2013,7 +2012,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         private final boolean useSendError;
         private final String errorString;
-
+        
         EarlyHintsServlet() {
             this(false, null);
         }
@@ -2024,8 +2023,9 @@ public class TestHttp11Processor extends TomcatBaseTest {
         }
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.addHeader("Content-Security-Policy","script-src: self;");
             resp.addHeader("Link", "</style.css>; rel=preload; as=style");
-
+            resp.addHeader("Link", "</main.js>; rel=preload; as=script");
             if (useSendError) {
                 if (null == errorString) {
                     resp.sendError(103);
@@ -2035,7 +2035,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
             } else {
                 ((ResponseFacade) resp).sendEarlyHints();
             }
-
+            resp.addHeader("Content-Security-Policy","style-src: self;");
+            resp.addHeader("Link", "</style.css>; rel=preload; as=style");
             resp.setCharacterEncoding(StandardCharsets.UTF_8);
             resp.setContentType("text/plain");
 

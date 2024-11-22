@@ -151,7 +151,12 @@ public class Http11Processor extends AbstractProcessor {
      */
     private final HttpParser httpParser;
 
-
+    /**
+     * early hints related header fields
+     * see https://html.spec.whatwg.org/multipage/semantics.html#early-hints
+     */
+    private static final Set<String> HTTP_EARLY_HINTS_HEADERS = Set.of("Link","Content-Security-Policy");
+    
     public Http11Processor(AbstractHttp11Protocol<?> protocol, Adapter adapter) {
         super(adapter);
         this.protocol = protocol;
@@ -1250,9 +1255,12 @@ public class Http11Processor extends AbstractProcessor {
 
     @Override
     protected void earlyHints() throws IOException {
-        writeHeaders(103, response.getMimeHeaders());
-        outputBuffer.writeHeaders();
-        outputBuffer.resetHeaderBuffer();
+        // see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/103, Early Hints are recommended to only be sent
+        // over HTTP/2 or HTTP/3 connections and most browsers will only accept them over those protocols. 
+        // cleanup early hints related headers.
+        for(String header:HTTP_EARLY_HINTS_HEADERS) {
+            response.getMimeHeaders().removeHeader(header);
+        }
     }
 
 
