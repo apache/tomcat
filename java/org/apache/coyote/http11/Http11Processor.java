@@ -151,11 +151,6 @@ public class Http11Processor extends AbstractProcessor {
      */
     private final HttpParser httpParser;
 
-    /**
-     * early hints related header fields
-     * see https://html.spec.whatwg.org/multipage/semantics.html#early-hints
-     */
-    private static final Set<String> HTTP_EARLY_HINTS_HEADERS = Set.of("Link","Content-Security-Policy");
 
     public Http11Processor(AbstractHttp11Protocol<?> protocol, Adapter adapter) {
         super(adapter);
@@ -1255,19 +1250,8 @@ public class Http11Processor extends AbstractProcessor {
 
     @Override
     protected void earlyHints() throws IOException {
-        MimeHeaders earlyHintsHeaders = new MimeHeaders();
-        earlyHintsHeaders.duplicate(response.getMimeHeaders());
-        earlyHintsHeaders.filter(HTTP_EARLY_HINTS_HEADERS);
-        writeHeaders(HttpServletResponse.SC_EARLY_HINTS, earlyHintsHeaders);
-        // Once early hints emitted, clean up early hints relative headers.
-        // The final response is responsible for resetting Link/CSP/etc related headers
-        for (String header : HTTP_EARLY_HINTS_HEADERS) {
-            response.getMimeHeaders().removeHeader(header);
-        }
+        writeHeaders(103, response.getMimeHeaders());
         outputBuffer.writeHeaders();
-        // to take advantage of the Early Hints feature, the server-think-time is needed between the Early Hints
-        // headers and the final response. Therefore, we need emit early hints status and headers via flush.
-        outputBuffer.flush();
         outputBuffer.resetHeaderBuffer();
     }
 
