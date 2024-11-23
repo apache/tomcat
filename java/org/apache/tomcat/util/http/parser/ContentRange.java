@@ -123,6 +123,6 @@ public class ContentRange {
      * @return <code>true</code> if the content range is valid, per rfc 9110 section 14.4
      */
     public boolean isValid() {
-        return start >= 0 && end >= 0 && start <= end && length > end;
+        return start >= 0 && end >=start && length > end;
     }
 }
