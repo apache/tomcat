@@ -1242,7 +1242,7 @@ public class DefaultServlet extends HttpServlet {
             }
             // see rfc9110 #status.416
             for (long[] e : rangeContext) {
-                if (Long.min(end, e[1]) - Long.max(start, e[0]) >= 0) {
+                if (Long.min(end, e[1]) >= Long.max(start, e[0])) {
                     // overlapping ranges: [10,30] intersect with [15,25]; [10,30] intersect with [5,15]
                     return false;
                 }
