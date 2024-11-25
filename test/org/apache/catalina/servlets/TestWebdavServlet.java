@@ -588,7 +588,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // Copy /myfolder/file5.txt to /myfolder/file6.txt without lock (should not work)
         client.setRequest(new String[] { "COPY /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                "Destination: /myfolder/file6.txt"  + SimpleHttpClient.CRLF +
+                "Destination: http://localhost:" + getPort() + "/myfolder/file6.txt"  + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
                 SimpleHttpClient.CRLF });
         client.connect();
@@ -617,7 +617,7 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // Copy /myfolder/file5.txt to /file7.txt without lock (should work)
         client.setRequest(new String[] { "COPY /myfolder/file5.txt HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                "Destination: /file7.txt"  + SimpleHttpClient.CRLF +
+                "Destination: http://localhost:" + getPort() + "/file7.txt"  + SimpleHttpClient.CRLF +
                 "Connection: Close" + SimpleHttpClient.CRLF +
                 SimpleHttpClient.CRLF });
         client.connect();
