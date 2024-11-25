@@ -17,6 +17,7 @@
 package org.apache.catalina.startup;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -33,8 +34,12 @@ import org.junit.Test;
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
+import org.apache.catalina.Server;
+import org.apache.catalina.Service;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.TestTomcat.HelloWorld;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.file.ConfigFileLoader;
 
 public class TestTomcatStandalone extends LoggingBaseTest {
 
@@ -156,6 +161,60 @@ public class TestTomcatStandalone extends LoggingBaseTest {
         }
         Thread.sleep(100);
         Assert.assertNotEquals(LifecycleState.STARTED, tomcat.getService().getState());
+
+    }
+
+    @Test
+    public void testStandalone() throws Exception {
+        ConfigFileLoader.setSource(new ServerXml());
+
+        Catalina catalina = new Catalina();
+        catalina.setAwait(true);
+        File generatedCodeLocation = new File(getTemporaryDirectory(), "generated");
+        new Thread() {
+            @Override
+            public void run() {
+                String[] args = { "start", "-generateCode", generatedCodeLocation.getAbsolutePath() };
+                catalina.load(args);
+                catalina.start();
+            }
+        }.start();
+
+        Service service = null;
+        int i = 0;
+        while (true) {
+            Assert.assertTrue(i++ < 500);
+            if (service == null) {
+                Server server = catalina.getServer();
+                if (server != null && catalina.getServer().findServices().length > 0) {
+                    service = catalina.getServer().findServices()[0];
+                }
+            }
+            if (service != null && service.getState() == LifecycleState.STARTED) {
+                break;
+            }
+            Thread.sleep(10);
+        }
+
+        Connector connector = service.findConnectors()[0];
+        ByteChunk res = TomcatBaseTest.getUrl("http://localhost:" + connector.getLocalPort() + "/");
+        Assert.assertTrue(res.toString().contains("404"));
+
+        File codeFolder = new File(generatedCodeLocation, "catalinaembedded");
+        File generatedLoader = new File(codeFolder, "DigesterGeneratedCodeLoader.java");
+        File generatedServerXml = new File(codeFolder, "ServerXml.java");
+        Assert.assertTrue(generatedLoader.exists());
+        Assert.assertTrue(generatedServerXml.exists());
+
+        (new Catalina()).stopServer();
+        i = 0;
+        while (true) {
+            Assert.assertTrue(i++ < 100);
+            if (service.getState() != LifecycleState.STARTED) {
+                break;
+            }
+            Thread.sleep(10);
+        }
 
     }
 
