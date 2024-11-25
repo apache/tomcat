@@ -35,6 +35,8 @@ import java.util.Locale;
 
 import org.junit.Assert;
 
+import org.apache.catalina.Globals;
+
 /**
  * Simple client for unit testing. It isn't robust, it isn't secure and
  * should not be used as the basis for production code. Its only purpose
@@ -47,6 +49,9 @@ public abstract class SimpleHttpClient {
     public static final String CR = "\r";
     public static final String LF = "\n";
     public static final String CRLF = CR + LF;
+
+    public static final String HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING =
+            "Content-Type: " + Globals.CONTENT_TYPE_FORM_URL_ENCODING + CRLF;
 
     public static final String INFO_100 = "HTTP/1.1 100 ";
     public static final String OK_200 = "HTTP/1.1 200 ";

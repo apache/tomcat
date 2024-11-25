@@ -116,8 +116,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
             "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-            "Content-Type: application/x-www-form-urlencoded" +
-                    SimpleHttpClient.CRLF +
+            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
             "Connection: close" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF +
             "3" + (chunkHeaderUsesCRLF ? SimpleHttpClient.CRLF : SimpleHttpClient.LF) +
@@ -192,7 +191,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                 "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
                 "Host: any" + SimpleHttpClient.CRLF +
                 "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-                "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
                 "Connection: close" + SimpleHttpClient.CRLF +
                 SimpleHttpClient.CRLF +
                 "3" + SimpleHttpClient.CRLF +
@@ -226,7 +225,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
             "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-            "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
             "Connection: close" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF +
             "3" + SimpleHttpClient.CRLF +
@@ -294,8 +293,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
             "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-            "Content-Type: application/x-www-form-urlencoded" +
-                    SimpleHttpClient.CRLF +
+            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
             "Connection: close" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF +
             "3" + extName + extValue.toString() + SimpleHttpClient.CRLF +
@@ -336,8 +334,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
             "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-            "Content-Type: application/x-www-form-urlencoded" +
-                    SimpleHttpClient.CRLF +
+            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
             "Connection: close" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF +
             "3" + SimpleHttpClient.CRLF +
@@ -507,7 +504,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: localhost" + SimpleHttpClient.CRLF +
             "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-            "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
             "Connection: close" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF +
             "3" + SimpleHttpClient.CRLF +
@@ -851,7 +848,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "POST /test HTTP/1.1" + SimpleHttpClient.CRLF +
             "Host: any" + SimpleHttpClient.CRLF +
             "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-            "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
             "Connection: close" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF +
             "7" + SimpleHttpClient.CRLF +

@@ -50,6 +50,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
@@ -345,7 +346,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         byte[] dataFrameHeader = new byte[9];
         ByteBuffer dataPayload = ByteBuffer.allocate(128);
 
-        buildPostRequest(headersFrameHeader, headersPayload, useExpectation, "application/x-www-form-urlencoded",
+        buildPostRequest(headersFrameHeader, headersPayload, useExpectation, Globals.CONTENT_TYPE_FORM_URL_ENCODING,
                 contentLength, "/parameter", dataFrameHeader, dataPayload, padding, false, streamId);
         writeFrame(headersFrameHeader, headersPayload);
         if (body != null) {

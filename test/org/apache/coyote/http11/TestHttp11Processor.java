@@ -166,7 +166,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         String request = "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
                 SimpleHttpClient.CRLF + "Transfer-encoding: void" + SimpleHttpClient.CRLF + "Content-Length: 9" +
-                SimpleHttpClient.CRLF + "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
                 SimpleHttpClient.CRLF + "test=data";
 
         Client client = new Client(getPort());
@@ -184,7 +184,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         String request = "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
                 SimpleHttpClient.CRLF + "Transfer-encoding: buffered" + SimpleHttpClient.CRLF + "Content-Length: 9" +
-                SimpleHttpClient.CRLF + "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
                 SimpleHttpClient.CRLF + "test=data";
 
         Client client = new Client(getPort());
@@ -216,7 +216,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
         String request = "POST /test/echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
                 SimpleHttpClient.CRLF + (withCL ? "Content-length: 1" + SimpleHttpClient.CRLF : "") +
                 "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-                "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF + "Connection: close" +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING + "Connection: close" +
                 SimpleHttpClient.CRLF + SimpleHttpClient.CRLF + "9" + SimpleHttpClient.CRLF + "test=data" +
                 SimpleHttpClient.CRLF + "0" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
 
@@ -236,8 +236,8 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         String request = "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
                 SimpleHttpClient.CRLF + "Transfer-encoding: savedrequest" + SimpleHttpClient.CRLF +
-                "Content-Length: 9" + SimpleHttpClient.CRLF + "Content-Type: application/x-www-form-urlencoded" +
-                SimpleHttpClient.CRLF + SimpleHttpClient.CRLF + "test=data";
+                "Content-Length: 9" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING + SimpleHttpClient.CRLF + "test=data";
 
         Client client = new Client(getPort());
         client.setRequest(new String[] { request });
@@ -254,7 +254,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         String request = "POST /echo-params.jsp HTTP/1.1" + SimpleHttpClient.CRLF + "Host: any" +
                 SimpleHttpClient.CRLF + "Transfer-encoding: unsupported" + SimpleHttpClient.CRLF + "Content-Length: 9" +
-                SimpleHttpClient.CRLF + "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
                 SimpleHttpClient.CRLF + "test=data";
 
         Client client = new Client(getPort());
@@ -1837,7 +1837,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
 
         String request = "POST /test/echo-params.jsp HTTP/1.0" + SimpleHttpClient.CRLF + "Host: any" +
                 SimpleHttpClient.CRLF + "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
-                "Content-Type: application/x-www-form-urlencoded" + SimpleHttpClient.CRLF + "Connection: close" +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING + "Connection: close" +
                 SimpleHttpClient.CRLF + SimpleHttpClient.CRLF + "9" + SimpleHttpClient.CRLF + "test=data" +
                 SimpleHttpClient.CRLF + "0" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
 

@@ -37,6 +37,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -640,7 +641,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         if (multipleCL) {
             forwardMessage.addHeader(0xA008, "99");
         }
-        forwardMessage.addHeader(0xA007, "application/x-www-form-urlencoded");
+        forwardMessage.addHeader(0xA007, Globals.CONTENT_TYPE_FORM_URL_ENCODING);
         forwardMessage.end();
 
         TesterAjpMessage bodyMessage = ajpClient.createBodyMessage("test=data".getBytes());
