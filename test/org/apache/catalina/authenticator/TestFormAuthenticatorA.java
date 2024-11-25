@@ -467,9 +467,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
                 if (requestTail == null) {
                     requestTail = "role=bar";
                 }
-                requestHead.append(
-                        "Content-Type: application/x-www-form-urlencoded")
-                        .append(CRLF);
+                requestHead.append(SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING);
                 // calculate post data length
                 String len = Integer.toString(requestTail.length());
                 requestHead.append("Content-length: ").append(len).append(CRLF);

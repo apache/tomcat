@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 
 public class TestServletRequestParameters extends ServletRequestParametersBaseTest {
@@ -50,7 +51,8 @@ public class TestServletRequestParameters extends ServletRequestParametersBaseTe
         client.setPort(getPort());
         client.setRequest(new String[] { "POST / HTTP/1.1" + CRLF + "Host: localhost:" + getPort() + CRLF +
                 "Connection: close" + CRLF + "Transfer-Encoding: chunked" + CRLF +
-                "Content-Type: application/x-www-form-urlencoded" + CRLF + CRLF + "0a" + CRLF + "var1=val1&" + CRLF });
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING + CRLF + "0a" + CRLF +
+                "var1=val1&" + CRLF });
 
         client.setResponseBodyEncoding(StandardCharsets.UTF_8);
         client.connect();
