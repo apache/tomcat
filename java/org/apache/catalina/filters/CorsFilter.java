@@ -35,6 +35,7 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.RequestUtil;
@@ -908,7 +909,7 @@ public class CorsFilter extends GenericFilter {
      * @see <a href="http://www.w3.org/TR/cors/#terminology" >http://www.w3.org/TR/cors/#terminology</a>
      */
     public static final Collection<String> SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList("application/x-www-form-urlencoded", "multipart/form-data", "text/plain")));
+            new HashSet<>(Arrays.asList(Globals.CONTENT_TYPE_FORM_URL_ENCODING, "multipart/form-data", "text/plain")));
 
     // ------------------------------------------------ Configuration Defaults
     /**

@@ -45,6 +45,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.authenticator.BasicAuthenticator;
 import org.apache.catalina.filters.FailedRequestFilter;
 import org.apache.catalina.startup.SimpleHttpClient;
@@ -54,6 +55,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
@@ -208,7 +210,7 @@ public class TestRequest extends TomcatBaseTest {
                     request[0] =
                         "POST http://localhost:8080/test HTTP/1.1" + CRLF +
                         "Host: localhost:8080" + CRLF +
-                        "content-type: application/x-www-form-urlencoded" + CRLF +
+                        SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
                         "Transfer-Encoding: CHUNKED" + CRLF +
                         "Connection: close" + CRLF +
                         CRLF +
@@ -218,7 +220,7 @@ public class TestRequest extends TomcatBaseTest {
                     request[0] =
                         "POST http://localhost:8080/test HTTP/1.1" + CRLF +
                         "Host: localhost:8080" + CRLF +
-                        "content-type: application/x-www-form-urlencoded" + CRLF +
+                        SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
                         "Transfer-Encoding: chunked" + CRLF +
                         "Connection: close" + CRLF +
                         CRLF +
@@ -420,7 +422,7 @@ public class TestRequest extends TomcatBaseTest {
         // Make sure POST works properly
         //
         // POST with separate GET and POST parameters
-        client.doRequest("POST", "foo=bar", "application/x-www-form-urlencoded", "bar=baz", true);
+        client.doRequest("POST", "foo=bar", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz", true);
 
         Assert.assertTrue("Non-200 response for POST request",
                    client.isResponse200());
@@ -431,7 +433,7 @@ public class TestRequest extends TomcatBaseTest {
         client.reset();
 
         // POST with overlapping GET and POST parameters
-        client.doRequest("POST", "foo=bar&bar=foo", "application/x-www-form-urlencoded", "bar=baz&foo=baz", true);
+        client.doRequest("POST", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
 
         Assert.assertTrue("Non-200 response for POST request",
                    client.isResponse200());
@@ -442,7 +444,7 @@ public class TestRequest extends TomcatBaseTest {
         client.reset();
 
         // PUT without POST-style parsing
-        client.doRequest("PUT", "foo=bar&bar=foo", "application/x-www-form-urlencoded", "bar=baz&foo=baz", false);
+        client.doRequest("PUT", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", false);
 
         Assert.assertTrue("Non-200 response for PUT/noparse request",
                    client.isResponse200());
@@ -453,7 +455,7 @@ public class TestRequest extends TomcatBaseTest {
         client.reset();
 
         // PUT with POST-style parsing
-        client.doRequest("PUT", "foo=bar&bar=foo", "application/x-www-form-urlencoded", "bar=baz&foo=baz", true);
+        client.doRequest("PUT", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
 
         Assert.assertTrue("Non-200 response for PUT request",
                    client.isResponse200());
@@ -462,14 +464,6 @@ public class TestRequest extends TomcatBaseTest {
                      client.getResponseBody());
 
         client.reset();
-
-        /*
-        private Exception doRequest(String method,
-                                    String queryString,
-                                    String contentType,
-                                    String requestBody,
-                                    boolean allowBody) {
-        */
     }
 
     @Test
@@ -961,6 +955,66 @@ public class TestRequest extends TomcatBaseTest {
                 throws ServletException, IOException {
             // Container will handle any errors
             req.getReader();
+        }
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=69442
+     */
+    @Test
+    public void testTestParameterMediaTypeLowerCase() throws Exception {
+        // toLowerCase() is unnecessary but keep it in case the constant is changed in the future
+        doTestParameterMediaTypeCase(Globals.CONTENT_TYPE_FORM_URL_ENCODING.toLowerCase(Locale.ENGLISH));
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=69442
+     */
+    @Test
+    public void testTestParameterMediaTypeUpperCase() throws Exception {
+        doTestParameterMediaTypeCase(Globals.CONTENT_TYPE_FORM_URL_ENCODING.toUpperCase(Locale.ENGLISH));
+    }
+
+
+    private void doTestParameterMediaTypeCase(String contentType) throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "servlet", new Bug69442Servlet());
+        ctx.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
+        reqHeaders.put("Content-Type", Arrays.asList(contentType));
+        postUrl("a=b&c=d".getBytes(), "http://localhost:" + getPort() + "/", bc, reqHeaders, null);
+        String responseBody = bc.toString();
+        Assert.assertTrue(responseBody, responseBody.contains("a=b"));
+        Assert.assertTrue(responseBody, responseBody.contains("c=d"));
+    }
+
+
+    private static class Bug69442Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+            PrintWriter pw = resp.getWriter();
+            Enumeration<String> names = req.getParameterNames();
+            while (names.hasMoreElements()) {
+                String name = names.nextElement();
+                String[] values = req.getParameterValues(name);
+                pw.println(name + "=" + StringUtils.join(values));
+            }
         }
     }
 }
