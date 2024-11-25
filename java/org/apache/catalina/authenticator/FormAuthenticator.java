@@ -28,6 +28,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Globals;
 import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.connector.Request;
@@ -621,7 +622,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             // If no content type specified, use default for POST
             String savedContentType = saved.getContentType();
             if (savedContentType == null && "POST".equalsIgnoreCase(method)) {
-                savedContentType = "application/x-www-form-urlencoded";
+                savedContentType = Globals.CONTENT_TYPE_FORM_URL_ENCODING;
             }
 
             contentType.setString(savedContentType);

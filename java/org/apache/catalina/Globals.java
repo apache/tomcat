@@ -236,4 +236,9 @@ public final class Globals {
      * Default domain for MBeans if none can be determined
      */
     public static final String DEFAULT_MBEAN_DOMAIN = "Catalina";
+
+
+    // ----------------------------------------- Specification related constants
+
+    public static final String CONTENT_TYPE_FORM_URL_ENCODING = "application/x-www-form-urlencoded";
 }

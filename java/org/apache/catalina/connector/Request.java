@@ -2809,7 +2809,7 @@ public class Request implements HttpServletRequest {
             return;
         }
 
-        if (!("application/x-www-form-urlencoded".equals(mediaType))) {
+        if (!(Globals.CONTENT_TYPE_FORM_URL_ENCODING.equals(mediaType))) {
             return;
         }
 
