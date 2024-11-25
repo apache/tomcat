@@ -546,7 +546,7 @@ public class Catalina {
                 if (!generatedCodeLocation.isAbsolute()) {
                     generatedCodeLocation = new File(Bootstrap.getCatalinaHomeFile(), generatedCodeLocationParameter);
                 }
-            } else {
+            } else if (generatedCodeLocation == null) {
                 generatedCodeLocation = new File(Bootstrap.getCatalinaHomeFile(), "work");
             }
             serverXmlLocation = new File(generatedCodeLocation, generatedCodePackage);
