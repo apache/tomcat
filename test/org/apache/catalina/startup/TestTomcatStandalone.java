@@ -42,7 +42,6 @@ import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.TestTomcat.HelloWorld;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.file.ConfigFileLoader;
 
 public class TestTomcatStandalone extends LoggingBaseTest {
 
@@ -160,7 +159,10 @@ public class TestTomcatStandalone extends LoggingBaseTest {
     }
 
     @Test
-    public void testServerXml() throws Exception {
+    public void testStandalone() throws Exception {
+
+        // Test embedded with pseudo standalone
+
         Tomcat tomcat = new Tomcat();
         tomcat.init(new ServerXml());
 
@@ -225,21 +227,19 @@ public class TestTomcatStandalone extends LoggingBaseTest {
         Thread.sleep(100);
         Assert.assertNotEquals(LifecycleState.STARTED, tomcat.getService().getState());
 
-    }
-
-    @Test
-    public void testStandalone() throws Exception {
-        ConfigFileLoader.setSource(new ServerXml());
+        // Second separate test, real standalone using Catalina
+        // This is done in one single test to avoid possible problems with the shutdown port
 
         // Add descriptor to deploy
         File descriptorsFolder = new File(getTemporaryDirectory(), "conf/Catalina/localhost");
-        Assert.assertTrue(descriptorsFolder.mkdirs());
+        descriptorsFolder.mkdirs();
         try (FileOutputStream os = new FileOutputStream(new File(descriptorsFolder, "test.xml"))) {
             os.write(TEST_WEBAPP_CONTEXT_XML.getBytes(StandardCharsets.UTF_8));
         }
 
         Catalina catalina = new Catalina();
         catalina.setAwait(true);
+        // Embedded code generation uses Catalina, so it is the best spot to test it as well
         File generatedCodeLocation = new File(getTemporaryDirectory(), "generated");
         new Thread() {
             @Override
@@ -267,7 +267,7 @@ public class TestTomcatStandalone extends LoggingBaseTest {
         }
 
         Connector connector = service.findConnectors()[0];
-        ByteChunk res = TomcatBaseTest.getUrl("http://localhost:" + connector.getLocalPort() + "/");
+        res = TomcatBaseTest.getUrl("http://localhost:" + connector.getLocalPort() + "/");
         Assert.assertTrue(res.toString().contains("404"));
 
         File codeFolder = new File(generatedCodeLocation, "catalinaembedded");
