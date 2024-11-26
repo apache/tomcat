@@ -208,6 +208,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Documentation. Remove references to the <code>ResourceParams</code>
+        element. Support for <code>ResourceParams</code> was removed in Tomcat
+        5.5.x. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.1 (markt)" rtext="2024-11-10">
   <subsection name="Catalina">
