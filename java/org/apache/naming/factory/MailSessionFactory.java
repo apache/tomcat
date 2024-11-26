@@ -38,7 +38,6 @@ import javax.naming.spi.ObjectFactory;
  * described in the JavaMail Specification may be passed to the Session
  * factory; however the following properties are the most commonly used:</p>
  * <ul>
- * <li>
  * <li><strong>mail.smtp.host</strong> - Hostname for outbound transport
  *     connections.  Defaults to <code>localhost</code> if not specified.</li>
  * </ul>
@@ -47,18 +46,11 @@ import javax.naming.spi.ObjectFactory;
  * <code>&lt;Context&gt;</code> element in your <code>conf/server.xml</code>
  * configuration file.  An example of factory configuration is:</p>
  * <pre>
- * &lt;Resource name="mail/smtp" auth="CONTAINER"
- *           type="javax.mail.Session"/&gt;
- * &lt;ResourceParams name="mail/smtp"&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;factory&lt;/name&gt;
- *     &lt;value&gt;org.apache.naming.factory.MailSessionFactory&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;mail.smtp.host&lt;/name&gt;
- *     &lt;value&gt;mail.mycompany.com&lt;/value&gt;
- *   &lt;/parameter&gt;
- * &lt;/ResourceParams&gt;
+ * &lt;Resource name="mail/smtp"
+ *           auth="CONTAINER"
+ *           type="jakarta.mail.Session"
+ *           mail.smtp.host="mail.mycompany.com"
+ *           /&gt;
  * </pre>
  *
  * @author Craig R. McClanahan
