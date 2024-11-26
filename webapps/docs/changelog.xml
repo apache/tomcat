@@ -227,6 +227,16 @@
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Documentation. Remove references to the <code>ResourceParams</code>
+        element. Support for <code>ResourceParams</code> was removed in Tomcat
+        5.5.x. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>

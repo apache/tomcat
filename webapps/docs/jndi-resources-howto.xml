@@ -1108,8 +1108,8 @@ public class MyBeanFactory implements ObjectFactory {
 
   <p>In this example, we are unconditionally creating a new instance of
   the <code>com.mycompany.MyBean</code> class, and populating its properties
-  based on the parameters included in the <code>&lt;ResourceParams&gt;</code>
-  element that configures this factory (see below).  You should note that any
+  based on the parameters included in the <code>&lt;Resource&gt;</code>
+  element that configures this resource (see below).  You should note that any
   parameter named <code>factory</code> should be skipped - that parameter is
   used to specify the name of the factory class itself (in this case,
   <code>com.mycompany.MyBeanFactory</code>) rather than a property of the

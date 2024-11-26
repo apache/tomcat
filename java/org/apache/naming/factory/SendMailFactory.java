@@ -42,31 +42,17 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <p>
  * Example:
  * <pre>
- * &lt;Resource name="mail/send" auth="CONTAINER"
- *           type="jakarta.mail.internet.MimePartDataSource"/&gt;
- * &lt;ResourceParams name="mail/send"&gt;
- *   &lt;parameter&gt;&lt;name&gt;factory&lt;/name&gt;
- *     &lt;value&gt;org.apache.naming.factory.SendMailFactory&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;&lt;name&gt;mail.smtp.host&lt;/name&gt;
- *     &lt;value&gt;your.smtp.host&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;&lt;name&gt;mail.smtp.user&lt;/name&gt;
- *     &lt;value&gt;someuser&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;&lt;name&gt;mail.from&lt;/name&gt;
- *     &lt;value&gt;someuser@some.host&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;&lt;name&gt;mail.smtp.sendpartial&lt;/name&gt;
- *     &lt;value&gt;true&lt;/value&gt;
- *   &lt;/parameter&gt;
- *  &lt;parameter&gt;&lt;name&gt;mail.smtp.dsn.notify&lt;/name&gt;
- *     &lt;value&gt;FAILURE&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;&lt;name&gt;mail.smtp.dsn.ret&lt;/name&gt;
- *     &lt;value&gt;FULL&lt;/value&gt;
- *   &lt;/parameter&gt;
- * &lt;/ResourceParams&gt;
+ * &lt;Resource name="mail/send"
+ *           auth="CONTAINER"
+ *           type="jakarta.mail.internet.MimePartDataSource"
+ *           factory="org.apache.naming.factory.SendMailFactory"
+ *           mail.smtp.host="your.smtp.host"
+ *           mail.smtp.user="someuser"
+ *           mail.from="someuser@some.host"
+ *           mail.smtp.sendpartial="true"
+ *           mail.smtp.dsn.notify="FAILURE"
+ *           mail.smtp.dsn.ret="FULL"
+ *           /&gt;
  * </pre>
  *
  * @author Glenn Nielsen Rich Catlett
