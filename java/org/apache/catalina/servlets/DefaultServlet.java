@@ -1241,9 +1241,14 @@ public class DefaultServlet extends HttpServlet {
                 return false;
             }
             // see rfc9110 #status.416
-            for (long[] e : rangeContext) {
-                if (Long.min(end, e[1]) >= Long.max(start, e[0])) {
-                    // overlapping ranges: [10,30] intersect with [15,25]; [10,30] intersect with [5,15]
+            // invalid if range entries is overlap (equivalent to intersection is not empty).
+            for (long[] r : rangeContext) {
+                long s2 = r[0];
+                long e2 = r[1];
+                // Given [s1,e1] and [s2,e2]: if intersection is empty, then { s1>e2 || s2>e1 }
+                // logically equivalent to: If not { s1>e2 || s2>e1 }, then intersection is not empty.
+                if (start <= e2 && s2 <= end) {
+                    // isOverlap
                     return false;
                 }
             }
