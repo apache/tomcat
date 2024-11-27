@@ -1450,7 +1450,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
          <param-name>protocolHeader</param-name>
          <param-value>x-forwarded-proto</param-value>
        </init-param>
-     </filter>]]></source>
+     </filter>
+
+     <filter-mapping>
+       <filter-name>RemoteIpFilter</filter-name>
+       <url-pattern>/*</url-pattern>
+       <dispatcher>REQUEST</dispatcher>
+     </filter-mapping>]]></source>
     <p>Request values:</p>
     <table class="defaultTable">
       <tr>
@@ -1525,7 +1531,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
          <param-name>trustedProxies</param-name>
          <param-value>proxy1|proxy2</param-value>
        </init-param>
-     </filter>]]></source>
+     </filter>
+
+     <filter-mapping>
+       <filter-name>RemoteIpFilter</filter-name>
+       <url-pattern>/*</url-pattern>
+       <dispatcher>REQUEST</dispatcher>
+     </filter-mapping>]]></source>
     <p>Request values:</p>
     <table class="defaultTable">
       <tr>
@@ -1579,7 +1591,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
          <param-name>trustedProxies</param-name>
          <param-value>proxy1|proxy2</param-value>
        </init-param>
-     </filter>]]></source>
+     </filter>
+
+     <filter-mapping>
+       <filter-name>RemoteIpFilter</filter-name>
+       <url-pattern>/*</url-pattern>
+       <dispatcher>REQUEST</dispatcher>
+     </filter-mapping>]]></source>
     <p>Request values:</p>
     <table class="defaultTable">
       <tr>
@@ -1636,7 +1654,13 @@ FINE: Request "/docs/config/manager.html" with response status "200"
          <param-name>trustedProxies</param-name>
          <param-value>proxy1|proxy2</param-value>
        </init-param>
-     </filter>]]></source>
+     </filter>
+
+     <filter-mapping>
+       <filter-name>RemoteIpFilter</filter-name>
+       <url-pattern>/*</url-pattern>
+       <dispatcher>REQUEST</dispatcher>
+     </filter-mapping>]]></source>
     <p>Request values:</p>
     <table class="defaultTable">
       <tr>
