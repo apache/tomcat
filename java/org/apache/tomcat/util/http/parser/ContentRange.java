@@ -40,6 +40,7 @@ public class ContentRange {
         this.length = length;
     }
 
+
     /**
      * @return rangeUnits in lower case.
      */
@@ -112,17 +113,18 @@ public class ContentRange {
         }
 
         ContentRange contentRange = new ContentRange(units, start, end, length);
-        if(!contentRange.isValid()) {
+        if (!contentRange.isValid()) {
             // Invalid content range
             return null;
         }
         return contentRange;
     }
 
+
     /**
-     * @return <code>true</code> if the content range is valid, per rfc 9110 section 14.4
+     * @return <code>true</code> if the content range is valid, per RFC 9110 section 14.4
      */
     public boolean isValid() {
-        return start >= 0 && end >=start && length > end;
+        return start >= 0 && end >= start && length > end;
     }
 }
