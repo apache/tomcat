@@ -617,7 +617,11 @@ public class DefaultServlet extends HttpServlet {
                     resp.setStatus(HttpServletResponse.SC_CREATED);
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_CONFLICT);
+                try {
+                    resp.sendError(HttpServletResponse.SC_CONFLICT);
+                } catch (IllegalStateException e) {
+                    // Already committed, ignore
+                }
             }
         } finally {
             if (resourceInputStream != null) {
