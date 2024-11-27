@@ -18,6 +18,7 @@ package org.apache.tomcat.util.http.parser;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Locale;
 
 public class ContentRange {
 
@@ -28,13 +29,21 @@ public class ContentRange {
 
 
     public ContentRange(String units, long start, long end, long length) {
-        this.units = units;
+        // Units are lower case (RFC 9110, section 14.1)
+        if (units == null) {
+            this.units = null;
+        } else {
+            this.units = units.toLowerCase(Locale.ENGLISH);
+        }
         this.start = start;
         this.end = end;
         this.length = length;
     }
 
 
+    /**
+     * @return rangeUnits in lower case.
+     */
     public String getUnits() {
         return units;
     }
@@ -103,6 +112,19 @@ public class ContentRange {
             return null;
         }
 
-        return new ContentRange(units, start, end, length);
+        ContentRange contentRange = new ContentRange(units, start, end, length);
+        if (!contentRange.isValid()) {
+            // Invalid content range
+            return null;
+        }
+        return contentRange;
+    }
+
+
+    /**
+     * @return <code>true</code> if the content range is valid, per RFC 9110 section 14.4
+     */
+    public boolean isValid() {
+        return start >= 0 && end >= start && length > end;
     }
 }
