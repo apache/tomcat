@@ -201,6 +201,12 @@
         header fields for HTTP (draft)</a> in the <code>RateLimitFilter</code>.
         Based on pull request <pr>775</pr> provided by Chenjp. (markt)
       </add>
+      <fix>
+        <bug>69478</bug>: Correct a regression introduced in 11.0.0-M19 that
+        meant when calling <code>setHttpOnly(boolean)</code> or
+        <code>setSecure(boolean)</code> for a cookie, the respective flags were
+        set regardless of the value passed to the method. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
