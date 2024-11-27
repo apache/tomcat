@@ -252,19 +252,15 @@ public class TestTomcatStandalone extends LoggingBaseTest {
 
         Service service = null;
         int i = 0;
-        while (true) {
-            Assert.assertTrue(i++ < 500);
-            if (service == null) {
-                Server server = catalina.getServer();
-                if (server != null && catalina.getServer().findServices().length > 0) {
-                    service = catalina.getServer().findServices()[0];
-                }
-            }
-            if (service != null && service.getState() == LifecycleState.STARTED) {
-                break;
+        while (i < 500 && (service == null || service.getState() != LifecycleState.STARTED)) {
+            Server server = catalina.getServer();
+            if (server != null && catalina.getServer().findServices().length > 0) {
+                service = catalina.getServer().findServices()[0];
             }
             Thread.sleep(10);
+            i++;
         }
+        Assert.assertNotNull(service);
 
         Connector connector = service.findConnectors()[0];
         res = TomcatBaseTest.getUrl("http://localhost:" + connector.getLocalPort() + "/");
