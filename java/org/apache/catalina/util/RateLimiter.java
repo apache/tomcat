@@ -65,4 +65,44 @@ public interface RateLimiter {
      * @param filterConfig The FilterConfig used to configure the associated filter
      */
     void setFilterConfig(FilterConfig filterConfig);
+
+    /**
+     * @return name of RateLimit policy
+     */
+    String getPolicyName();
+
+    /**
+     * Sets the policy name, otherwise an auto-generated name is used.
+     *
+     * @param name of rate limit policy
+     */
+    void setPolicyName(String name);
+
+    /**
+     * @return full representation of current policy
+     *
+     * @see <a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers">RateLimit header fields for
+     *          HTTP (draft)</a>
+     */
+    default String getPolicy() {
+        // enclose policy name with double quotes. e.g. "fixed-01";q=3000;w=60
+        return "\"" + getPolicyName() + "\";q=" + getRequests() + ";w=" + getDuration();
+    }
+
+    /**
+     * Provide the quota header for this rate limit for a given request count within the current time window.
+     *
+     * @param requestCount  The request count within the current time window
+     *
+     * @return the quota header for the given value of request count
+     *
+     * @see <a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers">RateLimit header fields for
+     *          HTTP (draft)</a>
+     */
+    default String getQuota(int requestCount) {
+        // Local copy to ensure consistency
+        int maxRequests = getRequests();
+        int remaining = (requestCount < 0 || requestCount > maxRequests) ? 0 : (maxRequests - requestCount);
+        return "\"" + getPolicyName() + "\";r=" + remaining;
+    }
 }
