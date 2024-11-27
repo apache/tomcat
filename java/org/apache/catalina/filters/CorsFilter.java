@@ -35,10 +35,12 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.ResponseUtil;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -566,7 +568,7 @@ public class CorsFilter extends GenericFilter {
                     } else if ("GET".equals(method) || "HEAD".equals(method)) {
                         requestType = CORSRequestType.SIMPLE;
                     } else if ("POST".equals(method)) {
-                        String mediaType = getMediaType(request.getContentType());
+                        String mediaType = MediaType.parseMediaTypeOnly(request.getContentType());
                         if (mediaType == null) {
                             requestType = CORSRequestType.SIMPLE;
                         } else {
@@ -588,22 +590,6 @@ public class CorsFilter extends GenericFilter {
         return requestType;
     }
 
-
-    /**
-     * Return the lower case, trimmed value of the media type from the content type.
-     */
-    private String getMediaType(String contentType) {
-        if (contentType == null) {
-            return null;
-        }
-        String result = contentType.toLowerCase(Locale.ENGLISH);
-        int firstSemiColonIndex = result.indexOf(';');
-        if (firstSemiColonIndex > -1) {
-            result = result.substring(0, firstSemiColonIndex);
-        }
-        result = result.trim();
-        return result;
-    }
 
     /**
      * Checks if the Origin is allowed to make a CORS request.
@@ -923,7 +909,7 @@ public class CorsFilter extends GenericFilter {
      * @see <a href="http://www.w3.org/TR/cors/#terminology" >http://www.w3.org/TR/cors/#terminology</a>
      */
     public static final Collection<String> SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList("application/x-www-form-urlencoded", "multipart/form-data", "text/plain")));
+            new HashSet<>(Arrays.asList(Globals.CONTENT_TYPE_FORM_URL_ENCODING, "multipart/form-data", "text/plain")));
 
     // ------------------------------------------------ Configuration Defaults
     /**

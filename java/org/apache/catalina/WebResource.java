@@ -92,12 +92,21 @@ public interface WebResource {
     String getWebappPath();
 
     /**
-     * Return the strong ETag if available (currently not supported) else return the weak ETag calculated from the
-     * content length and last modified.
+     * Return the weak ETag calculated from the content length and last modified.
      *
      * @return The ETag for this resource
      */
     String getETag();
+
+    /**
+     * Return the strong ETag if available else return the weak ETag calculated from the content length and last
+     * modified.
+     *
+     * @return The ETag for this resource
+     */
+    default String getStrongETag() {
+        return getETag();
+    }
 
     /**
      * Set the MIME type for this Resource.

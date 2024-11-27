@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.filters;
 
 import java.io.IOException;
@@ -63,6 +62,11 @@ import org.apache.tomcat.util.res.StringManager;
  * information that it has, e.g. allow more requests to certain users based on roles, etc.
  * </p>
  * <p>
+ * <code>exposeHeaders</code> enables the output of the rate limiter configuration and state via a response header as
+ * per <a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers">RateLimit header fields for HTTP
+ * (draft)</a>.
+ * </p>
+ * <p>
  * <strong>WARNING:</strong> if Tomcat is behind a reverse proxy then you must make sure that the Rate Limit Filter sees
  * the client IP address, so if for example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>, then the
  * filter mapping for the Rate Limit Filter must come <em>after</em> the mapping of the Remote IP Filter to ensure that
@@ -73,32 +77,51 @@ import org.apache.tomcat.util.res.StringManager;
 public class RateLimitFilter extends FilterBase {
 
     /**
-     * default duration in seconds
+     * Default duration in seconds.
      */
     public static final int DEFAULT_BUCKET_DURATION = 60;
 
     /**
-     * default number of requests per duration
+     * Default number of requests per duration.
      */
     public static final int DEFAULT_BUCKET_REQUESTS = 300;
 
     /**
-     * default value for enforce
+     * Default value for enforce.
      */
     public static final boolean DEFAULT_ENFORCE = true;
 
     /**
-     * default status code to return if requests per duration exceeded
+     * Default value of the expose headers flag.
+     */
+    public static final boolean DEFAULT_EXPOSE_HEADERS = false;
+
+    /**
+     * Name of the rate limit policy header field defined in
+     * <a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers">RateLimit header fields for HTTP
+     * (draft)</a>.
+     */
+    public static final String HEADER_RATE_LIMIT_POLICY = "RateLimit-Policy";
+
+    /**
+     * Name of the rate limit remaining quota header field defined in
+     * <a href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers">RateLimit header fields for HTTP
+     * (draft)</a>.
+     */
+    public static final String HEADER_RATE_LIMIT = "RateLimit";
+
+    /**
+     * Default status code to return if requests per duration is exceeded.
      */
     public static final int DEFAULT_STATUS_CODE = 429;
 
     /**
-     * default status message to return if requests per duration exceeded
+     * Default status message to return if requests per duration is exceeded.
      */
     public static final String DEFAULT_STATUS_MESSAGE = "Too many requests";
 
     /**
-     * request attribute that will contain the number of requests per duration
+     * Request attribute that will contain the number of requests per duration.
      */
     public static final String RATE_LIMIT_ATTRIBUTE_COUNT = "org.apache.catalina.filters.RateLimitFilter.Count";
 
@@ -117,6 +140,10 @@ public class RateLimitFilter extends FilterBase {
     private String statusMessage = DEFAULT_STATUS_MESSAGE;
 
     private String filterName;
+
+    private boolean exposeHeaders = DEFAULT_EXPOSE_HEADERS;
+
+    private String policyName = null;
 
     private transient Log log = LogFactory.getLog(RateLimitFilter.class);
 
@@ -152,6 +179,13 @@ public class RateLimitFilter extends FilterBase {
         this.rateLimitClassName = rateLimitClassName;
     }
 
+    public void setExposeHeaders(boolean exposeHeaders) {
+        this.exposeHeaders = exposeHeaders;
+    }
+
+    public void setPolicyName(String policyName) {
+        this.policyName = policyName;
+    }
 
     @Override
     protected boolean isConfigProblemFatal() {
@@ -173,6 +207,13 @@ public class RateLimitFilter extends FilterBase {
         rateLimiter.setRequests(bucketRequests);
         rateLimiter.setFilterConfig(filterConfig);
 
+        if (policyName != null) {
+            String trimmedName = policyName.trim();
+            if (!trimmedName.isEmpty()) {
+                rateLimiter.setPolicyName(trimmedName);
+            }
+        }
+
         filterName = filterConfig.getFilterName();
 
         log.info(sm.getString("rateLimitFilter.initialized", filterName, Integer.valueOf(bucketRequests),
@@ -189,6 +230,12 @@ public class RateLimitFilter extends FilterBase {
 
         request.setAttribute(RATE_LIMIT_ATTRIBUTE_COUNT, Integer.valueOf(reqCount));
 
+        if (exposeHeaders) {
+            ((HttpServletResponse) response).addHeader(HEADER_RATE_LIMIT_POLICY, rateLimiter.getPolicy());
+            if (enforce) {
+                ((HttpServletResponse) response).addHeader(HEADER_RATE_LIMIT, rateLimiter.getQuota(reqCount));
+            }
+        }
         if (reqCount > rateLimiter.getRequests()) {
 
             log.warn(sm.getString("rateLimitFilter.maxRequestsExceeded", filterName, Integer.valueOf(reqCount), ipAddr,

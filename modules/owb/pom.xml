@@ -37,7 +37,7 @@
         <jakarta-interceptor.version>2.1.0</jakarta-interceptor.version>
         <jakarta-enterprise-cdi.version>4.0.1</jakarta-enterprise-cdi.version>
         <jakarta-annotation-api.version>2.1.1</jakarta-annotation-api.version>
-        <tomcat.version>11.0.0-M22</tomcat.version>
+        <tomcat.version>12.0.0-SNAPSHOT</tomcat.version>
     </properties>
 
     <dependencies>

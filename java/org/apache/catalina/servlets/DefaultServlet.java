@@ -260,6 +260,11 @@ public class DefaultServlet extends HttpServlet {
      */
     private boolean allowPartialPut = true;
 
+    /**
+     * Use strong etags whenever possible.
+     */
+    private boolean useStrongETags = false;
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -297,7 +302,7 @@ public class DefaultServlet extends HttpServlet {
                     directoryRedirectStatusCode = statusCode;
                     break;
                 default:
-                    log("Invalid redirectStatusCode of " + statusCode);
+                    log(sm.getString("defaultServlet.invalidRedirectStatusCode", Integer.valueOf(statusCode)));
             }
         }
 
@@ -394,6 +399,11 @@ public class DefaultServlet extends HttpServlet {
         if (getServletConfig().getInitParameter("allowPartialPut") != null) {
             allowPartialPut = Boolean.parseBoolean(getServletConfig().getInitParameter("allowPartialPut"));
         }
+
+        if (getServletConfig().getInitParameter("useStrongETags") != null) {
+            useStrongETags = Boolean.parseBoolean(getServletConfig().getInitParameter("useStrongETags"));
+        }
+
     }
 
     private CompressionFormat[] parseCompressionFormats(String precompressed, String gzip) {
@@ -607,7 +617,11 @@ public class DefaultServlet extends HttpServlet {
                     resp.setStatus(HttpServletResponse.SC_CREATED);
                 }
             } else {
-                resp.sendError(HttpServletResponse.SC_CONFLICT);
+                try {
+                    resp.sendError(HttpServletResponse.SC_CONFLICT);
+                } catch (IllegalStateException e) {
+                    // Already committed, ignore
+                }
             }
         } finally {
             if (resourceInputStream != null) {
@@ -1225,10 +1239,33 @@ public class DefaultServlet extends HttpServlet {
                 contentType.contains("/javascript");
     }
 
-    private static boolean validate(Ranges.Entry range, long length) {
-        long start = getStart(range, length);
-        long end = getEnd(range, length);
-        return (start >= 0) && (end >= 0) && (start <= end);
+    private static boolean validate(Ranges ranges, long length) {
+        List<long[]> rangeContext = new ArrayList<>();
+        for (Ranges.Entry range : ranges.getEntries()) {
+            long start = getStart(range, length);
+            long end = getEnd(range, length);
+            if (start < 0 || start > end) {
+                // Invalid range
+                return false;
+            }
+            // See https://www.rfc-editor.org/rfc/rfc9110.html#status.416
+            // No good reason for ranges to overlap so always reject
+            for (long[] r : rangeContext) {
+                long s2 = r[0];
+                long e2 = r[1];
+                // Given valid [s1,e1] and [s2,e2]
+                // If { s1>e2 || s2>e1 } then no overlap
+                // equivalent to
+                // If not { s1>e2 || s2>e1 } then overlap
+                // De Morgan's law
+                if (start <= e2 && s2 <= end) {
+                    // isOverlap
+                    return false;
+                }
+            }
+            rangeContext.add(new long[] { start, end });
+        }
+        return true;
     }
 
     private static long getStart(Ranges.Entry range, long length) {
@@ -1478,12 +1515,10 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        for (Ranges.Entry range : ranges.getEntries()) {
-            if (!validate(range, fileLength)) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
-            }
+        if (!validate(ranges, fileLength)) {
+            response.addHeader("Content-Range", "bytes */" + fileLength);
+            response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+            return null;
         }
 
         return ranges;
@@ -1645,6 +1680,9 @@ public class DefaultServlet extends HttpServlet {
 
         StringBuilder sb = new StringBuilder();
 
+        // Get the right strings
+        StringManager sm = StringManager.getManager(DefaultServlet.class.getPackageName(), request.getLocales());
+
         String directoryWebappPath = resource.getWebappPath();
         WebResource[] entries = resources.listResources(directoryWebappPath);
 
@@ -1653,11 +1691,7 @@ public class DefaultServlet extends HttpServlet {
 
         // Render the page header
         sb.append("<!doctype html>\r\n");
-        sb.append("<html>\r\n");
-        /*
-         * TODO Activate this as soon as we use smClient with the request locales
-         * sb.append("<!doctype html><html lang=\""); sb.append(smClient.getLocale().getLanguage()).append("\">\r\n");
-         */
+        sb.append("<html lang=\"").append(sm.getLocale().getLanguage()).append("\">\r\n");
         sb.append("<head>\r\n");
         sb.append("<title>");
         sb.append(sm.getString("defaultServlet.directory.title", directoryWebappPath));
@@ -1700,7 +1734,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<table width=\"100%\" cellspacing=\"0\"" + " cellpadding=\"5\" align=\"center\">\r\n");
 
         SortManager.Order order;
-        if (sortListings && null != request) {
+        if (sortListings) {
             order = sortManager.getOrder(request.getQueryString());
         } else {
             order = null;
@@ -1709,7 +1743,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<thead>\r\n");
         sb.append("<tr>\r\n");
         sb.append("<th align=\"left\"><font size=\"+1\"><strong>");
-        if (sortListings && null != request) {
+        if (sortListings) {
             sb.append("<a href=\"?C=N;O=");
             sb.append(getOrderChar(order, 'N'));
             sb.append("\">");
@@ -1720,7 +1754,7 @@ public class DefaultServlet extends HttpServlet {
         }
         sb.append("</strong></font></th>\r\n");
         sb.append("<th align=\"center\"><font size=\"+1\"><strong>");
-        if (sortListings && null != request) {
+        if (sortListings) {
             sb.append("<a href=\"?C=S;O=");
             sb.append(getOrderChar(order, 'S'));
             sb.append("\">");
@@ -1731,7 +1765,7 @@ public class DefaultServlet extends HttpServlet {
         }
         sb.append("</strong></font></th>\r\n");
         sb.append("<th align=\"right\"><font size=\"+1\"><strong>");
-        if (sortListings && null != request) {
+        if (sortListings) {
             sb.append("<a href=\"?C=M;O=");
             sb.append(getOrderChar(order, 'M'));
             sb.append("\">");
@@ -1744,7 +1778,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("</tr>\r\n");
         sb.append("</thead>\r\n");
 
-        if (null != sortManager && null != request) {
+        if (null != sortManager) {
             sortManager.sort(entries, request.getQueryString());
         }
 
@@ -1945,7 +1979,7 @@ public class DefaultServlet extends HttpServlet {
             if (f != null) {
                 long globalXsltFileSize = f.length();
                 if (globalXsltFileSize > Integer.MAX_VALUE) {
-                    log("globalXsltFile [" + f.getAbsolutePath() + "] is too big to buffer");
+                    log(sm.getString("defaultServlet.globalXSLTTooBig", f.getAbsolutePath()));
                 } else {
                     try (FileInputStream fis = new FileInputStream(f)) {
                         byte b[] = new byte[(int) f.length()];
@@ -2223,7 +2257,11 @@ public class DefaultServlet extends HttpServlet {
      * @return The result of calling {@link WebResource#getETag()} on the given resource
      */
     protected String generateETag(WebResource resource) {
-        return resource.getETag();
+        if (useStrongETags) {
+            return resource.getStrongETag();
+        } else {
+            return resource.getETag();
+        }
     }
 
 
@@ -2350,7 +2388,7 @@ public class DefaultServlet extends HttpServlet {
                 }
                 long start = getStart(range, length);
                 long end = getEnd(range, length);
-                ostream.println("Content-Range: bytes " + start + "-" + end + "/" + (end - start));
+                ostream.println("Content-Range: bytes " + start + "-" + end + "/" + length);
                 ostream.println();
 
                 // Printing content

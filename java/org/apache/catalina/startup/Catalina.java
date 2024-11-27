@@ -568,7 +568,7 @@ public class Catalina {
                 if (!generatedCodeLocation.isAbsolute()) {
                     generatedCodeLocation = new File(Bootstrap.getCatalinaHomeFile(), generatedCodeLocationParameter);
                 }
-            } else {
+            } else if (generatedCodeLocation == null) {
                 generatedCodeLocation = new File(Bootstrap.getCatalinaHomeFile(), "work");
             }
             serverXmlLocation = new File(generatedCodeLocation, generatedCodePackage);
@@ -585,7 +585,11 @@ public class Catalina {
         }
 
         if (serverXml != null) {
-            serverXml.load(this);
+            try {
+                serverXml.load(this);
+            } catch (Exception e) {
+                log.warn(sm.getString("catalina.configFail", "GeneratedCode"), e);
+            }
         } else {
             try (ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getServerXml()) {
                 // Create and execute our Digester
@@ -926,7 +930,8 @@ public class Catalina {
         code.append(" implements ");
         code.append(ServerXml.class.getName().replace('$', '.')).append(" {").append(System.lineSeparator());
         code.append("public void load(").append(Catalina.class.getName());
-        code.append(' ').append(digester.toVariableName(this)).append(") {").append(System.lineSeparator());
+        code.append(' ').append(digester.toVariableName(this)).append(") throws Exception {")
+                .append(System.lineSeparator());
     }
 
 
@@ -938,7 +943,7 @@ public class Catalina {
 
 
     public interface ServerXml {
-        void load(Catalina catalina);
+        void load(Catalina catalina) throws Exception;
     }
 
 

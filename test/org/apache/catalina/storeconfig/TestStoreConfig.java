@@ -57,22 +57,22 @@ public class TestStoreConfig extends TomcatBaseTest {
         org.apache.catalina.core.StandardThreadExecutor tc_StandardThreadExecutor_14 = new org.apache.catalina.core.StandardThreadExecutor();
         tc_StandardThreadExecutor_14.setName("tomcatThreadPool");
         tc_StandardThreadExecutor_14.setNamePrefix("catalina-exec-");
-        tc_StandardThreadExecutor_14.setMaxThreads(Integer.valueOf("150"));
-        tc_StandardThreadExecutor_14.setMinSpareThreads(Integer.valueOf("4"));
+        tc_StandardThreadExecutor_14.setMaxThreads(Integer.parseInt("150"));
+        tc_StandardThreadExecutor_14.setMinSpareThreads(Integer.parseInt("4"));
         tomcat.getService().addExecutor(tc_StandardThreadExecutor_14);
 
         org.apache.coyote.http2.Http2Protocol tc_Http2Protocol_17 = new org.apache.coyote.http2.Http2Protocol();
         tomcat.getConnector().addUpgradeProtocol(tc_Http2Protocol_17);
         tomcat.getConnector().setProperty("SSLEnabled", "true");
         tomcat.getConnector().setScheme("https");
-        tomcat.getConnector().setSecure(Boolean.valueOf("true"));
+        tomcat.getConnector().setSecure(Boolean.parseBoolean("true"));
         tomcat.getConnector().setThrowOnFailure(false);
         tomcat.getConnector().getProtocolHandler().setExecutor(tomcat.getService().getExecutor("tomcatThreadPool"));
 
         org.apache.tomcat.util.net.SSLHostConfig tc_SSLHostConfig_22 = new org.apache.tomcat.util.net.SSLHostConfig();
         tc_SSLHostConfig_22.setProtocols("TLSv1.1+TLSv1.2");
         tc_SSLHostConfig_22.setCertificateVerification("optionalNoCA");
-        tc_SSLHostConfig_22.setCertificateVerificationDepth(Integer.valueOf("3"));
+        tc_SSLHostConfig_22.setCertificateVerificationDepth(Integer.parseInt("3"));
         org.apache.tomcat.util.net.SSLHostConfigCertificate tc_SSLHostConfigCertificate_23 =
                 new org.apache.tomcat.util.net.SSLHostConfigCertificate(tc_SSLHostConfig_22,
                         org.apache.tomcat.util.net.SSLHostConfigCertificate.Type.RSA);

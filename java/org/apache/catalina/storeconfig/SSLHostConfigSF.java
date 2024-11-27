@@ -43,7 +43,7 @@ public class SSLHostConfigSF extends StoreFactoryBase {
             getStoreAppender().printIndent(aWriter, indent + 2);
             aWriter.print("<");
             aWriter.print(elementDesc.getTag());
-            if (elementDesc.isAttributes() && aElement != null) {
+            if (elementDesc.isAttributes()) {
                 // Add protocols attribute
                 SSLHostConfig bean2 = (SSLHostConfig) getStoreAppender().defaultInstance(aElement);
                 SSLHostConfig sslHostConfig = (SSLHostConfig) aElement;

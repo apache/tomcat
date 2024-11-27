@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.CloseNowException;
@@ -604,7 +605,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     final void writeEarlyHints() throws IOException {
         MimeHeaders headers = coyoteResponse.getMimeHeaders();
         String originalStatus = headers.getHeader(":status");
-        headers.setValue(":status").setString("103");
+        headers.setValue(":status").setString(Integer.toString(HttpServletResponse.SC_EARLY_HINTS));
         try {
             handler.writeHeaders(this, headers, false, Constants.DEFAULT_HEADERS_FRAME_SIZE);
         } finally {

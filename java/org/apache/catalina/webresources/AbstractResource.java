@@ -17,12 +17,15 @@
 package org.apache.catalina.webresources;
 
 import java.io.InputStream;
+import java.security.MessageDigest;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.juli.logging.Log;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 public abstract class AbstractResource implements WebResource {
 
@@ -33,6 +36,7 @@ public abstract class AbstractResource implements WebResource {
 
     private String mimeType = null;
     private volatile String weakETag;
+    private volatile String strongETag;
 
 
     protected AbstractResource(WebResourceRoot root, String webAppPath) {
@@ -73,6 +77,47 @@ public abstract class AbstractResource implements WebResource {
             }
         }
         return weakETag;
+    }
+
+    @Override
+    public final String getStrongETag() {
+        if (strongETag == null) {
+            synchronized (this) {
+                if (strongETag == null) {
+                    long contentLength = getContentLength();
+                    long lastModified = getLastModified();
+                    if (contentLength > 0 && lastModified > 0) {
+                        if (contentLength <= 16 * 1024) {
+                            byte[] buf = getContent();
+                            if (buf != null) {
+                                buf = ConcurrentMessageDigest.digest("SHA-1", buf);
+                                strongETag = "\"" + HexUtils.toHexString(buf) + "\"";
+                            } else {
+                                strongETag = getETag();
+                            }
+                        } else {
+                            byte[] buf = new byte[4096];
+                            try (InputStream is = getInputStream()) {
+                                MessageDigest digest = MessageDigest.getInstance("SHA-1");
+                                while (true) {
+                                    int n = is.read(buf);
+                                    if (n <= 0) {
+                                        break;
+                                    }
+                                    digest.update(buf, 0, n);
+                                }
+                                strongETag = "\"" + HexUtils.toHexString(digest.digest()) + "\"";
+                            } catch (Exception e) {
+                                strongETag = getETag();
+                            }
+                        }
+                    } else {
+                        strongETag = getETag();
+                    }
+                }
+            }
+        }
+        return strongETag;
     }
 
     @Override
