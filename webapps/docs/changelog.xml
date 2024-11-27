@@ -245,6 +245,13 @@
         element. Support for <code>ResourceParams</code> was removed in Tomcat
         5.5.x. (markt)
       </fix>
+      <fix>
+        Documentation. <bug>69477</bug>: Correct name of attribute for
+        <code>RemoteIPFilter</code>. The attribute is
+        <code>internalProxies</code> rather than
+        <code>allowedInternalProxies</code>. Pull request <pr>786</pr> provided
+        by Jorge Díaz. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
