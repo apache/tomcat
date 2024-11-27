@@ -1381,8 +1381,8 @@ public class DefaultServlet extends HttpServlet {
             return null;
         }
 
-        // TODO: Remove the internal representation and use Ranges
-        // Convert to internal representation
+        // Can't update to use Ranges as this is a protected method. Only backwards compatible API changes are allowed.
+        // Convert to Range
         Range range = new Range();
         range.start = contentRange.getStart();
         range.end = contentRange.getEnd();
@@ -1478,8 +1478,8 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        // TODO: Remove the internal representation and use Ranges
-        // Convert to internal representation
+        // Can't update to use Ranges as this is a protected method. Only backwards compatible API changes are allowed.
+        // Convert to Range
         ArrayList<Range> result = new ArrayList<>();
 
         List<long[]> rangeContext = new ArrayList<>();
