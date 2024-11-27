@@ -217,9 +217,9 @@
         provided by Chenjp. (markt)
       </fix>
       <fix>
-        The default servlet now rejects partial PUT requests than contain
-        overlapping Content-Range values. Provided by Chenjp in pull request
-        <pr>778</pr>. (markt)
+        Enhance Content-Range verification for partial PUT requests handled by
+        the default swervlet. Provided by Chenjp in pull request <pr>778</pr>.
+        (markt)
       </fix>
     </changelog>
   </subsection>
