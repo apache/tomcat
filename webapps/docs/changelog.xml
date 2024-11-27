@@ -193,6 +193,10 @@
         header fields for HTTP (draft)</a> in the <code>RateLimitFilter</code>.
         Based on pull request <pr>775</pr> provided by Chenjp. (markt)
       </add>
+      <add>
+        <pr>787</pr>: Add regression tests for <bug>69478</bug>. Pull request
+        provided by Thomas Krisch. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
