@@ -53,6 +53,8 @@ public class TestDefaultServletPut extends TomcatBaseTest {
         // Valid partial PUT
         parameterSets.add(new Object[] {
                 "Content-Range: bytes 0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] {
+                "Content-Range: ByTeS 0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
         // Full PUT
         parameterSets.add(new Object[] {
                 "", null, PATCH_TEXT, Boolean.TRUE });
@@ -79,6 +81,8 @@ public class TestDefaultServletPut extends TomcatBaseTest {
                 "Content-Range: bytes 0-5/" + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
                 "Content-Range: bytes 0-5/0x5" + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] {
+                "Content-Range: bytes 0-" + PATCH_LEN + "/" + PATCH_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         // Valid partial PUT but partial PUT is disabled
         parameterSets.add(new Object[] {
                 "Content-Range: bytes 0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.TRUE, START_TEXT, Boolean.FALSE });
