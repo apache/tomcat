@@ -195,6 +195,12 @@
         <bug>69476</bug>: Catch possible ISE when trying to report PUT failure
         in the <code>DefaultServlet</code>. (remm)
       </fix>
+      <add>
+        Add support for <a
+        href="https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers">RateLimit
+        header fields for HTTP (draft)</a> in the <code>RateLimitFilter</code>.
+        Based on pull request <pr>775</pr> provided by Chenjp. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
