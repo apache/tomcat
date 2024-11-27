@@ -199,6 +199,10 @@
         <code>setSecure(boolean)</code> for a cookie, the respective flags were
         set regardless of the value passed to the method. (markt)
       </fix>
+      <add>
+        <pr>787</pr>: Add regression tests for <bug>69478</bug>. Pull request
+        provided by Thomas Krisch. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
