@@ -203,6 +203,11 @@
         <pr>787</pr>: Add regression tests for <bug>69478</bug>. Pull request
         provided by Thomas Krisch. (markt)
       </add>
+      <fix>
+        The default servlet now rejects HTTP range requests when two or more of
+        the requested ranges overlap. Based on pull request <pr>782</pr>
+        provided by Chenjp. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
