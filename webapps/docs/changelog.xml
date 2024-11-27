@@ -191,6 +191,10 @@
         references to <code>application/x-www-form-urlencoded</code>. Based on
         pull request <pr>779</pr> by Chenjp. (markt)
       </add>
+      <fix>
+        <bug>69476</bug>: Catch possible ISE when trying to report PUT failure
+        in the <code>DefaultServlet</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
