@@ -240,7 +240,7 @@ public class Cookie implements Cloneable, Serializable {
      * @see #getSecure
      */
     public void setSecure(boolean flag) {
-        setAttributeInternal(SECURE, EMPTY_STRING);
+        setAttributeInternal(SECURE, flag ? EMPTY_STRING : null);
     }
 
 
@@ -349,7 +349,7 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 3.0
      */
     public void setHttpOnly(boolean httpOnly) {
-        setAttributeInternal(HTTP_ONLY, EMPTY_STRING);
+        setAttributeInternal(HTTP_ONLY, httpOnly ? EMPTY_STRING : null);
     }
 
 
