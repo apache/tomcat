@@ -1435,7 +1435,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        <filter-name>RemoteIpFilter</filter-name>
        <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
        <init-param>
-         <param-name>allowedInternalProxies</param-name>
+         <param-name>internalProxies</param-name>
          <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
        </init-param>
        <init-param>
@@ -1510,7 +1510,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        <filter-name>RemoteIpFilter</filter-name>
        <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
        <init-param>
-         <param-name>allowedInternalProxies</param-name>
+         <param-name>internalProxies</param-name>
          <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
        </init-param>
        <init-param>
@@ -1564,7 +1564,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        <filter-name>RemoteIpFilter</filter-name>
        <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
        <init-param>
-         <param-name>allowedInternalProxies</param-name>
+         <param-name>internalProxies</param-name>
          <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
        </init-param>
        <init-param>
@@ -1621,7 +1621,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        <filter-name>RemoteIpFilter</filter-name>
        <filter-class>org.apache.catalina.filters.RemoteIpFilter</filter-class>
        <init-param>
-         <param-name>allowedInternalProxies</param-name>
+         <param-name>internalProxies</param-name>
          <param-value>192\.168\.0\.10|192\.168\.0\.11</param-value>
        </init-param>
        <init-param>
