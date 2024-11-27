@@ -1255,10 +1255,33 @@ public class DefaultServlet extends HttpServlet {
                 (range.getEnd() >= 0) && (range.getStart() <= range.getEnd()) && (range.getLength() > 0);
     }
 
-    private static boolean validate(Ranges.Entry range, long length) {
-        long start = getStart(range, length);
-        long end = getEnd(range, length);
-        return (start >= 0) && (end >= 0) && (start <= end);
+    private static boolean validate(Ranges ranges, long length) {
+        List<long[]> rangeContext = new ArrayList<>();
+        for (Ranges.Entry range : ranges.getEntries()) {
+            long start = getStart(range, length);
+            long end = getEnd(range, length);
+            if (start < 0 || start > end) {
+                // Invalid range
+                return false;
+            }
+            // See https://www.rfc-editor.org/rfc/rfc9110.html#status.416
+            // No good reason for ranges to overlap so always reject
+            for (long[] r : rangeContext) {
+                long s2 = r[0];
+                long e2 = r[1];
+                // Given valid [s1,e1] and [s2,e2]
+                // If { s1>e2 || s2>e1 } then no overlap
+                // equivalent to
+                // If not { s1>e2 || s2>e1 } then overlap
+                // De Morgan's law
+                if (start <= e2 && s2 <= end) {
+                    // isOverlap
+                    return false;
+                }
+            }
+            rangeContext.add(new long[] { start, end });
+        }
+        return true;
     }
 
     private static long getStart(Ranges.Entry range, long length) {
@@ -1508,12 +1531,10 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        for (Ranges.Entry range : ranges.getEntries()) {
-            if (!validate(range, fileLength)) {
-                response.addHeader("Content-Range", "bytes */" + fileLength);
-                response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                return null;
-            }
+        if (!validate(ranges, fileLength)) {
+            response.addHeader("Content-Range", "bytes */" + fileLength);
+            response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+            return null;
         }
 
         return ranges;
