@@ -1488,6 +1488,7 @@ public class DefaultServlet extends HttpServlet {
         // Convert to internal representation
         ArrayList<Range> result = new ArrayList<>();
 
+        List<long[]> rangeContext = new ArrayList<>();
         for (Ranges.Entry entry : ranges.getEntries()) {
             Range currentRange = new Range();
             if (entry.getStart() == -1) {
@@ -1511,6 +1512,24 @@ public class DefaultServlet extends HttpServlet {
                 return null;
             }
 
+            // See https://www.rfc-editor.org/rfc/rfc9110.html#status.416
+            // No good reason for ranges to overlap so always reject
+            for (long[] r : rangeContext) {
+                long s2 = r[0];
+                long e2 = r[1];
+                // Given valid [s1,e1] and [s2,e2]
+                // If { s1>e2 || s2>e1 } then no overlap
+                // equivalent to
+                // If not { s1>e2 || s2>e1 } then overlap
+                // De Morgan's law
+                if (currentRange.start <= e2 && s2 <= currentRange.end) {
+                    // isOverlap
+                    response.addHeader("Content-Range", "bytes */" + fileLength);
+                    response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+                    return null;
+                }
+            }
+            rangeContext.add(new long[] { currentRange.start, currentRange.end });
             result.add(currentRange);
         }
 
