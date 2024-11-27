@@ -198,6 +198,11 @@
         the requested ranges overlap. Based on pull request <pr>782</pr>
         provided by Chenjp. (markt)
       </fix>
+      <fix>
+        Enhance Content-Range verification for partial PUT requests handled by
+        the default swervlet. Provided by Chenjp in pull request <pr>778</pr>.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

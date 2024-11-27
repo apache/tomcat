@@ -1375,9 +1375,8 @@ public class DefaultServlet extends HttpServlet {
             return null;
         }
 
-
         // bytes is the only range unit supported
-        if (!contentRange.getUnits().equals("bytes")) {
+        if (!"bytes".equals(contentRange.getUnits())) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return null;
         }
@@ -1388,11 +1387,6 @@ public class DefaultServlet extends HttpServlet {
         range.start = contentRange.getStart();
         range.end = contentRange.getEnd();
         range.length = contentRange.getLength();
-
-        if (!range.validate()) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return null;
-        }
 
         return range;
     }
