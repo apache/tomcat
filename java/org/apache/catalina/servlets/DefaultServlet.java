@@ -1497,7 +1497,7 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        // Retrieving the range header (if any is specified
+        // Retrieving the range header (if any is specified)
         String rangeHeader = request.getHeader("Range");
 
         if (rangeHeader == null) {
