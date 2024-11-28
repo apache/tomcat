@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.realm;
 
-import java.io.File;
 import java.security.Principal;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -24,7 +23,6 @@ import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -86,11 +84,6 @@ public class TestDataSourceRealm extends LoggingBaseTest {
     }
 
     private DerbyDataSourceRealm db;
-
-    @AfterClass
-    public static void derbyCleanup() {
-        System.out.println("Deleted derby.log: " + (new File("derby.log")).delete());
-    }
 
     @Test
     public void testRealm() throws Exception {
