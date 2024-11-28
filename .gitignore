@@ -51,3 +51,6 @@ modules/**/target
 modules/jdbc-pool/bin
 modules/jdbc-pool/includes
 webapps/docs/jdbc-pool.xml
+.DS_Store
+derby*.log
+junit*.properties
