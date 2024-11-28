@@ -115,6 +115,7 @@ public abstract class LoggingBaseTest {
         tempDir = Files.createTempDirectory(tempBasePath, "test").toFile();
 
         System.setProperty(Constants.CATALINA_BASE_PROP, tempDir.getAbsolutePath());
+        System.setProperty("derby.system.home", tempDir.getAbsolutePath());
 
         // Configure logging
         System.setProperty("java.util.logging.manager",
