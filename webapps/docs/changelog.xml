@@ -129,12 +129,12 @@
         (remm)
       </fix>
       <fix>
-        The previous fix for incosistent resource metadata during concurrent
+        The previous fix for inconsistent resource metadata during concurrent
         reads and writes was incomplete. (markt)
       </fix>
       <fix>
         <pr>780</pr>: Fix <code>content-range</code> header length. Submitted
-        by Justin Chen. (remm)
+        by Chenjp. (remm)
       </fix>
       <fix>
         <bug>69444</bug>: Ensure that the
@@ -204,7 +204,7 @@
       </fix>
       <fix>
         Enhance Content-Range verification for partial PUT requests handled by
-        the default swervlet. Provided by Chenjp in pull request <pr>778</pr>.
+        the default servlet. Provided by Chenjp in pull request <pr>778</pr>.
         (markt)
       </fix>
     </changelog>
