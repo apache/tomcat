@@ -18,9 +18,9 @@
 #
 # This file provides the defaults for build properties that are likely to:
 # - change over time such as those related to dependencies
-# - be ones that individual developers will wish to customise.
+# - be ones that individual developers will wish to customize.
 #
-# To customise the build, create a build.properties file in the top-level
+# To customize the build, create a build.properties file in the top-level
 # source directory (where this file is located) and use it to define new
 # values for the build properties you wish to change. In addition to
 # changing any of the properties defined in this file, you can change any
