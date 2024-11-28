@@ -23,6 +23,7 @@ output
 work
 build.properties
 mvn.properties
+.DS_Store
 .ant-targets-build.xml
 .checkstyle
 .classpath
