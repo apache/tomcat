@@ -1240,7 +1240,8 @@ public class DefaultServlet extends HttpServlet {
     }
 
     private static boolean validate(Ranges ranges, long length) {
-        List<long[]> rangeContext = new ArrayList<>();
+        long[][] rangeContext = new long[ranges.getEntries().size()][];
+        int entryIndex = 0;
         for (Ranges.Entry range : ranges.getEntries()) {
             long start = getStart(range, length);
             long end = getEnd(range, length);
@@ -1249,10 +1250,10 @@ public class DefaultServlet extends HttpServlet {
                 return false;
             }
             // See https://www.rfc-editor.org/rfc/rfc9110.html#status.416
-            // No good reason for ranges to overlap so always reject
-            for (long[] r : rangeContext) {
-                long s2 = r[0];
-                long e2 = r[1];
+            // No good reason for ranges to overlap or not listed in ascending order, so always reject
+            for (int i=0;i<entryIndex;i++) {
+                long s2 = rangeContext[i][0];
+                long e2 = rangeContext[i][1];
                 // Given valid [s1,e1] and [s2,e2]
                 // If { s1>e2 || s2>e1 } then no overlap
                 // equivalent to
@@ -1262,8 +1263,12 @@ public class DefaultServlet extends HttpServlet {
                     // isOverlap
                     return false;
                 }
+                if (start<=e2) {
+                    // ranges that are not listed in ascending order
+                    return false;
+                }
             }
-            rangeContext.add(new long[] { start, end });
+            rangeContext[entryIndex++] = new long[] {start,end};
         }
         return true;
     }
