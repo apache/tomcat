@@ -1251,7 +1251,7 @@ public class DefaultServlet extends HttpServlet {
             }
             // See https://www.rfc-editor.org/rfc/rfc9110.html#status.416
             // No good reason for ranges to overlap or not listed in ascending order, so always reject
-            for (int i=0;i<entryIndex;i++) {
+            for (int i = 0; i < entryIndex; i++) {
                 long s2 = rangeContext[i][0];
                 long e2 = rangeContext[i][1];
                 // Given valid [s1,e1] and [s2,e2]
@@ -1263,12 +1263,12 @@ public class DefaultServlet extends HttpServlet {
                     // isOverlap
                     return false;
                 }
-                if (start<=e2) {
+                if (start <= e2) {
                     // ranges that are not listed in ascending order
                     return false;
                 }
             }
-            rangeContext[entryIndex++] = new long[] {start,end};
+            rangeContext[entryIndex++] = new long[] { start, end };
         }
         return true;
     }
