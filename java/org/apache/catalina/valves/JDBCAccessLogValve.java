@@ -68,11 +68,11 @@ import org.apache.tomcat.util.ExceptionUtils;
  * remoteHost CHAR(15) NOT NULL,
  * userName CHAR(15),
  * timestamp TIMESTAMP NOT NULL,
- * virtualHost VARCHAR(64) NOT NULL,
- * method VARCHAR(8) NOT NULL,
  * query VARCHAR(255) NOT NULL,
  * status SMALLINT UNSIGNED NOT NULL,
  * bytes INT UNSIGNED NOT NULL,
+ * virtualHost VARCHAR(64) NOT NULL,
+ * method VARCHAR(8) NOT NULL,
  * referer VARCHAR(128),
  * userAgent VARCHAR(128),
  * PRIMARY KEY (id),
@@ -94,9 +94,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <p>
  * If the request method is "common", only these fields are used:
  * <code>remoteHost, user, timeStamp, query, status, bytes</code>
- * </p>
- * <p>
- * <i>TO DO: provide option for excluding logging of certain MIME types.</i>
  * </p>
  *
  * @author Andre de Jesus
