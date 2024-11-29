@@ -16,9 +16,9 @@
  */
 package org.apache.catalina.valves;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -71,21 +71,14 @@ public class TestJDBCAccessLogValve extends TomcatBaseTest {
     @Test
     public void testValve() throws Exception {
 
-        String connectionURL = "jdbc:derby:" + getTemporaryDirectory().getAbsolutePath() + "/" + logPattern;
-
-        Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-        try (Connection connection = DriverManager.getConnection(connectionURL + ";create=true");
-                Statement statement = connection.createStatement()) {
-            statement.execute(SCHEMA);
-        }
-
-        Tomcat tomcat = getTomcatInstance();
+       Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
 
-        JDBCAccessLogValve accessLogValve = new JDBCAccessLogValve();
+        CustomJDBCAccessLogValve accessLogValve = new CustomJDBCAccessLogValve();
         accessLogValve.setDriverName("org.apache.derby.jdbc.EmbeddedDriver");
-        accessLogValve.setConnectionURL(connectionURL);
+        accessLogValve.setConnectionURL("jdbc:derby:" + getTemporaryDirectory().getAbsolutePath()
+                + "/accesslog-" + logPattern + ";create=true");
         accessLogValve.setPattern(logPattern);
         ctx.getParent().getPipeline().addValve(accessLogValve);
 
@@ -99,20 +92,31 @@ public class TestJDBCAccessLogValve extends TomcatBaseTest {
         rc = getUrl("http://localhost:" + getPort() + "/test2?foo=bar", result, null);
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
-        tomcat.stop();
+        accessLogValve.verify();
 
-        try (Connection connection = DriverManager.getConnection(connectionURL);
-                Statement statement = connection.createStatement()) {
-            statement.execute("SELECT * FROM access");
-            ResultSet rs = statement.getResultSet();
-            Assert.assertTrue(rs.next());
-            Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rs.getInt("status"));
-            Assert.assertEquals("/test1", rs.getString("query"));
-            Assert.assertTrue(rs.next());
-            Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rs.getInt("status"));
-            Assert.assertEquals("/test2", rs.getString("query"));
-        }
+        tomcat.stop();
 
     }
 
+    protected class CustomJDBCAccessLogValve extends JDBCAccessLogValve {
+        @Override
+        protected void prepare() throws SQLException {
+            try (Statement statement = conn.createStatement()) {
+                statement.execute(SCHEMA);
+            }
+        }
+
+        public void verify() throws Exception {
+            try (Statement statement = conn.createStatement()) {
+                statement.execute("SELECT * FROM access");
+                ResultSet rs = statement.getResultSet();
+                Assert.assertTrue(rs.next());
+                Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rs.getInt("status"));
+                Assert.assertEquals("/test1", rs.getString("query"));
+                Assert.assertTrue(rs.next());
+                Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rs.getInt("status"));
+                Assert.assertEquals("/test2", rs.getString("query"));
+            }
+        }
+    }
 }
