@@ -30,11 +30,11 @@ Reflection Directives
 ===
 
 This directory contains directives to the compiler on what classes use reflection.
-These are currently stored in a file called `tomcat-reflection.json` in the `META-INF/native-image/groupId/artifactId`
+These are currently stored in a file called `reflect-config.json` in the `META-INF/native-image/groupId/artifactId`
 location.
 
 This directory also contains resource directives, so that resource files normally included in a JAR file
 also get compiled into the executable image.
-These are currently stored in a file called `tomcat-resource.json` in the `META-INF/native-image/groupId/artifactId`
+These are currently stored in a file called `resource-config.json` in the `META-INF/native-image/groupId/artifactId`
 location.
 

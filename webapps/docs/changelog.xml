@@ -280,6 +280,10 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69465</bug>: Fix warnings during native image compilation using the
+        Tomcat embedded JARs. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
