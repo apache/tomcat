@@ -57,24 +57,10 @@ import org.xml.sax.Attributes;
 /**
  * Generate Java source from Nodes
  *
- * @author Anil K. Vijendran
- * @author Danno Ferrin
- * @author Mandar Raje
- * @author Rajiv Mordani
- * @author Pierre Delisle
- *
- * Tomcat 4.1.x and Tomcat 5:
- * @author Kin-man Chung
- * @author Jan Luehe
- * @author Shawn Bayern
- * @author Mark Roth
- * @author Denis Benoit
- *
- * Tomcat 6.x
- * @author Jacob Hookom
- * @author Remy Maucherat
+ * @author Anil K. Vijendran, Danno Ferrin, Mandar Raje, Rajiv Mordani, Pierre Delisle
+ * @author Tomcat 4.1.x and Tomcat 5: Kin-man Chung, Jan Luehe, Shawn Bayern, Mark Roth, Denis Benoit
+ * @author Tomcat 6.x: Jacob Hookom, Remy Maucherat
  */
-
 class Generator {
 
     private static final Class<?>[] OBJECT_CLASS = { Object.class };
@@ -410,9 +396,7 @@ class Generator {
     }
 
     /*
-     * Generates getters for
-     * - instance manager
-     * - expression factory
+     * Generates getters for instance manager & expression factory.
      *
      * For JSPs these methods use lazy init. This is not an option for tag files
      * (at least it would be more complicated to generate) because the
@@ -484,7 +468,7 @@ class Generator {
      * Generates the _jspInit() method for instantiating the tag handler pools.
      * For tag file, _jspInit has to be invoked manually, and the ServletConfig
      * object explicitly passed.
-     *
+     * <p>
      * In JSP 2.1, we also instantiate an ExpressionFactory
      */
     private void generateInit() {
@@ -654,7 +638,7 @@ class Generator {
      * Declare tag handler pools (tags of the same type and with the same
      * attribute set share the same tag handler pool) (shared by servlet and tag
      * handler preamble generation)
-     *
+     * <p>
      * In JSP 2.1, we also scope an instance of ExpressionFactory
      */
     private void genPreambleClassVariableDeclarations() {
@@ -857,9 +841,9 @@ class Generator {
     private void generateXmlProlog(Node.Nodes page) {
 
         /*
-         * An XML declaration is generated under the following conditions: -
+         * An XML declaration is generated under the following conditions: a)
          * 'omit-xml-declaration' attribute of <jsp:output> action is set to
-         * "no" or "false" - JSP document without a <jsp:root>
+         * "no" or "false"; b) JSP document without a <jsp:root>.
          */
         String omitXmlDecl = pageInfo.getOmitXmlDecl();
         if ((omitXmlDecl != null && !JspUtil.booleanValue(omitXmlDecl)) ||
@@ -875,7 +859,6 @@ class Generator {
          * doctype-public appears: <!DOCTYPE name PUBLIC "doctypePublic"
          * "doctypeSystem"> else <!DOCTYPE name SYSTEM "doctypeSystem" >
          */
-
         String doctypeName = pageInfo.getDoctypeName();
         if (doctypeName != null) {
             String doctypePublic = pageInfo.getDoctypePublic();
@@ -903,8 +886,11 @@ class Generator {
 
         /*
          * Map containing introspection information on tag handlers:
+         *
          * <key>: tag prefix <value>: Map containing introspection on tag
-         * handlers: <key>: tag short name <value>: introspection info of tag
+         * handlers
+         *
+         * <key>: tag short name <value>: introspection info of tag
          * handler for <prefix:shortName> tag
          */
         private final Map<String,Map<String,TagHandlerInfo>> handlerInfos;
