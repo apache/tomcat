@@ -1240,8 +1240,7 @@ public class DefaultServlet extends HttpServlet {
     }
 
     private static boolean validate(Ranges ranges, long length) {
-        long[][] rangeContext = new long[ranges.getEntries().size()][];
-        int entryIndex = 0;
+        long prevEnd = -1;
         for (Ranges.Entry range : ranges.getEntries()) {
             long start = getStart(range, length);
             long end = getEnd(range, length);
@@ -1251,24 +1250,12 @@ public class DefaultServlet extends HttpServlet {
             }
             // See https://www.rfc-editor.org/rfc/rfc9110.html#status.416
             // No good reason for ranges to overlap or not listed in ascending order, so always reject
-            for (int i = 0; i < entryIndex; i++) {
-                long s2 = rangeContext[i][0];
-                long e2 = rangeContext[i][1];
-                // Given valid [s1,e1] and [s2,e2]
-                // If { s1>e2 || s2>e1 } then no overlap
-                // equivalent to
-                // If not { s1>e2 || s2>e1 } then overlap
-                // De Morgan's law
-                if (start <= e2 && s2 <= end) {
-                    // isOverlap
-                    return false;
-                }
-                if (start <= e2) {
-                    // ranges that are not listed in ascending order
-                    return false;
-                }
+            if (prevEnd < 0 || prevEnd < start) {
+                // first range entry or strictly greater than previous range entry.
+                prevEnd = end;
+            } else {
+                return false;
             }
-            rangeContext[entryIndex++] = new long[] { start, end };
         }
         return true;
     }
