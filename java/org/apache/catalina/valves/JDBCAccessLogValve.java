@@ -100,7 +100,8 @@ import org.apache.tomcat.util.ExceptionUtils;
  * @author Peter Rossbach
  */
 
-public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
+public class JDBCAccessLogValve extends ValveBase implements AccessLog {
+
 
     // ----------------------------------------------------------- Constructors
 
@@ -156,47 +157,47 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      *
      * @since 6.0.15
      */
-    boolean useLongContentLength = false;
+    protected boolean useLongContentLength = false;
 
     /**
      * The connection username to use when trying to connect to the database.
      */
-    String connectionName = null;
+    protected String connectionName = null;
 
 
     /**
      * The connection URL to use when trying to connect to the database.
      */
-    String connectionPassword = null;
+    protected String connectionPassword = null;
 
     /**
      * Instance of the JDBC Driver class we use as a connection factory.
      */
-    Driver driver = null;
+    protected Driver driver = null;
 
 
-    private String driverName;
-    private String connectionURL;
-    private String tableName;
-    private String remoteHostField;
-    private String userField;
-    private String timestampField;
-    private String virtualHostField;
-    private String methodField;
-    private String queryField;
-    private String statusField;
-    private String bytesField;
-    private String refererField;
-    private String userAgentField;
-    private String pattern;
-    private boolean resolveHosts;
+    protected String driverName;
+    protected String connectionURL;
+    protected String tableName;
+    protected String remoteHostField;
+    protected String userField;
+    protected String timestampField;
+    protected String virtualHostField;
+    protected String methodField;
+    protected String queryField;
+    protected String statusField;
+    protected String bytesField;
+    protected String refererField;
+    protected String userAgentField;
+    protected String pattern;
+    protected boolean resolveHosts;
 
 
-    private Connection conn;
-    private PreparedStatement ps;
+    protected Connection conn;
+    protected PreparedStatement ps;
 
 
-    private long currentTimeMillis;
+    protected long currentTimeMillis;
 
     /**
      * Should this valve set request attributes for IP address, hostname, protocol and port used for the request.
@@ -204,7 +205,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
      *
      * @see #setRequestAttributesEnabled(boolean)
      */
-    boolean requestAttributesEnabled = true;
+    protected boolean requestAttributesEnabled = true;
 
 
     // ------------------------------------------------------------- Properties
@@ -558,6 +559,7 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
         }
         conn = driver.connect(connectionURL, props);
         conn.setAutoCommit(true);
+        prepare();
         String logPattern = pattern;
         if (logPattern.equals("common")) {
             ps = conn.prepareStatement(
@@ -570,6 +572,15 @@ public final class JDBCAccessLogValve extends ValveBase implements AccessLog {
                     ") VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
         }
     }
+
+
+    /**
+     * Prepare tables for processing. Used by subclasses for testing.
+     * @throws SQLException if an exception occurs
+     */
+    protected void prepare() throws SQLException {
+    }
+
 
     /**
      * Close the specified database connection.
