@@ -218,6 +218,11 @@
         to optionally avoid the <code>comp/env</code> prefix which is usually
         not used there. (remm)
       </fix>
+      <fix>
+        As required by RFC 9110, the HTTP <code>Range</code> header will now
+        only be processed for <code>GET</code> requests. Based on pull request
+        <pr>790</pr> provided by Chenjp. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
