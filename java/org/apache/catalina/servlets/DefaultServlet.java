@@ -1444,9 +1444,15 @@ public class DefaultServlet extends HttpServlet {
     protected Ranges parseRange(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        // Range headers are only valid on GET requests. That implies they are
-        // also valid on HEAD requests. This method is only called by doGet()
-        // and doHead() so no need to check the request method.
+        if (useAcceptRanges == false) {
+            // Not supported feature, ignore
+            return FULL;
+        }
+        if (!"GET".equals(request.getMethod())) {
+            // RFC 9110 - Section 14.2: GET is the only method for which range handling is defined.
+            // Otherwise MUST ignore a Range header field
+            return FULL;
+        }
 
         // Checking If-Range
         String headerValue = request.getHeader("If-Range");
