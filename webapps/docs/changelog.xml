@@ -244,6 +244,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name = "Other">
+    <changelog>
+      <fix>
+        <bug>69465</bug>: Fix warnings during native image compilation using the
+        Tomcat embedded JARs. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.33 (schultz)" rtext="release in progress">
   <subsection name="Other">
