@@ -254,6 +254,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name = "Other">
+    <changelog>
+      <fix>
+        <bug>69465</bug>: Fix warnings during native image compilation using the
+        Tomcat embedded JARs. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.1 (markt)" rtext="2024-11-10">
   <subsection name="Catalina">
