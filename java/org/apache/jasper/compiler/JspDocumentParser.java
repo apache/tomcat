@@ -496,6 +496,7 @@ class JspDocumentParser
          * and any leading and trailing white-space-only textual nodes in a
          * jsp:attribute whose 'trim' attribute is set to FALSE, which are to
          * be kept verbatim.
+         * <p>
          * JSP.6.2.3 defines white space characters.
          */
         boolean isAllSpace = true;
