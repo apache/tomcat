@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
@@ -95,12 +94,6 @@ public class RequestHeaderExample extends HttpServlet {
         out.println("<title>" + title + "</title>");
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
-
-        // all links relative
-
-        // XXX
-        // making these absolute till we work out the
-        // addition of a PathInfo issue
 
         out.println("<a href=\"../reqheaders.html\">");
         out.println(
