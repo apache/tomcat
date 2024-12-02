@@ -18,7 +18,6 @@
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
@@ -113,7 +112,7 @@ public class SessionExample extends HttpServlet {
             out.println(HTMLFilter.filter(name) + " = " + HTMLFilter.filter(value));
             out.print("<a href=\"");
             out.print(HTMLFilter.filter(
-                    response.encodeURL("SessionExample?dataname=" + URLEncoder.encode(name, StandardCharsets.UTF_8))));
+                    response.encodeURL("SessionExample?dataname=" + URLEncoder.encode(name, "UTF-8"))));
             out.println("\" >delete</a>");
             out.println("<br>");
         }
