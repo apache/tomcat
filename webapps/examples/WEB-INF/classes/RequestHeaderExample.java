@@ -42,10 +42,7 @@ public class RequestHeaderExample extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void doGet(HttpServletRequest request,
-                      HttpServletResponse response)
-        throws IOException, ServletException
-    {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         if (prefersJSON(request.getHeader("Accept"))) {
             renderJSON(request, response);
         } else {
@@ -54,16 +51,12 @@ public class RequestHeaderExample extends HttpServlet {
     }
 
     /**
-     * Returns true if the client appears to prefer a JSON response,
-     * false otherwise.
-     *
-     * Note that this method is not very pedantic and uses only a very lazy
-     * algorithm for checking whether JSON is "preferred".
+     * Returns true if the client appears to prefer a JSON response, false otherwise. Note that this method is not very
+     * pedantic and uses only a very lazy algorithm for checking whether JSON is "preferred".
      *
      * @param acceptHeader The value of the HTTP "Accept" header from the client.
      *
-     * @return true if the client appears to prefer a JSON response,
-     *              false otherwise.
+     * @return true if the client appears to prefer a JSON response, false otherwise.
      */
     protected boolean prefersJSON(String acceptHeader) {
         if (null == acceptHeader) {
@@ -87,11 +80,8 @@ public class RequestHeaderExample extends HttpServlet {
         return false;
     }
 
-    protected void renderHTML(HttpServletRequest request,
-                              HttpServletResponse response)
-        throws IOException
-    {
-        ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",request.getLocale());
+    protected void renderHTML(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        ResourceBundle rb = ResourceBundle.getBundle("LocalStrings", request.getLocale());
 
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
@@ -113,11 +103,11 @@ public class RequestHeaderExample extends HttpServlet {
         // addition of a PathInfo issue
 
         out.println("<a href=\"../reqheaders.html\">");
-        out.println("<img src=\"../images/code.gif\" height=24 " +
-                    "width=24 align=right border=0 alt=\"view code\"></a>");
+        out.println(
+                "<img src=\"../images/code.gif\" height=24 " + "width=24 align=right border=0 alt=\"view code\"></a>");
         out.println("<a href=\"../index.html\">");
-        out.println("<img src=\"../images/return.gif\" height=24 " +
-                    "width=24 align=right border=0 alt=\"return\"></a>");
+        out.println(
+                "<img src=\"../images/return.gif\" height=24 " + "width=24 align=right border=0 alt=\"return\"></a>");
 
         out.println("<h3>" + title + "</h3>");
         out.println("<table border=0>");
@@ -143,9 +133,7 @@ public class RequestHeaderExample extends HttpServlet {
         out.println("</table>");
     }
 
-    protected void renderJSON(HttpServletRequest request, HttpServletResponse response)
-        throws IOException
-    {
+    protected void renderJSON(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
@@ -157,14 +145,10 @@ public class RequestHeaderExample extends HttpServlet {
             String headerName = e.nextElement();
             String headerValue = request.getHeader(headerName);
 
-            out.append("{\"")
-            .append(JSONFilter.escape(headerName))
-            .append("\":\"")
-            .append(JSONFilter.escape(headerValue))
-            .append("\"}")
-            ;
+            out.append("{\"").append(JSONFilter.escape(headerName)).append("\":\"")
+                    .append(JSONFilter.escape(headerValue)).append("\"}");
 
-            if(e.hasMoreElements()) {
+            if (e.hasMoreElements()) {
                 out.append(',');
             }
         }
@@ -173,10 +157,7 @@ public class RequestHeaderExample extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request,
-                      HttpServletResponse response)
-        throws IOException, ServletException
-    {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         doGet(request, response);
     }
 
