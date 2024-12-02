@@ -264,6 +264,10 @@
         Examples. Add the ability to delete session attributes in the servlet
         session example. (markt)
       </add>
+      <add>
+        Examples. Add a hard coded limit of 10 attributes per session for the
+        servlet session example. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name = "Other">
