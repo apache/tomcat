@@ -252,6 +252,10 @@
         <code>allowedInternalProxies</code>. Pull request <pr>786</pr> provided
         by Jorge Díaz. (markt)
       </fix>
+      <fix>
+        Examples. Fix broken links when Servlet Request Info example is called
+        via a URL that includes a pathInfo component. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name = "Other">
