@@ -272,6 +272,10 @@
         <code>allowedInternalProxies</code>. Pull request <pr>786</pr> provided
         by Jorge Díaz. (markt)
       </fix>
+      <fix>
+        Examples. Expand the obfuscation of session cookie values in the request
+        header example to JSON responses. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
