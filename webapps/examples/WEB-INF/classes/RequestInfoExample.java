@@ -53,19 +53,18 @@ public class RequestInfoExample extends HttpServlet {
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
 
-        // img stuff not req'd for source code HTML showing
-        // all links relative!
+        /*
+         * Can't use relative paths since this servlet might have pathInfo. Allows for deployment to a different context
+         * path but otherwise assumes that the web application structure is not changed.
+         */
+        String baseURI = request.getServletContext().getContextPath() + "/servlets";
 
-        // XXX
-        // making these absolute till we work out the
-        // addition of a PathInfo issue
-
-        out.println("<a href=\"../reqinfo.html\">");
-        out.println(
-                "<img src=\"../images/code.gif\" height=24 " + "width=24 align=right border=0 alt=\"view code\"></a>");
-        out.println("<a href=\"../index.html\">");
-        out.println(
-                "<img src=\"../images/return.gif\" height=24 " + "width=24 align=right border=0 alt=\"return\"></a>");
+        out.println("<a href=\"" + baseURI + "/reqinfo.html\">");
+        out.println("<img src=\"" + baseURI + "/images/code.gif\" height=24 " +
+                "width=24 align=right border=0 alt=\"view code\"></a>");
+        out.println("<a href=\"" + baseURI + "/index.html\">");
+        out.println("<img src=\"" + baseURI + "/images/return.gif\" height=24 " +
+                "width=24 align=right border=0 alt=\"return\"></a>");
 
         out.println("<h3>" + title + "</h3>");
         out.println("<table border=0><tr><td>");
