@@ -107,6 +107,25 @@ public class TestJDBCAccessLogValve extends TomcatBaseTest {
         }
 
         public void verify() throws Exception {
+            /*
+             * The access log is written after the response. The client may have processed the response faster than the
+             * server was able to write the access log. Give the server up to 5 seconds to write the access log.
+             */
+            int rowCount = 0;
+            int timerCount = 0;
+            while (timerCount < 500) {
+                try (Statement statement = conn.createStatement()) {
+                    statement.execute("SELECT COUNT(*) FROM access");
+                    ResultSet rs = statement.getResultSet();
+                    Assert.assertTrue(rs.next());
+                    rowCount = rs.getInt(1);
+                    if (rowCount > 1) {
+                        break;
+                    }
+                    Thread.sleep(10);
+                    timerCount++;
+                }
+            }
             try (Statement statement = conn.createStatement()) {
                 statement.execute("SELECT * FROM access");
                 ResultSet rs = statement.getResultSet();
