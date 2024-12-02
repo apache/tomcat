@@ -41,6 +41,9 @@ public class SessionExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
+    private static final int SESSION_ATTRIBUTE_COUNT_LIMIT = 10;
+
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         ResourceBundle rb = ResourceBundle.getBundle("LocalStrings", request.getLocale());
@@ -76,15 +79,34 @@ public class SessionExample extends HttpServlet {
         out.println(rb.getString("sessions.lastaccessed") + " ");
         out.println(new Date(session.getLastAccessedTime()));
 
+        // Count the existing attributes
+        int sessionAttributeCount = 0;
+        Enumeration<String> names = session.getAttributeNames();
+        while (names.hasMoreElements()) {
+            names.nextElement();
+            sessionAttributeCount++;
+        }
+
         String dataName = request.getParameter("dataname");
         String dataValue = request.getParameter("datavalue");
         if (dataName != null) {
-            session.setAttribute(dataName, dataValue);
+            if (dataValue == null) {
+                session.removeAttribute(dataName);
+                sessionAttributeCount--;
+            } else if (sessionAttributeCount < SESSION_ATTRIBUTE_COUNT_LIMIT) {
+                session.setAttribute(dataName, dataValue);
+                sessionAttributeCount++;
+            } else {
+                out.print("<p> Session attribute [");
+                out.print(HTMLFilter.filter(dataName));
+                out.print("] not added as there are already "+ SESSION_ATTRIBUTE_COUNT_LIMIT + " attributes in the ");
+                out.println("session. Delete an attribute before adding another.");
+            }
         }
 
-        out.println("<P>");
+        out.println("<p>");
         out.println(rb.getString("sessions.data") + "<br>");
-        Enumeration<String> names = session.getAttributeNames();
+        names = session.getAttributeNames();
         while (names.hasMoreElements()) {
             String name = names.nextElement();
             String value = session.getAttribute(name).toString();
@@ -96,37 +118,41 @@ public class SessionExample extends HttpServlet {
             out.println("<br>");
         }
 
-        out.println("<P>");
-        out.print("<form action=\"");
-        out.print(response.encodeURL("SessionExample"));
-        out.print("\" ");
-        out.println("method=POST>");
-        out.println(rb.getString("sessions.dataname"));
-        out.println("<input type=text size=20 name=dataname>");
-        out.println("<br>");
-        out.println(rb.getString("sessions.datavalue"));
-        out.println("<input type=text size=20 name=datavalue>");
-        out.println("<br>");
-        out.println("<input type=submit>");
-        out.println("</form>");
+        if (sessionAttributeCount < SESSION_ATTRIBUTE_COUNT_LIMIT) {
+            out.println("<p>");
+            out.print("<form action=\"");
+            out.print(response.encodeURL("SessionExample"));
+            out.print("\" ");
+            out.println("method=POST>");
+            out.println(rb.getString("sessions.dataname"));
+            out.println("<input type=text size=20 name=dataname>");
+            out.println("<br>");
+            out.println(rb.getString("sessions.datavalue"));
+            out.println("<input type=text size=20 name=datavalue>");
+            out.println("<br>");
+            out.println("<input type=submit>");
+            out.println("</form>");
 
-        out.println("<P>GET based form:<br>");
-        out.print("<form action=\"");
-        out.print(response.encodeURL("SessionExample"));
-        out.print("\" ");
-        out.println("method=GET>");
-        out.println(rb.getString("sessions.dataname"));
-        out.println("<input type=text size=20 name=dataname>");
-        out.println("<br>");
-        out.println(rb.getString("sessions.datavalue"));
-        out.println("<input type=text size=20 name=datavalue>");
-        out.println("<br>");
-        out.println("<input type=submit>");
-        out.println("</form>");
+            out.println("<p>GET based form:<br>");
+            out.print("<form action=\"");
+            out.print(response.encodeURL("SessionExample"));
+            out.print("\" ");
+            out.println("method=GET>");
+            out.println(rb.getString("sessions.dataname"));
+            out.println("<input type=text size=20 name=dataname>");
+            out.println("<br>");
+            out.println(rb.getString("sessions.datavalue"));
+            out.println("<input type=text size=20 name=datavalue>");
+            out.println("<br>");
+            out.println("<input type=submit>");
+            out.println("</form>");
 
-        out.print("<p><a href=\"");
-        out.print(HTMLFilter.filter(response.encodeURL("SessionExample?dataname=exampleName&datavalue=exampleValue")));
-        out.println("\" >URL encoded </a>");
+            out.print("<p><a href=\"");
+            out.print(HTMLFilter.filter(response.encodeURL("SessionExample?dataname=exampleName&datavalue=exampleValue")));
+            out.println("\" >URL encoded </a>");
+        } else {
+            out.print("<p>You may not add more than " + SESSION_ATTRIBUTE_COUNT_LIMIT + " attributes to this session.");
+        }
 
         out.println("</body>");
         out.println("</html>");
