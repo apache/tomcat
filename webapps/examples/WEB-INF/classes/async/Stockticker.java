@@ -38,7 +38,7 @@ public class Stockticker implements Runnable {
 
         public synchronized void stop() {
             // On context stop this can be called multiple times.
-            // NO-OP is the ticker thread is not set
+            // NO-OP if the ticker thread is not set
             // (i.e. stop() has already completed)
             if (ticker == null) {
                 return;
