@@ -71,9 +71,10 @@ public class TestJDBCAccessLogValve extends TomcatBaseTest {
     @Test
     public void testValve() throws Exception {
 
-       Tomcat tomcat = getTomcatInstance();
+        Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = getProgrammaticRootContext();
+        getTomcatInstanceTestWebapp(false, false);
+        Context ctx = (Context) tomcat.getHost().findChildren()[0];
 
         CustomJDBCAccessLogValve accessLogValve = new CustomJDBCAccessLogValve();
         accessLogValve.setDriverName("org.apache.derby.jdbc.EmbeddedDriver");
@@ -85,12 +86,12 @@ public class TestJDBCAccessLogValve extends TomcatBaseTest {
         tomcat.start();
 
         ByteChunk result = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + "/test1", result, null);
-        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/index.html", result, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         result.recycle();
 
-        rc = getUrl("http://localhost:" + getPort() + "/test2?foo=bar", result, null);
-        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
+        rc = getUrl("http://localhost:" + getPort() + "/test/404.html?foo=bar", result, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         accessLogValve.verify();
 
@@ -130,11 +131,12 @@ public class TestJDBCAccessLogValve extends TomcatBaseTest {
                 statement.execute("SELECT * FROM access");
                 ResultSet rs = statement.getResultSet();
                 Assert.assertTrue(rs.next());
-                Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rs.getInt("status"));
-                Assert.assertEquals("/test1", rs.getString("query"));
+                Assert.assertEquals(HttpServletResponse.SC_OK, rs.getInt("status"));
+                Assert.assertEquals("/test/index.html", rs.getString("query"));
+                Assert.assertTrue(rs.getLong("bytes") == 934);
                 Assert.assertTrue(rs.next());
-                Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rs.getInt("status"));
-                Assert.assertEquals("/test2", rs.getString("query"));
+                Assert.assertEquals(HttpServletResponse.SC_OK, rs.getInt("status"));
+                Assert.assertEquals("/test/404.html", rs.getString("query"));
             }
         }
     }
