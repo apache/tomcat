@@ -276,6 +276,10 @@
         Examples. Expand the obfuscation of session cookie values in the request
         header example to JSON responses. (markt)
       </fix>
+      <add>
+        Examples. Add the ability to delete session attributes in the servlet
+        session example. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">

@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -16,6 +17,8 @@
  */
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.ResourceBundle;
@@ -75,7 +78,7 @@ public class SessionExample extends HttpServlet {
 
         String dataName = request.getParameter("dataname");
         String dataValue = request.getParameter("datavalue");
-        if (dataName != null && dataValue != null) {
+        if (dataName != null) {
             session.setAttribute(dataName, dataValue);
         }
 
@@ -85,7 +88,12 @@ public class SessionExample extends HttpServlet {
         while (names.hasMoreElements()) {
             String name = names.nextElement();
             String value = session.getAttribute(name).toString();
-            out.println(HTMLFilter.filter(name) + " = " + HTMLFilter.filter(value) + "<br>");
+            out.println(HTMLFilter.filter(name) + " = " + HTMLFilter.filter(value));
+            out.print("<a href=\"");
+            out.print(HTMLFilter.filter(
+                    response.encodeURL("SessionExample?dataname=" + URLEncoder.encode(name, StandardCharsets.UTF_8))));
+            out.println("\" >delete</a>");
+            out.println("<br>");
         }
 
         out.println("<P>");
@@ -117,7 +125,7 @@ public class SessionExample extends HttpServlet {
         out.println("</form>");
 
         out.print("<p><a href=\"");
-        out.print(HTMLFilter.filter(response.encodeURL("SessionExample?dataname=foo&datavalue=bar")));
+        out.print(HTMLFilter.filter(response.encodeURL("SessionExample?dataname=exampleName&datavalue=exampleValue")));
         out.println("\" >URL encoded </a>");
 
         out.println("</body>");
