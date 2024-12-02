@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ResourceBundle;
@@ -34,7 +33,6 @@ import util.HTMLFilter;
  *
  * @author James Duncan Davidson &lt;duncan@eng.sun.com>
  */
-
 public class CookieExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
@@ -64,12 +62,6 @@ public class CookieExample extends HttpServlet {
         out.println("<title>" + title + "</title>");
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
-
-        // relative links
-
-        // XXX
-        // making these absolute till we work out the
-        // addition of a PathInfo issue
 
         out.println("<a href=\"../cookies.html\">");
         out.println(
