@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ResourceBundle;
@@ -52,14 +51,6 @@ public class RequestParamExample extends HttpServlet {
         out.println("<title>" + title + "</title>");
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
-
-        // img stuff not req'd for source code HTML showing
-
-        // all links relative
-
-        // XXX
-        // making these absolute till we work out the
-        // addition of a PathInfo issue
 
         out.println("<a href=\"../reqparams.html\">");
         out.println(
