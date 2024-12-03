@@ -176,7 +176,6 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @see org.apache.tomcat.dbcp.pool2.ObjectPool#clear()
      * @since 2.3.0
      */
-    @SuppressWarnings("resource") // does not allocate a pool
     public void clear() {
         managers.values().forEach(manager -> {
             try {
@@ -301,7 +300,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @return The user specific value.
      */
     public boolean getPerUserBlockWhenExhausted(final String userName) {
-        return get(perUserBlockWhenExhausted, userName, this::getDefaultBlockWhenExhausted);
+        return get(perUserBlockWhenExhausted, userName, this::getDefaultBlockWhenExhausted).booleanValue();
     }
 
     /**
@@ -375,7 +374,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @return The user specific value.
      */
     public boolean getPerUserLifo(final String userName) {
-        return get(perUserLifo, userName, this::getDefaultLifo);
+        return get(perUserLifo, userName, this::getDefaultLifo).booleanValue();
     }
 
     /**
@@ -387,7 +386,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @return The user specific value.
      */
     public int getPerUserMaxIdle(final String userName) {
-        return get(perUserMaxIdle, userName, this::getDefaultMaxIdle);
+        return get(perUserMaxIdle, userName, this::getDefaultMaxIdle).intValue();
     }
 
     /**
@@ -399,7 +398,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @return The user specific value.
      */
     public int getPerUserMaxTotal(final String userName) {
-        return get(perUserMaxTotal, userName, this::getDefaultMaxTotal);
+        return get(perUserMaxTotal, userName, this::getDefaultMaxTotal).intValue();
     }
 
     /**
@@ -465,7 +464,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @return The user specific value.
      */
     public int getPerUserMinIdle(final String userName) {
-        return get(perUserMinIdle, userName, this::getDefaultMinIdle);
+        return get(perUserMinIdle, userName, this::getDefaultMinIdle).intValue();
     }
 
     /**
@@ -477,7 +476,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @return The user specific value.
      */
     public int getPerUserNumTestsPerEvictionRun(final String userName) {
-        return get(perUserNumTestsPerEvictionRun, userName, this::getDefaultNumTestsPerEvictionRun);
+        return get(perUserNumTestsPerEvictionRun, userName, this::getDefaultNumTestsPerEvictionRun).intValue();
     }
 
     /**
@@ -516,7 +515,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @return The user specific value.
      */
     public boolean getPerUserTestOnBorrow(final String userName) {
-        return get(perUserTestOnBorrow, userName, this::getDefaultTestOnBorrow);
+        return get(perUserTestOnBorrow, userName, this::getDefaultTestOnBorrow).booleanValue();
     }
 
     /**
@@ -528,7 +527,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @return The user specific value.
      */
     public boolean getPerUserTestOnCreate(final String userName) {
-        return get(perUserTestOnCreate, userName, this::getDefaultTestOnCreate);
+        return get(perUserTestOnCreate, userName, this::getDefaultTestOnCreate).booleanValue();
     }
 
     /**
@@ -540,7 +539,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @return The user specific value.
      */
     public boolean getPerUserTestOnReturn(final String userName) {
-        return get(perUserTestOnReturn, userName, this::getDefaultTestOnReturn);
+        return get(perUserTestOnReturn, userName, this::getDefaultTestOnReturn).booleanValue();
     }
 
     /**
@@ -552,7 +551,7 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @return The user specific value.
      */
     public boolean getPerUserTestWhileIdle(final String userName) {
-        return get(perUserTestWhileIdle, userName, this::getDefaultTestWhileIdle);
+        return get(perUserTestWhileIdle, userName, this::getDefaultTestWhileIdle).booleanValue();
     }
 
     /**
@@ -581,7 +580,6 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
         return mgr == null ? null : mgr.getPool();
     }
 
-    @SuppressWarnings("resource") // does not allocate a pool
     @Override
     protected PooledConnectionAndInfo getPooledConnectionAndInfo(final String userName, final String password) throws SQLException {
         final PoolKey key = getPoolKey(userName);
@@ -690,7 +688,6 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
                 isRollbackAfterValidation(), userName, password);
         factory.setMaxConn(getMaxConnDuration());
         // Create an object pool to contain our PooledConnections
-        @SuppressWarnings("resource")
         final GenericObjectPool<PooledConnectionAndInfo> pool = new GenericObjectPool<>(factory);
         factory.setPool(pool);
         pool.setBlockWhenExhausted(getPerUserBlockWhenExhausted(userName));
