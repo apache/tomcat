@@ -122,7 +122,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     @Override
     public void commit() throws SQLException {
         if (transactionContext != null) {
-            throw new SQLException("Commit can not be set while enrolled in a transaction");
+            throw new SQLException("Commit cannot be set while enrolled in a transaction");
         }
         super.commit();
     }
@@ -148,6 +148,8 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     }
 
     /**
+     * Gets the transaction context.
+     *
      * @return The transaction context.
      * @since 2.6.0
      */
@@ -156,6 +158,8 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     }
 
     /**
+     * Gets the transaction registry.
+     *
      * @return The transaction registry.
      * @since 2.6.0
      */
@@ -175,7 +179,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     @Override
     public void rollback() throws SQLException {
         if (transactionContext != null) {
-            throw new SQLException("Commit can not be set while enrolled in a transaction");
+            throw new SQLException("Commit cannot be set while enrolled in a transaction");
         }
         super.rollback();
     }
@@ -183,7 +187,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     @Override
     public void setAutoCommit(final boolean autoCommit) throws SQLException {
         if (transactionContext != null) {
-            throw new SQLException("Auto-commit can not be set while enrolled in a transaction");
+            throw new SQLException("Auto-commit cannot be set while enrolled in a transaction");
         }
         super.setAutoCommit(autoCommit);
     }
@@ -191,7 +195,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     @Override
     public void setReadOnly(final boolean readOnly) throws SQLException {
         if (transactionContext != null) {
-            throw new SQLException("Read-only can not be set while enrolled in a transaction");
+            throw new SQLException("Read-only cannot be set while enrolled in a transaction");
         }
         super.setReadOnly(readOnly);
     }
@@ -240,7 +244,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
         if (transactionContext != null && !transactionContext.isTransactionComplete()) {
             if (transactionContext.isActive()) {
                 if (transactionContext != transactionRegistry.getActiveTransactionContext()) {
-                    throw new SQLException("Connection can not be used while enlisted in another transaction");
+                    throw new SQLException("Connection cannot be used while enlisted in another transaction");
                 }
                 return;
             }

@@ -99,13 +99,12 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
      *            the given connection pool.
      */
     public PoolingDataSource(final ObjectPool<C> pool) {
-        Objects.requireNonNull(pool, "Pool must not be null.");
+        Objects.requireNonNull(pool, "pool");
         this.pool = pool;
         // Verify that pool's factory refers back to it. If not, log a warning and try to fix.
         if (this.pool instanceof GenericObjectPool<?>) {
-            final PoolableConnectionFactory pcf = (PoolableConnectionFactory) ((GenericObjectPool<?>) this.pool)
-                    .getFactory();
-            Objects.requireNonNull(pcf, "PoolableConnectionFactory must not be null.");
+            final PoolableConnectionFactory pcf = (PoolableConnectionFactory) ((GenericObjectPool<?>) this.pool).getFactory();
+            Objects.requireNonNull(pcf, "this.pool.getFactory()");
             if (pcf.getPool() != this.pool) {
                 log.warn(Utils.getMessage("poolingDataSource.factoryConfig"));
                 @SuppressWarnings("unchecked") // PCF must have a pool of PCs
@@ -165,7 +164,6 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
         throw new UnsupportedOperationException();
     }
 
-    // --- DataSource methods -----------------------------------------
 
     /**
      * Throws {@link UnsupportedOperationException}.
@@ -194,6 +192,11 @@ public class PoolingDataSource<C extends Connection> implements DataSource, Auto
         throw new SQLFeatureNotSupportedException();
     }
 
+    /**
+     * Gets the backing object pool.
+     *
+     * @return the backing object pool.
+     */
     protected ObjectPool<C> getPool() {
         return pool;
     }

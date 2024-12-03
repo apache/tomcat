@@ -19,7 +19,7 @@
  * <p>
  * Database Connection Pool API.
  * </p>
- * <b>Overview in Dialog Form</b>
+ * <strong>Overview in Dialog Form</strong>
  * <p>
  * Q: How do I use the DBCP package?
  * </p>
