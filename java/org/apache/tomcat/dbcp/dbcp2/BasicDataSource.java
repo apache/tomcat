@@ -465,7 +465,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * </p>
      *
      * @return A new connection factory.
-     *
      * @throws SQLException If the connection factory cannot be created
      */
     protected ConnectionFactory createConnectionFactory() throws SQLException {
@@ -571,7 +570,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * implementation class.
      *
      * @throws SQLException if unable to create a datasource instance
-     *
      * @return A new DataSource instance
      */
     protected DataSource createDataSourceInstance() throws SQLException {
@@ -606,7 +604,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      *
      * @param driverConnectionFactory JDBC connection factory
      * @throws SQLException if an error occurs creating the PoolableConnectionFactory
-     *
      * @return A new PoolableConnectionFactory configured with the current configuration of this BasicDataSource
      */
     protected PoolableConnectionFactory createPoolableConnectionFactory(final ConnectionFactory driverConnectionFactory)
@@ -727,7 +724,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      *
      * @param user Database user on whose behalf the Connection is being made
      * @param pass The database user's password
-     *
      * @throws UnsupportedOperationException always thrown.
      * @throws SQLException                  if a database access error occurs
      * @return nothing - always throws UnsupportedOperationException
@@ -1413,7 +1409,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Gets the {code testOnBorrow} property.
      *
      * @return true if objects are validated before being borrowed from the pool
-     *
      * @see #setTestOnBorrow(boolean)
      */
     @Override
@@ -1525,7 +1520,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * and reclaim pool capacity.
      *
      * @param connection The Connection to invalidate.
-     *
      * @throws IllegalStateException if invalidating the connection failed.
      * @since 2.1
      */

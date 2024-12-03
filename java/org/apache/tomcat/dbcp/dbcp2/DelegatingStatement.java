@@ -449,7 +449,6 @@ public class DelegatingStatement extends AbandonedTrace implements Statement {
      * </p>
      *
      * @return The innermost delegate, may return null.
-     *
      * @see #getDelegate
      */
     public Statement getInnermostDelegate() {
