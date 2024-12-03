@@ -85,7 +85,8 @@ public class TestServletRequestParametersFormUrlEncoded extends ServletRequestPa
                     "var2=val2&" + CRLF +
                     "0a" + CRLF +
                     "var3=val3&" + CRLF +
-                    "0" + CRLF + CRLF});
+                    "0" + CRLF +
+                    CRLF});
         } else {
             client.setRequest(new String[] {
                     "POST / HTTP/1.1" + CRLF +
