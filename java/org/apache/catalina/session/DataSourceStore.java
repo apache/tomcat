@@ -353,7 +353,7 @@ public class DataSourceStore extends JDBCStore {
             } else {
                 try {
                     // This should be the normal way to lookup for the global in the global context (no comp/env)
-                    Service service = Container.getService((Container) context);
+                    Service service = Container.getService(context);
                     if (service != null) {
                         Server server = service.getServer();
                         if (server != null) {
