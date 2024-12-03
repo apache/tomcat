@@ -71,10 +71,18 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     private boolean fatalSqlExceptionThrown;
 
     /**
-     * SQL_STATE codes considered to signal fatal conditions. Overrides the defaults in
+     * SQL State codes considered to signal fatal conditions. Overrides the defaults in
      * {@link Utils#getDisconnectionSqlCodes()} (plus anything starting with {@link Utils#DISCONNECTION_SQL_CODE_PREFIX}).
      */
     private final Collection<String> disconnectionSqlCodes;
+
+    /**
+     * A collection of SQL State codes that are not considered fatal disconnection codes.
+     *
+     * @since 2.13.0
+     */
+    private final Collection<String> disconnectionIgnoreSqlCodes;
+
 
     /** Whether or not to fast fail validation after fatal connection errors */
     private final boolean fastFailValidation;
@@ -102,18 +110,43 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * @param jmxObjectName
      *            JMX name
      * @param disconnectSqlCodes
-     *            SQL_STATE codes considered fatal disconnection errors
+     *            SQL State codes considered fatal disconnection errors
      * @param fastFailValidation
      *            true means fatal disconnection errors cause subsequent validations to fail immediately (no attempt to
      *            run query or isValid)
      */
     public PoolableConnection(final Connection conn, final ObjectPool<PoolableConnection> pool,
+                              final ObjectName jmxObjectName, final Collection<String> disconnectSqlCodes,
+                              final boolean fastFailValidation) {
+        this(conn, pool, jmxObjectName, disconnectSqlCodes, null, fastFailValidation);
+    }
+
+    /**
+     * Creates a new {@link PoolableConnection} instance.
+     *
+     * @param conn
+     *            my underlying connection
+     * @param pool
+     *            the pool to which I should return when closed
+     * @param jmxObjectName
+     *            JMX name
+     * @param disconnectSqlCodes
+     *            SQL State codes considered fatal disconnection errors
+     * @param disconnectionIgnoreSqlCodes
+     *            SQL State codes that should be ignored when determining fatal disconnection errors
+     * @param fastFailValidation
+     *            true means fatal disconnection errors cause subsequent validations to fail immediately (no attempt to
+     *            run query or isValid)
+     * @since 2.13.0
+     */
+    public PoolableConnection(final Connection conn, final ObjectPool<PoolableConnection> pool,
             final ObjectName jmxObjectName, final Collection<String> disconnectSqlCodes,
-            final boolean fastFailValidation) {
+            final Collection<String> disconnectionIgnoreSqlCodes, final boolean fastFailValidation) {
         super(conn);
         this.pool = pool;
         this.jmxObjectName = ObjectNameWrapper.wrap(jmxObjectName);
         this.disconnectionSqlCodes = disconnectSqlCodes;
+        this.disconnectionIgnoreSqlCodes = disconnectionIgnoreSqlCodes;
         this.fastFailValidation = fastFailValidation;
 
         if (jmxObjectName != null) {
@@ -139,7 +172,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     }
 
     /**
-     * Returns me to my pool.
+     * Returns this instance to my containing pool.
      */
     @Override
     public void close() throws SQLException {
@@ -212,7 +245,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     }
 
     /**
-     * Expose the {@link #toString()} method via a bean getter, so it can be read as a property via JMX.
+     * Gets the value of the {@link #toString()} method via a bean getter, so it can be read as a property via JMX.
      */
     @Override
     public String getToString() {
@@ -255,7 +288,8 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
      * If {@link #disconnectionSqlCodes} has been set, sql states are compared to those in the configured list of fatal
      * exception codes. If this property is not set, codes are compared against the default codes in
      * {@link Utils#getDisconnectionSqlCodes()} and in this case anything starting with #{link
-     * Utils.DISCONNECTION_SQL_CODE_PREFIX} is considered a disconnection.
+     * Utils.DISCONNECTION_SQL_CODE_PREFIX} is considered a disconnection. Additionally, any SQL state
+     * listed in {@link #disconnectionIgnoreSqlCodes} will be ignored and not treated as fatal.
      * </p>
      *
      * @param e SQLException to be examined
@@ -265,8 +299,11 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
         boolean fatalException = false;
         final String sqlState = e.getSQLState();
         if (sqlState != null) {
+            if (disconnectionIgnoreSqlCodes != null && disconnectionIgnoreSqlCodes.contains(sqlState)) {
+                return false;
+            }
             fatalException = disconnectionSqlCodes == null
-                ? sqlState.startsWith(Utils.DISCONNECTION_SQL_CODE_PREFIX) || Utils.getDisconnectionSqlCodes().contains(sqlState)
+                ? sqlState.startsWith(Utils.DISCONNECTION_SQL_CODE_PREFIX) || Utils.isDisconnectionSqlCode(sqlState)
                 : disconnectionSqlCodes.contains(sqlState);
         }
         return fatalException;
@@ -317,7 +354,7 @@ public class PoolableConnection extends DelegatingConnection<Connection> impleme
     }
 
     /**
-     * Actually close my underlying {@link Connection}.
+     * Closes the underlying {@link Connection}.
      */
     @Override
     public void reallyClose() throws SQLException {

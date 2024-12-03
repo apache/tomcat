@@ -42,10 +42,6 @@ final class UserPassKey implements Serializable {
     private final CharArray name;
     private final CharArray password;
 
-    UserPassKey(final char[] userName, final char[] password) {
-        this(new CharArray(userName), new CharArray(password));
-    }
-
     UserPassKey(final CharArray userName, final CharArray userPassword) {
         this.name = userName;
         this.password = userPassword;

@@ -25,7 +25,15 @@ import javax.naming.Reference;
  * @since 2.0
  */
 public class SharedPoolDataSourceFactory extends InstanceKeyDataSourceFactory {
+
     private static final String SHARED_POOL_CLASSNAME = SharedPoolDataSource.class.getName();
+
+    /**
+     * Constructs a new instance.
+     */
+    public SharedPoolDataSourceFactory() {
+        // empty
+    }
 
     @Override
     protected InstanceKeyDataSource getNewInstance(final Reference ref) {

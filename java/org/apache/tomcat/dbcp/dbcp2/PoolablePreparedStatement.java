@@ -74,7 +74,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
     @Override
     public void activate() throws SQLException {
         setClosedInternal(false);
-        AbandonedTrace.add(getConnectionInternal(), this);
+        add(getConnectionInternal(), this);
         super.activate();
     }
 

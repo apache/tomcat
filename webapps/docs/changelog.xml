@@ -281,6 +281,9 @@
         <bug>69465</bug>: Fix warnings during native image compilation using the
         Tomcat embedded JARs. (markt)
       </fix>
+      <update>
+        Update Tomcat's fork of Commons DBCP to 2.13.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
