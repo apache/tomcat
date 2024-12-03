@@ -277,6 +277,9 @@
       <update>
         Update EasyMock to 5.5.0. (markt)
       </update>
+      <update>
+        Update Checkstyle to 10.20.2. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
