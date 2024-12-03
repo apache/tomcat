@@ -213,6 +213,11 @@
         the default servlet. Provided by Chenjp in pull request <pr>778</pr>.
         (markt)
       </fix>
+      <fix>
+        Harmonize <code>DataSourceStore</code> lookup in the global resources
+        to optionally avoid the <code>comp/env</code> prefix which is usually
+        not used there. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
