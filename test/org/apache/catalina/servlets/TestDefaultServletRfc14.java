@@ -33,39 +33,6 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestDefaultServletRfc14 extends TomcatBaseTest {
-    @Test
-    public void test_14_optional() throws Exception {
-
-        Tomcat tomcat = getTomcatInstance();
-
-        File appDir = new File("test/webapp");
-        Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
-
-        Wrapper w = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
-        w.addInitParameter("useAcceptRanges", "false");
-        ctxt.addServletMappingDecoded("/", "default");
-
-        tomcat.start();
-
-        String path = "http://localhost:" + getPort() + "/index.html";
-        ByteChunk responseBody = new ByteChunk();
-        Map<String,List<String>> responseHeaders = new HashMap<>();
-        Map<String,List<String>> requestHeaders = new HashMap<>();
-
-        String rangeHeader = "bytes=0-10";
-        // Get and Head
-
-        requestHeaders.computeIfAbsent("Range", (k) -> List.of(rangeHeader));
-        int rc = getUrl(path, responseBody, requestHeaders, responseHeaders);
-        Assert.assertEquals(
-                "RFC 9110 - 14: Range requests is turn of, SC_OK of GET is expected",
-                HttpServletResponse.SC_OK, rc);
-        Assert.assertFalse(
-                "RFC 9110 - 14: Range requests is turn of, absence of header `Accept-Ranges: bytes` is expected",
-                responseHeaders.containsKey("Accept-Ranges") && responseHeaders.get("Accept-Ranges").contains("bytes"));
-
-        tomcat.stop();
-    }
 
     @Test
     public void test_14_2_range_handling_defined_methods() throws Exception {

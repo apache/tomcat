@@ -1444,10 +1444,6 @@ public class DefaultServlet extends HttpServlet {
     protected Ranges parseRange(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        if (useAcceptRanges == false) {
-            // Not supported feature, ignore
-            return FULL;
-        }
         if (!"GET".equals(request.getMethod())) {
             // RFC 9110 - Section 14.2: GET is the only method for which range handling is defined.
             // Otherwise MUST ignore a Range header field
