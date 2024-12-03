@@ -310,6 +310,9 @@
       <update>
         Update Checkstyle to 10.20.2. (markt)
       </update>
+      <update>
+        Update BND to 7.1.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
