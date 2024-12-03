@@ -128,8 +128,7 @@ public class BasicManagedDataSource extends BasicDataSource {
             throws SQLException {
         PoolableConnectionFactory connectionFactory = null;
         try {
-            connectionFactory = new PoolableManagedConnectionFactory((XAConnectionFactory) driverConnectionFactory,
-                    getRegisteredJmxName());
+            connectionFactory = new PoolableManagedConnectionFactory((XAConnectionFactory) driverConnectionFactory, getRegisteredJmxName());
             connectionFactory.setValidationQuery(getValidationQuery());
             connectionFactory.setValidationQueryTimeout(getValidationQueryTimeoutDuration());
             connectionFactory.setConnectionInitSql(getConnectionInitSqls());
@@ -148,6 +147,7 @@ public class BasicManagedDataSource extends BasicDataSource {
             connectionFactory.setDefaultQueryTimeout(getDefaultQueryTimeoutDuration());
             connectionFactory.setFastFailValidation(getFastFailValidation());
             connectionFactory.setDisconnectionSqlCodes(getDisconnectionSqlCodes());
+            connectionFactory.setDisconnectionIgnoreSqlCodes(getDisconnectionIgnoreSqlCodes());
             validateConnectionFactory(connectionFactory);
         } catch (final RuntimeException e) {
             throw e;
@@ -236,17 +236,14 @@ public class BasicManagedDataSource extends BasicDataSource {
     }
 
     /**
-     * <p>
      * Sets the XADataSource instance used by the XAConnectionFactory.
-     * </p>
      * <p>
-     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first time one of the following methods is
+     * invoked: {@link #getConnection()}, {@link #setLogWriter(java.io.PrintWriter)}, {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()},
+     * {@link #getLogWriter()}.
      * </p>
      *
-     * @param xaDataSourceInstance
-     *            XADataSource instance
+     * @param xaDataSourceInstance XADataSource instance
      */
     public synchronized void setXaDataSourceInstance(final XADataSource xaDataSourceInstance) {
         this.xaDataSourceInstance = xaDataSourceInstance;

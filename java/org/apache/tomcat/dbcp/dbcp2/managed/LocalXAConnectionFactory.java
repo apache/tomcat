@@ -201,18 +201,18 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
                     connection.setAutoCommit(originalAutoCommit);
 
                     // tell the transaction manager we are read only
-                    return XAResource.XA_RDONLY;
+                    return XA_RDONLY;
                 }
             } catch (final SQLException ignored) {
                 // no big deal
             }
 
             // this is a local (one phase) only connection, so we can't prepare
-            return XAResource.XA_OK;
+            return XA_OK;
         }
 
         /**
-         * Always returns a zero length Xid array. The LocalXAConnectionFactory can not support recovery, so no xids
+         * Always returns a zero length Xid array. The LocalXAConnectionFactory cannot support recovery, so no xids
          * will ever be found.
          *
          * @param flag
@@ -280,7 +280,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
          */
         @Override
         public synchronized void start(final Xid xid, final int flag) throws XAException {
-            if (flag == XAResource.TMNOFLAGS) {
+            if (flag == TMNOFLAGS) {
                 // first time in this transaction
 
                 // make sure we aren't already in another tx
@@ -305,7 +305,7 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
                 }
 
                 this.currentXid = xid;
-            } else if (flag == XAResource.TMRESUME) {
+            } else if (flag == TMRESUME) {
                 if (!xid.equals(this.currentXid)) {
                     throw new XAException("Attempting to resume in different transaction: expected " + this.currentXid
                             + ", but was " + xid);
@@ -369,6 +369,8 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
     }
 
     /**
+     * Gets the connection factory.
+     *
      * @return The connection factory.
      * @since 2.6.0
      */
@@ -376,6 +378,11 @@ public class LocalXAConnectionFactory implements XAConnectionFactory {
         return connectionFactory;
     }
 
+    /**
+     * Gets the transaction registry.
+     *
+     * @return The transaction registry.
+     */
     @Override
     public TransactionRegistry getTransactionRegistry() {
         return transactionRegistry;

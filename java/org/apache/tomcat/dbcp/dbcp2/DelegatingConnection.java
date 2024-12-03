@@ -95,6 +95,9 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         }
     }
 
+    /**
+     * Marks this instance as used and delegates to a wrapped {@link DelegatingConnection#activate()}.
+     */
     protected void activate() {
         closed = false;
         setLastUsed();
@@ -103,6 +106,11 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         }
     }
 
+    /**
+     * Throws a SQLException if this connection is not open.
+     *
+     * @throws SQLException Thrown if this connection is not open.
+     */
     protected void checkOpen() throws SQLException {
         if (closed) {
             if (null != connection) {
@@ -314,7 +322,13 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     }
 
     /**
-     * Returns the state caching flag.
+     * Gets whether to cache properties. The cached properties are:
+     * <ul>
+     * <li>auto-commit</li>
+     * <li>catalog</li>
+     * <li>schema</li>
+     * <li>read-only</li>
+     * </ul>
      *
      * @return the state caching flag
      */
@@ -573,6 +587,11 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         return closed || connection == null || connection.isClosed();
     }
 
+    /**
+     * Tests the raw internal closed state.
+     *
+     * @return the raw internal closed state.
+     */
     protected boolean isClosedInternal() {
         return closed;
     }
@@ -644,6 +663,11 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         }
     }
 
+    /**
+     * Clears the list of objects being traced by this object.
+     *
+     * @throws SQLException Thrown if not all traced objects were closed.
+     */
     protected void passivate() throws SQLException {
         // The JDBC specification requires that a Connection close any open
         // Statements when it is closed.
@@ -812,10 +836,15 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
     }
 
     /**
-     * Sets the state caching flag.
+     * Sets whether to cache properties. The cached properties are:
+     * <ul>
+     * <li>auto-commit</li>
+     * <li>catalog</li>
+     * <li>schema</li>
+     * <li>read-only</li>
+     * </ul>
      *
-     * @param cacheState
-     *            The new value for the state caching flag
+     * @param cacheState The new value for the state caching flag
      */
     public void setCacheState(final boolean cacheState) {
         this.cacheState = cacheState;
@@ -859,6 +888,11 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         }
     }
 
+    /**
+     * Sets the raw internal closed state.
+     *
+     * @param closed the raw internal closed state.
+     */
     protected void setClosedInternal(final boolean closed) {
         this.closed = closed;
     }
@@ -960,7 +994,7 @@ public class DelegatingConnection<C extends Connection> extends AbandonedTrace i
         try {
             Jdbc41Bridge.setSchema(connection, schema);
             if (cacheState) {
-                cachedSchema = connection.getSchema();
+                cachedSchema = Jdbc41Bridge.getSchema(connection);
             }
         } catch (final SQLException e) {
             cachedSchema = null;

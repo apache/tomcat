@@ -1109,18 +1109,15 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * <p>
-     * Sets the maximum permitted lifetime of a connection. A value of zero or less indicates an
-     * infinite lifetime.
+     * Sets the maximum permitted lifetime of a connection. A value of zero or less indicates an infinite lifetime.
      * </p>
      * <p>
-     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first time one of the following methods is
+     * invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)}, {@link #setLoginTimeout(Duration)}, {@link #getLoginTimeoutDuration()},
+     * {@link #getLogWriter()}.
      * </p>
      *
-     * @param maxConnLifetimeMillis
-     *            The maximum permitted lifetime of a connection. A value of zero or less indicates an
-     *            infinite lifetime.
+     * @param maxConnLifetimeMillis The maximum permitted lifetime of a connection. A value of zero or less indicates an infinite lifetime.
      * @since 2.9.0
      */
     public void setMaxConnLifetime(final Duration maxConnLifetimeMillis) {
@@ -1129,18 +1126,15 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * <p>
-     * Sets the maximum permitted lifetime of a connection in milliseconds. A value of zero or less indicates an
-     * infinite lifetime.
+     * Sets the maximum permitted lifetime of a connection in milliseconds. A value of zero or less indicates an infinite lifetime.
      * </p>
      * <p>
-     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first time one of the following methods is
+     * invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)}, {@link #setLoginTimeout(Duration)}, {@link #getLoginTimeoutDuration()},
+     * {@link #getLogWriter()}.
      * </p>
      *
-     * @param maxConnLifetimeMillis
-     *            The maximum permitted lifetime of a connection in milliseconds. A value of zero or less indicates an
-     *            infinite lifetime.
+     * @param maxConnLifetimeMillis The maximum permitted lifetime of a connection in milliseconds. A value of zero or less indicates an infinite lifetime.
      * @deprecated Use {@link #setMaxConnLifetime(Duration)}.
      */
     @Deprecated

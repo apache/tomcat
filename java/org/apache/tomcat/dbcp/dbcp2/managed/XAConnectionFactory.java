@@ -30,16 +30,16 @@ import org.apache.tomcat.dbcp.dbcp2.ConnectionFactory;
  * @since 2.0
  */
 public interface XAConnectionFactory extends ConnectionFactory {
+
     /**
-     * Create a new {@link java.sql.Connection} in an implementation specific fashion.
+     * Creates a new {@link Connection} in an implementation specific fashion.
      * <p>
      * An implementation can assume that the caller of this will wrap the connection in a proxy that protects access to
      * the setAutoCommit, commit and rollback when enrolled in a XA transaction.
      * </p>
      *
-     * @return a new {@link java.sql.Connection}
-     * @throws java.sql.SQLException
-     *             if a database error occurs creating the connection
+     * @return a new {@link Connection}
+     * @throws SQLException if a database error occurs creating the connection
      */
     @Override
     Connection createConnection() throws SQLException;
