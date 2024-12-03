@@ -122,6 +122,12 @@
         Add support for the new Servlet API method
         <code>HttpServletResponse.sendEarlyHints()</code>. (markt)
       </add>
+      <update>
+        Remove <code>JDBCAccessLogValve</code> which provides limited
+        functionality compared to what is expected from an
+        <code>AccessLog</code> and was not implemented in a scalable way.
+        (remm)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Add special handling for the <code>protocols</code> attribute of
