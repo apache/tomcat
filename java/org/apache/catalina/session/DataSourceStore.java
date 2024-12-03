@@ -38,6 +38,8 @@ import javax.sql.DataSource;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Globals;
+import org.apache.catalina.Server;
+import org.apache.catalina.Service;
 import org.apache.catalina.Session;
 import org.apache.juli.logging.Log;
 
@@ -542,9 +544,7 @@ public class DataSourceStore extends StoreBase {
                 }
 
                 try {
-                    // If sessions already exist in DB, remove and insert again.
-                    // TODO:
-                    // * Check if ID exists in database and if so use UPDATE.
+                    // Remove session if it exists and insert again.
                     remove(session.getIdInternal(), _conn);
 
                     bos = new ByteArrayOutputStream();
@@ -620,23 +620,40 @@ public class DataSourceStore extends StoreBase {
     protected Connection open() throws SQLException {
         if (dataSourceName != null && dataSource == null) {
             org.apache.catalina.Context context = getManager().getContext();
-            ClassLoader oldThreadContextCL = null;
             if (getLocalDataSource()) {
-                oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
-            }
-
-            Context initCtx;
-            try {
-                initCtx = new InitialContext();
-                Context envCtx = (Context) initCtx.lookup("java:comp/env");
-                this.dataSource = (DataSource) envCtx.lookup(this.dataSourceName);
-            } catch (NamingException e) {
-                context.getLogger().error(sm.getString("dataSourceStore.wrongDataSource", this.dataSourceName), e);
-            } finally {
-                if (getLocalDataSource()) {
+                ClassLoader oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
+                try {
+                    Context envCtx = (Context) (new InitialContext()).lookup("java:comp/env");
+                    this.dataSource = (DataSource) envCtx.lookup(this.dataSourceName);
+                } catch (NamingException e) {
+                    context.getLogger().error(sm.getString("dataSourceStore.wrongDataSource", this.dataSourceName), e);
+                } finally {
                     context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
                 }
+            } else {
+                try {
+                    // This should be the normal way to lookup for the global in the global context (no comp/env)
+                    Service service = Container.getService((Container) context);
+                    if (service != null) {
+                        Server server = service.getServer();
+                        if (server != null) {
+                            Context namingContext = server.getGlobalNamingContext();
+                            this.dataSource = (DataSource) namingContext.lookup(dataSourceName);
+                        }
+                    }
+                } catch (NamingException e) {
+                    // Ignore, try another way for compatibility
+                }
+                if (this.dataSource == null) {
+                    try {
+                        Context envCtx = (Context) (new InitialContext()).lookup("java:comp/env");
+                        this.dataSource = (DataSource) envCtx.lookup(this.dataSourceName);
+                    } catch (NamingException e) {
+                        context.getLogger().error(sm.getString("dataSourceStore.wrongDataSource", this.dataSourceName), e);
+                    }
+                }
             }
+
         }
 
         if (dataSource != null) {
