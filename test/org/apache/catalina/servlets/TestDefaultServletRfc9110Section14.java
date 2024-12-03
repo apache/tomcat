@@ -32,10 +32,10 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestDefaultServletRfc14 extends TomcatBaseTest {
+public class TestDefaultServletRfc9110Section14 extends TomcatBaseTest {
 
     @Test
-    public void test_14_2_range_handling_defined_methods() throws Exception {
+    public void testRangeHandlingDefinedMethods() throws Exception {
         // GET is the only method for which range handling is defined.
 
         Tomcat tomcat = getTomcatInstance();
@@ -73,7 +73,7 @@ public class TestDefaultServletRfc14 extends TomcatBaseTest {
     }
 
     @Test
-    public void test_14_2_unsupported_rangeunit() throws Exception {
+    public void testUnsupportedRangeUnit() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         File appDir = new File("test/webapp");
