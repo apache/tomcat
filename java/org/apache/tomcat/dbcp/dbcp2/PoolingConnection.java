@@ -122,7 +122,6 @@ public class PoolingConnection extends DelegatingConnection<Connection>
             }
         } finally {
             try {
-                @SuppressWarnings("resource")
                 final Connection delegateInternal = getDelegateInternal();
                 if (delegateInternal != null) {
                     delegateInternal.close();
