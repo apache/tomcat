@@ -37,6 +37,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
+@SuppressWarnings("deprecation")
 @RunWith(Parameterized.class)
 public class TestJDBCAccessLogValve extends TomcatBaseTest {
 
