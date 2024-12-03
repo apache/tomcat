@@ -81,7 +81,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean deletesAreDetected(final int type) throws SQLException {
-        return getB(() -> databaseMetaData.deletesAreDetected(type));
+        return getB(() -> Boolean.valueOf(databaseMetaData.deletesAreDetected(type)));
     }
 
     @Override
@@ -92,7 +92,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     @Override
     public boolean generatedKeyAlwaysReturned() throws SQLException {
         connection.checkOpen();
-        return getB(() -> Jdbc41Bridge.generatedKeyAlwaysReturned(databaseMetaData));
+        return getB(() -> Boolean.valueOf(Jdbc41Bridge.generatedKeyAlwaysReturned(databaseMetaData)));
     }
 
     private <T> T get(final Callable<T> s) throws SQLException {
@@ -117,7 +117,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     }
 
     private boolean getB(final Callable<Boolean> s) throws SQLException {
-        return get(s, false);
+        return get(s, Boolean.FALSE).booleanValue();
     }
 
     @Override
@@ -244,7 +244,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     }
 
     private int getI(final Callable<Integer> s) throws SQLException {
-        return get(s, 0);
+        return get(s, Integer.valueOf(0)).intValue();
     }
 
     @Override
@@ -297,7 +297,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
     }
 
     private long getL(final Callable<Long> s) throws SQLException {
-        return get(s, 0L);
+        return get(s, Long.valueOf(0)).longValue();
     }
 
     @Override
@@ -450,7 +450,6 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
         return get(databaseMetaData::getRowIdLifetime);
     }
 
-    @SuppressWarnings("resource")
     private ResultSet getRS(final Callable<ResultSet> s) throws SQLException {
         connection.checkOpen();
         return DelegatingResultSet.wrapResultSet(connection, get(s));
@@ -566,7 +565,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean insertsAreDetected(final int type) throws SQLException {
-        return getB(() -> databaseMetaData.insertsAreDetected(type));
+        return getB(() -> Boolean.valueOf(databaseMetaData.insertsAreDetected(type)));
     }
 
     @Override
@@ -622,32 +621,32 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean othersDeletesAreVisible(final int type) throws SQLException {
-        return getB(() -> databaseMetaData.othersDeletesAreVisible(type));
+        return getB(() -> Boolean.valueOf(databaseMetaData.othersDeletesAreVisible(type)));
     }
 
     @Override
     public boolean othersInsertsAreVisible(final int type) throws SQLException {
-        return getB(() -> databaseMetaData.othersInsertsAreVisible(type));
+        return getB(() -> Boolean.valueOf(databaseMetaData.othersInsertsAreVisible(type)));
     }
 
     @Override
     public boolean othersUpdatesAreVisible(final int type) throws SQLException {
-        return getB(() -> databaseMetaData.othersUpdatesAreVisible(type));
+        return getB(() -> Boolean.valueOf(databaseMetaData.othersUpdatesAreVisible(type)));
     }
 
     @Override
     public boolean ownDeletesAreVisible(final int type) throws SQLException {
-        return getB(() -> databaseMetaData.ownDeletesAreVisible(type));
+        return getB(() -> Boolean.valueOf(databaseMetaData.ownDeletesAreVisible(type)));
     }
 
     @Override
     public boolean ownInsertsAreVisible(final int type) throws SQLException {
-        return getB(() -> databaseMetaData.ownInsertsAreVisible(type));
+        return getB(() -> Boolean.valueOf(databaseMetaData.ownInsertsAreVisible(type)));
     }
 
     @Override
     public boolean ownUpdatesAreVisible(final int type) throws SQLException {
-        return getB(() -> databaseMetaData.ownUpdatesAreVisible(type));
+        return getB(() -> Boolean.valueOf(databaseMetaData.ownUpdatesAreVisible(type)));
     }
 
     @Override
@@ -748,7 +747,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean supportsConvert(final int fromType, final int toType) throws SQLException {
-        return getB(() -> databaseMetaData.supportsConvert(fromType, toType));
+        return getB(() -> Boolean.valueOf(databaseMetaData.supportsConvert(fromType, toType)));
     }
 
     @Override
@@ -916,17 +915,17 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean supportsResultSetConcurrency(final int type, final int concurrency) throws SQLException {
-        return getB(() -> databaseMetaData.supportsResultSetConcurrency(type, concurrency));
+        return getB(() -> Boolean.valueOf(databaseMetaData.supportsResultSetConcurrency(type, concurrency)));
     }
 
     @Override
     public boolean supportsResultSetHoldability(final int holdability) throws SQLException {
-        return getB(() -> databaseMetaData.supportsResultSetHoldability(holdability));
+        return getB(() -> Boolean.valueOf(databaseMetaData.supportsResultSetHoldability(holdability)));
     }
 
     @Override
     public boolean supportsResultSetType(final int type) throws SQLException {
-        return getB(() -> databaseMetaData.supportsResultSetType(type));
+        return getB(() -> Boolean.valueOf(databaseMetaData.supportsResultSetType(type)));
     }
 
     @Override
@@ -1006,7 +1005,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean supportsTransactionIsolationLevel(final int level) throws SQLException {
-        return getB(() -> databaseMetaData.supportsTransactionIsolationLevel(level));
+        return getB(() -> Boolean.valueOf(databaseMetaData.supportsTransactionIsolationLevel(level)));
     }
 
     @Override
@@ -1037,7 +1036,7 @@ public class DelegatingDatabaseMetaData implements DatabaseMetaData {
 
     @Override
     public boolean updatesAreDetected(final int type) throws SQLException {
-        return getB(() -> databaseMetaData.updatesAreDetected(type));
+        return getB(() -> Boolean.valueOf(databaseMetaData.updatesAreDetected(type)));
     }
 
     @Override
