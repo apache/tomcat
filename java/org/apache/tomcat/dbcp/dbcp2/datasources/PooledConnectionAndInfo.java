@@ -30,15 +30,6 @@ final class PooledConnectionAndInfo {
 
     private final UserPassKey userPassKey;
 
-    /**
-     * Constructs a new instance.
-     *
-     * @since 2.4.0
-     */
-    PooledConnectionAndInfo(final PooledConnection pooledConnection, final char[] userName, final char[] userPassword) {
-        this(pooledConnection, new UserPassKey(userName, userPassword));
-    }
-
     PooledConnectionAndInfo(final PooledConnection pooledConnection, final UserPassKey userPassKey) {
         this.pooledConnection = pooledConnection;
         this.userPassKey = userPassKey;
