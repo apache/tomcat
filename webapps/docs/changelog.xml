@@ -284,6 +284,9 @@
       <update>
         Update Tomcat's fork of Commons DBCP to 2.13.0. (markt)
       </update>
+      <update>
+        Update EasyMock to 5.5.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
