@@ -99,7 +99,8 @@ public class TestServletRequestParametersMultipartEncoded extends ServletRequest
                     CRLF +
                     "0a" + CRLF +
                     "--AaBbCc--" + CRLF +
-                    "0" + CRLF});
+                    "0" + CRLF +
+                    CRLF});
         } else {
             client.setRequest(new String[] {
                     "POST / HTTP/1.1" + CRLF +
