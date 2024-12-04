@@ -198,9 +198,9 @@
         provided by Thomas Krisch. (markt)
       </add>
       <fix>
-        The default servlet now rejects HTTP range requests when requested
-        ranges overlap or are not in ascending order. Based on pull requests
-        <pr>782</pr> and <pr>791</pr> provided by Chenjp. (markt)
+        The default servlet now rejects HTTP range requests when two or more of
+        the requested ranges overlap. Based on pull request <pr>782</pr>
+        provided by Chenjp. (markt)
       </fix>
       <fix>
         Enhance Content-Range verification for partial PUT requests handled by
