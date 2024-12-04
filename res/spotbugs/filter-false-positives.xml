@@ -848,13 +848,6 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
-    <!-- Non-constant strings are configuration settings rather than client
-         supplied -->
-    <Class name="org.apache.catalina.valves.JDBCAccessLogValve" />
-    <Method name="open" />
-    <Bug code="SQL" />
-  </Match>
-  <Match>
     <!-- NO-OPs due to remaining FIXMEs -->
     <Class name="org.apache.catalina.valves.rewrite.ResolverImpl"/>
     <Method name="resolveSsl"/>
