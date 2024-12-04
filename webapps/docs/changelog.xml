@@ -341,6 +341,9 @@
       <update>
         Update to the Eclipse JDT compiler 4.34. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
