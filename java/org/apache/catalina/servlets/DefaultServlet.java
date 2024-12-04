@@ -1251,6 +1251,7 @@ public class DefaultServlet extends HttpServlet {
 
     private static boolean validate(Ranges ranges, long length) {
         List<long[]> rangeContext = new ArrayList<>();
+        int overlapCount = 0;
         for (Ranges.Entry range : ranges.getEntries()) {
             long start = getStart(range, length);
             long end = getEnd(range, length);
@@ -1258,8 +1259,16 @@ public class DefaultServlet extends HttpServlet {
                 // Invalid range
                 return false;
             }
-            // See https://www.rfc-editor.org/rfc/rfc9110.html#status.416
-            // No good reason for ranges to overlap so always reject
+            /*
+             * See https://www.rfc-editor.org/rfc/rfc9110.html#name-range and
+             * https://www.rfc-editor.org/rfc/rfc9110.html#status.416
+             *
+             * The server MAY ignore or reject Range headers with:
+             *
+             * - "Many" (undefined) small ranges not in ascending order - not currently enforced.
+             *
+             * - More than two overlapping ranges (enforced)
+             */
             for (long[] r : rangeContext) {
                 long s2 = r[0];
                 long e2 = r[1];
@@ -1269,8 +1278,11 @@ public class DefaultServlet extends HttpServlet {
                 // If not { s1>e2 || s2>e1 } then overlap
                 // De Morgan's law
                 if (start <= e2 && s2 <= end) {
-                    // isOverlap
-                    return false;
+                    overlapCount++;
+                    // Off by one is deliberate. There is 1 more overlapping range than there are overlaps.
+                    if (overlapCount > 1) {
+                        return false;
+                    }
                 }
             }
             rangeContext.add(new long[] { start, end });
