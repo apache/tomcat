@@ -312,6 +312,9 @@
       <update>
         Update BND to 7.1.0. (markt)
       </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.34. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
