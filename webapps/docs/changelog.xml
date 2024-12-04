@@ -128,6 +128,11 @@
         <code>AccessLog</code> and was not implemented in a scalable way.
         (remm)
       </update>
+      <fix>
+        Remove the <code>useAcceptRanges</code> initialisation parameter for
+        the default servlet. It is now effectively hard coded to
+        <code>true</code>. (markt)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Add special handling for the <code>protocols</code> attribute of

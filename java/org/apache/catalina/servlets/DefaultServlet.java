@@ -236,15 +236,6 @@ public class DefaultServlet extends HttpServlet {
     protected int sendfileSize = 48 * 1024;
 
     /**
-     * Should the Accept-Ranges: bytes header be send with static resources?
-     *
-     * @deprecated This option will be removed without replacement in Tomcat 12 onwards where it will effectively be
-     *                 hard coded to {@code true}.
-     */
-    @Deprecated
-    protected boolean useAcceptRanges = true;
-
-    /**
      * Flag to determine if server information is presented.
      */
     protected boolean showServerInfo = true;
@@ -356,10 +347,6 @@ public class DefaultServlet extends HttpServlet {
         contextXsltFile = getServletConfig().getInitParameter("contextXsltFile");
         localXsltFile = getServletConfig().getInitParameter("localXsltFile");
         readmeFile = getServletConfig().getInitParameter("readmeFile");
-
-        if (getServletConfig().getInitParameter("useAcceptRanges") != null) {
-            useAcceptRanges = Boolean.parseBoolean(getServletConfig().getInitParameter("useAcceptRanges"));
-        }
 
         // Prevent the use of buffer sizes that are too small
         if (input < 256) {
@@ -900,10 +887,8 @@ public class DefaultServlet extends HttpServlet {
             contentType = "text/html;charset=UTF-8";
         } else {
             if (!isError) {
-                if (useAcceptRanges) {
-                    // Accept ranges header
-                    response.setHeader("Accept-Ranges", "bytes");
-                }
+                // Accept ranges header
+                response.setHeader("Accept-Ranges", "bytes");
 
                 // Parse range specifier
                 ranges = parseRange(request, response, resource);
