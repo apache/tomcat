@@ -1,5 +1,4 @@
-<html>
-<!--
+<%--
  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
@@ -14,33 +13,31 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-
+--%>
+<%@ page import="sessions.Item" %>
+<html>
 <head>
-    <title>carts</title>
+<title>Shopping Cart Example</title>
 </head>
 
- <body bgcolor="white">
+<body bgcolor="white">
 <font size = 5 color="#CC0000">
 
 <form type=POST action=carts.jsp>
-<BR>
+<br>
 Please enter item to add or remove:
 <br>
-Add Item:
+Select Item:
 
-<SELECT NAME="item">
-<OPTION>Beavis & Butt-head Video collection
-<OPTION>X-files movie
-<OPTION>Twin peaks tapes
-<OPTION>NIN CD
-<OPTION>JSP Book
-<OPTION>Concert tickets
-<OPTION>Love life
-<OPTION>Switch blade
-<OPTION>Rex, Rugs & Rock n' Roll
-</SELECT>
-
+<select name="itemId">
+<%
+  for (Item item : Item.values()) {
+%>
+  <option value="<%= item.ordinal() %>"><%= item.getTitle() %></option>
+<%
+  }
+%>
+</select>
 
 <br> <br>
 <INPUT TYPE=submit name="submit" value="add">
@@ -48,6 +45,6 @@ Add Item:
 
 </form>
 
-</FONT>
+</font>
 </body>
 </html>
