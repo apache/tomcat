@@ -314,6 +314,9 @@
         Examples. Limit the shopping cart example to only allow adding the
         pre-defined items to the cart. (markt)
       </add>
+      <fix>
+        Examples. Remove JSP calendar example. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
