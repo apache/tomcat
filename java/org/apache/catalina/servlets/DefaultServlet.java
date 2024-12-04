@@ -1485,6 +1485,7 @@ public class DefaultServlet extends HttpServlet {
         ArrayList<Range> result = new ArrayList<>();
 
         List<long[]> rangeContext = new ArrayList<>();
+        int overlapCount = 0;
         for (Ranges.Entry entry : ranges.getEntries()) {
             Range currentRange = new Range();
             if (entry.getStart() == -1) {
@@ -1509,7 +1510,16 @@ public class DefaultServlet extends HttpServlet {
             }
 
             // See https://www.rfc-editor.org/rfc/rfc9110.html#status.416
-            // No good reason for ranges to overlap so always reject
+            /*
+             * See https://www.rfc-editor.org/rfc/rfc9110.html#name-range and
+             * https://www.rfc-editor.org/rfc/rfc9110.html#status.416
+             *
+             * The server MAY ignore or reject Range headers with:
+             *
+             * - "Many" (undefined) small ranges not in ascending order - not currently enforced.
+             *
+             * - More than two overlapping ranges (enforced)
+             */
             for (long[] r : rangeContext) {
                 long s2 = r[0];
                 long e2 = r[1];
@@ -1519,10 +1529,13 @@ public class DefaultServlet extends HttpServlet {
                 // If not { s1>e2 || s2>e1 } then overlap
                 // De Morgan's law
                 if (currentRange.start <= e2 && s2 <= currentRange.end) {
-                    // isOverlap
-                    response.addHeader("Content-Range", "bytes */" + fileLength);
-                    response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
-                    return null;
+                    overlapCount++;
+                    // Off by one is deliberate. There is 1 more overlapping range than there are overlaps.
+                    if (overlapCount > 1) {
+                        response.addHeader("Content-Range", "bytes */" + fileLength);
+                        response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
+                        return null;
+                    }
                 }
             }
             rangeContext.add(new long[] { currentRange.start, currentRange.end });
