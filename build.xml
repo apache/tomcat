@@ -1670,15 +1670,6 @@
       </fileset>
     </txt2html>
 
-    <txt2html todir="${tomcat.build}/webapps/examples/jsp/cal">
-      <fileset dir="webapps/examples/WEB-INF/classes/cal">
-        <include name="Entries.java"/>
-        <include name="Entry.java"/>
-        <include name="JspCalendar.java"/>
-        <include name="TableBean.java"/>
-      </fileset>
-    </txt2html>
-
     <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsptoserv">
       <fileset dir="webapps/examples/WEB-INF/classes">
         <include name="ServletToJsp.java"/>
