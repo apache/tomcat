@@ -194,6 +194,9 @@ Tomcat.</p>
   <property name="useAcceptRanges">
         If true, the Accept-Ranges header will be set when appropriate for the
         response. [true]
+        <br/>
+        Deprecated. This option will be removed without replacement in Tomcat
+        12 onwards where it will effectively be hard coded to <code>true</code>.
   </property>
   <property name="showServerInfo">
         Should server information be presented in the response sent to clients
