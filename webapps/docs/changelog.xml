@@ -217,6 +217,11 @@
         only be processed for <code>GET</code> requests. Based on pull request
         <pr>790</pr> provided by Chenjp. (markt)
       </fix>
+      <fix>
+        Deprecate the <code>useAcceptRanges</code> initialisation parameter for
+        the default servlet. It will be removed in Tomcat 12 onwards where it
+        will effectively be hard coded to <code>true</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -84,6 +84,9 @@
   <!--                                                                      -->
   <!--   useAcceptRanges     Should the Accept-Ranges header be included    -->
   <!--                       in responses where appropriate? [true]         -->
+  <!--                       Deprecated. This option will be removed        -->
+  <!--                       without replacement in Tomcat 12 onwards where -->
+  <!--                       it will effectively be hard coded to true.     -->
   <!--                                                                      -->
   <!--  For directory listing customization. Checks localXsltFile, then     -->
   <!--  globalXsltFile, then defaults to original behavior.                 -->
