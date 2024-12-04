@@ -27,7 +27,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -43,8 +42,7 @@ public class TestDefaultServletRfc9110Section14 extends TomcatBaseTest {
         File appDir = new File("test/webapp");
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
 
-        Wrapper w = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
-        w.addInitParameter("useAcceptRanges", "true");
+        Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
         ctxt.addServletMappingDecoded("/", "default");
 
         tomcat.start();
@@ -79,8 +77,7 @@ public class TestDefaultServletRfc9110Section14 extends TomcatBaseTest {
         File appDir = new File("test/webapp");
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
 
-        Wrapper w = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
-        w.addInitParameter("useAcceptRanges", "true");
+        Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
         ctxt.addServletMappingDecoded("/", "default");
 
         tomcat.start();
