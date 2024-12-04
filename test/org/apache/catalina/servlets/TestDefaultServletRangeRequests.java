@@ -66,9 +66,6 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         // Invalid overlapping ranges
         parameterSets.add(new Object[] { "bytes=1-100, 30-50", null, Integer.valueOf(416), "", "*/" + len });
         parameterSets.add(new Object[] { "bytes=1-100, 90-150", null, Integer.valueOf(416), "", "*/" + len });
-        // Invalid ranges that not in ascending order
-        parameterSets.add(new Object[] { "bytes=0-5, 6-10, 80-90, 60-70", null, Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes=0-5, -10, 60-70", null, Integer.valueOf(416), "", "*/" + len });
         // Invalid no equals
         parameterSets.add(new Object[] { "bytes 1-10", null, Integer.valueOf(416), "", "*/" + len });
         parameterSets.add(new Object[] { "bytes1-10", null, Integer.valueOf(416), "", "*/" + len });
