@@ -178,7 +178,7 @@ To add some data to the authenticated session, enter it here:
 <tr>
   <td><%= util.HTMLFilter.filter(name) %></td>
   <td><%= util.HTMLFilter.filter(value) %></td>
-  <td><a href='<%= response.encodeURL("index.jsp?dataName=" + URLEncoder.encode(name, StandardCharsets.UTF_8)) %>'>delete</a></td>
+  <td><a href='<%= response.encodeURL("index.jsp?dataName=" + URLEncoder.encode(name, "UTF-8")) %>'>delete</a></td>
 </tr>
 <%
   }
