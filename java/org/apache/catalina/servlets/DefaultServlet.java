@@ -262,7 +262,11 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * Should the Accept-Ranges: bytes header be send with static resources?
+     *
+     * @deprecated This option will be removed without replacement in Tomcat 12 onwards where it will effectively be
+     *                 hard coded to {@code true}.
      */
+    @Deprecated
     protected boolean useAcceptRanges = true;
 
     /**
