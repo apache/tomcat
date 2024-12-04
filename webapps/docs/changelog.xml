@@ -310,6 +310,10 @@
         coded limit of 10 attributes per session for the JSP form authentication
         example. (markt)
       </add>
+      <add>
+        Examples. Limit the shopping cart example to only allow adding the
+        pre-defined items to the cart. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
