@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.3 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Add <code>tableName</code> configuration on the
+        <code>DataSourcePropertyStore</code> that may be used by the WebDAV
+        Servlet. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.2 (markt)" rtext="release in progress">
   <subsection name="Catalina">
