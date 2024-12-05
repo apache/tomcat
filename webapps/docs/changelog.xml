@@ -218,6 +218,10 @@
         the default servlet. It will be removed in Tomcat 12 onwards where it
         will effectively be hard coded to <code>true</code>. (markt)
       </fix>
+      <add>
+        Add <code>DataSource</code> based property storage for the
+        <code>WebdavServlet</code>. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

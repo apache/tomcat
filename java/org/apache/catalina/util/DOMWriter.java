@@ -66,6 +66,10 @@ public class DOMWriter {
                 Attr attrs[] = sortAttributes(node.getAttributes());
                 boolean xmlns = false;
                 for (Attr attr : attrs) {
+                    if ("xmlns".equals(attr.getPrefix())) {
+                        // Skip namespace prefixes as they are removed
+                        continue;
+                    }
                     out.print(' ');
                     out.print(attr.getLocalName());
                     if ("xmlns".equals(attr.getLocalName())) {

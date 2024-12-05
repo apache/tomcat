@@ -2887,7 +2887,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Default property store, which provides memory storage without persistence.
      */
-    private class MemoryPropertyStore implements PropertyStore {
+    public static class MemoryPropertyStore implements PropertyStore {
 
         private final ConcurrentHashMap<String,ArrayList<Node>> deadProperties = new ConcurrentHashMap<>();
 
