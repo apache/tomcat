@@ -17,6 +17,7 @@
 package org.apache.catalina.servlets;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class TestDefaultServletRfc9110Section14 extends TomcatBaseTest {
         String rangeHeader = "bytes=0-10";
         // Get and Head
 
-        requestHeaders.computeIfAbsent("Range", (k) -> List.of(rangeHeader));
+        requestHeaders.put("Range", Arrays.asList(rangeHeader));
         int rc = getUrl(path, responseBody, requestHeaders, responseHeaders);
         Assert.assertEquals("Range requests is turn on, SC_PARTIAL_CONTENT of GET is expected",
                 HttpServletResponse.SC_PARTIAL_CONTENT, rc);
@@ -90,7 +91,7 @@ public class TestDefaultServletRfc9110Section14 extends TomcatBaseTest {
         String rangeHeader = "Chars=0-10";
         // Get and Head
 
-        requestHeaders.computeIfAbsent("Range", (k) -> List.of(rangeHeader));
+        requestHeaders.put("Range", Arrays.asList(rangeHeader));
         int rc = getUrl(path, responseBody, requestHeaders, responseHeaders);
         Assert.assertEquals(
                 "RFC 9110 - 14.2: An origin server MUST ignore a Range header field that contains a range unit it does not understand. `Chars` is not a understandable RangeUnit, SC_OK is expected",
