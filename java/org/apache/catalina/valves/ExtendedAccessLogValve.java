@@ -54,17 +54,17 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <li><code>date</code>: The date in yyyy-mm-dd format for GMT</li>
  * <li><code>s-dns</code>: The server dns entry</li>
  * <li><code>s-ip</code>: The server ip address</li>
- * <li><code>cs(XXX)</code>: The value of header XXX from client to server</li>
- * <li><code>sc(XXX)</code>: The value of header XXX from server to client</li>
+ * <li><code>cs(xxx)</code>: The value of header xxx from client to server</li>
+ * <li><code>sc(xxx)</code>: The value of header xxx from server to client</li>
  * <li><code>sc-status</code>: The status code</li>
  * <li><code>time</code>: Time the request was served</li>
  * <li><code>time-taken</code>: Time (in seconds) taken to serve the request</li>
  * <li><code>x-threadname</code>: Current request thread name (can compare later with stacktraces)</li>
- * <li><code>x-A(XXX)</code>: Pull XXX attribute from the servlet context</li>
- * <li><code>x-C(XXX)</code>: Pull the cookie(s) of the name XXX</li>
- * <li><code>x-O(XXX)</code>: Pull the all response header values XXX</li>
- * <li><code>x-R(XXX)</code>: Pull XXX attribute from the servlet request</li>
- * <li><code>x-S(XXX)</code>: Pull XXX attribute from the session</li>
+ * <li><code>x-A(xxx)</code>: Pull xxx attribute from the servlet context</li>
+ * <li><code>x-C(xxx)</code>: Pull the cookie(s) of the name xxx</li>
+ * <li><code>x-O(xxx)</code>: Pull the all response header values xxx</li>
+ * <li><code>x-R(xxx)</code>: Pull xxx attribute from the servlet request</li>
+ * <li><code>x-S(xxx)</code>: Pull xxx attribute from the session</li>
  * <li><code>x-P(...)</code>: Call request.getParameter(...) and URLencode it. Helpful to capture certain POST
  * parameters.</li>
  * <li>For any of the x-H(...) the following method will be called from the HttpServletRequest object</li>
