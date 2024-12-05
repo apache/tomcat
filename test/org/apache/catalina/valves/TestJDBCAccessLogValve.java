@@ -33,6 +33,7 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
@@ -134,7 +135,11 @@ public class TestJDBCAccessLogValve extends TomcatBaseTest {
                 Assert.assertTrue(rs.next());
                 Assert.assertEquals(HttpServletResponse.SC_OK, rs.getInt("status"));
                 Assert.assertEquals("/test/index.html", rs.getString("query"));
-                Assert.assertTrue(rs.getLong("bytes") == 934);
+                if (System.lineSeparator().equals(SimpleHttpClient.CRLF)) {
+                    Assert.assertEquals(957, rs.getLong("bytes"));
+                } else {
+                    Assert.assertEquals(934, rs.getLong("bytes"));
+                }
                 Assert.assertTrue(rs.next());
                 Assert.assertEquals(HttpServletResponse.SC_OK, rs.getInt("status"));
                 Assert.assertEquals("/test/404.html", rs.getString("query"));
