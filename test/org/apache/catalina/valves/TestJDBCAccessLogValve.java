@@ -27,6 +27,7 @@ import java.util.List;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -37,6 +38,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.compat.JreCompat;
 
 @SuppressWarnings("deprecation")
 @RunWith(Parameterized.class)
@@ -72,6 +74,8 @@ public class TestJDBCAccessLogValve extends TomcatBaseTest {
 
     @Test
     public void testValve() throws Exception {
+
+        Assume.assumeTrue(JreCompat.isJre16Available());
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required

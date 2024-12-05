@@ -29,6 +29,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -36,6 +37,7 @@ import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestPersistentManagerDataSourceStore extends TomcatBaseTest {
 
@@ -79,6 +81,8 @@ public class TestPersistentManagerDataSourceStore extends TomcatBaseTest {
 
     @Test
     public void testDSStore() throws Exception {
+        Assume.assumeTrue(JreCompat.isJre16Available());
+
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
