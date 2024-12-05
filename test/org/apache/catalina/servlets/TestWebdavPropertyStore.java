@@ -34,6 +34,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -44,6 +45,7 @@ import org.apache.catalina.servlets.WebdavServlet.PropertyUpdateType;
 import org.apache.catalina.servlets.WebdavServlet.ProppatchOperation;
 import org.apache.catalina.startup.LoggingBaseTest;
 import org.apache.catalina.util.XMLWriter;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -163,6 +165,10 @@ public class TestWebdavPropertyStore extends LoggingBaseTest {
 
     @Test
     public void testStore() throws Exception {
+        if (storeName.contains("DataSource")) {
+            Assume.assumeTrue(JreCompat.isJre16Available());
+        }
+
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
         documentBuilderFactory.setExpandEntityReferences(false);
