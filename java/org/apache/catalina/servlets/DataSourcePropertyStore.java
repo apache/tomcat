@@ -29,7 +29,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.servlets.WebdavServlet.PropertyUpdateType;
 import org.apache.catalina.servlets.WebdavServlet.ProppatchOperation;
