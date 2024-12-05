@@ -811,7 +811,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
 
         if (log.isTraceEnabled()) {
             log.trace("Received [" + new String(byteBuffer.array(), byteBuffer.position(), byteBuffer.remaining(),
-                    StandardCharsets.ISO_8859_1) + "]");
+                    StandardCharsets.UTF_8) + "]");
         }
 
         if (nRead > 0) {
