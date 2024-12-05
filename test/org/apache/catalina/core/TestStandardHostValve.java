@@ -128,7 +128,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
             // Default error status code expected
             Assert.assertEquals(500, rc);
         }
-        String[] responseLines = (bc.toString().split("\n"));
+        String[] responseLines = (bc.toString().split(System.lineSeparator()));
         // First line should be the path
         Assert.assertEquals(report, responseLines[0]);
         // Second line should not be the null message warning
