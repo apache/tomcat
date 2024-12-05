@@ -70,11 +70,12 @@ public class TestWebdavPropertyStore extends LoggingBaseTest {
             "</V:someprop>";
 
     public static final String SIMPLE_SCHEMA =
-            "create table properties (\n" +
-            "  path         varchar(256) not null,\n" +
-            "  namespace    varchar(64) not null,\n" +
-            "  name         varchar(64) not null,\n" +
-            "  node         varchar(1024) not null" +
+            "CREATE TABLE webdavproperties (\n" +
+            "  path         VARCHAR(1024) NOT NULL,\n" +
+            "  namespace    VARCHAR(64) NOT NULL,\n" +
+            "  name         VARCHAR(64) NOT NULL,\n" +
+            "  node         VARCHAR(2048) NOT NULL,\n" +
+            "  PRIMARY KEY (path, namespace, name)\n" +
             ")";
 
     public static class CustomDataSourcePropertyStore extends DataSourcePropertyStore {
@@ -176,7 +177,9 @@ public class TestWebdavPropertyStore extends LoggingBaseTest {
         PropertyStore propertyStore = (PropertyStore) Class.forName(storeName).getDeclaredConstructor().newInstance();
         if (propertyStore instanceof CustomDataSourcePropertyStore) {
             ((CustomDataSourcePropertyStore) propertyStore).setDataSource(new DerbyDataSource());
+            ((CustomDataSourcePropertyStore) propertyStore).setTableName("webdavproperties");
         }
+        propertyStore.init();
 
         // Add properties
         ArrayList<ProppatchOperation> operations = new ArrayList<>();
@@ -240,6 +243,8 @@ public class TestWebdavPropertyStore extends LoggingBaseTest {
         XMLWriter xmlWriter9 = new XMLWriter();
         Assert.assertFalse(propertyStore.propfind("/other/path2", node1, false, xmlWriter9));
         Assert.assertTrue(xmlWriter9.toString().isEmpty());
+
+        propertyStore.destroy();
 
     }
 }

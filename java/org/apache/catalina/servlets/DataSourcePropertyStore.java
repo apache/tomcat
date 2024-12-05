@@ -40,8 +40,8 @@ import org.apache.tomcat.util.res.StringManager;
 import org.w3c.dom.Node;
 
 /**
- * WebDAV dead properties storage backed by a DataSource. Usually table and column names
- * are configurable, but for simplicity this is not the case.
+ * WebDAV dead properties storage using a DataSource.
+ * <p>
  * The schema is:
  * table properties ( path, namespace, name, node )
  * path: the resource path
@@ -54,36 +54,56 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
     protected static final StringManager sm = StringManager.getManager(DataSourcePropertyStore.class);
     private final Log log = LogFactory.getLog(DataSourcePropertyStore.class);
 
-    private static String ADD_PROPERTY_STMT = "INSERT INTO properties (path, namespace, name, node) VALUES (?, ?, ?, ?)";
-    private static String SET_PROPERTY_STMT = "UPDATE properties SET node = ? WHERE path = ? AND namespace = ? AND name = ?";
-    private static String REMOVE_ALL_PROPERTIES_STMT = "DELETE FROM properties WHERE path = ?";
-    private static String REMOVE_PROPERTY_STMT = "DELETE FROM properties WHERE path = ? AND namespace = ? AND name = ?";
-    private static String GET_PROPERTY_STMT = "SELECT node FROM properties WHERE path = ? AND namespace = ? AND name = ?";
-    private static String GET_PROPERTIES_NAMES_STMT = "SELECT namespace, name FROM properties WHERE path = ?";
-    private static String GET_PROPERTIES_STMT = "SELECT namespace, name, node FROM properties WHERE path = ?";
-    private static String GET_PROPERTIES_NODES_STMT = "SELECT node FROM properties WHERE path = ?";
-
     /**
      * DataSource JNDI name, will be prefixed with java:comp/env for the lookup.
      */
     private String dataSourceName = "WebdavPropertyStore";
+
+    /**
+     * Table name.
+     */
+    private String tableName = "properties";
+
+    private String addPropertyStatement;
+    private String setPropertyStatement;
+    private String removeAllPropertiesStatement;
+    private String removePropertyStatement;
+    private String getPropertyStatement;
+    private String getPropertiesNameStatement;
+    private String getPropertiesStatement;
+    private String getPropertiesNodeStatement;
 
     private final ReentrantReadWriteLock dbLock = new ReentrantReadWriteLock();
     private final Lock dbReadLock = dbLock.readLock();
     private final Lock dbWriteLock = dbLock.writeLock();
 
     /**
-     * @return the dataSourceName
+     * @return the DataSource JNDI name, will be prefixed with java:comp/env for the lookup.
      */
     public String getDataSourceName() {
         return this.dataSourceName;
     }
 
     /**
-     * @param dataSourceName the dataSourceName to set
+     * @param dataSourceName the DataSource JNDI name, will be prefixed with
+     *  java:comp/env for the lookup.
      */
     public void setDataSourceName(String dataSourceName) {
         this.dataSourceName = dataSourceName;
+    }
+
+    /**
+     * @return the table name that will be used in the database
+     */
+    public String getTableName() {
+        return this.tableName;
+    }
+
+    /**
+     * @param tableName the table name to use in the database
+     */
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 
     /**
@@ -100,6 +120,14 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                 throw new IllegalArgumentException(sm.getString("webdavservlet.dataSourceStore.noDataSource", dataSourceName), e);
             }
         }
+        addPropertyStatement = "INSERT INTO " + tableName + " (path, namespace, name, node) VALUES (?, ?, ?, ?)";
+        setPropertyStatement = "UPDATE " + tableName + " SET node = ? WHERE path = ? AND namespace = ? AND name = ?";
+        removeAllPropertiesStatement = "DELETE FROM " + tableName + " WHERE path = ?";
+        removePropertyStatement = "DELETE FROM " + tableName + " WHERE path = ? AND namespace = ? AND name = ?";
+        getPropertyStatement = "SELECT node FROM " + tableName + " WHERE path = ? AND namespace = ? AND name = ?";
+        getPropertiesNameStatement = "SELECT namespace, name FROM " + tableName + " WHERE path = ?";
+        getPropertiesStatement = "SELECT namespace, name, node FROM " + tableName + " WHERE path = ?";
+        getPropertiesNodeStatement = "SELECT node FROM " + tableName + " WHERE path = ?";
     }
 
     @Override
@@ -117,7 +145,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
         }
         dbWriteLock.lock();
         try (Connection connection = dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(GET_PROPERTIES_STMT)) {
+                PreparedStatement statement = connection.prepareStatement(getPropertiesStatement)) {
             statement.setString(1, source);
             if (statement.execute()) {
                 ResultSet rs = statement.getResultSet();
@@ -126,7 +154,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                     String name = rs.getString(2);
                     String node = rs.getString(3);
                     boolean found = false;
-                    try (PreparedStatement statement2 = connection.prepareStatement(GET_PROPERTY_STMT)) {
+                    try (PreparedStatement statement2 = connection.prepareStatement(getPropertyStatement)) {
                         statement2.setString(1, destination);
                         statement2.setString(2, namespace);
                         statement2.setString(3, name);
@@ -138,7 +166,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                         }
                     }
                     if (found) {
-                        try (PreparedStatement statement2 = connection.prepareStatement(SET_PROPERTY_STMT)) {
+                        try (PreparedStatement statement2 = connection.prepareStatement(setPropertyStatement)) {
                             statement2.setString(1, node);
                             statement2.setString(2, destination);
                             statement2.setString(3, namespace);
@@ -146,7 +174,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                             statement2.execute();
                         }
                     } else {
-                        try (PreparedStatement statement2 = connection.prepareStatement(ADD_PROPERTY_STMT)) {
+                        try (PreparedStatement statement2 = connection.prepareStatement(addPropertyStatement)) {
                             statement2.setString(1, destination);
                             statement2.setString(2, namespace);
                             statement2.setString(3, name);
@@ -170,7 +198,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
         }
         dbWriteLock.lock();
         try (Connection connection = dataSource.getConnection();
-                PreparedStatement statement = connection.prepareStatement(REMOVE_ALL_PROPERTIES_STMT)) {
+                PreparedStatement statement = connection.prepareStatement(removeAllPropertiesStatement)) {
             statement.setString(1, resource);
             statement.execute();
         } catch (SQLException e) {
@@ -189,7 +217,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
             // Add the names of all properties
             dbReadLock.lock();
             try (Connection connection = dataSource.getConnection();
-                    PreparedStatement statement = connection.prepareStatement(GET_PROPERTIES_NAMES_STMT)) {
+                    PreparedStatement statement = connection.prepareStatement(getPropertiesNameStatement)) {
                 statement.setString(1, resource);
                 if (statement.execute()) {
                     ResultSet rs = statement.getResultSet();
@@ -208,7 +236,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
             // Add a single property
             dbReadLock.lock();
             try (Connection connection = dataSource.getConnection();
-                    PreparedStatement statement = connection.prepareStatement(GET_PROPERTY_STMT)) {
+                    PreparedStatement statement = connection.prepareStatement(getPropertyStatement)) {
                 statement.setString(1, resource);
                 statement.setString(2, property.getNamespaceURI());
                 statement.setString(3, property.getLocalName());
@@ -229,7 +257,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
             // Add all properties
             dbReadLock.lock();
             try (Connection connection = dataSource.getConnection();
-                    PreparedStatement statement = connection.prepareStatement(GET_PROPERTIES_NODES_STMT)) {
+                    PreparedStatement statement = connection.prepareStatement(getPropertiesNodeStatement)) {
                 statement.setString(1, resource);
                 if (statement.execute()) {
                     ResultSet rs = statement.getResultSet();
@@ -283,7 +311,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                         String serializedNode = strWriter.toString();
                         boolean found = false;
                         try {
-                            try (PreparedStatement statement = connection.prepareStatement(GET_PROPERTY_STMT)) {
+                            try (PreparedStatement statement = connection.prepareStatement(getPropertyStatement)) {
                                 statement.setString(1, resource);
                                 statement.setString(2, node.getNamespaceURI());
                                 statement.setString(3, node.getLocalName());
@@ -295,7 +323,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                                 }
                             }
                             if (found) {
-                                try (PreparedStatement statement = connection.prepareStatement(SET_PROPERTY_STMT)) {
+                                try (PreparedStatement statement = connection.prepareStatement(setPropertyStatement)) {
                                     statement.setString(1, serializedNode);
                                     statement.setString(2, resource);
                                     statement.setString(3, node.getNamespaceURI());
@@ -303,7 +331,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                                     statement.execute();
                                 }
                             } else {
-                                try (PreparedStatement statement = connection.prepareStatement(ADD_PROPERTY_STMT)) {
+                                try (PreparedStatement statement = connection.prepareStatement(addPropertyStatement)) {
                                     statement.setString(1, resource);
                                     statement.setString(2, node.getNamespaceURI());
                                     statement.setString(3, node.getLocalName());
@@ -319,7 +347,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
                     }
                     if (operation.getUpdateType() == PropertyUpdateType.REMOVE) {
                         Node node = operation.getPropertyNode();
-                        try (PreparedStatement statement = connection.prepareStatement(REMOVE_PROPERTY_STMT)) {
+                        try (PreparedStatement statement = connection.prepareStatement(removePropertyStatement)) {
                             statement.setString(1, resource);
                             statement.setString(2, node.getNamespaceURI());
                             statement.setString(3, node.getLocalName());
