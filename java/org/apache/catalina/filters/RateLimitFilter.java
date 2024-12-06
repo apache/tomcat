@@ -17,6 +17,7 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -29,6 +30,7 @@ import org.apache.catalina.util.RateLimiter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
+import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
 
 /**
  * <p>
@@ -42,13 +44,16 @@ import org.apache.tomcat.util.res.StringManager;
  * the bucket time ends and a new bucket starts.
  * </p>
  * <p>
- * The RateLimiter implementation can be set via the <code>className</code> init param. The default implementation,
- * <code>org.apache.catalina.util.FastRateLimiter</code>, is optimized for efficiency and low overhead so it converts
- * some configured values to more efficient values. For example, a configuration of a 60 seconds time bucket is
- * converted to 65.536 seconds. That allows for very fast bucket calculation using bit shift arithmetic. In order to
- * remain true to the user intent, the configured number of requests is then multiplied by the same ratio, so a
- * configuration of 100 Requests per 60 seconds, has the real values of 109 Requests per 65 seconds. You can specify a
- * different class as long as it implements the <code>org.apache.catalina.util.RateLimiter</code> interface.
+ * The RateLimiter implementation can be set via the <code>rateLimitClassName</code> init param. The default
+ * implementation, <code>org.apache.catalina.util.FastRateLimiter</code>, is optimized for efficiency and low overhead
+ * so it converts some configured values to more efficient values. For example, a configuration of a 60 seconds time
+ * bucket is converted to 65.536 seconds. That allows for very fast bucket calculation using bit shift arithmetic. In
+ * order to remain true to the user intent, the configured number of requests is then multiplied by the same ratio, so a
+ * configuration of 100 Requests per 60 seconds, has the real values of 109 Requests per 65 seconds. An alternative
+ * implementation, <code>org.apache.catalina.util.ExactRateLimiter</code>, is intended to provide a less efficient but
+ * more accurate control, whose effective duration in seconds and number of requests configuration are consist with the
+ * user declared. You can specify a different class as long as it implements the
+ * <code>org.apache.catalina.util.RateLimiter</code> interface.
  * </p>
  * <p>
  * It is common to set up different restrictions for different URIs. For example, a login page or authentication script
@@ -197,15 +202,20 @@ public class RateLimitFilter extends FilterBase {
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
 
+        ScheduledExecutorService utilityExecutor = (ScheduledExecutorService) filterConfig.getServletContext()
+                .getAttribute(ScheduledThreadPoolExecutor.class.getName());
+        if (utilityExecutor == null) {
+            if (newExecutorService == null) {
+                newExecutorService = new java.util.concurrent.ScheduledThreadPoolExecutor(1);
+            }
+            utilityExecutor = newExecutorService;
+        }
+
         try {
             rateLimiter = (RateLimiter) Class.forName(rateLimitClassName).getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new ServletException(e);
         }
-
-        rateLimiter.setDuration(bucketDuration);
-        rateLimiter.setRequests(bucketRequests);
-        rateLimiter.setFilterConfig(filterConfig);
 
         if (policyName != null) {
             String trimmedName = policyName.trim();
@@ -213,6 +223,8 @@ public class RateLimitFilter extends FilterBase {
                 rateLimiter.setPolicyName(trimmedName);
             }
         }
+
+        rateLimiter.initialize(utilityExecutor, bucketDuration, bucketRequests);
 
         filterName = filterConfig.getFilterName();
 
@@ -250,9 +262,18 @@ public class RateLimitFilter extends FilterBase {
         chain.doFilter(request, response);
     }
 
+    private ScheduledExecutorService newExecutorService = null;
+
     @Override
     public void destroy() {
         rateLimiter.destroy();
+        if (newExecutorService != null) {
+            try {
+                newExecutorService.shutdown();
+            } catch (SecurityException e) {
+                // ignore
+            }
+        }
         super.destroy();
     }
 

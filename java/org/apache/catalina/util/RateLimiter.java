@@ -17,7 +17,7 @@
 
 package org.apache.catalina.util;
 
-import jakarta.servlet.FilterConfig;
+import java.util.concurrent.ScheduledExecutorService;
 
 public interface RateLimiter {
 
@@ -27,32 +27,18 @@ public interface RateLimiter {
     int getDuration();
 
     /**
-     * Sets the configured duration value in seconds.
-     *
-     * @param duration The duration of the time window in seconds
-     */
-    void setDuration(int duration);
-
-    /**
      * @return the maximum number of requests allowed per time window
      */
     int getRequests();
 
     /**
-     * Sets the configured number of requests allowed per time window.
+     * Increments the number of requests by the given identifier in the current time window.
      *
-     * @param requests The number of requests per time window
-     */
-    void setRequests(int requests);
-
-    /**
-     * Increments the number of requests by the given ipAddress in the current time window.
-     *
-     * @param ipAddress the ip address
+     * @param identifier of target request
      *
      * @return the new value after incrementing
      */
-    int increment(String ipAddress);
+    int increment(String identifier);
 
     /**
      * Cleanup no longer needed resources.
@@ -60,11 +46,13 @@ public interface RateLimiter {
     void destroy();
 
     /**
-     * Pass the FilterConfig to configure the filter.
+     * Initialize with parameters, start {@link TimeBucketCounter}.
      *
-     * @param filterConfig The FilterConfig used to configure the associated filter
+     * @param executorService the executor
+     * @param duration        the duration of the time window in seconds
+     * @param requests        the configured number of requests allowed per time window
      */
-    void setFilterConfig(FilterConfig filterConfig);
+    void initialize(ScheduledExecutorService executorService, int duration, int requests);
 
     /**
      * @return name of RateLimit policy
@@ -92,7 +80,7 @@ public interface RateLimiter {
     /**
      * Provide the quota header for this rate limit for a given request count within the current time window.
      *
-     * @param requestCount  The request count within the current time window
+     * @param requestCount The request count within the current time window
      *
      * @return the quota header for the given value of request count
      *

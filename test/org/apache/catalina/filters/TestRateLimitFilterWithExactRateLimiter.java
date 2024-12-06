@@ -14,11 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.time.Instant;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -32,14 +30,13 @@ import org.apache.catalina.filters.TestRemoteIpFilter.MockFilterChain;
 import org.apache.catalina.filters.TestRemoteIpFilter.MockHttpServletRequest;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.util.FastRateLimiter;
+import org.apache.catalina.util.ExactRateLimiter;
 import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 
-public class TestRateLimitFilter extends TomcatBaseTest {
-
-    private void testRateLimitWith4Clients(boolean exposeHeaders, boolean enforce) throws Exception {
+public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
+    private void testRateLimitWith1Clients(boolean exposeHeaders, boolean enforce) throws Exception {
 
         int bucketRequests = 40;
         int bucketDuration = 4;
@@ -49,47 +46,51 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         filterDef.addInitParameter("bucketDuration", String.valueOf(bucketDuration));
         filterDef.addInitParameter("enforce", String.valueOf(enforce));
         filterDef.addInitParameter("exposeHeaders", String.valueOf(exposeHeaders));
+        filterDef.addInitParameter("rateLimitClassName", "org.apache.catalina.util.ExactRateLimiter");
 
         Tomcat tomcat = getTomcatInstance();
         Context root = tomcat.addContext("", TEMP_DIR);
+
         MockFilterChain filterChain = new MockFilterChain();
         RateLimitFilter rateLimitFilter = testRateLimitFilter(filterDef, root);
-
         tomcat.start();
 
-        FastRateLimiter fastRateLimiter = (FastRateLimiter) rateLimitFilter.rateLimiter;
+        ExactRateLimiter exactRateLimiter = (ExactRateLimiter) rateLimitFilter.rateLimiter;
 
-        int allowedRequests = fastRateLimiter.getRequests();
-        long sleepTime = fastRateLimiter.getBucketCounter().getMillisUntilNextBucket();
+        int allowedRequests = exactRateLimiter.getRequests();
+        long sleepTime = exactRateLimiter.getBucketCounter().getMillisUntilNextBucket();
         System.out.printf("Sleeping %d millis for the next time bucket to start\n", Long.valueOf(sleepTime));
         Thread.sleep(sleepTime);
 
-        TestClient tc1 = new TestClient(rateLimitFilter, filterChain, "10.20.20.5", 200, 5);
-        TestClient tc2 = new TestClient(rateLimitFilter, filterChain, "10.20.20.10", 200, 10);
+        TestClient tc1 = new TestClient(rateLimitFilter, filterChain, "10.20.20.5", 50, 5); // TPS: 5
+        TestClient tc2 = new TestClient(rateLimitFilter, filterChain, "10.20.20.10", 100, 10); // TPS: 10
 
-        TestClient tc3 = new TestClient(rateLimitFilter, filterChain, "10.20.20.20", 200, 20);
-        TestClient tc4 = new TestClient(rateLimitFilter, filterChain, "10.20.20.40", 200, 40);
+        TestClient tc3 = new TestClient(rateLimitFilter, filterChain, "10.20.20.20", 200, 20); // TPS: 20
+        TestClient tc4 = new TestClient(rateLimitFilter, filterChain, "10.20.20.40", 400, 40); // TPS: 40
+        tc1.join();
+        tc2.join();
+        tc3.join();
+        tc4.join();
+        Assert.assertEquals(200, tc1.results[24]); // only 25 requests made in 5 seconds, all allowed
 
-        // Sleep for up to 10s for clients to complete
-        int count = 0;
-        while (count < 100 && (tc1.results[24] == 0 || tc2.results[49] == 0 || tc3.results[allowedRequests - 1] == 0 ||
-                tc3.results[allowedRequests] == 0 || tc4.results[allowedRequests - 1] == 0 ||
-                tc4.results[allowedRequests] == 0)) {
-            Thread.sleep(100);
-            count++;
-        }
+        Assert.assertEquals(200, tc2.results[49]); // only 50 requests made in 5 seconds, all allowed
 
-        Assert.assertEquals(200, tc1.results[24]); // only 25 requests made, all allowed
+        Assert.assertEquals(200, tc3.results[39]); // first allowedRequests allowed
 
-        Assert.assertEquals(200, tc2.results[49]); // only 25 requests made, all allowed
-
-        Assert.assertEquals(200, tc3.results[allowedRequests - 1]); // first allowedRequests allowed
-
-        Assert.assertEquals(200, tc4.results[allowedRequests - 1]); // first allowedRequests allowed
         if (enforce) {
             Assert.assertEquals(429, tc3.results[allowedRequests]); // subsequent requests dropped
-            Assert.assertEquals(429, tc4.results[allowedRequests]); // subsequent requests dropped
+        } else {
+            Assert.assertEquals(200, tc3.results[allowedRequests]);
         }
+
+        Assert.assertEquals(200, tc4.results[allowedRequests - 1]); // first allowedRequests allowed
+
+        if (enforce) {
+            Assert.assertEquals(429, tc4.results[allowedRequests]); // subsequent requests dropped
+        } else {
+            Assert.assertEquals(200, tc4.results[allowedRequests]);
+        }
+
         if (exposeHeaders) {
             Assert.assertTrue(tc3.rlpHeader[24].contains("q=" + allowedRequests));
             Assert.assertTrue(tc3.rlpHeader[allowedRequests].contains("q=" + allowedRequests));
@@ -104,26 +105,27 @@ public class TestRateLimitFilter extends TomcatBaseTest {
             Assert.assertTrue(tc3.rlpHeader[allowedRequests] == null);
             Assert.assertTrue(tc3.rlHeader[allowedRequests] == null);
         }
+        tomcat.stop();
     }
 
     @Test
-    public void testExposeHeaderAndUnenforcedRateLimitWith4Clients() throws Exception {
-        testRateLimitWith4Clients(true, false);
+    public void testExposeHeaderAndRerferenceRateLimitWith4Clients() throws Exception {
+        testRateLimitWith1Clients(true, false);
     }
 
     @Test
-    public void testUnexposeHeaderAndUnenforcedRateLimitWith4Clients() throws Exception {
-        testRateLimitWith4Clients(false, false);
+    public void testUnexposeHeaderAndRerferenceRateLimitWith4Clients() throws Exception {
+        testRateLimitWith1Clients(false, false);
     }
 
     @Test
-    public void testExposeHeaderAndEnforcedRateLimitWith4Clients() throws Exception {
-        testRateLimitWith4Clients(true, true);
+    public void testExposeHeaderAndEnforceRateLimitWith4Clients() throws Exception {
+        testRateLimitWith1Clients(true, true);
     }
 
     @Test
-    public void testUnexposeHeaderAndEnforcedRateLimitWith4Clients() throws Exception {
-        testRateLimitWith4Clients(false, true);
+    public void testUnexposeHeaderAndEnforceRateLimitWith4Clients() throws Exception {
+        testRateLimitWith1Clients(false, true);
     }
 
     private RateLimitFilter testRateLimitFilter(FilterDef filterDef, Context root) throws ServletException {
@@ -140,6 +142,7 @@ public class TestRateLimitFilter extends TomcatBaseTest {
         root.addFilterMap(filterMap);
 
         FilterConfig filterConfig = TesterFilterConfigs.generateFilterConfig(filterDef);
+
         return rateLimitFilter;
     }
 
@@ -178,10 +181,13 @@ public class TestRateLimitFilter extends TomcatBaseTest {
                     response.setRequest(request);
                     filter.doFilter(request, response, filterChain);
                     results[i] = response.getStatus();
+
                     rlpHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT_POLICY);
                     rlHeader[i] = response.getHeader(RateLimitFilter.HEADER_RATE_LIMIT);
-                    System.out.printf("%s %s: %s %d, Policy:%s, Current:%s\n", ip, Instant.now(),
-                            Integer.valueOf(i + 1), Integer.valueOf(response.getStatus()), rlpHeader[i], rlHeader[i]);
+
+                    if (results[i] != 200) {
+                        break;
+                    }
                     sleep(sleep);
                 }
             } catch (Exception ex) {
@@ -206,5 +212,4 @@ public class TestRateLimitFilter extends TomcatBaseTest {
             return status;
         }
     }
-
 }
