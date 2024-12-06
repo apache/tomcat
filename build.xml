@@ -2061,6 +2061,7 @@
           <!-- These are managed as jvmargs rather than sysproperty because the default varies by OS -->
           <jvmarg value="${openssl.ffm.1}" />
           <jvmarg value="${openssl.ffm.2}" />
+          <jvmarg value="${openssl.ffm.3}" />
 
           <classpath refid="tomcat.test.classpath" />
 

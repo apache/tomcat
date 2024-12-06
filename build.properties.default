@@ -86,8 +86,13 @@ java.net.preferIPv4Stack=false
 # MacOS requires non-default settings to test FFM with OpenSSL. Eg:
 #openssl.ffm.1=-Dorg.apache.tomcat.util.openssl.USE_SYSTEM_LOAD_LIBRARY=true
 #openssl.ffm.2=-Dorg.apache.tomcat.util.openssl.LIBRARY_NAME=ssl
+# Allows loading the crypto library using the JVM and the given name
+# if using org.apache.tomcat.util.openssl.USE_SYSTEM_LOAD_LIBRARY
+# (otherwise it is loaded later by ssl)
+#openssl.ffm.3=-Dorg.apache.tomcat.util.openssl.CRYPTO_LIBRARY_NAME=crypto
 openssl.ffm.1=-DNoop1
 openssl.ffm.2=-DNoop2
+openssl.ffm.3=-DNoop3
 
 
 # ----- Release build settings -----
