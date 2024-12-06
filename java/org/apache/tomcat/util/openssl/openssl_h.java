@@ -35,8 +35,10 @@ public class openssl_h {
     /*
      * On Mac OS SymbolLookup.libraryLookup() appears to ignore java.library.path which means the LibreSSL
      * library will be found which will then fail. Therefore, skip that lookup on Mac OS.
+     * On other platforms this can also be used to give more flexibility when testing.
      */
     public static final boolean USE_SYSTEM_LOAD_LIBRARY = Boolean.getBoolean("org.apache.tomcat.util.openssl.USE_SYSTEM_LOAD_LIBRARY");
+    public static final String CRYPTO_LIBRARY_NAME = System.getProperty("org.apache.tomcat.util.openssl.CRYPTO_LIBRARY_NAME");
     public static final String LIBRARY_NAME = System.getProperty("org.apache.tomcat.util.openssl.LIBRARY_NAME",
             (JrePlatform.IS_MAC_OS) ? "ssl.48" : "ssl");
 
@@ -61,6 +63,9 @@ public class openssl_h {
     static final SymbolLookup SYMBOL_LOOKUP;
     static {
         if (USE_SYSTEM_LOAD_LIBRARY) {
+            if (CRYPTO_LIBRARY_NAME != null) {
+                System.loadLibrary(CRYPTO_LIBRARY_NAME);
+            }
             System.loadLibrary(LIBRARY_NAME);
             SYMBOL_LOOKUP = SymbolLookup.loaderLookup().or(Linker.nativeLinker().defaultLookup());
         } else {
