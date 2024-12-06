@@ -335,7 +335,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 10.1.33 (schultz)" rtext="release in progress">
+<section name="Tomcat 10.1.33 (schultz)" rtext="2024-11-11">
   <subsection name="Other">
     <changelog>
       <fix>Fix release build issue.</fix>
