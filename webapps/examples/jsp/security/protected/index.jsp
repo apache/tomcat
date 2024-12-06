@@ -15,7 +15,6 @@
   limitations under the License.
 --%>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="java.security.Principal" %>
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="org.apache.catalina.TomcatPrincipal" %>
