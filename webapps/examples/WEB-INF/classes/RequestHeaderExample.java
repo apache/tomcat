@@ -73,7 +73,7 @@ public class RequestHeaderExample extends HttpServlet {
 
             // text/html, application/html, etc.
             if (accept.contains("html")) {
-                return true;
+                return false;
             }
         }
         return false;
