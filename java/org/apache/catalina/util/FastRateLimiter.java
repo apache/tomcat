@@ -18,88 +18,119 @@
 package org.apache.catalina.util;
 
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import jakarta.servlet.FilterConfig;
-
-import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
 
 /**
  * A RateLimiter that compromises accuracy for speed in order to provide maximum throughput.
  */
-public class FastRateLimiter implements RateLimiter {
-
-    private static AtomicInteger index = new AtomicInteger();
-
-    TimeBucketCounter bucketCounter;
-
-    int duration;
-
-    int requests;
-
-    int actualRequests;
-
-    int actualDuration;
-
-    // Initial policy name can be rewritten by setPolicyName()
-    private String policyName = "fast-" + index.incrementAndGet();
+public class FastRateLimiter extends RateLimiterBase implements RateLimiter {
 
     @Override
-    public String getPolicyName() {
-        return policyName;
+    protected String getDefaultPolicyName() {
+        return "fast";
     }
 
     @Override
-    public void setPolicyName(String name) {
-        this.policyName = name;
+    protected TimeBucketCounter newCounterInstance(ScheduledExecutorService executorService, int duration) {
+        return new FastTimeBucketCounter(executorService, duration);
     }
 
-    @Override
-    public int getDuration() {
-        return actualDuration;
-    }
+    /**
+     * A fast counter that optimizes efficiency at the expense of approximate bucket indexing.
+     */
+    class FastTimeBucketCounter extends TimeBucketCounter {
 
-    @Override
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    @Override
-    public int getRequests() {
-        return actualRequests;
-    }
-
-    @Override
-    public void setRequests(int requests) {
-        this.requests = requests;
-    }
-
-    @Override
-    public int increment(String ipAddress) {
-        return bucketCounter.increment(ipAddress);
-    }
-
-    @Override
-    public void destroy() {
-        bucketCounter.destroy();
-    }
-
-    @Override
-    public void setFilterConfig(FilterConfig filterConfig) {
-
-        ScheduledExecutorService executorService = (ScheduledExecutorService) filterConfig.getServletContext()
-                .getAttribute(ScheduledThreadPoolExecutor.class.getName());
-
-        if (executorService == null) {
-            executorService = new java.util.concurrent.ScheduledThreadPoolExecutor(1);
+        FastTimeBucketCounter(ScheduledExecutorService utilityExecutor, int bucketDuration) {
+            super(utilityExecutor, getActualDuration(bucketDuration));
+            this.numBits = determineShiftBitsOfDuration(bucketDuration);
+            this.ratio = ratioToPowerOf2(bucketDuration * 1000);
         }
 
-        bucketCounter = new TimeBucketCounter(duration, executorService);
-        actualRequests = (int) Math.round(bucketCounter.getRatio() * requests);
-        actualDuration = bucketCounter.getActualDuration() / 1000;
-    }
+        /**
+         * Milliseconds bucket size as a Power of 2 for bit shift math, e.g. 16 for 65_536ms which is about 1:05 minute
+         */
+        private final int numBits;
 
-    public TimeBucketCounter getBucketCounter() {
-        return bucketCounter;
+        /**
+         * Ratio of actual duration to config duration
+         */
+        private final double ratio;
+
+        @Override
+        public long getBucketIndex(long timestamp) {
+            return System.currentTimeMillis() >> this.numBits;
+        }
+
+        protected int getNumBits() {
+            return numBits;
+        }
+
+        /**
+         * Determines the bits of shift for the specific bucket duration in seconds, which used to figure out the
+         * correct bucket index.
+         */
+        protected static final int determineShiftBitsOfDuration(int duration) {
+            int bits = 0;
+            int pof2 = nextPowerOf2(duration * 1000);
+            int bitCheck = pof2;
+            while (bitCheck > 1) {
+                bitCheck = pof2 >> ++bits;
+            }
+            return bits;
+        }
+
+        /**
+         * The actual duration may differ from the configured duration because it is set to the next power of 2 value in
+         * order to perform very fast bit shift arithmetic.
+         *
+         * @param duration in seconds
+         *
+         * @return the actual bucket duration in seconds
+         *
+         * @see FastTimeBucketCounter#determineShiftBitsOfDuration(int)
+         */
+        protected static final int getActualDuration(int duration) {
+            return (int) (1L << determineShiftBitsOfDuration(duration)) / 1000;
+        }
+
+
+        /**
+         * Returns the ratio between the configured duration param and the actual duration which will be set to the next
+         * power of 2. We then multiply the configured requests param by the same ratio in order to compensate for the
+         * added time, if any.
+         *
+         * @return the ratio, e.g. 1.092 if the actual duration is 65_536 for the configured duration of 60_000
+         */
+        public double getRatio() {
+            return ratio;
+        }
+
+        /**
+         * Returns the ratio to the next power of 2 so that we can adjust the value.
+         */
+        protected static double ratioToPowerOf2(int value) {
+            double nextPO2 = nextPowerOf2(value);
+            return Math.round((1000d * nextPO2 / value)) / 1000d;
+        }
+
+        /**
+         * Returns the next power of 2 given a value, e.g. 256 for 250, or 1024, for 1000.
+         */
+        static int nextPowerOf2(int value) {
+            int valueOfHighestBit = Integer.highestOneBit(value);
+            if (valueOfHighestBit == value) {
+                return value;
+            }
+
+            return valueOfHighestBit << 1;
+        }
+
+
+        @Override
+        public long getMillisUntilNextBucket() {
+            long millis = System.currentTimeMillis();
+            long nextTimeBucketMillis = ((millis + (long) Math.pow(2, numBits)) >> numBits) << numBits;
+            long delta = nextTimeBucketMillis - millis;
+            return delta;
+        }
     }
 }
