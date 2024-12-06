@@ -151,9 +151,6 @@ public abstract class TimeBucketCounter {
      */
     public void destroy() {
         this.map.clear();
-        System.err.println("###################################################################");
-        System.err.println("Destroying monitorFuture:" + monitorFuture + "; maintenanceFuture:" + maintenanceFuture);
-        System.err.println("###################################################################");
         if (monitorFuture != null) {
             monitorFuture.cancel(true);
             monitorFuture = null;
