@@ -734,8 +734,6 @@ public class DefaultServlet extends HttpServlet {
         String ifRangeHeader = request.getHeader("If-Range");
         String rangeHeader = request.getHeader("Range");
 
-        String resourceETag = generateETag(resource);
-        long resourceLastModified = resource.getLastModified();
         // RFC9110 #13.3.2 defines preconditions evaluation order
         int next = 1;
         while (next < 6) {
@@ -910,12 +908,10 @@ public class DefaultServlet extends HttpServlet {
         // be needed later
         String eTag = null;
         String lastModifiedHttp = null;
-        long lastModified = -1;
 
         if (resource.isFile() && !isError) {
             eTag = generateETag(resource);
             lastModifiedHttp = resource.getLastModifiedHttp();
-            lastModified = resource.getLastModified();
         }
 
         // Check if the conditions specified in the optional If headers are
