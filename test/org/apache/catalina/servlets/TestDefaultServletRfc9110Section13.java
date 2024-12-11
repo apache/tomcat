@@ -650,9 +650,9 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         }
         String scExpectation = usePredicate ? "IntPredicate" : Arrays.toString(scExpected);
         Assert.assertTrue(
-                "Failure - sc expected:%s, sc actual:%d, %s, task:%s, \ntarget resource:(%s,%s), \nreq headers: %s, \nresp headers: %s"
-                        .formatted(scExpectation, sc, message, task, etag, FastHttpDateFormat.formatDate(lastModified),
-                                requestHeaders.toString(), responseHeaders.toString()),
+                "Failure - sc expected:" + scExpectation + ", sc actual:" + String.valueOf(sc) + ", " + message
+                + ", task:" + task + ", \ntarget resource:(" + etag + "," + FastHttpDateFormat.formatDate(lastModified)
+                + "), \nreq headers: " + requestHeaders.toString() + ", \nresp headers: " + responseHeaders.toString(),
                 test);
     }
 
