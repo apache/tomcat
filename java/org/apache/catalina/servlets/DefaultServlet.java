@@ -2144,7 +2144,9 @@ public class DefaultServlet extends HttpServlet {
             return true;
         }
         boolean hasAsteriskValue = false;// check existence of special header value '*'
+        int headerCount = 0;
         while (headerValues.hasMoreElements() && !conditionSatisfied) {
+            headerCount++;
             String headerValue = headerValues.nextElement();
             if ("*".equals(headerValue)) {
                 hasAsteriskValue = true;
@@ -2163,7 +2165,11 @@ public class DefaultServlet extends HttpServlet {
                 }
             }
         }
-        if (hasAsteriskValue && headerValues.hasMoreElements()) {
+        if (headerValues.hasMoreElements()) {
+            headerCount++;
+        }
+
+        if (hasAsteriskValue && headerCount > 1) {
             // Note that an If-Match header field with a list value containing "*" and other values (including other
             // instances of "*") is syntactically invalid (therefore not allowed to be generated) and furthermore is
             // unlikely to be interoperable.
@@ -2238,13 +2244,14 @@ public class DefaultServlet extends HttpServlet {
         }
         boolean hasAsteriskValue = false;// check existence of special header value '*'
         boolean conditionSatisfied = true;
+        int headerCount = 0;
         while (headerValues.hasMoreElements()) {
-
+            headerCount++;
             String headerValue = headerValues.nextElement();
 
             if (headerValue.equals("*")) {
                 hasAsteriskValue = true;
-                if (headerValues.hasMoreElements()) {
+                if (headerCount > 1 || headerValues.hasMoreElements()) {
                     conditionSatisfied = false;
                     break;
                 } else {
@@ -2284,8 +2291,11 @@ public class DefaultServlet extends HttpServlet {
             }
 
         }
+        if (headerValues.hasMoreElements()) {
+            headerCount++;
+        }
 
-        if (hasAsteriskValue && headerValues.hasMoreElements()) {
+        if (hasAsteriskValue && headerCount > 1) {
             // Note that an If-None-Match header field with a list value containing "*" and other values (including
             // other instances of "*") is syntactically invalid (therefore not allowed to be generated) and furthermore
             // is unlikely to be interoperable.
