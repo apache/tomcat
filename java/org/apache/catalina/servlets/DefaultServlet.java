@@ -778,8 +778,8 @@ public class DefaultServlet extends HttpServlet {
                     }
                     break;
                 case 5:
-                    if ("GET".equals(request.getMethod()) && request.getHeader("If-Range") != null
-                        && request.getHeader("Range") != null) {
+                    if ("GET".equals(request.getMethod()) && request.getHeader("If-Range") != null &&
+                            request.getHeader("Range") != null) {
                         if (checkIfRange(request, response, resource) && determineRangeRequestsApplicable(resource)) {
                             // Partial content, precondition passed
                             return true;
