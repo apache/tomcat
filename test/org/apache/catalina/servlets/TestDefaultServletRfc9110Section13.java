@@ -422,7 +422,7 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
     }
 
     protected List<String> genETagCondtion(String strongETag, String weakETag, IfPolicy policy) {
-        List<String> headerValues = new ArrayList<String>();
+        List<String> headerValues = new ArrayList<>();
         switch (policy) {
             case ETAG_ALL:
                 headerValues.add("*");
@@ -442,10 +442,10 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
                 break;
             case ETAG_NOT_IN:
                 if (weakETag != null && weakETag.length() > 8) {
-                    headerValues.add(weakETag.substring(0, 3) + "XXXXX"+weakETag.substring(8));
+                    headerValues.add(weakETag.substring(0, 3) + "XXXXX" + weakETag.substring(8));
                 }
                 if (strongETag != null && strongETag.length() > 6) {
-                    headerValues.add(strongETag.substring(0, 1) + "XXXXX"+strongETag.substring(6));
+                    headerValues.add(strongETag.substring(0, 1) + "XXXXX" + strongETag.substring(6));
                 }
                 break;
             case ETAG_SYNTAX_INVALID:
@@ -459,7 +459,7 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
     }
 
     protected List<String> genDateCondtion(long lastModifiedTimestamp, IfPolicy policy) {
-        List<String> headerValues = new ArrayList<String>();
+        List<String> headerValues = new ArrayList<>();
         if (lastModifiedTimestamp <= 0) {
             return headerValues;
         }
@@ -493,7 +493,7 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         if (policy == null) {
             return;
         }
-        List<String> headerValues = new ArrayList<String>();
+        List<String> headerValues = new ArrayList<>();
         String weakETag = resourceETag;
         String strongETag = resourceETag;
         if (resourceETag != null) {
@@ -610,8 +610,8 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         };
         client.setPort(getPort());
         StringBuffer curl = new StringBuffer();
-        curl.append(task.m.name() + " " + task.uri + " HTTP/1.1" + SimpleHttpClient.CRLF + "Host: localhost" + SimpleHttpClient.CRLF +
-                "Connection: Close" + SimpleHttpClient.CRLF);
+        curl.append(task.m.name() + " " + task.uri + " HTTP/1.1" + SimpleHttpClient.CRLF + "Host: localhost" +
+                SimpleHttpClient.CRLF + "Connection: Close" + SimpleHttpClient.CRLF);
 
         for (Entry<String,List<String>> e : requestHeaders.entrySet()) {
             for (String v : e.getValue()) {
@@ -648,11 +648,10 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
             test = p.test(sc);
         }
         String scExpectation = usePredicate ? "IntPredicate" : Arrays.toString(scExpected);
-        Assert.assertTrue(
-                "Failure - sc expected:" + scExpectation + ", sc actual:" + String.valueOf(sc) + ", " + message
-                + ", task:" + task + ", \ntarget resource:(" + etag + "," + FastHttpDateFormat.formatDate(lastModified)
-                + "), \nreq headers: " + requestHeaders.toString() + ", \nresp headers: " + responseHeaders.toString(),
-                test);
+        Assert.assertTrue("Failure - sc expected:" + scExpectation + ", sc actual:" + String.valueOf(sc) + ", " +
+                message + ", task:" + task + ", \ntarget resource:(" + etag + "," +
+                FastHttpDateFormat.formatDate(lastModified) + "), \nreq headers: " + requestHeaders.toString() +
+                ", \nresp headers: " + responseHeaders.toString(), test);
     }
 
     protected void testPreconditions(Task task, IfPolicy ifMatchHeader, IfPolicy ifUnmodifiedSinceHeader,
