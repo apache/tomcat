@@ -2141,6 +2141,11 @@ public class DefaultServlet extends HttpServlet {
     protected boolean checkIfMatch(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
 
+        boolean conditionSatisfied = false;
+        Enumeration<String> headerValues = request.getHeaders("If-Match");
+        if (!headerValues.hasMoreElements()) {
+            return true;
+        }
         String resourceETag = generateETag(resource);
         if (resourceETag == null) {
             // if a current representation for the target resource is not present
@@ -2148,11 +2153,6 @@ public class DefaultServlet extends HttpServlet {
             return false;
         }
 
-        boolean conditionSatisfied = false;
-        Enumeration<String> headerValues = request.getHeaders("If-Match");
-        if (!headerValues.hasMoreElements()) {
-            return true;
-        }
         boolean hasAsteriskValue = false;// check existence of special header value '*'
         int headerCount = 0;
         while (headerValues.hasMoreElements() && !conditionSatisfied) {
