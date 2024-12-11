@@ -44,7 +44,9 @@ public class TestCookieProcessorGenerationHttp extends TomcatBaseTest {
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
         ctx.setCookieProcessor(new Rfc6265CookieProcessor());
-        Tomcat.addServlet(ctx, "test", new CookieServlet("\u0120"));
+        Map<String,String> cookies = new HashMap<>();
+        cookies.put("Test", "\u0120");
+        Tomcat.addServlet(ctx, "test", new CookieServlet(cookies));
         ctx.addServletMappingDecoded("/test", "test");
         tomcat.start();
 
@@ -68,19 +70,50 @@ public class TestCookieProcessorGenerationHttp extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private final String cookieValue;
+        private final Map<String,String> cookieNamesValues;
 
-        CookieServlet(String cookieValue) {
-            this.cookieValue = cookieValue;
+        CookieServlet(Map<String,String> cookieNamesValues) {
+            this.cookieNamesValues = cookieNamesValues;
         }
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp)
                 throws ServletException, IOException {
-            Cookie cookie = new Cookie("Test", cookieValue);
-            resp.addCookie(cookie);
+            for (Map.Entry<String,String> entry : cookieNamesValues.entrySet()) {
+                Cookie cookie = new Cookie(entry.getKey(), entry.getValue());
+                resp.addCookie(cookie);
+            }
             resp.setContentType("text/plain");
             resp.getWriter().print("OK");
         }
+    }
+
+
+    @Test
+    public void testCaseSensitiveCookie() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+        ctx.setCookieProcessor(new Rfc6265CookieProcessor());
+        Map<String,String> cookies = new HashMap<>();
+        cookies.put("aaa", "zzz");
+        cookies.put("aAa", "yyy");
+        Tomcat.addServlet(ctx, "test", new CookieServlet(cookies));
+        ctx.addServletMappingDecoded("/test", "test");
+        tomcat.start();
+
+        Map<String,List<String>> headers = new HashMap<>();
+        ByteChunk res = new ByteChunk();
+        getUrl("http://localhost:" + getPort() + "/test", res, headers);
+        List<String> cookieHeaders = headers.get("Set-Cookie");
+        Assert.assertEquals("There should be two Set-Cookie headers in this test",
+                2, cookieHeaders.size());
+        // Remove the cookies the client sees from the map that was sent. Should leave the map empty.
+        for (String cookieHeader : cookieHeaders) {
+            String[] nv = cookieHeader.split("=");
+            Assert.assertEquals(2, nv.length);
+            Assert.assertTrue(nv[1].equals(cookies.remove(nv[0])));
+        }
+        Assert.assertEquals(0,  cookies.size());
     }
 }
