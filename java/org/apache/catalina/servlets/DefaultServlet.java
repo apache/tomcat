@@ -580,6 +580,10 @@ public class DefaultServlet extends HttpServlet {
 
         WebResource resource = resources.getResource(path);
 
+        if (resource != null && !checkIfHeaders(req, resp, resource)) {
+            return;
+        }
+
         ContentRange range = parseContentRange(req, resp);
 
         if (range == null) {
@@ -699,6 +703,9 @@ public class DefaultServlet extends HttpServlet {
 
         WebResource resource = resources.getResource(path);
 
+        if (resource != null && !checkIfHeaders(req, resp, resource)) {
+            return;
+        }
         if (resource.exists()) {
             if (resource.delete()) {
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
