@@ -129,6 +129,8 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         testPreconditions(Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, IfPolicy.ETAG_EXACTLY, IfPolicy.DATE_MULTI_IN,
                 null, 304);
         testPreconditions(Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, IfPolicy.ETAG_ALL, IfPolicy.DATE_EQ, null, 304);
+
+        testPreconditions(Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, IfPolicy.DATE_GT, null, 412);
     }
 
     @Test
