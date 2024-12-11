@@ -749,10 +749,72 @@ public class DefaultServlet extends HttpServlet {
      */
     protected boolean checkIfHeaders(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
+        String ifNoneMatchHeader = request.getHeader("If-None-Match");
 
-        return checkIfMatch(request, response, resource) && checkIfModifiedSince(request, response, resource) &&
-                checkIfNoneMatch(request, response, resource) && checkIfUnmodifiedSince(request, response, resource);
-
+        // RFC9110 #13.3.2 defines preconditions evaluation order
+        int next = 1;
+        while (true) {
+            switch (next) {
+                case 1:
+                    if (request.getHeader("If-Match") != null) {
+                        if (checkIfMatch(request, response, resource)) {
+                            next = 3;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        next = 2;
+                    }
+                    break;
+                case 2:
+                    if (request.getHeader("If-Unmodified-Since") != null) {
+                        if (checkIfUnmodifiedSince(request, response, resource)) {
+                            next = 3;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        next = 3;
+                    }
+                    break;
+                case 3:
+                    if (ifNoneMatchHeader != null) {
+                        if (checkIfNoneMatch(request, response, resource)) {
+                            next = 5;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        next = 4;
+                    }
+                    break;
+                case 4:
+                    if (("GET".equals(request.getMethod()) || "HEAD".equals(request.getMethod())) &&
+                            ifNoneMatchHeader == null && request.getHeader("If-Modified-Since") != null) {
+                        if (checkIfModifiedSince(request, response, resource)) {
+                            next = 5;
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        next = 5;
+                    }
+                    break;
+                case 5:
+                    if ("GET".equals(request.getMethod()) && request.getHeader("If-Range") != null
+                        && request.getHeader("Range") != null) {
+                        if (checkIfRange(request, response, resource) && determineRangeRequestsApplicable(resource)) {
+                            // Partial content, precondition passed
+                            return true;
+                        } else {
+                            // ignore the Range header field
+                            return true;
+                        }
+                    } else {
+                        return true;
+                    }
+            }
+        }
     }
 
 
@@ -848,15 +910,6 @@ public class DefaultServlet extends HttpServlet {
         }
 
         boolean included = false;
-        // Check if the conditions specified in the optional If headers are
-        // satisfied.
-        if (resource.isFile()) {
-            // Checking If headers
-            included = (request.getAttribute(RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
-            if (!included && !isError && !checkIfHeaders(request, response, resource)) {
-                return;
-            }
-        }
 
         // Find content type.
         String contentType = resource.getMimeType();
@@ -870,11 +923,21 @@ public class DefaultServlet extends HttpServlet {
         // be needed later
         String eTag = null;
         String lastModifiedHttp = null;
+
         if (resource.isFile() && !isError) {
             eTag = generateETag(resource);
             lastModifiedHttp = resource.getLastModifiedHttp();
         }
 
+        // Check if the conditions specified in the optional If headers are
+        // satisfied.
+        if (resource.isFile()) {
+            // Checking If headers
+            included = (request.getAttribute(RequestDispatcher.INCLUDE_CONTEXT_PATH) != null);
+            if (!included && !isError && !checkIfHeaders(request, response, resource)) {
+                return;
+            }
+        }
 
         // Serve a precompressed version of the file if present
         boolean usingPrecompressedVersion = false;
@@ -1411,41 +1474,24 @@ public class DefaultServlet extends HttpServlet {
     protected ArrayList<Range> parseRange(HttpServletRequest request, HttpServletResponse response,
             WebResource resource) throws IOException {
 
-        if (!"GET".equals(request.getMethod())) {
+        // Retrieving the range header (if any is specified)
+        String rangeHeader = request.getHeader("Range");
+
+        if (rangeHeader == null) {
+            // No Range header is the same as ignoring any Range header
+            return FULL;
+        }
+
+        if (!"GET".equals(request.getMethod()) || !determineRangeRequestsApplicable(resource)) {
             // RFC 9110 - Section 14.2: GET is the only method for which range handling is defined.
             // Otherwise MUST ignore a Range header field
             return FULL;
         }
 
-        // Checking If-Range
-        String headerValue = request.getHeader("If-Range");
-
-        if (headerValue != null) {
-
-            long headerValueTime = (-1L);
-            try {
-                headerValueTime = request.getDateHeader("If-Range");
-            } catch (IllegalArgumentException e) {
-                // Ignore
-            }
-
-            String eTag = generateETag(resource);
-            long lastModified = resource.getLastModified();
-
-            if (headerValueTime == (-1L)) {
-                // If the ETag the client gave does not match the entity
-                // etag, then the entire entity is returned.
-                if (!eTag.equals(headerValue.trim())) {
-                    return FULL;
-                }
-            } else {
-                // If the timestamp of the entity the client got differs from
-                // the last modification date of the entity, the entire entity
-                // is returned.
-                if (Math.abs(lastModified - headerValueTime) > 1000) {
-                    return FULL;
-                }
-            }
+        // Although If-Range evaluation was performed previously, the result were not propagated.
+        // Hence we have to evaluate If-Range again.
+        if (!checkIfRange(request, response, resource)) {
+            return FULL;
         }
 
         long fileLength = resource.getContentLength();
@@ -1456,13 +1502,6 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        // Retrieving the range header (if any is specified)
-        String rangeHeader = request.getHeader("Range");
-
-        if (rangeHeader == null) {
-            // No Range header is the same as ignoring any Range header
-            return FULL;
-        }
 
         Ranges ranges = Ranges.parse(new StringReader(rangeHeader));
 
@@ -2230,35 +2269,48 @@ public class DefaultServlet extends HttpServlet {
     protected boolean checkIfMatch(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        String headerValue = request.getHeader("If-Match");
-        if (headerValue != null) {
+        String resourceETag = generateETag(resource);
+        if (resourceETag == null) {
+            // if a current representation for the target resource is not present
+            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+            return false;
+        }
 
-            boolean conditionSatisfied;
-
-            if (!headerValue.equals("*")) {
-                String resourceETag = generateETag(resource);
-                if (resourceETag == null) {
-                    conditionSatisfied = false;
-                } else {
-                    // RFC 7232 requires strong comparison for If-Match headers
-                    Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), false, resourceETag);
-                    if (matched == null) {
-                        if (debug > 10) {
-                            log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
-                        }
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                        return false;
+        boolean conditionSatisfied = false;
+        Enumeration<String> headerValues = request.getHeaders("If-Match");
+        if (!headerValues.hasMoreElements()) {
+            return true;
+        }
+        boolean hasAsteriskValue = false;// check existence of special header value '*'
+        while (headerValues.hasMoreElements() && !conditionSatisfied) {
+            String headerValue = headerValues.nextElement();
+            if ("*".equals(headerValue)) {
+                hasAsteriskValue = true;
+                conditionSatisfied = true;
+            } else {
+                // RFC 7232 requires strong comparison for If-Match headers
+                Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), false, resourceETag);
+                if (matched == null) {
+                    if (debug > 10) {
+                        log("DefaultServlet.checkIfMatch:  Invalid header value [" + headerValue + "]");
                     }
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return false;
+                } else {
                     conditionSatisfied = matched.booleanValue();
                 }
-            } else {
-                conditionSatisfied = true;
             }
-
-            if (!conditionSatisfied) {
-                response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-                return false;
-            }
+        }
+        if (hasAsteriskValue && headerValues.hasMoreElements()) {
+            // Note that an If-Match header field with a list value containing "*" and other values (including other
+            // instances of "*") is syntactically invalid (therefore not allowed to be generated) and furthermore is
+            // unlikely to be interoperable.
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return false;
+        }
+        if (!conditionSatisfied) {
+            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+            return false;
         }
         return true;
     }
@@ -2276,14 +2328,16 @@ public class DefaultServlet extends HttpServlet {
      */
     protected boolean checkIfModifiedSince(HttpServletRequest request, HttpServletResponse response,
             WebResource resource) {
+
+        long resourceLastModified = resource.getLastModified();
+
         try {
             long headerValue = request.getDateHeader("If-Modified-Since");
-            long lastModified = resource.getLastModified();
             if (headerValue != -1) {
 
                 // If an If-None-Match header has been specified, if modified since
                 // is ignored.
-                if ((request.getHeader("If-None-Match") == null) && (lastModified < headerValue + 1000)) {
+                if ((request.getHeader("If-None-Match") == null) && (resourceLastModified < headerValue + 1000)) {
                     // The entity has not been modified since the date
                     // specified by the client. This is not an error case.
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -2314,15 +2368,39 @@ public class DefaultServlet extends HttpServlet {
     protected boolean checkIfNoneMatch(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
 
-        String headerValue = request.getHeader("If-None-Match");
-        if (headerValue != null) {
+        String resourceETag = generateETag(resource);
 
-            boolean conditionSatisfied;
+        Enumeration<String> headerValues = request.getHeaders("If-None-Match");
+        if (!headerValues.hasMoreElements()) {
+            return true;
+        }
+        boolean hasAsteriskValue = false;// check existence of special header value '*'
+        boolean conditionSatisfied = true;
+        while (headerValues.hasMoreElements()) {
 
-            String resourceETag = generateETag(resource);
-            if (!headerValue.equals("*")) {
-                if (resourceETag == null) {
+            String headerValue = headerValues.nextElement();
+
+            if (headerValue.equals("*")) {
+                hasAsteriskValue = true;
+                if (headerValues.hasMoreElements()) {
                     conditionSatisfied = false;
+                    break;
+                } else {
+                    // asterisk '*' is the only field value.
+                    // RFC9110: If the field value is "*", the condition is false if the origin server has a current
+                    // representation for the target resource.
+                    if (resourceETag != null) {
+                        conditionSatisfied = false;
+                    } else {
+                        conditionSatisfied = true;
+                    }
+                    break;
+                }
+            } else {
+                if (resourceETag == null) {
+                    // None of the entity tag matches.
+                    conditionSatisfied = true;
+                    break;
                 } else {
                     // RFC 7232 requires weak comparison for If-None-Match headers
                     Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), true, resourceETag);
@@ -2333,25 +2411,37 @@ public class DefaultServlet extends HttpServlet {
                         response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                         return false;
                     }
-                    conditionSatisfied = matched.booleanValue();
+                    if (matched.booleanValue()) {
+                        // RFC9110: If the field value is a list of entity tags, the condition is false if one of the
+                        // listed tags
+                        // matches the entity tag of the selected representation.
+                        conditionSatisfied = false;
+                        break;
+                    }
                 }
-            } else {
-                conditionSatisfied = true;
             }
 
-            if (conditionSatisfied) {
-                // For GET and HEAD, we should respond with
-                // 304 Not Modified.
-                // For every other method, 412 Precondition Failed is sent
-                // back.
-                if ("GET".equals(request.getMethod()) || "HEAD".equals(request.getMethod())) {
-                    response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                    response.setHeader("ETag", resourceETag);
-                } else {
-                    response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-                }
-                return false;
+        }
+
+        if (hasAsteriskValue && headerValues.hasMoreElements()) {
+            // Note that an If-None-Match header field with a list value containing "*" and other values (including
+            // other instances of "*") is syntactically invalid (therefore not allowed to be generated) and furthermore
+            // is unlikely to be interoperable.
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return false;
+        }
+        if (!conditionSatisfied) {
+            // For GET and HEAD, we should respond with
+            // 304 Not Modified.
+            // For every other method, 412 Precondition Failed is sent
+            // back.
+            if ("GET".equals(request.getMethod()) || "HEAD".equals(request.getMethod())) {
+                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                response.setHeader("ETag", resourceETag);
+            } else {
+                response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
             }
+            return false;
         }
         return true;
     }
@@ -2371,11 +2461,28 @@ public class DefaultServlet extends HttpServlet {
      */
     protected boolean checkIfUnmodifiedSince(HttpServletRequest request, HttpServletResponse response,
             WebResource resource) throws IOException {
+
+        long resourceLastModified = resource.getLastModified();
+        if (resourceLastModified <= -1 || request.getHeader("If-Match") != null) {
+            // MUST ignore if the resource does not have a modification date available.
+            // MUST ignore if the request contains an If-Match header field
+            return true;
+        }
+        Enumeration<String> headerEnum = request.getHeaders("If-Unmodified-Since");
+        if (!headerEnum.hasMoreElements()) {
+            // If-Unmodified-Since is not present
+            return true;
+        }
+        headerEnum.nextElement();
+        if (headerEnum.hasMoreElements()) {
+            // If-Unmodified-Since is a list of dates
+            return true;
+        }
+
         try {
-            long lastModified = resource.getLastModified();
             long headerValue = request.getDateHeader("If-Unmodified-Since");
             if (headerValue != -1) {
-                if (lastModified >= (headerValue + 1000)) {
+                if (resourceLastModified >= (headerValue + 1000)) {
                     // The entity has not been modified since the date
                     // specified by the client. This is not an error case.
                     response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
@@ -2388,6 +2495,79 @@ public class DefaultServlet extends HttpServlet {
         return true;
     }
 
+
+    /**
+     * Check if the if-range condition is satisfied.
+     *
+     * @param request  The servlet request we are processing
+     * @param response The servlet response we are creating
+     * @param resource The resource
+     *
+     * @return <code>true</code> if the resource meets the specified condition, and <code>false</code> if the condition
+     *             is not satisfied, resulting in transfer of the new selected representation instead of a 412
+     *             (Precondition Failed) response.
+     *
+     * @throws IOException an IO error occurred
+     */
+    protected boolean checkIfRange(HttpServletRequest request, HttpServletResponse response, WebResource resource)
+            throws IOException {
+        String resourceETag = generateETag(resource);
+        long resourceLastModified = resource.getLastModified();
+
+        String headerValue = request.getHeader("If-Range");
+        if (headerValue == null) {
+            return true;
+        }
+
+        String rangeHeader = request.getHeader("Range");
+        if (rangeHeader == null || !determineRangeRequestsApplicable(resource)) {
+            // Simply ignore If-Range header field
+            return true;
+        }
+
+        long headerValueTime = (-1L);
+        try {
+            headerValueTime = request.getDateHeader("If-Range");
+        } catch (IllegalArgumentException e) {
+            // Ignore
+        }
+
+        if (headerValueTime == (-1L)) {
+            // If the ETag the client gave does not match the entity
+            // etag, then the entire entity is returned.
+            if (resourceETag != null && resourceETag.startsWith("\"") && resourceETag.equals(headerValue.trim())) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            // unit of HTTP date is second, ignore millisecond part.
+            return resourceLastModified >= headerValueTime && resourceLastModified < headerValueTime + 1000;
+        }
+    }
+
+    /**
+     * Checks if range request is supported by server
+     *
+     * @return <code>true</code> server supports range requests feature.
+     */
+    protected boolean isRangeRequestsSupported() {
+        // Range-Requests optional feature is enabled implicitly.
+        return true;
+    }
+
+    /**
+     * Determines if range-request is applicable for the target resource.
+     * <p>
+     * Subclass have an opportunity to customize by overriding this method.
+     *
+     * @param resource the target resource
+     *
+     * @return <code>true</code> only if range requests is supported by both the server and the target resource.
+     */
+    protected boolean determineRangeRequestsApplicable(WebResource resource) {
+        return isRangeRequestsSupported() && resource.isFile() && resource.exists();
+    }
 
     /**
      * Provides the entity tag (the ETag header) for the given resource. Intended to be over-ridden by custom

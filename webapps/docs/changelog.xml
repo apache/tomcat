@@ -112,6 +112,10 @@
         <code>DataSourcePropertyStore</code> that may be used by the WebDAV
         Servlet. (remm)
       </update>
+      <update>
+        Improve HTTP If headers processing according to RFC 9110. Based on pull
+        request <pr>796</pr> by Chenjp. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
