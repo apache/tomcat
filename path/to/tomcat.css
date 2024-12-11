@@ -1,0 +1,13 @@
+.searchbox button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  border: 1px solid black;
+}
+
+.searchbox input,
+.searchbox button {
+  height: 100%;
+  border: 1px solid black;
+}
