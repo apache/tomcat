@@ -74,45 +74,45 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
         // testPreconditions_rfc9110_13_2_2_1_head0
-        parameterSets.add(new Object[] { true, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_ALL, null, null, null, null, false,
-                null, new int[] { 200 } });
-        parameterSets.add(new Object[] { true, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_EXACTLY, null, null, null, null,
-                false, null, new int[] { 200 } });
-        parameterSets.add(new Object[] { true, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_IN, null, null, null, null, false,
-                null, new int[] { 200 } });
-        parameterSets.add(new Object[] { true, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_NOT_IN, null, null, null, null,
-                false, null, new int[] { 412 } });
-        parameterSets.add(new Object[] { true, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_SYNTAX_INVALID, null, null, null,
-                null, false, null, new int[] { 400 } });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_ALL, null, null, null, null,
+                Boolean.FALSE, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_EXACTLY, null, null, null,
+                null, Boolean.FALSE, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_IN, null, null, null, null,
+                Boolean.FALSE, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_NOT_IN, null, null, null,
+                null, Boolean.FALSE, null, new int[] { 412 } });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_SYNTAX_INVALID, null, null,
+                null, null, Boolean.FALSE, null, new int[] { 400 } });
 
-        parameterSets.add(new Object[] { false, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_ALL, null, null, null, null, false,
-                null, new int[] { 200 } });
-        parameterSets.add(new Object[] { false, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_EXACTLY, null, null, null, null,
-                false, null, new int[] { 412 } });
-        parameterSets.add(new Object[] { false, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_IN, null, null, null, null, false,
-                null, new int[] { 412 } });
-        parameterSets.add(new Object[] { false, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_NOT_IN, null, null, null, null,
-                false, null, new int[] { 412 } });
-        parameterSets.add(new Object[] { false, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_SYNTAX_INVALID, null, null, null,
-                null, false, null, new int[] { 400 } });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_ALL, null, null, null, null,
+                Boolean.FALSE, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_EXACTLY, null, null, null,
+                null, Boolean.FALSE, null, new int[] { 412 } });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_IN, null, null, null, null,
+                Boolean.FALSE, null, new int[] { 412 } });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_NOT_IN, null, null, null,
+                null, Boolean.FALSE, null, new int[] { 412 } });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_SYNTAX_INVALID, null, null,
+                null, null, Boolean.FALSE, null, new int[] { 400 } });
 
-        parameterSets.add(new Object[] { true, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_EQ, null, null, null, false,
-                null, new int[] { 200 } });
-        parameterSets.add(new Object[] { true, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, null, null, false,
-                null, new int[] { 412 } });
-        parameterSets.add(new Object[] { true, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, null, null, null, false,
-                null, new int[] { 200 } });
-        parameterSets.add(new Object[] { true, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_MULTI_IN, null, null, null,
-                false, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_EQ, null, null, null,
+                Boolean.FALSE, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, null, null,
+                Boolean.FALSE, null, new int[] { 412 } });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, null, null, null,
+                Boolean.FALSE, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_MULTI_IN, null, null,
+                null, Boolean.FALSE, null, new int[] { 200 } });
 
-        parameterSets.add(new Object[] { false, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_EQ, null, null, null, false,
-                null, new int[] { 200 } });
-        parameterSets.add(new Object[] { false, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, null, null, false,
-                null, new int[] { 412 } });
-        parameterSets.add(new Object[] { false, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, null, null, null, false,
-                null, new int[] { 200 } });
-        parameterSets.add(new Object[] { false, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_MULTI_IN, null, null, null,
-                false, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_EQ, null, null, null,
+                Boolean.FALSE, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, null, null,
+                Boolean.FALSE, null, new int[] { 412 } });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, null, null, null,
+                Boolean.FALSE, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_MULTI_IN, null, null,
+                null, Boolean.FALSE, null, new int[] { 200 } });
 
 
         return parameterSets;
@@ -205,7 +205,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     }
 
     protected List<String> genETagCondtion(String strongETag, String weakETag, IfPolicy policy) {
-        List<String> headerValues = new ArrayList<String>();
+        List<String> headerValues = new ArrayList<>();
         switch (policy) {
             case ETAG_ALL:
                 headerValues.add("*");
@@ -242,7 +242,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     }
 
     protected List<String> genDateCondtion(long lastModifiedTimestamp, IfPolicy policy) {
-        List<String> headerValues = new ArrayList<String>();
+        List<String> headerValues = new ArrayList<>();
         if (lastModifiedTimestamp <= 0) {
             return headerValues;
         }
@@ -276,7 +276,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
         if (policy == null) {
             return;
         }
-        List<String> headerValues = new ArrayList<String>();
+        List<String> headerValues = new ArrayList<>();
         String weakETag = resourceETag;
         String strongETag = resourceETag;
         if (resourceETag != null) {
@@ -424,10 +424,9 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
             test = p.test(sc);
         }
         String scExpectation = usePredicate ? "IntPredicate" : Arrays.toString(scExpected);
-        Assert.assertTrue(
-                "Failure - sc expected:" + scExpectation + ", sc actual:" + String.valueOf(sc)
-                + ", task:" + task + ", \ntarget resource:(" + etag + "," + FastHttpDateFormat.formatDate(lastModified)
-                + "), \nreq headers: " + requestHeaders.toString() + ", \nresp headers: " + responseHeaders.toString(),
+        Assert.assertTrue("Failure - sc expected:" + scExpectation + ", sc actual:" + String.valueOf(sc) + ", task:" +
+                task + ", \ntarget resource:(" + etag + "," + FastHttpDateFormat.formatDate(lastModified) +
+                "), \nreq headers: " + requestHeaders.toString() + ", \nresp headers: " + responseHeaders.toString(),
                 test);
     }
 }
