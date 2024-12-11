@@ -18,7 +18,6 @@ package org.apache.catalina.servlets;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -309,33 +308,33 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
         super.setUp();
         tempDocBase = Files.createTempDirectory(getTemporaryDirectory().toPath(), "conditional").toFile();
         long lastModified = FastHttpDateFormat.parseDate("Fri, 06 Dec 2024 00:00:00 GMT");
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "index.html"), "<html><body>Index</body></html>".getBytes(),
+        Files.write((new File(tempDocBase.getAbsolutePath(), "index.html")).toPath(), "<html><body>Index</body></html>".getBytes(),
                 StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "index.html").toFile().setLastModified(lastModified);
+        (new File(tempDocBase.getAbsolutePath(), "index.html")).setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "put_exist.txt"), "put_exist_v0".getBytes(),
+        Files.write((new File(tempDocBase.getAbsolutePath(), "put_exist.txt")).toPath(), "put_exist_v0".getBytes(),
                 StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "put_exist.txt").toFile().setLastModified(lastModified);
+        (new File(tempDocBase.getAbsolutePath(), "put_exist.txt")).setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist.txt"), "delete_exist_v0".getBytes(),
+        Files.write((new File(tempDocBase.getAbsolutePath(), "delete_exist.txt")).toPath(), "delete_exist_v0".getBytes(),
                 StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "delete_exist.txt").toFile().setLastModified(lastModified);
+        (new File(tempDocBase.getAbsolutePath(), "delete_exist.txt")).setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist1.txt"), "delete_exist1_v0".getBytes(),
+        Files.write((new File(tempDocBase.getAbsolutePath(), "delete_exist1.txt")).toPath(), "delete_exist1_v0".getBytes(),
                 StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "delete_exist1.txt").toFile().setLastModified(lastModified);
+        (new File(tempDocBase.getAbsolutePath(), "delete_exist1.txt")).setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist2.txt"), "delete_exist2_v0".getBytes(),
+        Files.write((new File(tempDocBase.getAbsolutePath(), "delete_exist2.txt")).toPath(), "delete_exist2_v0".getBytes(),
                 StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "delete_exist2.txt").toFile().setLastModified(lastModified);
+        (new File(tempDocBase.getAbsolutePath(), "delete_exist2.txt")).setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist3.txt"), "delete_exist3_v0".getBytes(),
+        Files.write((new File(tempDocBase.getAbsolutePath(), "delete_exist3.txt")).toPath(), "delete_exist3_v0".getBytes(),
                 StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "delete_exist3.txt").toFile().setLastModified(lastModified);
+        (new File(tempDocBase.getAbsolutePath(), "delete_exist3.txt")).setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist4.txt"), "delete_exist4_v0".getBytes(),
+        Files.write((new File(tempDocBase.getAbsolutePath(), "delete_exist4.txt")).toPath(), "delete_exist4_v0".getBytes(),
                 StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "delete_exist4.txt").toFile().setLastModified(lastModified);
+        (new File(tempDocBase.getAbsolutePath(), "delete_exist4.txt")).setLastModified(lastModified);
 
     }
 
@@ -425,9 +424,9 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
         }
         String scExpectation = usePredicate ? "IntPredicate" : Arrays.toString(scExpected);
         Assert.assertTrue(
-                "Failure - sc expected:%s, sc actual:%d, task:%s, \ntarget resource:(%s,%s), \nreq headers: %s, \nresp headers: %s"
-                        .formatted(scExpectation, sc, task, etag, FastHttpDateFormat.formatDate(lastModified),
-                                requestHeaders.toString(), responseHeaders.toString()),
+                "Failure - sc expected:" + scExpectation + ", sc actual:" + String.valueOf(sc)
+                + ", task:" + task + ", \ntarget resource:(" + etag + "," + FastHttpDateFormat.formatDate(lastModified)
+                + "), \nreq headers: " + requestHeaders.toString() + ", \nresp headers: " + responseHeaders.toString(),
                 test);
     }
 }
