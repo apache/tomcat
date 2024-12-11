@@ -749,72 +749,8 @@ public class DefaultServlet extends HttpServlet {
      */
     protected boolean checkIfHeaders(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
-        String ifNoneMatchHeader = request.getHeader("If-None-Match");
-
-        // RFC9110 #13.3.2 defines preconditions evaluation order
-        int next = 1;
-        while (true) {
-            switch (next) {
-                case 1:
-                    if (request.getHeader("If-Match") != null) {
-                        if (checkIfMatch(request, response, resource)) {
-                            next = 3;
-                        } else {
-                            return false;
-                        }
-                    } else {
-                        next = 2;
-                    }
-                    break;
-                case 2:
-                    if (request.getHeader("If-Unmodified-Since") != null) {
-                        if (checkIfUnmodifiedSince(request, response, resource)) {
-                            next = 3;
-                        } else {
-                            return false;
-                        }
-                    } else {
-                        next = 3;
-                    }
-                    break;
-                case 3:
-                    if (ifNoneMatchHeader != null) {
-                        if (checkIfNoneMatch(request, response, resource)) {
-                            next = 5;
-                        } else {
-                            return false;
-                        }
-                    } else {
-                        next = 4;
-                    }
-                    break;
-                case 4:
-                    if (("GET".equals(request.getMethod()) || "HEAD".equals(request.getMethod())) &&
-                            ifNoneMatchHeader == null && request.getHeader("If-Modified-Since") != null) {
-                        if (checkIfModifiedSince(request, response, resource)) {
-                            next = 5;
-                        } else {
-                            return false;
-                        }
-                    } else {
-                        next = 5;
-                    }
-                    break;
-                case 5:
-                    if ("GET".equals(request.getMethod()) && request.getHeader("If-Range") != null &&
-                            request.getHeader("Range") != null) {
-                        if (checkIfRange(request, response, resource) && determineRangeRequestsApplicable(resource)) {
-                            // Partial content, precondition passed
-                            return true;
-                        } else {
-                            // ignore the Range header field
-                            return true;
-                        }
-                    } else {
-                        return true;
-                    }
-            }
-        }
+        return checkIfMatch(request, response, resource) && checkIfModifiedSince(request, response, resource) &&
+                checkIfNoneMatch(request, response, resource) && checkIfUnmodifiedSince(request, response, resource);
     }
 
 
@@ -2335,6 +2271,10 @@ public class DefaultServlet extends HttpServlet {
     protected boolean checkIfModifiedSince(HttpServletRequest request, HttpServletResponse response,
             WebResource resource) {
 
+        String method = request.getMethod();
+        if (!"GET".equals(method) && !"HEAD".equals(method)) {
+            return true;
+        }
         long resourceLastModified = resource.getLastModified();
 
         try {
@@ -2348,7 +2288,6 @@ public class DefaultServlet extends HttpServlet {
                     // specified by the client. This is not an error case.
                     response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                     response.setHeader("ETag", generateETag(resource));
-
                     return false;
                 }
             }
