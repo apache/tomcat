@@ -4,6 +4,7 @@
   right: 0;
   cursor: pointer;
   border: 1px solid black;
+  border-radius: 10px;
 }
 
 .searchbox input,
