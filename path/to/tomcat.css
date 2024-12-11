@@ -1,14 +1,10 @@
-.searchbox button {
-  position: absolute;
-  top: 0;
-  right: 0;
-  cursor: pointer;
-  border: 1px solid black;
-  border-radius: 10px;
+a {
+  color: #0066cc;
+  text-decoration: none;
+  font-weight: bold;
 }
 
-.searchbox input,
-.searchbox button {
-  height: 100%;
-  border: 1px solid black;
+a:hover {
+  color: #003366;
+  text-decoration: underline;
 }
