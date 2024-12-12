@@ -610,6 +610,10 @@ public class DefaultServlet extends HttpServlet {
             return;
         }
 
+        if (!checkIfHeaders(req, resp, resource)) {
+            return;
+        }
+
         InputStream resourceInputStream = null;
 
         try {
@@ -2217,11 +2221,6 @@ public class DefaultServlet extends HttpServlet {
             return true;
         }
         String resourceETag = generateETag(resource);
-        if (resourceETag == null) {
-            // if a current representation for the target resource is not present
-            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-            return false;
-        }
 
         boolean hasAsteriskValue = false;// check existence of special header value '*'
         int headerCount = 0;
@@ -2230,7 +2229,9 @@ public class DefaultServlet extends HttpServlet {
             String headerValue = headerValues.nextElement();
             if ("*".equals(headerValue)) {
                 hasAsteriskValue = true;
-                conditionSatisfied = true;
+                if (resourceETag != null) {
+                    conditionSatisfied = true;
+                }
             } else {
                 // RFC 7232 requires strong comparison for If-Match headers
                 Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), false, resourceETag);

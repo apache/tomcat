@@ -27,6 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -116,12 +118,15 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
 
                 // RFC 9110, Section 13.2.2, Step 3, HEAD: If-None-Match with and without If-Modified-Since
                 for (DatePrecondition dateCondition : DatePrecondition.values()) {
-                    parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.ALL,
-                            dateCondition, null, null, Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_412 : SC_304 });
-                    parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.EXACTLY,
-                            dateCondition, null, null, Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_412 : SC_304 });
-                    parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.IN,
-                            dateCondition, null, null, Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_412 : SC_304 });
+                    parameterSets
+                            .add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.ALL, dateCondition,
+                                    null, null, Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_412 : SC_304 });
+                    parameterSets.add(
+                            new Object[] { useStrongEtag, task, null, null, EtagPrecondition.EXACTLY, dateCondition,
+                                    null, null, Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_412 : SC_304 });
+                    parameterSets
+                            .add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.IN, dateCondition,
+                                    null, null, Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_412 : SC_304 });
                     parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.NOT_IN,
                             dateCondition, null, null, Boolean.FALSE, SC_200 });
                     parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.INVALID,
@@ -223,17 +228,48 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                     DatePrecondition.MULTI_IN_REV, Boolean.FALSE, SC_200 });
             parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
                     DatePrecondition.INVALID, Boolean.FALSE, SC_200 });
+
+            // PUT tests
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_EXIST_TXT, null, null, null, null, null, null,
+                    Boolean.FALSE, SC_204 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_EXIST_TXT, EtagPrecondition.ALL, null, null, null,
+                    null, null, Boolean.FALSE, SC_204 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_EXIST_TXT, EtagPrecondition.EXACTLY, null, null,
+                    null, null, null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_204 : SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_EXIST_TXT, EtagPrecondition.IN, null, null, null,
+                    null, null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_204 : SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_EXIST_TXT, EtagPrecondition.NOT_IN, null, null,
+                    null, null, null, Boolean.FALSE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_EXIST_TXT, EtagPrecondition.INVALID, null, null,
+                    null, null, null, Boolean.FALSE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_EXIST_TXT, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
+                    null, null, null, null, null, Boolean.FALSE, SC_400 });
+
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_NEW_TXT, null, null, null, null, null, null,
+                    Boolean.FALSE, SC_201 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_NEW_TXT, EtagPrecondition.ALL, null, null, null,
+                    null, null, Boolean.FALSE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_NEW_TXT, EtagPrecondition.IN, null, null, null,
+                    null, null, Boolean.FALSE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_NEW_TXT, EtagPrecondition.NOT_IN, null, null, null,
+                    null, null, Boolean.FALSE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_NEW_TXT, EtagPrecondition.INVALID, null, null,
+                    null, null, null, Boolean.FALSE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.PUT_NEW_TXT, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
+                    null, null, null, null, null, Boolean.FALSE, SC_400 });
         }
 
         return parameterSets;
     }
 
 
-    private static Integer SC_200 = Integer.valueOf(200);
-    private static Integer SC_206 = Integer.valueOf(206);
-    private static Integer SC_304 = Integer.valueOf(304);
-    private static Integer SC_400 = Integer.valueOf(400);
-    private static Integer SC_412 = Integer.valueOf(412);
+    private static Integer SC_200 = Integer.valueOf(HttpServletResponse.SC_OK);
+    private static Integer SC_201 = Integer.valueOf(HttpServletResponse.SC_CREATED);
+    private static Integer SC_204 = Integer.valueOf(HttpServletResponse.SC_NO_CONTENT);
+    private static Integer SC_206 = Integer.valueOf(HttpServletResponse.SC_PARTIAL_CONTENT);
+    private static Integer SC_304 = Integer.valueOf(HttpServletResponse.SC_NOT_MODIFIED);
+    private static Integer SC_400 = Integer.valueOf(HttpServletResponse.SC_BAD_REQUEST);
+    private static Integer SC_412 = Integer.valueOf(HttpServletResponse.SC_PRECONDITION_FAILED);
 
 
     private enum HTTP_METHOD {
@@ -336,7 +372,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                 break;
             case IN:
                 headerValues.add("\"1a2b3c4d\"");
-                headerValues.add(weakETag + "," + strongETag + ",W/\"*\"");
+                headerValues.add((weakETag != null ? weakETag + "," : "") +
+                        (strongETag != null ? strongETag + "," : "") + "W/\"*\"");
                 headerValues.add("\"abcdefg\"");
                 break;
             case NOT_IN:
@@ -466,7 +503,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
 
         Wrapper w = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
         w.addInitParameter("readonly", "false");
-        w.addInitParameter("allowPartialPut", Boolean.toString(true));
+        w.addInitParameter("allowPartialPut", "true");
         w.addInitParameter("useStrongETags", Boolean.toString(useStrongETags));
         ctxt.addServletMappingDecoded("/", "default");
 
