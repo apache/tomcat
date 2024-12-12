@@ -69,19 +69,24 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
         for (Boolean useStrongEtag : booleans) {
-            // RFC 9110, Section 13.2.2, Step 1, HEAD
-            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.ALL, null, null, null,
-                    null, Boolean.FALSE, SC_200 });
-            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.EXACTLY, null, null, null,
-                    null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412});
-            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.IN, null, null, null,
-                    null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412 });
-            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.NOT_IN, null, null, null,
-                    null, Boolean.FALSE, SC_412 });
-            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
-                    null, null, null, null, Boolean.FALSE, SC_400 });
+            // RFC 9110, Section 13.2.2, Step 1, HEAD: If-Match with and without If-Unmodified-Since
+            for (DatePrecondition dateCondition : DatePrecondition.values()) {
+                parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.ALL,
+                        dateCondition, null, null, null, Boolean.FALSE, SC_200 });
+                parameterSets.add(
+                        new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.EXACTLY, dateCondition,
+                                null, null, null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412 });
+                parameterSets
+                        .add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.IN, dateCondition,
+                                null, null, null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412 });
+                parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.NOT_IN,
+                        dateCondition, null, null, null, Boolean.FALSE, SC_412 });
+                parameterSets.add(
+                        new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
+                                dateCondition, null, null, null, Boolean.FALSE, SC_400 });
+            }
 
-            // RFC 9110, Section 13.2.2, Step 2, HEAD
+            // RFC 9110, Section 13.2.2, Step 2, HEAD: If-Unmodified-Since only
             parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.EQ, null, null,
                     null, Boolean.FALSE, SC_200 });
             parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null, null,
@@ -90,6 +95,15 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                     null, Boolean.FALSE, SC_200 });
             parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.MULTI_IN, null,
                     null, null, Boolean.FALSE, SC_200 });
+
+            // Ensure If-Unmodified-Since takes precedence over If-Modified-Since
+            // If-Unmodified-Since only
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null, null,
+                    null, Boolean.FALSE, SC_412 });
+            // If-Modified-Since only
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, null, null, DatePrecondition.GT,
+                    null, Boolean.FALSE, SC_304 });
+            // Both
             parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null,
                     DatePrecondition.GT, null, Boolean.FALSE, SC_412 });
         }
@@ -99,6 +113,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
 
 
     private static Integer SC_200 = Integer.valueOf(200);
+    private static Integer SC_304 = Integer.valueOf(304);
     private static Integer SC_400 = Integer.valueOf(400);
     private static Integer SC_412 = Integer.valueOf(412);
 
@@ -173,7 +188,11 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
         /**
          * not a valid HTTP-date
          */
-        INVALID;
+        INVALID,
+        /**
+         * None.
+         */
+        NONE;
     }
 
 
@@ -242,6 +261,9 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                 break;
             case INVALID:
                 headerValues.add("2024.12.09 GMT");
+                break;
+            case NONE:
+                // NO-OP
                 break;
         }
         if (!headerValues.isEmpty()) {
