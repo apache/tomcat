@@ -32,7 +32,6 @@ import java.util.function.IntPredicate;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -130,6 +129,8 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         testPreconditions(Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, IfPolicy.ETAG_EXACTLY, IfPolicy.DATE_MULTI_IN,
                 null, 304);
         testPreconditions(Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, IfPolicy.ETAG_ALL, IfPolicy.DATE_EQ, null, 304);
+
+        testPreconditions(Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, IfPolicy.DATE_GT, null, 412);
     }
 
     @Test
@@ -289,7 +290,6 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         testPreconditions(Task.POST_INDEX_HTML, IfPolicy.ETAG_SYNTAX_INVALID, null, null, null, null, true, 400);
     }
 
-    @Ignore
     @Test
     public void testPreconditions2_2_1_put0() throws Exception {
         startServer(true);
@@ -303,7 +303,6 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         testPreconditions(Task.PUT_NEW_TXT, null, null, null, null, null, HttpServletResponse.SC_CREATED);
     }
 
-    @Ignore
     @Test
     public void testPreconditions2_2_1_put1() throws Exception {
         startServer(false);
@@ -313,7 +312,6 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         testPreconditions(Task.PUT_EXIST_TXT, IfPolicy.ETAG_EXACTLY, null, null, null, null, 412);
     }
 
-    @Ignore
     @Test
     public void testPreconditions2_2_1_delete0() throws Exception {
         startServer(true);
@@ -327,7 +325,6 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         testPreconditions(Task.DELETE_NOT_EXIST_TXT, null, null, null, null, null, 404);
     }
 
-    @Ignore
     @Test
     public void testPreconditions2_2_1_delete1() throws Exception {
         startServer(false);
@@ -450,8 +447,8 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
                 }
                 break;
             case ETAG_SYNTAX_INVALID:
-                headerValues.add("*");
                 headerValues.add("W/\"1abcd\"");
+                headerValues.add("*");
                 break;
             default:
                 break;
