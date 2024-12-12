@@ -104,6 +104,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                 Boolean.FALSE, null, new int[] { 200 } });
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_MULTI_IN, null, null,
                 null, Boolean.FALSE, null, new int[] { 200 } });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, IfPolicy.DATE_GT,
+                null, Boolean.FALSE, null, new int[] { 412 } });
 
         parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_EQ, null, null, null,
                 Boolean.FALSE, null, new int[] { 200 } });
