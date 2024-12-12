@@ -173,7 +173,7 @@ public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
         // if-range: multiple node policy, not defined in RFC 9110.
         // Currently, tomcat process the first If-Range header simply.
         // testPreconditions(Task.GET_INDEX_HTML, null, null, null, null, IfPolicy.DATE_MULTI_IN, true,200);
-        testPreconditions(Task.GET_INDEX_HTML, null, null, null, null, IfPolicy.DATE_SEMANTIC_INVALID, true, 200);
+        testPreconditions(Task.GET_INDEX_HTML, null, null, null, null, IfPolicy.DATE_SEMANTIC_INVALID, true, 400);
         testPreconditions(Task.GET_INDEX_HTML, null, null, null, null, IfPolicy.ETAG_EXACTLY, true, 206);
 
         testPreconditions(Task.GET_INDEX_HTML, null, IfPolicy.DATE_EQ, null, null, IfPolicy.DATE_EQ, true, 206);
