@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,15 +52,15 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     @Parameter(1)
     public Task task;
     @Parameter(2)
-    public IfPolicy ifMatchHeader;
+    public EtagPrecondition ifMatchPrecondition;
     @Parameter(3)
-    public IfPolicy ifUnmodifiedSinceHeader;
+    public DatePrecondition ifUnmodifiedSincePrecondition;
     @Parameter(4)
-    public IfPolicy ifNoneMatchHeader;
+    public EtagPrecondition ifNoneMatchPrecondition;
     @Parameter(5)
-    public IfPolicy ifModifiedSinceHeader;
+    public DatePrecondition ifModifiedSincePrecondition;
     @Parameter(6)
-    public IfPolicy ifRangeHeader;
+    public EtagPrecondition ifRangePrecondition;
     @Parameter(7)
     public boolean autoRangeHeader;
     @Parameter(8)
@@ -71,47 +70,47 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
         // testPreconditions_rfc9110_13_2_2_1_head0
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_ALL, null, null, null, null,
-                Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_EXACTLY, null, null, null,
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, EtagPrecondition.ALL, null, null, null,
                 null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_IN, null, null, null, null,
-                Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_NOT_IN, null, null, null,
-                null, Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_SYNTAX_INVALID, null, null,
-                null, null, Boolean.FALSE, SC_400 });
-
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_ALL, null, null, null, null,
-                Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_EXACTLY, null, null, null,
-                null, Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_IN, null, null, null, null,
-                Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_NOT_IN, null, null, null,
-                null, Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_SYNTAX_INVALID, null, null,
-                null, null, Boolean.FALSE, SC_400 });
-
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_EQ, null, null, null,
-                Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, null, null,
-                Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, null, null, null,
-                Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_MULTI_IN, null, null,
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, EtagPrecondition.EXACTLY, null, null, null,
                 null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, IfPolicy.DATE_GT,
-                null, Boolean.FALSE, SC_412 });
-
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_EQ, null, null, null,
-                Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, null, null,
-                Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, null, null, null,
-                Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_MULTI_IN, null, null,
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, EtagPrecondition.IN, null, null, null,
                 null, Boolean.FALSE, SC_200 });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, EtagPrecondition.NOT_IN, null, null, null,
+                null, Boolean.FALSE, SC_412 });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
+                null, null, null, null, Boolean.FALSE, SC_400 });
+
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, EtagPrecondition.ALL, null, null, null,
+                null, Boolean.FALSE, SC_200 });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, EtagPrecondition.EXACTLY, null, null,
+                null, null, Boolean.FALSE, SC_412 });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, EtagPrecondition.IN, null, null, null,
+                null, Boolean.FALSE, SC_412 });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, EtagPrecondition.NOT_IN, null, null, null,
+                null, Boolean.FALSE, SC_412 });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
+                null, null, null, null, Boolean.FALSE, SC_400 });
+
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, DatePrecondition.EQ, null, null,
+                null, Boolean.FALSE, SC_200 });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null, null,
+                null, Boolean.FALSE, SC_412 });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, DatePrecondition.GT, null, null,
+                null, Boolean.FALSE, SC_200 });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, DatePrecondition.MULTI_IN, null,
+                null, null, Boolean.FALSE, SC_200 });
+        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null,
+                DatePrecondition.GT, null, Boolean.FALSE, SC_412 });
+
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, DatePrecondition.EQ, null, null,
+                null, Boolean.FALSE, SC_200 });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null, null,
+                null, Boolean.FALSE, SC_412 });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, DatePrecondition.GT, null, null,
+                null, Boolean.FALSE, SC_200 });
+        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, DatePrecondition.MULTI_IN, null,
+                null, null, Boolean.FALSE, SC_200 });
 
 
         return parameterSets;
@@ -123,7 +122,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     private static Integer SC_412 = Integer.valueOf(412);
 
 
-    enum HTTP_METHOD {
+    private enum HTTP_METHOD {
         GET,
         PUT,
         DELETE,
@@ -131,7 +130,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
         HEAD
     }
 
-    enum Task {
+
+    private enum Task {
         HEAD_INDEX_HTML(HTTP_METHOD.HEAD, "/index.html"),
         HEAD_404_HTML(HTTP_METHOD.HEAD, "/sc_404.html"),
 
@@ -165,56 +165,48 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
         }
     }
 
-    enum IfPolicy {
-        ETAG_EXACTLY,
-        ETAG_IN,
-        ETAG_ALL,
-        ETAG_NOT_IN,
-        ETAG_SYNTAX_INVALID,
+
+    private enum EtagPrecondition {
+        EXACTLY,
+        IN,
+        ALL,
+        NOT_IN,
+        INVALID_ALL_PLUS_OTHER
+    }
+
+
+    private enum DatePrecondition {
         /**
          * Condition header value of http date is equivalent to actual resource lastModified date
          */
-        DATE_EQ,
+        EQ,
         /**
          * Condition header value of http date is greater(later) than actual resource lastModified date
          */
-        DATE_GT,
+        GT,
         /**
          * Condition header value of http date is less(earlier) than actual resource lastModified date
          */
-        DATE_LT,
-        DATE_MULTI_IN,
+        LT,
+        MULTI_IN,
         /**
          * not a valid HTTP-date
          */
-        DATE_SEMANTIC_INVALID;
+        INVALID;
     }
 
-    enum IfType {
-        ifMatch("If-Match"), // ETag strong comparison
-        ifUnmodifiedSince("If-Unmodified-Since"),
-        ifNoneMatch("If-None-Match"), // ETag weak comparison
-        ifModifiedSince("If-Modified-Since"),
-        ifRange("If-Range"); // ETag strong comparison
 
-        private String header;
-
-        IfType(String header) {
-            this.header = header;
+    protected void genETagPrecondition(String strongETag, String weakETag, EtagPrecondition condition,
+            String headerName, Map<String,List<String>> requestHeaders) {
+        if (condition == null) {
+            return;
         }
-
-        public String value() {
-            return this.header;
-        }
-    }
-
-    protected List<String> genETagCondtion(String strongETag, String weakETag, IfPolicy policy) {
         List<String> headerValues = new ArrayList<>();
-        switch (policy) {
-            case ETAG_ALL:
+        switch (condition) {
+            case ALL:
                 headerValues.add("*");
                 break;
-            case ETAG_EXACTLY:
+            case EXACTLY:
                 if (strongETag != null) {
                     headerValues.add(strongETag);
                 } else {
@@ -222,12 +214,12 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                     throw new IllegalArgumentException("strong etag not found!");
                 }
                 break;
-            case ETAG_IN:
+            case IN:
                 headerValues.add("\"1a2b3c4d\"");
                 headerValues.add(weakETag + "," + strongETag + ",W/\"*\"");
                 headerValues.add("\"abcdefg\"");
                 break;
-            case ETAG_NOT_IN:
+            case NOT_IN:
                 if (weakETag != null && weakETag.length() > 8) {
                     headerValues.add(weakETag.substring(0, 3) + "XXXXX" + weakETag.substring(8));
                 }
@@ -235,52 +227,50 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                     headerValues.add(strongETag.substring(0, 1) + "XXXXX" + strongETag.substring(6));
                 }
                 break;
-            case ETAG_SYNTAX_INVALID:
+            case INVALID_ALL_PLUS_OTHER:
                 headerValues.add("*");
                 headerValues.add("W/\"1abcd\"");
                 break;
-            default:
-                break;
         }
-        return headerValues;
+        if (!headerValues.isEmpty()) {
+            requestHeaders.put(headerName, headerValues);
+        }
     }
 
-    protected List<String> genDateCondtion(long lastModifiedTimestamp, IfPolicy policy) {
-        List<String> headerValues = new ArrayList<>();
-        if (lastModifiedTimestamp <= 0) {
-            return headerValues;
-        }
-        switch (policy) {
-            case DATE_EQ:
-                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp));
-                break;
-            case DATE_GT:
-                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp + 30000L));
-                break;
-            case DATE_LT:
-                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp - 30000L));
-                break;
-            case DATE_MULTI_IN:
-                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp - 30000L));
-                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp));
-                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp + 30000L));
-                break;
-            case DATE_SEMANTIC_INVALID:
-                headerValues.add("2024.12.09 GMT");
-                break;
-            default:
-                break;
-        }
-        return headerValues;
-    }
 
-    protected void wrapperHeaders(Map<String,List<String>> headers, String resourceETag, long lastModified,
-            IfPolicy policy, IfType type) {
-        Objects.requireNonNull(type);
-        if (policy == null) {
+    protected void genDatePrecondition(long lastModifiedTimestamp, DatePrecondition condition, String headerName,
+            Map<String,List<String>> requestHeaders) {
+        if (condition == null || lastModifiedTimestamp <= 0) {
             return;
         }
         List<String> headerValues = new ArrayList<>();
+        switch (condition) {
+            case EQ:
+                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp));
+                break;
+            case GT:
+                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp + 30000L));
+                break;
+            case LT:
+                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp - 30000L));
+                break;
+            case MULTI_IN:
+                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp - 30000L));
+                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp));
+                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp + 30000L));
+                break;
+            case INVALID:
+                headerValues.add("2024.12.09 GMT");
+                break;
+        }
+        if (!headerValues.isEmpty()) {
+            requestHeaders.put(headerName, headerValues);
+        }
+    }
+
+    protected void addPreconditionHeaders(Map<String,List<String>> requestHeaders, String resourceETag,
+            long lastModified) {
+
         String weakETag = resourceETag;
         String strongETag = resourceETag;
         if (resourceETag != null) {
@@ -291,19 +281,11 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
             }
         }
 
-        List<String> eTagConditions = genETagCondtion(strongETag, weakETag, policy);
-        if (!eTagConditions.isEmpty()) {
-            headerValues.addAll(eTagConditions);
-        }
-
-        List<String> dateConditions = genDateCondtion(lastModified, policy);
-        if (!dateConditions.isEmpty()) {
-            headerValues.addAll(dateConditions);
-        }
-
-        if (!headerValues.isEmpty()) {
-            headers.put(type.value(), headerValues);
-        }
+        genETagPrecondition(strongETag, weakETag, ifMatchPrecondition, "If-Match", requestHeaders);
+        genDatePrecondition(lastModified, ifUnmodifiedSincePrecondition, "If-Unmodified-Since", requestHeaders);
+        genETagPrecondition(strongETag, weakETag, ifNoneMatchPrecondition, "If-None-Match", requestHeaders);
+        genDatePrecondition(lastModified, ifModifiedSincePrecondition, "If-Modified-Since", requestHeaders);
+        genETagPrecondition(strongETag, weakETag, ifRangePrecondition, "If-Range", requestHeaders);
     }
 
     private File tempDocBase = null;
@@ -358,14 +340,12 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
 
         Assert.assertNotNull(task);
 
-
         Map<String,List<String>> requestHeaders = new HashMap<>();
-
         Map<String,List<String>> responseHeaders = new HashMap<>();
-
         String etag = null;
         long lastModified = -1;
         String uri = "http://localhost:" + getPort() + task.uri;
+
         // Try head to receives etag and lastModified Date
         int sc = headUrl(uri, new ByteChunk(), responseHeaders);
         if (sc == 200) {
@@ -376,11 +356,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
             }
         }
 
-        wrapperHeaders(requestHeaders, etag, lastModified, ifMatchHeader, IfType.ifMatch);
-        wrapperHeaders(requestHeaders, etag, lastModified, ifModifiedSinceHeader, IfType.ifModifiedSince);
-        wrapperHeaders(requestHeaders, etag, lastModified, ifNoneMatchHeader, IfType.ifNoneMatch);
-        wrapperHeaders(requestHeaders, etag, lastModified, ifUnmodifiedSinceHeader, IfType.ifUnmodifiedSince);
-        wrapperHeaders(requestHeaders, etag, lastModified, ifRangeHeader, IfType.ifRange);
+        addPreconditionHeaders(requestHeaders, etag, lastModified);
+
         responseHeaders.clear();
         sc = 0;
         SimpleHttpClient client = null;
