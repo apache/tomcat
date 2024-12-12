@@ -1485,10 +1485,14 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        // Although If-Range evaluation was performed previously, the result were not propagated.
-        // Hence we have to evaluate If-Range again.
-        if (!checkIfRange(request, response, resource)) {
-            return FULL;
+        // Evaluate If-Range
+        try {
+            if (!checkIfRange(request, response, resource)) {
+                return FULL;
+            }
+        } catch (IllegalArgumentException iae) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
         }
 
         long fileLength = resource.getContentLength();
@@ -2412,25 +2416,39 @@ public class DefaultServlet extends HttpServlet {
         String resourceETag = generateETag(resource);
         long resourceLastModified = resource.getLastModified();
 
-        String headerValue = request.getHeader("If-Range");
-        if (headerValue == null) {
-            return true;
-        }
-
         String rangeHeader = request.getHeader("Range");
         if (rangeHeader == null || !determineRangeRequestsApplicable(resource)) {
             // Simply ignore If-Range header field
             return true;
         }
 
-        long headerValueTime = (-1L);
+        Enumeration<String> headerEnum = request.getHeaders("If-Range");
+        if (!headerEnum.hasMoreElements()) {
+            // If-Range is not present
+            return true;
+        }
+        String headerValue = headerEnum.nextElement();
+        if (headerEnum.hasMoreElements()) {
+            // Multiple If-Range headers
+            // Not ideal but can't easily change method interface (No i18n - internal only)
+            throw new IllegalArgumentException("Multiple If-Range headers");
+        }
+
+        long headerValueTime = -1L;
         try {
             headerValueTime = request.getDateHeader("If-Range");
         } catch (IllegalArgumentException e) {
             // Ignore
         }
 
-        if (headerValueTime == (-1L)) {
+        if (headerValueTime == -1L) {
+            // Not HTTP-date so this should be a single strong etag
+            if (headerValue.length() < 2 || headerValue.charAt(0) != '"' ||
+                    headerValue.charAt(headerValue.length() -1 ) != '"' ||
+                    headerValue.indexOf('"', 1) != headerValue.length() -1) {
+                // Not ideal but can't easily change method interface (No i18n - internal only)
+                throw new IllegalArgumentException("Not a single, strong entity tag");
+            }
             // If the ETag the client gave does not match the entity
             // etag, then the entire entity is returned.
             if (resourceETag != null && resourceETag.startsWith("\"") && resourceETag.equals(headerValue.trim())) {
