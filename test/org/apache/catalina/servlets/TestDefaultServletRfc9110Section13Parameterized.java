@@ -82,6 +82,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                                 null, null, null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412 });
                 parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.NOT_IN,
                         dateCondition, null, null, null, Boolean.FALSE, SC_412 });
+                parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.INVALID,
+                        dateCondition, null, null, null, Boolean.FALSE, SC_400 });
                 parameterSets.add(
                         new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
                                 dateCondition, null, null, null, Boolean.FALSE, SC_400 });
@@ -170,6 +172,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
         IN,
         ALL,
         NOT_IN,
+        INVALID,
         INVALID_ALL_PLUS_OTHER
     }
 
@@ -229,6 +232,9 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                 if (strongETag != null && strongETag.length() > 6) {
                     headerValues.add(strongETag.substring(0, 1) + "XXXXX" + strongETag.substring(6));
                 }
+                break;
+            case INVALID:
+                headerValues.add("invalid-no-quotes");
                 break;
             case INVALID_ALL_PLUS_OTHER:
                 headerValues.add("*");
