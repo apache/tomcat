@@ -446,11 +446,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
         }
         sc = client.getStatusCode();
         boolean test = scExpected.intValue() == sc;
-        Assert.assertTrue(
-                "Failure - sc expected:%d, sc actual:%d, task:%s, \ntarget resource:(%s,%s), \nreq headers: %s, \nresp headers: %s"
-                        .formatted(scExpected, Integer.valueOf(sc), task, etag,
-                                FastHttpDateFormat.formatDate(lastModified), requestHeaders.toString(),
-                                responseHeaders.toString()),
-                test);
+        Assert.assertTrue("Failure - sc expected:" + String.valueOf(scExpected) + ", sc actual:" + String.valueOf(sc) + ", task:" +
+                task + ", \ntarget resource:(" + etag + "," + FastHttpDateFormat.formatDate(lastModified) +
+                "), \nreq headers: " + requestHeaders.toString() + ", \nresp headers: " + responseHeaders.toString(), test);
     }
 }
