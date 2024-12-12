@@ -739,8 +739,10 @@ public class DefaultServlet extends HttpServlet {
      */
     protected boolean checkIfHeaders(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
-        return checkIfMatch(request, response, resource) && checkIfModifiedSince(request, response, resource) &&
-                checkIfNoneMatch(request, response, resource) && checkIfUnmodifiedSince(request, response, resource);
+        return checkIfMatch(request, response, resource)
+                && checkIfUnmodifiedSince(request, response, resource)
+                && checkIfNoneMatch(request, response, resource)
+                && checkIfModifiedSince(request, response, resource);
     }
 
 
