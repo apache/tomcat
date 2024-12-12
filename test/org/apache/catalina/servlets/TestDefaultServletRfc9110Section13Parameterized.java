@@ -61,88 +61,169 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     @Parameter(5)
     public DatePrecondition ifModifiedSincePrecondition;
     @Parameter(6)
-    public EtagPrecondition ifRangePrecondition;
+    public EtagPrecondition ifRangeEtagPrecondition;
     @Parameter(7)
-    public boolean autoRangeHeader;
+    public DatePrecondition ifRangeDatePrecondition;
     @Parameter(8)
+    public boolean addRangeHeader;
+    @Parameter(9)
     public Integer scExpected;
 
     @Parameterized.Parameters(name = "{index} resource-strong [{0}], matchHeader [{1}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        for (Task task : Arrays.asList(Task.HEAD_INDEX_HTML, Task.GET_INDEX_HTML)) {
-            for (Boolean useStrongEtag : booleans) {
+        for (Boolean useStrongEtag : booleans) {
+            for (Task task : Arrays.asList(Task.HEAD_INDEX_HTML, Task.GET_INDEX_HTML, Task.POST_INDEX_HTML)) {
                 // RFC 9110, Section 13.2.2, Step 1, HEAD: If-Match with and without If-Unmodified-Since
                 for (DatePrecondition dateCondition : DatePrecondition.values()) {
                     parameterSets.add(new Object[] { useStrongEtag, task, EtagPrecondition.ALL, dateCondition, null,
-                            null, null, Boolean.FALSE, SC_200 });
+                            null, null, null, Boolean.FALSE, SC_200 });
                     parameterSets.add(new Object[] { useStrongEtag, task, EtagPrecondition.EXACTLY, dateCondition, null,
-                            null, null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412 });
+                            null, null, null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412 });
                     parameterSets.add(new Object[] { useStrongEtag, task, EtagPrecondition.IN, dateCondition, null,
-                            null, null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412 });
+                            null, null, null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412 });
                     parameterSets.add(new Object[] { useStrongEtag, task, EtagPrecondition.NOT_IN, dateCondition, null,
-                            null, null, Boolean.FALSE, SC_412 });
+                            null, null, null, Boolean.FALSE, SC_412 });
                     parameterSets.add(new Object[] { useStrongEtag, task, EtagPrecondition.INVALID, dateCondition, null,
-                            null, null, Boolean.FALSE, SC_400 });
+                            null, null, null, Boolean.FALSE, SC_400 });
                     parameterSets.add(new Object[] { useStrongEtag, task, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
-                            dateCondition, null, null, null, Boolean.FALSE, SC_400 });
+                            dateCondition, null, null, null, null, Boolean.FALSE, SC_400 });
                 }
 
                 // RFC 9110, Section 13.2.2, Step 2, HEAD: If-Unmodified-Since only
-                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.EQ, null, null, null,
+                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.EQ, null, null, null, null,
                         Boolean.FALSE, SC_200 });
-                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.LT, null, null, null,
+                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.LT, null, null, null, null,
                         Boolean.FALSE, SC_412 });
-                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.GT, null, null, null,
+                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.GT, null, null, null, null,
                         Boolean.FALSE, SC_200 });
                 parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.MULTI_IN, null, null, null,
-                        Boolean.FALSE, SC_200 });
-                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.MULTI_IN_REV, null, null,
                         null, Boolean.FALSE, SC_200 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.MULTI_IN_REV, null, null,
+                        null, null, Boolean.FALSE, SC_200 });
                 parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.INVALID, null, null, null,
-                        Boolean.FALSE, SC_200 });
+                        null, Boolean.FALSE, SC_200 });
 
                 // Ensure If-Unmodified-Since takes precedence over If-Modified-Since
                 // If-Unmodified-Since only
-                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.LT, null, null, null,
+                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.LT, null, null, null, null,
                         Boolean.FALSE, SC_412 });
                 // If-Modified-Since only
-                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.GT, null,
-                        Boolean.FALSE, SC_304 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.GT, null, null,
+                        Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_200 : SC_304 });
                 // Both
                 parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.LT, null,
-                        DatePrecondition.GT, null, Boolean.FALSE, SC_412 });
+                        DatePrecondition.GT, null, null, Boolean.FALSE, SC_412 });
 
                 // RFC 9110, Section 13.2.2, Step 3, HEAD: If-None-Match with and without If-Modified-Since
                 for (DatePrecondition dateCondition : DatePrecondition.values()) {
                     parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.ALL,
-                            dateCondition, null, Boolean.FALSE, SC_304 });
+                            dateCondition, null, null, Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_412 : SC_304 });
                     parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.EXACTLY,
-                            dateCondition, null, Boolean.FALSE, SC_304 });
+                            dateCondition, null, null, Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_412 : SC_304 });
                     parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.IN,
-                            dateCondition, null, Boolean.FALSE, SC_304 });
+                            dateCondition, null, null, Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_412 : SC_304 });
                     parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.NOT_IN,
-                            dateCondition, null, Boolean.FALSE, SC_200 });
+                            dateCondition, null, null, Boolean.FALSE, SC_200 });
                     parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.INVALID,
-                            dateCondition, null, Boolean.FALSE, SC_400 });
-                    parameterSets.add(new Object[] { useStrongEtag, task, null, null,
-                            EtagPrecondition.INVALID_ALL_PLUS_OTHER, dateCondition, null, Boolean.FALSE, SC_400 });
+                            dateCondition, null, null, Boolean.FALSE, SC_400 });
+                    parameterSets.add(
+                            new Object[] { useStrongEtag, task, null, null, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
+                                    dateCondition, null, null, Boolean.FALSE, SC_400 });
                 }
 
-                // RFC 9110, Section 13.2.2, Step 4, HEAD: If-Unmodified-Since only
-                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.EQ, null,
-                        Boolean.FALSE, SC_304 });
-                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.LT, null,
+                // RFC 9110, Section 13.2.2, Step 4, HEAD: If-Modified-Since only
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.EQ, null, null,
+                        Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_200 : SC_304 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.LT, null, null,
                         Boolean.FALSE, SC_200 });
-                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.GT, null,
-                        Boolean.FALSE, SC_304 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.GT, null, null,
+                        Boolean.FALSE, task.equals(Task.POST_INDEX_HTML) ? SC_200 : SC_304 });
                 parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.MULTI_IN, null,
-                        Boolean.FALSE, SC_200 });
-                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.MULTI_IN_REV,
                         null, Boolean.FALSE, SC_200 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.MULTI_IN_REV,
+                        null, null, Boolean.FALSE, SC_200 });
                 parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.INVALID, null,
-                        Boolean.FALSE, SC_200 });
+                        null, Boolean.FALSE, SC_200 });
             }
+
+            // RFC 9110, Section 13.2.2, Step 5, GET: If-Range only
+            // entity-tag
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.ALL, null, Boolean.TRUE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.EXACTLY, null, Boolean.TRUE, useStrongEtag.booleanValue() ? SC_206 : SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.IN, null, Boolean.TRUE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.NOT_IN, null, Boolean.TRUE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.INVALID, null, Boolean.TRUE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.INVALID_ALL_PLUS_OTHER, null, Boolean.TRUE, SC_400 });
+            // HTTP-date
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.EQ, Boolean.TRUE, SC_206 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.LT, Boolean.TRUE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.GT, Boolean.TRUE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.MULTI_IN, Boolean.TRUE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.MULTI_IN_REV, Boolean.TRUE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.INVALID, Boolean.TRUE, SC_400 });
+            // Range header without If-Range
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, EtagPrecondition.ALL, null, null, null,
+                    null, null, Boolean.TRUE, SC_206 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, EtagPrecondition.EXACTLY, null, null,
+                    null, null, null, Boolean.TRUE, useStrongEtag.booleanValue() ? SC_206 : SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, EtagPrecondition.IN, null, null, null,
+                    null, null, Boolean.TRUE, useStrongEtag.booleanValue() ? SC_206 : SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, EtagPrecondition.NOT_IN, null, null,
+                    null, null, null, Boolean.TRUE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, EtagPrecondition.INVALID, null, null,
+                    null, null, null, Boolean.TRUE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML,
+                    EtagPrecondition.INVALID_ALL_PLUS_OTHER, null, null, null, null, null, Boolean.TRUE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, DatePrecondition.EQ, null, null,
+                    null, null, Boolean.TRUE, SC_206 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, DatePrecondition.LT, null, null,
+                    null, null, Boolean.TRUE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, DatePrecondition.GT, null, null,
+                    null, null, Boolean.TRUE, SC_206 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, DatePrecondition.MULTI_IN, null,
+                    null, null, null, Boolean.TRUE, SC_206 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, DatePrecondition.MULTI_IN_REV,
+                    null, null, null, null, Boolean.TRUE, SC_206 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, DatePrecondition.INVALID, null,
+                    null, null, null, Boolean.TRUE, SC_206 });
+            // If-Range header without Range
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.ALL, null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.EXACTLY, null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.IN, null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.NOT_IN, null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.INVALID, null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null,
+                    EtagPrecondition.INVALID_ALL_PLUS_OTHER, null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.EQ, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.LT, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.GT, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.MULTI_IN, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.MULTI_IN_REV, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.GET_INDEX_HTML, null, null, null, null, null,
+                    DatePrecondition.INVALID, Boolean.FALSE, SC_200 });
         }
 
         return parameterSets;
@@ -150,6 +231,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
 
 
     private static Integer SC_200 = Integer.valueOf(200);
+    private static Integer SC_206 = Integer.valueOf(206);
     private static Integer SC_304 = Integer.valueOf(304);
     private static Integer SC_400 = Integer.valueOf(400);
     private static Integer SC_412 = Integer.valueOf(412);
@@ -259,12 +341,14 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                 headerValues.add("\"abcdefg\"");
                 break;
             case NOT_IN:
+                headerValues.add("\"1a2b3c4d\"");
                 if (weakETag != null && weakETag.length() > 8) {
                     headerValues.add(weakETag.substring(0, 3) + "XXXXX" + weakETag.substring(8));
                 }
                 if (strongETag != null && strongETag.length() > 6) {
                     headerValues.add(strongETag.substring(0, 1) + "XXXXX" + strongETag.substring(6));
                 }
+                headerValues.add("\"abcdefg\"");
                 break;
             case INVALID:
                 headerValues.add("invalid-no-quotes");
@@ -335,7 +419,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
         genDatePrecondition(lastModified, ifUnmodifiedSincePrecondition, "If-Unmodified-Since", requestHeaders);
         genETagPrecondition(strongETag, weakETag, ifNoneMatchPrecondition, "If-None-Match", requestHeaders);
         genDatePrecondition(lastModified, ifModifiedSincePrecondition, "If-Modified-Since", requestHeaders);
-        genETagPrecondition(strongETag, weakETag, ifRangePrecondition, "If-Range", requestHeaders);
+        genETagPrecondition(strongETag, weakETag, ifRangeEtagPrecondition, "If-Range", requestHeaders);
+        genDatePrecondition(lastModified, ifRangeDatePrecondition, "If-Range", requestHeaders);
     }
 
     private File tempDocBase = null;
@@ -428,7 +513,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                 curl.append(e.getKey() + ": " + v + SimpleHttpClient.CRLF);
             }
         }
-        if (autoRangeHeader) {
+        if (addRangeHeader) {
             curl.append("Range: bytes=0-10" + SimpleHttpClient.CRLF);
         }
         curl.append("Content-Length: 6" + SimpleHttpClient.CRLF);
