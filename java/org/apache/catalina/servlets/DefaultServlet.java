@@ -2308,14 +2308,13 @@ public class DefaultServlet extends HttpServlet {
         }
 
         try {
+            // Header is present so -1 will be not returned. Only a valid date or an IAE are possible.
             long headerValue = request.getDateHeader("If-Unmodified-Since");
-            if (headerValue != -1) {
-                if (resourceLastModified >= (headerValue + 1000)) {
-                    // The entity has not been modified since the date
-                    // specified by the client. This is not an error case.
-                    response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-                    return false;
-                }
+            if (resourceLastModified >= (headerValue + 1000)) {
+                // The entity has not been modified since the date
+                // specified by the client. This is not an error case.
+                response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+                return false;
             }
         } catch (IllegalArgumentException illegalArgument) {
             return true;
