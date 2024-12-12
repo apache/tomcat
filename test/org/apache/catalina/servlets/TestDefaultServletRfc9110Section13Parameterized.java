@@ -97,6 +97,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                         Boolean.FALSE, SC_200 });
                 parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.MULTI_IN, null, null, null,
                         Boolean.FALSE, SC_200 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.MULTI_IN_REV, null, null, null,
+                        Boolean.FALSE, SC_200 });
                 parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.INVALID, null, null, null,
                         Boolean.FALSE, SC_200 });
 
@@ -110,6 +112,20 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                 // Both
                 parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.LT, null,
                         DatePrecondition.GT, null, Boolean.FALSE, SC_412 });
+
+                // RFC 9110, Section 13.2.2, Step 4, HEAD: If-Unmodified-Since only
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.EQ, null,
+                        Boolean.FALSE, SC_304 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.LT, null,
+                        Boolean.FALSE, SC_200 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.GT, null,
+                        Boolean.FALSE, SC_304 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.MULTI_IN, null,
+                        Boolean.FALSE, SC_200 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.MULTI_IN_REV, null,
+                        Boolean.FALSE, SC_200 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.INVALID, null,
+                        Boolean.FALSE, SC_200 });
             }
         }
 
@@ -191,6 +207,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
          */
         LT,
         MULTI_IN,
+        MULTI_IN_REV,
         /**
          * not a valid HTTP-date
          */
@@ -267,6 +284,11 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                 headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp - 30000L));
                 headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp));
                 headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp + 30000L));
+                break;
+            case MULTI_IN_REV:
+                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp + 30000L));
+                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp));
+                headerValues.add(FastHttpDateFormat.formatDate(lastModifiedTimestamp - 30000L));
                 break;
             case INVALID:
                 headerValues.add("2024.12.09 GMT");
