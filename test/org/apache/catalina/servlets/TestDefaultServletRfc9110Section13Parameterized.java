@@ -471,30 +471,33 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                 StandardOpenOption.CREATE);
         Path.of(tempDocBase.getAbsolutePath(), "index.html").toFile().setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "put_exist.txt"), "put_exist_v0".getBytes(),
-                StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "put_exist.txt").toFile().setLastModified(lastModified);
+        if (task.m.equals(HTTP_METHOD.PUT)) {
+            Files.write(Path.of(tempDocBase.getAbsolutePath(), "put_exist.txt"), "put_exist_v0".getBytes(),
+                    StandardOpenOption.CREATE);
+            Path.of(tempDocBase.getAbsolutePath(), "put_exist.txt").toFile().setLastModified(lastModified);
+        }
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist.txt"), "delete_exist_v0".getBytes(),
-                StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "delete_exist.txt").toFile().setLastModified(lastModified);
+        if (task.m.equals(HTTP_METHOD.DELETE)) {
+            Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist.txt"), "delete_exist_v0".getBytes(),
+                    StandardOpenOption.CREATE);
+            Path.of(tempDocBase.getAbsolutePath(), "delete_exist.txt").toFile().setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist1.txt"), "delete_exist1_v0".getBytes(),
-                StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "delete_exist1.txt").toFile().setLastModified(lastModified);
+            Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist1.txt"), "delete_exist1_v0".getBytes(),
+                    StandardOpenOption.CREATE);
+            Path.of(tempDocBase.getAbsolutePath(), "delete_exist1.txt").toFile().setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist2.txt"), "delete_exist2_v0".getBytes(),
-                StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "delete_exist2.txt").toFile().setLastModified(lastModified);
+            Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist2.txt"), "delete_exist2_v0".getBytes(),
+                    StandardOpenOption.CREATE);
+            Path.of(tempDocBase.getAbsolutePath(), "delete_exist2.txt").toFile().setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist3.txt"), "delete_exist3_v0".getBytes(),
-                StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "delete_exist3.txt").toFile().setLastModified(lastModified);
+            Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist3.txt"), "delete_exist3_v0".getBytes(),
+                    StandardOpenOption.CREATE);
+            Path.of(tempDocBase.getAbsolutePath(), "delete_exist3.txt").toFile().setLastModified(lastModified);
 
-        Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist4.txt"), "delete_exist4_v0".getBytes(),
-                StandardOpenOption.CREATE);
-        Path.of(tempDocBase.getAbsolutePath(), "delete_exist4.txt").toFile().setLastModified(lastModified);
-
+            Files.write(Path.of(tempDocBase.getAbsolutePath(), "delete_exist4.txt"), "delete_exist4_v0".getBytes(),
+                    StandardOpenOption.CREATE);
+            Path.of(tempDocBase.getAbsolutePath(), "delete_exist4.txt").toFile().setLastModified(lastModified);
+        }
     }
 
     @Test
