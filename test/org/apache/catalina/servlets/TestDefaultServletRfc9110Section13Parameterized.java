@@ -97,8 +97,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                         Boolean.FALSE, SC_200 });
                 parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.MULTI_IN, null, null, null,
                         Boolean.FALSE, SC_200 });
-                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.MULTI_IN_REV, null, null, null,
-                        Boolean.FALSE, SC_200 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.MULTI_IN_REV, null, null,
+                        null, Boolean.FALSE, SC_200 });
                 parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.INVALID, null, null, null,
                         Boolean.FALSE, SC_200 });
 
@@ -113,6 +113,22 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                 parameterSets.add(new Object[] { useStrongEtag, task, null, DatePrecondition.LT, null,
                         DatePrecondition.GT, null, Boolean.FALSE, SC_412 });
 
+                // RFC 9110, Section 13.2.2, Step 3, HEAD: If-None-Match with and without If-Modified-Since
+                for (DatePrecondition dateCondition : DatePrecondition.values()) {
+                    parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.ALL,
+                            dateCondition, null, Boolean.FALSE, SC_304 });
+                    parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.EXACTLY,
+                            dateCondition, null, Boolean.FALSE, SC_304 });
+                    parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.IN,
+                            dateCondition, null, Boolean.FALSE, SC_304 });
+                    parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.NOT_IN,
+                            dateCondition, null, Boolean.FALSE, SC_200 });
+                    parameterSets.add(new Object[] { useStrongEtag, task, null, null, EtagPrecondition.INVALID,
+                            dateCondition, null, Boolean.FALSE, SC_400 });
+                    parameterSets.add(new Object[] { useStrongEtag, task, null, null,
+                            EtagPrecondition.INVALID_ALL_PLUS_OTHER, dateCondition, null, Boolean.FALSE, SC_400 });
+                }
+
                 // RFC 9110, Section 13.2.2, Step 4, HEAD: If-Unmodified-Since only
                 parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.EQ, null,
                         Boolean.FALSE, SC_304 });
@@ -122,8 +138,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                         Boolean.FALSE, SC_304 });
                 parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.MULTI_IN, null,
                         Boolean.FALSE, SC_200 });
-                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.MULTI_IN_REV, null,
-                        Boolean.FALSE, SC_200 });
+                parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.MULTI_IN_REV,
+                        null, Boolean.FALSE, SC_200 });
                 parameterSets.add(new Object[] { useStrongEtag, task, null, null, null, DatePrecondition.INVALID, null,
                         Boolean.FALSE, SC_200 });
             }
