@@ -21,14 +21,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.function.IntPredicate;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,6 +47,7 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
  */
 @RunWith(Parameterized.class)
 public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseTest {
+
     @Parameter(0)
     public boolean useStrongETags;
     @Parameter(1)
@@ -66,59 +65,62 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     @Parameter(7)
     public boolean autoRangeHeader;
     @Parameter(8)
-    public IntPredicate p;
-    @Parameter(9)
-    public int[] scExpected;
+    public Integer scExpected;
 
     @Parameterized.Parameters(name = "{index} resource-strong [{0}], matchHeader [{1}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
         // testPreconditions_rfc9110_13_2_2_1_head0
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_ALL, null, null, null, null,
-                Boolean.FALSE, null, new int[] { 200 } });
+                Boolean.FALSE, SC_200 });
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_EXACTLY, null, null, null,
-                null, Boolean.FALSE, null, new int[] { 200 } });
+                null, Boolean.FALSE, SC_200 });
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_IN, null, null, null, null,
-                Boolean.FALSE, null, new int[] { 200 } });
+                Boolean.FALSE, SC_200 });
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_NOT_IN, null, null, null,
-                null, Boolean.FALSE, null, new int[] { 412 } });
+                null, Boolean.FALSE, SC_412 });
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_SYNTAX_INVALID, null, null,
-                null, null, Boolean.FALSE, null, new int[] { 400 } });
+                null, null, Boolean.FALSE, SC_400 });
 
         parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_ALL, null, null, null, null,
-                Boolean.FALSE, null, new int[] { 200 } });
+                Boolean.FALSE, SC_200 });
         parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_EXACTLY, null, null, null,
-                null, Boolean.FALSE, null, new int[] { 412 } });
+                null, Boolean.FALSE, SC_412 });
         parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_IN, null, null, null, null,
-                Boolean.FALSE, null, new int[] { 412 } });
+                Boolean.FALSE, SC_412 });
         parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_NOT_IN, null, null, null,
-                null, Boolean.FALSE, null, new int[] { 412 } });
+                null, Boolean.FALSE, SC_412 });
         parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, IfPolicy.ETAG_SYNTAX_INVALID, null, null,
-                null, null, Boolean.FALSE, null, new int[] { 400 } });
+                null, null, Boolean.FALSE, SC_400 });
 
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_EQ, null, null, null,
-                Boolean.FALSE, null, new int[] { 200 } });
+                Boolean.FALSE, SC_200 });
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, null, null,
-                Boolean.FALSE, null, new int[] { 412 } });
+                Boolean.FALSE, SC_412 });
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, null, null, null,
-                Boolean.FALSE, null, new int[] { 200 } });
+                Boolean.FALSE, SC_200 });
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_MULTI_IN, null, null,
-                null, Boolean.FALSE, null, new int[] { 200 } });
+                null, Boolean.FALSE, SC_200 });
         parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, IfPolicy.DATE_GT,
-                null, Boolean.FALSE, null, new int[] { 412 } });
+                null, Boolean.FALSE, SC_412 });
 
         parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_EQ, null, null, null,
-                Boolean.FALSE, null, new int[] { 200 } });
+                Boolean.FALSE, SC_200 });
         parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_LT, null, null, null,
-                Boolean.FALSE, null, new int[] { 412 } });
+                Boolean.FALSE, SC_412 });
         parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_GT, null, null, null,
-                Boolean.FALSE, null, new int[] { 200 } });
+                Boolean.FALSE, SC_200 });
         parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, IfPolicy.DATE_MULTI_IN, null, null,
-                null, Boolean.FALSE, null, new int[] { 200 } });
+                null, Boolean.FALSE, SC_200 });
 
 
         return parameterSets;
     }
+
+
+    private static Integer SC_200 = Integer.valueOf(200);
+    private static Integer SC_400 = Integer.valueOf(400);
+    private static Integer SC_412 = Integer.valueOf(412);
 
 
     enum HTTP_METHOD {
@@ -417,18 +419,12 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
             responseHeaders.computeIfAbsent(name, k -> new ArrayList<String>()).add(value);
         }
         sc = client.getStatusCode();
-        boolean test = false;
-        boolean usePredicate = false;
-        if (scExpected != null && scExpected.length > 0 && scExpected[0] >= 100) {
-            test = Arrays.binarySearch(scExpected, sc) >= 0;
-        } else {
-            usePredicate = true;
-            test = p.test(sc);
-        }
-        String scExpectation = usePredicate ? "IntPredicate" : Arrays.toString(scExpected);
-        Assert.assertTrue("Failure - sc expected:" + scExpectation + ", sc actual:" + String.valueOf(sc) + ", task:" +
-                task + ", \ntarget resource:(" + etag + "," + FastHttpDateFormat.formatDate(lastModified) +
-                "), \nreq headers: " + requestHeaders.toString() + ", \nresp headers: " + responseHeaders.toString(),
+        boolean test = scExpected.intValue() == sc;
+        Assert.assertTrue(
+                "Failure - sc expected:%d, sc actual:%d, task:%s, \ntarget resource:(%s,%s), \nreq headers: %s, \nresp headers: %s"
+                        .formatted(scExpected, Integer.valueOf(sc), task, etag,
+                                FastHttpDateFormat.formatDate(lastModified), requestHeaders.toString(),
+                                responseHeaders.toString()),
                 test);
     }
 }
