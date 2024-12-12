@@ -96,6 +96,8 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                     null, Boolean.FALSE, SC_200 });
             parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.MULTI_IN, null,
                     null, null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.INVALID, null,
+                    null, null, Boolean.FALSE, SC_200 });
 
             // Ensure If-Unmodified-Since takes precedence over If-Modified-Since
             // If-Unmodified-Since only
