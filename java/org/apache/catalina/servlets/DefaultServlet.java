@@ -2154,21 +2154,33 @@ public class DefaultServlet extends HttpServlet {
         if (!"GET".equals(method) && !"HEAD".equals(method)) {
             return true;
         }
+
         long resourceLastModified = resource.getLastModified();
+        if (resourceLastModified <= -1 || request.getHeader("If-None-Match") != null) {
+            // MUST ignore if the resource does not have a modification date available.
+            // MUST ignore if the request contains an If-None-Match header field
+            return true;
+        }
+        Enumeration<String> headerEnum = request.getHeaders("If-Modified-Since");
+        if (!headerEnum.hasMoreElements()) {
+            // If-Modified-Since is not present
+            return true;
+        }
+        headerEnum.nextElement();
+        if (headerEnum.hasMoreElements()) {
+            // If-Modified-Since is a list of dates
+            return true;
+        }
 
         try {
+            // Header is present so -1 will be not returned. Only a valid date or an IAE are possible.
             long headerValue = request.getDateHeader("If-Modified-Since");
-            if (headerValue != -1) {
-
-                // If an If-None-Match header has been specified, if modified since
-                // is ignored.
-                if ((request.getHeader("If-None-Match") == null) && (resourceLastModified < headerValue + 1000)) {
-                    // The entity has not been modified since the date
-                    // specified by the client. This is not an error case.
-                    response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                    response.setHeader("ETag", generateETag(resource));
-                    return false;
-                }
+            if (resourceLastModified < (headerValue + 1000)) {
+                // The entity has not been modified since the date
+                // specified by the client. This is not an error case.
+                response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                response.setHeader("ETag", generateETag(resource));
+                return false;
             }
         } catch (IllegalArgumentException illegalArgument) {
             return true;
