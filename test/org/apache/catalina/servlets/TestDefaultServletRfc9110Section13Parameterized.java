@@ -69,49 +69,31 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     @Parameterized.Parameters(name = "{index} resource-strong [{0}], matchHeader [{1}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        // testPreconditions_rfc9110_13_2_2_1_head0
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, EtagPrecondition.ALL, null, null, null,
-                null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, EtagPrecondition.EXACTLY, null, null, null,
-                null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, EtagPrecondition.IN, null, null, null,
-                null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, EtagPrecondition.NOT_IN, null, null, null,
-                null, Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
-                null, null, null, null, Boolean.FALSE, SC_400 });
+        for (Boolean useStrongEtag : booleans) {
+            // RFC 9110, Section 13.2.2, Step 1, HEAD
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.ALL, null, null, null,
+                    null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.EXACTLY, null, null, null,
+                    null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412});
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.IN, null, null, null,
+                    null, Boolean.FALSE, useStrongEtag.booleanValue() ? SC_200 : SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.NOT_IN, null, null, null,
+                    null, Boolean.FALSE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
+                    null, null, null, null, Boolean.FALSE, SC_400 });
 
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, EtagPrecondition.ALL, null, null, null,
-                null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, EtagPrecondition.EXACTLY, null, null,
-                null, null, Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, EtagPrecondition.IN, null, null, null,
-                null, Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, EtagPrecondition.NOT_IN, null, null, null,
-                null, Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
-                null, null, null, null, Boolean.FALSE, SC_400 });
-
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, DatePrecondition.EQ, null, null,
-                null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null, null,
-                null, Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, DatePrecondition.GT, null, null,
-                null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, DatePrecondition.MULTI_IN, null,
-                null, null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.TRUE, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null,
-                DatePrecondition.GT, null, Boolean.FALSE, SC_412 });
-
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, DatePrecondition.EQ, null, null,
-                null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null, null,
-                null, Boolean.FALSE, SC_412 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, DatePrecondition.GT, null, null,
-                null, Boolean.FALSE, SC_200 });
-        parameterSets.add(new Object[] { Boolean.FALSE, Task.HEAD_INDEX_HTML, null, DatePrecondition.MULTI_IN, null,
-                null, null, Boolean.FALSE, SC_200 });
-
+            // RFC 9110, Section 13.2.2, Step 2, HEAD
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.EQ, null, null,
+                    null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null, null,
+                    null, Boolean.FALSE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.GT, null, null,
+                    null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.MULTI_IN, null,
+                    null, null, Boolean.FALSE, SC_200 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.HEAD_INDEX_HTML, null, DatePrecondition.LT, null,
+                    DatePrecondition.GT, null, Boolean.FALSE, SC_412 });
+        }
 
         return parameterSets;
     }
