@@ -257,6 +257,35 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
                     null, null, null, Boolean.FALSE, SC_400 });
             parameterSets.add(new Object[] { useStrongEtag, Task.PUT_NEW_TXT, EtagPrecondition.INVALID_ALL_PLUS_OTHER,
                     null, null, null, null, null, Boolean.FALSE, SC_400 });
+
+            // DELETE TESTS
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_EXIST_TXT, null, null, null, null, null, null,
+                    Boolean.FALSE, SC_204 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_EXIST_TXT, EtagPrecondition.ALL, null, null, null, null, null,
+                    Boolean.FALSE, SC_204 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_EXIST_TXT, EtagPrecondition.EXACTLY, null, null, null, null, null,
+                    Boolean.FALSE, useStrongEtag.booleanValue() ? SC_204 : SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_EXIST_TXT, EtagPrecondition.IN, null, null, null, null, null,
+                    Boolean.FALSE, useStrongEtag.booleanValue() ? SC_204 : SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_EXIST_TXT, EtagPrecondition.NOT_IN, null, null, null, null, null,
+                    Boolean.FALSE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_EXIST_TXT, EtagPrecondition.INVALID, null, null, null, null, null,
+                    Boolean.FALSE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_EXIST_TXT, EtagPrecondition.INVALID_ALL_PLUS_OTHER, null, null, null, null, null,
+                    Boolean.FALSE, SC_400 });
+
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_NOT_EXIST_TXT, null, null, null, null, null, null,
+                    Boolean.FALSE, SC_404 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_NOT_EXIST_TXT, EtagPrecondition.ALL, null, null, null, null, null,
+                    Boolean.FALSE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_NOT_EXIST_TXT, EtagPrecondition.IN, null, null, null, null, null,
+                    Boolean.FALSE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_NOT_EXIST_TXT, EtagPrecondition.NOT_IN, null, null, null, null, null,
+                    Boolean.FALSE, SC_412 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_NOT_EXIST_TXT, EtagPrecondition.INVALID, null, null, null, null, null,
+                    Boolean.FALSE, SC_400 });
+            parameterSets.add(new Object[] { useStrongEtag, Task.DELETE_NOT_EXIST_TXT, EtagPrecondition.INVALID_ALL_PLUS_OTHER, null, null, null, null, null,
+                    Boolean.FALSE, SC_400 });
         }
 
         return parameterSets;
@@ -269,6 +298,7 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
     private static Integer SC_206 = Integer.valueOf(HttpServletResponse.SC_PARTIAL_CONTENT);
     private static Integer SC_304 = Integer.valueOf(HttpServletResponse.SC_NOT_MODIFIED);
     private static Integer SC_400 = Integer.valueOf(HttpServletResponse.SC_BAD_REQUEST);
+    private static Integer SC_404 = Integer.valueOf(HttpServletResponse.SC_NOT_FOUND);
     private static Integer SC_412 = Integer.valueOf(HttpServletResponse.SC_PRECONDITION_FAILED);
 
 
@@ -295,10 +325,6 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
         PUT_NEW_TXT(HTTP_METHOD.PUT, "/put_new.txt"),
 
         DELETE_EXIST_TXT(HTTP_METHOD.DELETE, "/delete_exist.txt"),
-        DELETE_EXIST1_TXT(HTTP_METHOD.DELETE, "/delete_exist1.txt"),
-        DELETE_EXIST2_TXT(HTTP_METHOD.DELETE, "/delete_exist2.txt"),
-        DELETE_EXIST3_TXT(HTTP_METHOD.DELETE, "/delete_exist3.txt"),
-        DELETE_EXIST4_TXT(HTTP_METHOD.DELETE, "/delete_exist4.txt"),
         DELETE_NOT_EXIST_TXT(HTTP_METHOD.DELETE, "/delete_404.txt");
 
         HTTP_METHOD m;
@@ -480,22 +506,6 @@ public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseT
             Files.write((new File(tempDocBase.getAbsolutePath(), "delete_exist.txt")).toPath(), "delete_exist_v0".getBytes(),
                     StandardOpenOption.CREATE);
             (new File(tempDocBase.getAbsolutePath(), "delete_exist.txt")).setLastModified(lastModified);
-
-            Files.write((new File(tempDocBase.getAbsolutePath(), "delete_exist1.txt")).toPath(), "delete_exist1_v0".getBytes(),
-                    StandardOpenOption.CREATE);
-            (new File(tempDocBase.getAbsolutePath(), "delete_exist1.txt")).setLastModified(lastModified);
-
-            Files.write((new File(tempDocBase.getAbsolutePath(), "delete_exist2.txt")).toPath(), "delete_exist2_v0".getBytes(),
-                    StandardOpenOption.CREATE);
-            (new File(tempDocBase.getAbsolutePath(), "delete_exist2.txt")).setLastModified(lastModified);
-
-            Files.write((new File(tempDocBase.getAbsolutePath(), "delete_exist3.txt")).toPath(), "delete_exist3_v0".getBytes(),
-                    StandardOpenOption.CREATE);
-            (new File(tempDocBase.getAbsolutePath(), "delete_exist3.txt")).setLastModified(lastModified);
-
-            Files.write((new File(tempDocBase.getAbsolutePath(), "delete_exist4.txt")).toPath(), "delete_exist4_v0".getBytes(),
-                    StandardOpenOption.CREATE);
-            (new File(tempDocBase.getAbsolutePath(), "delete_exist4.txt")).setLastModified(lastModified);
         }
     }
 
