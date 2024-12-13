@@ -726,6 +726,10 @@ public class DefaultServlet extends HttpServlet {
 
         WebResource resource = resources.getResource(path);
 
+        if (!checkIfHeaders(req, resp, resource)) {
+            return;
+        }
+
         if (resource.exists()) {
             if (resource.delete()) {
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
@@ -735,7 +739,6 @@ public class DefaultServlet extends HttpServlet {
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
         }
-
     }
 
 
