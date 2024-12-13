@@ -1410,6 +1410,9 @@ public class DefaultServlet extends HttpServlet {
 
     /**
      * Parse the range header.
+     * <p>
+     * The caller is required to have confirmed that the requested resource exists and is a file before calling this
+     * method.
      *
      * @param request  The servlet request we are processing
      * @param response The servlet response we are creating
@@ -1431,7 +1434,7 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        if (!"GET".equals(request.getMethod()) || !determineRangeRequestsApplicable(resource)) {
+        if (!"GET".equals(request.getMethod()) || !isRangeRequestsSupported()) {
             // RFC 9110 - Section 14.2: GET is the only method for which range handling is defined.
             // Otherwise MUST ignore a Range header field
             return FULL;
@@ -2462,7 +2465,8 @@ public class DefaultServlet extends HttpServlet {
 
 
     /**
-     * Check if the if-range condition is satisfied.
+     * Check if the if-range condition is satisfied. The calling method is required to ensure a Range header is present
+     * and that Range requests are supported for the current resource.
      *
      * @param request  The servlet request we are processing
      * @param response The servlet response we are creating
@@ -2478,12 +2482,6 @@ public class DefaultServlet extends HttpServlet {
             throws IOException {
         String resourceETag = generateETag(resource);
         long resourceLastModified = resource.getLastModified();
-
-        String rangeHeader = request.getHeader("Range");
-        if (rangeHeader == null || !determineRangeRequestsApplicable(resource)) {
-            // Simply ignore If-Range header field
-            return true;
-        }
 
         Enumeration<String> headerEnum = request.getHeaders("If-Range");
         if (!headerEnum.hasMoreElements()) {
@@ -2533,19 +2531,6 @@ public class DefaultServlet extends HttpServlet {
     protected boolean isRangeRequestsSupported() {
         // Range-Requests optional feature is enabled implicitly.
         return true;
-    }
-
-    /**
-     * Determines if range-request is applicable for the target resource.
-     * <p>
-     * Subclass have an opportunity to customize by overriding this method.
-     *
-     * @param resource the target resource
-     *
-     * @return <code>true</code> only if range requests is supported by both the server and the target resource.
-     */
-    protected boolean determineRangeRequestsApplicable(WebResource resource) {
-        return isRangeRequestsSupported() && resource.isFile() && resource.exists();
     }
 
     /**
