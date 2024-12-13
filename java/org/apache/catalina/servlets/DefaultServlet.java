@@ -733,10 +733,25 @@ public class DefaultServlet extends HttpServlet {
      */
     protected boolean checkIfHeaders(HttpServletRequest request, HttpServletResponse response, WebResource resource)
             throws IOException {
-        return checkIfMatch(request, response, resource)
-                && checkIfUnmodifiedSince(request, response, resource)
-                && checkIfNoneMatch(request, response, resource)
-                && checkIfModifiedSince(request, response, resource);
+        if (request.getHeader("If-Match") != null) {
+            if (!checkIfMatch(request, response, resource)) {
+                return false;
+            }
+        } else if (request.getHeader("If-Unmodified-Since") != null) {
+            if (!checkIfUnmodifiedSince(request, response, resource)) {
+                return false;
+            }
+        }
+        if (request.getHeader("If-None-Match") != null) {
+            if (!checkIfNoneMatch(request, response, resource)) {
+                return false;
+            }
+        } else if (request.getHeader("If-Modified-Since") != null) {
+            if (!checkIfModifiedSince(request, response, resource)) {
+                return false;
+            }
+        }
+        return true;
     }
 
 
@@ -2089,9 +2104,6 @@ public class DefaultServlet extends HttpServlet {
 
         boolean conditionSatisfied = false;
         Enumeration<String> headerValues = request.getHeaders("If-Match");
-        if (!headerValues.hasMoreElements()) {
-            return true;
-        }
         String resourceETag = generateETag(resource);
 
         boolean hasAsteriskValue = false;// check existence of special header value '*'
@@ -2156,16 +2168,13 @@ public class DefaultServlet extends HttpServlet {
         }
 
         long resourceLastModified = resource.getLastModified();
-        if (resourceLastModified <= -1 || request.getHeader("If-None-Match") != null) {
+        if (resourceLastModified <= -1) {
             // MUST ignore if the resource does not have a modification date available.
-            // MUST ignore if the request contains an If-None-Match header field
             return true;
         }
+
+        // Must be at least one header for this method to be called
         Enumeration<String> headerEnum = request.getHeaders("If-Modified-Since");
-        if (!headerEnum.hasMoreElements()) {
-            // If-Modified-Since is not present
-            return true;
-        }
         headerEnum.nextElement();
         if (headerEnum.hasMoreElements()) {
             // If-Modified-Since is a list of dates
@@ -2207,9 +2216,6 @@ public class DefaultServlet extends HttpServlet {
         String resourceETag = generateETag(resource);
 
         Enumeration<String> headerValues = request.getHeaders("If-None-Match");
-        if (!headerValues.hasMoreElements()) {
-            return true;
-        }
         boolean hasAsteriskValue = false;// check existence of special header value '*'
         boolean conditionSatisfied = true;
         int headerCount = 0;
@@ -2294,16 +2300,12 @@ public class DefaultServlet extends HttpServlet {
             WebResource resource) throws IOException {
 
         long resourceLastModified = resource.getLastModified();
-        if (resourceLastModified <= -1 || request.getHeader("If-Match") != null) {
+        if (resourceLastModified <= -1) {
             // MUST ignore if the resource does not have a modification date available.
-            // MUST ignore if the request contains an If-Match header field
             return true;
         }
+        // Must be at least one header for this method to be called
         Enumeration<String> headerEnum = request.getHeaders("If-Unmodified-Since");
-        if (!headerEnum.hasMoreElements()) {
-            // If-Unmodified-Since is not present
-            return true;
-        }
         headerEnum.nextElement();
         if (headerEnum.hasMoreElements()) {
             // If-Unmodified-Since is a list of dates
