@@ -2168,7 +2168,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         long resourceLastModified = resource.getLastModified();
-        if (resourceLastModified <= -1) {
+        if (resourceLastModified <= 0) {
             // MUST ignore if the resource does not have a modification date available.
             return true;
         }
@@ -2300,7 +2300,7 @@ public class DefaultServlet extends HttpServlet {
             WebResource resource) throws IOException {
 
         long resourceLastModified = resource.getLastModified();
-        if (resourceLastModified <= -1) {
+        if (resourceLastModified <= 0) {
             // MUST ignore if the resource does not have a modification date available.
             return true;
         }
