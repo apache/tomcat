@@ -47,7 +47,7 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
  * This test case is used to verify RFC 9110 Section 13. Conditional Requests.
  */
 @RunWith(Parameterized.class)
-public class TestDefaultServletRfc9110Section13Parameterized extends TomcatBaseTest {
+public class TestDefaultServletRfc9110Section13 extends TomcatBaseTest {
 
     @Parameter(0)
     public boolean useStrongETags;
