@@ -817,6 +817,10 @@ public class DefaultServlet extends HttpServlet {
             if (isError) {
                 response.sendError(((Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE)).intValue());
             } else {
+                // Need to check If headers before we return a 404
+                if (!checkIfHeaders(request, response, resource)) {
+                    return;
+                }
                 response.sendError(HttpServletResponse.SC_NOT_FOUND,
                         sm.getString("defaultServlet.missingResource", requestUri));
             }
@@ -2236,36 +2240,27 @@ public class DefaultServlet extends HttpServlet {
                     // representation for the target resource.
                     if (resourceETag != null) {
                         conditionSatisfied = false;
-                    } else {
-                        conditionSatisfied = true;
                     }
                     break;
                 }
             } else {
-                if (resourceETag == null) {
-                    // None of the entity tag matches.
-                    conditionSatisfied = true;
+                // RFC 7232 requires weak comparison for If-None-Match headers
+                Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), true, resourceETag);
+                if (matched == null) {
+                    if (debug > 10) {
+                        log("DefaultServlet.checkIfNoneMatch:  Invalid header value [" + headerValue + "]");
+                    }
+                    response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                    return false;
+                }
+                if (matched.booleanValue()) {
+                    // RFC9110: If the field value is a list of entity tags, the condition is false if one of the
+                    // listed tags
+                    // matches the entity tag of the selected representation.
+                    conditionSatisfied = false;
                     break;
-                } else {
-                    // RFC 7232 requires weak comparison for If-None-Match headers
-                    Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), true, resourceETag);
-                    if (matched == null) {
-                        if (debug > 10) {
-                            log("DefaultServlet.checkIfNoneMatch:  Invalid header value [" + headerValue + "]");
-                        }
-                        response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-                        return false;
-                    }
-                    if (matched.booleanValue()) {
-                        // RFC9110: If the field value is a list of entity tags, the condition is false if one of the
-                        // listed tags
-                        // matches the entity tag of the selected representation.
-                        conditionSatisfied = false;
-                        break;
-                    }
                 }
             }
-
         }
         if (headerValues.hasMoreElements()) {
             headerCount++;
