@@ -93,6 +93,10 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
             case NO_RFC7540_PRIORITIES:
                 validateNoRfc7540Priorities(value);
                 break;
+            case ENABLE_CONNECT_PROTOCOL:
+            case TLS_RENEG_PERMITTED:
+                // Not supported. Ignore it.
+                return;
             case UNKNOWN:
                 // Unrecognised. Ignore it.
                 return;
