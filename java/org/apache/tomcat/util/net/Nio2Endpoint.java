@@ -1699,7 +1699,7 @@ public class Nio2Endpoint extends AbstractJsseEndpoint<Nio2Channel,AsynchronousS
             } catch (Throwable t) {
                 log.error(sm.getString("endpoint.processing.fail"), t);
                 if (socketWrapper != null) {
-                    ((Nio2SocketWrapper) socketWrapper).close();
+                    socketWrapper.close();
                 }
             } finally {
                 if (launch) {
