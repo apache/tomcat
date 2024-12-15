@@ -127,7 +127,7 @@ public class TestRequestFilterValve {
                 if (usePeerAddress) {
                     request.setRemoteAddr(ADDR_OTHER);
                     request.getCoyoteRequest().peerAddr().setString(property);
-                    ((RemoteAddrValve) valve).setUsePeerAddress(true);
+                    valve.setUsePeerAddress(true);
                     msg.append(" peer='" + property + "'");
                 } else {
                     request.setRemoteAddr(property);
@@ -143,7 +143,7 @@ public class TestRequestFilterValve {
                 if (usePeerAddress) {
                     request.setRemoteAddr(ADDR_OTHER);
                     request.getCoyoteRequest().peerAddr().setString(property);
-                    ((RemoteCIDRValve) valve).setUsePeerAddress(true);
+                    valve.setUsePeerAddress(true);
                     msg.append(" peer='" + property + "'");
                 } else {
                     request.setRemoteAddr(property);
@@ -172,11 +172,11 @@ public class TestRequestFilterValve {
         }
         if (addConnectorPort) {
             if (valve instanceof RemoteAddrValve) {
-                ((RemoteAddrValve) valve).setAddConnectorPort(true);
+                valve.setAddConnectorPort(true);
             } else if (valve instanceof RemoteHostValve) {
-                ((RemoteHostValve) valve).setAddConnectorPort(true);
+                valve.setAddConnectorPort(true);
             } else if (valve instanceof RemoteCIDRValve) {
-                ((RemoteCIDRValve) valve).setAddConnectorPort(true);
+                valve.setAddConnectorPort(true);
             } else {
                 Assert.fail("Can only set 'addConnectorPort' for RemoteAddrValve, RemoteHostValve and RemoteCIDRValve");
             }
