@@ -23,7 +23,9 @@ enum Setting {
     INITIAL_WINDOW_SIZE(4),
     MAX_FRAME_SIZE(5),
     MAX_HEADER_LIST_SIZE(6),
+    ENABLE_CONNECT_PROTOCOL(8),
     NO_RFC7540_PRIORITIES(9),
+    TLS_RENEG_PERMITTED(10),
     UNKNOWN(Integer.MAX_VALUE);
 
     private final int id;
@@ -61,8 +63,14 @@ enum Setting {
             case 6: {
                 return MAX_HEADER_LIST_SIZE;
             }
+            case 8: {
+                return ENABLE_CONNECT_PROTOCOL;
+            }
             case 9: {
                 return NO_RFC7540_PRIORITIES;
+            }
+            case 10: {
+                return TLS_RENEG_PERMITTED;
             }
             default: {
                 return UNKNOWN;
