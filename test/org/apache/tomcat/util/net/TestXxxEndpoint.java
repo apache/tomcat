@@ -50,7 +50,8 @@ public class TestXxxEndpoint extends TomcatBaseTest {
 
         tomcat.getConnector().stop();
         Exception e = null;
-        try (ServerSocket s = new ServerSocket(port, 100, InetAddress.getByName("localhost"))){
+        try (@SuppressWarnings("unused")
+        ServerSocket s = new ServerSocket(port, 100, InetAddress.getByName("localhost"))){
         } catch (Exception e1) {
             e = e1;
         }
@@ -76,7 +77,8 @@ public class TestXxxEndpoint extends TomcatBaseTest {
 
         tomcat.getConnector().stop();
         Exception e = null;
-        try (ServerSocket s = new ServerSocket(port, 100, InetAddress.getByName("localhost"))) {
+        try (@SuppressWarnings("unused")
+        ServerSocket s = new ServerSocket(port, 100, InetAddress.getByName("localhost"))) {
             // This should not throw an Exception
         } catch (Exception e1) {
             e = e1;
