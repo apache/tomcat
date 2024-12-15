@@ -158,6 +158,10 @@
         (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Don't log warnings for registered HTTP/2 settings that Tomcat does not
+        support. These settings are now silently ignored. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
