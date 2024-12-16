@@ -109,11 +109,11 @@
   <!--                       listings is enabled? [true]                    -->
   <!--                                                                      -->
   <!--   allowPartialPut     Should the server treat an HTTP PUT request    -->
-  <!--                       with a Range header as a partial PUT? Note     -->
-  <!--                       that while RFC 7233 clarified that Range       -->
-  <!--                       headers only valid for GET requests, RFC 9110  -->
-  <!--                       (which obsoletes RFC 7233) now allows partial  -->
-  <!--                       puts. [true]                                   -->
+  <!--                       with a Content-Range header as a partial PUT?  -->
+  <!--                       Note that while RFC 7231 clarified that such a -->
+  <!--                       PUT with a Content-Range header field is a bad -->
+  <!--                       request, RFC 9110 (which obsoletes RFC 7231)   -->
+  <!--                       now allows partial PUT. [true]                 -->
 
     <servlet>
         <servlet-name>default</servlet-name>
