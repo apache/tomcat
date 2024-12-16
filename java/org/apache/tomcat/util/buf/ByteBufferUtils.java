@@ -94,6 +94,10 @@ public class ByteBufferUtils {
         return out;
     }
 
+    /**
+     * Clean specified direct buffer. This will cause an unavoidable warning on Java 24 and newer.
+     * @param buf the buffer to clean
+     */
     public static void cleanDirectBuffer(ByteBuffer buf) {
         if (invokeCleanerMethod != null) {
             try {

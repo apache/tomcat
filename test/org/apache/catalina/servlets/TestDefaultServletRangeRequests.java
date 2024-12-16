@@ -97,9 +97,9 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         // Valid
         parameterSets.add(new Object[] {
                 "bytes=0-9", lastModified, Integer.valueOf(206), "10", "0-9/" + len });
-        // Nonsense date (return whole entity)
+        // Nonsense data (request rejected)
         parameterSets.add(new Object[] {
-                "bytes=0-9", "a-b-c", Integer.valueOf(200), strLen, ""});
+                "bytes=0-9", "a-b-c", Integer.valueOf(400), null, ""});
         // Different date (return whole entity)
         parameterSets.add(new Object[] {
                 "bytes=0-9", FastHttpDateFormat.formatDate(1000), Integer.valueOf(200), strLen, ""});
