@@ -42,11 +42,11 @@ import org.apache.tomcat.util.res.StringManager;
  * the bucket time ends and a new bucket starts.
  * </p>
  * <p>
- * The RateLimiter implementation can be set via the <code>className</code> init param. The default implementation,
- * <code>org.apache.catalina.util.FastRateLimiter</code>, is optimized for efficiency and low overhead so it converts
- * some configured values to more efficient values. For example, a configuration of a 60 seconds time bucket is
- * converted to 65.536 seconds. That allows for very fast bucket calculation using bit shift arithmetic. In order to
- * remain true to the user intent, the configured number of requests is then multiplied by the same ratio, so a
+ * The RateLimiter implementation can be set via the <code>rateLimitClassName</code> init param. The default
+ * implementation, <code>org.apache.catalina.util.FastRateLimiter</code>, is optimized for efficiency and low overhead
+ * so it converts some configured values to more efficient values. For example, a configuration of a 60 seconds time
+ * bucket is converted to 65.536 seconds. That allows for very fast bucket calculation using bit shift arithmetic. In
+ * order to remain true to the user intent, the configured number of requests is then multiplied by the same ratio, so a
  * configuration of 100 Requests per 60 seconds, has the real values of 109 Requests per 65 seconds. You can specify a
  * different class as long as it implements the <code>org.apache.catalina.util.RateLimiter</code> interface.
  * </p>
