@@ -29,7 +29,7 @@
     <name>Apache CXF for Apache Tomcat CDI</name>
     <description>Apache CXF packaged for Apache Tomcat CDI</description>
     <!-- This is the Apache CXF version -->
-    <version>3.6.4</version>
+    <version>3.6.5</version>
     <packaging>jar</packaging>
 
     <properties>
