@@ -1490,13 +1490,20 @@ public class DefaultServlet extends HttpServlet {
         }
 
         // Evaluate If-Range
-        try {
-            if (!checkIfRange(request, response, resource)) {
-                return FULL;
+        if (!checkIfRange(request, response, resource)) {
+            if (response.isCommitted()) {
+                /*
+                 * Ideally, checkIfRange() would be changed to return Boolean so the three states (satisfied,
+                 * unsatisfied  and error) could each be communicated via the return value. There isn't a backwards
+                 * compatible way to do that that doesn't involve changing the method name and there are benefits to
+                 * retaining the consistency of the existing method name pattern. Hence, this 'trick'. For the error
+                 * state, checkIfRange() will call response.sendError() which will commit the response which this method
+                 * can then detect.
+                 */
+                return null;
             }
-        } catch (IllegalArgumentException iae) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return null;
+            // No error but If-Range not satisfied
+            return FULL;
         }
 
         long fileLength = resource.getContentLength();
@@ -2336,9 +2343,10 @@ public class DefaultServlet extends HttpServlet {
      * @param response The servlet response we are creating
      * @param resource The resource
      *
-     * @return <code>true</code> if the resource meets the specified condition, and <code>false</code> if the condition
-     *             is not satisfied, resulting in transfer of the new selected representation instead of a 412
-     *             (Precondition Failed) response.
+     * @return {@code true} if the resource meets the specified condition, and {@code false} if the condition is not
+     *             satisfied, resulting in transfer of the new selected representation instead of a 412 (Precondition
+     *             Failed) response. If the if-range condition is not valid then an appropriate status code will be set,
+     *             the response will be committed and this method will return {@code false}
      *
      * @throws IOException an IO error occurred
      */
@@ -2355,8 +2363,8 @@ public class DefaultServlet extends HttpServlet {
         String headerValue = headerEnum.nextElement();
         if (headerEnum.hasMoreElements()) {
             // Multiple If-Range headers
-            // Not ideal but can't easily change method interface (No i18n - internal only)
-            throw new IllegalArgumentException("Multiple If-Range headers");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return false;
         }
 
         long headerValueTime = -1L;
@@ -2369,10 +2377,11 @@ public class DefaultServlet extends HttpServlet {
         if (headerValueTime == -1L) {
             // Not HTTP-date so this should be a single strong etag
             if (headerValue.length() < 2 || headerValue.charAt(0) != '"' ||
-                    headerValue.charAt(headerValue.length() -1 ) != '"' ||
-                    headerValue.indexOf('"', 1) != headerValue.length() -1) {
-                // Not ideal but can't easily change method interface (No i18n - internal only)
-                throw new IllegalArgumentException("Not a single, strong entity tag");
+                    headerValue.charAt(headerValue.length() - 1) != '"' ||
+                    headerValue.indexOf('"', 1) != headerValue.length() - 1) {
+                // Not a single, strong entity tag
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return false;
             }
             // If the ETag the client gave does not match the entity
             // etag, then the entire entity is returned.
