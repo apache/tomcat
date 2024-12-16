@@ -46,7 +46,7 @@ public interface RateLimiter {
     void destroy();
 
     /**
-     * Initialize with parameters, start {@link TimeBucketCounter}.
+     * Initialize with parameters, start {@link TimeBucketCounterBase}.
      *
      * @param executorService the executor
      * @param duration        the duration of the time window in seconds

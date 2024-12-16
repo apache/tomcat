@@ -27,7 +27,7 @@ public abstract class RateLimiterBase implements RateLimiter {
 
     private static final AtomicInteger index = new AtomicInteger();
 
-    TimeBucketCounter bucketCounter;
+    TimeBucketCounterBase bucketCounter;
 
     int actualRequests;
 
@@ -79,15 +79,15 @@ public abstract class RateLimiterBase implements RateLimiter {
     }
 
     /**
-     * Instantiate an instance of {@link TimeBucketCounter} for specific time bucket size. Concrete classes determine
+     * Instantiate an instance of {@link TimeBucketCounterBase} for specific time bucket size. Concrete classes determine
      * its counter policy by returning different implementation instance.
      *
      * @param utilityExecutor the executor
      * @param duration        size of each time bucket in seconds
      *
-     * @return counter instance of {@link TimeBucketCounter}
+     * @return counter instance of {@link TimeBucketCounterBase}
      */
-    protected abstract TimeBucketCounter newCounterInstance(ScheduledExecutorService utilityExecutor, int duration);
+    protected abstract TimeBucketCounterBase newCounterInstance(ScheduledExecutorService utilityExecutor, int duration);
 
     @Override
     public void initialize(ScheduledExecutorService utilityExecutor, int duration, int requests) {
@@ -102,11 +102,11 @@ public abstract class RateLimiterBase implements RateLimiter {
     }
 
     /**
-     * Returns the internal instance of {@link TimeBucketCounter}
+     * Returns the internal instance of {@link TimeBucketCounterBase}
      *
-     * @return instance of {@link TimeBucketCounter}
+     * @return instance of {@link TimeBucketCounterBase}
      */
-    public TimeBucketCounter getBucketCounter() {
+    public TimeBucketCounterBase getBucketCounter() {
         return bucketCounter;
     }
 }

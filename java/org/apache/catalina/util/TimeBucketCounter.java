@@ -16,192 +16,134 @@
  */
 package org.apache.catalina.util;
 
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This class maintains a thread safe hash map that has timestamp-based buckets followed by a string for a key, and a
- * counter for a integer value. each time the increment() method is called it adds the key if it does not exist,
- * increments its value and returns it.
+ * A fast counter that optimizes efficiency at the expense of approximate bucket indexing.
  */
-public abstract class TimeBucketCounter {
+public class TimeBucketCounter extends TimeBucketCounterBase {
 
-    private static final Log log = LogFactory.getLog(TimeBucketCounter.class);
-    private static final StringManager sm = StringManager.getManager(TimeBucketCounter.class);
+    TimeBucketCounter(int bucketDuration,ScheduledExecutorService utilityExecutor) {
+        this(utilityExecutor,bucketDuration);
+    }
 
-    private static final String BUCKET_KEY_DELIMITER = "^";
+    TimeBucketCounter(ScheduledExecutorService utilityExecutor, int bucketDuration) {
+        super(utilityExecutor, getActualDuration(bucketDuration));
+        this.numBits = determineShiftBitsOfDuration(bucketDuration);
+        this.ratio = ratioToPowerOf2(bucketDuration * 1000);
+    }
+
     /**
-     * Map to hold the buckets
+     * Milliseconds bucket size as a Power of 2 for bit shift math, e.g. 16 for 65_536ms which is about 1:05 minute
      */
-    private final ConcurrentHashMap<String,AtomicInteger> map = new ConcurrentHashMap<>();
+    private final int numBits;
 
     /**
-     * /** The future allowing control of the background processor.
+     * Ratio of actual duration to config duration
      */
-    private ScheduledFuture<?> maintenanceFuture;
-    private ScheduledFuture<?> monitorFuture;
-    private final ScheduledExecutorService executorService;
-    private final long sleeptime;
-    private int bucketDuration;
+    private final double ratio;
+
+    @Override
+    public long getBucketIndex(long timestamp) {
+        return timestamp >> this.numBits;
+    }
 
     /**
-     * Creates a new TimeBucketCounter with the specified lifetime.
+     * Calculates the current time bucket prefix by shifting bits for fast division, e.g. shift 16 bits is the same as
+     * dividing by 65,536 which is about 1:05m.
      *
-     * @param utilityExecutor the executor that should be used to handle maintenance task.
-     * @param bucketDuration  duration in seconds, e.g. for 1 minute pass 60
-     *
-     * @throws NullPointerException if executorService is <code>null</code>.
+     * @return The current bucket prefix.
      */
-    public TimeBucketCounter(ScheduledExecutorService utilityExecutor, int bucketDuration) {
-        Objects.requireNonNull(utilityExecutor);
-        this.executorService = utilityExecutor;
-        this.bucketDuration = bucketDuration;
+    @Override
+    public final int getCurrentBucketPrefix() {
+        return (int) (System.currentTimeMillis() >> this.numBits);
+    }
 
-        int cleanupsPerBucketDuration = (bucketDuration >= 60) ? 6 : 3;
-        sleeptime = bucketDuration * 1000 / cleanupsPerBucketDuration;
+    protected int getNumBits() {
+        return numBits;
+    }
 
-        // Start our thread
-        if (sleeptime > 0) {
-            monitorFuture = executorService.scheduleWithFixedDelay(new MaintenanceMonitor(), 0, 60, TimeUnit.SECONDS);
+    /**
+     * The actual duration may differ from the configured duration because it is set to the next power of 2 value in
+     * order to perform very fast bit shift arithmetic.
+     *
+     * @return the actual bucket duration in milliseconds
+     */
+    public int getActualDuration() {
+        return (int) Math.pow(2, getNumBits());
+    }
+
+    /**
+     * Determines the bits of shift for the specific bucket duration in seconds, which used to figure out the
+     * correct bucket index.
+     * @param duration bucket duration in seconds
+     * @return bits to be shifted
+     */
+    protected static final int determineShiftBitsOfDuration(int duration) {
+        int bits = 0;
+        int pof2 = nextPowerOf2(duration * 1000);
+        int bitCheck = pof2;
+        while (bitCheck > 1) {
+            bitCheck = pof2 >> ++bits;
         }
+        return bits;
     }
 
     /**
-     * @return bucketDuration in seconds
+     * The actual duration may differ from the configured duration because it is set to the next power of 2 value in
+     * order to perform very fast bit shift arithmetic.
+     *
+     * @param duration in seconds
+     *
+     * @return the actual bucket duration in seconds
+     *
+     * @see FastTimeBucketCounter#determineShiftBitsOfDuration(int)
      */
-    public int getBucketDuration() {
-        return bucketDuration;
+    protected static final int getActualDuration(int duration) {
+        return (int) (1L << determineShiftBitsOfDuration(duration)) / 1000;
+    }
+
+
+    /**
+     * Returns the ratio between the configured duration param and the actual duration which will be set to the next
+     * power of 2. We then multiply the configured requests param by the same ratio in order to compensate for the
+     * added time, if any.
+     *
+     * @return the ratio, e.g. 1.092 if the actual duration is 65_536 for the configured duration of 60_000
+     */
+    @Override
+    public double getRatio() {
+        return ratio;
     }
 
     /**
-     * Returns the ratio between the configured duration param and the actual duration.
-     * @return the ratio between the configured duration param and the actual duration.
+     * Returns the ratio to the next power of 2 so that we can adjust the value.
+     * @param value of target duration in seconds
+     * @return the ratio to the next power of 2 so that we can adjust the value
      */
-    public abstract double getRatio();
-
-    /**
-     * Increments the counter for the passed identifier in the current time bucket and returns the new value.
-     *
-     * @param identifier an identifier for which we want to maintain count, e.g. IP Address
-     *
-     * @return the count within the current time bucket
-     *
-     * @see TimeBucketCounter#genKey(String)
-     */
-    public final int increment(String identifier) {
-        String key = genKey(identifier);
-        AtomicInteger ai = map.computeIfAbsent(key, v -> new AtomicInteger());
-        return ai.incrementAndGet();
+    protected static double ratioToPowerOf2(int value) {
+        double nextPO2 = nextPowerOf2(value);
+        return Math.round((1000d * nextPO2 / value)) / 1000d;
     }
 
     /**
-     * Generates the key of timeBucket counter maps with the specific identifier, and the timestamp is implicitly
-     * equivalent to "now".
-     *
-     * @param identifier an identifier for which we want to maintain count
-     *
-     * @return key of timeBucket counter maps
+     * Returns the next power of 2 given a value, e.g. 256 for 250, or 1024, for 1000.
      */
-    protected final String genKey(String identifier) {
-        return genKey(identifier, System.currentTimeMillis());
-    }
-
-    /**
-     * Generates the key of timeBucket counter maps with the specific identifier and timestamp.
-     *
-     * @param identifier of target request
-     * @param timestamp  when target request received
-     *
-     * @return key of timeBucket counter maps
-     */
-    protected final String genKey(String identifier, long timestamp) {
-        return getBucketIndex(timestamp) + BUCKET_KEY_DELIMITER + identifier;
-    }
-
-    /**
-     * Calculate the bucket index for the specific timestamp, concrete subclass.
-     *
-     * @param timestamp the specific timestamp in milliseconds
-     *
-     * @return prefix the bucket key prefix for the specific timestamp
-     */
-    protected abstract long getBucketIndex(long timestamp);
-
-    /**
-     * When we want to test a full bucket duration we need to sleep until the next bucket starts.
-     * <p>
-     * <strong>WARNING:</strong> This method is used for test purpose.
-     *
-     * @return the number of milliseconds until the next bucket
-     */
-    @Deprecated
-    public abstract long getMillisUntilNextBucket();
-
-    /**
-     * Destroy resources
-     */
-    public void destroy() {
-        this.map.clear();
-        if (monitorFuture != null) {
-            monitorFuture.cancel(true);
-            monitorFuture = null;
+    static int nextPowerOf2(int value) {
+        int valueOfHighestBit = Integer.highestOneBit(value);
+        if (valueOfHighestBit == value) {
+            return value;
         }
-        if (maintenanceFuture != null) {
-            maintenanceFuture.cancel(true);
-            maintenanceFuture = null;
-        }
-    }
 
-    /**
-     * Periodic evict, perform removal of obsolete bucket items. Absence of this operation may result in OOM after a
-     * long run.
-     */
-    public void periodicEvict() {
-        final long minBucketIndex = getBucketIndex(System.currentTimeMillis());
-        // assume that elapsed time of periodicEvict less than 1x bucketDuration.
-        // to avoid extreme case: 999999-xxx vs 1000000-xxx
-        final long maxBucket = minBucketIndex + 2;
-
-        final String minBucketPrefix = minBucketIndex + BUCKET_KEY_DELIMITER;
-        final String maxBucketPrefix = maxBucket + BUCKET_KEY_DELIMITER;
-
-        // remove obsolete items whose key are less than minBucketPrefix and maxBucketPrefix in same time.
-        map.keySet().removeIf(k -> k.compareTo(minBucketPrefix) < 0 && k.compareTo(maxBucketPrefix) < 0);
+        return valueOfHighestBit << 1;
     }
 
 
-    private class Maintenance implements Runnable {
-        @Override
-        public void run() {
-            periodicEvict();
-        }
+    @Override
+    public long getMillisUntilNextBucket() {
+        long millis = System.currentTimeMillis();
+        long nextTimeBucketMillis = ((millis + (long) Math.pow(2, numBits)) >> numBits) << numBits;
+        long delta = nextTimeBucketMillis - millis;
+        return delta;
     }
-
-    private class MaintenanceMonitor implements Runnable {
-        @Override
-        public void run() {
-            if (sleeptime > 0 && (maintenanceFuture == null || maintenanceFuture.isDone())) {
-                if (maintenanceFuture != null && maintenanceFuture.isDone()) {
-                    // There was an error executing the scheduled task, get it and log it
-                    try {
-                        maintenanceFuture.get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        log.error(sm.getString("timebucket.maintenance.error"), e);
-                    }
-                }
-                maintenanceFuture = executorService.scheduleWithFixedDelay(new Maintenance(), sleeptime, sleeptime,
-                        TimeUnit.MILLISECONDS);
-            }
-        }
-    }
-
 }

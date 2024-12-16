@@ -29,7 +29,7 @@ public class ExactRateLimiter extends RateLimiterBase {
     }
 
     @Override
-    protected TimeBucketCounter newCounterInstance(ScheduledExecutorService executorService, int duration) {
+    protected TimeBucketCounterBase newCounterInstance(ScheduledExecutorService executorService, int duration) {
         return new ExactTimeBucketCounter(executorService, duration);
     }
 
@@ -37,7 +37,7 @@ public class ExactRateLimiter extends RateLimiterBase {
      * An accurate counter with exact bucket index, but slightly less efficient than another fast counter provided with
      * the {@link FastRateLimiter}.
      */
-    class ExactTimeBucketCounter extends TimeBucketCounter {
+    class ExactTimeBucketCounter extends TimeBucketCounterBase {
 
         ExactTimeBucketCounter(ScheduledExecutorService executorService, int bucketDuration) {
             super(executorService, bucketDuration);
