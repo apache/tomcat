@@ -17,7 +17,6 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
-import java.util.concurrent.ScheduledExecutorService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -30,7 +29,6 @@ import org.apache.catalina.util.RateLimiter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
 
 /**
  * <p>
@@ -202,20 +200,15 @@ public class RateLimitFilter extends FilterBase {
     public void init(FilterConfig filterConfig) throws ServletException {
         super.init(filterConfig);
 
-        ScheduledExecutorService utilityExecutor = (ScheduledExecutorService) filterConfig.getServletContext()
-                .getAttribute(ScheduledThreadPoolExecutor.class.getName());
-        if (utilityExecutor == null) {
-            if (newExecutorService == null) {
-                newExecutorService = new java.util.concurrent.ScheduledThreadPoolExecutor(1);
-            }
-            utilityExecutor = newExecutorService;
-        }
-
         try {
             rateLimiter = (RateLimiter) Class.forName(rateLimitClassName).getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
             throw new ServletException(e);
         }
+
+        rateLimiter.setDuration(bucketDuration);
+        rateLimiter.setRequests(bucketRequests);
+        rateLimiter.setFilterConfig(filterConfig);
 
         if (policyName != null) {
             String trimmedName = policyName.trim();
@@ -223,8 +216,6 @@ public class RateLimitFilter extends FilterBase {
                 rateLimiter.setPolicyName(trimmedName);
             }
         }
-
-        rateLimiter.initialize(utilityExecutor, bucketDuration, bucketRequests);
 
         filterName = filterConfig.getFilterName();
 
@@ -262,18 +253,9 @@ public class RateLimitFilter extends FilterBase {
         chain.doFilter(request, response);
     }
 
-    private ScheduledExecutorService newExecutorService = null;
-
     @Override
     public void destroy() {
         rateLimiter.destroy();
-        if (newExecutorService != null) {
-            try {
-                newExecutorService.shutdown();
-            } catch (SecurityException e) {
-                // ignore
-            }
-        }
         super.destroy();
     }
 

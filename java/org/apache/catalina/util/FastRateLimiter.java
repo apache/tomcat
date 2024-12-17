@@ -33,4 +33,9 @@ public class FastRateLimiter extends RateLimiterBase implements RateLimiter {
     protected TimeBucketCounterBase newCounterInstance(ScheduledExecutorService executorService, int duration) {
         return new TimeBucketCounter(executorService, duration);
     }
+
+    @Override
+    public TimeBucketCounter getBucketCounter() {
+        return (TimeBucketCounter)bucketCounter;
+    }
 }

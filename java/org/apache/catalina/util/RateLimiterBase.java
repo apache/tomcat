@@ -18,7 +18,10 @@ package org.apache.catalina.util;
 
 import java.util.Objects;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import jakarta.servlet.FilterConfig;
 
 /**
  * Basic implementation of {@link RateLimiter}, provides runtime data maintenance mechanism monitor.
@@ -29,8 +32,10 @@ public abstract class RateLimiterBase implements RateLimiter {
 
     TimeBucketCounterBase bucketCounter;
 
+    int requests;
     int actualRequests;
 
+    int duration;
     int actualDuration;
 
     // Initial policy name can be rewritten by setPolicyName()
@@ -64,8 +69,18 @@ public abstract class RateLimiterBase implements RateLimiter {
     }
 
     @Override
+    public void setDuration(int duration) {
+        this.duration=duration;
+    }
+
+    @Override
     public int getRequests() {
         return actualRequests;
+    }
+
+    @Override
+    public void setRequests(int requests) {
+        this.requests=requests;
     }
 
     @Override
@@ -76,6 +91,13 @@ public abstract class RateLimiterBase implements RateLimiter {
     @Override
     public void destroy() {
         bucketCounter.destroy();
+        if (newExecutorService != null) {
+            try {
+                newExecutorService.shutdown();
+            } catch (SecurityException e) {
+                // ignore
+            }
+        }
     }
 
     /**
@@ -90,17 +112,20 @@ public abstract class RateLimiterBase implements RateLimiter {
     protected abstract TimeBucketCounterBase newCounterInstance(ScheduledExecutorService utilityExecutor, int duration);
 
     @Override
-    public void initialize(ScheduledExecutorService utilityExecutor, int duration, int requests) {
-        if (bucketCounter != null) {
-            bucketCounter.destroy();
+    public void setFilterConfig(FilterConfig filterConfig) {
+
+        ScheduledExecutorService executorService = (ScheduledExecutorService) filterConfig.getServletContext()
+                .getAttribute(ScheduledThreadPoolExecutor.class.getName());
+
+        if (executorService == null) {
+            newExecutorService = new java.util.concurrent.ScheduledThreadPoolExecutor(1);
+            executorService = newExecutorService;
         }
 
-        bucketCounter = newCounterInstance(utilityExecutor, duration);
-
+        bucketCounter = newCounterInstance(executorService, duration);
         actualDuration = bucketCounter.getBucketDuration();
         actualRequests = (int) Math.round(bucketCounter.getRatio() * requests);
     }
-
     /**
      * Returns the internal instance of {@link TimeBucketCounterBase}
      *
@@ -109,4 +134,10 @@ public abstract class RateLimiterBase implements RateLimiter {
     public TimeBucketCounterBase getBucketCounter() {
         return bucketCounter;
     }
+
+    /**
+     * The self-owned utility executor, will be instantiated only when ScheduledThreadPoolExecutor is absent during
+     * filter configure phase.
+     */
+    private ScheduledThreadPoolExecutor newExecutorService = null;
 }
