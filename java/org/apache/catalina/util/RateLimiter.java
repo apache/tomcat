@@ -46,13 +46,13 @@ public interface RateLimiter {
     void setRequests(int requests);
 
     /**
-     * Increments the number of requests by the given ipAddress in the current time window.
+     * Increments the number of requests by the given identifier in the current time window.
      *
-     * @param ipAddress the ip address
+     * @param identifier of target request
      *
      * @return the new value after incrementing
      */
-    int increment(String ipAddress);
+    int increment(String identifier);
 
     /**
      * Cleanup no longer needed resources.
