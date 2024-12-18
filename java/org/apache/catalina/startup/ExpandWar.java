@@ -83,7 +83,8 @@ public class ExpandWar {
         File warTracker = new File(host.getAppBaseFile(), pathname + Constants.WarTracker);
         long warLastModified = -1;
 
-        try (InputStream is = jfuc.getInputStream()) {
+        try (@SuppressWarnings("unused")
+        InputStream is = jfuc.getInputStream()) {
             // Get the last modified time for the WAR
             warLastModified = jfuc.getLastModified();
         }

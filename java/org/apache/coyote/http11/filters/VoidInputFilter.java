@@ -26,8 +26,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 
 /**
- * Void input filter, which returns -1 when attempting a read. Used with a GET,
- * HEAD, or a similar request.
+ * Void input filter, which returns -1 when attempting a read. Used with a GET, HEAD, or a similar request.
  *
  * @author Remy Maucherat
  */
@@ -43,8 +42,7 @@ public class VoidInputFilter implements InputFilter {
     // ----------------------------------------------------- Static Initializer
 
     static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1),
-                0, ENCODING_NAME.length());
+        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1), 0, ENCODING_NAME.length());
     }
 
 

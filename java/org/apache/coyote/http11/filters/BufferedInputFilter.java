@@ -29,8 +29,8 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Input filter responsible for reading and buffering the request body, so that
- * it does not interfere with client SSL handshake messages.
+ * Input filter responsible for reading and buffering the request body, so that it does not interfere with client SSL
+ * handshake messages.
  */
 public class BufferedInputFilter implements InputFilter, ApplicationBufferHandler {
 
@@ -63,8 +63,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
 
 
     /**
-     * Set the buffering limit. This should be reset every time the buffer is
-     * used.
+     * Set the buffering limit. This should be reset every time the buffer is used.
      *
      * @param limit The maximum number of bytes that will be buffered
      */
@@ -103,7 +102,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
                     tempRead = null;
                 }
             }
-        } catch(IOException | BufferOverflowException ioe) {
+        } catch (IOException | BufferOverflowException ioe) {
             // No need for i18n - this isn't going to get logged anywhere
             throw new IllegalStateException(sm.getString("bufferedInputFilter.bodySize", ioe.getMessage()));
         }

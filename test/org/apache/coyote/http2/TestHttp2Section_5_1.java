@@ -296,8 +296,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         // Reset stream 3 (client cancel)
         sendRst(3, Http2Error.NO_ERROR.getCode());
-        // Client reset triggers a write error which in turn triggers a server
-        // reset
+        // Client reset triggers both a read error and a write error which in turn trigger two server resets
         parser.readFrame();
         Assert.assertEquals("3-RST-[5]\n", output.getTrace());
         output.clearTrace();

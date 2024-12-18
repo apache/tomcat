@@ -31,7 +31,6 @@ import java.net.URLClassLoader;
 import java.security.CodeSource;
 import java.security.Permission;
 import java.security.PermissionCollection;
-import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
@@ -68,6 +67,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstrumentableClassLoader;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.apache.tomcat.util.buf.ToStringUtil;
+import org.apache.tomcat.util.collections.ConcurrentLruCache;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
@@ -123,50 +124,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         JVM_THREAD_GROUP_NAMES.add(JVM_THREAD_GROUP_SYSTEM);
         JVM_THREAD_GROUP_NAMES.add("RMI Runtime");
-    }
-
-    protected class PrivilegedFindClassByName implements PrivilegedAction<Class<?>> {
-
-        private final String name;
-
-        PrivilegedFindClassByName(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public Class<?> run() {
-            return findClassInternal(name);
-        }
-    }
-
-
-    protected static final class PrivilegedGetClassLoader implements PrivilegedAction<ClassLoader> {
-
-        private final Class<?> clazz;
-
-        public PrivilegedGetClassLoader(Class<?> clazz) {
-            this.clazz = clazz;
-        }
-
-        @Override
-        public ClassLoader run() {
-            return clazz.getClassLoader();
-        }
-    }
-
-
-    protected final class PrivilegedJavaseGetResource implements PrivilegedAction<URL> {
-
-        private final String name;
-
-        public PrivilegedJavaseGetResource(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public URL run() {
-            return javaseClassLoader.getResource(name);
-        }
     }
 
 
@@ -356,8 +313,25 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
     private volatile LifecycleState state = LifecycleState.NEW;
 
+    /*
+     * Class resources are not cached since they are loaded on first use and the resource is then no longer required. It
+     * does help, however, to cache classes that are not found as in some scenarios the same class will be searched for
+     * many times and the greater the number of JARs/classes, the longer that lookup will take.
+     */
+    private final ConcurrentLruCache<String> notFoundClassResources = new ConcurrentLruCache<>(1000);
+
 
     // ------------------------------------------------------------- Properties
+
+    public void setNotFoundClassResourceCacheSize(int notFoundClassResourceCacheSize) {
+        notFoundClassResources.setLimit(notFoundClassResourceCacheSize);
+    }
+
+
+    public int getNotFoundClassResourceCacheSize() {
+        return notFoundClassResources.getLimit();
+    }
+
 
     /**
      * Set associated resources.
@@ -658,6 +632,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         checkStateForClassLoading(name);
 
+        if (name == null) {
+            throw new ClassNotFoundException("null");
+        }
+
+        String path = binaryNameToPath(name, true);
+
         // Ask our superclass to locate this class, if possible
         // (throws ClassNotFoundException if it is not found)
         Class<?> clazz = null;
@@ -665,35 +645,39 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (log.isTraceEnabled()) {
                 log.trace("      findClassInternal(" + name + ")");
             }
-            try {
-                clazz = findClassInternal(name);
-            } catch (RuntimeException e) {
-                if (log.isTraceEnabled()) {
-                    log.trace("      -->RuntimeException Rethrown", e);
-                }
-                throw e;
-            }
-            if (clazz == null && hasExternalRepositories) {
+            if (!notFoundClassResources.contains(path)) {
                 try {
-                    clazz = super.findClass(name);
+                    clazz = findClassInternal(name, path);
                 } catch (RuntimeException e) {
                     if (log.isTraceEnabled()) {
                         log.trace("      -->RuntimeException Rethrown", e);
                     }
                     throw e;
                 }
-            }
-            if (clazz == null) {
-                if (log.isTraceEnabled()) {
-                    log.trace("    --> Returning ClassNotFoundException");
+                if (clazz == null && hasExternalRepositories) {
+                    try {
+                        clazz = super.findClass(name);
+                    } catch (RuntimeException e) {
+                        if (log.isTraceEnabled()) {
+                            log.trace("      -->RuntimeException Rethrown", e);
+                        }
+                        throw e;
+                    }
                 }
-                throw new ClassNotFoundException(name);
             }
         } catch (ClassNotFoundException e) {
             if (log.isTraceEnabled()) {
                 log.trace("    --> Passing on ClassNotFoundException");
             }
+            notFoundClassResources.add(path);
             throw e;
+        }
+        if (clazz == null) {
+            if (log.isTraceEnabled()) {
+                log.trace("    --> Returning ClassNotFoundException");
+            }
+            notFoundClassResources.add(path);
+            throw new ClassNotFoundException(name);
         }
 
         // Return the class we have located
@@ -729,14 +713,20 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         String path = nameToPath(name);
 
-        WebResource resource = resources.getClassLoaderResource(path);
-        if (resource.exists()) {
-            url = resource.getURL();
-            trackLastModified(path, resource);
-        }
+        if (!notFoundClassResources.contains(path)) {
+            WebResource resource = resources.getClassLoaderResource(path);
+            if (resource.exists()) {
+                url = resource.getURL();
+                trackLastModified(path, resource);
+            }
 
-        if (url == null && hasExternalRepositories) {
-            url = super.findResource(name);
+            if (url == null && hasExternalRepositories) {
+                url = super.findResource(name);
+            }
+
+            if (url == null) {
+                notFoundClassResources.add(path);
+            }
         }
 
         if (log.isTraceEnabled()) {
@@ -923,60 +913,64 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             log.trace("  Searching local repositories");
         }
         String path = nameToPath(name);
-        WebResource resource = resources.getClassLoaderResource(path);
-        if (resource.exists()) {
-            stream = resource.getInputStream();
-            // Filter out .class resources through the ClassFileTranformer
-            if (name.endsWith(CLASS_FILE_SUFFIX) && transformers.size() > 0) {
-                // If the resource is a class, decorate it with any attached transformers
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                byte[] buf = new byte[8192];
-                int numRead;
-                try {
-                    while ((numRead = stream.read(buf)) >= 0) {
-                        baos.write(buf, 0, numRead);
-                    }
-                } catch (IOException e) {
-                    log.error(sm.getString("webappClassLoader.transformError", name), e);
-                    return null;
-                } finally {
+        if (!notFoundClassResources.contains(path)) {
+            WebResource resource = resources.getClassLoaderResource(path);
+            if (resource.exists()) {
+                stream = resource.getInputStream();
+                // Filter out .class resources through the ClassFileTranformer
+                if (name.endsWith(CLASS_FILE_SUFFIX) && transformers.size() > 0) {
+                    // If the resource is a class, decorate it with any attached transformers
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buf = new byte[8192];
+                    int numRead;
                     try {
-                        stream.close();
-                    } catch (IOException e) {
-                    }
-                }
-                byte[] binaryContent = baos.toByteArray();
-                String internalName = path.substring(1, path.length() - CLASS_FILE_SUFFIX.length());
-                for (ClassFileTransformer transformer : this.transformers) {
-                    try {
-                        byte[] transformed = transformer.transform(this, internalName, null, null, binaryContent);
-                        if (transformed != null) {
-                            binaryContent = transformed;
+                        while ((numRead = stream.read(buf)) >= 0) {
+                            baos.write(buf, 0, numRead);
                         }
-                    } catch (IllegalClassFormatException e) {
+                    } catch (IOException e) {
                         log.error(sm.getString("webappClassLoader.transformError", name), e);
                         return null;
+                    } finally {
+                        try {
+                            stream.close();
+                        } catch (IOException e) {
+                        }
+                    }
+                    byte[] binaryContent = baos.toByteArray();
+                    String internalName = path.substring(1, path.length() - CLASS_FILE_SUFFIX.length());
+                    for (ClassFileTransformer transformer : this.transformers) {
+                        try {
+                            byte[] transformed = transformer.transform(this, internalName, null, null, binaryContent);
+                            if (transformed != null) {
+                                binaryContent = transformed;
+                            }
+                        } catch (IllegalClassFormatException e) {
+                            log.error(sm.getString("webappClassLoader.transformError", name), e);
+                            return null;
+                        }
+                    }
+                    stream = new ByteArrayInputStream(binaryContent);
+                }
+                trackLastModified(path, resource);
+            }
+            try {
+                if (hasExternalRepositories && stream == null) {
+                    URL url = super.findResource(name);
+                    if (url != null) {
+                        stream = url.openStream();
                     }
                 }
-                stream = new ByteArrayInputStream(binaryContent);
+            } catch (IOException e) {
+                // Ignore
             }
-            trackLastModified(path, resource);
-        }
-        try {
-            if (hasExternalRepositories && stream == null) {
-                URL url = super.findResource(name);
-                if (url != null) {
-                    stream = url.openStream();
+            if (stream != null) {
+                if (log.isTraceEnabled()) {
+                    log.trace("  --> Returning stream from local");
                 }
+                return stream;
             }
-        } catch (IOException e) {
-            // Ignore
-        }
-        if (stream != null) {
-            if (log.isTraceEnabled()) {
-                log.trace("  --> Returning stream from local");
-            }
-            return stream;
+
+            notFoundClassResources.add(path);
         }
 
         // (3) Delegate to parent unconditionally
@@ -1177,6 +1171,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
         }
 
+        if (log.isDebugEnabled()) {
+            log.debug(ToStringUtil.classPathForCNFE(this));
+        }
         throw new ClassNotFoundException(name);
     }
 
@@ -1308,6 +1305,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         state = LifecycleState.STOPPING;
 
         resourceEntries.clear();
+        notFoundClassResources.clear();
         jarModificationTimes.clear();
         resources = null;
 
@@ -1991,11 +1989,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
      *
      * @return the loaded class, or null if the class isn't found
      */
-    /*
-     * The use of getPackage() is appropriate given that the code is checking if the package is sealed. Therefore,
-     * parent class loaders need to be checked.
-     */
-    @SuppressWarnings("deprecation")
     protected Class<?> findClassInternal(String name) {
 
         checkStateForResourceLoading(name);
@@ -2005,6 +1998,16 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
         String path = binaryNameToPath(name, true);
 
+        return findClassInternal(name, path);
+    }
+
+
+    /*
+     * The use of getPackage() is appropriate given that the code is checking if the package is sealed. Therefore,
+     * parent class loaders need to be checked.
+     */
+    @SuppressWarnings("deprecation")
+    private Class<?> findClassInternal(String name, String path) {
         ResourceEntry entry = resourceEntries.get(path);
         WebResource resource = null;
 
@@ -2058,6 +2061,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 return null;
             }
             Manifest manifest = resource.getManifest();
+            URL codeBase = resource.getCodeBase();
             Certificate[] certificates = resource.getCertificates();
 
             if (transformers.size() > 0) {
@@ -2099,7 +2103,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         if (manifest == null) {
                             definePackage(packageName, null, null, null, null, null, null, null);
                         } else {
-                            definePackage(packageName, manifest, null);
+                            definePackage(packageName, manifest, codeBase);
                         }
                     } catch (IllegalArgumentException e) {
                         // Ignore: normal error due to dual definition of package
@@ -2109,7 +2113,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             try {
-                clazz = defineClass(name, binaryContent, 0, binaryContent.length, new CodeSource(null, certificates));
+                clazz = defineClass(name, binaryContent, 0, binaryContent.length,
+                        new CodeSource(codeBase, certificates));
             } catch (UnsupportedClassVersionError ucve) {
                 throw new UnsupportedClassVersionError(
                         ucve.getLocalizedMessage() + " " + sm.getString("webappClassLoader.wrongVersion", name));

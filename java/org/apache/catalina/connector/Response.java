@@ -1021,10 +1021,8 @@ public class Response implements HttpServletResponse {
      *
      * @param continueResponseTiming Indicates when the request for the ACK originated so it can be compared with the
      *                                   configured timing for ACK responses.
-     *
-     * @exception IOException if an input/output error occurs
      */
-    public void sendAcknowledgement(ContinueResponseTiming continueResponseTiming) throws IOException {
+    public void sendAcknowledgement(ContinueResponseTiming continueResponseTiming) {
 
         if (isCommitted()) {
             return;
@@ -1040,11 +1038,46 @@ public class Response implements HttpServletResponse {
 
 
     @Override
+    public void sendEarlyHints() {
+        if (isCommitted()) {
+            return;
+        }
+
+        // Ignore any call from an included servlet
+        if (included) {
+            return;
+        }
+
+        getCoyoteResponse().action(ActionCode.EARLY_HINTS, null);
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <i>Deprecated functionality</i>: calling <code>sendError</code> with a status code of 103 differs from the usual
+     * behavior. Sending 103 will trigger the container to send a "103 Early Hints" informational response including all
+     * current headers. The application can continue to use the request and response after calling sendError with a 103
+     * status code, including triggering a more typical response of any type.
+     * <p>
+     * Starting with Tomcat 12, applications should use {@link #sendEarlyHints}.
+     */
+    @Override
     public void sendError(int status) throws IOException {
         sendError(status, null);
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * <i>Deprecated functionality</i>: calling <code>sendError</code> with a status code of 103 differs from the usual
+     * behavior. Sending 103 will trigger the container to send a "103 Early Hints" informational response including all
+     * current headers. The application can continue to use the request and response after calling sendError with a 103
+     * status code, including triggering a more typical response of any type.
+     * <p>
+     * Starting with Tomcat 12, applications should use {@link #sendEarlyHints}.
+     */
     @Override
     public void sendError(int status, String message) throws IOException {
 
@@ -1057,16 +1090,20 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        setError();
+        if (HttpServletResponse.SC_EARLY_HINTS == status) {
+            sendEarlyHints();
+        } else {
+            setError();
 
-        getCoyoteResponse().setStatus(status);
-        getCoyoteResponse().setMessage(message);
+            getCoyoteResponse().setStatus(status);
+            getCoyoteResponse().setMessage(message);
 
-        // Clear any data content that has been buffered
-        resetBuffer();
+            // Clear any data content that has been buffered
+            resetBuffer();
 
-        // Cause the response to be finished (from the application perspective)
-        setSuspended(true);
+            // Cause the response to be finished (from the application perspective)
+            setSuspended(true);
+        }
     }
 
 

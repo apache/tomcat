@@ -51,7 +51,9 @@ abstract class AbstractNonZeroStream extends AbstractStream {
 
     /**
      * Check the frame type against the state
+     *
      * @param frameType the type
+     *
      * @throws Http2Exception if an error is detected
      */
     final void checkState(FrameType frameType) throws Http2Exception {
@@ -65,11 +67,14 @@ abstract class AbstractNonZeroStream extends AbstractStream {
      * @return {@code null} if the DATA frame payload can be swallowed, or a ByteBuffer with at least enough space
      *             remaining for the current flow control window for stream data from the client.
      */
-    abstract ByteBuffer getInputByteBuffer();
+    abstract ByteBuffer getInputByteBuffer(boolean create);
+
 
     /**
      * Notify that some data has been received.
+     *
      * @param payloadSize the byte count
+     *
      * @throws Http2Exception if an error is detected
      */
     abstract void receivedData(int payloadSize) throws Http2Exception;

@@ -25,32 +25,37 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 
 
 /**
- * This Tomcat specific interface is implemented by handlers that require direct
- * access to Tomcat's I/O layer rather than going through the Servlet API.
+ * This Tomcat specific interface is implemented by handlers that require direct access to Tomcat's I/O layer rather
+ * than going through the Servlet API.
  */
 public interface InternalHttpUpgradeHandler extends HttpUpgradeHandler {
 
     /**
      * Process the specified event.
+     *
      * @param status the event
+     *
      * @return the status following the event
      */
     SocketState upgradeDispatch(SocketEvent status);
 
     /**
      * Check for a possible timeout.
+     *
      * @param now the time to use for the timeout check
      */
     void timeoutAsync(long now);
 
     /**
      * Associate with the specified socket.
+     *
      * @param wrapper the socket
      */
     void setSocketWrapper(SocketWrapperBase<?> wrapper);
 
     /**
      * Associate with the specified SSL support.
+     *
      * @param sslSupport the SSL support
      */
     void setSslSupport(SSLSupport sslSupport);

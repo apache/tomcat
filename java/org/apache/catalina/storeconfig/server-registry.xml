@@ -24,6 +24,7 @@
         children="true"
         tagClass="org.apache.catalina.core.StandardServer"
         storeFactoryClass="org.apache.catalina.storeconfig.StandardServerSF">
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Service"
@@ -32,6 +33,7 @@
         children="true"
         tagClass="org.apache.catalina.core.StandardService"
         storeFactoryClass="org.apache.catalina.storeconfig.StandardServiceSF">
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Engine"
@@ -90,6 +92,7 @@
         children="true"
         tagClass="org.apache.catalina.deploy.NamingResourcesImpl"
         storeFactoryClass="org.apache.catalina.storeconfig.GlobalNamingResourcesSF">
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Connector"
@@ -99,6 +102,7 @@
         children="true"
         storeFactoryClass="org.apache.catalina.storeconfig.ConnectorSF"
         storeAppenderClass="org.apache.catalina.storeconfig.ConnectorStoreAppender">
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="UpgradeProtocol"
@@ -168,6 +172,7 @@
         children="true"
         tagClass="org.apache.catalina.session.PersistentManager"
         storeFactoryClass="org.apache.catalina.storeconfig.PersistentManagerSF">
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Store"
@@ -191,6 +196,7 @@
         tagClass="org.apache.catalina.ha.CatalinaCluster"
         storeFactoryClass="org.apache.catalina.storeconfig.CatalinaClusterSF">
         <TransientAttribute>clusterName</TransientAttribute>
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Realm"
@@ -267,6 +273,7 @@
          <TransientChild>org.apache.catalina.valves.CertificatesValve</TransientChild>
          <TransientChild>org.apache.catalina.valves.ErrorReportValve</TransientChild>
          <TransientChild>org.apache.catalina.valves.RequestListenerValve</TransientChild>
+         <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Environment"
@@ -448,6 +455,7 @@
         default="false"
         tagClass="org.apache.catalina.core.StandardThreadExecutor"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+       <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="JarScanner"

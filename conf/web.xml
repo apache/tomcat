@@ -82,9 +82,6 @@
   <!--                       which sendfile will be used. Use a negative    -->
   <!--                       value to always disable sendfile.  [48]        -->
   <!--                                                                      -->
-  <!--   useAcceptRanges     Should the Accept-Ranges header be included    -->
-  <!--                       in responses where appropriate? [true]         -->
-  <!--                                                                      -->
   <!--  For directory listing customization. Checks localXsltFile, then     -->
   <!--  globalXsltFile, then defaults to original behavior.                 -->
   <!--                                                                      -->
@@ -111,11 +108,11 @@
   <!--                       listings is enabled? [true]                    -->
   <!--                                                                      -->
   <!--   allowPartialPut     Should the server treat an HTTP PUT request    -->
-  <!--                       with a Range header as a partial PUT? Note     -->
-  <!--                       that while RFC 7233 clarified that Range       -->
-  <!--                       headers only valid for GET requests, RFC 9110  -->
-  <!--                       (which obsoletes RFC 7233) now allows partial  -->
-  <!--                       puts. [true]                                   -->
+  <!--                       with a Content-Range header as a partial PUT?  -->
+  <!--                       Note that while RFC 7231 clarified that such a -->
+  <!--                       PUT with a Content-Range header field is a bad -->
+  <!--                       request, RFC 9110 (which obsoletes RFC 7231)   -->
+  <!--                       now allows partial PUT. [true]                 -->
   <!--                                                                      -->
   <!--   directoryRedirectStatusCode                                        -->
   <!--                       Status code to use for directory redirects.    -->
@@ -160,9 +157,9 @@
   <!--                       pages.  See the jasper documentation for more  -->
   <!--                       information.                                   -->
   <!--                                                                      -->
-  <!--   compilerSourceVM    Compiler source VM. [17]                       -->
+  <!--   compilerSourceVM    Compiler source VM. [21]                       -->
   <!--                                                                      -->
-  <!--   compilerTargetVM    Compiler target VM. [17]                       -->
+  <!--   compilerTargetVM    Compiler target VM. [21]                       -->
   <!--                                                                      -->
   <!--   development         Is Jasper used in development mode? If true,   -->
   <!--                       the frequency at which JSPs are checked for    -->

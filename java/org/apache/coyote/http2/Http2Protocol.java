@@ -34,6 +34,7 @@ import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
@@ -98,6 +99,18 @@ public class Http2Protocol implements UpgradeProtocol {
     private AbstractHttp11Protocol<?> http11Protocol = null;
 
     private RequestGroupInfo global = new RequestGroupInfo();
+
+    /*
+     * Setting discardRequestsAndResponses can have a significant performance impact. The magnitude of the impact is
+     * very application dependent but with a simple Spring Boot application[1] returning a short JSON response running
+     * on markt's desktop in 2024 the difference was 108k req/s with this set to true compared to 124k req/s with this
+     * set to false. The larger the response and/or the larger the request processing time, the smaller the performance
+     * impact of this setting.
+     *
+     * [1] https://github.com/markt-asf/spring-boot-http2
+     */
+    private boolean discardRequestsAndResponses = false;
+    private final SynchronizedStack<Request> recycledRequestsAndResponses = new SynchronizedStack<>();
 
     @Override
     public String getHttpUpgradeName(boolean isSSLEnabled) {
@@ -365,6 +378,7 @@ public class Http2Protocol implements UpgradeProtocol {
     @Override
     public void setHttp11Protocol(AbstractHttp11Protocol<?> http11Protocol) {
         this.http11Protocol = http11Protocol;
+        recycledRequestsAndResponses.setLimit(http11Protocol.getMaxConnections());
 
         try {
             ObjectName oname = this.http11Protocol.getONameForUpgrade(getUpgradeProtocolName());
@@ -389,5 +403,37 @@ public class Http2Protocol implements UpgradeProtocol {
 
     public RequestGroupInfo getGlobal() {
         return global;
+    }
+
+
+    public boolean getDiscardRequestsAndResponses() {
+        return discardRequestsAndResponses;
+    }
+
+
+    public void setDiscardRequestsAndResponses(boolean discardRequestsAndResponses) {
+        this.discardRequestsAndResponses = discardRequestsAndResponses;
+    }
+
+
+    Request popRequestAndResponse() {
+        Request requestAndResponse = null;
+        if (!discardRequestsAndResponses) {
+            requestAndResponse = recycledRequestsAndResponses.pop();
+        }
+        if (requestAndResponse == null) {
+            requestAndResponse = new Request();
+            Response response = new Response();
+            requestAndResponse.setResponse(response);
+        }
+        return requestAndResponse;
+    }
+
+
+    void pushRequestAndResponse(Request requestAndResponse) {
+        requestAndResponse.recycle();
+        if (!discardRequestsAndResponses) {
+            recycledRequestsAndResponses.push(requestAndResponse);
+        }
     }
 }

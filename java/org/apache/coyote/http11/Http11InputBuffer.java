@@ -335,8 +335,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                         wrapper.setReadTimeout(keepAliveTimeout);
                     }
                     if (!fill(false)) {
-                        // A read is pending, so no longer in initial state
-                        parsingRequestLinePhase = 1;
                         return false;
                     }
                     // At least one byte of the request has been received.
@@ -358,7 +356,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                 }
                 // Set the start time once we start reading data (even if it is
                 // just skipping blank lines)
-                if (request.getStartTimeNanos() < 0) {
+                if (parsingRequestLinePhase == 0) {
+                    parsingRequestLinePhase = 1;
                     request.setStartTimeNanos(System.nanoTime());
                 }
                 chr = byteBuffer.get();
@@ -647,6 +646,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
     /**
      * Available bytes in the buffers for the current request. Note that when requests are pipelined, the data in
      * byteBuffer may relate to the next request rather than this one.
+     *
      * @return the amount of bytes available, 0 if none, and 1 if there was an IO error to trigger a read
      */
     int available(boolean read) {
@@ -690,6 +690,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
     /**
      * Has all of the request body been read? There are subtle differences between this and available() &gt; 0 primarily
      * because of having to handle faking non-blocking reads with the blocking IO connector.
+     *
      * @return {@code true} if the request has been fully read
      */
     boolean isFinished() {

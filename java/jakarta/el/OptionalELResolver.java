@@ -25,6 +25,8 @@ import java.util.Optional;
  * This resolver handles base objects that are instances of {@link Optional}.
  * <p>
  * This resolver is always a read-only resolver since {@link Optional} instances are immutable.
+ *
+ * @since EL 6.0
  */
 public class OptionalELResolver extends ELResolver {
 
@@ -56,11 +58,7 @@ public class OptionalELResolver extends ELResolver {
 
         if (base instanceof Optional) {
             context.setPropertyResolved(base, property);
-            if (((Optional<?>) base).isEmpty()) {
-                if (property == null) {
-                    return null;
-                }
-            } else {
+            if (((Optional<?>) base).isPresent()) {
                 if (property == null) {
                     return ((Optional<?>) base).get();
                 } else {

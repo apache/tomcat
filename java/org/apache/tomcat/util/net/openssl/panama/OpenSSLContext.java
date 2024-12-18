@@ -26,6 +26,7 @@ import java.lang.foreign.ValueLayout;
 import java.lang.ref.Cleaner;
 import java.lang.ref.Cleaner.Cleanable;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyManagementException;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -66,6 +67,7 @@ import org.apache.tomcat.util.openssl.SSL_CTX_set_alpn_select_cb$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_cert_verify_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_tmp_dh_callback$dh;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
+import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.openssl.pem_password_cb;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -113,8 +115,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         }
     }
 
-    static final boolean OPENSSL_3 = (OpenSSL_version_num() >= 0x3000000fL);
-
     private final SSLHostConfig sslHostConfig;
     private final SSLHostConfigCertificate certificate;
     private final boolean alpn;
@@ -135,13 +135,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static String[] getCiphers(MemorySegment sslCtx) {
         MemorySegment sk = SSL_CTX_get_ciphers(sslCtx);
-        int len = OPENSSL_sk_num(sk);
+        int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
         if (len <= 0) {
             return null;
         }
         ArrayList<String> ciphers = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
-            MemorySegment cipher = OPENSSL_sk_value(sk, i);
+            MemorySegment cipher = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
             MemorySegment cipherName = SSL_CIPHER_get_name(cipher);
             ciphers.add(cipherName.getString(0));
         }
@@ -175,14 +175,18 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 if (log.isTraceEnabled()) {
                     log.trace(sm.getString("openssl.makeConf"));
                 }
-                confCtx = SSL_CONF_CTX_new();
-                if (MemorySegment.NULL.equals(confCtx)) {
-                    throw new SSLException(sm.getString("openssl.errMakeConf", OpenSSLLibrary.getLastError()));
+                if (!openssl_h_Compatibility.BORINGSSL) {
+                    confCtx = SSL_CONF_CTX_new();
+                    if (MemorySegment.NULL.equals(confCtx)) {
+                        throw new SSLException(sm.getString("openssl.errMakeConf", OpenSSLLibrary.getLastError()));
+                    }
+                    SSL_CONF_CTX_set_flags(confCtx, SSL_CONF_FLAG_FILE() |
+                            SSL_CONF_FLAG_SERVER() |
+                            SSL_CONF_FLAG_CERTIFICATE() |
+                            SSL_CONF_FLAG_SHOW_ERRORS());
+                } else {
+                    log.error(sm.getString("opensslconf.unsupported"));
                 }
-                SSL_CONF_CTX_set_flags(confCtx, SSL_CONF_FLAG_FILE() |
-                        SSL_CONF_FLAG_SERVER() |
-                        SSL_CONF_FLAG_CERTIFICATE() |
-                        SSL_CONF_FLAG_SHOW_ERRORS());
             }
 
             // SSL protocol
@@ -243,14 +247,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSL_CTX_set_min_proto_version(sslCtx, prot);
 
             // Disable compression, usually unsafe
-            SSL_CTX_set_options(sslCtx, SSL_OP_NO_COMPRESSION());
+            openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_NO_COMPRESSION());
 
             // Disallow a session from being resumed during a renegotiation,
             // so that an acceptable cipher suite can be negotiated.
-            SSL_CTX_set_options(sslCtx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION());
+            openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION());
 
-            SSL_CTX_set_options(sslCtx, SSL_OP_SINGLE_DH_USE());
-            SSL_CTX_set_options(sslCtx, SSL_OP_SINGLE_ECDH_USE());
+            openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_SINGLE_DH_USE());
+            openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_SINGLE_ECDH_USE());
 
             // Default session context id and cache size
             SSL_CTX_sess_set_cache_size(sslCtx, 256);
@@ -453,41 +457,43 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
      * @param tms Must contain a TrustManager of the type
      *            {@code X509TrustManager}
      * @param sr Is not used for this implementation.
+     * @throws KeyManagementException if an error occurs
      */
     @Override
-    public void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) {
+    public void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) throws KeyManagementException {
         if (initialized) {
             log.warn(sm.getString("openssl.doubleInit"));
             return;
         }
         boolean success = true;
+        Exception cause = null;
         try (var localArena = Arena.ofConfined()) {
             if (sslHostConfig.getInsecureRenegotiation()) {
-                SSL_CTX_set_options(state.sslCtx, SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION());
+                openssl_h_Compatibility.SSL_CTX_set_options(state.sslCtx, SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION());
             } else {
-                SSL_CTX_clear_options(state.sslCtx, SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION());
+                openssl_h_Compatibility.SSL_CTX_clear_options(state.sslCtx, SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION());
             }
 
             // Use server's preference order for ciphers (rather than
             // client's)
             if (sslHostConfig.getHonorCipherOrder()) {
-                SSL_CTX_set_options(state.sslCtx, SSL_OP_CIPHER_SERVER_PREFERENCE());
+                openssl_h_Compatibility.SSL_CTX_set_options(state.sslCtx, SSL_OP_CIPHER_SERVER_PREFERENCE());
             } else {
-                SSL_CTX_clear_options(state.sslCtx, SSL_OP_CIPHER_SERVER_PREFERENCE());
+                openssl_h_Compatibility.SSL_CTX_clear_options(state.sslCtx, SSL_OP_CIPHER_SERVER_PREFERENCE());
             }
 
             // Disable compression if requested
             if (sslHostConfig.getDisableCompression()) {
-                SSL_CTX_set_options(state.sslCtx, SSL_OP_NO_COMPRESSION());
+                openssl_h_Compatibility.SSL_CTX_set_options(state.sslCtx, SSL_OP_NO_COMPRESSION());
             } else {
-                SSL_CTX_clear_options(state.sslCtx, SSL_OP_NO_COMPRESSION());
+                openssl_h_Compatibility.SSL_CTX_clear_options(state.sslCtx, SSL_OP_NO_COMPRESSION());
             }
 
             // Disable TLS Session Tickets (RFC4507) to protect perfect forward secrecy
             if (sslHostConfig.getDisableSessionTickets()) {
-                SSL_CTX_set_options(state.sslCtx, SSL_OP_NO_TICKET());
+                openssl_h_Compatibility.SSL_CTX_set_options(state.sslCtx, SSL_OP_NO_TICKET());
             } else {
-                SSL_CTX_clear_options(state.sslCtx, SSL_OP_NO_TICKET());
+                openssl_h_Compatibility.SSL_CTX_clear_options(state.sslCtx, SSL_OP_NO_TICKET());
             }
 
             // List the ciphers that the client is permitted to negotiate
@@ -622,7 +628,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     log.error(sm.getString("openssl.errApplyConf"), e);
                 }
                 // Reconfigure the enabled protocols
-                long opts = SSL_CTX_get_options(state.sslCtx);
+                long opts = openssl_h_Compatibility.SSL_CTX_get_options(state.sslCtx);
                 List<String> enabled = new ArrayList<>();
                 // Seems like there is no way to explicitly disable SSLv2Hello
                 // in OpenSSL so it is always enabled
@@ -659,11 +665,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             sslHostConfig.setOpenSslContext(Long.valueOf(state.sslCtx.address()));
             initialized = true;
         } catch (Exception e) {
-            log.warn(sm.getString("openssl.errorSSLCtxInit"), e);
+            cause = e;
             success = false;
         }
         if (!success) {
             destroy();
+            throw new KeyManagementException(sm.getString("openssl.errorSSLCtxInit"), cause);
         }
     }
 
@@ -757,11 +764,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             MemorySegment ssl = X509_STORE_CTX_get_ex_data(x509_ctx, SSL_get_ex_data_X509_STORE_CTX_idx());
             MemorySegment /*STACK_OF(X509)*/ sk = X509_STORE_CTX_get0_untrusted(x509_ctx);
-            int len = OPENSSL_sk_num(sk);
+            int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
             byte[][] certificateChain = new byte[len][];
             try (var localArena = Arena.ofConfined()) {
                 for (int i = 0; i < len; i++) {
-                    MemorySegment/*(X509*)*/ x509 = OPENSSL_sk_value(sk, i);
+                    MemorySegment/*(X509*)*/ x509 = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
                     MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
                     int length = i2d_X509(x509, bufPointer);
                     if (length < 0) {
@@ -1052,57 +1059,61 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 // Try to read DH parameters from the (first) SSLCertificateFile
                 if (index == SSL_AIDX_RSA) {
                     BIO_reset(certificateBIO);
-                    if (!OPENSSL_3) {
-                        var dh = PEM_read_bio_DHparams(certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
-                        if (!MemorySegment.NULL.equals(dh)) {
-                            SSL_CTX_set_tmp_dh(state.sslCtx, dh);
-                            DH_free(dh);
-                        }
-                    } else {
-                        var pkey = PEM_read_bio_Parameters(certificateBIO, MemorySegment.NULL);
-                        if (!MemorySegment.NULL.equals(pkey)) {
-                            int numBits = EVP_PKEY_get_bits(pkey);
-                            if (SSL_CTX_set0_tmp_dh_pkey(state.sslCtx, pkey) <= 0) {
-                                EVP_PKEY_free(pkey);
-                            } else {
-                                log.debug(sm.getString("openssl.setCustomDHParameters", Integer.valueOf(numBits), certificate.getCertificateFile()));
+                    if (!openssl_h_Compatibility.BORINGSSL) {
+                        if (!openssl_h_Compatibility.OPENSSL3) {
+                            var dh = PEM_read_bio_DHparams(certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                            if (!MemorySegment.NULL.equals(dh)) {
+                                SSL_CTX_set_tmp_dh(state.sslCtx, dh);
+                                DH_free(dh);
                             }
                         } else {
-                            String errMessage = OpenSSLLibrary.getLastError();
-                            if (errMessage != null) {
-                                log.debug(sm.getString("openssl.errorReadingPEMParameters", errMessage, certificate.getCertificateFile()));
+                            var pkey = PEM_read_bio_Parameters(certificateBIO, MemorySegment.NULL);
+                            if (!MemorySegment.NULL.equals(pkey)) {
+                                int numBits = EVP_PKEY_get_bits(pkey);
+                                if (SSL_CTX_set0_tmp_dh_pkey(state.sslCtx, pkey) <= 0) {
+                                    EVP_PKEY_free(pkey);
+                                } else {
+                                    log.debug(sm.getString("openssl.setCustomDHParameters", Integer.valueOf(numBits), certificate.getCertificateFile()));
+                                }
+                            } else {
+                                String errMessage = OpenSSLLibrary.getLastError();
+                                if (errMessage != null) {
+                                    log.debug(sm.getString("openssl.errorReadingPEMParameters", errMessage, certificate.getCertificateFile()));
+                                }
+                                SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
                             }
-                            SSL_CTX_ctrl(state.sslCtx, SSL_CTRL_SET_DH_AUTO(), 1, MemorySegment.NULL);
                         }
                     }
                 }
                 // Similarly, try to read the ECDH curve name from SSLCertificateFile...
                 BIO_reset(certificateBIO);
-                if (!OPENSSL_3) {
-                    var ecparams = PEM_read_bio_ECPKParameters(certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
-                    if (!MemorySegment.NULL.equals(ecparams)) {
-                        int nid = EC_GROUP_get_curve_name(ecparams);
-                        var eckey = EC_KEY_new_by_curve_name(nid);
-                        SSL_CTX_set_tmp_ecdh(state.sslCtx, eckey);
-                        EC_KEY_free(eckey);
-                        EC_GROUP_free(ecparams);
-                    }
-                    // Set callback for DH parameters
-                    SSL_CTX_set_tmp_dh_callback(state.sslCtx, SSL_CTX_set_tmp_dh_callback$dh.allocate(new TmpDHCallback(), contextArena));
-                } else {
-                    var ecparams = PEM_ASN1_read_bio(d2i_ECPKParameters$SYMBOL(),
-                            PEM_STRING_ECPARAMETERS(), certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
-                    if (!MemorySegment.NULL.equals(ecparams)) {
-                        int curveNid = EC_GROUP_get_curve_name(ecparams);
-                        var curveNidAddress = localArena.allocateFrom(ValueLayout.JAVA_INT, curveNid);
-                        if (SSL_CTX_set1_groups(state.sslCtx, curveNidAddress, 1) <= 0) {
-                            curveNid = 0;
+                if (!openssl_h_Compatibility.BORINGSSL) {
+                    if (!openssl_h_Compatibility.OPENSSL3) {
+                        var ecparams = PEM_read_bio_ECPKParameters(certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                        if (!MemorySegment.NULL.equals(ecparams)) {
+                            int nid = EC_GROUP_get_curve_name(ecparams);
+                            var eckey = EC_KEY_new_by_curve_name(nid);
+                            SSL_CTX_set_tmp_ecdh(state.sslCtx, eckey);
+                            EC_KEY_free(eckey);
+                            EC_GROUP_free(ecparams);
                         }
-                        if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("openssl.setECDHCurve", Integer.valueOf(curveNid),
-                                    certificate.getCertificateFile()));
+                        // Set callback for DH parameters
+                        SSL_CTX_set_tmp_dh_callback(state.sslCtx, SSL_CTX_set_tmp_dh_callback$dh.allocate(new TmpDHCallback(), contextArena));
+                    } else {
+                        var ecparams = PEM_ASN1_read_bio(d2i_ECPKParameters$SYMBOL(),
+                                PEM_STRING_ECPARAMETERS(), certificateBIO, MemorySegment.NULL, MemorySegment.NULL, MemorySegment.NULL);
+                        if (!MemorySegment.NULL.equals(ecparams)) {
+                            int curveNid = EC_GROUP_get_curve_name(ecparams);
+                            var curveNidAddress = localArena.allocateFrom(ValueLayout.JAVA_INT, curveNid);
+                            if (SSL_CTX_set1_groups(state.sslCtx, curveNidAddress, 1) <= 0) {
+                                curveNid = 0;
+                            }
+                            if (log.isDebugEnabled()) {
+                                log.debug(sm.getString("openssl.setECDHCurve", Integer.valueOf(curveNid),
+                                        certificate.getCertificateFile()));
+                            }
+                            EC_GROUP_free(ecparams);
                         }
-                        EC_GROUP_free(ecparams);
                     }
                 }
                 // Set certificate chain file
@@ -1211,7 +1222,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     logLastError("openssl.errorPrivateKeyCheck");
                     return false;
                 }
-                if (!OPENSSL_3) {
+                if (!openssl_h_Compatibility.OPENSSL3) {
                     // Set callback for DH parameters
                     SSL_CTX_set_tmp_dh_callback(state.sslCtx,
                             SSL_CTX_set_tmp_dh_callback$dh.allocate(new TmpDHCallback(), contextArena));
@@ -1393,7 +1404,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 this.confCtx = confCtx.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
                         (MemorySegment t) -> SSL_CONF_CTX_free(t));
             } else {
-                this.confCtx = null;
+                this.confCtx = MemorySegment.NULL;
             }
         }
 

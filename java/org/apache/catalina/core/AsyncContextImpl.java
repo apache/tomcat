@@ -77,10 +77,10 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     private final AtomicBoolean hasOnErrorReturned = new AtomicBoolean(false);
 
     public AsyncContextImpl(Request request) {
+        this.request = request;
         if (log.isTraceEnabled()) {
             logDebug("Constructor");
         }
-        this.request = request;
     }
 
     @Override
@@ -345,7 +345,17 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 fireOnComplete();
             }
         } catch (RuntimeException x) {
-            // doInternalComplete(true);
+            AtomicBoolean result = new AtomicBoolean();
+            request.getCoyoteRequest().action(ActionCode.IS_IO_ALLOWED, result);
+            /*
+             * If IO is allowed then onComplete() will be called from AbstractProcessorLight.process() when
+             * AbstractProcessorLight.postProcess() is called. If IO is not allowed then that call will not happen so
+             * call onComplete() here. This can't be handled in AbstractProcessorLight.process() as it does not have the
+             * information required to determine that onComplete() needs to be called.
+             */
+            if (!result.get()) {
+                fireOnComplete();
+            }
             if (x.getCause() instanceof ServletException) {
                 throw (ServletException) x.getCause();
             }

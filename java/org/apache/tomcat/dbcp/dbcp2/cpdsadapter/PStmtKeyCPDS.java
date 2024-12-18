@@ -16,10 +16,12 @@
  */
 package org.apache.tomcat.dbcp.dbcp2.cpdsadapter;
 
+import java.sql.PreparedStatement;
+
 import org.apache.tomcat.dbcp.dbcp2.PStmtKey;
 
 /**
- * A key uniquely identifying a {@link java.sql.PreparedStatement PreparedStatement}.
+ * A key uniquely identifying a {@link PreparedStatement}.
  *
  * @since 2.0
  * @deprecated Use {@link PStmtKey}.

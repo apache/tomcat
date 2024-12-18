@@ -28,10 +28,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -49,11 +53,11 @@ public class TestClientCertTls13 extends TomcatBaseTest {
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
         parameterSets.add(new Object[] {
-                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation", Boolean.FALSE});
         parameterSets.add(new Object[] {
-                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", Boolean.TRUE});
         parameterSets.add(new Object[] {
-                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation", Boolean.FALSE});
 
         return parameterSets;
     }
@@ -67,11 +71,18 @@ public class TestClientCertTls13 extends TomcatBaseTest {
     @Parameter(2)
     public String sslImplementationName;
 
+    @Parameter(3)
+    public boolean initSslImplementation;
+
 
     @Test
     public void testClientCertGet() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.start();
+
+        Assume.assumeFalse("LibreSSL does not allow PHA",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
+
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/protected");
         Assert.assertEquals("OK-" + TesterSupport.ROLE, res.toString());
     }
@@ -80,6 +91,9 @@ public class TestClientCertTls13 extends TomcatBaseTest {
     public void testClientCertPost() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.start();
+
+        Assume.assumeFalse("LibreSSL does not allow PHA",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
 
         int size = 32 * 1024;
 
@@ -108,7 +122,12 @@ public class TestClientCertTls13 extends TomcatBaseTest {
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         if (useOpenSSL) {
-            Assume.assumeTrue(TesterSupport.getOpensslVersion() >= 0x1010100f);
+            // getOpenSSLVersion() requires that the listener has been initialised
+            if (initSslImplementation) {
+                tomcat.getServer().findLifecycleListeners()[0].lifecycleEvent(
+                        new LifecycleEvent(tomcat.getServer(), Lifecycle.BEFORE_INIT_EVENT, null));
+            }
+            Assume.assumeTrue(AprStatus.getOpenSSLVersion() >= 0x1010100f || OpenSSLStatus.getVersion() >= 0x1010100f);
         }
 
         // Tests default to TLSv1.2 when client cert auth is used

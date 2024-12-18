@@ -121,16 +121,12 @@ Tomcat is designed to be a fast and efficient implementation of the
 Servlet Specification.  Tomcat came about as the reference implementation
 of this specification, and has remained rigorous in adhering to the
 specification.  At the same time, significant attention has been paid
-to Tomcat's performance and it is now on par with other servlet containers,
+to Tomcat's performance and it is on par with other servlet containers,
 including commercial ones.
 </p>
 <p>
-In recent releases of Tomcat, mostly starting with Tomcat 5,
-we have begun efforts to make more aspects of Tomcat manageable via
-JMX.  In addition, the Manager and Admin webapps have been greatly
-enhanced and improved.  Manageability is a primary area of concern
-for us as the product matures and the specification becomes more
-stable.
+In current releases of Tomcat, we aim to make Tomcat manageable via JMX.
+Manageability continues to be a primary area of concern and ongoing development.
 </p>
 </section>
 

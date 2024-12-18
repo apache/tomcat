@@ -320,38 +320,38 @@ java.util.logging.ConsoleHandler.level=ALL</source>
   <p>
     Example logging.properties file to be placed in $CATALINA_BASE/conf:
   </p>
-  <source><![CDATA[handlers = 1catalina.org.apache.juli.FileHandler, \
-           2localhost.org.apache.juli.FileHandler, \
-           3manager.org.apache.juli.FileHandler, \
+  <source><![CDATA[handlers = 1catalina.org.apache.juli.AsyncFileHandler, \
+           2localhost.org.apache.juli.AsyncFileHandler, \
+           3manager.org.apache.juli.AsyncFileHandler, \
            java.util.logging.ConsoleHandler
 
-.handlers = 1catalina.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler
+.handlers = 1catalina.org.apache.juli.AsyncFileHandler, java.util.logging.ConsoleHandler
 
 ############################################################
 # Handler specific properties.
 # Describes specific configuration info for Handlers.
 ############################################################
 
-1catalina.org.apache.juli.FileHandler.level = FINE
-1catalina.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
-1catalina.org.apache.juli.FileHandler.prefix = catalina.
-1catalina.org.apache.juli.FileHandler.maxDays = 90
-1catalina.org.apache.juli.FileHandler.encoding = UTF-8
+1catalina.org.apache.juli.AsyncFileHandler.level = ALL
+1catalina.org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+1catalina.org.apache.juli.AsyncFileHandler.prefix = catalina.
+1catalina.org.apache.juli.AsyncFileHandler.maxDays = 90
+1catalina.org.apache.juli.AsyncFileHandler.encoding = UTF-8
 
-2localhost.org.apache.juli.FileHandler.level = FINE
-2localhost.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
-2localhost.org.apache.juli.FileHandler.prefix = localhost.
-2localhost.org.apache.juli.FileHandler.maxDays = 90
-2localhost.org.apache.juli.FileHandler.encoding = UTF-8
+2localhost.org.apache.juli.AsyncFileHandler.level = ALL
+2localhost.org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+2localhost.org.apache.juli.AsyncFileHandler.prefix = localhost.
+2localhost.org.apache.juli.AsyncFileHandler.maxDays = 90
+2localhost.org.apache.juli.AsyncFileHandler.encoding = UTF-8
 
-3manager.org.apache.juli.FileHandler.level = FINE
-3manager.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
-3manager.org.apache.juli.FileHandler.prefix = manager.
-3manager.org.apache.juli.FileHandler.bufferSize = 16384
-3manager.org.apache.juli.FileHandler.maxDays = 90
-3manager.org.apache.juli.FileHandler.encoding = UTF-8
+3manager.org.apache.juli.AsyncFileHandler.level = ALL
+3manager.org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+3manager.org.apache.juli.AsyncFileHandler.prefix = manager.
+3manager.org.apache.juli.AsyncFileHandler.bufferSize = 16384
+3manager.org.apache.juli.AsyncFileHandler.maxDays = 90
+3manager.org.apache.juli.AsyncFileHandler.encoding = UTF-8
 
-java.util.logging.ConsoleHandler.level = FINE
+java.util.logging.ConsoleHandler.level = ALL
 java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter
 java.util.logging.ConsoleHandler.encoding = UTF-8
 
@@ -362,11 +362,11 @@ java.util.logging.ConsoleHandler.encoding = UTF-8
 
 org.apache.catalina.core.ContainerBase.[Catalina].[localhost].level = INFO
 org.apache.catalina.core.ContainerBase.[Catalina].[localhost].handlers = \
-   2localhost.org.apache.juli.FileHandler
+   2localhost.org.apache.juli.AsyncFileHandler
 
 org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].level = INFO
 org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].handlers = \
-   3manager.org.apache.juli.FileHandler
+   3manager.org.apache.juli.AsyncFileHandler
 
 # For example, set the org.apache.catalina.util.LifecycleBase logger to log
 # each component that extends LifecycleBase changing state:
@@ -376,19 +376,21 @@ org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].handler
       Example logging.properties for the servlet-examples web application to be
       placed in WEB-INF/classes inside the web application:
     </p>
-    <source><![CDATA[handlers = org.apache.juli.FileHandler, java.util.logging.ConsoleHandler
+    <source><![CDATA[handlers = org.apache.juli.AsyncFileHandler, java.util.logging.ConsoleHandler
 
 ############################################################
 # Handler specific properties.
 # Describes specific configuration info for Handlers.
 ############################################################
 
-org.apache.juli.FileHandler.level = FINE
-org.apache.juli.FileHandler.directory = ${catalina.base}/logs
-org.apache.juli.FileHandler.prefix = ${classloader.webappName}.
+org.apache.juli.AsyncFileHandler.level = ALL
+org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+org.apache.juli.AsyncFileHandler.prefix = ${classloader.webappName}.
+org.apache.juli.AsyncFileHandler.encoding = UTF-8
 
-java.util.logging.ConsoleHandler.level = FINE
-java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]]></source>
+java.util.logging.ConsoleHandler.level = ALL
+java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter
+java.util.logging.ConsoleHandler.encoding = UTF-8]]></source>
 
 
     <subsection name="Documentation references">
@@ -399,7 +401,7 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]
           package.
         </li>
         <li>Oracle Java 11 Javadoc for the
-          <a href="https://docs.oracle.com/en/java/javase/11/docs/api/java.logging/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
+          <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.logging/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
           package.
         </li>
       </ul>
@@ -410,15 +412,12 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]
       <ul>
         <li>Consider removing <code>ConsoleHandler</code> from configuration. By
         default (thanks to the <code>.handlers</code> setting) logging goes both
-        to a <code>FileHandler</code> and to a <code>ConsoleHandler</code>. The
+        to a <code>AsyncFileHandler</code> and to a <code>ConsoleHandler</code>. The
         output of the latter one is usually captured into a file, such as
         <code>catalina.out</code>. Thus you end up with two copies of the same
         messages.</li>
-        <li>Consider removing <code>FileHandler</code>s for the applications
+        <li>Consider removing <code>AsyncFileHandler</code>s for the applications
         that you do not use. E.g., the one for <code>host-manager</code>.</li>
-        <li>The handlers by default use the system default encoding to write
-        the log files. It can be configured with <code>encoding</code> property.
-        See Javadoc for details.</li>
         <li>Consider configuring an
         <a href="config/valve.html#Access_Logging">Access log</a>.</li>
       </ul>

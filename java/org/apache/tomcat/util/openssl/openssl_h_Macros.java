@@ -17,7 +17,10 @@
 
 package org.apache.tomcat.util.openssl;
 
+import java.lang.foreign.FunctionDescriptor;
+import java.lang.foreign.Linker;
 import java.lang.foreign.MemorySegment;
+import java.lang.invoke.MethodHandle;
 
 import static org.apache.tomcat.util.openssl.openssl_h.*;
 
@@ -40,7 +43,24 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_set_max_proto_version(MemorySegment sslCtx, long version) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MAX_PROTO_VERSION(), version, MemorySegment.NULL);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_set_max_proto_version";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, Long.valueOf(version));
+                }
+                return (long) mh$.invokeExact(sslCtx, version);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MAX_PROTO_VERSION(), version, MemorySegment.NULL);
+        }
     }
 
 
@@ -56,7 +76,24 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_set_min_proto_version(MemorySegment sslCtx, long version) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MIN_PROTO_VERSION(), version, MemorySegment.NULL);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_set_min_proto_version";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, Long.valueOf(version));
+                }
+                return (long) mh$.invokeExact(sslCtx, version);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_MIN_PROTO_VERSION(), version, MemorySegment.NULL);
+        }
     }
 
 
@@ -71,7 +108,24 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_sess_get_cache_size(MemorySegment sslCtx) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_GET_SESS_CACHE_SIZE(), 0, MemorySegment.NULL);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_sess_get_cache_size";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx);
+                }
+                return (long) mh$.invokeExact(sslCtx);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_GET_SESS_CACHE_SIZE(), 0, MemorySegment.NULL);
+        }
     }
 
 
@@ -87,7 +141,24 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_sess_set_cache_size(MemorySegment sslCtx, long cacheSize) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_SESS_CACHE_SIZE(), cacheSize, MemorySegment.NULL);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_sess_set_cache_size";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, Long.valueOf(cacheSize));
+                }
+                return (long) mh$.invokeExact(sslCtx, cacheSize);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_SESS_CACHE_SIZE(), cacheSize, MemorySegment.NULL);
+        }
     }
 
 
@@ -102,7 +173,24 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_get_session_cache_mode(MemorySegment sslCtx) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_GET_SESS_CACHE_MODE(), 0, MemorySegment.NULL);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_get_session_cache_mode";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx);
+                }
+                return (long) mh$.invokeExact(sslCtx);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_GET_SESS_CACHE_MODE(), 0, MemorySegment.NULL);
+        }
     }
 
 
@@ -118,7 +206,24 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_set_session_cache_mode(MemorySegment sslCtx, long cacheMode) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_SESS_CACHE_MODE(), cacheMode, MemorySegment.NULL);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_set_session_cache_mode";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, Long.valueOf(cacheMode));
+                }
+                return (long) mh$.invokeExact(sslCtx, cacheMode);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_SESS_CACHE_MODE(), cacheMode, MemorySegment.NULL);
+        }
     }
 
 
@@ -134,7 +239,24 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_add0_chain_cert(MemorySegment sslCtx, MemorySegment x509) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_CHAIN_CERT(), 0, x509);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_add0_chain_cert";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, x509);
+                }
+                return (long) mh$.invokeExact(sslCtx, x509);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_CHAIN_CERT(), 0, x509);
+        }
     }
 
 
@@ -151,7 +273,24 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_set_tlsext_ticket_keys(MemorySegment sslCtx, MemorySegment keys, long keyLength) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_TLSEXT_TICKET_KEYS(), keyLength, keys);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_set_tlsext_ticket_keys";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_LONG);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, keys, Long.valueOf(keyLength));
+                }
+                return (long) mh$.invokeExact(sslCtx, keys, keyLength);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_TLSEXT_TICKET_KEYS(), keyLength, keys);
+        }
     }
 
 
@@ -183,7 +322,11 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_set_tmp_dh(MemorySegment sslCtx, MemorySegment dh) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_TMP_DH(), 0, dh);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            return 1;
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_TMP_DH(), 0, dh);
+        }
     }
 
 
@@ -199,7 +342,24 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_set_tmp_ecdh(MemorySegment sslCtx, MemorySegment ecdh) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_TMP_ECDH(), 0, ecdh);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_set_tmp_ecdh";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, ecdh);
+                }
+                return (long) mh$.invokeExact(sslCtx, ecdh);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_TMP_ECDH(), 0, ecdh);
+        }
     }
 
 
@@ -243,7 +403,24 @@ public class openssl_h_Macros {
      * @return > 0 if successful
      */
     public static long SSL_CTX_set1_groups(MemorySegment sslCtx, MemorySegment groupsList, int listLength) {
-        return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_GROUPS(), listLength, groupsList);
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_set1_groups";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, groupsList, Integer.valueOf(listLength));
+                }
+                return (long) mh$.invokeExact(sslCtx, groupsList, listLength);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_GROUPS(), listLength, groupsList);
+        }
     }
 
 
@@ -286,7 +463,7 @@ public class openssl_h_Macros {
      * @return the symbol
      */
     public static MemorySegment d2i_ECPKParameters$SYMBOL() {
-        return openssl_h.findOrThrow("d2i_ECPKParameters"); 
+        return openssl_h.findOrThrow("d2i_ECPKParameters");
     }
 
 }

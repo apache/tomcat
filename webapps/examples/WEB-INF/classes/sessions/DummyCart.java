@@ -16,42 +16,54 @@
  */
 package sessions;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class DummyCart {
-    final List<String> items = Collections.synchronizedList(new ArrayList<>());
+public class DummyCart implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    final Set<Item> items = Collections.synchronizedSet(new HashSet<>());
+    int itemId = -1;
     String submit = null;
-    String item = null;
 
-    private void addItem(String name) {
-        items.add(name);
-    }
-
-    private void removeItem(String name) {
-        items.remove(name);
-    }
-
-    public void setItem(String name) {
-        item = name;
+    public void setItemId(int itemId) {
+        this.itemId = itemId;
     }
 
     public void setSubmit(String s) {
         submit = s;
     }
 
-    public String[] getItems() {
-        return items.toArray(new String[0]);
+    private void addItem(int itemId) {
+        try {
+            items.add(Item.values()[itemId]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Ignore. Can only happen if user edits URL directly.
+        }
+    }
+
+    private void removeItem(int itemId) {
+        try {
+            items.remove(Item.values()[itemId]);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Ignore. Can only happen if user edits URL directly.
+        }
+    }
+
+    public Item[] getItems() {
+        return items.toArray(new Item[0]);
     }
 
     public void processRequest() {
         // null value for submit - user hit enter instead of clicking on
         // "add" or "remove"
         if (submit == null || submit.equals("add")) {
-            addItem(item);
+            addItem(itemId);
         } else if (submit.equals("remove")) {
-            removeItem(item);
+            removeItem(itemId);
         }
 
         // reset at the end of the request
@@ -61,6 +73,6 @@ public class DummyCart {
     // reset
     private void reset() {
         submit = null;
-        item = null;
+        itemId = -1;
     }
 }

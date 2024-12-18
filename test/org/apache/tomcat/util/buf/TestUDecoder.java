@@ -219,6 +219,48 @@ public class TestUDecoder {
     }
 
 
+    @Test
+    public void testURLDecodeStringSolidus10a() throws IOException {
+        String result = doTestSolidus("xx%25xx", EncodedSolidusHandling.REJECT);
+        Assert.assertEquals("xx%xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringSolidus10b() throws IOException {
+        String result = doTestSolidus("xx%25xx", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("xx%25xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringSolidus10c() throws IOException {
+        String result = doTestSolidus("xx%25xx", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("xx%xx", result);
+    }
+
+
+    @Test(expected = CharConversionException.class)
+    public void testURLDecodeStringSolidus11a() throws IOException {
+        String result = doTestSolidus("xx%2f%25xx", EncodedSolidusHandling.REJECT);
+        Assert.assertEquals("xx%xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringSolidus11b() throws IOException {
+        String result = doTestSolidus("xx%2f%25xx", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("xx%2f%25xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringSolidus11c() throws IOException {
+        String result = doTestSolidus("xx%2f%25xx", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("xx/%xx", result);
+    }
+
+
     private void doTestSolidus(String input, String expected) throws IOException {
         for (EncodedSolidusHandling solidusHandling : EncodedSolidusHandling.values()) {
             String result = doTestSolidus(input, solidusHandling);

@@ -45,7 +45,7 @@ import java.util.TreeMap;
  * Cookies affect the caching of the Web pages that use them. HTTP 1.0 does not cache pages that use cookies created
  * with this class. This class does not support the cache control defined with HTTP 1.1.
  * <p>
- * This class supports both the RFC 6265 specification.
+ * This class supports the RFC 6265 specification.
  */
 public class Cookie implements Cloneable, Serializable {
 
@@ -234,13 +234,17 @@ public class Cookie implements Cloneable, Serializable {
      * <p>
      * The default value is <code>false</code>.
      *
-     * @param flag if <code>true</code>, sends the cookie from the browser to the server only when using a secure
+     * @param secure if <code>true</code>, sends the cookie from the browser to the server only when using a secure
      *                 protocol; if <code>false</code>, sent on any protocol
      *
      * @see #getSecure
      */
-    public void setSecure(boolean flag) {
-        setAttributeInternal(SECURE, EMPTY_STRING);
+    public void setSecure(boolean secure) {
+        if (secure) {
+            setAttributeInternal(SECURE, EMPTY_STRING);
+        } else {
+            setAttributeInternal(SECURE, null);
+        }
     }
 
 
@@ -349,7 +353,11 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 3.0
      */
     public void setHttpOnly(boolean httpOnly) {
-        setAttributeInternal(HTTP_ONLY, EMPTY_STRING);
+        if (httpOnly) {
+            setAttributeInternal(HTTP_ONLY, EMPTY_STRING);
+        } else {
+            setAttributeInternal(HTTP_ONLY, null);
+        }
     }
 
 

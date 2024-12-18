@@ -94,17 +94,15 @@ public abstract class SimpleNode implements Node {
     }
 
     /*
-     * You can override these two methods in subclasses of SimpleNode to
-     * customize the way the node appears when the tree is dumped. If your
-     * output uses more than one line you should override toString(String),
-     * otherwise overriding toString() is probably all you need to do.
+     * You can override these two methods in subclasses of SimpleNode to customize the way the node appears when the
+     * tree is dumped. If your output uses more than one line you should override toString(String), otherwise overriding
+     * toString() is probably all you need to do.
      */
 
     @Override
     public String toString() {
         if (this.image != null) {
-            return ELParserTreeConstants.jjtNodeName[id] + "[" + this.image
-                    + "]";
+            return ELParserTreeConstants.jjtNodeName[id] + "[" + this.image + "]";
         }
         return ELParserTreeConstants.jjtNodeName[id];
     }
@@ -119,26 +117,22 @@ public abstract class SimpleNode implements Node {
     }
 
     @Override
-    public Class<?> getType(EvaluationContext ctx)
-            throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean isReadOnly(EvaluationContext ctx)
-            throws ELException {
+    public boolean isReadOnly(EvaluationContext ctx) throws ELException {
         return true;
     }
 
     @Override
-    public void setValue(EvaluationContext ctx, Object value)
-            throws ELException {
+    public void setValue(EvaluationContext ctx, Object value) throws ELException {
         throw new PropertyNotWritableException(MessageFactory.get("error.syntax.set"));
     }
 
@@ -153,14 +147,12 @@ public abstract class SimpleNode implements Node {
     }
 
     @Override
-    public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
-            Object[] paramValues) throws ELException {
+    public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes, Object[] paramValues) throws ELException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public MethodInfo getMethodInfo(EvaluationContext ctx,
-            Class<?>[] paramTypes) throws ELException {
+    public MethodInfo getMethodInfo(EvaluationContext ctx, Class<?>[] paramTypes) throws ELException {
         throw new UnsupportedOperationException();
     }
 

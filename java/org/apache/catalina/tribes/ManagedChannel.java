@@ -19,57 +19,70 @@ package org.apache.catalina.tribes;
 import java.util.Iterator;
 
 /**
- * Channel interface
- * A managed channel interface gives you access to the components of the channels
- * such as senders, receivers, interceptors etc for configurations purposes
+ * A managed channel interface gives you access to the components of the channels such as senders, receivers,
+ * interceptors etc for configurations purposes
  */
 public interface ManagedChannel extends Channel {
 
     /**
      * Sets the channel sender
+     *
      * @param sender ChannelSender
+     *
      * @see ChannelSender
      */
     void setChannelSender(ChannelSender sender);
 
     /**
      * Sets the channel receiver
+     *
      * @param receiver ChannelReceiver
+     *
      * @see ChannelReceiver
      */
     void setChannelReceiver(ChannelReceiver receiver);
 
     /**
      * Sets the membership service
+     *
      * @param service MembershipService
+     *
      * @see MembershipService
      */
     void setMembershipService(MembershipService service);
 
     /**
      * returns the channel sender
+     *
      * @return ChannelSender
+     *
      * @see ChannelSender
      */
     ChannelSender getChannelSender();
 
     /**
      * returns the channel receiver
+     *
      * @return ChannelReceiver
+     *
      * @see ChannelReceiver
      */
     ChannelReceiver getChannelReceiver();
 
     /**
      * Returns the membership service
+     *
      * @return MembershipService
+     *
      * @see MembershipService
      */
     MembershipService getMembershipService();
 
     /**
      * Returns the interceptor stack
+     *
      * @return Iterator
+     *
      * @see Channel#addInterceptor(ChannelInterceptor)
      */
     Iterator<ChannelInterceptor> getInterceptors();

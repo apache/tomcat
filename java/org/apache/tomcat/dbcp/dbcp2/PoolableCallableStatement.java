@@ -76,7 +76,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
     @Override
     public void activate() throws SQLException {
         setClosedInternal(false);
-        AbandonedTrace.add(getConnectionInternal(), this);
+        add(getConnectionInternal(), this);
         super.activate();
     }
 

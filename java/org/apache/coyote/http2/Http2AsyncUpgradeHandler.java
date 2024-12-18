@@ -198,8 +198,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     void writeHeaders(Stream stream, MimeHeaders mimeHeaders, boolean endOfStream, int payloadSize) throws IOException {
         headerWriteLock.lock();
         try {
-            AsyncHeaderFrameBuffers headerFrameBuffers = (AsyncHeaderFrameBuffers) doWriteHeaders(stream, mimeHeaders,
-                    endOfStream, payloadSize);
+            AsyncHeaderFrameBuffers headerFrameBuffers =
+                    (AsyncHeaderFrameBuffers) doWriteHeaders(stream, mimeHeaders, endOfStream, payloadSize);
             if (headerFrameBuffers != null) {
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,
                         SocketWrapperBase.COMPLETE_WRITE, applicationErrorCompletion,

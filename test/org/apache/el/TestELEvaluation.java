@@ -245,6 +245,17 @@ public class TestELEvaluation {
         Assert.assertEquals("RUOK", evaluateExpression("${fn:concat2('RU', fn:toArray('O','K'))}"));
     }
 
+    @Test
+    public void testElvis01() throws Exception {
+        Assert.assertEquals("OK", evaluateExpression("${'OK'?:'FAIL'}"));
+    }
+
+    @Test
+    public void testElvis02() throws Exception {
+        Assert.assertEquals("OK", evaluateExpression("${null?:'OK'}"));
+    }
+
+
     // ************************************************************************
 
     private String evaluateExpression(String expression) {

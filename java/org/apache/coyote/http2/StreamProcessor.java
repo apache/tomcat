@@ -85,6 +85,15 @@ class StreamProcessor extends AbstractProcessor {
             // Note: The regular processor uses the socketWrapper lock, but using that here triggers a deadlock
             processLock.lock();
             try {
+                /*
+                 * In some scenarios, error handling may trigger multiple ERROR events for the same stream. The first
+                 * ERROR event processed will close the stream, replace it and recycle it. Once the stream has been
+                 * replaced it should not be used for processing any further events. When it is known that processing is
+                 * going to be a NO-OP, exit early.
+                 */
+                if (!stream.equals(handler.getStream(stream.getIdAsInt()))) {
+                    return;
+                }
                 // HTTP/2 equivalent of AbstractConnectionHandler#process() without the
                 // socket <-> processor mapping
                 SocketState state = SocketState.CLOSED;
@@ -121,8 +130,8 @@ class StreamProcessor extends AbstractProcessor {
                             stream.close(se);
                         } else {
                             if (!stream.isActive()) {
-                                // stream.close() will call recycle so only need it here
-                                stream.recycle();
+                                // Close calls replace() so need the same call here
+                                stream.replace();
                             }
                         }
                     }
@@ -137,6 +146,7 @@ class StreamProcessor extends AbstractProcessor {
                     state = SocketState.CLOSED;
                 } finally {
                     if (state == SocketState.CLOSED) {
+                        stream.recycle();
                         recycle();
                     }
                 }
@@ -233,11 +243,17 @@ class StreamProcessor extends AbstractProcessor {
             headers.addValue("date").setString(FastHttpDateFormat.getCurrentDate());
         }
 
-        // Exclude some HTTP header fields where the value is determined only
-        // while generating the content as per section 9.3.2 of RFC 9110.
-        if (coyoteRequest != null && coyoteRequest.method().equals("HEAD")) {
-            headers.removeHeader("content-length");
-            headers.removeHeader("content-range");
+        // Server header
+        if (protocol != null) {
+            String server = protocol.getHttp11Protocol().getServer();
+            if (server == null) {
+                if (protocol.getHttp11Protocol().getServerRemoveAppProvidedValues()) {
+                    headers.removeHeader("server");
+                }
+            } else {
+                // server always overrides anything the app might set
+                headers.setValue("Server").setString(server);
+            }
         }
     }
 
@@ -265,6 +281,12 @@ class StreamProcessor extends AbstractProcessor {
                 }
             }
         }
+    }
+
+
+    @Override
+    protected void earlyHints() throws IOException {
+        stream.writeEarlyHints();
     }
 
 
@@ -467,8 +489,7 @@ class StreamProcessor extends AbstractProcessor {
      * The checks performed below are based on the checks in Http11InputBuffer.
      */
     private boolean validateRequest() {
-        HttpParser httpParser = new HttpParser(handler.getProtocol().getHttp11Protocol().getRelaxedPathChars(),
-                handler.getProtocol().getHttp11Protocol().getRelaxedQueryChars());
+        HttpParser httpParser = handler.getProtocol().getHttp11Protocol().getHttpParser();
 
         // Method name must be a token
         String method = request.method().toString();

@@ -44,6 +44,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.IntrospectionUtils.PropertySource;
 import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.ToStringUtil;
 import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 import org.xml.sax.EntityResolver;
@@ -1262,6 +1263,12 @@ public class Digester extends DefaultHandler2 {
                         log.trace("  Fire begin() for " + rule);
                     }
                     rule.begin(namespaceURI, name, list);
+                } catch (ClassNotFoundException cnfe) {
+                    log.error(sm.getString("digester.error.begin"), cnfe);
+                    if (log.isDebugEnabled()) {
+                        log.debug(ToStringUtil.classPathForCNFE(getClassLoader()));
+                    }
+                    throw createSAXException(cnfe);
                 } catch (Exception e) {
                     log.error(sm.getString("digester.error.begin"), e);
                     throw createSAXException(e);

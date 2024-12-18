@@ -35,16 +35,19 @@ public class EntityTag {
      */
     public static Boolean compareEntityTag(StringReader input, boolean compareWeak, String resourceETag)
             throws IOException {
+
+        Boolean result = Boolean.FALSE;
+
         // The resourceETag may be weak so to do weak comparison remove /W
         // before comparison
         String comparisonETag;
-        if (compareWeak && resourceETag.startsWith("W/")) {
+        if (resourceETag == null) {
+            comparisonETag = null;
+        } else if (compareWeak && resourceETag.startsWith("W/")) {
             comparisonETag = resourceETag.substring(2);
         } else {
             comparisonETag = resourceETag;
         }
-
-        Boolean result = Boolean.FALSE;
 
         while (true) {
             boolean strong = false;
@@ -71,7 +74,7 @@ public class EntityTag {
             }
 
             if (strong || compareWeak) {
-                if (comparisonETag.equals(value)) {
+                if (value.equals(comparisonETag)) {
                     result = Boolean.TRUE;
                 }
             }

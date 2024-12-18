@@ -18,9 +18,11 @@ package org.apache.catalina.authenticator.jaspic;
 
 import java.io.IOException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
@@ -58,14 +60,18 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
         String[] groups = null;
 
         if (callbacks != null) {
-            // Need to combine data from multiple callbacks so use this to hold
-            // the data
-            // Process the callbacks
+            /*
+             * There may be multiple callbacks passed to this method and/or multiple calls to this method. The Jakarta
+             * Authentication specification recommends that this class does not maintain state for individual requests
+             * and that the Subject is used to maintain state.
+             */
             for (Callback callback : callbacks) {
                 if (callback instanceof CallerPrincipalCallback) {
                     CallerPrincipalCallback cpc = (CallerPrincipalCallback) callback;
                     name = cpc.getName();
-                    principal = cpc.getPrincipal();
+                    if (cpc.getPrincipal() != null) {
+                        principal = cpc.getPrincipal();
+                    }
                     subject = cpc.getSubject();
                 } else if (callback instanceof GroupPrincipalCallback) {
                     GroupPrincipalCallback gpc = (GroupPrincipalCallback) callback;
@@ -88,35 +94,49 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
                 }
             }
 
-            // Create the GenericPrincipal
-            Principal gp = getPrincipal(principal, name, groups);
-            if (subject != null && gp != null) {
-                subject.getPrivateCredentials().add(gp);
+            // If subject is null, there is nothing to do
+            if (subject != null) {
+
+                // Need a name to create a Principal
+                if (name == null && principal != null) {
+                    name = principal.getName();
+                }
+
+                if (name != null) {
+                    // If the Principal has been cached in the session, just return it.
+                    if (principal instanceof GenericPrincipal) {
+                        // Duplicates are unlikely and will be handled in AuthenticatorBase.getPrincipal()
+                        subject.getPrivateCredentials().add(principal);
+                    } else {
+                        /*
+                         * There should only be a single GenericPrincipal in the private credentials for the Subject. If
+                         * one is already present, merge the groups to create a new GenericPrincipal. The code assumes
+                         * that the name and principal (if any) will be the same.
+                         */
+                        List<String> mergedRoles = new ArrayList<>();
+
+                        Set<GenericPrincipal> gps = subject.getPrivateCredentials(GenericPrincipal.class);
+                        if (!gps.isEmpty()) {
+                            GenericPrincipal gp = gps.iterator().next();
+                            mergedRoles.addAll(Arrays.asList(gp.getRoles()));
+                            // Remove the existing GenericPrincipal
+                            subject.getPrivateCredentials().remove(gp);
+                        }
+                        if (groups != null) {
+                            mergedRoles.addAll(Arrays.asList(groups));
+                        }
+
+                        if (mergedRoles.size() == 0) {
+                            mergedRoles = Collections.emptyList();
+                        }
+
+                        subject.getPrivateCredentials().add(new GenericPrincipal(name, mergedRoles, principal));
+                    }
+                }
             }
         }
     }
 
-
-    private Principal getPrincipal(Principal principal, String name, String[] groups) {
-        // If the Principal is cached in the session JASPIC may simply return it
-        if (principal instanceof GenericPrincipal) {
-            return principal;
-        }
-        if (name == null && principal != null) {
-            name = principal.getName();
-        }
-        if (name == null) {
-            return null;
-        }
-        List<String> roles;
-        if (groups == null || groups.length == 0) {
-            roles = Collections.emptyList();
-        } else {
-            roles = Arrays.asList(groups);
-        }
-
-        return new GenericPrincipal(name, roles, principal);
-    }
 
     // Contained interface methods
     @Override

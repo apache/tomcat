@@ -151,6 +151,11 @@ public class EmptyResource implements WebResource {
     }
 
     @Override
+    public URL getCodeBase() {
+        return null;
+    }
+
+    @Override
     public Certificate[] getCertificates() {
         return null;
     }

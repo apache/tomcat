@@ -55,7 +55,7 @@
         </table>
       <xsl:apply-templates select="readme"/>
       <hr style="height: 1px;" />
-      <h3>Apache Tomcat/11.0</h3>
+      <h3>Apache Tomcat/12.0</h3>
     </body>
    </html>
   </xsl:template>

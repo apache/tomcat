@@ -30,6 +30,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLEngineResult;
@@ -69,7 +70,7 @@ public class SecureNio2Channel extends Nio2Channel  {
     protected volatile boolean sniComplete = false;
 
     private volatile boolean handshakeComplete = false;
-    private volatile int handshakeWrapQueueLength = 0;
+    private final AtomicInteger handshakeWrapQueueLength = new AtomicInteger();
     private volatile HandshakeStatus handshakeStatus; //gets set by handshake
 
     protected boolean closed;
@@ -142,6 +143,7 @@ public class SecureNio2Channel extends Nio2Channel  {
         sslEngine = null;
         sniComplete = false;
         handshakeComplete = false;
+        handshakeWrapQueueLength.set(0);
         unwrapBeforeRead = true;
         closed = false;
         closing = false;
@@ -771,7 +773,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                     if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
                         tasks();
                     } else if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_WRAP) {
-                        if (++handshakeWrapQueueLength > HANDSHAKE_WRAP_QUEUE_LENGTH_LIMIT) {
+                        if (handshakeWrapQueueLength.incrementAndGet() > HANDSHAKE_WRAP_QUEUE_LENGTH_LIMIT) {
                             throw new ExecutionException(
                                     new IOException(sm.getString("channel.nio.ssl.handshakeWrapQueueTooLong")));
                         }
@@ -906,7 +908,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                     netOutBuffer.clear();
                     SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
                     // Call to wrap() will have included any required handshake data
-                    handshakeWrapQueueLength = 0;
+                    handshakeWrapQueueLength.set(0);
                     written = result.bytesConsumed();
                     netOutBuffer.flip();
                     if (result.getStatus() == Status.OK) {
@@ -973,7 +975,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
                                     tasks();
                                 } else if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_WRAP) {
-                                    if (++handshakeWrapQueueLength > HANDSHAKE_WRAP_QUEUE_LENGTH_LIMIT) {
+                                    if (handshakeWrapQueueLength.incrementAndGet() > HANDSHAKE_WRAP_QUEUE_LENGTH_LIMIT) {
                                         throw new ExecutionException(new IOException(
                                                 sm.getString("channel.nio.ssl.handshakeWrapQueueTooLong")));
                                     }
@@ -1091,7 +1093,7 @@ public class SecureNio2Channel extends Nio2Channel  {
                                 if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_TASK) {
                                     tasks();
                                 } else if (unwrap.getHandshakeStatus() == HandshakeStatus.NEED_WRAP) {
-                                    if (++handshakeWrapQueueLength > HANDSHAKE_WRAP_QUEUE_LENGTH_LIMIT) {
+                                    if (handshakeWrapQueueLength.incrementAndGet() > HANDSHAKE_WRAP_QUEUE_LENGTH_LIMIT) {
                                         throw new ExecutionException(new IOException(
                                                 sm.getString("channel.nio.ssl.handshakeWrapQueueTooLong")));
                                     }
@@ -1205,7 +1207,7 @@ public class SecureNio2Channel extends Nio2Channel  {
             // Wrap the source data into the internal buffer
             SSLEngineResult result = sslEngine.wrap(src, netOutBuffer);
             // Call to wrap() will have included any required handshake data
-            handshakeWrapQueueLength = 0;
+            handshakeWrapQueueLength.set(0);
             final int written = result.bytesConsumed();
             netOutBuffer.flip();
             if (result.getStatus() == Status.OK) {

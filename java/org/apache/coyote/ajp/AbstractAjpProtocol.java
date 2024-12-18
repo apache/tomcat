@@ -43,7 +43,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     protected static final StringManager sm = StringManager.getManager(AbstractAjpProtocol.class);
 
 
-    public AbstractAjpProtocol(AbstractEndpoint<S, ?> endpoint) {
+    public AbstractAjpProtocol(AbstractEndpoint<S,?> endpoint) {
         super(endpoint);
         setConnectionTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         // AJP does not use Send File
@@ -63,7 +63,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
      * {@inheritDoc} Overridden to make getter accessible to other classes in this package.
      */
     @Override
-    protected AbstractEndpoint<S, ?> getEndpoint() {
+    protected AbstractEndpoint<S,?> getEndpoint() {
         return super.getEndpoint();
     }
 

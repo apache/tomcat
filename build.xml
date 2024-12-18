@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 11.0" default="deploy" basedir="."
+<project name="Tomcat 12.0" default="deploy" basedir="."
   xmlns:if="ant:if"
   xmlns:unless="ant:unless"
   xmlns:jacoco="antlib:org.jacoco.ant"
@@ -57,18 +57,18 @@
   <property name="md5sum.binary-prefix"  value=" *" />
 
   <!-- Exact spec versions (for the manifests etc.) -->
-  <property name="servlet.spec.version"    value="6.1" />
-  <property name="servlet.revision"        value="" />
-  <property name="jsp.spec.version"        value="4.0" />
-  <property name="jsp.revision"            value="" />
-  <property name="el.spec.version"         value="6.0" />
-  <property name="el.revision"             value="" />
-  <property name="websocket.spec.version"  value="2.2" />
-  <property name="websocket.revision"      value="" />
-  <property name="jaspic.spec.version"     value="3.1" />
-  <property name="jaspic.revision"         value="" />
-  <property name="annotation.spec.version" value="3.0" />
-  <property name="annotation.revision"     value="" />
+  <property name="servlet.spec.version"    value="6.2" />
+  <property name="servlet.revision"        value="DRAFT" />
+  <property name="jsp.spec.version"        value="4.1" />
+  <property name="jsp.revision"            value="DRAFT" />
+  <property name="el.spec.version"         value="6.1" />
+  <property name="el.revision"             value="DRAFT" />
+  <property name="websocket.spec.version"  value="2.3" />
+  <property name="websocket.revision"      value="DRAFT" />
+  <property name="jaspic.spec.version"     value="3.2" />
+  <property name="jaspic.revision"         value="DRAFT" />
+  <property name="annotation.spec.version" value="3.1" />
+  <property name="annotation.revision"     value="DRAFT" />
 
   <!-- Release artifact base names -->
   <property name="final.name"            value="${project}-${version}" />
@@ -104,13 +104,12 @@
   <!-- build output directory for generated reflectionless code -->
   <property name="tomcat.xreflect"       value="${tomcat.output}/xreflect"/>
 
-  <!-- Jakarta EE 11 platform requires Java 17+ -->
+  <!-- Jakarta EE 12 platform requires Java 21+ -->
   <!-- Keep in sync with webapps/docs/tomcat-docs.xsl -->
-  <property name="compile.release" value="17"/>
-  <property name="min.java.version" value="17"/>
-  <property name="build.java.version" value="17"/>
+  <property name="compile.release" value="21"/>
+  <property name="min.java.version" value="21"/>
+  <property name="build.java.version" value="21"/>
   <property name="release.java.version" value="22"/>
-  <property name="skip.build.java.version" value="false"/>
 
   <!-- Check Java Build Version -->
   <fail message="Java version ${build.java.version} or newer is required (${java.version} is installed)">
@@ -142,6 +141,7 @@
   <property name="catalina-ant.jar" value="${tomcat.build}/lib/catalina-ant.jar"/>
   <property name="catalina-storeconfig.jar" value="${tomcat.build}/lib/catalina-storeconfig.jar"/>
   <property name="tomcat-coyote.jar" value="${tomcat.build}/lib/tomcat-coyote.jar"/>
+  <property name="tomcat-coyote-ffm.jar" value="${tomcat.build}/lib/tomcat-coyote-ffm.jar"/>
   <property name="tomcat-dbcp.jar" value="${tomcat.build}/lib/tomcat-dbcp.jar"/>
   <property name="tomcat-jni.jar" value="${tomcat.build}/lib/tomcat-jni.jar"/>
   <property name="tomcat-api.jar" value="${tomcat.build}/lib/tomcat-api.jar"/>
@@ -171,6 +171,7 @@
   <property name="catalina-storeconfig-src.jar" value="${tomcat.src.jars}/catalina-storeconfig-src.jar"/>
   <property name="tomcat-jni-src.jar" value="${tomcat.src.jars}/tomcat-jni-src.jar"/>
   <property name="tomcat-coyote-src.jar" value="${tomcat.src.jars}/tomcat-coyote-src.jar"/>
+  <property name="tomcat-coyote-ffm-src.jar" value="${tomcat.src.jars}/tomcat-coyote-ffm-src.jar"/>
   <property name="tomcat-dbcp-src.jar" value="${tomcat.src.jars}/tomcat-dbcp-src.jar"/>
   <property name="tomcat-api-src.jar" value="${tomcat.src.jars}/tomcat-api-src.jar"/>
   <property name="tomcat-util-src.jar" value="${tomcat.src.jars}/tomcat-util-src.jar"/>
@@ -246,8 +247,8 @@
     <pathelement location="${junit.jar}"/>
     <pathelement location="${hamcrest.jar}"/>
     <pathelement location="${easymock.jar}"/>
-    <pathelement location="${cglib.jar}"/>
     <pathelement location="${objenesis.jar}"/>
+    <pathelement location="${bytebuddy.jar}"/>
     <pathelement location="${unboundid.jar}"/>
     <pathelement location="${derby.jar}"/>
     <pathelement location="${derby-shared.jar}"/>
@@ -262,8 +263,8 @@
     <filter token="JDT_JAR" value="${jdt.jar}"/>
     <filter token="EASYMOCK_JAR" value="${easymock.jar}"/>
     <filter token="HAMCREST_JAR" value="${hamcrest.jar}"/>
-    <filter token="CGLIB_JAR" value="${cglib.jar}"/>
     <filter token="OBJENESIS_JAR" value="${objenesis.jar}"/>
+    <filter token="BYTEBUDDY_JAR" value="${bytebuddy.jar}"/>
     <filter token="BND_JAR" value="${bnd.jar}"/>
     <filter token="MIGRATION_JAR" value="${migration-lib.jar}"/>
     <filter token="UNBOUNDID_JAR" value="${unboundid.jar}"/>
@@ -341,6 +342,7 @@
     <include name="**/*.nsi"/>
     <include name="**/*.pem"/>
     <include name="**/*.pl"/>
+    <include name="**/*.plantuml"/>
     <include name="**/*.policy"/>
     <include name="**/*.pom"/>
     <include name="**/*.project"/>
@@ -350,6 +352,7 @@
     <include name="**/*.shtml"/>
     <include name="**/*.svg"/>
     <include name="**/*.tag"/>
+    <include name="**/*.tagf"/>
     <include name="**/*.tagx"/>
     <include name="**/*.tasks"/>
     <include name="**/*.tld"/>
@@ -544,7 +547,6 @@
     <include name="org/apache/tomcat/util/json/**" />
     <include name="org/apache/tomcat/util/log/**" />
     <include name="org/apache/tomcat/util/net/**" />
-    <include name="org/apache/tomcat/util/openssl/**"/>
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/security/**" />
     <include name="org/apache/tomcat/util/threads/**" />
@@ -629,7 +631,6 @@
     <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve*" />
     <exclude name="org/apache/catalina/valves/ExtendedAccessLogValve*" />
     <exclude name="org/apache/catalina/valves/HealthCheckValve*" />
-    <exclude name="org/apache/catalina/valves/JDBCAccessLogValve*" />
     <exclude name="org/apache/catalina/valves/LoadBalancerDrainingValve*" />
     <exclude name="org/apache/catalina/valves/PersistentValve*" />
 
@@ -756,6 +757,11 @@
     <include name="org/apache/tomcat/util/log/**" />
     <include name="org/apache/tomcat/util/modeler/**" />
     <include name="org/apache/tomcat/util/net/**" />
+    <exclude name="org/apache/tomcat/util/net/openssl/panama/**"/>
+  </patternset>
+
+  <patternset id="files.tomcat-coyote-ffm">
+    <include name="org/apache/tomcat/util/net/openssl/panama/**"/>
     <include name="org/apache/tomcat/util/openssl/**"/>
   </patternset>
 
@@ -1195,6 +1201,13 @@
     <jarIt jarfile="${tomcat-coyote.jar}"
       filesDir="${tomcat.classes}"
       filesId="files.tomcat-coyote"
+      addOSGi="true" />
+
+    <!-- OpenSSL FFM - Coyote -->
+    <jarIt jarfile="${tomcat-coyote-ffm.jar}"
+      filesDir="${tomcat.classes}"
+      filesId="files.tomcat-coyote-ffm"
+      manifest="${tomcat.manifests}/tomcat-coyote-ffm.jar.manifest"
       addOSGi="true" />
 
     <!-- WebSocket implementation JAR File -->
@@ -1656,15 +1669,6 @@
       </fileset>
     </txt2html>
 
-    <txt2html todir="${tomcat.build}/webapps/examples/jsp/cal">
-      <fileset dir="webapps/examples/WEB-INF/classes/cal">
-        <include name="Entries.java"/>
-        <include name="Entry.java"/>
-        <include name="JspCalendar.java"/>
-        <include name="TableBean.java"/>
-      </fileset>
-    </txt2html>
-
     <txt2html todir="${tomcat.build}/webapps/examples/jsp/jsptoserv">
       <fileset dir="webapps/examples/WEB-INF/classes">
         <include name="ServletToJsp.java"/>
@@ -2052,6 +2056,10 @@
           <jvmarg value="${opens.javautil}"/>
           <jvmarg value="${opens.javautilconcurrent}"/>
           <jvmarg value="${native.nativeaccess}"/>
+          <!-- These are managed as jvmargs rather than sysproperty because the default varies by OS -->
+          <jvmarg value="${openssl.ffm.1}" />
+          <jvmarg value="${openssl.ffm.2}" />
+          <jvmarg value="${openssl.ffm.3}" />
 
           <classpath refid="tomcat.test.classpath" />
 
@@ -2108,7 +2116,7 @@
       <executiondata>
         <file file="${coverage.datafile}"/>
       </executiondata>
-      <structure name="Tomcat 11.0.x Code Coverage">
+      <structure name="Tomcat 12.0.x Code Coverage">
         <classfiles>
           <fileset dir="${tomcat.classes}"/>
         </classfiles>
@@ -2399,8 +2407,8 @@
       <link href="../elapi"/>
       <link href="../websocketapi"/>
       <link href="../jaspicapi"/>
-      <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
-      <link href="https://jakarta.ee/specifications/platform/10/apidocs/"/>
+      <link href="https://docs.oracle.com/en/java/javase/21/docs/api/"/>
+      <link href="https://jakarta.ee/specifications/platform/11/apidocs/"/>
       <packageset dir="${tomcat.dist}/src/java/">
         <include name="org/**"/>
         <exclude name="org/apache/el/parser/**"/>
@@ -2640,9 +2648,11 @@ skip.installer property in build.properties" />
     <jsign file="${tomcat.dist}/Uninstall.exe"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
+        keypass="${codesigning.keypass}"
         alias="${codesigning.alias}"
         alg="${codesigning.digest}"
-        tsaurl="http://timestamp.digicert.com"
+        tsaurl="http://ts.ssl.com"
+        tsmode="RFC3161"
         detached="true"/>
     <!-- Copy detached signature to source tree -->
     <copy file="${tomcat.dist}/Uninstall.exe.sig" todir="res/install-win"/>
@@ -2675,9 +2685,11 @@ skip.installer property in build.properties" />
     <jsign file="${tomcat.release}/v${version}/bin/${final.name}.exe"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
+        keypass="${codesigning.keypass}"
         alias="${codesigning.alias}"
         alg="${codesigning.digest}"
-        tsaurl="http://timestamp.digicert.com"
+        tsaurl="http://ts.ssl.com"
+        tsmode="RFC3161"
         detached="true" />
     <!-- Copy detached signature to source tree -->
     <copy file="${tomcat.release}/v${version}/bin/${final.name}.exe.sig"
@@ -2797,10 +2809,19 @@ gpg.exec=${gpg.exec}
 # Set the user name to use to upload the artefacts to Nexus.
 asf.ldap.username=${release.asfusername}
 </echo>
-    <replace file="webapps/docs/changelog.xml"
-        encoding="UTF-8"
-        token="rtext=&quot;in development&quot;"
-        value="rtext=&quot;&quot;" />
+    <!-- Update the changelog to include the release-manager's asfid and remove any rtext -->
+    <replaceregexp file="webapps/docs/changelog.xml"
+               encoding="UTF-8"
+                 byline="true"
+                  match="&lt;section name=&quot;Tomcat ${version.major}.${version.minor}.${version.build}${version.suffix} \([^)]*\).*&gt;"
+                replace="&lt;section name=&quot;Tomcat ${version.major}.${version.minor}.${version.build}${version.suffix} \(${release.asfusername}\)&quot; rtext=&quot;&quot;&gt;" />
+
+    <echo>=====
+
+Configured for ${release.asfusername} to release Tomcat ${version.major}.${version.minor}.${version.build}${version.suffix} using Java ${java.vm.version} and ant ${antversion}
+
+=====
+</echo>
   </target>
 
   <target name="release"
@@ -3126,6 +3147,7 @@ asf.ldap.username=${release.asfusername}
       <include name="bin/*.sh" />
       <include name=".travis/*.sh" />
       <include name="res/graal/*.sh" />
+      <include name="res/openssl/*.sh" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
@@ -3229,6 +3251,11 @@ asf.ldap.username=${release.asfusername}
     <jarIt jarfile="${tomcat-coyote-src.jar}"
       filesDir="java"
       filesId="files.tomcat-coyote" />
+
+    <!-- Protocol handlers - Coyote OpenSSL FFM -->
+    <jarIt jarfile="${tomcat-coyote-ffm-src.jar}"
+      filesDir="java"
+      filesId="files.tomcat-coyote-ffm" />
 
     <!-- WebSocket implementation JAR File -->
     <jarIt jarfile="${tomcat-websocket-src.jar}"
@@ -3384,21 +3411,21 @@ asf.ldap.username=${release.asfusername}
     </antcall>
 
     <antcall target="downloadfile">
-      <param name="sourcefile" value="${cglib.loc}"/>
-      <param name="destfile" value="${cglib.jar}"/>
-      <param name="destdir" value="${cglib.home}"/>
-      <param name="checksum.enabled" value="${cglib.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${cglib.checksum.algorithm}"/>
-      <param name="checksum.value" value="${cglib.checksum.value}"/>
-    </antcall>
-
-    <antcall target="downloadfile">
       <param name="sourcefile" value="${objenesis.loc}"/>
       <param name="destfile" value="${objenesis.jar}"/>
       <param name="destdir" value="${objenesis.home}"/>
       <param name="checksum.enabled" value="${objenesis.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${objenesis.checksum.algorithm}"/>
       <param name="checksum.value" value="${objenesis.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadfile">
+      <param name="sourcefile" value="${bytebuddy.loc}"/>
+      <param name="destfile" value="${bytebuddy.jar}"/>
+      <param name="destdir" value="${bytebuddy.home}"/>
+      <param name="checksum.enabled" value="${bytebuddy.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${bytebuddy.checksum.algorithm}"/>
+      <param name="checksum.value" value="${bytebuddy.checksum.value}"/>
     </antcall>
 
     <antcall target="downloadfile">
@@ -3932,7 +3959,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     </antcall>
   </target>
 
-  <target name="setup-bnd" depends="download-bnd" unless="skip.build.java.version">
+  <target name="setup-bnd" depends="download-bnd" unless="${skip.build.java.version}">
     <!-- Add bnd tasks to project -->
     <path id="bnd.classpath">
       <fileset file="${bnd.jar}" />
@@ -4007,7 +4034,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     </sequential>
   </macrodef>
 
-  <target name="add-osgi" if="${addOSGi}" unless="skip.build.java.version">
+  <target name="add-osgi" if="${addOSGi}" unless="${skip.build.java.version}" >
     <echo message="add-osgi ${jarfile} ${addOSGi}"></echo>
     <local name="filename"/>
     <basename property="filename" file="${jarfile}"/>
@@ -4017,7 +4044,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
     >
       <classpath>
         <pathelement location="${bnd.jar}"/>
-        <fileset dir="${tomcat.output}" includes="${libs}" />
+        <fileset dir="${tomcat.output}" includes="${libs}" excludes="build/lib/tomcat-i18n-*.jar" />
       </classpath>
       <bndfiles>
         <pathelement location="${tomcat.bnd}/${filename}.tmp.bnd"/>
@@ -4115,7 +4142,7 @@ Read the Building page on the Apache Tomcat documentation site for details on ho
         <or>
           <available file="${tomcat.release.verify}/@{basefile}.sha512" />
           <and>
-            <contains string="${version}" substring="11.0." /><!-- Super hack -->
+            <contains string="${version}" substring="12.0." /><!-- Super hack -->
             <contains string="@{basefile}" substring="x86" />
           </and>
         </or>
@@ -4210,7 +4237,7 @@ reproducible-10=${reproducible-10}
         <isset property="reproducible-4" />
         <or>
           <isset property="reproducible-5" />
-          <contains string="${version}" substring="11.0." /><!-- Super hack, Tomcat 11 does not produce x86 binaries. -->
+          <contains string="${version}" substring="12.0." /><!-- Super hack, Tomcat 12 does not produce x86 binaries. -->
         </or>
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />

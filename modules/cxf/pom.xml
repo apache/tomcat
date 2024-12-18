@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>30</version>
+        <version>33</version>
     </parent>
 
     <groupId>org.apache.tomcat</groupId>
@@ -29,7 +29,7 @@
     <name>Apache CXF for Apache Tomcat CDI</name>
     <description>Apache CXF packaged for Apache Tomcat CDI</description>
     <!-- This is the Apache CXF version -->
-    <version>4.0.4</version>
+    <version>4.1.0</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -144,6 +144,12 @@
                                     <artifact>org.apache.johnzon:johnzon-jsonb</artifact>
                                     <excludes>
                                         <exclude>META-INF/services/jakarta.enterprise.inject.spi.Extension</exclude>
+                                    </excludes>
+                                </filter>
+                                <filter>
+                                    <artifact>org.apache.cxf:cxf-integration-cdi</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/beans.xml</exclude>
                                     </excludes>
                                 </filter>
                                 <filter>

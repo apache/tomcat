@@ -31,6 +31,7 @@ import org.junit.runners.Parameterized.Parameter;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 
 @RunWith(Parameterized.class)
@@ -76,7 +77,7 @@ public class TestServletRequestParametersFormUrlEncoded extends ServletRequestPa
                     "Host: localhost:" + getPort() + CRLF +
                     "Connection: close" + CRLF +
                     "Transfer-Encoding: chunked" + CRLF +
-                    "Content-Type: application/x-www-form-urlencoded" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
                     CRLF +
                     "0a" + CRLF +
                     "var1=val1&" + CRLF +
@@ -84,14 +85,15 @@ public class TestServletRequestParametersFormUrlEncoded extends ServletRequestPa
                     "var2=val2&" + CRLF +
                     "0a" + CRLF +
                     "var3=val3&" + CRLF +
-                    "0" + CRLF });
+                    "0" + CRLF +
+                    CRLF});
         } else {
             client.setRequest(new String[] {
                     "POST / HTTP/1.1" + CRLF +
                     "Host: localhost:" + getPort() + CRLF +
                     "Connection: close" + CRLF +
                     "Content-Length: 50" + CRLF +
-                    "Content-Type: application/x-www-form-urlencoded" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
                     CRLF +
                     "01234567890123456789012345678901234567890123456789" });
         }

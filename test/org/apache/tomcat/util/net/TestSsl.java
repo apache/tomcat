@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -38,23 +39,32 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.SessionTrackingMode;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 /**
@@ -115,6 +125,42 @@ public class TestSsl extends TomcatBaseTest {
         POST_DATA = new byte[POST_DATA_SIZE]; // 16 MiB
         Arrays.fill(POST_DATA, (byte) 1);
 
+    }
+
+    private String sessionId = null;
+
+    @Test
+    public void testSSLSessionTracking() throws Exception {
+        TesterSupport.configureClientSsl();
+
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.getEngine().getPipeline().addValve(new VerificationValve());
+
+        File appDir = new File(getBuildDirectory(), "webapps/examples");
+        Context ctxt  = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        ctxt.addLifecycleListener(new SSLSessionTrackingLifecycleListener());
+        ctxt.addApplicationListener(WsContextListener.class.getName());
+
+        ctxt = getProgrammaticRootContext();
+        Tomcat.addServlet(ctxt, "post", new SimplePostServlet());
+        ctxt.addServletMappingDecoded("/post", "post");
+
+        TesterSupport.initSsl(tomcat);
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
+
+        tomcat.start();
+
+        Assume.assumeFalse("BoringSSL and LibreSSL return no session id",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL)
+                    || TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
+
+        getUrl("https://localhost:" + getPort() + "/examples/servlets/servlet/HelloWorldExample");
+        // SSL is the only source for the requested session ID, and SessionTrackingMode.SSL is set on examples
+        Assert.assertNotNull(sessionId);
+        Assert.assertTrue(sessionId.length() > 1);
+        // No SessionTrackingMode.SSL on the root webapp
+        getUrl("https://localhost:" + getPort() + "/post");
+        Assert.assertNull(sessionId);
     }
 
     @Test
@@ -231,6 +277,8 @@ public class TestSsl extends TomcatBaseTest {
 
         TesterSupport.initSsl(tomcat, TesterSupport.LOCALHOST_KEYPASS_JKS,
                       null, TesterSupport.JKS_PASS_FILE, null, TesterSupport.JKS_KEY_PASS_FILE);
+
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
@@ -376,5 +424,25 @@ public class TestSsl extends TomcatBaseTest {
             resp.getOutputStream().write(out);
         }
 
+    }
+
+    public static class SSLSessionTrackingLifecycleListener implements LifecycleListener {
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (Lifecycle.BEFORE_START_EVENT.equals(event.getType())) {
+                if (!(event.getLifecycle() instanceof Context)) {
+                    throw new IllegalArgumentException("Not Context");
+                }
+                Context context = (Context) event.getLifecycle();
+                context.getServletContext().setSessionTrackingModes(EnumSet.of(SessionTrackingMode.SSL));
+            }
+        }
+    }
+
+    public class VerificationValve extends ValveBase {
+        @Override
+        public void invoke(Request request, Response response) throws IOException, ServletException {
+            sessionId = request.getRequestedSessionId();
+        }
     }
 }

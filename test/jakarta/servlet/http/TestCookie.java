@@ -57,6 +57,8 @@ public class TestCookie {
         Assert.assertNull(cookie.getValue());
         Assert.assertEquals(0, cookie.getVersion());
         Assert.assertEquals(-1, cookie.getMaxAge());
+        Assert.assertFalse(cookie.isHttpOnly());
+        Assert.assertFalse(cookie.getSecure());
     }
 
     @SuppressWarnings("removal")
@@ -143,6 +145,34 @@ public class TestCookie {
             cookie.setMaxAge(value);
             Assert.assertEquals(value, cookie.getMaxAge());
         }
+    }
+
+    @Test
+    public void testHttpOnlySet() {
+        Cookie cookie = new Cookie("name", "value");
+        cookie.setHttpOnly(true);
+        Assert.assertTrue(cookie.isHttpOnly());
+    }
+
+    @Test
+    public void testHttpOnlyUnset() {
+        Cookie cookie = new Cookie("name", "value");
+        cookie.setHttpOnly(false);
+        Assert.assertFalse(cookie.isHttpOnly());
+    }
+
+    @Test
+    public void testSecureSet() {
+        Cookie cookie = new Cookie("name", "value");
+        cookie.setSecure(true);
+        Assert.assertTrue(cookie.getSecure());
+    }
+
+    @Test
+    public void testSecureUnset() {
+        Cookie cookie = new Cookie("name", "value");
+        cookie.setSecure(false);
+        Assert.assertFalse(cookie.getSecure());
     }
 
     @Test

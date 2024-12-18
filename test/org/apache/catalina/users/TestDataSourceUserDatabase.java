@@ -16,13 +16,11 @@
  */
 package org.apache.catalina.users;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
 import java.util.Iterator;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -110,11 +108,6 @@ public class TestDataSourceUserDatabase extends LoggingBaseTest {
     }
 
     private DerbyUserDatabase db;
-
-    @AfterClass
-    public static void derbyCleanup() {
-        System.out.println("Deleted derby.log: " + (new File("derby.log")).delete());
-    }
 
     @Test
     public void testBasicUserRoleDatabase()

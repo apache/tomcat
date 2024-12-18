@@ -16,7 +16,6 @@
  */
 package org.apache.coyote.http11;
 
-import org.apache.coyote.Processor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.Nio2Channel;
@@ -44,12 +43,6 @@ public class Http11Nio2Protocol extends AbstractHttp11Protocol<Nio2Channel> {
     @Override
     protected Log getLog() {
         return log;
-    }
-
-
-    @Override
-    protected Processor createProcessor() {
-        return new Http11Processor(this, adapter);
     }
 
 

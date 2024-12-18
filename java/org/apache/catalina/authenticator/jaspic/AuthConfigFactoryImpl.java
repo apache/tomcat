@@ -328,9 +328,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             ServletContext servletContext = (ServletContext) context;
             String appContext = servletContext.getVirtualServerName() + " " + servletContext.getContextPath();
 
-            ServerAuthContext serverAuthContext = new SingleModuleServerAuthContext(serverAuthModule);
-            ServerAuthConfig serverAuthConfig = new SingleContextServerAuthConfig(serverAuthContext, appContext);
-            AuthConfigProvider authConfigProvider = new SingleConfigAuthConfigProvider(serverAuthConfig);
+            AuthConfigProvider authConfigProvider = new SingleConfigAuthConfigProvider(serverAuthModule, appContext);
 
             return registerConfigProvider(authConfigProvider, SERVLET_LAYER_ID, appContext, "");
         }
@@ -576,12 +574,16 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
     private static class SingleContextServerAuthConfig implements ServerAuthConfig {
 
-        private final ServerAuthContext context;
+        private final ServerAuthModule serverAuthModule;
         private final String appContext;
+        private final CallbackHandler handler;
+        private final Object serverAuthContextLock = new Object();
+        private volatile ServerAuthContext serverAuthContext;
 
-        SingleContextServerAuthConfig(ServerAuthContext context, String appContext) {
-            this.context = context;
+        SingleContextServerAuthConfig(ServerAuthModule serverAuthModule, String appContext, CallbackHandler handler) {
+            this.serverAuthModule = serverAuthModule;
             this.appContext = appContext;
+            this.handler = handler;
         }
 
         @Override
@@ -612,17 +614,32 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         @Override
         public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject,
                 Map<String,Object> properties) throws AuthException {
-            return context;
+            /*
+             * Lazy initialization since we need to pass in the properties which aren't available until this point.
+             */
+            if (serverAuthContext == null) {
+                synchronized (serverAuthContextLock) {
+                    if (serverAuthContext == null) {
+                        serverAuthContext = new SingleModuleServerAuthContext(serverAuthModule);
+                        serverAuthModule.initialize(null, null, handler, properties);
+                    }
+                }
+            }
+            return serverAuthContext;
         }
     }
 
 
     private static class SingleConfigAuthConfigProvider implements AuthConfigProvider {
 
-        private final ServerAuthConfig serverAuthConfig;
+        private final ServerAuthModule serverAuthModule;
+        private final String appContext;
+        private final Object serverAuthConfigLock = new Object();
+        private volatile ServerAuthConfig serverAuthConfig;
 
-        SingleConfigAuthConfigProvider(ServerAuthConfig serverAuthConfig) {
-            this.serverAuthConfig = serverAuthConfig;
+        SingleConfigAuthConfigProvider(ServerAuthModule serverAuthModule, String appContext) {
+            this.serverAuthModule = serverAuthModule;
+            this.appContext = appContext;
         }
 
         @Override
@@ -635,6 +652,17 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         @Override
         public ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler)
                 throws AuthException {
+            /*
+             * Lazy initialization since we need to pass in the CallbackHandler which isn't available until this point.
+             */
+            if (serverAuthConfig == null) {
+                synchronized (serverAuthConfigLock) {
+                    if (serverAuthConfig == null) {
+                        serverAuthConfig =
+                                new SingleContextServerAuthConfig(serverAuthModule, this.appContext, handler);
+                    }
+                }
+            }
             return serverAuthConfig;
         }
 

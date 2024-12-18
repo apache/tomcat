@@ -334,7 +334,8 @@ public class JspCServletContext implements ServletContext {
         try {
             URI uri = new URI(myResourceBaseURL.toExternalForm() + path);
             url = uri.toURL();
-            try (InputStream is = url.openStream()) {
+            try (@SuppressWarnings("unused")
+            InputStream is = url.openStream()) {
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -434,7 +435,7 @@ public class JspCServletContext implements ServletContext {
 
     @Override
     public String getServerInfo() {
-        return "JspC/ApacheTomcat11";
+        return "JspC/ApacheTomcat12";
     }
 
 

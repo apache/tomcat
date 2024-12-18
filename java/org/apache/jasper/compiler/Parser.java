@@ -335,7 +335,15 @@ class Parser implements TagConstants {
         }
 
         try {
-            parserController.parse(file, parent, jar);
+            /*
+             * Include directive defined by 1.10.3 which references 1.2.1 for the file attribute. As per 1.2.1, paths
+             * starting with "/" are context relative.
+             */
+            if (file.startsWith("/")) {
+                parserController.parse(file, parent, null);
+            } else {
+                parserController.parse(file, parent, jar);
+            }
         } catch (FileNotFoundException ex) {
             err.jspError(start, "jsp.error.file.not.found", file);
         } catch (Exception ex) {

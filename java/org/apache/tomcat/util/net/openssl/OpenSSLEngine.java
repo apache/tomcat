@@ -136,6 +136,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private final OpenSSLState state;
     private final Cleanable cleanable;
+    private ByteBuffer buf = ByteBuffer.allocateDirect(MAX_ENCRYPTED_PACKET_LENGTH);
 
     private enum Accepted { NOT, IMPLICIT, EXPLICIT }
     private Accepted accepted = Accepted.NOT;
@@ -145,7 +146,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private volatile boolean destroyed;
 
     // Use an invalid cipherSuite until the handshake is completed
-    // See http://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLEngine.html#getSession()
+    // See https://docs.oracle.com/en/java/javase/21/docs/api/java.base/javax/net/ssl/SSLEngine.html#getSession()
     private volatile String version;
     private volatile String cipher;
     private volatile String applicationProtocol;
@@ -225,6 +226,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             cleanable.clean();
             // internal errors can cause shutdown without marking the engine closed
             isInboundDone = isOutboundDone = engineClosed = true;
+            ByteBufferUtils.cleanDirectBuffer(buf);
         }
     }
 
@@ -252,7 +254,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return sslWrote;
             }
         } else {
-            ByteBuffer buf = ByteBuffer.allocateDirect(len);
             try {
                 final long addr = Buffer.address(buf);
 
@@ -273,7 +274,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 }
             } finally {
                 buf.clear();
-                ByteBufferUtils.cleanDirectBuffer(buf);
             }
         }
 
@@ -300,7 +300,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return netWrote;
             }
         } else {
-            ByteBuffer buf = ByteBuffer.allocateDirect(len);
             try {
                 final long addr = Buffer.address(buf);
 
@@ -318,7 +317,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 }
             } finally {
                 buf.clear();
-                ByteBufferUtils.cleanDirectBuffer(buf);
             }
         }
 
@@ -346,7 +344,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             final int pos = dst.position();
             final int limit = dst.limit();
             final int len = Math.min(MAX_ENCRYPTED_PACKET_LENGTH, limit - pos);
-            final ByteBuffer buf = ByteBuffer.allocateDirect(len);
             try {
                 final long addr = Buffer.address(buf);
 
@@ -362,7 +359,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 }
             } finally {
                 buf.clear();
-                ByteBufferUtils.cleanDirectBuffer(buf);
             }
         }
 
@@ -386,7 +382,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 checkLastError();
             }
         } else {
-            final ByteBuffer buf = ByteBuffer.allocateDirect(pending);
             try {
                 final long addr = Buffer.address(buf);
 
@@ -403,7 +398,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 }
             } finally {
                 buf.clear();
-                ByteBufferUtils.cleanDirectBuffer(buf);
             }
         }
 
@@ -465,8 +459,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
             // If isOutboundDone is set, then the data from the network BIO
             // was the close_notify message -- we are not required to wait
-            // for the receipt the peer's close_notify message -- shutdown.
-            if (isOutboundDone) {
+            // for the receipt of the peer's close_notify message -- shutdown.
+            if (isOutboundDone()) {
                 shutdown();
             }
 
@@ -559,9 +553,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         // protect against protocol overflow attack vector
         if (len > MAX_ENCRYPTED_PACKET_LENGTH) {
-            isInboundDone = true;
-            isOutboundDone = true;
-            engineClosed = true;
             shutdown();
             throw new SSLException(sm.getString("engine.oversizedPacket"));
         }
@@ -637,7 +628,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         // Check to see if we received a close_notify message from the peer
         if (!receivedShutdown && (SSL.getShutdown(state.ssl) & SSL.SSL_RECEIVED_SHUTDOWN) == SSL.SSL_RECEIVED_SHUTDOWN) {
             receivedShutdown = true;
-            closeOutbound();
             closeInbound();
         }
         if (bytesProduced == 0 && (written == 0 || (written > 0 && !src.hasRemaining() && handshakeFinished))) {
@@ -692,7 +682,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         isInboundDone = true;
         engineClosed = true;
 
-        shutdown();
+        if (isOutboundDone()) {
+            // Only call shutdown if there is no outbound data pending.
+            shutdown();
+        }
 
         if (accepted != Accepted.NOT && !receivedShutdown) {
             throw new SSLException(sm.getString("engine.inboundClose"));
@@ -1073,13 +1066,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         // Check if we are in the shutdown phase
         if (engineClosed) {
-            // Waiting to send the close_notify message
             if (SSL.pendingWrittenBytesInBIO(state.networkBIO) != 0) {
+                // Waiting to send the close_notify message
                 return SSLEngineResult.HandshakeStatus.NEED_WRAP;
             }
 
-            // Must be waiting to receive the close_notify message
-            return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
+            if (!isInboundDone()) {
+                // Must be waiting to receive the close_notify message
+                return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
+            }
         }
 
         return SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;

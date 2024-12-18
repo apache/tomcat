@@ -17,6 +17,9 @@
 package org.apache.catalina.manager;
 
 import java.io.File;
+import java.io.StringReader;
+
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,11 +31,32 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.json.JSONParser;
+import org.w3c.dom.Document;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.xml.sax.InputSource;
 
 public class TestStatusTransformer extends TomcatBaseTest {
 
+    enum Mode {
+        HTML, XML, JSON
+    }
+
     @Test
     public void testJSON() throws Exception {
+        testStatusServlet(Mode.JSON);
+    }
+
+    @Test
+    public void testXML() throws Exception {
+        testStatusServlet(Mode.XML);
+    }
+
+    @Test
+    public void testHTML() throws Exception {
+        testStatusServlet(Mode.HTML);
+    }
+
+    protected void testStatusServlet(Mode mode) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // Add default servlet to make some requests
@@ -65,17 +89,34 @@ public class TestStatusTransformer extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
 
+        String requestline = null;
+        switch (mode) {
+            case XML -> requestline = "GET /status/all?XML=true HTTP/1.1";
+            case JSON -> requestline = "GET /status/all?JSON=true HTTP/1.1";
+            default -> requestline = "GET /status/all HTTP/1.1";
+        }
         client.setRequest(new String[] {
-                "GET /status/all?JSON=true HTTP/1.1" + CRLF +
+                requestline + CRLF +
                 "Host: localhost" + CRLF +
                 "Connection: Close" + CRLF + CRLF });
         client.connect();
         client.processRequest(true);
-        String json = client.getResponseBody();
-        System.out.println(json);
-        JSONParser parser = new JSONParser(json);
-        String result = parser.parse().toString();
-        Assert.assertTrue(result.contains("name=localhost/"));
+        String body = client.getResponseBody();
+        if (mode.equals(Mode.JSON)) {
+            JSONParser parser = new JSONParser(body);
+            String result = parser.parse().toString();
+            Assert.assertTrue(result.contains("name=localhost/"));
+        } else if (mode.equals(Mode.XML)) {
+            try (StringReader reader = new StringReader(body)) {
+                Document xmlDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(reader));
+                String serialized = ((DOMImplementationLS) xmlDocument.getImplementation()).createLSSerializer().writeToString(xmlDocument);
+                // Verify that a request is being processed
+                Assert.assertTrue(serialized.contains("stage=\"S\""));
+            }
+        } else {
+            // Verify that a request is being processed
+            Assert.assertTrue(body.contains("<strong>S</strong>"));
+        }
     }
 
 }

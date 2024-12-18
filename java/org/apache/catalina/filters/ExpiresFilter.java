@@ -165,10 +165,10 @@ import org.apache.tomcat.util.buf.StringUtils;
  * <h4>
  * {@code ExpiresExcludedResponseStatusCodes}</h4>
  * <p>
- * This directive defines the http response status codes for which the
+ * This directive defines the HTTP response status codes for which the
  * {@code ExpiresFilter} will not generate expiration headers. By default, the
  * {@code 304} status code (&quot;{@code Not modified}&quot;) is skipped. The
- * value is a comma separated list of http status codes.
+ * value is a comma separated list of HTTP status codes.
  * </p>
  * <p>
  * This directive is useful to ease usage of {@code ExpiresDefault} directive.
@@ -332,7 +332,7 @@ import org.apache.tomcat.util.buf.StringUtils;
  * </p>
  * <p>
  * To trap the &#x27;before write response body&#x27; event, the
- * {@code ExpiresFilter} wraps the http servlet response&#x27;s writer and
+ * {@code ExpiresFilter} wraps the HTTP servlet response&#x27;s writer and
  * outputStream to intercept calls to the methods {@code write()},
  * {@code print()}, {@code close()} and {@code flush()}. For empty response
  * body (e.g. empty files), the {@code write()}, {@code print()},
@@ -517,7 +517,7 @@ public class ExpiresFilter extends FilterBase {
 
     /**
      * <p>
-     * Wrapping extension of the {@link HttpServletResponse} to yrap the "Start Write Response Body" event.
+     * Wrapping extension of the {@link HttpServletResponse} to wrap the "Start Write Response Body" event.
      * </p>
      * <p>
      * For performance optimization : this extended response holds the {@link #lastModifiedHeader} and
@@ -528,12 +528,12 @@ public class ExpiresFilter extends FilterBase {
     public class XHttpServletResponse extends HttpServletResponseWrapper {
 
         /**
-         * Value of the {@code Cache-Control} http response header if it has been set.
+         * Value of the {@code Cache-Control} HTTP response header if it has been set.
          */
         private String cacheControlHeader;
 
         /**
-         * Value of the {@code Last-Modified} http response header if it has been set.
+         * Value of the {@code Last-Modified} HTTP response header if it has been set.
          */
         private long lastModifiedHeader;
 
@@ -568,8 +568,12 @@ public class ExpiresFilter extends FilterBase {
         @Override
         public void addHeader(String name, String value) {
             super.addHeader(name, value);
-            if (HEADER_CACHE_CONTROL.equalsIgnoreCase(name) && cacheControlHeader == null) {
-                cacheControlHeader = value;
+            if (HEADER_CACHE_CONTROL.equalsIgnoreCase(name)) {
+                if (cacheControlHeader == null) {
+                    cacheControlHeader = value;
+                } else {
+                    cacheControlHeader = StringUtils.join(cacheControlHeader, value);
+                }
             }
         }
 
@@ -1383,11 +1387,27 @@ public class ExpiresFilter extends FilterBase {
      */
     protected boolean isEligibleToExpirationHeaderGeneration(HttpServletRequest request,
             XHttpServletResponse response) {
-        boolean expirationHeaderHasBeenSet =
-                response.containsHeader(HEADER_EXPIRES) || contains(response.getCacheControlHeader(), "max-age");
-        if (expirationHeaderHasBeenSet) {
+
+        // Don't add cache headers unless the request is a GET or a HEAD request
+        String method = request.getMethod();
+        if (!"GET".equals(method) && !"HEAD".equals(method)) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("expiresFilter.invalidMethod", request.getRequestURI(), method));
+            }
+            return false;
+        }
+
+        if (response.containsHeader(HEADER_EXPIRES) || contains(response.getCacheControlHeader(), "max-age")) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.expirationHeaderAlreadyDefined", request.getRequestURI(),
+                        Integer.valueOf(response.getStatus()), response.getContentType()));
+            }
+            return false;
+        }
+
+        if (contains(response.getCacheControlHeader(), "no-store")) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("expiresFilter.cacheControlNoStore", request.getRequestURI(),
                         Integer.valueOf(response.getStatus()), response.getContentType()));
             }
             return false;

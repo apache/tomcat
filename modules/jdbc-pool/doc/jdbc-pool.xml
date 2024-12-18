@@ -510,13 +510,13 @@
     </attribute>
     <attribute name="alternateUsernameAllowed" required="false">
       <p>(boolean) By default, the jdbc-pool will ignore the
-         <a href="http://docs.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
+         <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/javax/sql/DataSource.html#getConnection(java.lang.String,java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
          call, and simply return a previously pooled connection under the globally configured properties <code>username</code> and <code>password</code>, for performance reasons.
       </p>
       <p>
          The pool can however be configured to allow use of different credentials
          each time a connection is requested.  To enable the functionality described in the
-         <a href="http://docs.oracle.com/javase/6/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
+         <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/javax/sql/DataSource.html#getConnection(java.lang.String,java.lang.String)"><code>DataSource.getConnection(username,password)</code></a>
          call, simply set the property <code>alternateUsernameAllowed</code>
          to <code>true</code>.<br />
          Should you request a connection with the credentials user1/password1 and the connection

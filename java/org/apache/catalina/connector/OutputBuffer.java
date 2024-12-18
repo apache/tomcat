@@ -220,9 +220,14 @@ public class OutputBuffer extends Writer {
             flushCharBuffer();
         }
 
-        if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1)) {
-            // If this didn't cause a commit of the response, the final content
-            // length can be calculated.
+        // Content length can be calculated if:
+        // - the response has not been committed
+        // AND
+        // - the content length has not been explicitly set
+        // AND
+        // - some content has been written OR this is NOT a HEAD request
+        if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1) &&
+                ((bb.remaining() > 0 || !coyoteResponse.getRequest().method().equals("HEAD")))) {
             coyoteResponse.setContentLength(bb.remaining());
         }
 
@@ -270,7 +275,7 @@ public class OutputBuffer extends Writer {
         try {
             doFlush = true;
             if (initial) {
-                coyoteResponse.sendHeaders();
+                coyoteResponse.commit();
                 initial = false;
             }
             if (cb.remaining() > 0) {
@@ -358,11 +363,11 @@ public class OutputBuffer extends Writer {
     private void writeBytes(byte b[], int off, int len) throws IOException {
 
         if (closed) {
-            return;
+            throw new IOException(sm.getString("outputBuffer.closed"));
         }
 
         append(b, off, len);
-        bytesWritten += len;
+        updateBytesWritten(len);
 
         // if called from within flush(), then immediately flush
         // remaining bytes
@@ -376,12 +381,12 @@ public class OutputBuffer extends Writer {
     private void writeBytes(ByteBuffer from) throws IOException {
 
         if (closed) {
-            return;
+            throw new IOException(sm.getString("outputBuffer.closed"));
         }
 
         int remaining = from.remaining();
         append(from);
-        bytesWritten += remaining;
+        updateBytesWritten(remaining);
 
         // if called from within flush(), then immediately flush
         // remaining bytes
@@ -394,6 +399,10 @@ public class OutputBuffer extends Writer {
 
     public void writeByte(int b) throws IOException {
 
+        if (closed) {
+            throw new IOException(sm.getString("outputBuffer.closed"));
+        }
+
         if (suspended) {
             return;
         }
@@ -403,8 +412,24 @@ public class OutputBuffer extends Writer {
         }
 
         transfer((byte) b, bb);
-        bytesWritten++;
+        updateBytesWritten(1);
+    }
 
+
+    private void updateBytesWritten(int increment) throws IOException {
+        bytesWritten += increment;
+        int contentLength = coyoteResponse.getContentLength();
+
+        /*
+         * Handle the requirements of section 5.7 of the Servlet specification - Closure of the Response Object.
+         *
+         * Currently this just handles the simple case. There is work in progress to better define what should happen if
+         * an attempt is made to write > content-length bytes. When that work is complete, this is likely where the
+         * implementation will end up.
+         */
+        if (contentLength != -1 && bytesWritten >= contentLength) {
+            close();
+        }
     }
 
 

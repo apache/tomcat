@@ -798,8 +798,20 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     private boolean parallelAnnotationScanning = false;
 
+    private int notFoundClassResourceCacheSize = 1000;
+
 
     // ----------------------------------------------------- Context Properties
+
+    public int getNotFoundClassResourceCacheSize() {
+        return notFoundClassResourceCacheSize;
+    }
+
+
+    public void setNotFoundClassResourceCacheSize(int notFoundClassResourceCacheSize) {
+        this.notFoundClassResourceCacheSize = notFoundClassResourceCacheSize;
+    }
+
 
     @Override
     public void setCreateUploadTargets(boolean createUploadTargets) {
@@ -2128,10 +2140,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     @Override
     public ServletContext getServletContext() {
-        /*
-         * This method is called (multiple times) during context start which is single threaded so there is concurrency
-         * issue here.
-         */
+        // This method is called multiple times during context start which is single threaded
+        // so there is no concurrency issue
         if (context == null) {
             context = new ApplicationContext(this);
             if (altDDName != null) {
@@ -4260,6 +4270,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     cl.setClearReferencesHttpClientKeepAliveThread(getClearReferencesHttpClientKeepAliveThread());
                     cl.setClearReferencesThreadLocals(getClearReferencesThreadLocals());
                     cl.setSkipMemoryLeakChecksOnJvmShutdown(getSkipMemoryLeakChecksOnJvmShutdown());
+                    cl.setNotFoundClassResourceCacheSize(getNotFoundClassResourceCacheSize());
                 }
 
                 // By calling unbindThread and bindThread in a row, we setup the

@@ -45,6 +45,7 @@ import org.apache.coyote.http11.upgrade.UpgradeGroupInfo;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.modeler.Util;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -59,6 +60,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     private final CompressionConfig compressionConfig = new CompressionConfig();
 
+    private HttpParser httpParser = null;
 
     public AbstractHttp11Protocol(AbstractEndpoint<S,?> endpoint) {
         super(endpoint);
@@ -68,6 +70,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     public void init() throws Exception {
+        httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
+
         // Upgrade protocols have to be configured first since the endpoint
         // init (triggered via super.init() below) uses this list to configure
         // the list of ALPN protocols to advertise
@@ -75,13 +79,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
             configureUpgradeProtocol(upgradeProtocol);
         }
 
-        super.init();
-
-        // Set the Http11Protocol (i.e. this) for any upgrade protocols once
-        // this has completed initialisation as the upgrade protocols may expect this
-        // to be initialised when the call is made
-        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
-            upgradeProtocol.setHttp11Protocol(this);
+        try {
+            super.init();
+        } finally {
+            // Set the Http11Protocol (i.e. this) for any upgrade protocols once
+            // this has completed initialisation as the upgrade protocols may expect this
+            // to be initialised when the call is made
+            for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
+                upgradeProtocol.setHttp11Protocol(this);
+            }
         }
     }
 
@@ -118,6 +124,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     @Override
     protected AbstractEndpoint<S,?> getEndpoint() {
         return super.getEndpoint();
+    }
+
+
+    public HttpParser getHttpParser() {
+        return httpParser;
     }
 
 
@@ -751,7 +762,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------------------- Common code
 
     @Override
-    protected abstract Processor createProcessor();
+    protected Processor createProcessor() {
+        Http11Processor processor = new Http11Processor(this, adapter);
+        return processor;
+    }
 
 
     @Override

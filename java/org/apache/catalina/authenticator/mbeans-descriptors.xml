@@ -67,10 +67,6 @@
                description="The name of the LifecycleState that this component is currently in"
                type="java.lang.String"
                writeable="false"/>
-
-    <attribute name="trimCredentials"
-               description="Controls whether leading and/or trailing whitespace is removed from the parsed credentials"
-               type="boolean"/>
   </mbean>
 
 

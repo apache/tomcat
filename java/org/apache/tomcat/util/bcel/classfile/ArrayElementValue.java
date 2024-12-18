@@ -26,7 +26,7 @@ public class ArrayElementValue extends ElementValue
         if (type != ARRAY) {
             throw new ClassFormatException("Only element values of type array can be built with this ctor - type specified: " + type);
         }
-        this.elementValues = elementValues != null ? elementValues : ElementValue.EMPTY_ARRAY;
+        this.elementValues = elementValues != null ? elementValues : EMPTY_ARRAY;
     }
 
     public ElementValue[] getElementValuesArray() {

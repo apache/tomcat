@@ -45,10 +45,6 @@ import org.apache.tomcat.util.net.TesterSupport.SimpleServlet;
 
 public class TestHttpServlet extends TomcatBaseTest {
 
-    /*
-     * Nature of test has changed from original bug report since content-length
-     * is no longer returned for HEAD requests as allowed by RFC 9110.
-     */
     @Test
     public void testBug53454() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -68,7 +64,7 @@ public class TestHttpServlet extends TomcatBaseTest {
                resHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertNull(resHeaders.get("Content-Length"));
+        Assert.assertEquals(LargeBodyServlet.RESPONSE_LENGTH, resHeaders.get("Content-Length").get(0));
     }
 
 
@@ -181,20 +177,29 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         int rc = getUrl(path, out, getHeaders);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        removeGeneratingContentHeaders(getHeaders);
         out.recycle();
 
-        Map<String,List<String>> headHeaders = new HashMap<>();
+        Map<String,List<String>> headHeaders = new CaseInsensitiveKeyMap<>();
         rc = headUrl(path, out, headHeaders);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        // Date header is likely to be different so just remove it from both GET and HEAD.
+        getHeaders.remove("date");
+        headHeaders.remove("date");
+        /*
+         * There are some headers that are optional for HEAD. See RFC 9110, section 9.3.2. If present, they must be the
+         * same for both GET and HEAD. If not present in HEAD, remove them from GET.
+         */
+        for (String header : TesterConstants.OPTIONAL_HEADERS_WITH_HEAD) {
+            if (!headHeaders.containsKey(header)) {
+                getHeaders.remove(header);
+            }
+        }
 
         // Headers should be the same (apart from Date)
         Assert.assertEquals(getHeaders.size(), headHeaders.size());
         for (Map.Entry<String, List<String>> getHeader : getHeaders.entrySet()) {
             String headerName = getHeader.getKey();
-            if ("date".equalsIgnoreCase(headerName)) {
-                continue;
-            }
             Assert.assertTrue(headerName, headHeaders.containsKey(headerName));
             List<String> getValues = getHeader.getValue();
             List<String> headValues = headHeaders.get(headerName);
@@ -205,18 +210,6 @@ public class TestHttpServlet extends TomcatBaseTest {
         }
 
         tomcat.stop();
-    }
-
-
-    /*
-     * Removes headers that are not expected to appear in the response to the
-     * equivalent HEAD request.
-     */
-    private void removeGeneratingContentHeaders(Map<String,List<String>> headers) {
-        headers.remove("content-length");
-        headers.remove("content-range");
-        headers.remove("trailer");
-        headers.remove("transfer-encoding");
     }
 
 

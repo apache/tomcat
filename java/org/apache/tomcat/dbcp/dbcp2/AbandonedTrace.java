@@ -158,7 +158,7 @@ public class AbandonedTrace implements TrackedUse, AutoCloseable {
      *            AbandonedTrace parent object.
      */
     private void init(final AbandonedTrace parent) {
-        AbandonedTrace.add(parent, this);
+        add(parent, this);
     }
 
     /**

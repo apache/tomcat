@@ -30,6 +30,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
+import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -180,12 +181,22 @@ public class OpenSSLLibrary {
                 // Main library init
                 initLibrary();
 
+                OpenSSLStatus.setVersion(OpenSSL_version_num());
+                if (openssl_h_Compatibility.OPENSSL3) {
+                    OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL3);
+                } else if (openssl_h_Compatibility.OPENSSL) {
+                    OpenSSLStatus.setName(OpenSSLStatus.Name.OPENSSL);
+                } else if (openssl_h_Compatibility.LIBRESSL) {
+                    OpenSSLStatus.setName(OpenSSLStatus.Name.LIBRESSL);
+                } else if (openssl_h_Compatibility.BORINGSSL) {
+                    OpenSSLStatus.setName(OpenSSLStatus.Name.BORINGSSL);
+                }
+
                 // OpenSSL 3 onwards uses providers
-                boolean isOpenSSL3 = (OpenSSL_version_num() >= 0x3000000fL);
 
                 // Setup engine
                 String engineName = "on".equalsIgnoreCase(SSLEngine) ? null : SSLEngine;
-                if (!isOpenSSL3 && engineName != null) {
+                if (!openssl_h_Compatibility.OPENSSL3 && !openssl_h_Compatibility.BORINGSSL && engineName != null) {
                     if ("auto".equals(engineName)) {
                         ENGINE_register_all_complete();
                     } else {
@@ -232,15 +243,15 @@ public class OpenSSLLibrary {
                     RAND_seed(memorySession.allocateFrom(ValueLayout.JAVA_BYTE, randomBytes), 128);
                 }
 
-                if (!isOpenSSL3) {
+                if (!openssl_h_Compatibility.OPENSSL3 && !openssl_h_Compatibility.BORINGSSL) {
                     initDHParameters();
                 }
 
-                if (isOpenSSL3 || !(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
+                if (openssl_h_Compatibility.OPENSSL3 || !(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode))) {
                     fipsModeActive = false;
                     final boolean enterFipsMode;
                     int fipsModeState = FIPS_OFF;
-                    if (isOpenSSL3) {
+                    if (openssl_h_Compatibility.OPENSSL3) {
                         var md = EVP_MD_fetch(MemorySegment.NULL, memorySession.allocateFrom("SHA-512"), MemorySegment.NULL);
                         var provider = EVP_MD_get0_provider(md);
                         String name = OSSL_PROVIDER_get0_name(provider).getString(0);
@@ -263,13 +274,13 @@ public class OpenSSLLibrary {
                         enterFipsMode = false;
                     } else if ("on".equalsIgnoreCase(FIPSMode)) {
                         if (fipsModeState == FIPS_ON) {
-                            if (!isOpenSSL3) {
+                            if (!openssl_h_Compatibility.OPENSSL3) {
                                 log.info(sm.getString("openssllibrary.skipFIPSInitialization"));
                             }
                             fipsModeActive = true;
                             enterFipsMode = false;
                         } else {
-                            if (isOpenSSL3) {
+                            if (openssl_h_Compatibility.OPENSSL3) {
                                 throw new IllegalStateException(sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
                             } else {
                                 enterFipsMode = true;
@@ -280,7 +291,7 @@ public class OpenSSLLibrary {
                             fipsModeActive = true;
                             enterFipsMode = false;
                         } else {
-                            if (isOpenSSL3) {
+                            if (openssl_h_Compatibility.OPENSSL3) {
                                 throw new IllegalStateException(sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
                             } else {
                                 throw new IllegalStateException(sm.getString("openssllibrary.requireNotInFIPSMode"));
@@ -288,13 +299,13 @@ public class OpenSSLLibrary {
                         }
                     } else if ("enter".equalsIgnoreCase(FIPSMode)) {
                         if (fipsModeState == FIPS_OFF) {
-                            if (isOpenSSL3) {
+                            if (openssl_h_Compatibility.OPENSSL3) {
                                 throw new IllegalStateException(sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
                             } else {
                                 enterFipsMode = true;
                             }
                         } else {
-                            if (isOpenSSL3) {
+                            if (openssl_h_Compatibility.OPENSSL3) {
                                 fipsModeActive = true;
                                 enterFipsMode = false;
                             } else {
@@ -323,7 +334,7 @@ public class OpenSSLLibrary {
                         log.info(sm.getString("openssllibrary.initializeFIPSSuccess"));
                     }
 
-                    if (isOpenSSL3 && fipsModeActive) {
+                    if (openssl_h_Compatibility.OPENSSL3 && fipsModeActive) {
                         log.info(sm.getString("aprListener.usingFIPSProvider"));
                     }
                 }
@@ -348,6 +359,8 @@ public class OpenSSLLibrary {
 
             try {
                 if (OpenSSL_version_num() < 0x3000000fL) {
+                    // There could be unreferenced SSL_CTX still waiting for GC
+                    System.gc();
                     freeDHParameters();
                     if (!MemorySegment.NULL.equals(enginePointer)) {
                         ENGINE_free(enginePointer);
@@ -420,7 +433,7 @@ public class OpenSSLLibrary {
             initLibrary();
             var sslCtx = SSL_CTX_new(TLS_server_method());
             try {
-                SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
+                openssl_h_Compatibility.SSL_CTX_set_options(sslCtx, SSL_OP_ALL());
                 SSL_CTX_set_cipher_list(sslCtx, localArena.allocateFrom(ciphers));
                 var ssl = SSL_new(sslCtx);
                 SSL_set_accept_state(ssl);
@@ -446,13 +459,13 @@ public class OpenSSLLibrary {
 
     static String[] getCiphers(MemorySegment ssl) {
         MemorySegment sk = SSL_get_ciphers(ssl);
-        int len = OPENSSL_sk_num(sk);
+        int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
         if (len <= 0) {
             return null;
         }
         ArrayList<String> ciphers = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
-            MemorySegment cipher = OPENSSL_sk_value(sk, i);
+            MemorySegment cipher = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
             MemorySegment cipherName = SSL_CIPHER_get_name(cipher);
             ciphers.add(cipherName.getString(0));
         }

@@ -57,6 +57,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.filters.CorsFilter;
 import org.apache.catalina.filters.RemoteIpFilter;
 import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.catalina.util.FilterUtil;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.catalina.valves.RemoteIpValve;
@@ -628,12 +629,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                                         for (FilterMap filterMap : context.findFilterMaps()) {
                                             if (filterMap.getFilterName().equals(filterDef.getFilterName())) {
                                                 if ((filterMap.getDispatcherMapping() & FilterMap.REQUEST) > 0) {
-                                                    for (String urlPattern : filterMap.getURLPatterns()) {
-                                                        if ("/*".equals(urlPattern)) {
-                                                            allowBypass = true;
-                                                            // No need to check other patterns
-                                                            break;
-                                                        }
+                                                    String requestPath = FilterUtil.getRequestPath(request);
+                                                    if (FilterUtil.matchFiltersURL(filterMap, requestPath)) {
+                                                        allowBypass = true;
                                                     }
                                                 }
                                                 // Found mappings for CORS filter.
@@ -805,6 +803,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             authStatus = state.serverAuthContext.validateRequest(state.messageInfo, client, null);
         } catch (AuthException e) {
             log.debug(sm.getString("authenticator.loginFail"), e);
+            // Need to explicitly set the return code as the ServerAuthContext may not have done.
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return false;
         }
 

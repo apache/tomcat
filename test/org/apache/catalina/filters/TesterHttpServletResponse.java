@@ -354,6 +354,11 @@ public class TesterHttpServletResponse implements HttpServletResponse {
         /* NOOP */}
 
     @Override
+    public void sendEarlyHints() {
+        /* NOOP */
+    }
+
+    @Override
     public void setDateHeader(String name, long value) {
         /* NOOP */}
 

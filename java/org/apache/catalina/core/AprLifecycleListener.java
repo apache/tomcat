@@ -167,7 +167,7 @@ public class AprLifecycleListener implements LifecycleListener {
             synchronized (lock) {
                 // Instance may get destroyed without ever being initialized
                 if (instanceInitialized) {
-                    referenceCount --;
+                    referenceCount--;
                 }
                 if (referenceCount != 0) {
                     // Still being used
@@ -193,6 +193,8 @@ public class AprLifecycleListener implements LifecycleListener {
         AprStatus.setAprAvailable(false);
         fipsModeActive = false;
         sslInitialized = false; // terminate() will clean the pool
+        // There could be unreferenced SSL_CTX still waiting for GC
+        System.gc();
         Library.terminate();
     }
 
@@ -288,6 +290,7 @@ public class AprLifecycleListener implements LifecycleListener {
         method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
 
+        AprStatus.setOpenSSLVersion(SSL.version());
         // OpenSSL 3 onwards uses providers
         boolean usingProviders = tcnMajor > 1 || (tcnVersion > 1233 && (SSL.version() & 0xF0000000L) > 0x20000000);
 

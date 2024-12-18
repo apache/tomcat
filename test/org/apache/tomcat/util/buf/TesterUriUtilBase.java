@@ -87,6 +87,24 @@ public abstract class TesterUriUtilBase {
 
 
     @Test
+    public void testBuildJarUrl05() throws IOException {
+        File jarFile = new File("/patha/pathb/pathc/war##001.war");
+        String result = UriUtil.buildJarUrl(jarFile).toString();
+
+        int index = result.indexOf("!/");
+        Assert.assertEquals(result, result.length() - 2, index);
+
+        index = result.indexOf(separator + "/");
+        Assert.assertEquals(result, -1, index);
+
+        // Ensure there is no double decoding
+        // https://bz.apache.org/bugzilla/show_bug.cgi?id=69234
+        index = result.indexOf("%25");
+        Assert.assertEquals(result, -1, index);
+    }
+
+
+    @Test
     public void testWarToJar02() throws IOException {
         doTestWarToJar("*");
     }

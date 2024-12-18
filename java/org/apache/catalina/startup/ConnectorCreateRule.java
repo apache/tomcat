@@ -69,8 +69,8 @@ public class ConnectorCreateRule extends Rule {
             code.append(System.lineSeparator());
             if (ex != null) {
                 code.append(digester.toVariableName(con)).append(".getProtocolHandler().setExecutor(");
-                code.append(digester.toVariableName(svc)).append(".getExecutor(").append(executorName);
-                code.append("));");
+                code.append(digester.toVariableName(svc)).append(".getExecutor(\"").append(executorName);
+                code.append("\"));");
                 code.append(System.lineSeparator());
             }
             if (sslImplementationName != null) {

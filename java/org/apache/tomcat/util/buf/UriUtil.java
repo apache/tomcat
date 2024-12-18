@@ -128,7 +128,8 @@ public final class UriUtil {
         }
         URI uri;
         try {
-            uri = new URI("jar", sb.toString(), null);
+            // Have to use the single argument constructor as that is the only one that doesn't escape input.
+            uri = new URI("jar:" + sb.toString());
         } catch (URISyntaxException e) {
             throw new IOException(e);
         }

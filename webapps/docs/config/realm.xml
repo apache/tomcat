@@ -470,7 +470,7 @@
         connection. This attribute should be a comma-separated list of values
         selected from <code>auth-conf</code>, <code>auth-int</code> and
         <code>auth</code>. See <a
-        href="http://docs.oracle.com/javase/7/docs/api/javax/security/sasl/Sasl.html#QOP"
+        href="https://docs.oracle.com/en/java/javase/21/docs/api/java.security.sasl/javax/security/sasl/Sasl.html#QOP"
         rel="nofollow">Java documentation</a> for more details.</p>
         <p>The default value is <code>auth-conf</code>.</p>
       </attribute>

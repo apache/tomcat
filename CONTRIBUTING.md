@@ -48,7 +48,7 @@ issues which should only require a few lines of code, and a test or two to
 resolve.
 
 The list above shows all bugs that are marked 'Beginner' and are open in the
-currently supported Tomcat versions (7, 8.5, and 9).
+currently supported Tomcat versions (9.0, 10.1, 11.0 and 12.0).
 
 If you prefer C over Java, you may also take a look at the tomcat-native and
 Tomcat Connectors products in Bugzilla.
@@ -82,9 +82,8 @@ can download the sources from the "Source Code Distributions" section of the
 Download Page. There is one such page for every major Tomcat version:
 
 - [Tomcat 11](https://tomcat.apache.org/download-11.cgi)
+- [Tomcat 10](https://tomcat.apache.org/download-10.cgi)
 - [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
-- [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
-- [Tomcat 7](https://tomcat.apache.org/download-70.cgi)
 
 ##### Manual Patch Generation
 

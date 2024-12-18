@@ -53,7 +53,6 @@ import javax.net.ssl.SSLSessionBindingListener;
 import javax.net.ssl.SSLSessionContext;
 
 import static org.apache.tomcat.util.openssl.openssl_h.*;
-import static org.apache.tomcat.util.openssl.openssl_h_Compatibility.*;
 import static org.apache.tomcat.util.openssl.openssl_h_Macros.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -64,6 +63,7 @@ import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationPars
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
 import org.apache.tomcat.util.openssl.SSL_set_info_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_set_verify$callback;
+import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -131,7 +131,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private volatile boolean destroyed;
 
     // Use an invalid cipherSuite until the handshake is completed
-    // See http://docs.oracle.com/javase/7/docs/api/javax/net/ssl/SSLEngine.html#getSession()
+    // See https://docs.oracle.com/en/java/javase/21/docs/api/java.base/javax/net/ssl/SSLEngine.html#getSession()
     private volatile String version;
     private volatile String cipher;
     private volatile String applicationProtocol;
@@ -191,7 +191,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         } else {
             SSL_set_accept_state(ssl);
         }
-        SSL_set_verify_result(ssl, X509_V_OK());
+        openssl_h_Compatibility.SSL_set_verify_result(ssl, X509_V_OK());
         try (var localArena = Arena.ofConfined()) {
             var internalBIOPointer = localArena.allocate(ValueLayout.ADDRESS);
             var networkBIOPointer = localArena.allocate(ValueLayout.ADDRESS);
@@ -370,8 +370,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
             // If isOutboundDone is set, then the data from the network BIO
             // was the close_notify message -- we are not required to wait
-            // for the receipt the peer's close_notify message -- shutdown.
-            if (isOutboundDone) {
+            // for the receipt of the peer's close_notify message -- shutdown.
+            if (isOutboundDone()) {
                 shutdown();
             }
 
@@ -471,9 +471,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         // protect against protocol overflow attack vector
         if (len > MAX_ENCRYPTED_PACKET_LENGTH) {
-            isInboundDone = true;
-            isOutboundDone = true;
-            engineClosed = true;
             shutdown();
             throw new SSLException(sm.getString("engine.oversizedPacket"));
         }
@@ -549,7 +546,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         // Check to see if we received a close_notify message from the peer
         if (!receivedShutdown && (SSL_get_shutdown(state.ssl) & SSL_RECEIVED_SHUTDOWN()) == SSL_RECEIVED_SHUTDOWN()) {
             receivedShutdown = true;
-            closeOutbound();
             closeInbound();
         }
 
@@ -603,7 +599,10 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         isInboundDone = true;
         engineClosed = true;
 
-        shutdown();
+        if (isOutboundDone()) {
+            // Only call shutdown if there is no outbound data pending.
+            shutdown();
+        }
 
         if (accepted != Accepted.NOT && !receivedShutdown) {
             throw new SSLException(sm.getString("engine.inboundClose"));
@@ -719,7 +718,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         List<String> enabled = new ArrayList<>();
         // Seems like there is no way to explicitly disable SSLv2Hello in OpenSSL so it is always enabled
         enabled.add(Constants.SSL_PROTO_SSLv2Hello);
-        long opts = SSL_get_options(state.ssl);
+        long opts = openssl_h_Compatibility.SSL_get_options(state.ssl);
         if ((opts & SSL_OP_NO_TLSv1()) == 0) {
             enabled.add(Constants.SSL_PROTO_TLSv1);
         }
@@ -783,25 +782,25 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
         }
         // Enable all and then disable what we not want
-        SSL_set_options(state.ssl, SSL_OP_ALL());
+        openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_ALL());
 
         if (!sslv2) {
-            SSL_set_options(state.ssl, SSL_OP_NO_SSLv2());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_SSLv2());
         }
         if (!sslv3) {
-            SSL_set_options(state.ssl, SSL_OP_NO_SSLv3());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_SSLv3());
         }
         if (!tlsv1) {
-            SSL_set_options(state.ssl, SSL_OP_NO_TLSv1());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1());
         }
         if (!tlsv1_1) {
-            SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_1());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_1());
         }
         if (!tlsv1_2) {
-            SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_2());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_2());
         }
         if (!tlsv1_3) {
-            SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_3());
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_3());
         }
     }
 
@@ -837,7 +836,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private byte[] getPeerCertificate() {
         try (var localArena = Arena.ofConfined()) {
-            MemorySegment/*(X509*)*/ x509 = (OpenSSLContext.OPENSSL_3 ? SSL_get1_peer_certificate(state.ssl) : SSL_get_peer_certificate(state.ssl));
+            MemorySegment/*(X509*)*/ x509 = openssl_h_Compatibility.SSL_get_peer_certificate(state.ssl);
             MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
             int length = i2d_X509(x509, bufPointer);
             if (length <= 0) {
@@ -853,14 +852,14 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private byte[][] getPeerCertChain() {
         MemorySegment/*STACK_OF(X509)*/ sk = SSL_get_peer_cert_chain(state.ssl);
-        int len = OPENSSL_sk_num(sk);
+        int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
         if (len <= 0) {
             return null;
         }
         byte[][] certificateChain = new byte[len][];
         try (var localArena = Arena.ofConfined()) {
             for (int i = 0; i < len; i++) {
-                MemorySegment/*(X509*)*/ x509 = OPENSSL_sk_value(sk, i);
+                MemorySegment/*(X509*)*/ x509 = openssl_h_Compatibility.OPENSSL_sk_value(sk, i);
                 MemorySegment bufPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
                 int length = i2d_X509(x509, bufPointer);
                 if (length < 0) {
@@ -1038,13 +1037,15 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
         // Check if we are in the shutdown phase
         if (engineClosed) {
-            // Waiting to send the close_notify message
             if (BIO_ctrl_pending(state.networkBIO) != 0) {
+                // Waiting to send the close_notify message
                 return SSLEngineResult.HandshakeStatus.NEED_WRAP;
             }
 
-            // Must be waiting to receive the close_notify message
-            return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
+            if (!isInboundDone()) {
+                // Must be waiting to receive the close_notify message
+                return SSLEngineResult.HandshakeStatus.NEED_UNWRAP;
+            }
         }
 
         return SSLEngineResult.HandshakeStatus.NOT_HANDSHAKING;
@@ -1153,7 +1154,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                     || (errnum == X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE());
             if (verifyErrorIsOptional && (state.certificateVerifyMode == OpenSSLContext.OPTIONAL_NO_CA)) {
                 ok = 1;
-                SSL_set_verify_result(state.ssl, X509_V_OK());
+                openssl_h_Compatibility.SSL_set_verify_result(state.ssl, X509_V_OK());
             }
             /*
              * Expired certificates vs. "expired" CRLs: by default, OpenSSL

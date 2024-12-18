@@ -42,32 +42,61 @@ different ways to start tomcat, including:
   <li>Automatically as a Windows service.</li>
 </ul>
 
-<subsection name="description">
 <p>
-A text description of the startup procedure is available
-<a href="startup/serverStartup.txt">here.</a>
+A series of UML diagrams have been created to document the start-up process for
+Tomcat.
 </p>
-</subsection>
-
-<subsection name="diagram">
 <p>
-A UML sequence diagram of the startup procedure is available
-<a href="startup/serverStartup.pdf">here.</a>
+<a href="startup/1_overview.png">Diagram 1</a> shows an overview of how Tomcat
+start, serves requests and then stops. Once the class loaders have been
+initialized, Tomcat parses server.xml using the Digester and the Digester
+creates the objects defined in server.xml, configures them using the property
+values defined in server.xml and the starts the Server. The main Java thread
+waits in the await() method for a shutdown signal. Once a shutdown signal is
+received, the Server object is stopped and then destroyed. The JVM then exits.
 </p>
-</subsection>
-
-<subsection name="comments">
 <p>
-The startup process can be customized in many ways, both
-by modifying Tomcat code and by implementing your own
-LifecycleListeners which are then registered in the server.xml
-configuration file.
+<a href="startup/2_catalina_init.png">Diagram 2</a> shows how Tomcat initalizes
+the objects created by the Digester in the previous step and when additional key
+objects are created. A Server may have several Services although it typically
+only has one. Each Service may have multiple Connectors. A Connector instance is
+associated with a single Protocol instance and a single CoyoteAdapter instance.
+</p>
+<p>
+<a href="startup/3_catalina_start_1.png">Diagram 3</a> shows how Tomcat starts
+the objects created by the Digester that were initialized in the previous step.
+This diagram also shows when lifecycle events are fired. There is more detail to
+the starting of the Engine (and other Containers) which is shown in the
+following diagram.
+</p>
+<p>
+<a href="startup/4_catalina_start_2.png">Diagram 4</a> shows how Containers
+(Engines, Hosts, Contexts and Wrappers) start along with any supporting
+Clusters, Realms and Valves.
+</p>
+<p>
+<a href="startup/5_catalina_start_3.png">Diagram 5</a> shows the start process
+for Context elements as it is rather more involved that the other Containers.
+</p>
+<p>
+<a href="startup/6_catalina_host_config.png">Diagram 6</a> shows how the
+HostConfig component responds to lifecycle events triggered by the Host to
+deploy web applications to the Host.</p>
+<p>
+<a href="startup/7_catalina_context_config.png">Diagram 7</a> shows how the
+ContextConfig component responds to lifecycle events triggered by the Context to
+parse the global and application provided configuration files to create a merged
+web.xml file that is then used, along with other settings, to configure the web
+application.
 </p>
 
-</subsection>
+<p>
+The startup process can be customized in many ways by implementing your own
+LifecycleListeners which are then registered in the server.xml configuration
+file.
+</p>
 
 </section>
-
 
 </body>
 </document>

@@ -18,7 +18,6 @@ package org.apache.catalina.core;
 
 import java.io.IOException;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -28,7 +27,6 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.coyote.ContinueResponseTiming;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Valve that implements the default basic behavior for the <code>StandardContext</code> container implementation.
@@ -38,8 +36,6 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Craig R. McClanahan
  */
 final class StandardContextValve extends ValveBase {
-
-    private static final StringManager sm = StringManager.getManager(StandardContextValve.class);
 
     StandardContextValve() {
         super(true);
@@ -75,14 +71,7 @@ final class StandardContextValve extends ValveBase {
         }
 
         // Acknowledge the request
-        try {
-            response.sendAcknowledgement(ContinueResponseTiming.IMMEDIATELY);
-        } catch (IOException ioe) {
-            container.getLogger().error(sm.getString("standardContextValve.acknowledgeException"), ioe);
-            request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, ioe);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            return;
-        }
+        response.sendAcknowledgement(ContinueResponseTiming.IMMEDIATELY);
 
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(wrapper.getPipeline().isAsyncSupported());

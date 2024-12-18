@@ -25,8 +25,8 @@ package org.apache.el.util;
 public class ExceptionUtils {
 
     /**
-     * Checks whether the supplied Throwable is one that needs to be
-     * rethrown and swallows all others.
+     * Checks whether the supplied Throwable is one that needs to be rethrown and swallows all others.
+     *
      * @param t the Throwable to check
      */
     public static void handleThrowable(Throwable t) {
@@ -42,10 +42,9 @@ public class ExceptionUtils {
 
 
     /**
-     * NO-OP method provided to enable simple pre-loading of this class. Since
-     * the class is used extensively in error handling, it is prudent to
-     * pre-load it to avoid any failure to load this class masking the true
-     * problem during error handling.
+     * NO-OP method provided to enable simple pre-loading of this class. Since the class is used extensively in error
+     * handling, it is prudent to pre-load it to avoid any failure to load this class masking the true problem during
+     * error handling.
      */
     public static void preload() {
         // NO-OP

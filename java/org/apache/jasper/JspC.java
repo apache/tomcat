@@ -197,8 +197,8 @@ public class JspC extends Task implements Options {
 
     protected String compiler = null;
 
-    protected String compilerTargetVM = "17";
-    protected String compilerSourceVM = "17";
+    protected String compilerTargetVM = "21";
+    protected String compilerSourceVM = "21";
 
     protected boolean classDebugInfo = true;
 

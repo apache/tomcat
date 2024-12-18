@@ -44,6 +44,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 @RunWith(Parameterized.class)
 public class TestResolverSSL extends TomcatBaseTest {
@@ -82,6 +83,12 @@ public class TestResolverSSL extends TomcatBaseTest {
         sslHostConfig.setSessionCacheSize(20 * 1024);
 
         tomcat.start();
+
+        Assume.assumeFalse("LibreSSL does not allow renegotiation",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
+        Assume.assumeFalse("BoringSSL does not allow TLS renegotiation",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
+
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/protected");
         // Just look a bit at the result
         System.out.println(res.toString());

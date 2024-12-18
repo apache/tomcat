@@ -86,6 +86,16 @@ public interface DataSourceMXBean {
     int getDefaultTransactionIsolation();
 
     /**
+     * See {@link BasicDataSource#getDisconnectionIgnoreSqlCodesAsArray()}.
+     *
+     * @return {@link BasicDataSource#getDisconnectionIgnoreSqlCodesAsArray()}.
+     * @since 2.13.0
+     */
+    default String[] getDisconnectionIgnoreSqlCodesAsArray() {
+        return Utils.EMPTY_STRING_ARRAY;
+    }
+
+    /**
      * See {@link BasicDataSource#getDisconnectionSqlCodesAsArray()}.
      *
      * @return {@link BasicDataSource#getDisconnectionSqlCodesAsArray()}.
@@ -346,7 +356,6 @@ public interface DataSourceMXBean {
      * See {@link BasicDataSource#restart()}
      *
      * @throws SQLException if an error occurs initializing the data source.
-     *
      * @since 2.8.0
      */
     default void restart() throws SQLException {
@@ -357,7 +366,6 @@ public interface DataSourceMXBean {
      * See {@link BasicDataSource#start()}
      *
      * @throws SQLException if an error occurs initializing the data source.
-     *
      * @since 2.8.0
      */
     default void start() throws SQLException {

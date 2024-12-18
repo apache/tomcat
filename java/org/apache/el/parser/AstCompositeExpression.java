@@ -33,14 +33,12 @@ public final class AstCompositeExpression extends SimpleNode {
     }
 
     @Override
-    public Class<?> getType(EvaluationContext ctx)
-            throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         return String.class;
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         StringBuilder sb = new StringBuilder(16);
         Object obj = null;
         if (this.children != null) {

@@ -19,17 +19,15 @@ package org.apache.el.util;
 public class Validation {
 
     // Java keywords, boolean literals & the null literal in alphabetical order
-    private static final String invalidIdentifiers[] = { "abstract", "assert",
-        "boolean", "break", "byte", "case", "catch", "char", "class", "const",
-        "continue", "default", "do", "double", "else", "enum", "extends",
-        "false", "final", "finally", "float", "for", "goto", "if", "implements",
-        "import", "instanceof", "int", "interface", "long", "native", "new",
-        "null", "package", "private", "protected", "public", "return", "short",
-        "static", "strictfp", "super", "switch", "synchronized", "this",
-        "throw", "throws", "transient", "true", "try", "void", "volatile",
-        "while" };
+    private static final String invalidIdentifiers[] = { "abstract", "assert", "boolean", "break", "byte", "case",
+            "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends",
+            "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int",
+            "interface", "long", "native", "new", "null", "package", "private", "protected", "public", "return",
+            "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient",
+            "true", "try", "void", "volatile", "while" };
 
-    private static final boolean SKIP_IDENTIFIER_CHECK = Boolean.getBoolean("org.apache.el.parser.SKIP_IDENTIFIER_CHECK");
+    private static final boolean SKIP_IDENTIFIER_CHECK =
+            Boolean.getBoolean("org.apache.el.parser.SKIP_IDENTIFIER_CHECK");
 
 
     private Validation() {
@@ -37,14 +35,12 @@ public class Validation {
     }
 
     /**
-     * Test whether a string is a Java identifier. Note that the behaviour of
-     * this method depend on the system property
+     * Test whether a string is a Java identifier. Note that the behaviour of this method depend on the system property
      * {@code org.apache.el.parser.SKIP_IDENTIFIER_CHECK}
      *
      * @param key The string to test
      *
-     * @return {@code true} if the provided String should be treated as a Java
-     *         identifier, otherwise false
+     * @return {@code true} if the provided String should be treated as a Java identifier, otherwise false
      */
     public static boolean isIdentifier(String key) {
 

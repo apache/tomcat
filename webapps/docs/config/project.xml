@@ -15,10 +15,10 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Apache Tomcat 11 Configuration Reference"
+<project name="Apache Tomcat 12 Configuration Reference"
         href="https://tomcat.apache.org/">
 
-  <title>Apache Tomcat 11 Configuration Reference</title>
+  <title>Apache Tomcat 12 Configuration Reference</title>
 
   <logo href="/images/tomcat.gif">
     The Apache Tomcat Servlet/JSP Container

@@ -218,24 +218,30 @@ public class TestWsRemoteEndpoint extends WebSocketBaseTest {
             wsSession = wsContainer.connectToServer(clazz, uri);
         }
 
-        CountDownLatch latch = new CountDownLatch(1);
-        TesterEndpoint tep = (TesterEndpoint) wsSession.getUserProperties().get("endpoint");
-        tep.setLatch(latch);
-        AsyncHandler<?> handler;
-        handler = new AsyncText(latch);
-
+        AsyncHandler<?> handler = new AsyncText(null);
         wsSession.addMessageHandler(handler);
 
         // This should trigger the error
-        wsSession.getBasicRemote().sendText("Start");
+        wsSession.getBasicRemote().sendText(TesterEchoServer.WriterError.MSG_ERROR);
 
-        boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
-
-        Assert.assertTrue(latchResult);
+        // This should get a PASS/FAIL message
+        wsSession.getBasicRemote().sendText(TesterEchoServer.WriterError.MSG_COUNT);
 
         @SuppressWarnings("unchecked")
         List<String> messages = (List<String>) handler.getMessages();
 
-        Assert.assertEquals(0, messages.size());
+        // There should be a response - allow up to 15s
+        int count = 0;
+        while (count < 300 && messages.size() == 0) {
+            // 200 * 50 == 15,000ms == 15s
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                // Ignore
+            }
+            count++;
+        }
+        Assert.assertEquals(1, messages.size());
+        Assert.assertEquals(TesterEchoServer.WriterError.RESULT_PASS, messages.get(0));
     }
 }

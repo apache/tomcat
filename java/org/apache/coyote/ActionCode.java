@@ -238,6 +238,12 @@ public enum ActionCode {
     DISPATCH_WRITE,
 
     /**
+     * Indicates that the container needs to trigger a call to onError() for the registered non-blocking write and/or
+     * read listener(s).
+     */
+    DISPATCH_ERROR,
+
+    /**
      * Execute any non-blocking dispatches that have been registered via {@link #DISPATCH_READ} or
      * {@link #DISPATCH_WRITE}. Typically required when the non-blocking listeners are configured on a thread where the
      * processing wasn't triggered by a read or write event on the socket.
@@ -265,5 +271,10 @@ public enum ActionCode {
     /**
      * Obtain the servlet connection instance for the network connection supporting the current request.
      */
-    SERVLET_CONNECTION
+    SERVLET_CONNECTION,
+
+    /**
+     * Send an RFC 8297 Early Hints informational response.
+     */
+    EARLY_HINTS
 }

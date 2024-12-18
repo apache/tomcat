@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ResourceBundle;
@@ -37,11 +36,8 @@ public class RequestParamExample extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Override
-    public void doGet(HttpServletRequest request,
-                      HttpServletResponse response)
-        throws IOException, ServletException
-    {
-        ResourceBundle rb = ResourceBundle.getBundle("LocalStrings",request.getLocale());
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        ResourceBundle rb = ResourceBundle.getBundle("LocalStrings", request.getLocale());
 
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
@@ -56,20 +52,12 @@ public class RequestParamExample extends HttpServlet {
         out.println("</head>");
         out.println("<body bgcolor=\"white\">");
 
-        // img stuff not req'd for source code HTML showing
-
-       // all links relative
-
-        // XXX
-        // making these absolute till we work out the
-        // addition of a PathInfo issue
-
         out.println("<a href=\"../reqparams.html\">");
-        out.println("<img src=\"../images/code.gif\" height=24 " +
-                    "width=24 align=right border=0 alt=\"view code\"></a>");
+        out.println(
+                "<img src=\"../images/code.gif\" height=24 " + "width=24 align=right border=0 alt=\"view code\"></a>");
         out.println("<a href=\"../index.html\">");
-        out.println("<img src=\"../images/return.gif\" height=24 " +
-                    "width=24 align=right border=0 alt=\"return\"></a>");
+        out.println(
+                "<img src=\"../images/return.gif\" height=24 " + "width=24 align=right border=0 alt=\"return\"></a>");
 
         out.println("<h3>" + title + "</h3>");
         String firstName = request.getParameter("firstname");
@@ -101,10 +89,7 @@ public class RequestParamExample extends HttpServlet {
     }
 
     @Override
-    public void doPost(HttpServletRequest request,
-                      HttpServletResponse response)
-        throws IOException, ServletException
-    {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         doGet(request, response);
     }
 

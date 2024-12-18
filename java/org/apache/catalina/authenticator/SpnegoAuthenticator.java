@@ -19,11 +19,9 @@ package org.apache.catalina.authenticator;
 import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
 import java.util.Base64;
 import java.util.LinkedHashMap;
+import java.util.concurrent.CompletionException;
 import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
@@ -33,7 +31,6 @@ import javax.security.auth.login.LoginException;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -134,7 +131,6 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     }
 
 
-    @SuppressWarnings("removal")
     @Override
     protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
@@ -168,8 +164,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         authorizationBC.setStart(authorizationBC.getStart() + 10);
 
         byte[] encoded = new byte[authorizationBC.getLength()];
-        System.arraycopy(authorizationBC.getBuffer(), authorizationBC.getStart(),
-                encoded, 0, authorizationBC.getLength());
+        System.arraycopy(authorizationBC.getBuffer(), authorizationBC.getStart(), encoded, 0,
+                authorizationBC.getLength());
         byte[] decoded = Base64.getDecoder().decode(encoded);
 
         if (getApplyJava8u40Fix()) {
@@ -211,11 +207,15 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             } else {
                 credentialLifetime = GSSCredential.DEFAULT_LIFETIME;
             }
-            final PrivilegedExceptionAction<GSSCredential> action = () -> manager.createCredential(null,
-                    credentialLifetime, new Oid("1.3.6.1.5.5.2"), GSSCredential.ACCEPT_ONLY);
-            gssContext = manager.createContext(Subject.doAs(subject, action));
+            gssContext = manager.createContext(Subject.callAs(subject, () -> {
+                return manager.createCredential(null, credentialLifetime, new Oid("1.3.6.1.5.5.2"),
+                        GSSCredential.ACCEPT_ONLY);
+            }));
 
-            outToken = Subject.doAs(lc.getSubject(), new AcceptAction(gssContext, decoded));
+            final GSSContext gssContextFinal = gssContext;
+            outToken = Subject.callAs(subject, () -> {
+                return gssContextFinal.acceptSecContext(decoded, 0, decoded.length);
+            });
 
             if (outToken == null) {
                 if (log.isDebugEnabled()) {
@@ -227,9 +227,9 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 return false;
             }
 
-            principal = Subject.doAs(subject,
-                    new AuthenticateAction(context.getRealm(), gssContext, storeDelegatedCredential));
-
+            principal = Subject.callAs(subject, () -> {
+                return context.getRealm().authenticate(gssContextFinal, storeDelegatedCredential);
+            });
         } catch (GSSException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail"), e);
@@ -237,7 +237,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
-        } catch (PrivilegedActionException e) {
+        } catch (CompletionException e) {
             Throwable cause = e.getCause();
             if (cause instanceof GSSException) {
                 if (log.isDebugEnabled()) {
@@ -292,46 +292,6 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     protected boolean isPreemptiveAuthPossible(Request request) {
         MessageBytes authorizationHeader = request.getCoyoteRequest().getMimeHeaders().getValue("authorization");
         return authorizationHeader != null && authorizationHeader.startsWithIgnoreCase("negotiate ", 0);
-    }
-
-
-    /**
-     * This class gets a gss credential via a privileged action.
-     */
-    public static class AcceptAction implements PrivilegedExceptionAction<byte[]> {
-
-        GSSContext gssContext;
-
-        byte[] decoded;
-
-        public AcceptAction(GSSContext context, byte[] decodedToken) {
-            this.gssContext = context;
-            this.decoded = decodedToken;
-        }
-
-        @Override
-        public byte[] run() throws GSSException {
-            return gssContext.acceptSecContext(decoded, 0, decoded.length);
-        }
-    }
-
-
-    public static class AuthenticateAction implements PrivilegedAction<Principal> {
-
-        private final Realm realm;
-        private final GSSContext gssContext;
-        private final boolean storeDelegatedCredential;
-
-        public AuthenticateAction(Realm realm, GSSContext gssContext, boolean storeDelegatedCredential) {
-            this.realm = realm;
-            this.gssContext = gssContext;
-            this.storeDelegatedCredential = storeDelegatedCredential;
-        }
-
-        @Override
-        public Principal run() {
-            return realm.authenticate(gssContext, storeDelegatedCredential);
-        }
     }
 
 

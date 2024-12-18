@@ -47,9 +47,26 @@ public class TestAsyncReadListener extends Http2TestBase {
         asyncServlet = new AsyncServlet();
     }
 
+
     @Test
-    public void testEmptyWindow() throws Exception {
+    public void testEmptyWindowDefaultReadTimeout() throws Exception {
+        doTestEmptyWindowMaximumTimeout(false);
+    }
+
+
+    @Test
+    public void testEmptyWindowMaximumReadTimeout() throws Exception {
+        doTestEmptyWindowMaximumTimeout(true);
+    }
+
+
+    public void doTestEmptyWindowMaximumTimeout(boolean useMaxReadTimeout) throws Exception {
         http2Connect();
+
+        if (useMaxReadTimeout) {
+            http2Protocol.setStreamReadTimeout(Integer.MAX_VALUE);
+            http2Protocol.setReadTimeout(Integer.MAX_VALUE);
+        }
 
         byte[] headersFrameHeader = new byte[9];
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
@@ -60,7 +77,8 @@ public class TestAsyncReadListener extends Http2TestBase {
 
 
         buildPostRequest(headersFrameHeader, headersPayload, false, null, -1, "/async", dataFrameHeader, dataPayload,
-            null, trailerFrameHeader, trailerPayload, 3);
+            null, true, 3);
+        buildTrailerHeaders(trailerFrameHeader, trailerPayload, 3);
 
         synchronized (asyncServlet) {
             // Write the headers

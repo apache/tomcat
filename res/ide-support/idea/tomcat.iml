@@ -84,7 +84,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://@CGLIB_JAR@!/" />
+          <root url="jar://@BYTEBUDDY_JAR@!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

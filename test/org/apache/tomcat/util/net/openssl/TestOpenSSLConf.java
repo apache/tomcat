@@ -34,8 +34,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.AprLifecycleListener;
+import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
@@ -70,34 +74,38 @@ public class TestOpenSSLConf extends TomcatBaseTest {
     // Test behavior needs to adjust for OpenSSL 1.1.1-pre3 and above
     private static final int OPENSSL_TLS13_SUPPORT_MIN_VERSION = 0x10101003;
 
-    private static int OPENSSL_VERSION = TesterSupport.getOpensslVersion();
-
     private static boolean hasTLS13() {
-        return OPENSSL_VERSION >= OPENSSL_TLS13_SUPPORT_MIN_VERSION;
+        return AprStatus.getOpenSSLVersion() >= OPENSSL_TLS13_SUPPORT_MIN_VERSION
+                || OpenSSLStatus.getVersion() >= OPENSSL_TLS13_SUPPORT_MIN_VERSION;
     }
 
-    private SSLHostConfig initOpenSSLConfCmd(String... commands) throws Exception {
-        Assert.assertNotNull(commands);
-        Assert.assertTrue("Invalid length", commands.length % 2 == 0);
-
+    private void initOpenSSL() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Connector connector = tomcat.getConnector();
 
         TesterSupport.initSsl(tomcat);
 
         Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
 
         if (OpenSSLImplementation.class.getName().equals(sslImplementationName)) {
-            AprLifecycleListener listener = new AprLifecycleListener();
+            LifecycleListener listener = new AprLifecycleListener();
             Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
             StandardServer server = (StandardServer) tomcat.getServer();
             server.addLifecycleListener(listener);
+            // Initialize only the listener as the OpenSSL version is not available before initializeSSL
+            listener.lifecycleEvent(new LifecycleEvent(tomcat.getServer(), Lifecycle.BEFORE_INIT_EVENT, null));
         } else if ("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName)) {
-            OpenSSLLifecycleListener listener = new OpenSSLLifecycleListener();
+            LifecycleListener listener = new OpenSSLLifecycleListener();
             Assume.assumeTrue(OpenSSLLifecycleListener.isAvailable());
+            Assume.assumeFalse("LibreSSL does not support OpenSSLConf",
+                    Class.forName("org.apache.tomcat.util.openssl.openssl_h_Compatibility").getField("LIBRESSL").getBoolean(null));
             StandardServer server = (StandardServer) tomcat.getServer();
             server.addLifecycleListener(listener);
         }
+    }
+
+    private SSLHostConfig initOpenSSLConfCmd(String... commands) throws Exception {
+        Assert.assertNotNull(commands);
+        Assert.assertTrue("Invalid length", commands.length % 2 == 0);
 
         OpenSSLConf conf = new OpenSSLConf();
         for (int i = 0; i < commands.length;) {
@@ -107,11 +115,17 @@ public class TestOpenSSLConf extends TomcatBaseTest {
             conf.addCmd(cmd);
         }
 
+        Tomcat tomcat = getTomcatInstance();
+        Connector connector = tomcat.getConnector();
+
         SSLHostConfig[] sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
         Assert.assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
         sslHostConfigs[0].setOpenSslConf(conf);
 
         tomcat.start();
+
+        Assume.assumeFalse("BoringSSL does not support OpenSSLConf",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
 
         sslHostConfigs = connector.getProtocolHandler().findSslHostConfigs();
         Assert.assertEquals("Wrong SSLHostConfigCount", 1, sslHostConfigs.length);
@@ -120,6 +134,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
     @Test
     public void testOpenSSLConfCmdCipher() throws Exception {
+        initOpenSSL();
         SSLHostConfig sslHostConfig;
         if (hasTLS13()) {
             // Ensure TLSv1.3 ciphers aren't returned
@@ -148,6 +163,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
 
     @Test
     public void testOpenSSLConfCmdProtocol() throws Exception {
+        initOpenSSL();
         Set<String> disabledProtocols = new HashSet<>(Arrays.asList(DISABLED_PROTOCOLS));
         StringBuilder sb = new StringBuilder();
         for (String protocol : DISABLED_PROTOCOLS) {

@@ -60,16 +60,13 @@ import org.apache.catalina.core.OpenSSLLifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
-import org.apache.tomcat.jni.Library;
-import org.apache.tomcat.jni.LibraryNotFoundError;
-import org.apache.tomcat.jni.SSL;
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 public final class TesterSupport {
 
@@ -90,9 +87,6 @@ public final class TesterSupport {
     public static final String LOCALHOST_EC_KEY_PEM = SSL_DIR + "localhost-ec-key.pem";
     public static final String LOCALHOST_RSA_CERT_PEM = SSL_DIR + "localhost-rsa-cert.pem";
     public static final String LOCALHOST_RSA_KEY_PEM = SSL_DIR + "localhost-rsa-key.pem";
-    public static final boolean OPENSSL_AVAILABLE;
-    public static final int OPENSSL_VERSION;
-    public static final String OPENSSL_ERROR;
     public static final boolean TLSV13_AVAILABLE;
 
     public static final String ROLE = "testrole";
@@ -103,27 +97,6 @@ public final class TesterSupport {
 
     static {
         boolean available = false;
-        int version = 0;
-        String err = "";
-        try {
-            if (JreCompat.isJre22Available()) {
-                // Try with FFM
-                Class<?> openSSL = Class.forName("org.apache.tomcat.util.openssl.openssl_h");
-                version = ((Long) openSSL.getMethod("OpenSSL_version_num").invoke(null)).intValue();
-            } else {
-                Library.initialize(null);
-                available = true;
-                version = SSL.version();
-                Library.terminate();
-            }
-        } catch (Exception | LibraryNotFoundError ex) {
-            err = ex.getMessage();
-        }
-        OPENSSL_AVAILABLE = available;
-        OPENSSL_VERSION = version;
-        OPENSSL_ERROR = err;
-
-        available = false;
         try {
             SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
             available = true;
@@ -132,19 +105,12 @@ public final class TesterSupport {
         TLSV13_AVAILABLE = available;
     }
 
-    public static boolean isOpensslAvailable() {
-        return OPENSSL_AVAILABLE;
-    }
-
-    public static int getOpensslVersion() {
-        return OPENSSL_VERSION;
-    }
-
     public static boolean isTlsv13Available() {
         return TLSV13_AVAILABLE;
     }
 
     public static void initSsl(Tomcat tomcat) {
+        // TLS material for tests uses default password
         initSsl(tomcat, LOCALHOST_RSA_JKS, null, null, null, null);
     }
 
@@ -176,6 +142,8 @@ public final class TesterSupport {
         }
         if (keystorePass != null) {
             certificate.setCertificateKeystorePassword(keystorePass);
+        } else {
+            certificate.setCertificateKeystorePassword(JKS_PASS);
         }
         if (keyPassFile != null) {
             certificate.setCertificateKeyPasswordFile(new File(keyPassFile).getAbsolutePath());
@@ -261,6 +229,11 @@ public final class TesterSupport {
             server.addLifecycleListener(listener);
         }
         Assert.assertTrue(tomcat.getConnector().setProperty("sslImplementationName", sslImplementationName));
+    }
+
+    public static boolean isOpenSSLVariant(String sslImplementationName, OpenSSLStatus.Name name) {
+        return "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation".equals(sslImplementationName)
+                && name.equals(OpenSSLStatus.getName());
     }
 
     public static void configureClientCertContext(Tomcat tomcat) {

@@ -19,22 +19,25 @@ package org.apache.catalina.tribes;
 import java.io.Serializable;
 
 /**
- * The Member interface, defines a member in the group.
- * Each member can carry a set of properties, defined by the actual implementation.<BR>
- * A member is identified by the host/ip/uniqueId<br>
- * The host is what interface the member is listening to, to receive data<br>
- * The port is what port the member is listening to, to receive data<br>
- * The uniqueId defines the session id for the member. This is an important feature
- * since a member that has crashed and the starts up again on the same port/host is
- * not guaranteed to be the same member, so no state transfers will ever be confused
+ * The Member interface, defines a member in the group. Each member can carry a set of properties, defined by the actual
+ * implementation.
+ * <p>
+ * A member is identified by the host/ip/uniqueId.
+ * <ul>
+ * <li>The host is what interface the member is listening to, to receive data</li>
+ * <li>The port is what port the member is listening to, to receive data</li>
+ * <li>The uniqueId defines the session id for the member. This is an important feature since a member that has crashed
+ * and the starts up again on the same port/host is not guaranteed to be the same member, so no state transfers will
+ * ever be confused.</li>
+ * </ul>
  */
 public interface Member extends Serializable {
 
     /**
-     * When a member leaves the cluster, the payload of the memberDisappeared member
-     * will be the following bytes. This indicates a soft shutdown, and not a crash
+     * When a member leaves the cluster, the payload of the memberDisappeared member will be the following bytes. This
+     * indicates a soft shutdown, and not a crash
      */
-    byte[] SHUTDOWN_PAYLOAD = new byte[] {66, 65, 66, 89, 45, 65, 76, 69, 88};
+    byte[] SHUTDOWN_PAYLOAD = new byte[] { 66, 65, 66, 89, 45, 65, 76, 69, 88 };
 
     /**
      * @return the name of this node, should be unique within the group.
@@ -43,55 +46,65 @@ public interface Member extends Serializable {
 
     /**
      * Returns the listen host for the ChannelReceiver implementation
+     *
      * @return IPv4 or IPv6 representation of the host address this member listens to incoming data
+     *
      * @see ChannelReceiver
      */
     byte[] getHost();
 
     /**
      * Returns the listen port for the ChannelReceiver implementation
+     *
      * @return the listen port for this member, -1 if its not listening on an insecure port
+     *
      * @see ChannelReceiver
      */
     int getPort();
 
     /**
-     * Returns the secure listen port for the ChannelReceiver implementation.
-     * Returns -1 if its not listening to a secure port.
+     * Returns the secure listen port for the ChannelReceiver implementation. Returns -1 if its not listening to a
+     * secure port.
+     *
      * @return the listen port for this member, -1 if its not listening on a secure port
+     *
      * @see ChannelReceiver
      */
     int getSecurePort();
 
     /**
      * Returns the UDP port that this member is listening to for UDP messages.
+     *
      * @return the listen UDP port for this member, -1 if its not listening on a UDP port
      */
     int getUdpPort();
 
 
     /**
-     * Contains information on how long this member has been online.
-     * The result is the number of milli seconds this member has been
-     * broadcasting its membership to the group.
+     * Contains information on how long this member has been online. The result is the number of milli seconds this
+     * member has been broadcasting its membership to the group.
+     *
      * @return nr of milliseconds since this member started.
      */
     long getMemberAliveTime();
 
     /**
      * Set the alive time in ms.
+     *
      * @param memberAliveTime the value to set
      */
     void setMemberAliveTime(long memberAliveTime);
 
     /**
-     * The current state of the member
+     * The current state of the member.
+     *
      * @return {@code true} if the member is functioning correctly
      */
     boolean isReady();
 
     /**
-     * The current state of the member
+     * The current state of the member.
+     *
      * @return {@code true} if the member is suspect, but the crash has not been confirmed
      */
     boolean isSuspect();
@@ -102,8 +115,9 @@ public interface Member extends Serializable {
     boolean isFailing();
 
     /**
-     * returns a UUID unique for this member over all sessions.
-     * If the member crashes and restarts, the uniqueId will be different.
+     * returns a UUID unique for this member over all sessions. If the member crashes and restarts, the uniqueId will be
+     * different.
+     *
      * @return byte[]
      */
     byte[] getUniqueId();
@@ -115,6 +129,7 @@ public interface Member extends Serializable {
 
     /**
      * Set the payload associated with this member.
+     *
      * @param payload the payload
      */
     void setPayload(byte[] payload);
@@ -126,6 +141,7 @@ public interface Member extends Serializable {
 
     /**
      * Set the command associated with this member.
+     *
      * @param command the command
      */
     void setCommand(byte[] command);
@@ -136,25 +152,29 @@ public interface Member extends Serializable {
     byte[] getDomain();
 
     /**
-     * Highly optimized version of serializing a member into a byte array
-     * Returns a cached byte[] reference, do not modify this data
-     * @param getalive  calculate memberAlive time
+     * Highly optimized version of serializing a member into a byte array Returns a cached byte[] reference, do not
+     * modify this data
+     *
+     * @param getalive calculate memberAlive time
+     *
      * @return the data as a byte array
      */
     byte[] getData(boolean getalive);
 
     /**
-     * Highly optimized version of serializing a member into a byte array
-     * Returns a cached byte[] reference, do not modify this data
-     * @param getalive  calculate memberAlive time
-     * @param reset     reset the cached data package, and create a new one
+     * Highly optimized version of serializing a member into a byte array Returns a cached byte[] reference, do not
+     * modify this data
+     *
+     * @param getalive calculate memberAlive time
+     * @param reset    reset the cached data package, and create a new one
+     *
      * @return the data as a byte array
      */
     byte[] getData(boolean getalive, boolean reset);
 
     /**
-     * Length of a message obtained by {@link #getData(boolean)} or
-     * {@link #getData(boolean, boolean)}.
+     * Length of a message obtained by {@link #getData(boolean)} or {@link #getData(boolean, boolean)}.
+     *
      * @return the data length
      */
     int getDataLength();
@@ -166,6 +186,7 @@ public interface Member extends Serializable {
 
     /**
      * Set if the member is local.
+     *
      * @param local set to {@code true} if this is the local member
      */
     void setLocal(boolean local);

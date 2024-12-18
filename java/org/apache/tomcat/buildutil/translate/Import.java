@@ -68,6 +68,7 @@ public class Import {
 
             if (!cKey.pkg.equals(currentPkg)) {
                 currentPkg = cKey.pkg;
+                currentGroup = "zzz";
                 if (w != null) {
                     w.close();
                 }
@@ -75,6 +76,7 @@ public class Import {
                 FileOutputStream fos = new FileOutputStream(outFile);
                 w = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
                 org.apache.tomcat.buildutil.Utils.insertLicense(w);
+                Utils.insertEditInstructions(w);
             }
 
             if (!currentGroup.equals(cKey.group)) {

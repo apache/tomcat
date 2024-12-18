@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.compiler;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -269,6 +270,9 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         URL url = null;
         try {
             url = ctxt.getResource(uri);
+            if (url == null) {
+                throw new FileNotFoundException();
+            }
             /*
              *  When the TLD cache is built for a TLD contained within a JAR within a WAR, the jar form of the URL is
              *  used for any nested JAR.

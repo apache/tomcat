@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -36,6 +37,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.StoreType;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
 import org.apache.tomcat.util.net.TesterSupport.ClientSSLSocketFactory;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 /*
  * Tests compatibility of JSSE and OpenSSL settings.
@@ -244,6 +246,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         case KEYSTORE: {
             SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
             sslHostConfigCertificateRsa.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_RSA_JKS));
+            sslHostConfigCertificateRsa.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
             sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
             break;
         }
@@ -251,6 +254,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
             SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
             sslHostConfigCertificateRsa.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
             sslHostConfigCertificateRsa.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+            sslHostConfigCertificateRsa.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
             sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
             break;
         }
@@ -264,6 +268,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         case KEYSTORE: {
             SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
             sslHostConfigCertificateEc.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_EC_JKS));
+            sslHostConfigCertificateEc.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
             sslHostConfig.addCertificate(sslHostConfigCertificateEc);
             break;
         }
@@ -271,6 +276,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
             SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
             sslHostConfigCertificateEc.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
             sslHostConfigCertificateEc.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
+            sslHostConfigCertificateEc.setCertificateKeyPassword(TesterSupport.JKS_PASS);
             sslHostConfig.addCertificate(sslHostConfigCertificateEc);
             break;
         }
@@ -291,6 +297,9 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         tomcat.start();
+
+        Assume.assumeFalse("BoringSSL removes support for many ciphers",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
 
         // Check a request can be made
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/");

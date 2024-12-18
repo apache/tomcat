@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -31,6 +32,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -83,6 +85,11 @@ public class TestClientCert extends TomcatBaseTest {
         }
 
         getTomcatInstance().start();
+
+        Assume.assumeFalse("LibreSSL does not allow renegotiation",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
+        Assume.assumeFalse("BoringSSL does not allow TLS renegotiation",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
 
         // Unprotected resource
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/unprotected");
@@ -155,6 +162,11 @@ public class TestClientCert extends TomcatBaseTest {
             throws Exception {
         Tomcat tomcat = getTomcatInstance();
         tomcat.start();
+
+        Assume.assumeFalse("LibreSSL does not allow renegotiation",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
+        Assume.assumeFalse("BoringSSL does not allow TLS renegotiation",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
 
         byte[] body = new byte[bodySize];
         Arrays.fill(body, TesterSupport.DATA);

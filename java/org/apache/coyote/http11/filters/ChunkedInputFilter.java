@@ -36,8 +36,8 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Chunked input filter. Parses chunked data according to
- * <a href="http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1">http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1</a><br>
+ * Chunked input filter. Parses chunked data according to <a href=
+ * "http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1">http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1</a><br>
  *
  * @author Remy Maucherat
  */
@@ -55,8 +55,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     // ----------------------------------------------------- Static Initializer
 
     static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1),
-                0, ENCODING_NAME.length());
+        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1), 0, ENCODING_NAME.length());
     }
 
 
@@ -199,6 +198,16 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         if (readChunk != null) {
             available = readChunk.remaining();
         }
+
+        // Handle some edge cases
+        if (available == 1 && parseState == ParseState.CHUNK_BODY_CRLF) {
+            // Either just the CR or just the LF are left in the buffer. There is no data to read.
+            available = 0;
+        } else if (available == 2 && !crFound && parseState == ParseState.CHUNK_BODY_CRLF) {
+            // Just CRLF is left in the buffer. There is no data to read.
+            available = 0;
+        }
+
         if (available == 0) {
             // No data buffered here. Try the next filter in the chain.
             return buffer.available();
@@ -247,7 +256,9 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
     /**
      * Read bytes from the previous buffer.
+     *
      * @return The byte count which has been read
+     *
      * @throws IOException Read error
      */
     protected int readBytes() throws IOException {
@@ -305,18 +316,15 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
 
     /**
-     * Parse the header of a chunk.
-     * A chunk header can look like one of the following:<br>
+     * Parse the header of a chunk. A chunk header can look like one of the following:<br>
      * A10CRLF<br>
      * F23;chunk-extension to be ignoredCRLF
-     *
      * <p>
-     * The letters before CRLF or ';' (whatever comes first) must be valid hex
-     * digits. We should not parse F23IAMGONNAMESSTHISUP34CRLF as a valid
-     * header according to the spec.
+     * The letters before CRLF or ';' (whatever comes first) must be valid hex digits. We should not parse
+     * F23IAMGONNAMESSTHISUP34CRLF as a valid header according to the spec.
      *
      * @return {@code true} if the read is complete or {@code false if incomplete}. In complete reads can only happen
-     *         with non-blocking I/O.
+     *             with non-blocking I/O.
      *
      * @throws IOException Read error
      */
@@ -417,7 +425,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
      * Parse CRLF at end of chunk.
      *
      * @return {@code true} if the read is complete or {@code false if incomplete}. In complete reads can only happen
-     *         with non-blocking I/O.
+     *             with non-blocking I/O.
      *
      * @throws IOException An error occurred parsing CRLF
      */
@@ -457,7 +465,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
      * Parse end chunk data.
      *
      * @return {@code true} if the read is complete or {@code false if incomplete}. In complete reads can only happen
-     *         with non-blocking I/O.
+     *             with non-blocking I/O.
      *
      * @throws IOException Error propagation
      */
@@ -477,14 +485,14 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             request.getMimeTrailerFields().filter(allowedTrailerHeaders);
             if (request.getReadListener() != null) {
                 /*
-                 * Perform the dispatch back to the container for the onAllDataRead() event. For non-chunked input
-                 * this would be performed when isReady() is next called.
+                 * Perform the dispatch back to the container for the onAllDataRead() event. For non-chunked input this
+                 * would be performed when isReady() is next called.
                  *
                  * Chunked input returns one chunk at a time for non-blocking reads. A consequence of this is that
-                 * reading the final chunk returns -1 which signals the end of stream. The application code reading
-                 * the request body probably won't call isReady() after receiving the -1 return value since it
-                 * already knows it is at end of stream. Therefore we trigger the dispatch back to the container
-                 * here which in turn ensures the onAllDataRead() event is fired.
+                 * reading the final chunk returns -1 which signals the end of stream. The application code reading the
+                 * request body probably won't call isReady() after receiving the -1 return value since it already knows
+                 * it is at end of stream. Therefore we trigger the dispatch back to the container here which in turn
+                 * ensures the onAllDataRead() event is fired.
                  */
                 request.action(ActionCode.DISPATCH_READ, null);
                 request.action(ActionCode.DISPATCH_EXECUTE, null);
