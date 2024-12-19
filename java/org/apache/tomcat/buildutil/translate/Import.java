@@ -43,12 +43,8 @@ public class Import {
     private static void processFile(File f) throws IOException {
         String language = Utils.getLanguage(f.getName());
 
-        // Skip the original
-        if (language.length() == 0) {
-            // Comment this line out if the originals need to be imported.
-            return;
-        }
-
+        // Unlike the main branch, don't skip the original so we can import
+        // updates to the English translations
         Properties props = Utils.load(f);
         Object[] objKeys = props.keySet().toArray();
         Arrays.sort(objKeys);
