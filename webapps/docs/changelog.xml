@@ -128,6 +128,11 @@
         Avoid a rare <code>NullPointerException</code> when recycling the
         <code>Http11InputBuffer</code>. (markt)
       </fix>
+      <fix>
+        Lower the log level to debug for logging an invalid socket channel when
+        processing poller events for the NIO Connector as this may occur in
+        normal usage. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
