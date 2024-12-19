@@ -124,6 +124,10 @@
         Don't log warnings for registered HTTP/2 settings that Tomcat does not
         support. These settings are now silently ignored. (markt)
       </fix>
+      <fix>
+        Avoid a rare <code>NullPointerException</code> when recycling the
+        <code>Http11InputBuffer</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
