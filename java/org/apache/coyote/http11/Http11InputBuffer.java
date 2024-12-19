@@ -250,7 +250,10 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
             activeFilters[i].recycle();
         }
 
-        byteBuffer.limit(0).position(0);
+        // Avoid rare NPE reported on users@ list
+        if (byteBuffer != null) {
+            byteBuffer.limit(0).position(0);
+        }
         lastActiveFilter = -1;
         swallowInput = true;
 
