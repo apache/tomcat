@@ -70,6 +70,13 @@ public class RequestFacade implements HttpServletRequest {
         this.request = request;
     }
 
+    /**
+     * @return the <code>Request</code> for which this object
+     * is the facade.
+     */
+    public Request getRequest() {
+        return request;
+    }
 
     /**
      * Clear facade.
