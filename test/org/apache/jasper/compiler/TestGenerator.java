@@ -987,6 +987,37 @@ public class TestGenerator extends TomcatBaseTest {
     }
 
     @Test
+    public void testBug69508() throws Exception {
+        getTomcatInstanceTestWebapp(false, true);
+
+        ByteChunk body = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug69508.jsp?init=InitCommand", body, null);
+
+        String text = body.toString();
+        Assert.assertEquals(text, HttpServletResponse.SC_OK, rc);
+        // include page URL with param cmd
+        Assert.assertTrue(text, text.contains("<p>cmd - someCommand</p>"));
+        Assert.assertTrue(text, text.contains("<p>param1 - value1</p>"));
+        Assert.assertTrue(text, text.contains("<p>cmd - someCommandAbs</p>"));
+        Assert.assertTrue(text, text.contains("<p>param1 - value1Abs</p>"));
+        // include page URL without param
+        Assert.assertTrue(text, text.contains("<p>param2 - value2</p>"));
+        Assert.assertTrue(text, text.contains("<p>param2 - value2Abs</p>"));
+
+        Assert.assertTrue(text, text.contains("<p>param3 - InitCommand</p>"));
+        Assert.assertTrue(text, text.contains("<p>param3 - InitCommandAbs</p>"));
+
+        Assert.assertTrue(text, text.contains("<p>param4 - value4</p>"));
+        Assert.assertTrue(text, text.contains("<p>param4 - value4Abs</p>"));
+
+        Assert.assertTrue(text, text.contains("<p>param5 - InitCommand</p>"));
+        Assert.assertTrue(text, text.contains("<p>param5 - InitCommandAbs</p>"));
+
+        Assert.assertTrue(text, text.contains("<p>param6 - value6</p>"));
+        Assert.assertTrue(text, text.contains("<p>param6 - value6Abs</p>"));
+    }
+
+    @Test
     public void testTagReleaseWithPooling() throws Exception {
         doTestTagRelease(true);
     }
