@@ -224,6 +224,12 @@
         21 being the minimum Java version required for Tomcat 12. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69508</bug>: Correct a regression in the fix for <bug>69382</bug>
+        that broke JSP include actions if both the page attribute and the body
+        contained parameters. Pull request <pr>803</pr> provided by Chenjp.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">

@@ -1082,7 +1082,7 @@ class Generator {
             }
 
             if (n.getBody() != null) {
-                generateIncludeWithParameters(n, page, isFlush, pageParam);
+                generateIncludeWithParameters(n, isFlush, pageParam);
             } else {
                 generateInclude(n, page, isFlush, pageParam);
             }
@@ -1097,8 +1097,8 @@ class Generator {
             out.println(", out, " + isFlush + ");");
         }
 
-        private void generateIncludeWithParameters(Node.IncludeAction n, Node.JspAttribute page, boolean isFlush,
-                String pageParam) throws JasperException {
+        private void generateIncludeWithParameters(Node.IncludeAction n, boolean isFlush, String pageParam)
+                throws JasperException {
             // jsp:include contains jsp:param - reuse some calculations
             String temporaryVariableName = n.getRoot().nextTemporaryVariableName();
             String urlVariableName = temporaryVariableName + "_url";
@@ -1108,7 +1108,8 @@ class Generator {
             out.printin("String " + requestEncodingVariableName + " = " + REQUEST_CHARACTER_ENCODING_TEXT + ";");
             out.println();
             out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.include(request, response, " + urlVariableName);
-            printParams(n, urlVariableName, page.isLiteral(), requestEncodingVariableName);
+            // literal is hard-coded to false for this call since it always uses a variable
+            printParams(n, urlVariableName, false, requestEncodingVariableName);
             out.println(", out, " + isFlush + ");");
         }
 
