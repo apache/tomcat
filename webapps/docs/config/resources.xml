@@ -122,6 +122,12 @@
         used.</p>
       </attribute>
 
+      <attribute name="readOnly" required="false">
+        <p>If the value of this flag is <code>true</code>, then writing will
+        be enabled on the main resource set. The default value is
+        <code>false</code>.</p>
+      </attribute>
+
       <attribute name="trackLockedFiles" required="false">
         <p>Controls whether the track locked files feature is enabled. If
         enabled, all calls to methods that return objects that lock a file and
