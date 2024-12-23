@@ -1108,7 +1108,7 @@ class Generator {
             out.printin("String " + requestEncodingVariableName + " = " + REQUEST_CHARACTER_ENCODING_TEXT + ";");
             out.println();
             out.printin("org.apache.jasper.runtime.JspRuntimeLibrary.include(request, response, " + urlVariableName);
-            printParams(n, urlVariableName, page.isLiteral(), requestEncodingVariableName);
+            printParams(n, urlVariableName, false, requestEncodingVariableName);
             out.println(", out, " + isFlush + ");");
         }
 
