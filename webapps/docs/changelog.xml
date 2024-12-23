@@ -143,6 +143,13 @@
         Improve HTTP If headers processing according to RFC 9110. Based on pull
         request <pr>796</pr> by Chenjp. (remm/markt)
       </update>
+      <update>
+        Allow <code>readOnly</code> attribute configuration on the
+        <code>Resources</code> element and allow configure the
+        <code>readOnly</code> attribute value of the main resources. The
+        attribute value will also be used by the default and WebDAV Servlets.
+        (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

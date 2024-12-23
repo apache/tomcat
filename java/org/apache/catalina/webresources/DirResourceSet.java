@@ -101,13 +101,14 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
         checkPath(path);
         String webAppMount = getWebAppMount();
         WebResourceRoot root = getRoot();
+        boolean readOnly = isReadOnly();
         if (path.startsWith(webAppMount)) {
             /*
              * Lock the path for reading until the WebResource has been constructed. The lock prevents concurrent reads
              * and writes (e.g. HTTP GET and PUT / DELETE) for the same path causing corruption of the FileResource
              * where some of the fields are set as if the file exists and some as set as if it does not.
              */
-            ResourceLock lock = lockForRead(path);
+            ResourceLock lock = readOnly ? null : lockForRead(path);
             try {
                 File f = file(path.substring(webAppMount.length()), false);
                 if (f == null) {
@@ -119,9 +120,11 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
                 if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
                     path = path + '/';
                 }
-                return new FileResource(root, path, f, isReadOnly(), getManifest(), this, lock.key);
+                return new FileResource(root, path, f, readOnly, getManifest(), this, readOnly ? null : lock.key);
             } finally {
-                unlockForRead(lock);
+                if (!readOnly) {
+                    unlockForRead(lock);
+                }
             }
         } else {
             return new EmptyResource(root, path);

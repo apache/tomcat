@@ -480,6 +480,16 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
+    protected boolean isListings() {
+        return listings;
+    }
+
+
+    protected boolean isReadOnly() {
+        return readOnly || resources.isReadOnly();
+    }
+
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -542,7 +552,7 @@ public class DefaultServlet extends HttpServlet {
         allow.append("OPTIONS, GET, HEAD, POST");
 
         // PUT and DELETE depend on readonly
-        if (!readOnly) {
+        if (!isReadOnly()) {
             allow.append(", PUT, DELETE");
         }
 
@@ -571,7 +581,7 @@ public class DefaultServlet extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             sendNotAllowed(req, resp);
             return;
         }
@@ -694,7 +704,7 @@ public class DefaultServlet extends HttpServlet {
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             sendNotAllowed(req, resp);
             return;
         }
@@ -906,7 +916,7 @@ public class DefaultServlet extends HttpServlet {
 
             // Skip directory listings if we have been configured to
             // suppress them
-            if (!listings) {
+            if (!isListings()) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND,
                         sm.getString("defaultServlet.missingResource", request.getRequestURI()));
                 return;
