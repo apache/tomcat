@@ -751,7 +751,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         // if the resource does not exist.
         StringBuilder methodsAllowed = new StringBuilder("OPTIONS, GET, POST, HEAD");
 
-        if (!readOnly) {
+        if (!isReadOnly()) {
             methodsAllowed.append(", DELETE");
             if (!resource.isDirectory()) {
                 methodsAllowed.append(", PUT");
@@ -765,7 +765,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         methodsAllowed.append(", LOCK, UNLOCK, PROPPATCH, COPY, MOVE");
 
-        if (listings) {
+        if (isListings()) {
             methodsAllowed.append(", PROPFIND");
         }
 
@@ -796,7 +796,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doPropfind(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (!listings) {
+        if (!isListings()) {
             sendNotAllowed(req, resp);
             return;
         }
@@ -1013,7 +1013,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1194,7 +1194,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1221,7 +1221,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             sendNotAllowed(req, resp);
             return;
         }
@@ -1268,7 +1268,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doCopy(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1289,7 +1289,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doMove(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1318,7 +1318,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doLock(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1731,7 +1731,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      */
     protected void doUnlock(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        if (readOnly) {
+        if (isReadOnly()) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }

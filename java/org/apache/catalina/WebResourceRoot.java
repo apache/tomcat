@@ -414,6 +414,23 @@ public interface WebResourceRoot extends Lifecycle {
         // NO-OP
     }
 
+    /**
+     * Set if the main resources are read only.
+     *
+     * @param readOnly the value
+     */
+    default void setReadOnly(boolean readOnly) {
+        // NO-OP
+    }
+
+    /**
+     * @return {@code true} if the main resources are read only, otherwise {@code false}. The default implementation
+     *   returns {@code false}.
+     */
+    default boolean isReadOnly() {
+        return false;
+    }
+
     enum ResourceSetType {
         PRE,
         RESOURCE_JAR,

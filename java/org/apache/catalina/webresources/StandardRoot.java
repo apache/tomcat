@@ -67,6 +67,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     private Context context;
     private boolean allowLinking = false;
+    private boolean readOnly = false;
     private final List<WebResourceSet> preResources = new ArrayList<>();
     private WebResourceSet main;
     private final List<WebResourceSet> classResources = new ArrayList<>();
@@ -657,6 +658,16 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     }
 
 
+    @Override
+    public boolean isReadOnly() {
+        return (readOnly || main == null || main.isReadOnly());
+    }
+
+    @Override
+    public void setReadOnly(boolean readOnly) {
+        this.readOnly = readOnly;
+    }
+
     // ----------------------------------------------------------- JMX Lifecycle
     @Override
     protected String getDomainInternal() {
@@ -743,6 +754,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             }
             if (f.isDirectory()) {
                 mainResourceSet = new DirResourceSet(this, "/", f.getAbsolutePath(), "/");
+                mainResourceSet.setReadOnly(readOnly);
             } else if (f.isFile() && docBase.endsWith(".war")) {
                 mainResourceSet = new WarResourceSet(this, "/", f.getAbsolutePath());
             } else {
