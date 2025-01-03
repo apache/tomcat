@@ -19,6 +19,7 @@
 <%@page import="java.util.Map" %>
 <%@page import="java.util.Map.Entry" %>
 <%@page import="java.util.List" %>
+<%@page import="org.apache.catalina.manager.Constants" %>
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -32,7 +33,7 @@
     <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
     <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
     <meta http-equiv="content-language" content="en"/>
-    <meta name="copyright" content="copyright 2005-2025 the Apache Software Foundation"/>
+    <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Trusted certificates per Connector</title>
 </head>
