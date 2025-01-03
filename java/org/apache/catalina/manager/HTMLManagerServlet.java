@@ -730,7 +730,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
     @Override
     public String getServletInfo() {
-        return "HTMLManagerServlet, Copyright (c) 1999-2025, The Apache Software Foundation";
+        return "HTMLManagerServlet, " + Constants.COPYRIGHT_NOTICE;
     }
 
     @Override
