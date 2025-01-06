@@ -21,6 +21,8 @@ import java.util.List;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Provides a common interface for {@link SSLImplementation}s to create the
@@ -28,6 +30,10 @@ import javax.net.ssl.TrustManager;
  * JSSE API.
  */
 public interface SSLUtil {
+
+    static SSLContext createSSLContext(javax.net.ssl.SSLContext sslContext, X509KeyManager keyManager, X509TrustManager trustManager) {
+        return new SSLContextWrapper(sslContext, keyManager, trustManager);
+    }
 
     SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception;
 
