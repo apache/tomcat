@@ -566,11 +566,7 @@ java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
         "\u00d8"-"\u00f6",
         "\u00f8"-"\u00ff",
         "\u0100"-"\u1fff",
-        "\u3040"-"\u318f",
-        "\u3300"-"\u337f",
-        "\u3400"-"\u3d2d",
-        "\u4e00"-"\u9fff",
-        "\uf900"-"\ufaff"
+        "\u2c60"-"\uffef"
         ]
     >
 |    < #DIGIT:
