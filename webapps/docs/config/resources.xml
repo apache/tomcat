@@ -138,7 +138,7 @@
 
       <attribute name="readOnly" required="false">
         <p>If the value of this flag is <code>true</code>, then writing will
-        be enabled on the main resource set. The default value is
+        be disabled on the main resource set. The default value is
         <code>false</code>.</p>
       </attribute>
 
