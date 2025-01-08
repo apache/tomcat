@@ -96,6 +96,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     }
 
 
+    @SuppressWarnings("null") // lock can never be null when lock.key is read
     @Override
     public WebResource getResource(String path) {
         checkPath(path);
