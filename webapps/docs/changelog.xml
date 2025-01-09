@@ -144,6 +144,10 @@
         processing poller events for the NIO Connector as this may occur in
         normal usage. (markt)
       </fix>
+      <scode>
+        Refactor the <code>SavedRequestInputFilter</code> so the buffered data
+        is used directly rather than copied. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
