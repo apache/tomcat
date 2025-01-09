@@ -133,6 +133,11 @@
         <pr>843</pr>: Fix off by one validation logic for partial PUT ranges
         and associated test case. Submitted by Chenjp. (remm)
       </fix>
+      <scode>
+        Replace the unused buffer in
+        <code>org.apache.catalina.connector.InputBuffer</code> with a static,
+        zero length buffer. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
