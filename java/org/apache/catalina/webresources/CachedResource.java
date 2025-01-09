@@ -85,6 +85,7 @@ public class CachedResource implements WebResource {
         this.root = root;
         this.webAppPath = path;
         this.ttl = ttl;
+        nextCheck = ttl + System.currentTimeMillis();
         this.objectMaxSizeBytes = objectMaxSizeBytes;
         this.usesClassLoaderResources = usesClassLoaderResources;
     }
@@ -247,6 +248,9 @@ public class CachedResource implements WebResource {
 
     @Override
     public long getContentLength() {
+        if (webResource == null) {
+            return Long.valueOf(0);
+        }
         /*
          * Cache the content length for two reasons.
          *
@@ -263,11 +267,7 @@ public class CachedResource implements WebResource {
         if (cachedContentLength == null) {
             synchronized (cachedContentLengthLock) {
                 if (cachedContentLength == null) {
-                    if (webResource == null) {
-                        cachedContentLength = Long.valueOf(0);
-                    } else {
-                        cachedContentLength = Long.valueOf(webResource.getContentLength());
-                    }
+                    cachedContentLength = Long.valueOf(webResource.getContentLength());
                 }
             }
         }

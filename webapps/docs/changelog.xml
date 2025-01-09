@@ -123,6 +123,10 @@
         attribute value will also be used by the default and WebDAV Servlets.
         (remm)
       </update>
+      <fix>
+        <bug>69527</bug>: Avoid rare cases where a cached resource could be set
+        with 0 content length, or could be evicted immediately. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
