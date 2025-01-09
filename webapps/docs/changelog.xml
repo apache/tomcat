@@ -123,6 +123,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        Refactor the <code>SavedRequestInputFilter</code> so the buffered data
+        is used directly rather than copied. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
