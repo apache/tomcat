@@ -60,6 +60,8 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
     private static final Log log = LogFactory.getLog(InputBuffer.class);
 
+    private static final ByteBuffer EMPTY_BUFFER = ByteBuffer.allocate(0);
+
     public static final int DEFAULT_BUFFER_SIZE = 8 * 1024;
 
     // The buffer can be used for byte[] and char[] reading
@@ -76,8 +78,11 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
     // ----------------------------------------------------- Instance Variables
 
-    /**
-     * The byte buffer.
+    /*
+     * The byte buffer. Data is always injected into this class by calling {@link #setByteBuffer(ByteBuffer)} rather
+     * than copying data into any existing buffer. It is initialised to an empty buffer as there are code paths that
+     * access the buffer when it is expected to be empty and an empty buffer gives cleaner code than lots of null
+     * checks.
      */
     private ByteBuffer bb;
 
@@ -151,8 +156,8 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
     public InputBuffer(int size) {
 
         this.size = size;
-        bb = ByteBuffer.allocate(size);
-        clear(bb);
+        // Will be replaced when there is data to read so initialise to empty buffer.
+        bb = EMPTY_BUFFER;
         cb = CharBuffer.allocate(size);
         clear(cb);
         readLimit = size;
@@ -191,7 +196,11 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         }
         readLimit = size;
         markPos = -1;
-        clear(bb);
+        /*
+         * This buffer will have been replaced if there was data to read so re-initialise to an empty buffer to clear
+         * any reference to an injected buffer.
+         */
+        bb = EMPTY_BUFFER;
         closed = false;
 
         if (conv != null) {
