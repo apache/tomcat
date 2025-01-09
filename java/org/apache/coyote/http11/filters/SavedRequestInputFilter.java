@@ -49,11 +49,10 @@ public class SavedRequestInputFilter implements InputFilter {
             return -1;
         }
 
-        ByteBuffer byteBuffer = handler.getByteBuffer();
-        byteBuffer.position(byteBuffer.limit()).limit(byteBuffer.capacity());
-        input.subtract(byteBuffer);
-
-        return byteBuffer.remaining();
+        int len = input.getLength();
+        handler.setByteBuffer(ByteBuffer.wrap(input.getBytes(), input.getStart(), len));
+        input.setStart(input.getEnd());
+        return len;
     }
 
     /**
