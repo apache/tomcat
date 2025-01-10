@@ -611,6 +611,16 @@ public class DefaultServlet extends HttpServlet {
             if (range == IGNORE) {
                 resourceInputStream = req.getInputStream();
             } else {
+                if (req instanceof RequestFacade) {
+                    int maxSwallowSize = -1;
+                    maxSwallowSize = ((RequestFacade) req).getMaxSwallowSize();
+
+                    if (maxSwallowSize >= 0 && range.getLength() > maxSwallowSize) {
+                        // maxSwallowSize is semantically equivalent to PUT destination file size limit.
+                        resp.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+                        return;
+                    }
+                }
                 File contentFile = executePartialPut(req, range, path);
                 resourceInputStream = new FileInputStream(contentFile);
             }

@@ -612,4 +612,15 @@ public class RequestFacade implements HttpServletRequest {
             throw new IllegalStateException(sm.getString("requestFacade.nullRequest"));
         }
     }
+
+    /**
+     * Get the maximum number of request body bytes to be swallowed by Tomcat for an aborted upload. A value of less
+     * than zero indicates that no limit should be enforced.
+     *
+     * @return the maximum number of request body bytes to be swallowed by Tomcat for an aborted upload
+     */
+    public int getMaxSwallowSize() {
+        checkFacade();
+        return request.getMaxSwallowSize();
+    }
 }

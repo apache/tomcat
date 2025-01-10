@@ -3091,4 +3091,14 @@ public class Request implements HttpServletRequest {
             }
         });
     }
+
+    /**
+     * Get the maximum number of request body bytes to be swallowed by Tomcat for an aborted upload. A value of less
+     * than zero indicates that no limit should be enforced. The value is determined by its underlying connector.
+     *
+     * @return the maximum number of request body bytes to be swallowed by Tomcat for an aborted upload
+     */
+    public int getMaxSwallowSize() {
+        return (int) connector.getProperty("maxSwallowSize");
+    }
 }
