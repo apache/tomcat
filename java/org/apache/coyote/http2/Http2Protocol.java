@@ -544,7 +544,6 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     void pushRequestAndResponse(Request requestAndResponse) {
-        requestAndResponse.recycle();
         if (!discardRequestsAndResponses) {
             recycledRequestsAndResponses.push(requestAndResponse);
         }
