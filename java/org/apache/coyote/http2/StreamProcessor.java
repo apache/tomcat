@@ -35,6 +35,7 @@ import org.apache.coyote.ActionCode;
 import org.apache.coyote.Adapter;
 import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.ErrorState;
+import org.apache.coyote.NonPipeliningProcessor;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.Response;
@@ -52,7 +53,7 @@ import org.apache.tomcat.util.net.SocketEvent;
 import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
-class StreamProcessor extends AbstractProcessor {
+class StreamProcessor extends AbstractProcessor implements NonPipeliningProcessor {
 
     private static final Log log = LogFactory.getLog(StreamProcessor.class);
     private static final StringManager sm = StringManager.getManager(StreamProcessor.class);
