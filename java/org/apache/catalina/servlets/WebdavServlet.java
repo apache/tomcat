@@ -17,6 +17,7 @@
 package org.apache.catalina.servlets;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -55,6 +56,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.connector.RequestFacade;
 import org.apache.catalina.util.DOMWriter;
+import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.XMLWriter;
 import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -832,11 +834,19 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             }
         }
 
-        if (req.getContentLengthLong() > 0 || "chunked".equalsIgnoreCase(req.getHeader("Transfer-Encoding"))) {
+        byte[] body = null;
+        try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            IOTools.flow(is, os);
+            body = os.toByteArray();
+        } catch (IOException e) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return;
+        }
+        if (body.length > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
 
             try {
-                Document document = documentBuilder.parse(new InputSource(req.getInputStream()));
+                Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(body)));
 
                 // Get the root element of the document
                 Element rootElement = document.getDocumentElement();
@@ -1025,8 +1035,20 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         DocumentBuilder documentBuilder = getDocumentBuilder();
         ArrayList<ProppatchOperation> operations = new ArrayList<>();
 
+        byte[] body = null;
+        try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            IOTools.flow(is, os);
+            body = os.toByteArray();
+        } catch (IOException e) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return;
+        }
+        if (body.length <= 0) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return;
+        }
         try {
-            Document document = documentBuilder.parse(new InputSource(req.getInputStream()));
+            Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(body)));
 
             // Get the root element of the document
             Element rootElement = document.getDocumentElement();
@@ -1203,7 +1225,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return;
         }
 
-        if (req.getContentLengthLong() > 0) {
+        if (req.getContentLengthLong() > 0 || "chunked".equalsIgnoreCase(req.getHeader("Transfer-Encoding"))) {
             // No support for MKCOL bodies, which are non standard
             resp.sendError(WebdavStatus.SC_UNSUPPORTED_MEDIA_TYPE);
             return;
@@ -1379,11 +1401,19 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         Node lockInfoNode = null;
 
-        if (req.getContentLengthLong() > 0 || "chunked".equalsIgnoreCase(req.getHeader("Transfer-Encoding"))) {
+        byte[] body = null;
+        try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
+            IOTools.flow(is, os);
+            body = os.toByteArray();
+        } catch (IOException e) {
+            resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+            return;
+        }
+        if (body.length > 0) {
             DocumentBuilder documentBuilder = getDocumentBuilder();
 
             try {
-                Document document = documentBuilder.parse(new InputSource(req.getInputStream()));
+                Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(body)));
 
                 // Get the root element of the document
                 Element rootElement = document.getDocumentElement();
