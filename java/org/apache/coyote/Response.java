@@ -649,6 +649,15 @@ public final class Response {
 
         // update counters
         contentWritten = 0;
+
+        if (hook instanceof NonPipeliningProcessor) {
+            /*
+             * No requirement to maintain state between requests so clear the hook (a.k.a. Processor) and the output
+             * buffer to aid GC.
+             */
+            setHook(null);
+            setOutputBuffer(null);
+        }
     }
 
     /**
