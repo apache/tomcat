@@ -405,6 +405,11 @@ public class HpackDecoder {
     }
 
 
+    void clearHeaderEmitter() {
+        headerEmitter = null;
+    }
+
+
     void setMaxHeaderCount(int maxHeaderCount) {
         this.maxHeaderCount = maxHeaderCount;
     }
