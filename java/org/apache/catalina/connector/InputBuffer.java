@@ -181,7 +181,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         readLimit = size;
         markPos = -1;
         /*
-         * This buffer will have been be replaced if there was data to read so re-initialise to an empty buffer to clear
+         * This buffer will have been replaced if there was data to read so re-initialise to an empty buffer to clear
          * any reference to an injected buffer.
          */
         bb = EMPTY_BUFFER;
