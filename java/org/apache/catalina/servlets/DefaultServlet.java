@@ -612,9 +612,7 @@ public class DefaultServlet extends HttpServlet {
                 resourceInputStream = req.getInputStream();
             } else {
                 if (req instanceof RequestFacade) {
-                    int maxSwallowSize = -1;
-                    maxSwallowSize = ((RequestFacade) req).getMaxSwallowSize();
-
+                    int maxSwallowSize = ((RequestFacade) req).getMaxSwallowSize();
                     if (maxSwallowSize >= 0 && range.getLength() > maxSwallowSize) {
                         // maxSwallowSize is semantically equivalent to PUT destination file size limit.
                         resp.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
