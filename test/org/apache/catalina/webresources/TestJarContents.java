@@ -70,6 +70,9 @@ public class TestJarContents {
         Assert.assertTrue(testJarContentsObject.mightContainResource(
                 "d1/d1-f1.txt", jar.getAbsolutePath()));
 
+        Assert.assertTrue(testJarContentsObject.mightContainResource(
+                "f9.txt", jar.getAbsolutePath()));
+
         Assert.assertFalse(testJarContentsObject.mightContainResource(
                 "/d7/d1-f1.txt", jar.getAbsolutePath()));
 

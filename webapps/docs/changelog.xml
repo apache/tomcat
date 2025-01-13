@@ -158,6 +158,11 @@
         Fix possible edge cases (such as HTTP/1.0) with trying to detect
         requests without body for WebDAV LOCK and PROPFIND. (remm)
       </fix>
+      <fix>
+        <bug>69528</bug>: Add multi-release JAR support for the
+        <code>bloom</code> <code>archiveIndexStrategy</code> of the
+        <code>Resources</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
