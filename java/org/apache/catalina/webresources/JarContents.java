@@ -67,6 +67,20 @@ public final class JarContents {
                 startPos = 1;
             }
 
+            // Versioned entries should be added to the table according to their real name
+            if (name.startsWith("META-INF/versions/", startPos)) {
+                int i = name.indexOf('/', 18 + startPos);
+                if (i > 0) {
+                    int version = Integer.parseInt(name.substring(18 + startPos, i));
+                    if (version <= Runtime.version().feature()) {
+                        startPos = i + 1;
+                    }
+                }
+                if (startPos == name.length()) {
+                    continue;
+                }
+            }
+
             // Find the correct table slot
             int pathHash1 = hashcode(name, startPos, HASH_PRIME_1);
             int pathHash2 = hashcode(name, startPos, HASH_PRIME_2);
