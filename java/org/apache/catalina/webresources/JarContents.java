@@ -21,6 +21,8 @@ import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
+import org.apache.tomcat.util.compat.JreCompat;
+
 /**
  * This class represents the contents of a jar by determining whether a given resource <b>might</b> be in the cache,
  * based on a bloom filter. This is not a general-purpose bloom filter because it contains logic to strip out characters
@@ -65,6 +67,20 @@ public final class JarContents {
             boolean precedingSlash = name.charAt(0) == '/';
             if (precedingSlash) {
                 startPos = 1;
+            }
+
+            // Versioned entries should be added to the table according to their real name
+            if (name.startsWith("META-INF/versions/", startPos)) {
+                int i = name.indexOf('/', 18 + startPos);
+                if (i > 0) {
+                    int version = Integer.parseInt(name.substring(18 + startPos, i));
+                    if (version <= JreCompat.getInstance().jarFileRuntimeMajorVersion()) {
+                        startPos = i + 1;
+                    }
+                }
+                if (startPos == name.length()) {
+                    continue;
+                }
             }
 
             // Find the correct table slot
