@@ -249,7 +249,7 @@ public class CachedResource implements WebResource {
     @Override
     public long getContentLength() {
         if (webResource == null) {
-            return Long.valueOf(0);
+            return 0;
         }
         /*
          * Cache the content length for two reasons.
