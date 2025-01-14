@@ -162,6 +162,11 @@
         <code>org.apache.catalina.connector.InputBuffer</code> with a static,
         zero length buffer. (markt)
       </scode>
+      <scode>
+        Clean-up references to the HTTP/2 stream once request processing has
+        completed to aid GC and reduce the size of the HTTP/2 recycled request
+        and response cache. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
