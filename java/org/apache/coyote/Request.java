@@ -829,15 +829,6 @@ public final class Request {
 
         startTimeNanos = -1;
         threadId = 0;
-
-        if (hook instanceof NonPipeliningProcessor) {
-            /*
-             * No requirement to maintain state between requests so clear the hook (a.k.a. Processor) and the input
-             * buffer to aid GC.
-             */
-            setHook(null);
-            setInputBuffer(null);
-        }
     }
 
     // -------------------- Info --------------------
