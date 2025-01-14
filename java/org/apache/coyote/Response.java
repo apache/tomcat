@@ -355,7 +355,7 @@ public final class Response {
             throw new IllegalStateException();
         }
 
-        recycle();
+        recycle(false);
     }
 
 
@@ -632,10 +632,13 @@ public final class Response {
         contentWritten += len - chunk.remaining();
     }
 
-    // --------------------
 
     public void recycle() {
+        recycle(true);
+    }
 
+
+    private void recycle(boolean responseComplete) {
         contentType = null;
         contentLanguage = null;
         locale = DEFAULT_LOCALE;
@@ -659,7 +662,19 @@ public final class Response {
 
         // update counters
         contentWritten = 0;
+
+        if (responseComplete && hook instanceof NonPipeliningProcessor) {
+            /*
+             * No requirement to maintain state between responses so clear the hook (a.k.a. Processor) and the output
+             * buffer to aid GC.
+             *
+             * Only clear these between responses. They need to be retained when the response is reset.
+             */
+            setHook(null);
+            setOutputBuffer(null);
+        }
     }
+
 
     /**
      * Bytes written by application - i.e. before compression, chunking, etc.
