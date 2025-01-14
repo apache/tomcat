@@ -7,9 +7,7 @@
 # the License.  You may obtain a copy of the License at
 #
 #     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
+## distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -205,20 +203,20 @@ nsis.nsdialogs.dll=${nsis.home}/Plugins/${nsis.arch.dir}nsDialogs.dll
 nsis.loc=${base-sf.loc}/nsis/nsis-${nsis.version}.zip
 
 # ----- Commons Daemon, version 1.2.0 or later -----
-commons-daemon.version=1.4.0
+commons-daemon.version=1.4.1
 
-# checksum for commons-daemon-1.4.0-bin.tar.gz
+# checksum for commons-daemon-1.4.1-bin.tar.gz
 commons-daemon.bin.checksum.enabled=true
 commons-daemon.bin.checksum.algorithm=SHA-512
-commons-daemon.bin.checksum.value=15fccd35a711f91e5b4466d56f50585c7ae3a787a39c16e006617c86b9e9feee9fbf902582b08c2e896ca6a655500d805fdbb9c97f04f70321631168b8d42c81
+commons-daemon.bin.checksum.value=6e1e590d1b25b1c543b7e149748b25b7a200a20a70d490b1f2628ce808dd9da170d33c62b57421bdf7db0a9e0ac1df7f67de5e9ea4e70d500ec97ff7e6662e6a
 
-# checksums for commons-daemon-1.4.0-native-src.tar.gz, commons-daemon-1.4.0-bin-windows.zip
+# checksums for commons-daemon-1.4.1-native-src.tar.gz, commons-daemon-1.4.1-bin-windows.zip
 commons-daemon.native.src.checksum.enabled=true
 commons-daemon.native.src.checksum.algorithm=SHA-512
-commons-daemon.native.src.checksum.value=8a54200d547ef7ee647e8d4910fd3cb55bf7d8fc75de8f0e01bc701ef0b386ddc3843e6c9189e34d2afd62060fb6299ea83c421cf60c7d105d04cb45904500d3
+commons-daemon.native.src.checksum.value=578002ddd6d1a63488b9920b848d839cab39fca58c1e208b929b5c327590ca63c5878cd5280d2a2006191a8e81d93e5ca07414f6f6f4a72669352df72a5977b1
 commons-daemon.native.win.checksum.enabled=true
 commons-daemon.native.win.checksum.algorithm=SHA-512
-commons-daemon.native.win.checksum.value=5974d638994cbf821c17d0fc6b69bace08b0314ea5614c1a57175a02cda7c57a6b8ee49f8892206061f9d3385da5841db31d9ce9b3ce74cf4afc10ad8eeeee68
+commons-daemon.native.win.checksum.value=b8eeea01dbca495780e61db26776eab1561990d54499202bcb5d97c9f49e194ebc40002fabbaf74b5334481a2f42f80df5132efd0671632074df83759e04484a
 
 commons-daemon.home=${base.path}/commons-daemon-${commons-daemon.version}
 commons-daemon.jar=${commons-daemon.home}/commons-daemon-${commons-daemon.version}.jar
