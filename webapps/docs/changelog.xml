@@ -160,6 +160,13 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to Commons Daemon 1.4.1. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.98 (remm)" rtext="2024-12-09">
   <subsection name="Catalina">
