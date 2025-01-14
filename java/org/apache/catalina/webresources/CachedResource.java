@@ -101,15 +101,12 @@ public class CachedResource implements WebResource {
             return false;
         }
 
-        long now = System.currentTimeMillis();
-
         if (webResource == null) {
             synchronized (this) {
                 if (webResource == null) {
                     webResource = root.getResourceInternal(webAppPath, useClassLoaderResources);
                     getLastModified();
                     getContentLength();
-                    nextCheck = ttl + now;
                     // exists() is a relatively expensive check for a file so
                     // use the fact that we know if it exists at this point
                     if (webResource instanceof EmptyResource) {
@@ -121,6 +118,8 @@ public class CachedResource implements WebResource {
                 }
             }
         }
+
+        long now = System.currentTimeMillis();
 
         if (now < nextCheck) {
             return true;
