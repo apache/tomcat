@@ -610,6 +610,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             if (hrefs.hasNext()) {
                 currentHref = hrefs.next();
                 currentPath = getPathFromHref(currentHref, request);
+                if (currentPath == null) {
+                    // The path was invalid
+                    return false;
+                }
                 currentWebResource = resources.getResource(currentPath);
             } else {
                 currentPath = path;
@@ -804,12 +808,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         String path = getRelativePath(req);
-
-        // Exclude any resource in the /WEB-INF and /META-INF subdirectories
-        if (isSpecialPath(path)) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
-            return;
-        }
 
         // Properties which are to be displayed.
         List<Node> properties = new ArrayList<>();
@@ -1196,12 +1194,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     protected void doMkcol(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         String path = getRelativePath(req);
-
-        // Exclude any resource in the /WEB-INF and /META-INF subdirectories
-        if (isSpecialPath(path)) {
-            resp.sendError(WebdavStatus.SC_FORBIDDEN);
-            return;
-        }
 
         WebResource resource = resources.getResource(path);
         if (!checkIfHeaders(req, resp, resource)) {
@@ -1852,8 +1844,14 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * @return <code>true</code> if the resource specified is under a special path
      */
     private boolean isSpecialPath(final String path) {
-        return !allowSpecialPaths && (path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
-                path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"));
+        if (!allowSpecialPaths) {
+            String upperCasePath = path.toUpperCase(Locale.ENGLISH);
+            if (upperCasePath.startsWith("/WEB-INF/") || upperCasePath.startsWith("/META-INF/")
+                    || upperCasePath.equals("/WEB-INF") || upperCasePath.equals("/META-INF")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
