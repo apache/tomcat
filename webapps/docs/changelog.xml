@@ -163,6 +163,10 @@
         <code>bloom</code> <code>archiveIndexStrategy</code> of the
         <code>Resources</code>. (remm)
       </fix>
+      <fix>
+        Improve checks for <code>WEB-INF</code> and <code>META-INF</code> in
+        the WebDAV servlet. Based on a patch submitted by Chenjp. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
