@@ -123,7 +123,7 @@ import org.xml.sax.SAXException;
  *  &lt;/servlet-mapping&gt;
  * </pre>
  *
- * By default access to /WEB-INF and META-INF are not available via WebDAV. To enable access to these URLs, use add:
+ * By default access to /WEB-INF and /META-INF are not available via WebDAV. To enable access to these URLs, use add:
  *
  * <pre>
  *  &lt;init-param&gt;
@@ -551,7 +551,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         // and doesn't add any special path protection
         // WebdavServlet remounts the webapp under a new path, so this check is
         // necessary on all methods (including GET).
-        if (isSpecialPath(path)) {
+        if (checkSpecialPath(path)) {
             resp.sendError(WebdavStatus.SC_NOT_FOUND);
             return;
         }
@@ -806,7 +806,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         String path = getRelativePath(req);
 
         // Exclude any resource in the /WEB-INF and /META-INF subdirectories
-        if (isSpecialPath(path)) {
+        if (checkSpecialPath(path)) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -954,7 +954,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 String currentPath = stack.remove();
 
                 // Exclude any resource in the /WEB-INF and /META-INF subdirectories
-                if (isSpecialPath(currentPath)) {
+                if (checkSpecialPath(currentPath)) {
                     continue;
                 }
 
@@ -1198,7 +1198,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         String path = getRelativePath(req);
 
         // Exclude any resource in the /WEB-INF and /META-INF subdirectories
-        if (isSpecialPath(path)) {
+        if (checkSpecialPath(path)) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return;
         }
@@ -1845,15 +1845,22 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     /**
-     * Checks whether a given path refers to a resource under <code>WEB-INF</code> or <code>META-INF</code>.
+     * Checks whether a given path refers to a resource is equal to or under a special path, either <code>WEB-INF</code>
+     * or <code>META-INF</code>.
      *
      * @param path the full path of the resource being accessed
      *
-     * @return <code>true</code> if the resource specified is under a special path
+     * @return <code>true</code> if the resource specified is equal to or under a special path
      */
-    private boolean isSpecialPath(final String path) {
-        return !allowSpecialPaths && (path.toUpperCase(Locale.ENGLISH).startsWith("/WEB-INF") ||
-                path.toUpperCase(Locale.ENGLISH).startsWith("/META-INF"));
+    private boolean checkSpecialPath(final String path) {
+        if (!allowSpecialPaths) {
+            String upperPath = path.toUpperCase(Locale.ENGLISH);
+            if (upperPath.equals("/WEB-INF") || upperPath.startsWith("/WEB-INF/") || upperPath.equals("/META-INF") ||
+                    upperPath.startsWith("/META-INF/")) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
@@ -1921,7 +1928,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         // Protect special subdirectories
-        if (isSpecialPath(hrefPath)) {
+        if (checkSpecialPath(hrefPath)) {
             return null;
         }
 
@@ -2101,7 +2108,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         // Check destination path to protect special subdirectories
-        if (isSpecialPath(destinationPath)) {
+        if (checkSpecialPath(destinationPath)) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return false;
         }
@@ -2381,7 +2388,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         // Prevent deletion of special subdirectories
-        if (isSpecialPath(path)) {
+        if (checkSpecialPath(path)) {
             errorList.put(path, Integer.valueOf(WebdavStatus.SC_FORBIDDEN));
             return;
         }

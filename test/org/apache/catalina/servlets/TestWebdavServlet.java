@@ -18,6 +18,7 @@ package org.apache.catalina.servlets;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -46,46 +47,76 @@ import org.xml.sax.InputSource;
 
 public class TestWebdavServlet extends TomcatBaseTest {
 
-    /*
-     * Test attempting to access special paths (WEB-INF/META-INF) using WebdavServlet
-     */
     @Test
-    public void testGetSpecials() throws Exception {
+    public void testGetSpecial_allowSpecialPaths_rootdavcontext() throws Exception {
+        testGetSpecials(true, false);
+    }
+
+    @Test
+    public void testGetSpecial_allowSpecialPaths_nonrootdavcontext() throws Exception {
+        testGetSpecials(true, true);
+    }
+
+    @Test
+    public void testGetSpecial_disallowSpecialPaths_rootdavcontext() throws Exception {
+        testGetSpecials(false, false);
+    }
+
+    @Test
+    public void testGetSpecial_disallowSpecialPaths_nonrootdavcontext() throws Exception {
+        testGetSpecials(false, true);
+    }
+
+    /* Test attempting to access special paths (WEB-INF/META-INF) using WebdavServlet */
+    private void testGetSpecials(boolean allowSpecialPaths, boolean useSubpathWebdav) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         String contextPath = "/examples";
 
         File appDir = new File(getBuildDirectory(), "webapps" + contextPath);
+        try (FileWriter fw = new FileWriter(new File(appDir, "WEB-INFORMATION.xml"))) {
+            fw.write("<CheckSpecial>This is not a special file</CheckSpecial>");
+        }
         // app dir is relative to server home
         Context ctx = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
 
-        Tomcat.addServlet(ctx, "webdav", new WebdavServlet());
-        ctx.addServletMappingDecoded("/*", "webdav");
+        Wrapper webdavServlet = Tomcat.addServlet(ctx, "webdav", new WebdavServlet());
+
+        webdavServlet.addInitParameter("listings", "true");
+        webdavServlet.addInitParameter("allowSpecialPaths", allowSpecialPaths ? "true" : "false");
+        if (useSubpathWebdav) {
+            ctx.addServletMappingDecoded("/webdav/*", "webdav");
+            contextPath = contextPath + "/webdav";
+        } else {
+            ctx.addServletMappingDecoded("/*", "webdav");
+        }
 
         tomcat.start();
 
         final ByteChunk res = new ByteChunk();
 
-        int rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/WEB-INF/web.xml", res, null);
+        int rc = 0;
+
+        // Notice: Special paths /WEB-INF and /META-INF are protected by StandardContextValve.
+        // allowSpecialPaths works only when webdav re-mount to a non-root path.
+        rc = getUrl("http://localhost:" + getPort() + contextPath + "/WEB-INF/web.xml", res, null);
+        Assert.assertEquals(
+                useSubpathWebdav && allowSpecialPaths ? HttpServletResponse.SC_OK : HttpServletResponse.SC_NOT_FOUND,
+                rc);
+
+        rc = getUrl("http://localhost:" + getPort() + contextPath + "/WEB-INF/doesntexistanywhere", res, null);
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
-        rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/WEB-INF/doesntexistanywhere", res, null);
+        rc = getUrl("http://localhost:" + getPort() + contextPath + "/META-INF/context.xml", res, null);
+        Assert.assertEquals(
+                useSubpathWebdav && allowSpecialPaths ? HttpServletResponse.SC_OK : HttpServletResponse.SC_NOT_FOUND,
+                rc);
+
+        rc = getUrl("http://localhost:" + getPort() + contextPath + "/META-INF/doesntexistanywhere", res, null);
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
-        rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/WEB-INF/", res, null);
-        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
-
-        rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/META-INF/MANIFEST.MF", res, null);
-        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
-
-        rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/META-INF/doesntexistanywhere", res, null);
-        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
-
+        rc = getUrl("http://localhost:" + getPort() + contextPath + "/WEB-INFORMATION.xml", res, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
     /*
