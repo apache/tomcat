@@ -95,7 +95,7 @@ import org.xml.sax.SAXException;
  *    &lt;/init-param&gt;
  *    &lt;init-param&gt;
  *      &lt;param-name&gt;listings&lt;/param-name&gt;
- *      &lt;param-value&gt;false&lt;/param-value&gt;
+ *      &lt;param-value&gt;true&lt;/param-value&gt;
  *    &lt;/init-param&gt;
  *  &lt;/servlet&gt;
  *  &lt;servlet-mapping&gt;
@@ -104,7 +104,7 @@ import org.xml.sax.SAXException;
  *  &lt;/servlet-mapping&gt;
  * </pre>
  *
- * This will enable read only access. To enable read-write access add:
+ * This will enable read only access with folder listings enabled. To enable read-write access add:
  *
  * <pre>
  *  &lt;init-param&gt;
@@ -122,7 +122,7 @@ import org.xml.sax.SAXException;
  *  &lt;/servlet-mapping&gt;
  * </pre>
  *
- * By default access to /WEB-INF and META-INF are not available via WebDAV. To enable access to these URLs, use add:
+ * By default access to /WEB-INF and META-INF are not available via WebDAV. To enable access to these URLs, add:
  *
  * <pre>
  *  &lt;init-param&gt;
@@ -142,7 +142,7 @@ import org.xml.sax.SAXException;
  * interface and configuring the Servlet to use that store. The <code>propertyStore</code> init-param allows configuring
  * the classname of the store to use, while the parameters in the form of <code>store.xxx</code> will be set on the
  * store object as bean properties. For example, this would configure a store with class
- * <code>com.MyPropertyStore</code>, and set its field <code>myName</code> to value <code>myValue</code>:
+ * <code>com.MyPropertyStore</code>, and set its property <code>myName</code> to value <code>myValue</code>:
  *
  * <pre>
  *  &lt;init-param&gt;
