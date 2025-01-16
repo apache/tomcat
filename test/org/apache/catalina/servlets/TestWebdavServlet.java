@@ -18,11 +18,13 @@ package org.apache.catalina.servlets;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.SAXParserFactory;
@@ -45,46 +47,85 @@ import org.xml.sax.InputSource;
 
 public class TestWebdavServlet extends TomcatBaseTest {
 
-    /*
-     * Test attempting to access special paths (WEB-INF/META-INF) using WebdavServlet
-     */
     @Test
-    public void testGetSpecials() throws Exception {
+    public void testGetSpecial_allowSpecialPaths_rootdavcontext() throws Exception {
+        testGetSpecials(true, false);
+    }
+
+    @Test
+    public void testGetSpecial_allowSpecialPaths_nonrootdavcontext() throws Exception {
+        testGetSpecials(true, true);
+    }
+
+    @Test
+    public void testGetSpecial_disallowSpecialPaths_rootdavcontext() throws Exception {
+        testGetSpecials(false, false);
+    }
+
+    @Test
+    public void testGetSpecial_disallowSpecialPaths_nonrootdavcontext() throws Exception {
+        testGetSpecials(false, true);
+    }
+
+    /* Test attempting to access special paths (WEB-INF/META-INF) using WebdavServlet */
+    private void testGetSpecials(boolean allowSpecialPaths, boolean useSubpathWebdav) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        String contextPath = "/examples";
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-specialpath"+UUID.randomUUID());
+        Assert.assertTrue("Failed to mkdirs on "+tempWebapp.getCanonicalPath(),tempWebapp.mkdirs());
+        Assert.assertTrue(new File(tempWebapp,"WEB-INF").mkdir());
+        Assert.assertTrue(new File(tempWebapp,"META-INF").mkdir());
+        try (FileWriter fw = new FileWriter(new File(tempWebapp, "WEB-INF-desc.xml"))) {
+            fw.write("<CheckSpecial>This is not a special file</CheckSpecial>");
+        }
+        try (FileWriter fw = new FileWriter(new File(tempWebapp, "WEB-INF/web.xml"))) {
+            fw.write("<web>...</web>");
+        }
+        try (FileWriter fw = new FileWriter(new File(tempWebapp, "META-INF/context.xml"))) {
+            fw.write("<context>...</context>");
+        }
 
-        File appDir = new File(getBuildDirectory(), "webapps" + contextPath);
-        // app dir is relative to server home
-        Context ctx = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        Context ctx = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctx, "webdav", new WebdavServlet());
 
-        Tomcat.addServlet(ctx, "webdav", new WebdavServlet());
-        ctx.addServletMappingDecoded("/*", "webdav");
+        webdavServlet.addInitParameter("listings", "true");
+        webdavServlet.addInitParameter("allowSpecialPaths", allowSpecialPaths ? "true" : "false");
+
+        String contextPath="";
+        if (useSubpathWebdav) {
+            ctx.addServletMappingDecoded("/webdav/*", "webdav");
+            contextPath = "/webdav";
+        } else {
+            ctx.addServletMappingDecoded("/*", "webdav");
+        }
 
         tomcat.start();
 
         final ByteChunk res = new ByteChunk();
 
-        int rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/WEB-INF/web.xml", res, null);
+        int rc = 0;
+
+        // Notice: Special paths /WEB-INF and /META-INF are protected by StandardContextValve.
+        // allowSpecialPaths works only when webdav re-mount to a non-root path.
+        rc = getUrl("http://localhost:" + getPort() + contextPath + "/WEB-INF/web.xml", res, null);
+        Assert.assertEquals(
+                useSubpathWebdav && allowSpecialPaths ? HttpServletResponse.SC_OK : HttpServletResponse.SC_NOT_FOUND,
+                rc);
+
+        rc = getUrl("http://localhost:" + getPort() + contextPath + "/WEB-INF/doesntexistanywhere", res, null);
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
-        rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/WEB-INF/doesntexistanywhere", res, null);
+        rc = getUrl("http://localhost:" + getPort() + contextPath + "/META-INF/context.xml", res, null);
+        Assert.assertEquals(
+                useSubpathWebdav && allowSpecialPaths ? HttpServletResponse.SC_OK : HttpServletResponse.SC_NOT_FOUND,
+                rc);
+
+        rc = getUrl("http://localhost:" + getPort() + contextPath + "/META-INF/doesntexistanywhere", res, null);
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
 
-        rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/WEB-INF/", res, null);
-        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
-
-        rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/META-INF/MANIFEST.MF", res, null);
-        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
-
-        rc =getUrl("http://localhost:" + getPort() + contextPath +
-                "/META-INF/doesntexistanywhere", res, null);
-        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, rc);
-
+        rc = getUrl("http://localhost:" + getPort() + contextPath + "/WEB-INF-desc.xml", res, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
     /*
