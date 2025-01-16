@@ -239,6 +239,12 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Documentation. Expand the description of the security implications of
+        setting <code>mapperContextRootRedirectEnabled</code> and/or
+        <code>mapperDirectoryRedirectEnabled</code> to <code>true</code>.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
