@@ -438,17 +438,25 @@
       <attribute name="mapperContextRootRedirectEnabled" required="false">
         <p>If enabled, requests for a web application context root will be
         redirected (adding a trailing slash) if necessary by the Mapper rather
-        than the default Servlet. This is more efficient but has the side effect
-        of confirming that the context path exists. If not specified, the
-        default value of <code>true</code> is used.</p>
+        than the default Servlet. This is more efficient but there are security
+        side effects. First, the existance of a web application or a directory
+        may be confirmed even though the user does not have access to that
+        directory. Secondly, any Valves and/or Filters - including those
+        providing security functionality - will not have an opportunity to
+        process the request. If not specified, the default value of
+        <code>true</code> is used.</p>
       </attribute>
 
       <attribute name="mapperDirectoryRedirectEnabled" required="false">
         <p>If enabled, requests for a web application directory will be
         redirected (adding a trailing slash) if necessary by the Mapper rather
-        than the default Servlet. This is more efficient but has the side effect
-        of confirming that the directory is exists. If not specified, the
-        default value of <code>false</code> is used.</p>
+        than the default Servlet. This is more efficient but there are security
+        side effects. First, the existance of a web application or a directory
+        may be confirmed even though the user does not have access to that
+        directory. Secondly, any Valves and/or Filters - including those
+        providing security functionality - will not have an opportunity to
+        process the request. If not specified, the default value of
+        <code>false</code> is used.</p>
       </attribute>
 
       <attribute name="override" required="false">
