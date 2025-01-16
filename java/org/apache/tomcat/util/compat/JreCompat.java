@@ -40,9 +40,8 @@ import javax.security.auth.Subject;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This is the base implementation class for JRE compatibility and provides an
- * implementation based on Java 8. Sub-classes may extend this class and provide
- * alternative implementations for later JRE versions
+ * This is the base implementation class for JRE compatibility and provides an implementation based on Java 8.
+ * Sub-classes may extend this class and provide alternative implementations for later JRE versions
  */
 public class JreCompat {
 
@@ -181,13 +180,11 @@ public class JreCompat {
     // Java 8 implementation of Java 9 methods
 
     /**
-     * Test if the provided exception is an instance of
-     * java.lang.reflect.InaccessibleObjectException.
+     * Test if the provided exception is an instance of java.lang.reflect.InaccessibleObjectException.
      *
      * @param t The exception to test
      *
-     * @return {@code true} if the exception is an instance of
-     *         InaccessibleObjectException, otherwise {@code false}
+     * @return {@code true} if the exception is an instance of InaccessibleObjectException, otherwise {@code false}
      */
     public boolean isInstanceOfInaccessibleObjectException(Throwable t) {
         // Exception does not exist prior to Java 9
@@ -199,8 +196,7 @@ public class JreCompat {
      * Set the application protocols the server will accept for ALPN
      *
      * @param sslParameters The SSL parameters for a connection
-     * @param protocols     The application protocols to be allowed for that
-     *                      connection
+     * @param protocols     The application protocols to be allowed for that connection
      */
     public void setApplicationProtocols(SSLParameters sslParameters, String[] protocols) {
         if (setApplicationProtocolsMethod != null) {
@@ -216,11 +212,9 @@ public class JreCompat {
 
 
     /**
-     * Get the application protocol that has been negotiated for connection
-     * associated with the given SSLEngine.
+     * Get the application protocol that has been negotiated for connection associated with the given SSLEngine.
      *
-     * @param sslEngine The SSLEngine for which to obtain the negotiated
-     *                  protocol
+     * @param sslEngine The SSLEngine for which to obtain the negotiated protocol
      *
      * @return The name of the negotiated protocol
      */
@@ -238,8 +232,8 @@ public class JreCompat {
 
 
     /**
-     * Disables caching for JAR URL connections. For Java 8 and earlier, this also disables
-     * caching for ALL URL connections.
+     * Disables caching for JAR URL connections. For Java 8 and earlier, this also disables caching for ALL URL
+     * connections.
      *
      * @throws IOException If a dummy JAR URLConnection can not be created
      */
@@ -253,11 +247,9 @@ public class JreCompat {
 
 
     /**
-     * Obtains the URLs for all the JARs on the module path when the JVM starts
-     * and adds them to the provided Deque.
+     * Obtains the URLs for all the JARs on the module path when the JVM starts and adds them to the provided Deque.
      *
-     * @param classPathUrlsToProcess    The Deque to which the modules should be
-     *                                  added
+     * @param classPathUrlsToProcess The Deque to which the modules should be added
      */
     public void addBootModulePath(Deque<URL> classPathUrlsToProcess) {
         // NO-OP for Java 8. There is no module path.
@@ -265,15 +257,14 @@ public class JreCompat {
 
 
     /**
-     * Creates a new JarFile instance. When running on Java 9 and later, the
-     * JarFile will be multi-release JAR aware. While this isn't strictly
-     * required to be in this package, it is provided as a convenience method.
+     * Creates a new JarFile instance. When running on Java 9 and later, the JarFile will be multi-release JAR aware.
+     * While this isn't strictly required to be in this package, it is provided as a convenience method.
      *
      * @param s The JAR file to open
      *
      * @return A JarFile instance based on the provided path
      *
-     * @throws IOException  If an I/O error occurs creating the JarFile instance
+     * @throws IOException If an I/O error occurs creating the JarFile instance
      */
     public final JarFile jarFileNewInstance(String s) throws IOException {
         return jarFileNewInstance(new File(s));
@@ -281,14 +272,13 @@ public class JreCompat {
 
 
     /**
-     * Creates a new JarFile instance. When running on Java 9 and later, the
-     * JarFile will be multi-release JAR aware.
+     * Creates a new JarFile instance. When running on Java 9 and later, the JarFile will be multi-release JAR aware.
      *
      * @param f The JAR file to open
      *
      * @return A JarFile instance based on the provided file
      *
-     * @throws IOException  If an I/O error occurs creating the JarFile instance
+     * @throws IOException If an I/O error occurs creating the JarFile instance
      */
     public JarFile jarFileNewInstance(File f) throws IOException {
         return new JarFile(f);
@@ -298,10 +288,9 @@ public class JreCompat {
     /**
      * Is this JarFile a multi-release JAR file.
      *
-     * @param jarFile   The JarFile to test
+     * @param jarFile The JarFile to test
      *
-     * @return {@code true} If it is a multi-release JAR file and is configured
-     *         to behave as such.
+     * @return {@code true} If it is a multi-release JAR file and is configured to behave as such.
      */
     public boolean jarFileIsMultiRelease(JarFile jarFile) {
         // Java 8 doesn't support multi-release so default to false
@@ -315,14 +304,12 @@ public class JreCompat {
 
 
     /**
-     * Is the accessibleObject accessible (as a result of appropriate module
-     * exports) on the provided instance?
+     * Is the accessibleObject accessible (as a result of appropriate module exports) on the provided instance?
      *
-     * @param base  The specific instance to be tested.
-     * @param accessibleObject  The method/field/constructor to be tested.
+     * @param base             The specific instance to be tested.
+     * @param accessibleObject The method/field/constructor to be tested.
      *
-     * @return {code true} if the AccessibleObject can be accessed otherwise
-     *         {code false}
+     * @return {code true} if the AccessibleObject can be accessed otherwise {code false}
      */
     public boolean canAccess(Object base, AccessibleObject accessibleObject) {
         // Java 8 doesn't support modules so default to true
@@ -333,10 +320,9 @@ public class JreCompat {
     /**
      * Is the given class in an exported package?
      *
-     * @param type  The class to test
+     * @param type The class to test
      *
-     * @return Always {@code true} for Java 8. {@code true} if the enclosing
-     *         package is exported for Java 9+
+     * @return Always {@code true} for Java 8. {@code true} if the enclosing package is exported for Java 9+
      */
     public boolean isExported(Class<?> type) {
         return true;
@@ -346,10 +332,9 @@ public class JreCompat {
     /**
      * What is the module of the given class?
      *
-     * @param type  The class to test
+     * @param type The class to test
      *
-     * @return Always {@code true} for Java 8. {@code true} if the enclosing
-     *         package is exported for Java 9+
+     * @return Always {@code true} for Java 8. {@code true} if the enclosing package is exported for Java 9+
      */
     public String getModuleName(Class<?> type) {
         return "NO_MODULE_JAVA_8";
@@ -360,7 +345,9 @@ public class JreCompat {
 
     /**
      * Return Unix domain socket address for given path.
+     *
      * @param path The path
+     *
      * @return the socket address
      */
     public SocketAddress getUnixDomainSocketAddress(String path) {
@@ -370,6 +357,7 @@ public class JreCompat {
 
     /**
      * Create server socket channel using the Unix domain socket ProtocolFamily.
+     *
      * @return the server socket channel
      */
     public ServerSocketChannel openUnixDomainServerSocketChannel() {
@@ -379,6 +367,7 @@ public class JreCompat {
 
     /**
      * Create socket channel using the Unix domain socket ProtocolFamily.
+     *
      * @return the socket channel
      */
     public SocketChannel openUnixDomainSocketChannel() {

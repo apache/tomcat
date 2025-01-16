@@ -68,11 +68,9 @@ public class Jre19Compat extends Jre16Compat {
                 return null;
             }
 
-            if (task!= null && task.getClass().getCanonicalName() != null &&
-                    (task.getClass().getCanonicalName().equals(
-                            "org.apache.tomcat.util.threads.ThreadPoolExecutor.Worker") ||
-                            task.getClass().getCanonicalName().equals(
-                                    "java.util.concurrent.ThreadPoolExecutor.Worker"))) {
+            if (task != null && task.getClass().getCanonicalName() != null && (task.getClass().getCanonicalName()
+                    .equals("org.apache.tomcat.util.threads.ThreadPoolExecutor.Worker") ||
+                    task.getClass().getCanonicalName().equals("java.util.concurrent.ThreadPoolExecutor.Worker"))) {
                 Field executorField = task.getClass().getDeclaredField("this$0");
                 executorField.setAccessible(true);
                 result = executorField.get(task);

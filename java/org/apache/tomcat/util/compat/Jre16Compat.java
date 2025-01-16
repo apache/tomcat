@@ -70,8 +70,7 @@ class Jre16Compat extends Jre9Compat {
     public SocketAddress getUnixDomainSocketAddress(String path) {
         try {
             return (SocketAddress) unixDomainSocketAddressOfMethod.invoke(null, path);
-        } catch (IllegalAccessException | IllegalArgumentException
-                | InvocationTargetException e) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
     }
@@ -80,8 +79,8 @@ class Jre16Compat extends Jre9Compat {
     @Override
     public ServerSocketChannel openUnixDomainServerSocketChannel() {
         try {
-            return (ServerSocketChannel) openServerSocketChannelFamilyMethod.invoke
-                    (null, StandardProtocolFamily.valueOf("UNIX"));
+            return (ServerSocketChannel) openServerSocketChannelFamilyMethod.invoke(null,
+                    StandardProtocolFamily.valueOf("UNIX"));
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
@@ -91,8 +90,7 @@ class Jre16Compat extends Jre9Compat {
     @Override
     public SocketChannel openUnixDomainSocketChannel() {
         try {
-            return (SocketChannel) openSocketChannelFamilyMethod.invoke
-                    (null, StandardProtocolFamily.valueOf("UNIX"));
+            return (SocketChannel) openSocketChannelFamilyMethod.invoke(null, StandardProtocolFamily.valueOf("UNIX"));
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }

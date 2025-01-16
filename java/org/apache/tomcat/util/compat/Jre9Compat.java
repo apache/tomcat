@@ -203,8 +203,7 @@ class Jre9Compat extends JreCompat {
     @Override
     public JarFile jarFileNewInstance(File f) throws IOException {
         try {
-            return jarFileConstructor.newInstance(
-                    f, Boolean.TRUE, Integer.valueOf(ZipFile.OPEN_READ), RUNTIME_VERSION);
+            return jarFileConstructor.newInstance(f, Boolean.TRUE, Integer.valueOf(ZipFile.OPEN_READ), RUNTIME_VERSION);
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             throw new IOException(e);
         }
