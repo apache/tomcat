@@ -183,6 +183,16 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Documentation. Expand the description of the security implications of
+        setting <code>mapperContextRootRedirectEnabled</code> and/or
+        <code>mapperDirectoryRedirectEnabled</code> to <code>true</code>.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
