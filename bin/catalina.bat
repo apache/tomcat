@@ -203,6 +203,13 @@ set "JSSE_OPTS=-Djdk.tls.ephemeralDHKeySize=2048"
 :gotJsseOpts
 set "JAVA_OPTS=%JAVA_OPTS% %JSSE_OPTS%"
 
+rem Disable the global canonical file name cache to protect against CVE-2024-56337
+rem Note: The cache is disabled by default in Java 12 to 20 inclusive
+rem       The cache is removed in Java 21 onwards
+rem Need to set this here as java.io.FileSystem caches this in a static field during class
+rem initialisation so it needs to be set before any file system access
+set "JAVA_OPTS=%JAVA_OPTS% -Dsun.io.useCanonCaches=false"
+
 if not "%CATALINA_LOGGING_CONFIG%" == "" goto noJuliConfig
 set CATALINA_LOGGING_CONFIG=-Dnop
 if not exist "%CATALINA_BASE%\conf\logging.properties" goto noJuliConfig
