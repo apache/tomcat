@@ -37,6 +37,8 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.security.auth.Subject;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -44,6 +46,9 @@ import org.apache.tomcat.util.res.StringManager;
  * Sub-classes may extend this class and provide alternative implementations for later JRE versions
  */
 public class JreCompat {
+
+    private static final Log log = LogFactory.getLog(Jre21Compat.class);
+    private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
     private static final int RUNTIME_MAJOR_VERSION = 8;
 
@@ -55,8 +60,8 @@ public class JreCompat {
     private static final boolean jre19Available;
     private static final boolean jre21Available;
     private static final boolean jre22Available;
-    private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
+    private static final Field useCanonCachesField;
     protected static final Method setApplicationProtocolsMethod;
     protected static final Method getApplicationProtocolMethod;
 
@@ -118,6 +123,21 @@ public class JreCompat {
             jre9Available = false;
         }
         jre11Available = instance.jarFileRuntimeMajorVersion() >= 11;
+
+        Field f1 = null;
+        try {
+            Class<?> clazz = Class.forName("java.io.FileSystem");
+            f1 = clazz.getDeclaredField("useCanonCaches");
+            f1.setAccessible(true);
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            /*
+             * Log at debug level as this will only be an issue if the field needs to be accessed and most
+             * configurations will not need to do so. Appropriate warnings will be logged if an attempt is made to use
+             * the field when it could not be found/accessed.
+             */
+            log.debug(sm.getString("jreCompat.useCanonCaches.init"), e);
+        }
+        useCanonCachesField = f1;
 
         Method m1 = null;
         Method m2 = null;
@@ -481,5 +501,52 @@ public class JreCompat {
         } catch (Exception e) {
             throw new CompletionException(e);
         }
+    }
+
+
+    /*
+     * The behaviour of the canonical file cache varies by Java version.
+     *
+     * The cache was removed in Java 21 so these methods and the associated code can be removed once the minimum Java
+     * version is 21.
+     *
+     * For 12 <= Java <= 20, the cache was present but disabled by default. Since the user may have changed the default
+     * Tomcat has to assume the cache is enabled unless proven otherwise.
+     *
+     * For Java < 12, the cache was enabled by default. Tomcat assumes the cache is enabled unless proven otherwise.
+     */
+    public boolean isCanonCachesDisabled() {
+        if (useCanonCachesField == null) {
+            // No need to log a warning. The warning will be logged when trying to disable the cache.
+            return false;
+        }
+        boolean result = false;
+        try {
+            result = !((Boolean) useCanonCachesField.get(null)).booleanValue();
+        } catch (ReflectiveOperationException e) {
+            // No need to log a warning. The warning will be logged when trying to disable the cache.
+        }
+        return result;
+    }
+
+
+    /**
+     * Disable the global canonical file cache.
+     *
+     * @return {@code true} if the global canonical file cache was already disabled prior to this call or was disabled
+     *             as a result of this call, otherwise {@code false}
+     */
+    public boolean disableCanonCaches() {
+        if (useCanonCachesField == null) {
+            log.warn(sm.getString("jreCompat.useCanonCaches.none"));
+            return false;
+        }
+        try {
+            useCanonCachesField.set(null, Boolean.TRUE);
+        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+            log.warn(sm.getString("jreCompat.useCanonCaches.failed"), e);
+            return false;
+        }
+        return true;
     }
 }

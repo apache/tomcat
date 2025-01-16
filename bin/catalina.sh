@@ -268,6 +268,13 @@ JAVA_OPTS="$JAVA_OPTS $JSSE_OPTS"
 # Do this here so custom URL handles (specifically 'war:...') can be used in the security policy
 JAVA_OPTS="$JAVA_OPTS -Djava.protocol.handler.pkgs=org.apache.catalina.webresources"
 
+# Disable the global canonical file name cache to protect against CVE-2024-56337
+# Note: The cache is disabled by default in Java 12 to 20 inclusive
+#       The cache is removed in Java 21 onwards
+# Need to set this here as java.io.FileSystem caches this in a static field during class
+# initialisation so it needs to be set before any file system access
+JAVA_OPTS="$JAVA_OPTS -Dsun.io.useCanonCaches=false"
+
 # Check for the deprecated LOGGING_CONFIG
 # Only use it if CATALINA_LOGGING_CONFIG is not set and LOGGING_CONFIG starts with "-D..."
 if [ -z "$CATALINA_LOGGING_CONFIG" ]; then
