@@ -43,12 +43,23 @@ import org.w3c.dom.Node;
 /**
  * WebDAV dead properties storage using a DataSource.
  * <p>
- * The schema is:
- * table properties ( path, namespace, name, node )
- * path: the resource path
- * namespace: the node namespace
- * name: the local name in the namespace
- * node: the full serialized XML node including the name
+ * A single properties table with four columns is used:
+ * <ul>
+ * <li>path: the resource path</li>
+ * <li>namespace: the node namespace</li>
+ * <li>name: the local name in the namespace</li>
+ * <li>node: the full serialized XML node including the name</li>
+ * </ul>
+ * The table name used can be configured using the <code>tableName</code> property of the store.
+ * <p>
+ * Example table schema:
+ * <code>CREATE TABLE properties (
+ *    path         VARCHAR(1024) NOT NULL,
+ *    namespace    VARCHAR(64) NOT NULL,
+ *    name         VARCHAR(64) NOT NULL,
+ *    node         VARCHAR(2048) NOT NULL,
+ *    PRIMARY KEY (path, namespace, name)
+ * )</code>
  */
 public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
 
