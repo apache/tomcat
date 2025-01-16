@@ -29,9 +29,8 @@ import javax.security.auth.Subject;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This is the base implementation class for JRE compatibility and provides an
- * implementation based on Java 11. Sub-classes may extend this class and provide
- * alternative implementations for later JRE versions
+ * This is the base implementation class for JRE compatibility and provides an implementation based on Java 11.
+ * Sub-classes may extend this class and provide alternative implementations for later JRE versions
  */
 public class JreCompat {
 
@@ -125,7 +124,9 @@ public class JreCompat {
 
     /**
      * Return Unix domain socket address for given path.
+     *
      * @param path The path
+     *
      * @return the socket address
      */
     public SocketAddress getUnixDomainSocketAddress(String path) {
@@ -135,6 +136,7 @@ public class JreCompat {
 
     /**
      * Create server socket channel using the Unix domain socket ProtocolFamily.
+     *
      * @return the server socket channel
      */
     public ServerSocketChannel openUnixDomainServerSocketChannel() {
@@ -144,6 +146,7 @@ public class JreCompat {
 
     /**
      * Create socket channel using the Unix domain socket ProtocolFamily.
+     *
      * @return the socket channel
      */
     public SocketChannel openUnixDomainSocketChannel() {
