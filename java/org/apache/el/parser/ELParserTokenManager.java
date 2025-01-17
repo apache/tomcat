@@ -754,127 +754,124 @@ public class ELParserTokenManager implements ELParserConstants {
     }
 
     static final long[] jjbitVec3 =
-            { 0xfff0000040220002L, 0xffffffffffffdfffL, 0xfffff02fffffffffL, 0x12000000007fffffL };
-    static final long[] jjbitVec4 = { 0x20000000L, 0x2000L, 0x0L, 0x0L };
-    static final long[] jjbitVec5 = { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0x0L };
-    static final long[] jjbitVec6 = { 0x0L, 0x0L, 0x420043c00000000L, 0xff7fffffff7fffffL };
-    static final long[] jjbitVec7 = { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0x501f0003ffc3L };
-    static final long[] jjbitVec8 = { 0x0L, 0xbcdf000000000000L, 0xfffffffbffffd740L, 0xffbfffffffffffffL };
-    static final long[] jjbitVec9 =
+            { 0xfff0000040220002L, 0xffffffffffffdfffL, 0xfffff02f7fffffffL, 0x12000000007fffffL };
+    static final long[] jjbitVec4 = { 0x0L, 0x0L, 0x420043c00000000L, 0xff7fffffff7fffffL };
+    static final long[] jjbitVec5 = { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0x501f0003ffc3L };
+    static final long[] jjbitVec6 = { 0x0L, 0xbcdf000000000000L, 0xfffffffbffffd740L, 0xffbfffffffffffffL };
+    static final long[] jjbitVec7 =
             { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xfffffffffffffc03L, 0xffffffffffffffffL };
-    static final long[] jjbitVec10 = { 0xfffeffffffffffffL, 0xffffffff027fffffL, 0x81ffL, 0x787ffffff0000L };
-    static final long[] jjbitVec11 =
+    static final long[] jjbitVec8 = { 0xfffeffffffffffffL, 0xfffffffe027fffffL, 0x80ffL, 0x707ffffff0000L };
+    static final long[] jjbitVec9 =
             { 0xffffffff00000800L, 0xfffec000000007ffL, 0xffffffffffffffffL, 0x9c00c060002fffffL };
-    static final long[] jjbitVec12 = { 0xfffffffd0000L, 0xffffffffffffe000L, 0x2003fffffffffL, 0xc43007fffffffc00L };
-    static final long[] jjbitVec13 = { 0x110043fffffL, 0xffff07ff01ffffffL, 0xffffffff00007effL, 0x3ffL };
-    static final long[] jjbitVec14 =
+    static final long[] jjbitVec10 = { 0xfffffffd0000L, 0xffffffffffffe000L, 0x2003fffffffffL, 0x43007fffffffc00L };
+    static final long[] jjbitVec11 = { 0x110043fffffL, 0x7ff01ffffffL, 0x3fdfffff00000000L, 0x0L };
+    static final long[] jjbitVec12 =
             { 0x23fffffffffffff0L, 0xfffe0003ff010000L, 0x23c5fdfffff99fe1L, 0x180f0003b0004000L };
-    static final long[] jjbitVec15 = { 0x36dfdfffff987e0L, 0x1c00005e000000L, 0x23edfdfffffbbfe0L, 0x202000300010000L };
-    static final long[] jjbitVec16 = { 0x23edfdfffff99fe0L, 0x20003b0000000L, 0x3ffc718d63dc7e8L, 0x200000000010000L };
-    static final long[] jjbitVec17 = { 0x23fffdfffffddfe0L, 0x327000000L, 0x23effdfffffddfe1L, 0x6000360000000L };
-    static final long[] jjbitVec18 = { 0x27fffffffffddff0L, 0xfc00000380704000L, 0x2ffbfffffc7fffe0L, 0x7fL };
-    static final long[] jjbitVec19 = { 0x800dfffffffffffeL, 0x7fL, 0x200dffaffffff7d6L, 0xf000005fL };
-    static final long[] jjbitVec20 = { 0x1L, 0x1ffffffffeffL, 0x1f00L, 0x0L };
-    static final long[] jjbitVec21 =
+    static final long[] jjbitVec13 = { 0x36dfdfffff987e0L, 0x1c00005e000000L, 0x23edfdfffffbbfe0L, 0x202000300010000L };
+    static final long[] jjbitVec14 = { 0x23edfdfffff99fe0L, 0x20003b0000000L, 0x3ffc718d63dc7e8L, 0x200000000010000L };
+    static final long[] jjbitVec15 = { 0x23fffdfffffddfe0L, 0x307000000L, 0x23effdfffffddfe1L, 0x6000340000000L };
+    static final long[] jjbitVec16 = { 0x27fffffffffddfe0L, 0xfc00000380704000L, 0x2ffbfffffc7fffe0L, 0x7fL };
+    static final long[] jjbitVec17 = { 0x800dfffffffffffeL, 0x7fL, 0x200decaefef02596L, 0xf000005fL };
+    static final long[] jjbitVec18 = { 0x1L, 0x1ffffffffeffL, 0x1f00L, 0x0L };
+    static final long[] jjbitVec19 =
             { 0x800007ffffffffffL, 0xffe1c0623c3f0000L, 0xffffffff00004003L, 0xf7ffffffffff20bfL };
-    static final long[] jjbitVec22 =
+    static final long[] jjbitVec20 =
             { 0xffffffffffffffffL, 0xffffffff3d7f3dffL, 0x7f3dffffffff3dffL, 0xffffffffff7fff3dL };
-    static final long[] jjbitVec23 = { 0xffffffffff3dffffL, 0x7ffffffL, 0xffffffff0000ffffL, 0x3f3fffffffffffffL };
-    static final long[] jjbitVec24 =
+    static final long[] jjbitVec21 = { 0xffffffffff3dffffL, 0x7ffffffL, 0xffffffff0000ffffL, 0x3f3fffffffffffffL };
+    static final long[] jjbitVec22 =
             { 0xffffffffffffffffL, 0xffff9fffffffffffL, 0xffffffff07fffffeL, 0x1ffc7ffffffffffL };
-    static final long[] jjbitVec25 = { 0x3ffff8003ffffL, 0x1dfff0003ffffL, 0xfffffffffffffL, 0x18800000L };
-    static final long[] jjbitVec26 =
-            { 0xffffffff00000000L, 0x1ffffffffffffffL, 0xffff05ffffffff9fL, 0x3fffffffffffffL };
-    static final long[] jjbitVec27 = { 0x7fffffffL, 0x1f3fffffff0000L, 0xffff0fffffffffffL, 0x3ffL };
-    static final long[] jjbitVec28 = { 0xffffffff007fffffL, 0x1fffffL, 0x8000000000L, 0x0L };
-    static final long[] jjbitVec29 = { 0xfffffffffffe0L, 0x1fe0L, 0xfc00c001fffffff8L, 0x3fffffffffL };
-    static final long[] jjbitVec30 = { 0xfffffffffL, 0x3ffffffffc00e000L, 0xe7ffffffffff01ffL, 0x46fde0000000000L };
-    static final long[] jjbitVec31 =
+    static final long[] jjbitVec23 = { 0x3ffff0003dfffL, 0x1dfff0003ffffL, 0xfffffffffffffL, 0x18800000L };
+    static final long[] jjbitVec24 = { 0xffffffff00000000L, 0xffffffffffffffL, 0xffff05ffffffff9fL, 0x3fffffffffffffL };
+    static final long[] jjbitVec25 = { 0x7fffffffL, 0x1f3fffffff0000L, 0xffff0fffffffffffL, 0x3ffL };
+    static final long[] jjbitVec26 = { 0xffffffff007fffffL, 0x1fffffL, 0x8000000000L, 0x0L };
+    static final long[] jjbitVec27 = { 0xfffffffffffe0L, 0xfe0L, 0xfc00c001fffffff8L, 0x3fffffffffL };
+    static final long[] jjbitVec28 = { 0xfffffffffL, 0x3ffffffffc00e000L, 0x1ffL, 0x63de0000000000L };
+    static final long[] jjbitVec29 = { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0x0L };
+    static final long[] jjbitVec30 =
             { 0xffffffff3f3fffffL, 0x3fffffffaaff3f3fL, 0x5fdfffffffffffffL, 0x1fdc1fff0fcf1fdcL };
-    static final long[] jjbitVec32 = { 0x8000000000000000L, 0x8002000000100001L, 0xffffffff1fff0000L, 0x1L };
-    static final long[] jjbitVec33 = { 0xf3ffbd503e2ffc84L, 0xffffffff000043e0L, 0x1ffL, 0x0L };
-    static final long[] jjbitVec34 =
-            { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0xc781fffffffffL };
-    static final long[] jjbitVec35 = { 0xffff20bfffffffffL, 0x80ffffffffffL, 0x7f7f7f7f007fffffL, 0x7f7f7f7fL };
-    static final long[] jjbitVec36 = { 0x800000000000L, 0x0L, 0x0L, 0x0L };
-    static final long[] jjbitVec37 =
+    static final long[] jjbitVec31 = { 0x8000000000000000L, 0x8002000000100001L, 0xffffffff1fff0000L, 0x0L };
+    static final long[] jjbitVec32 = { 0xf3ffbd503e2ffc84L, 0xffffffff000043e0L, 0x1ffL, 0x0L };
+    static final long[] jjbitVec33 =
+            { 0xffff7fffffffffffL, 0xffffffff7fffffffL, 0xffffffffffffffffL, 0xc781fffffffffL };
+    static final long[] jjbitVec34 = { 0xffff20bfffffffffL, 0x80ffffffffffL, 0x7f7f7f7f007fffffL, 0x7f7f7f7fL };
+    static final long[] jjbitVec35 = { 0x800000000000L, 0x0L, 0x0L, 0x0L };
+    static final long[] jjbitVec36 =
             { 0x1f3e03fe000000e0L, 0xfffffffffffffffeL, 0xfffffffee07fffffL, 0xf7ffffffffffffffL };
-    static final long[] jjbitVec38 =
-            { 0xfffeffffffffffe0L, 0xffffffffffffffffL, 0xffffffff00007fffL, 0xffff000000000000L };
-    static final long[] jjbitVec39 = { 0xffffffffffffffffL, 0xffffffffffffffffL, 0x1fffL, 0x3fffffffffff0000L };
-    static final long[] jjbitVec40 = { 0xc00ffff1fffL, 0x80007fffffffffffL, 0xffffffff3fffffffL, 0xffffffffffffL };
-    static final long[] jjbitVec41 =
-            { 0xfffffffcff800000L, 0xffffffffffffffffL, 0xfffffffffffff9ffL, 0xfffc000003eb07ffL };
-    static final long[] jjbitVec42 = { 0x1000007fffff7bbL, 0xfffffffffffffL, 0xffffffffffffcL, 0x68fc000000000000L };
-    static final long[] jjbitVec43 =
+    static final long[] jjbitVec37 =
+            { 0xfffe7fffffffffe0L, 0xffffffffffffffffL, 0x7ffffff00007fffL, 0xffff000000000000L };
+    static final long[] jjbitVec38 = { 0xffffffffffffffffL, 0xffffffffffffffffL, 0x3fffffffffffffL, 0x0L };
+    static final long[] jjbitVec39 = { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0x7ffffffffffL };
+    static final long[] jjbitVec40 = { 0xffffffffffffffffL, 0xffffffffffffffffL, 0x1fffL, 0x3fffffffffff0000L };
+    static final long[] jjbitVec41 = { 0xc00ffff1fffL, 0x80007fffffffffffL, 0xffffffff3fffffffL, 0xffffffffffffL };
+    static final long[] jjbitVec42 =
+            { 0xfffffffcff800000L, 0xffffffffffffffffL, 0xff7ffffffff9ffL, 0xff80000000000000L };
+    static final long[] jjbitVec43 = { 0x1000007fffff7bbL, 0xfffffffffffffL, 0xffffffffffffcL, 0x28fc000000000000L };
+    static final long[] jjbitVec44 =
             { 0xffff003ffffffc00L, 0x1fffffff0000007fL, 0x7fffffffffff0L, 0x7c00ffdf00008000L };
-    static final long[] jjbitVec44 = { 0x1ffffffffffL, 0xc47fffff00000ff7L, 0x3e62ffffffffffffL, 0x1c07ff38000005L };
-    static final long[] jjbitVec45 = { 0xffff7f7f007e7e7eL, 0xffff03fff7ffffffL, 0xffffffffffffffffL, 0x7ffffffffL };
-    static final long[] jjbitVec46 =
+    static final long[] jjbitVec45 = { 0x1ffffffffffL, 0xc47fffff00000ff7L, 0x3e62ffffffffffffL, 0x1c07ff38000005L };
+    static final long[] jjbitVec46 = { 0xffff7f7f007e7e7eL, 0xffff003ff7ffffffL, 0xffffffffffffffffL, 0x7ffffffffL };
+    static final long[] jjbitVec47 =
             { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffff000fffffffffL, 0xffffffffffff87fL };
-    static final long[] jjbitVec47 = { 0xffffffffffffffffL, 0xffff3fffffffffffL, 0xffffffffffffffffL, 0x3ffffffL };
-    static final long[] jjbitVec48 =
-            { 0x5f7ffdffa0f8007fL, 0xffffffffffffffdbL, 0x3ffffffffffffL, 0xfffffffffff80000L };
+    static final long[] jjbitVec48 = { 0xffffffffffffffffL, 0xffff3fffffffffffL, 0xffffffffffffffffL, 0x3ffffffL };
     static final long[] jjbitVec49 =
-            { 0x3fffffffffffffffL, 0xffffffffffff0000L, 0xfffffffffffcffffL, 0x1fff0000000000ffL };
+            { 0x5f7ffdffa0f8007fL, 0xffffffffffffffdbL, 0x3ffffffffffffL, 0xfffffffffff80000L };
     static final long[] jjbitVec50 =
+            { 0x3fffffffffffffffL, 0xffffffffffff0000L, 0xfffffffffffcffffL, 0x1fff0000000000ffL };
+    static final long[] jjbitVec51 =
             { 0x18000000000000L, 0xffdf02000000e000L, 0xffffffffffffffffL, 0x1fffffffffffffffL };
-    static final long[] jjbitVec51 = { 0x87fffffe00000010L, 0xffffffc007fffffeL, 0x7fffffffffffffffL, 0x631cfcfcfcL };
-    static final long[] jjbitVec52 =
-            { 0xfff0000060220002L, 0xffffffffffffdfffL, 0xfffff02fffffffffL, 0x12000000007fffffL };
+    static final long[] jjbitVec52 = { 0x87fffffe00000010L, 0xffffffc007fffffeL, 0x7fffffffffffffffL, 0x631cfcfcfcL };
     static final long[] jjbitVec53 = { 0x0L, 0x0L, 0x420243cffffffffL, 0xff7fffffff7fffffL };
     static final long[] jjbitVec54 =
             { 0xffffffffffffffffL, 0xbcdfffffffffffffL, 0xfffffffbffffd740L, 0xffbfffffffffffffL };
     static final long[] jjbitVec55 =
             { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xfffffffffffffcfbL, 0xffffffffffffffffL };
     static final long[] jjbitVec56 =
-            { 0xfffeffffffffffffL, 0xffffffff027fffffL, 0xbffffffffffe81ffL, 0x787ffffff00b6L };
+            { 0xfffeffffffffffffL, 0xfffffffe027fffffL, 0xbffffffffffe80ffL, 0x707ffffff00b6L };
     static final long[] jjbitVec57 =
             { 0xffffffff17ff083fL, 0xffffc3ffffffffffL, 0xffffffffffffffffL, 0x9ffffdffbfefffffL };
-    static final long[] jjbitVec58 =
-            { 0xffffffffffff8000L, 0xffffffffffffe7ffL, 0x3ffffffffffffL, 0xe43fffffffffffffL };
-    static final long[] jjbitVec59 = { 0x3fffffffffffL, 0xffff07ff0fffffffL, 0xffffffffff037effL, 0xffffffffffffffffL };
+    static final long[] jjbitVec58 = { 0xffffffffffff8000L, 0xffffffffffffe7ffL, 0x3ffffffffffffL, 0x43fffffffffffffL };
+    static final long[] jjbitVec59 = { 0x3fffffffffffL, 0x7ff0fffffffL, 0x3fdfffff00000000L, 0xfffffffffff00000L };
     static final long[] jjbitVec60 =
-            { 0xffffffffffffffffL, 0xfffeffcfffffffffL, 0xf3c5fdfffff99fefL, 0x580fffcfb080799fL };
+            { 0xffffffffffffffffL, 0xfffeffcfffffffffL, 0xf3c5fdfffff99fefL, 0x180fffcfb080799fL };
     static final long[] jjbitVec61 =
             { 0xd36dfdfffff987eeL, 0x3fffc05e023987L, 0xf3edfdfffffbbfeeL, 0xfe02ffcf00013bbfL };
-    static final long[] jjbitVec62 = { 0xf3edfdfffff99feeL, 0x2ffcfb0e0399fL, 0xc3ffc718d63dc7ecL, 0x200ffc000813dc7L };
-    static final long[] jjbitVec63 = { 0xf3fffdfffffddfffL, 0xffcf27603ddfL, 0xf3effdfffffddfefL, 0xeffcf60603ddfL };
+    static final long[] jjbitVec62 = { 0xf3edfdfffff99feeL, 0x2ffcfb0c0399fL, 0xc3ffc718d63dc7ecL, 0x200ffc000813dc7L };
+    static final long[] jjbitVec63 = { 0xe3fffdfffffddfefL, 0xffcf07603ddfL, 0xf3effdfffffddfefL, 0x6ffcf40603ddfL };
     static final long[] jjbitVec64 =
-            { 0xfffffffffffddfffL, 0xfc00ffcf80f07ddfL, 0x2ffbfffffc7fffeeL, 0xcffc0ff5f847fL };
-    static final long[] jjbitVec65 = { 0x87fffffffffffffeL, 0x3ff7fffL, 0x3fffffaffffff7d6L, 0xf3ff7f5fL };
+            { 0xfffffffffffddfefL, 0xfc00ffcf80f07ddfL, 0x2ffbfffffc7fffecL, 0xcffc0ff5f847fL };
+    static final long[] jjbitVec65 = { 0x87fffffffffffffeL, 0x3ff7fffL, 0x3bffecaefef02596L, 0xf3ff3f5fL };
     static final long[] jjbitVec66 = { 0xc2a003ff03000001L, 0xfffe1ffffffffeffL, 0x1ffffffffeffffdfL, 0x40L };
     static final long[] jjbitVec67 =
             { 0xffffffffffffffffL, 0xffffffffffff03ffL, 0xffffffff3fffffffL, 0xf7ffffffffff20bfL };
     static final long[] jjbitVec68 = { 0xffffffffff3dffffL, 0xe7ffffffL, 0xffffffff0000ffffL, 0x3f3fffffffffffffL };
-    static final long[] jjbitVec69 = { 0x1fffff803fffffL, 0xddfff000fffffL, 0xffffffffffffffffL, 0x3ff388fffffL };
-    static final long[] jjbitVec70 =
-            { 0xffffffff03fff800L, 0x1ffffffffffffffL, 0xffff07ffffffffffL, 0x3fffffffffffffL };
+    static final long[] jjbitVec69 = { 0x1fffff001fdfffL, 0xddfff000fffffL, 0xffffffffffffffffL, 0x3ff388fffffL };
+    static final long[] jjbitVec70 = { 0xffffffff03ff7800L, 0xffffffffffffffL, 0xffff07ffffffffffL, 0x3fffffffffffffL };
     static final long[] jjbitVec71 = { 0xfff0fff7fffffffL, 0x1f3fffffffffc0L, 0xffff0fffffffffffL, 0x3ff03ffL };
-    static final long[] jjbitVec72 = { 0xffffffff0fffffffL, 0x9fffffff7fffffffL, 0xbfff008003ff03ffL, 0x7fffL };
-    static final long[] jjbitVec73 = { 0xffffffffffffffffL, 0xff80003ff1fffL, 0xffffffffffffffffL, 0xfffffffffffffL };
-    static final long[] jjbitVec74 =
-            { 0xffffffffffffffL, 0x3fffffffffffe3ffL, 0xe7ffffffffff01ffL, 0x7fffffffff70000L };
+    static final long[] jjbitVec72 = { 0xffffffff0fffffffL, 0x9fffffff7fffffffL, 0x3fff008003ff03ffL, 0x0L };
+    static final long[] jjbitVec73 = { 0xffffffffffffffffL, 0xff80003ff0fffL, 0xffffffffffffffffL, 0xfffffffffffffL };
+    static final long[] jjbitVec74 = { 0xffffffffffffffL, 0x3fffffffffffe3ffL, 0x1ffL, 0x3fffffffff70000L };
     static final long[] jjbitVec75 =
-            { 0x80007c000000f800L, 0x8002ffdf00100001L, 0xffffffff1fff0000L, 0x1ffe21fff0001L };
+            { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0xfbffffffffffffffL };
     static final long[] jjbitVec76 =
-            { 0xffffffffffffffffL, 0xffffffffffffffffL, 0xffffffffffffffffL, 0xff81fffffffffL };
+            { 0x80007c000000f800L, 0x8002ffdf00100001L, 0xffffffff1fff0000L, 0x1ffe21fff0000L };
     static final long[] jjbitVec77 =
-            { 0xffff20bfffffffffL, 0x800080ffffffffffL, 0x7f7f7f7f007fffffL, 0xffffffff7f7f7f7fL };
+            { 0xffff7fffffffffffL, 0xffffffff7fffffffL, 0xffffffffffffffffL, 0xff81fffffffffL };
     static final long[] jjbitVec78 =
+            { 0xffff20bfffffffffL, 0x800080ffffffffffL, 0x7f7f7f7f007fffffL, 0xffffffff7f7f7f7fL };
+    static final long[] jjbitVec79 =
             { 0x1f3efffe000000e0L, 0xfffffffffffffffeL, 0xfffffffee67fffffL, 0xf7ffffffffffffffL };
-    static final long[] jjbitVec79 = { 0xfffffff1fffL, 0xbff0ffffffffffffL, 0xffffffffffffffffL, 0x3ffffffffffffL };
-    static final long[] jjbitVec80 = { 0x10010ffffffffffL, 0xfffffffffffffL, 0xffffffffffffffffL, 0xe8ffffff03ff003fL };
-    static final long[] jjbitVec81 =
+    static final long[] jjbitVec80 = { 0xfffffff1fffL, 0xbff0ffffffffffffL, 0xffffffffffffffffL, 0x3ffffffffffffL };
+    static final long[] jjbitVec81 = { 0x10000ffffffffffL, 0xfffffffffffffL, 0xffffffffffffffffL, 0x28ffffff03ff003fL };
+    static final long[] jjbitVec82 =
             { 0xffff3fffffffffffL, 0x1fffffff000fffffL, 0xffffffffffffffffL, 0x7fffffff03ff8001L };
-    static final long[] jjbitVec82 = { 0x7fffffffffffffL, 0xfc7fffff03ff3fffL, 0xffffffffffffffffL, 0x7cffff38000007L };
-    static final long[] jjbitVec83 =
-            { 0xffff7f7f007e7e7eL, 0xffff03fff7ffffffL, 0xffffffffffffffffL, 0x3ff37ffffffffffL };
+    static final long[] jjbitVec83 = { 0x7fffffffffffffL, 0xfc7fffff03ff3fffL, 0xffffffffffffffffL, 0x7cffff38000007L };
     static final long[] jjbitVec84 =
-            { 0x5f7ffdffe0f8007fL, 0xffffffffffffffdbL, 0x3ffffffffffffL, 0xfffffffffff80000L };
+            { 0xffff7f7f007e7e7eL, 0xffff003ff7ffffffL, 0xffffffffffffffffL, 0x3ff37ffffffffffL };
     static final long[] jjbitVec85 =
-            { 0x18ffff0000ffffL, 0xffdf02000000e000L, 0xffffffffffffffffL, 0x9fffffffffffffffL };
+            { 0x5f7ffdffe0f8007fL, 0xffffffffffffffdbL, 0x3ffffffffffffL, 0xfffffffffff80000L };
     static final long[] jjbitVec86 =
+            { 0x18ffff0000ffffL, 0xffdf02000000e000L, 0xffffffffffffffffL, 0x9fffffffffffffffL };
+    static final long[] jjbitVec87 =
             { 0x87fffffe03ff0010L, 0xffffffc007fffffeL, 0x7fffffffffffffffL, 0xe0000631cfcfcfcL };
 
     private int jjMoveNfa_2(int startState, int curPos) {
@@ -2239,107 +2236,106 @@ public class ELParserTokenManager implements ELParserConstants {
     private static final boolean jjCanMove_1(int hiByte, int i1, int i2, long l1, long l2) {
         switch (hiByte) {
             case 0:
-                return ((jjbitVec6[i2] & l2) != 0L);
+                return ((jjbitVec4[i2] & l2) != 0L);
             case 2:
-                return ((jjbitVec7[i2] & l2) != 0L);
+                return ((jjbitVec5[i2] & l2) != 0L);
             case 3:
-                return ((jjbitVec8[i2] & l2) != 0L);
+                return ((jjbitVec6[i2] & l2) != 0L);
             case 4:
-                return ((jjbitVec9[i2] & l2) != 0L);
+                return ((jjbitVec7[i2] & l2) != 0L);
             case 5:
-                return ((jjbitVec10[i2] & l2) != 0L);
+                return ((jjbitVec8[i2] & l2) != 0L);
             case 6:
-                return ((jjbitVec11[i2] & l2) != 0L);
+                return ((jjbitVec9[i2] & l2) != 0L);
             case 7:
-                return ((jjbitVec12[i2] & l2) != 0L);
+                return ((jjbitVec10[i2] & l2) != 0L);
             case 8:
-                return ((jjbitVec13[i2] & l2) != 0L);
+                return ((jjbitVec11[i2] & l2) != 0L);
             case 9:
-                return ((jjbitVec14[i2] & l2) != 0L);
+                return ((jjbitVec12[i2] & l2) != 0L);
             case 10:
-                return ((jjbitVec15[i2] & l2) != 0L);
+                return ((jjbitVec13[i2] & l2) != 0L);
             case 11:
-                return ((jjbitVec16[i2] & l2) != 0L);
+                return ((jjbitVec14[i2] & l2) != 0L);
             case 12:
-                return ((jjbitVec17[i2] & l2) != 0L);
+                return ((jjbitVec15[i2] & l2) != 0L);
             case 13:
-                return ((jjbitVec18[i2] & l2) != 0L);
+                return ((jjbitVec16[i2] & l2) != 0L);
             case 14:
-                return ((jjbitVec19[i2] & l2) != 0L);
+                return ((jjbitVec17[i2] & l2) != 0L);
             case 15:
-                return ((jjbitVec20[i2] & l2) != 0L);
+                return ((jjbitVec18[i2] & l2) != 0L);
             case 16:
-                return ((jjbitVec21[i2] & l2) != 0L);
+                return ((jjbitVec19[i2] & l2) != 0L);
             case 18:
-                return ((jjbitVec22[i2] & l2) != 0L);
+                return ((jjbitVec20[i2] & l2) != 0L);
             case 19:
-                return ((jjbitVec23[i2] & l2) != 0L);
+                return ((jjbitVec21[i2] & l2) != 0L);
             case 20:
                 return ((jjbitVec0[i2] & l2) != 0L);
             case 22:
-                return ((jjbitVec24[i2] & l2) != 0L);
+                return ((jjbitVec22[i2] & l2) != 0L);
             case 23:
-                return ((jjbitVec25[i2] & l2) != 0L);
+                return ((jjbitVec23[i2] & l2) != 0L);
             case 24:
-                return ((jjbitVec26[i2] & l2) != 0L);
+                return ((jjbitVec24[i2] & l2) != 0L);
             case 25:
-                return ((jjbitVec27[i2] & l2) != 0L);
+                return ((jjbitVec25[i2] & l2) != 0L);
             case 26:
-                return ((jjbitVec28[i2] & l2) != 0L);
+                return ((jjbitVec26[i2] & l2) != 0L);
             case 27:
-                return ((jjbitVec29[i2] & l2) != 0L);
+                return ((jjbitVec27[i2] & l2) != 0L);
             case 28:
-                return ((jjbitVec30[i2] & l2) != 0L);
+                return ((jjbitVec28[i2] & l2) != 0L);
+            case 29:
+                return ((jjbitVec29[i2] & l2) != 0L);
             case 31:
-                return ((jjbitVec31[i2] & l2) != 0L);
+                return ((jjbitVec30[i2] & l2) != 0L);
             case 32:
-                return ((jjbitVec32[i2] & l2) != 0L);
+                return ((jjbitVec31[i2] & l2) != 0L);
             case 33:
-                return ((jjbitVec33[i2] & l2) != 0L);
+                return ((jjbitVec32[i2] & l2) != 0L);
             case 44:
-                return ((jjbitVec34[i2] & l2) != 0L);
+                return ((jjbitVec33[i2] & l2) != 0L);
             case 45:
-                return ((jjbitVec35[i2] & l2) != 0L);
+                return ((jjbitVec34[i2] & l2) != 0L);
             case 46:
-                return ((jjbitVec36[i2] & l2) != 0L);
+                return ((jjbitVec35[i2] & l2) != 0L);
             case 48:
-                return ((jjbitVec37[i2] & l2) != 0L);
+                return ((jjbitVec36[i2] & l2) != 0L);
             case 49:
+                return ((jjbitVec37[i2] & l2) != 0L);
+            case 77:
                 return ((jjbitVec38[i2] & l2) != 0L);
-            case 164:
+            case 159:
                 return ((jjbitVec39[i2] & l2) != 0L);
-            case 166:
+            case 164:
                 return ((jjbitVec40[i2] & l2) != 0L);
-            case 167:
+            case 166:
                 return ((jjbitVec41[i2] & l2) != 0L);
-            case 168:
+            case 167:
                 return ((jjbitVec42[i2] & l2) != 0L);
-            case 169:
+            case 168:
                 return ((jjbitVec43[i2] & l2) != 0L);
-            case 170:
+            case 169:
                 return ((jjbitVec44[i2] & l2) != 0L);
-            case 171:
+            case 170:
                 return ((jjbitVec45[i2] & l2) != 0L);
-            case 215:
+            case 171:
                 return ((jjbitVec46[i2] & l2) != 0L);
-            case 250:
+            case 215:
                 return ((jjbitVec47[i2] & l2) != 0L);
-            case 251:
+            case 250:
                 return ((jjbitVec48[i2] & l2) != 0L);
-            case 253:
+            case 251:
                 return ((jjbitVec49[i2] & l2) != 0L);
-            case 254:
+            case 253:
                 return ((jjbitVec50[i2] & l2) != 0L);
-            case 255:
+            case 254:
                 return ((jjbitVec51[i2] & l2) != 0L);
+            case 255:
+                return ((jjbitVec52[i2] & l2) != 0L);
             default:
-                if ((jjbitVec4[i1] & l1) != 0L) {
-                    if ((jjbitVec5[i2] & l2) == 0L) {
-                        return false;
-                    } else {
-                        return true;
-                    }
-                }
                 if ((jjbitVec3[i1] & l1) != 0L) {
                     return true;
                 }
@@ -2352,7 +2348,7 @@ public class ELParserTokenManager implements ELParserConstants {
             case 0:
                 return ((jjbitVec53[i2] & l2) != 0L);
             case 2:
-                return ((jjbitVec7[i2] & l2) != 0L);
+                return ((jjbitVec5[i2] & l2) != 0L);
             case 3:
                 return ((jjbitVec54[i2] & l2) != 0L);
             case 4:
@@ -2382,13 +2378,13 @@ public class ELParserTokenManager implements ELParserConstants {
             case 16:
                 return ((jjbitVec67[i2] & l2) != 0L);
             case 18:
-                return ((jjbitVec22[i2] & l2) != 0L);
+                return ((jjbitVec20[i2] & l2) != 0L);
             case 19:
                 return ((jjbitVec68[i2] & l2) != 0L);
             case 20:
                 return ((jjbitVec0[i2] & l2) != 0L);
             case 22:
-                return ((jjbitVec24[i2] & l2) != 0L);
+                return ((jjbitVec22[i2] & l2) != 0L);
             case 23:
                 return ((jjbitVec69[i2] & l2) != 0L);
             case 24:
@@ -2401,52 +2397,56 @@ public class ELParserTokenManager implements ELParserConstants {
                 return ((jjbitVec73[i2] & l2) != 0L);
             case 28:
                 return ((jjbitVec74[i2] & l2) != 0L);
-            case 31:
-                return ((jjbitVec31[i2] & l2) != 0L);
-            case 32:
+            case 29:
                 return ((jjbitVec75[i2] & l2) != 0L);
-            case 33:
-                return ((jjbitVec33[i2] & l2) != 0L);
-            case 44:
+            case 31:
+                return ((jjbitVec30[i2] & l2) != 0L);
+            case 32:
                 return ((jjbitVec76[i2] & l2) != 0L);
-            case 45:
+            case 33:
+                return ((jjbitVec32[i2] & l2) != 0L);
+            case 44:
                 return ((jjbitVec77[i2] & l2) != 0L);
-            case 46:
-                return ((jjbitVec36[i2] & l2) != 0L);
-            case 48:
+            case 45:
                 return ((jjbitVec78[i2] & l2) != 0L);
-            case 49:
-                return ((jjbitVec38[i2] & l2) != 0L);
-            case 77:
-                return ((jjbitVec5[i2] & l2) != 0L);
-            case 164:
-                return ((jjbitVec39[i2] & l2) != 0L);
-            case 166:
+            case 46:
+                return ((jjbitVec35[i2] & l2) != 0L);
+            case 48:
                 return ((jjbitVec79[i2] & l2) != 0L);
-            case 167:
-                return ((jjbitVec41[i2] & l2) != 0L);
-            case 168:
+            case 49:
+                return ((jjbitVec37[i2] & l2) != 0L);
+            case 77:
+                return ((jjbitVec38[i2] & l2) != 0L);
+            case 159:
+                return ((jjbitVec39[i2] & l2) != 0L);
+            case 164:
+                return ((jjbitVec40[i2] & l2) != 0L);
+            case 166:
                 return ((jjbitVec80[i2] & l2) != 0L);
-            case 169:
+            case 167:
+                return ((jjbitVec42[i2] & l2) != 0L);
+            case 168:
                 return ((jjbitVec81[i2] & l2) != 0L);
-            case 170:
+            case 169:
                 return ((jjbitVec82[i2] & l2) != 0L);
-            case 171:
+            case 170:
                 return ((jjbitVec83[i2] & l2) != 0L);
-            case 215:
-                return ((jjbitVec46[i2] & l2) != 0L);
-            case 250:
-                return ((jjbitVec47[i2] & l2) != 0L);
-            case 251:
+            case 171:
                 return ((jjbitVec84[i2] & l2) != 0L);
-            case 253:
-                return ((jjbitVec49[i2] & l2) != 0L);
-            case 254:
+            case 215:
+                return ((jjbitVec47[i2] & l2) != 0L);
+            case 250:
+                return ((jjbitVec48[i2] & l2) != 0L);
+            case 251:
                 return ((jjbitVec85[i2] & l2) != 0L);
-            case 255:
+            case 253:
+                return ((jjbitVec50[i2] & l2) != 0L);
+            case 254:
                 return ((jjbitVec86[i2] & l2) != 0L);
+            case 255:
+                return ((jjbitVec87[i2] & l2) != 0L);
             default:
-                if ((jjbitVec52[i1] & l1) != 0L) {
+                if ((jjbitVec3[i1] & l1) != 0L) {
                     return true;
                 }
                 return false;
