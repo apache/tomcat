@@ -18,13 +18,16 @@ package org.apache.el.util;
 
 public class Validation {
 
-    // Java keywords, boolean literals & the null literal in alphabetical order
-    private static final String invalidIdentifiers[] = { "abstract", "assert", "boolean", "break", "byte", "case",
+    /*
+     * Java keywords, boolean literals & the null literal in alphabetical order. As per the Java Language Specification,
+     * none of these are permitted to be used as an identifier.
+     */
+    private static final String invalidIdentifiers[] = { "_", "abstract", "assert", "boolean", "break", "byte", "case",
             "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends",
             "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int",
             "interface", "long", "native", "new", "null", "package", "private", "protected", "public", "return",
             "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient",
-            "true", "try", "void", "volatile", "while" };
+            "true", "try", "void", "volatile", "while"};
 
     private static final boolean SKIP_IDENTIFIER_CHECK =
             Boolean.getBoolean("org.apache.el.parser.SKIP_IDENTIFIER_CHECK");
