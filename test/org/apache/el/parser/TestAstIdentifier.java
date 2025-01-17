@@ -16,10 +16,15 @@
  */
 package org.apache.el.parser;
 
+import jakarta.el.ELContext;
 import jakarta.el.ELProcessor;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.ValueExpression;
 
 import org.junit.Assert;
 import org.junit.Test;
+
+import org.apache.jasper.el.ELContextImpl;
 
 public class TestAstIdentifier {
 
@@ -42,5 +47,47 @@ public class TestAstIdentifier {
                 processor.getValue("MAX_VALUE",
                         Integer.class);
         Assert.assertEquals(Integer.valueOf(Integer.MAX_VALUE), result);
+    }
+
+
+    @Test
+    public void testIdentifierStart() {
+        for (int i = 0; i < 0xFFFF; i++) {
+            if (Character.isJavaIdentifierStart(i)) {
+                testIdentifier((char) i, 'b');
+            }
+        }
+    }
+
+
+    @Test
+    public void testIdentifierPart() {
+        for (int i = 0; i < 0xFFFF; i++) {
+            if (Character.isJavaIdentifierPart(i)) {
+                testIdentifier('b', (char) i);
+            }
+        }
+    }
+
+
+    private void testIdentifier(char one, char two) {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        String s = "OK";
+        ValueExpression var = factory.createValueExpression(s, String.class);
+
+        String identifier = new String(new char[] { one , two });
+        context.getVariableMapper().setVariable(identifier, var);
+
+        ValueExpression ve = null;
+        try {
+            ve = factory.createValueExpression(context, "${" + identifier + "}", String.class);
+        } catch (Exception e) {
+            System.out.println("" + (int) one + " " + (int) two);
+            throw e;
+        }
+
+        Assert.assertEquals(s, ve.getValue(context));
     }
 }
