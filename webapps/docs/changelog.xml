@@ -186,6 +186,11 @@
         contained parameters. Pull request <pr>803</pr> provided by Chenjp.
         (markt)
       </fix>
+      <fix>
+        <bug>69521</bug>: Update the EL Parser to allow the full range of valid
+        characters in an EL identifier as defined by the Java Language
+        Specification. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
