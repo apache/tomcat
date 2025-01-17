@@ -167,6 +167,11 @@
         Improve checks for <code>WEB-INF</code> and <code>META-INF</code> in
         the WebDAV servlet. Based on a patch submitted by Chenjp. (remm)
       </fix>
+      <fix>
+        Remove unused session to client map from
+        <code>CrawlerSessionManagerValve</code>. Submitted by Brian Matzon.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
