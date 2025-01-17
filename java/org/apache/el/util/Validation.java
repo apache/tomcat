@@ -87,16 +87,12 @@ public class Validation {
             }
         }
 
-        // Check the start character that has more restrictions
-        if (!Character.isJavaIdentifierStart(key.charAt(0))) {
+        /*
+         * The parser checks Character.isJavaIdentifierStart() and Character.isJavaIdentifierPart() so no need to check
+         * them again here. However, we do need to check that '#' hasn't been used at the start of the identifier.
+         */
+        if (key.charAt(0) == '#') {
             return false;
-        }
-
-        // Check each remaining character used is permitted
-        for (int idx = 1; idx < key.length(); idx++) {
-            if (!Character.isJavaIdentifierPart(key.charAt(idx))) {
-                return false;
-            }
         }
 
         return true;
