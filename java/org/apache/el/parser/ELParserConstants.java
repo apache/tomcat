@@ -118,9 +118,9 @@ public interface ELParserConstants {
     /** RegularExpression Id. */
     int IMPL_OBJ_START = 58;
     /** RegularExpression Id. */
-    int LETTER = 59;
+    int JAVALETTER = 59;
     /** RegularExpression Id. */
-    int DIGIT = 60;
+    int JAVADIGIT = 60;
     /** RegularExpression Id. */
     int ILLEGAL_CHARACTER = 61;
 
@@ -138,7 +138,7 @@ public interface ELParserConstants {
             "\":\"", "\";\"", "\",\"", "\">\"", "\"gt\"", "\"<\"", "\"lt\"", "\">=\"", "\"ge\"", "\"<=\"", "\"le\"",
             "\"==\"", "\"eq\"", "\"!=\"", "\"ne\"", "\"!\"", "\"not\"", "\"&&\"", "\"and\"", "\"||\"", "\"or\"",
             "\"empty\"", "\"instanceof\"", "\"*\"", "\"+\"", "\"-\"", "\"?\"", "\"/\"", "\"div\"", "\"%\"", "\"mod\"",
-            "\"+=\"", "\"=\"", "\"->\"", "<IDENTIFIER>", "<FUNCTIONSUFFIX>", "\"#\"", "<LETTER>", "<DIGIT>",
+            "\"+=\"", "\"=\"", "\"->\"", "<IDENTIFIER>", "<FUNCTIONSUFFIX>", "\"#\"", "<JAVALETTER>", "<JAVADIGIT>",
             "<ILLEGAL_CHARACTER>", };
 
 }
