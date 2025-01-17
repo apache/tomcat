@@ -21,6 +21,11 @@ import org.junit.Test;
 /*
  * The purpose of this class is to generate the ranges used in the JavaCC grammar for EL parsing.
  *
+ * The ranges for Tomcat 12 were generated with Java 21.
+ *
+ * The generated ranges are unchanged from Java 21 to Java 23.
+ *
+ * The generated ranges change in Java 24 (somewhere between EA 22 and EA 31).
  */
 public class TesterGenerateIdentifierRanges {
 
