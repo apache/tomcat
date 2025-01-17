@@ -149,6 +149,11 @@
         be confirmed that the JVM has been correctly configured, prevent the
         impacted web applications from starting. (markt)
       </add>
+      <fix>
+        Remove unused session to client map from
+        <code>CrawlerSessionManagerValve</code>. Submitted by Brian Matzon.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

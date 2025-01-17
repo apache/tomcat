@@ -46,7 +46,6 @@ public class CrawlerSessionManagerValve extends ValveBase {
     private static final Log log = LogFactory.getLog(CrawlerSessionManagerValve.class);
 
     private final Map<String,String> clientIdSessionId = new ConcurrentHashMap<>();
-    private final Map<String,String> sessionIdClientId = new ConcurrentHashMap<>();
 
     private String crawlerUserAgents = ".*[bB]ot.*|.*Yahoo! Slurp.*|.*Feedfetcher-Google.*";
     private Pattern uaPattern = null;
@@ -246,7 +245,6 @@ public class CrawlerSessionManagerValve extends ValveBase {
                 HttpSession s = request.getSession(false);
                 if (s != null) {
                     clientIdSessionId.put(clientIdentifier, s.getId());
-                    sessionIdClientId.put(s.getId(), clientIdentifier);
                     // #valueUnbound() will be called on session expiration
                     s.setAttribute(this.getClass().getName(),
                             new CrawlerHttpSessionBindingListener(clientIdSessionId, clientIdentifier));
