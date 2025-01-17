@@ -542,7 +542,7 @@ public class JreCompat {
             return false;
         }
         try {
-            useCanonCachesField.set(null, Boolean.TRUE);
+            useCanonCachesField.set(null, Boolean.FALSE);
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             log.warn(sm.getString("jreCompat.useCanonCaches.failed"), e);
             return false;
