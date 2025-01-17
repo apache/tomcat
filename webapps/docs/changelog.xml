@@ -239,6 +239,11 @@
         contained parameters. Pull request <pr>803</pr> provided by Chenjp.
         (markt)
       </fix>
+      <fix>
+        Update the identifier validation in the Expression Language parser to
+        reflect that, as of Java 9, <code>_</code> is also a Java keyword and
+        may not be used as an identifier. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
