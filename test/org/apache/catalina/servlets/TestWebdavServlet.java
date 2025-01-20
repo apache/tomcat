@@ -690,8 +690,83 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertEquals(WebdavStatus.SC_MULTI_STATUS, client.getStatusCode());
         Assert.assertFalse(client.getResponseBody().contains("/myfolder"));
         validateXml(client.getResponseBody());
-
     }
+
+
+    @Test
+    public void testCopyOutsideSubpath() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // Create a temp webapp that can be safely written to
+        File tempWebapp = new File(getTemporaryDirectory(), "webdav-subpath");
+        File subPath = new File(tempWebapp, "aaa");
+        Assert.assertTrue(subPath.mkdirs());
+
+        Context ctxt = tomcat.addContext("", tempWebapp.getAbsolutePath());
+        Wrapper webdavServlet = Tomcat.addServlet(ctxt, "webdav", new WebdavServlet());
+        webdavServlet.addInitParameter("listings", "true");
+        webdavServlet.addInitParameter("readonly", "false");
+        webdavServlet.addInitParameter("serveSubpathOnly", "true");
+        ctxt.addServletMappingDecoded("/aaa/*", "webdav");
+        tomcat.start();
+
+        ctxt.getResources().setCacheMaxSize(10);
+        ctxt.getResources().setCacheObjectMaxSize(1);
+
+        Client client = new Client();
+        client.setPort(getPort());
+
+        // Create a file
+        client.setRequest(new String[] { "PUT /aaa/file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Content-Length: 6" + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF + CONTENT });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        // Copy file1.txt to file2.txt
+        client.setRequest(new String[] { "COPY /aaa/file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Destination: http://localhost:" + getPort() + "/aaa/file2.txt"  + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        // Move file2.txt to file3.txt
+        client.setRequest(new String[] { "MOVE /aaa/file2.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Destination: http://localhost:" + getPort() + "/aaa/file3.txt"  + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_CREATED, client.getStatusCode());
+
+        // Copy file1.txt outside sub-path
+        client.setRequest(new String[] { "COPY /aaa/file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Destination: http://localhost:" + getPort() + "/file1.txt"  + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, client.getStatusCode());
+
+        // Move file1.txt outside sub-path
+        client.setRequest(new String[] { "MOVE /aaa/file1.txt HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
+                "Destination: http://localhost:" + getPort() + "/file1.txt"  + SimpleHttpClient.CRLF +
+                "Connection: Close" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF });
+        client.connect();
+        client.processRequest(true);
+        Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, client.getStatusCode());
+}
+
 
     @Test
     public void testSharedLocks() throws Exception {
