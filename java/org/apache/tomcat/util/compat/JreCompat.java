@@ -47,7 +47,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JreCompat {
 
-    private static final Log log = LogFactory.getLog(Jre21Compat.class);
+    private static final Log log = LogFactory.getLog(JreCompat.class);
     private static final StringManager sm = StringManager.getManager(JreCompat.class);
 
     private static final int RUNTIME_MAJOR_VERSION = 8;
