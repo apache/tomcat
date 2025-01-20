@@ -2085,7 +2085,12 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         // Cross-context operations aren't supported
         String reqContextPath = getPathPrefix(req);
-        if (!destinationPath.startsWith(reqContextPath + "/")) {
+        String expectedTargetPath = reqContextPath;
+        // Also ensure copy (and move) operations do not escape the configured sub-path when limited to the sub-path
+        if (serveSubpathOnly && req.getServletPath() != null) {
+            expectedTargetPath = expectedTargetPath + req.getServletPath();
+        }
+        if (!destinationPath.startsWith(expectedTargetPath + "/")) {
             resp.sendError(WebdavStatus.SC_FORBIDDEN);
             return false;
         }
