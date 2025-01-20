@@ -172,6 +172,11 @@
         <code>CrawlerSessionManagerValve</code>. Submitted by Brian Matzon.
         (remm)
       </fix>
+      <fix>
+        When using the WebDAV servlet with <code>serveSubpathOnly</code> set to
+        <code>true</code>, ensure that the destination for any requested WebDAV
+        operation is also restricted to the sub-path. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
