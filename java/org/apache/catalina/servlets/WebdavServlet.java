@@ -74,15 +74,29 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
- * Servlet which adds support for <a href="https://tools.ietf.org/html/rfc4918">WebDAV</a>
+ * This servlet adds support for <a href="https://tools.ietf.org/html/rfc4918">WebDAV</a>
  * <a href="https://tools.ietf.org/html/rfc4918#section-18">level 3</a>. All the basic HTTP requests are handled by the
- * DefaultServlet. The WebdavServlet must not be used as the default servlet (ie mapped to '/') as it will not work in
- * this configuration.
+ * DefaultServlet.
  * <p>
- * Mapping a subpath (e.g. <code>/webdav/*</code> to this servlet has the effect of re-mounting the entire web
- * application under that sub-path, with WebDAV access to all the resources. To restore the DefaultServlet behavior set
- * <code>serveSubpathOnly</code> to <code>true</code>. The <code>WEB-INF</code> and <code>META-INF</code> directories
- * are protected in this re-mounted resource tree.
+ * The WebDAV servlet is only designed for use with path mapping. The WebdavServlet must not be used as the default
+ * servlet (i.e. mapped to '/') or with any other mapping types as it will not work in those configurations.
+ * <p>
+ * By default, the entire web application is exposed via the WebDAV servlet. Mapping the WebDAV servlet to
+ * <code>/*</code> provides WebDAV access to all the resources within the web application. To aid separation of normal
+ * users and WebDAV users, the WebDAV servlet may be mounted at a sub-path (e.g. <code>/webdav/*</code>) which creates
+ * an additional mapping for the entire web application under that sub-path, with WebDAV access to all the resources.
+ * <p>
+ * By default, the <code>WEB-INF</code> and <code>META-INF</code> directories are not accessible via WebDAV. This may
+ * be changed by setting the <code>allowSpecialPaths</code> initialisation parameter to <code>true</code>.
+ * <p>
+ * It is also possible to enable WebDAV access to a sub-set of the standard web application URL space rather than
+ * creating an additional, WebDAV specific mapping. To do this, map the WebDAV servlet to the desired sub-path and set
+ * the <code>serveSubpathOnly</code> initialisation parameter to <code>true</code>.
+ * <p>
+ * Security constraints using the same URL pattern as the mapping (e.g. <code>/webdav/*</code>) can be used to limit the
+ * users with access to WebDAV functionality. Care is required if using security constraints to further limit WebDAV
+ * functionality. In particular, administrators should be aware that security constraints apply only to the request URL.
+ * Security constraints do not apply to any destination URL associated with the WebDAV operation (such as COPY or MOVE).
  * <p>
  * To enable WebDAV for a context add the following to web.xml:
  *
@@ -141,7 +155,7 @@ import org.xml.sax.SAXException;
  * values are not protected by the server, such as the content length of a resource). By default the Servlet will use
  * non persistent memory storage for them. Persistence can be achieved by implementing the <code>PropertyStore</code>
  * interface and configuring the Servlet to use that store. The <code>propertyStore</code> init-param allows configuring
- * the classname of the store to use, while the parameters in the form of <code>store.xxx</code> will be set on the
+ * the class name of the store to use, while the parameters in the form of <code>store.xxx</code> will be set on the
  * store object as bean properties. For example, this would configure a store with class
  * <code>com.MyPropertyStore</code>, and set its property <code>myName</code> to value <code>myValue</code>:
  *
