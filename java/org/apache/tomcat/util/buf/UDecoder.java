@@ -82,24 +82,6 @@ public final class UDecoder {
     /**
      * URLDecode, will modify the source. Assumes source bytes are encoded using a superset of US-ASCII as per RFC 7230.
      *
-     * @param mb                     The URL encoded bytes
-     * @param encodedSolidusHandling How should the %2f sequence handled by the decoder? For query strings this
-     *                                   parameter will be ignored and the %2f sequence will be decoded
-     *
-     * @throws IOException Invalid %xx URL encoding
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12. Use
-     *                 {@link #convert(ByteChunk, EncodedSolidusHandling, EncodedSolidusHandling)}
-     */
-    @Deprecated
-    public void convert(ByteChunk mb, EncodedSolidusHandling encodedSolidusHandling) throws IOException {
-        convert(mb, false, encodedSolidusHandling, EncodedSolidusHandling.DECODE);
-    }
-
-
-    /**
-     * URLDecode, will modify the source. Assumes source bytes are encoded using a superset of US-ASCII as per RFC 7230.
-     *
      * @param mb                            The URL encoded bytes
      * @param encodedSolidusHandling        How should the %2f sequence handled by the decoder? For query strings this
      *                                          parameter will be ignored and the %2f sequence will be decoded
