@@ -181,7 +181,7 @@
         Generate an appropriate <code>Allow</code> HTTP header when the Default
         servlet returns a 405 (method not allowed) response in response to a
         <code>DELETE</code> request because the target resource cannot be
-        deleted. (markt)
+        deleted. Pull request <pr>802</pr> provided by Chenjp. (markt)
       </fix>
     </changelog>
   </subsection>
