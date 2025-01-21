@@ -258,7 +258,13 @@ public class Connector extends LifecycleMBeanBase {
 
 
     /**
-     * The behavior when an encoded solidus (slash) is submitted.
+     * The behavior when an encoded reverse solidus (backslash - \) is submitted.
+     */
+    private EncodedSolidusHandling encodedReverseSolidusHandling = EncodedSolidusHandling.DECODE;
+
+
+    /**
+     * The behavior when an encoded solidus (slash - /) is submitted.
      */
     @SuppressWarnings("deprecation")
     private EncodedSolidusHandling encodedSolidusHandling =
@@ -863,6 +869,21 @@ public class Connector extends LifecycleMBeanBase {
 
     public UpgradeProtocol[] findUpgradeProtocols() {
         return protocolHandler.findUpgradeProtocols();
+    }
+
+
+    public String getEncodedReverseSolidusHandling() {
+        return encodedReverseSolidusHandling.getValue();
+    }
+
+
+    public void setEncodedReverseSolidusHandling(String encodedReverseSolidusHandling) {
+        this.encodedReverseSolidusHandling = EncodedSolidusHandling.fromString(encodedReverseSolidusHandling);
+    }
+
+
+    public EncodedSolidusHandling getEncodedReverseSolidusHandlingInternal() {
+        return encodedReverseSolidusHandling;
     }
 
 
