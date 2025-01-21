@@ -58,10 +58,12 @@ public final class UDecoder {
     /** %-encoded slash is forbidden in resource path */
     private static final IOException EXCEPTION_SLASH = new DecodeException(sm.getString("uDecoder.noSlash"));
 
+    /** %-encoded backslash is forbidden in resource path */
+    private static final IOException EXCEPTION_BACKSLASH = new DecodeException(sm.getString("uDecoder.noBackslash"));
 
     /**
      * URLDecode, will modify the source. Assumes source bytes are encoded using a superset of US-ASCII as per RFC 7230.
-     * "%2f" will be rejected unless the input is a query string.
+     * "%5c" will be decoded. "%2f" will be rejected unless the input is a query string.
      *
      * @param mb    The URL encoded bytes
      * @param query {@code true} if this is a query string. For a query string '+' will be decoded to ' '
@@ -70,9 +72,9 @@ public final class UDecoder {
      */
     public void convert(ByteChunk mb, boolean query) throws IOException {
         if (query) {
-            convert(mb, true, EncodedSolidusHandling.DECODE);
+            convert(mb, true, EncodedSolidusHandling.DECODE, EncodedSolidusHandling.DECODE);
         } else {
-            convert(mb, false, EncodedSolidusHandling.REJECT);
+            convert(mb, false, EncodedSolidusHandling.REJECT, EncodedSolidusHandling.DECODE);
         }
     }
 
@@ -85,14 +87,35 @@ public final class UDecoder {
      *                                   parameter will be ignored and the %2f sequence will be decoded
      *
      * @throws IOException Invalid %xx URL encoding
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12. Use
+     *                 {@link #convert(ByteChunk, EncodedSolidusHandling, EncodedSolidusHandling)}
      */
+    @Deprecated
     public void convert(ByteChunk mb, EncodedSolidusHandling encodedSolidusHandling) throws IOException {
-        convert(mb, false, encodedSolidusHandling);
+        convert(mb, false, encodedSolidusHandling, EncodedSolidusHandling.DECODE);
     }
 
 
-    private void convert(ByteChunk mb, boolean query, EncodedSolidusHandling encodedSolidusHandling)
-            throws IOException {
+    /**
+     * URLDecode, will modify the source. Assumes source bytes are encoded using a superset of US-ASCII as per RFC 7230.
+     *
+     * @param mb                            The URL encoded bytes
+     * @param encodedSolidusHandling        How should the %2f sequence handled by the decoder? For query strings this
+     *                                          parameter will be ignored and the %2f sequence will be decoded
+     * @param encodedReverseSolidusHandling How should the %5c sequence handled by the decoder? For query strings this
+     *                                          parameter will be ignored and the %5c sequence will be decoded
+     *
+     * @throws IOException Invalid %xx URL encoding
+     */
+    public void convert(ByteChunk mb, EncodedSolidusHandling encodedSolidusHandling,
+            EncodedSolidusHandling encodedReverseSolidusHandling) throws IOException {
+        convert(mb, false, encodedSolidusHandling, encodedReverseSolidusHandling);
+    }
+
+
+    private void convert(ByteChunk mb, boolean query, EncodedSolidusHandling encodedSolidusHandling,
+            EncodedSolidusHandling encodedReverseSolidusHandling) throws IOException {
 
         int start = mb.getStart();
         byte buff[] = mb.getBytes();
@@ -145,22 +168,33 @@ public final class UDecoder {
                             buff[idx] = buff[j];
                         }
                     }
+                } else if (res == '\\') {
+                        switch (encodedReverseSolidusHandling) {
+                            case DECODE: {
+                                buff[idx] = (byte) res;
+                                break;
+                            }
+                            case REJECT: {
+                                throw EXCEPTION_BACKSLASH;
+                            }
+                            case PASS_THROUGH: {
+                                buff[idx++] = buff[j - 2];
+                                buff[idx++] = buff[j - 1];
+                                buff[idx] = buff[j];
+                            }
+                        }
                 } else if (res == '%') {
                     /*
-                     * If encoded '/' is going to be left encoded then so must encoded '%' else the subsequent %nn
-                     * decoding will either fail or corrupt the output.
+                     * If encoded '/' or '\' is going to be left encoded then so must encoded '%' else the subsequent
+                     * %nn decoding will either fail or corrupt the output.
                      */
-                    switch (encodedSolidusHandling) {
-                        case DECODE:
-                        case REJECT: {
-                            buff[idx] = (byte) res;
-                            break;
-                        }
-                        case PASS_THROUGH: {
-                            buff[idx++] = buff[j - 2];
-                            buff[idx++] = buff[j - 1];
-                            buff[idx] = buff[j];
-                        }
+                    if (encodedSolidusHandling.equals(EncodedSolidusHandling.PASS_THROUGH) ||
+                            encodedReverseSolidusHandling.equals(EncodedSolidusHandling.PASS_THROUGH)) {
+                        buff[idx++] = buff[j - 2];
+                        buff[idx++] = buff[j - 1];
+                        buff[idx] = buff[j];
+                    } else {
+                        buff[idx] = (byte) res;
                     }
                 } else {
                     buff[idx] = (byte) res;
