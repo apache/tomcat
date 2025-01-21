@@ -721,7 +721,7 @@ public class DefaultServlet extends HttpServlet {
             if (resource.delete()) {
                 resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
             } else {
-                resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+                sendNotAllowed(req, resp);
             }
         } else {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND);
