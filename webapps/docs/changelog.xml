@@ -177,6 +177,12 @@
         <code>true</code>, ensure that the destination for any requested WebDAV
         operation is also restricted to the sub-path. (markt)
       </fix>
+      <fix>
+        Generate an appropriate <code>Allow</code> HTTP header when the Default
+        servlet returns a 405 (method not allowed) response in response to a
+        <code>DELETE</code> request because the target resource cannot be
+        deleted. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
