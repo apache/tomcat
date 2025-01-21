@@ -218,6 +218,10 @@
       <update>
         Update to Commons Daemon 1.4.1. (markt)
       </update>
+      <update>
+        Update the packaged version of the Tomcat Migration Tool for Jakarta EE
+        to 1.0.9. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
