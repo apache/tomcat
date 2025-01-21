@@ -116,6 +116,27 @@
       By default, DNS lookups are disabled.</p>
     </attribute>
 
+    <attribute name="encodedReverseSolidusHandling" required="false">
+      <p>When set to <code>reject</code> request paths containing a
+      <code>%5c</code> sequence will be rejected with a 400 response. When set
+      to <code>decode</code> request paths containing a <code>%5c</code>
+      sequence will have that sequence decoded to <code>\</code> at the same
+      time other <code>%nn</code> sequences are decoded. When set to
+      <code>passthrough</code> request paths containing a <code>%5c</code>
+      sequence will be processed with the <code>%5c</code> sequence unchanged.
+      </p>
+      <p>When set to <code>decoded</code>, the <strong>allowBackslash</strong>
+      attribute will be applied after decoding.
+      </p>
+      <p>If <code>passthrough</code> is used then it is the application's
+      resposibility to perform any further <code>%nn</code> decoding required.
+      Any <code>%25</code> sequences (encoded <code>%</code>) in the request
+      path with also be processed with the <code>%25</code> sequence unchanged
+      to avoid potential corruption and/or decoding failure when the path is
+      subsequently <code>%nn</code> decoded by the application.</p>
+      <p>If not specified, the default value is <code>decode</code>.</p>
+    </attribute>
+
     <attribute name="encodedSolidusHandling" required="false">
       <p>When set to <code>reject</code> request paths containing a
       <code>%2f</code> sequence will be rejected with a 400 response. When set
