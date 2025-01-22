@@ -183,6 +183,11 @@
         <code>DELETE</code> request because the target resource cannot be
         deleted. Pull request <pr>802</pr> provided by Chenjp. (markt)
       </fix>
+      <scode>
+        Refactor creation of <code>RequestDispatcher</code> instances so that
+        the processing of the provided path is consistent with normal request
+        processing. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
