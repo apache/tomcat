@@ -689,10 +689,15 @@ public class DefaultServlet extends HttpServlet {
             // Append data in request input stream to contentFile
             randAccessContentFile.seek(range.getStart());
             int numBytesRead;
+            long remainingBytes = range.getEnd() - range.getStart() + 1L;
             byte[] transferBuffer = new byte[BUFFER_SIZE];
             try (BufferedInputStream requestBufInStream = new BufferedInputStream(req.getInputStream(), BUFFER_SIZE)) {
-                while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
+                while (remainingBytes > 0 && (numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
+                    if (numBytesRead > remainingBytes) {
+                        numBytesRead = (int) remainingBytes;
+                    }
                     randAccessContentFile.write(transferBuffer, 0, numBytesRead);
+                    remainingBytes -= numBytesRead;
                 }
             }
         }
