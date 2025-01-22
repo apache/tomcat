@@ -400,36 +400,31 @@ public class ApplicationContext implements ServletContext {
             queryString = null;
         }
 
+        // From this point, the removal of path parameters, decoding and normalization is only for mapping purposes.
         // Remove path parameters
-        String uriNoParams = stripPathParams(uri);
+        String uriToMap = stripPathParams(uri);
+
+        // Decode only if the uri derived from the provided path is expected to be encoded
+        if (getContext().getDispatchersUseEncodedPaths()) {
+            uriToMap = UDecoder.URLDecode(uriToMap, StandardCharsets.UTF_8);
+        }
 
         // Then normalize
-        String normalizedUri = RequestUtil.normalize(uriNoParams);
-        if (normalizedUri == null) {
+        uriToMap = RequestUtil.normalize(uriToMap);
+        if (uriToMap == null) {
+            getContext().getLogger().warn(sm.getString("applicationContext.illegalDispatchPath", path),
+                    new IllegalArgumentException());
             return null;
         }
 
-        // Mapping is against the normalized uri
-
+        /*
+         * uri is passed to the constructor for ApplicationDispatcher and is ultimately used as the value for
+         * getRequestURI() which returns encoded values. getContextPath() returns a decoded value. uri may be encoded or
+         * not. Need to prepend the context path to uri and ensure the result is correctly encoded.
+         */
         if (getContext().getDispatchersUseEncodedPaths()) {
-            // Decode
-            String decodedUri = UDecoder.URLDecode(normalizedUri, StandardCharsets.UTF_8);
-
-            // Security check to catch attempts to encode /../ sequences
-            normalizedUri = RequestUtil.normalize(decodedUri);
-            if (!decodedUri.equals(normalizedUri)) {
-                getContext().getLogger().warn(sm.getString("applicationContext.illegalDispatchPath", path),
-                        new IllegalArgumentException());
-                return null;
-            }
-
-            // URI needs to include the context path
             uri = URLEncoder.DEFAULT.encode(getContextPath(), StandardCharsets.UTF_8) + uri;
         } else {
-            // uri is passed to the constructor for ApplicationDispatcher and is
-            // ultimately used as the value for getRequestURI() which returns
-            // encoded values. Therefore, since the value passed in for path
-            // was decoded, encode uri here.
             uri = URLEncoder.DEFAULT.encode(getContextPath() + uri, StandardCharsets.UTF_8);
         }
 
@@ -450,7 +445,7 @@ public class ApplicationContext implements ServletContext {
             CharChunk uriCC = uriMB.getCharChunk();
             try {
                 uriCC.append(context.getPath());
-                uriCC.append(normalizedUri);
+                uriCC.append(uriToMap);
                 service.getMapper().map(context, uriMB, mappingData);
                 if (mappingData.wrapper == null) {
                     return null;
