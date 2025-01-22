@@ -30,13 +30,13 @@ public class RequestUtil {
 
 
     /**
-     * Normalize a relative URI path that may have relative values ("/./", "/../", and so on ) it it.
-     * <strong>WARNING</strong> - This method is useful only for normalizing application-generated paths. It does not
-     * try to perform security checks for malicious input.
+     * Normalize a relative URI path. This method normalizes "/./", "/../", "//" and "\". If the input path is an
+     * attempt to 'escape the root' (e.g. /../input.txt) then {@code null} is returned to prevent attempts to 'escape
+     * the root'. <strong>WARNING</strong> - No other URI validation checks are performed.
      *
      * @param path Relative path to be normalized
      *
-     * @return The normalized path or <code>null</code> if the path cannot be normalized
+     * @return The normalized path or {@code null} if the input path attempts to 'escape the root'.
      */
     public static String normalize(String path) {
         return normalize(path, true);
@@ -44,14 +44,14 @@ public class RequestUtil {
 
 
     /**
-     * Normalize a relative URI path that may have relative values ("/./", "/../", and so on ) it it.
-     * <strong>WARNING</strong> - This method is useful only for normalizing application-generated paths. It does not
-     * try to perform security checks for malicious input.
+     * Normalize a relative URI path. This method normalizes "/./", "/../" and "//". This method optionally normalizes
+     * "\". If the input path is an attempt to 'escape the root' (e.g. /../input.txt) then {@code null} is returned to
+     * prevent attempts to 'escape the root'. <strong>WARNING</strong> - No other URI validation checks are performed.
      *
      * @param path             Relative path to be normalized
-     * @param replaceBackSlash Should '\\' be replaced with '/'
+     * @param replaceBackSlash Should '\\' be normalized to '/'
      *
-     * @return The normalized path or <code>null</code> if the path cannot be normalized
+     * @return The normalized path or {@code null} if the input path attempts to 'escape the root'.
      */
     public static String normalize(String path, boolean replaceBackSlash) {
 
