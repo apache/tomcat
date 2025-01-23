@@ -2677,10 +2677,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
-        tomcat.getConnector().setEncodedSolidusHandling(EncodedSolidusHandling.DECODE.getValue());
-
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
+
+        tomcat.getConnector().setEncodedSolidusHandling(EncodedSolidusHandling.DECODE.getValue());
+        ctx.setEncodedSolidusHandling(EncodedSolidusHandling.DECODE.getValue());
 
         EncodedDispatchServlet encodedDispatchServlet = new EncodedDispatchServlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "encodedDispatchServlet", encodedDispatchServlet);
