@@ -169,20 +169,20 @@ public final class UDecoder {
                         }
                     }
                 } else if (res == '\\') {
-                        switch (encodedReverseSolidusHandling) {
-                            case DECODE: {
-                                buff[idx] = (byte) res;
-                                break;
-                            }
-                            case REJECT: {
-                                throw EXCEPTION_BACKSLASH;
-                            }
-                            case PASS_THROUGH: {
-                                buff[idx++] = buff[j - 2];
-                                buff[idx++] = buff[j - 1];
-                                buff[idx] = buff[j];
-                            }
+                    switch (encodedReverseSolidusHandling) {
+                        case DECODE: {
+                            buff[idx] = (byte) res;
+                            break;
                         }
+                        case REJECT: {
+                            throw EXCEPTION_BACKSLASH;
+                        }
+                        case PASS_THROUGH: {
+                            buff[idx++] = buff[j - 2];
+                            buff[idx++] = buff[j - 1];
+                            buff[idx] = buff[j];
+                        }
+                    }
                 } else if (res == '%') {
                     /*
                      * If encoded '/' or '\' is going to be left encoded then so must encoded '%' else the subsequent
@@ -218,6 +218,24 @@ public final class UDecoder {
      * @exception IllegalArgumentException if a '%' character is not followed by a valid 2-digit hexadecimal number
      */
     public static String URLDecode(String str, Charset charset) {
+        return URLDecode(str, charset, EncodedSolidusHandling.DECODE, EncodedSolidusHandling.DECODE);
+    }
+
+
+    /**
+     * Decode and return the specified URL-encoded String. It is assumed the string is not a query string.
+     *
+     * @param str                           The url-encoded string
+     * @param charset                       The character encoding to use; if null, UTF-8 is used.
+     * @param encodedSolidusHandling        The required handling of encoded solidus (%2f - /)
+     * @param encodedReverseSolidusHandling The required handling of encoded reverse solidus (%5c - \)
+     *
+     * @return the decoded string
+     *
+     * @exception IllegalArgumentException if a '%' character is not followed by a valid 2-digit hexadecimal number
+     */
+    public static String URLDecode(String str, Charset charset, EncodedSolidusHandling encodedSolidusHandling,
+            EncodedSolidusHandling encodedReverseSolidusHandling) {
         if (str == null) {
             return null;
         }
@@ -266,7 +284,60 @@ public final class UDecoder {
                     char c1 = sourceChars[ix++];
                     char c2 = sourceChars[ix++];
                     if (isHexDigit(c1) && isHexDigit(c2)) {
-                        baos.write(x2c(c1, c2));
+                        int decoded = x2c(c1, c2);
+                        switch (decoded) {
+                            case '/': {
+                                switch (encodedSolidusHandling) {
+                                    case DECODE: {
+                                        osw.append('/');
+                                        break;
+                                    }
+                                    case PASS_THROUGH: {
+                                        osw.append(c);
+                                        osw.append(c1);
+                                        osw.append(c2);
+                                        break;
+                                    }
+                                    case REJECT: {
+                                        throw new IllegalArgumentException(
+                                                sm.getString("uDecoder.urlDecode.rejectEncodedSolidus", str));
+                                    }
+                                }
+                                break;
+                            }
+                            case '\\': {
+                                switch (encodedReverseSolidusHandling) {
+                                    case DECODE: {
+                                        osw.append('\\');
+                                        break;
+                                    }
+                                    case PASS_THROUGH: {
+                                        osw.append(c);
+                                        osw.append(c1);
+                                        osw.append(c2);
+                                        break;
+                                    }
+                                    case REJECT: {
+                                        throw new IllegalArgumentException(
+                                                sm.getString("uDecoder.urlDecode.rejectEncodedReverseSolidus", str));
+                                    }
+                                }
+                                break;
+                            }
+                            case '%': {
+                                if (encodedReverseSolidusHandling == EncodedSolidusHandling.PASS_THROUGH ||
+                                        encodedSolidusHandling == EncodedSolidusHandling.PASS_THROUGH) {
+                                    osw.append(c);
+                                    osw.append(c1);
+                                    osw.append(c2);
+                                } else {
+                                    baos.write('%');
+                                }
+                                break;
+                            }
+                            default:
+                                baos.write(decoded);
+                        }
                     } else {
                         throw new IllegalArgumentException(sm.getString("uDecoder.urlDecode.missingDigit", str));
                     }
