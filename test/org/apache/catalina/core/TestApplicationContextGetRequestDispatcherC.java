@@ -17,7 +17,6 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -154,7 +153,7 @@ public class TestApplicationContextGetRequestDispatcherC extends TomcatBaseTest 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
-            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setCharacterEncoding("UTF-8");
             resp.getWriter().print(req.getPathInfo());
         }
     }
