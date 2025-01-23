@@ -1915,7 +1915,7 @@ public interface Context extends Container, ContextBind {
      * @return Obtain the current configuration for the handling of encoded solidus characters
      */
     default String getEncodedSolidusHandling() {
-        return EncodedSolidusHandling.DECODE.getValue();
+        return EncodedSolidusHandling.REJECT.getValue();
     }
 
 
@@ -1937,6 +1937,6 @@ public interface Context extends Container, ContextBind {
      * @return Obtain the current configuration for the handling of encoded solidus characters
      */
     default EncodedSolidusHandling getEncodedSolidusHandlingEnum() {
-        return EncodedSolidusHandling.DECODE;
+        return EncodedSolidusHandling.REJECT;
     }
 }

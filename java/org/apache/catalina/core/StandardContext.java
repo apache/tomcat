@@ -803,7 +803,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     private EncodedSolidusHandling encodedReverseSolidusHandling = EncodedSolidusHandling.DECODE;
 
-    private EncodedSolidusHandling encodedSolidusHandling = EncodedSolidusHandling.DECODE;
+    private EncodedSolidusHandling encodedSolidusHandling = EncodedSolidusHandling.REJECT;
 
 
     // ----------------------------------------------------- Context Properties

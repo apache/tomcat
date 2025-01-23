@@ -133,6 +133,11 @@
         the default servlet. It is now effectively hard coded to
         <code>true</code>. (markt)
       </fix>
+      <update>
+        Change the default for the <code>encodedSolidusHandling</code> attribute
+        of <strong>Context</strong> from <code>decode</code> to
+        <code>reject</code>. (markt)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <update>
         Add <code>tableName</code> configuration on the

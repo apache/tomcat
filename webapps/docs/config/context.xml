@@ -444,9 +444,7 @@
         also be processed with the <code>%25</code> sequence unchanged
         to avoid potential corruption and/or decoding failure when the path is
         subsequently <code>%nn</code> decoded by the application.</p>
-        <p>If not specified, the default value is <code>decode</code>. This
-        default will change to <code>reject</code> (to align with the
-        <strong>Connector</strong>) in Tomcat 12.</p>
+        <p>If not specified, the default value is <code>reject</code>.</p>
       </attribute>
 
       <attribute name="failCtxIfServletStartFails" required="false">
