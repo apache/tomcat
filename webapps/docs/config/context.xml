@@ -353,6 +353,15 @@
         return <code>null</code>.</p>
       </attribute>
 
+      <attribute name="dispatchersUseEncodedPaths" required="false">
+        <p>Controls whether paths used in calls to obtain a request dispatcher
+        ares expected to be encoded. This affects both how Tomcat handles calls
+        to obtain a request dispatcher as well as how Tomcat generates paths
+        used to obtain request dispatchers internally. If not specified, the
+        default value of <code>true</code> is used. When encoding/decoding paths
+        for a request dispatcher, UTF-8 is always used.</p>
+      </attribute>
+
       <attribute name="docBase" required="true">
         <p>The <em>Document Base</em> (also known as the <em>Context
         Root</em>) directory for this web application, or the pathname
@@ -368,15 +377,6 @@
         the symbolic link will only be effective after a Tomcat restart or
         by undeploying and redeploying the context. A context reload is not
         sufficient.</p>
-      </attribute>
-
-      <attribute name="dispatchersUseEncodedPaths" required="false">
-        <p>Controls whether paths used in calls to obtain a request dispatcher
-        ares expected to be encoded. This affects both how Tomcat handles calls
-        to obtain a request dispatcher as well as how Tomcat generates paths
-        used to obtain request dispatchers internally. If not specified, the
-        default value of <code>true</code> is used. When encoding/decoding paths
-        for a request dispatcher, UTF-8 is always used.</p>
       </attribute>
 
       <attribute name="failCtxIfServletStartFails" required="false">
