@@ -378,7 +378,8 @@ public class ApplicationContext implements ServletContext {
 
         // Decode only if the uri derived from the provided path is expected to be encoded
         if (getContext().getDispatchersUseEncodedPaths()) {
-            uriToMap = UDecoder.URLDecode(uriToMap, StandardCharsets.UTF_8);
+            uriToMap = UDecoder.URLDecode(uriToMap, StandardCharsets.UTF_8, context.getEncodedSolidusHandlingEnum(),
+                    context.getEncodedReverseSolidusHandlingEnum());
         }
 
         // Then normalize
