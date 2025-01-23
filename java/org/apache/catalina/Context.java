@@ -25,6 +25,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
@@ -36,6 +37,7 @@ import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.tomcat.ContextBind;
 import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.JarScanner;
+import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.descriptor.web.ApplicationParameter;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
@@ -1816,4 +1818,70 @@ public interface Context extends Container, ContextBind {
      */
     @Deprecated
     void setUseBloomFilterForArchives(boolean useBloomFilterForArchives);
+
+
+    /**
+     * Obtain the current configuration for the handling of encoded reverse solidus (%5c - \) characters in paths used
+     * to obtain {@link RequestDispatcher} instances for this {@link Context}.
+     *
+     * @return Obtain the current configuration for the handling of encoded reverse solidus characters
+     */
+    default String getEncodedReverseSolidusHandling() {
+        return EncodedSolidusHandling.DECODE.getValue();
+    }
+
+
+    /**
+     * Configure the handling for encoded reverse solidus (%5c - \) characters in paths used to obtain
+     * {@link RequestDispatcher} instances for this {@link Context}.
+     *
+     * @param encodedReverseSolidusHandling One of the values of {@link EncodedSolidusHandling}
+     */
+    default void setEncodedReverseSolidusHandling(String encodedReverseSolidusHandling) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    /**
+     * Obtain the current configuration for the handling of encoded reverse solidus (%5c - \) characters in paths used
+     * to obtain {@link RequestDispatcher} instances for this {@link Context}.
+     *
+     * @return Obtain the current configuration for the handling of encoded reverse solidus characters
+     */
+    default EncodedSolidusHandling getEncodedReverseSolidusHandlingEnum() {
+        return EncodedSolidusHandling.DECODE;
+    }
+
+
+    /**
+     * Obtain the current configuration for the handling of encoded solidus (%2f - /) characters in paths used to obtain
+     * {@link RequestDispatcher} instances for this {@link Context}.
+     *
+     * @return Obtain the current configuration for the handling of encoded solidus characters
+     */
+    default String getEncodedSolidusHandling() {
+        return EncodedSolidusHandling.DECODE.getValue();
+    }
+
+
+    /**
+     * Configure the handling for encoded solidus (%2f - /) characters in paths used to obtain {@link RequestDispatcher}
+     * instances for this {@link Context}.
+     *
+     * @param encodedSolidusHandling One of the values of {@link EncodedSolidusHandling}
+     */
+    default void setEncodedSolidusHandling(String encodedSolidusHandling) {
+        throw new UnsupportedOperationException();
+    }
+
+
+    /**
+     * Obtain the current configuration for the handling of encoded solidus (%2f - /) characters in paths used to obtain
+     * {@link RequestDispatcher} instances for this {@link Context}.
+     *
+     * @return Obtain the current configuration for the handling of encoded solidus characters
+     */
+    default EncodedSolidusHandling getEncodedSolidusHandlingEnum() {
+        return EncodedSolidusHandling.DECODE;
+    }
 }

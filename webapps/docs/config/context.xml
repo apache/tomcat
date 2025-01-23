@@ -379,6 +379,46 @@
         sufficient.</p>
       </attribute>
 
+      <attribute name="encodedReverseSolidusHandling" required="false">
+        <p>When set to <code>reject</code>, an attempt to obtain a
+        <code>RequestDispatcher</code> for a path containing a <code>%5c</code>
+        sequence will trigger an <code>IllegalArgumentException</code>. When set
+        to <code>decode</code>, any <code>%5c</code> sequence in the path used
+        to obtain a <code>RequestDispatcher</code> will have that sequence
+        decoded to <code>\</code> (and then normalized to <code>/</code>) before
+        the <code>RequestDispatcher</code> is created. When set to
+        <code>passthrough</code>, any <code>%5c</code> sequence in the path used
+        to obtain a <code>RequestDispatcher</code> will remain unchanged.</p>
+        <p>If <code>passthrough</code> is used then it is the application's
+        resposibility to perform any further <code>%nn</code> decoding required.
+        Any <code>%25</code> sequences (encoded <code>%</code>) in the path will
+        also be processed with the <code>%25</code> sequence unchanged
+        to avoid potential corruption and/or decoding failure when the path is
+        subsequently <code>%nn</code> decoded by the application.</p>
+        <p>If not specified, the default value is <code>decode</code>.</p>
+      </attribute>
+
+      <attribute name="encodedSolidusHandling" required="false">
+        <p>When set to <code>reject</code>, an attempt to obtain a
+        <code>RequestDispatcher</code> for a path containing a <code>%2f</code>
+        sequence will trigger an <code>IllegalArgumentException</code>. When set
+        to <code>decode</code>, any <code>%2f</code> sequence in the path used
+        to obtain a <code>RequestDispatcher</code> will have that sequence
+        decoded to <code>/</code> before the <code>RequestDispatcher</code> is
+        created. When set to <code>passthrough</code>, any <code>%2f</code>
+        sequence in the path used to obtain a <code>RequestDispatcher</code>
+        will remain unchanged.</p>
+        <p>If <code>passthrough</code> is used then it is the application's
+        resposibility to perform any further <code>%nn</code> decoding required.
+        Any <code>%25</code> sequences (encoded <code>%</code>) in the path will
+        also be processed with the <code>%25</code> sequence unchanged
+        to avoid potential corruption and/or decoding failure when the path is
+        subsequently <code>%nn</code> decoded by the application.</p>
+        <p>If not specified, the default value is <code>decode</code>. This
+        default will change to <code>reject</code> (to align with the
+        <strong>Connector</strong>) in Tomcat 12.</p>
+      </attribute>
+
       <attribute name="failCtxIfServletStartFails" required="false">
         <p>Set to <code>true</code> to have the context fail its startup if any
         servlet that has load-on-startup &gt;=0 fails its own startup.</p>

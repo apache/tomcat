@@ -116,6 +116,7 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.InstanceManagerBindings;
 import org.apache.tomcat.JarScanner;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
@@ -798,8 +799,48 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     private int notFoundClassResourceCacheSize = 1000;
 
+    private EncodedSolidusHandling encodedReverseSolidusHandling = EncodedSolidusHandling.DECODE;
+
+    private EncodedSolidusHandling encodedSolidusHandling = EncodedSolidusHandling.DECODE;
+
 
     // ----------------------------------------------------- Context Properties
+
+    @Override
+    public String getEncodedReverseSolidusHandling() {
+        return encodedReverseSolidusHandling.getValue();
+    }
+
+
+    @Override
+    public void setEncodedReverseSolidusHandling(String encodedReverseSolidusHandling) {
+        this.encodedReverseSolidusHandling = EncodedSolidusHandling.fromString(encodedReverseSolidusHandling);
+    }
+
+
+    @Override
+    public EncodedSolidusHandling getEncodedReverseSolidusHandlingEnum() {
+        return encodedReverseSolidusHandling;
+    }
+
+
+    @Override
+    public String getEncodedSolidusHandling() {
+        return encodedSolidusHandling.getValue();
+    }
+
+
+    @Override
+    public void setEncodedSolidusHandling(String encodedSolidusHandling) {
+        this.encodedSolidusHandling = EncodedSolidusHandling.fromString(encodedSolidusHandling);
+    }
+
+
+    @Override
+    public EncodedSolidusHandling getEncodedSolidusHandlingEnum() {
+        return encodedSolidusHandling;
+    }
+
 
     public int getNotFoundClassResourceCacheSize() {
         return notFoundClassResourceCacheSize;

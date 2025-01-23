@@ -170,6 +170,12 @@
         the processing of the provided path is consistent with normal request
         processing. (markt)
       </scode>
+      <add>
+        Add <code>encodedReverseSolidusHandling</code> and
+        <code>encodedSolidusHandling</code> attributes to Context to provide
+        control over the handling of the path used to created a
+        <code>RequestDispatcher</code>. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
