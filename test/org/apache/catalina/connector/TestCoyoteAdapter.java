@@ -311,8 +311,12 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         for (int i = 0; i < 10; i++) {
             String line = client.readLine();
-            if (line != null && line.length() > 20) {
-                log.info(line.subSequence(0, 20) + "...");
+            if (line != null) {
+                if (line.length() > 20) {
+                    log.info(line.subSequence(0, 20) + "...");
+                } else {
+                    log.info(line);
+                }
             }
         }
 
@@ -404,7 +408,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            log.info("Exception caught " + e);
+                            log.info("Exception caught " + e, e);
                             try {
                                 // Note if request times out before this
                                 // exception is thrown and the complete call
