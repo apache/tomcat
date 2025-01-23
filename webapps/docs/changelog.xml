@@ -199,6 +199,11 @@
         control over the handling of the path used to created a
         <code>RequestDispatcher</code>. (markt)
       </add>
+      <fix>
+        Handle a potential <code>NullPointerException</code> after an
+        <code>IOException</code> occurs on a non-container thread during
+        asynchronous processing. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
