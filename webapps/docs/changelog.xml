@@ -181,6 +181,9 @@
         <code>IOException</code> occurs on a non-container thread during
         asynchronous processing. (markt)
       </fix>
+      <fix>
+        Enhance lifecycle of temporary files used by partial PUT. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
