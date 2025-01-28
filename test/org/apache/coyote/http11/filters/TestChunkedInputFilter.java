@@ -24,7 +24,10 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.ReadListener;
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -33,6 +36,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
@@ -816,6 +820,63 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
     }
 
 
+    private static class NonBlockingReadLineServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+
+        int lineCount = 0;
+        int pauseCount = 0;
+        long lastRead = 0;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+
+            final AsyncContext ctx = req.startAsync();
+            ServletInputStream is = req.getInputStream();
+            is.setReadListener(new ReadListener() {
+                @Override
+                public void onDataAvailable() throws IOException {
+                    byte[] buf = new byte[1024];
+                    do {
+                        int n = is.read(buf);
+                        if (n <= 0) {
+                            break;
+                        }
+                        String line = new String(buf, 0, n, StandardCharsets.UTF_8);
+                        Assert.assertTrue(line.length() > 0);
+                        long thisRead = System.nanoTime();
+                        if (lineCount > 0) {
+                           /*
+                            * After the first line, look for a pause of at least 800ms between reads.
+                            */
+                           if ((thisRead - lastRead) > TimeUnit.MILLISECONDS.toNanos(800)) {
+                               pauseCount++;
+                           }
+                        }
+                        lastRead = thisRead;
+                        lineCount++;
+                    } while (is.isReady());
+                }
+
+                @Override
+                public void onAllDataRead() throws IOException {
+                    resp.setContentType("text/plain");
+                    PrintWriter pw = resp.getWriter();
+                    pw.write(Integer.toString(lineCount) + "," + Integer.toString(pauseCount));
+                    ctx.complete();
+                }
+
+                @Override
+                public void onError(Throwable throwable) {
+                    throwable.printStackTrace();
+                }
+
+            });
+
+        }
+    }
+
+
     private static class ReadLineClient extends SimpleHttpClient {
 
         ReadLineClient(int port) {
@@ -852,17 +913,68 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             "Connection: close" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF +
             "7" + SimpleHttpClient.CRLF +
-            "DATA01\n" + SimpleHttpClient.CRLF,
-            "7" + SimpleHttpClient.CRLF +
+            "DATA01\n", SimpleHttpClient.CRLF +
+            "7", SimpleHttpClient.CRLF +
             "DATA02\n" + SimpleHttpClient.CRLF,
             "7" + SimpleHttpClient.CRLF +
             // Split the CRLF between writes
             "DATA03\n" + SimpleHttpClient.CR,
             SimpleHttpClient.LF +
             "7" + SimpleHttpClient.CRLF +
-            "DATA04\n" + SimpleHttpClient.CRLF,
+            "DATA04\n", SimpleHttpClient.CRLF +
+            "13" + SimpleHttpClient.CRLF,
+            "DATA05DATA05DATA05\n" + SimpleHttpClient.CRLF +
+            "0" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF};
+
+        ReadLineClient client = new ReadLineClient(tomcat.getConnector().getLocalPort());
+        client.setRequest(request);
+
+        client.connect(300000,300000);
+        client.processRequest();
+        Assert.assertTrue(client.isResponse200());
+        /*
+         * Output is "<lines read>,<pauses observer>" so there should be 5 lines read with a pause between each.
+         */
+        Assert.assertEquals("5,4", client.getResponseBody());
+    }
+
+
+    @Test
+    public void testChunkedSplitWithNonBlocking() throws Exception {
+        // Setup Tomcat instance
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        NonBlockingReadLineServlet servlet = new NonBlockingReadLineServlet();
+        Wrapper wrapper = Tomcat.addServlet(ctx, "servlet", servlet);
+        wrapper.setAsyncSupported(true);
+        ctx.addServletMappingDecoded("/test", "servlet");
+
+        tomcat.getConnector().setProperty("connectionTimeout", "300000");
+        tomcat.start();
+
+        String[] request = new String[]{
+            "POST /test HTTP/1.1" + SimpleHttpClient.CRLF +
+            "Host: any" + SimpleHttpClient.CRLF +
+            "Transfer-encoding: chunked" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+            "Connection: close" + SimpleHttpClient.CRLF +
+            SimpleHttpClient.CRLF +
             "7" + SimpleHttpClient.CRLF +
-            "DATA05\n" + SimpleHttpClient.CRLF +
+            "DATA01\n", SimpleHttpClient.CRLF +
+            "7"/*, */ + SimpleHttpClient.CRLF +
+            "DATA02\n" + SimpleHttpClient.CRLF,
+            "7" + SimpleHttpClient.CRLF +
+            // Split the CRLF between writes
+            "DATA03\n" + SimpleHttpClient.CR,
+            SimpleHttpClient.LF +
+            "7" + SimpleHttpClient.CRLF +
+            "DATA04\n", SimpleHttpClient.CRLF +
+            "13" + SimpleHttpClient.CRLF/*, */ +
+            "DATA05DATA05DATA05\n" + SimpleHttpClient.CRLF +
             "0" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF};
 
