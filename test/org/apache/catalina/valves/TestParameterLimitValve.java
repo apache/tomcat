@@ -25,15 +25,16 @@ import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.ServletRequestParametersBaseTest;
 
-import org.apache.catalina.Context;
-import org.apache.tomcat.util.scan.StandardJarScanner;
 import org.junit.Assert;
 import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
+import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.scan.StandardJarScanner;
+
 
 public class TestParameterLimitValve extends ServletRequestParametersBaseTest {
 
@@ -172,7 +173,7 @@ public class TestParameterLimitValve extends ServletRequestParametersBaseTest {
 
         ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
         ctx.getPipeline().addValve(parameterLimitValve);
-        parameterLimitValve.setUrlPatternLimits("/special/.*=2\r\n/special2/.*=3\r\n/my/special/url1=1");
+        parameterLimitValve.setUrlPatternLimits("/special/.*=2" + CRLF + "/special2/.*=3" + CRLF + "/my/special/url1=1");
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
         ctx.addServletMappingDecoded("/special/endpoint", "snoop");
