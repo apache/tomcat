@@ -128,6 +128,11 @@
         <code>AccessLog</code> and was not implemented in a scalable way.
         (remm)
       </update>
+      <add>
+        Added support for limiting the number of parameters in HTTP requests through
+        the new <code>ParameterLimitValve</code>. The valve allows configurable
+        URL-specific limits on the number of parameters. (dsoumis)
+      </add>
       <fix>
         Remove the <code>useAcceptRanges</code> initialisation parameter for
         the default servlet. It is now effectively hard coded to
