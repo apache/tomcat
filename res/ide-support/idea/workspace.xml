@@ -30,5 +30,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <option name="VM_PARAMETERS" value="--add-opens java.base/java.io=ALL-UNNAMED" />
+      <module name="tomcat" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
   </component>
 </project>
