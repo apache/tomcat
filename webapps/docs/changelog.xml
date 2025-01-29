@@ -328,6 +328,9 @@
         Update the packaged version of the Tomcat Migration Tool for Jakarta EE
         to 1.0.9. (markt)
       </update>
+      <update>
+        Update the internal fork of Commons Pool to 2.12.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>

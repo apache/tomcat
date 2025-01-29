@@ -25,7 +25,6 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-
 /**
  * Provides a shared idle object eviction timer for all pools.
  * <p>
@@ -44,12 +43,12 @@ import java.util.concurrent.TimeUnit;
  *
  * @since 2.0
  */
-class EvictionTimer {
+final class EvictionTimer {
 
     /**
      * Thread factory that creates a daemon thread, with the context class loader from this class.
      */
-    private static class EvictorThreadFactory implements ThreadFactory {
+    private static final class EvictorThreadFactory implements ThreadFactory {
 
         @Override
         public Thread newThread(final Runnable runnable) {
@@ -64,7 +63,7 @@ class EvictionTimer {
      * Task that removes references to abandoned tasks and shuts
      * down the executor if there are no live tasks left.
      */
-    private static class Reaper implements Runnable {
+    private static final class Reaper implements Runnable {
         @Override
         public void run() {
             synchronized (EvictionTimer.class) {
@@ -89,7 +88,7 @@ class EvictionTimer {
      * no longer reachable, run is no-op.
      * @param <R> The kind of Runnable.
      */
-    private static class WeakRunner<R extends Runnable> implements Runnable {
+    private static final class WeakRunner<R extends Runnable> implements Runnable {
 
         private final WeakReference<R> ref;
 
@@ -113,7 +112,6 @@ class EvictionTimer {
             }
         }
     }
-
 
     /** Executor instance */
     private static ScheduledThreadPoolExecutor executor; //@GuardedBy("EvictionTimer.class")
