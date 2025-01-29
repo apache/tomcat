@@ -184,6 +184,11 @@
       <fix>
         Enhance lifecycle of temporary files used by partial PUT. (remm)
       </fix>
+      <add>
+        Added support for limiting the number of parameters in HTTP requests through
+        the new <code>ParameterLimitValve</code>. The valve allows configurable
+        URL-specific limits on the number of parameters. (dsoumis)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
