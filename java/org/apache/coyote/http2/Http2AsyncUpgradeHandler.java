@@ -82,8 +82,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
     };
 
     @Override
-    protected Http2Parser getParser(String connectionId) {
-        return new Http2AsyncParser(connectionId, this, this, socketWrapper, this);
+    protected Http2Parser getParser(String connectionId, String rip) {
+        return new Http2AsyncParser(connectionId, this, this, socketWrapper, this, rip);
     }
 
 

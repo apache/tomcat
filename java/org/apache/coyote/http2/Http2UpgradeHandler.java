@@ -191,7 +191,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("upgradeHandler.init", connectionId, connectionState.get()));
         }
-
         if (!connectionState.compareAndSet(ConnectionState.NEW, ConnectionState.CONNECTED)) {
             return;
         }
@@ -202,9 +201,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             queuedRunnable = new ConcurrentLinkedQueue<>();
         }
 
-        parser = getParser(connectionId);
-
         Stream stream = null;
+        String rip = "-";
 
         socketWrapper.setReadTimeout(protocol.getReadTimeout());
         socketWrapper.setWriteTimeout(protocol.getWriteTimeout());
@@ -216,6 +214,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             try {
                 // Process the initial settings frame
                 stream = getStream(1, true);
+                rip = stream.getCoyoteRequest().getRequestProcessor().getRemoteAddr();
                 String base64Settings = stream.getCoyoteRequest().getHeader(HTTP2_SETTINGS_HEADER);
                 byte[] settings = Base64.getUrlDecoder().decode(base64Settings);
 
@@ -228,7 +227,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     Setting key = Setting.valueOf(id);
                     if (key == Setting.UNKNOWN) {
                         log.warn(sm.getString("connectionSettings.unknown", connectionId, Integer.toString(id),
-                                Long.toString(value)));
+                                Long.toString(value), rip));
                     }
                     remoteSettings.set(key, value);
                 }
@@ -236,6 +235,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 throw new ProtocolException(sm.getString("upgradeHandler.upgrade.fail", connectionId));
             }
         }
+
+        parser = getParser(connectionId, rip);
 
         // Send the initial settings frame
         writeSettings();
@@ -275,8 +276,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
     }
 
-    protected Http2Parser getParser(String connectionId) {
-        return new Http2Parser(connectionId, this, this);
+    protected Http2Parser getParser(String connectionId, String rip) {
+        return new Http2Parser(connectionId, this, this, rip);
     }
 
 

@@ -38,8 +38,8 @@ class Http2AsyncParser extends Http2Parser {
     private volatile Throwable error = null;
 
     Http2AsyncParser(String connectionId, Input input, Output output, SocketWrapperBase<?> socketWrapper,
-            Http2AsyncUpgradeHandler upgradeHandler) {
-        super(connectionId, input, output);
+            Http2AsyncUpgradeHandler upgradeHandler, String rip) {
+        super(connectionId, input, output, rip);
         this.socketWrapper = socketWrapper;
         socketWrapper.getSocketBufferHandler().expand(input.getMaxFrameSize());
         this.upgradeHandler = upgradeHandler;

@@ -44,6 +44,7 @@ class Http2Parser {
     protected final String connectionId;
     protected final Input input;
     private final Output output;
+    private final String rip;
     private final byte[] frameHeaderBuffer = new byte[9];
 
     private volatile HpackDecoder hpackDecoder;
@@ -51,10 +52,11 @@ class Http2Parser {
     private volatile int headersCurrentStream = -1;
     private volatile boolean headersEndStream = false;
 
-    Http2Parser(String connectionId, Input input, Output output) {
+    Http2Parser(String connectionId, Input input, Output output, String rip) {
         this.connectionId = connectionId;
         this.input = input;
         this.output = output;
+        this.rip = rip;
     }
 
 
@@ -328,7 +330,7 @@ class Http2Parser {
                 Setting key = Setting.valueOf(id);
                 if (key == Setting.UNKNOWN) {
                     log.warn(sm.getString("connectionSettings.unknown", connectionId, Integer.toString(id),
-                            Long.toString(value)));
+                            Long.toString(value), rip));
                 }
                 output.setting(key, value);
             }
