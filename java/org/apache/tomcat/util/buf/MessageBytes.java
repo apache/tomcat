@@ -163,20 +163,7 @@ public final class MessageBytes implements Cloneable, Serializable {
      */
     @Override
     public String toString() {
-        switch (type) {
-            case T_NULL:
-            case T_STR:
-                // No conversion required
-                break;
-            case T_BYTES:
-                strValue = byteC.toString();
-                break;
-            case T_CHARS:
-                strValue = charC.toString();
-                break;
-        }
-
-        return strValue;
+        return toStringType();
     }
 
 
