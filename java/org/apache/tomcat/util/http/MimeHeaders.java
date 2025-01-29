@@ -387,7 +387,7 @@ public class MimeHeaders {
 
     public String getHeader(String name) {
         MessageBytes mh = getValue(name);
-        return mh != null ? mh.toString() : null;
+        return mh != null ? mh.toStringType() : null;
     }
 
     // -------------------- Removing --------------------
