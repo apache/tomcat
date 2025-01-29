@@ -326,10 +326,10 @@ bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
 bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
 
 # ----- JSign, version 4.1 or later -----
-jsign.version=6.0
+jsign.version=7.0
 jsign.checksum.enabled=true
 jsign.checksum.algorithm=MD5|SHA-1
-jsign.checksum.value=c14fe256b5bc42dc6934d3ce7b659cdf|d2f1a60711c3b51123f84cd9e04dd9d482d95f5e
+jsign.checksum.value=9e5c914bf68adda356fac74c5c172157|bb25183c9987fedba89e4475787ff9d9270b0736
 
 jsign.home=${base.path}/jsign-${jsign.version}
 jsign.jar=${jsign.home}/jsign-${jsign.version}.jar

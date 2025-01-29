@@ -266,6 +266,9 @@
       <update>
         Update SpotBugs to 4.9.0. (markt)
       </update>
+      <update>
+        Update JSign to 7.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
