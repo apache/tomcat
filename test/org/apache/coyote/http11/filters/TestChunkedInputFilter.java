@@ -839,22 +839,23 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                     byte[] buf = new byte[1024];
                     do {
                         int n = is.read(buf);
-                        if (n <= 0) {
+                        if (n < 0) {
                             break;
+                        } else if (n > 0) {
+                            String line = new String(buf, 0, n, StandardCharsets.UTF_8);
+                            Assert.assertTrue(line.length() > 0);
+                            long thisRead = System.nanoTime();
+                            if (lineCount > 0) {
+                                /*
+                                 * After the first line, look for a pause of at least 800ms between reads.
+                                 */
+                                if ((thisRead - lastRead) > TimeUnit.MILLISECONDS.toNanos(800)) {
+                                    pauseCount++;
+                                }
+                            }
+                            lastRead = thisRead;
+                            lineCount++;
                         }
-                        String line = new String(buf, 0, n, StandardCharsets.UTF_8);
-                        Assert.assertTrue(line.length() > 0);
-                        long thisRead = System.nanoTime();
-                        if (lineCount > 0) {
-                           /*
-                            * After the first line, look for a pause of at least 800ms between reads.
-                            */
-                           if ((thisRead - lastRead) > TimeUnit.MILLISECONDS.toNanos(800)) {
-                               pauseCount++;
-                           }
-                        }
-                        lastRead = thisRead;
-                        lineCount++;
                     } while (is.isReady());
                 }
 
@@ -965,7 +966,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             SimpleHttpClient.CRLF +
             "7" + SimpleHttpClient.CRLF +
             "DATA01\n", SimpleHttpClient.CRLF +
-            "7"/*, */ + SimpleHttpClient.CRLF +
+            "7", SimpleHttpClient.CRLF +
             "DATA02\n" + SimpleHttpClient.CRLF,
             "7" + SimpleHttpClient.CRLF +
             // Split the CRLF between writes
@@ -973,7 +974,7 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
             SimpleHttpClient.LF +
             "7" + SimpleHttpClient.CRLF +
             "DATA04\n", SimpleHttpClient.CRLF +
-            "13" + SimpleHttpClient.CRLF/*, */ +
+            "13" + SimpleHttpClient.CRLF,
             "DATA05DATA05DATA05\n" + SimpleHttpClient.CRLF +
             "0" + SimpleHttpClient.CRLF +
             SimpleHttpClient.CRLF};
