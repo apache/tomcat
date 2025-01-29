@@ -1456,10 +1456,11 @@
       <p>The name of the truststore provider to be used for the server
       certificate. The default is the value of the
       <code>javax.net.ssl.trustStoreProvider</code> system property. If
-      that property is null, the value of <code>keystoreProvider</code> is used
-      as the default. If neither this attribute, the default system property nor
-      <code>keystoreProvider</code> is set, the list of registered providers is
-      traversed in preference order and the first provider that supports the
+      that property is null and a single certificate has been configured for
+      this TLS virtual host then default will be the the value of
+      <code>keystoreProvider</code> of the single certificate. If none of these
+      identify a default, the list of registered providers is traversed in
+      preference order and the first provider that supports the
       <code>truststoreType</code> is used.
       </p>
     </attribute>
