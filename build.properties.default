@@ -279,10 +279,10 @@ bytebuddy.jar=${bytebuddy.home}/byte-buddy-${bytebuddy.version}.jar
 bytebuddy.loc=${base-maven.loc}/net/bytebuddy/byte-buddy/${bytebuddy.version}/byte-buddy-${bytebuddy.version}.jar
 
 # ----- UnboundID, used by unit tests, version 5.1.4 or later -----
-unboundid.version=7.0.1
+unboundid.version=7.0.2
 unboundid.checksum.enabled=true
 unboundid.checksum.algorithm=SHA-512
-unboundid.checksum.value=6bd8681b89886989a65316bbe03429263c0f8b442ac92e17d55dffa1035f12d8fc0b363fba8a23cac7a1d6fc93f1c50233ace83ca8769f5a0a3eee8544a9a5cb
+unboundid.checksum.value=425a003273c8fb3ddcefae8273b322dae2186ccb48344c55e8a4a8251915ef0c595cd69566c3ef33476c3151bcd5b20a3492b2917c4959a83e30ca363cbce88e
 unboundid.home=${base.path}/unboundid-${unboundid.version}
 unboundid.jar=${unboundid.home}/unboundid-ldapsdk-${unboundid.version}.jar
 unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.version}/unboundid-ldapsdk-${unboundid.version}.jar
@@ -291,7 +291,7 @@ unboundid.loc=${base-maven.loc}/com/unboundid/unboundid-ldapsdk/${unboundid.vers
 checkstyle.version=10.20.2
 checkstyle.checksum.enabled=true
 checkstyle.checksum.algorithm=SHA-512
-checkstyle.checksum.value=e7de3f1745b3dcd0b56993f30f01453bf4d44935cacc83863cd84c94453fdf7486dbd1610bd95e9aa8083104b06af69416cfb7f39ca5b8112cb17fa36028e279
+checkstyle.checksum.value=425a003273c8fb3ddcefae8273b322dae2186ccb48344c55e8a4a8251915ef0c595cd69566c3ef33476c3151bcd5b20a3492b2917c4959a83e30ca363cbce88e
 checkstyle.home=${base.path}/checkstyle-${checkstyle.version}
 checkstyle.jar=${checkstyle.home}/checkstyle-${checkstyle.version}-all.jar
 checkstyle.loc=${base-gh.loc}/checkstyle/checkstyle/releases/download/checkstyle-${checkstyle.version}/checkstyle-${checkstyle.version}-all.jar
