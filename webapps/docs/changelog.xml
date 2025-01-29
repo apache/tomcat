@@ -272,6 +272,9 @@
       <update>
         Update the internal fork of Commons Pool to 2.12.1. (markt)
       </update>
+      <update>
+        Update Byte Buddy to 1.16.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
