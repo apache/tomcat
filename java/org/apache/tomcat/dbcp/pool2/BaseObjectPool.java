@@ -49,7 +49,6 @@ public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool
      * closed.
      *
      * @throws IllegalStateException when this pool has been closed.
-     *
      * @see #isClosed()
      */
     protected final void assertOpen() throws IllegalStateException {

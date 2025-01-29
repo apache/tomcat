@@ -32,13 +32,12 @@ import org.apache.tomcat.dbcp.pool2.PooledObjectFactory;
  *
  * @since 2.0
  */
-class PoolImplUtils {
+final class PoolImplUtils {
 
     /**
      * Identifies the concrete type of object that an object factory creates.
      *
      * @param factoryClass The factory to examine
-     *
      * @return the type of object the factory creates
      */
     @SuppressWarnings("rawtypes")
@@ -73,7 +72,6 @@ class PoolImplUtils {
      * @param type The interface that defines a generic type
      * @param clazz The class that implements the interface with a concrete type
      * @param <T> The interface type
-     *
      * @return concrete type used by the implementation
      */
     private static <T> Object getGenericType(final Class<T> type, final Class<? extends T> clazz) {
@@ -135,7 +133,6 @@ class PoolImplUtils {
      *
      * @param clazz defining class
      * @param argType the type argument of interest
-     *
      * @return An instance of {@link Class} representing the type used by the type parameter or an instance of
      *         {@link Integer} representing the index for the type in the definition of the defining class
      */
@@ -227,7 +224,7 @@ class PoolImplUtils {
      * @return a Duration.
      */
     static Duration toDuration(final long amount, final TimeUnit timeUnit) {
-        return Duration.of(amount, PoolImplUtils.toChronoUnit(timeUnit));
+        return Duration.of(amount, toChronoUnit(timeUnit));
     }
 
 }

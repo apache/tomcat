@@ -90,7 +90,6 @@ public interface DefaultPooledObjectInfoMBean {
      * Gets a String form of the wrapper for debug purposes. The format is not fixed and may change at any time.
      *
      * @return A string representation of the pooled object.
-     *
      * @see Object#toString()
      */
     String getPooledObjectToString();
@@ -99,7 +98,6 @@ public interface DefaultPooledObjectInfoMBean {
      * Gets the name of the class of the pooled object.
      *
      * @return The pooled object's class name.
-     *
      * @see Class#getName()
      */
     String getPooledObjectType();
