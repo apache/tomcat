@@ -65,7 +65,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
     /**
      * The idle object eviction iterator. Holds a reference to the idle objects.
      */
-    class EvictionIterator implements Iterator<PooledObject<T>> {
+    final class EvictionIterator implements Iterator<PooledObject<T>> {
 
         private final Deque<PooledObject<T>> idleObjects;
         private final Iterator<PooledObject<T>> idleObjectIterator;
@@ -117,7 +117,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      *
      * @see GenericKeyedObjectPool#setTimeBetweenEvictionRunsMillis
      */
-    class Evictor implements Runnable {
+    final class Evictor implements Runnable {
 
         private ScheduledFuture<?> scheduledFuture;
 
@@ -249,7 +249,7 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * Maintains a cache of values for a single metric and reports
      * statistics on the cached values.
      */
-    private static class StatsStore {
+    private static final class StatsStore {
 
         private static final int NONE = -1;
         private final AtomicLong[] values;
@@ -579,7 +579,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * will be run.
      *
      * @return number of milliseconds to sleep between evictor runs
-     *
      * @see #setTimeBetweenEvictionRuns
      * @since 2.11.0
      */
@@ -603,7 +602,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * used by this pool.
      *
      * @return  The fully qualified class name of the {@link EvictionPolicy}
-     *
      * @see #setEvictionPolicyClassName(String)
      */
     public final String getEvictionPolicyClassName() {
@@ -935,7 +933,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * tested per run.
      *
      * @return max number of objects to examine during each evictor run
-     *
      * @see #setNumTestsPerEvictionRun
      * @see #setTimeBetweenEvictionRunsMillis
      */
@@ -1150,7 +1147,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      *         being returned from the {@code borrowObject()} method
      *
      * @see #setTestOnCreate
-     *
      * @since 2.2
      */
     public final boolean getTestOnCreate() {
@@ -1182,7 +1178,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * the pool and destroyed.
      *
      * @return {@code true} if objects will be validated by the evictor
-     *
      * @see #setTestWhileIdle
      * @see #setTimeBetweenEvictionRunsMillis
      */
@@ -1196,7 +1191,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * will be run.
      *
      * @return number of milliseconds to sleep between evictor runs
-     *
      * @see #setTimeBetweenEvictionRuns
      * @since 2.10.0
      * @deprecated {@link #getDurationBetweenEvictionRuns()}.
@@ -1212,7 +1206,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * will be run.
      *
      * @return number of milliseconds to sleep between evictor runs
-     *
      * @see #setTimeBetweenEvictionRunsMillis
      * @deprecated Use {@link #getDurationBetweenEvictionRuns()}.
      */
@@ -1333,7 +1326,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      * Sets the abandoned object removal configuration.
      *
      * @param abandonedConfig the new configuration to use. This is used by value.
-     *
      * @see AbandonedConfig
      * @since 2.11.0
      */
@@ -1833,7 +1825,6 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
      *                      {@code borrowObject()} method
      *
      * @see #getTestOnCreate
-     *
      * @since 2.2
      */
     public final void setTestOnCreate(final boolean testOnCreate) {
@@ -2077,6 +2068,5 @@ public abstract class BaseGenericObjectPool<T> extends BaseObject implements Aut
         returnedCount.incrementAndGet();
         activeTimes.add(activeTime);
     }
-
 
 }

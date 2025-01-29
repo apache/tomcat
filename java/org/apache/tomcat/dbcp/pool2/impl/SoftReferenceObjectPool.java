@@ -58,7 +58,6 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
     /** Total number of instances that have been destroyed */
     private long destroyCount; // @GuardedBy("this")
 
-
     /** Total number of instances that have been created */
     private long createCount; // @GuardedBy("this")
 
@@ -267,7 +266,6 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
      * references pools.
      *
      * @param toDestroy PooledSoftReference to destroy
-     *
      * @throws Exception If an error occurs while trying to destroy the object
      */
     private void destroy(final PooledSoftReference<T> toDestroy) throws Exception {
@@ -348,7 +346,8 @@ public class SoftReferenceObjectPool<T> extends BaseObjectPool<T> {
         // Remove wrappers for enqueued references from idle and allReferences lists
         removeClearedReferences(idleReferences.iterator());
         removeClearedReferences(allReferences.iterator());
-        while (refQueue.poll() != null) { // NOPMD
+        while (refQueue.poll() != null) {
+            // loop until null
         }
     }
 
