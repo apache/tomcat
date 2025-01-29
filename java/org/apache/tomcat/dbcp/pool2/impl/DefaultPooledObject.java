@@ -34,7 +34,6 @@ import org.apache.tomcat.dbcp.pool2.TrackedUse;
  * </p>
  *
  * @param <T> the type of object in the pool
- *
  * @since 2.0
  */
 public class DefaultPooledObject<T> implements PooledObject<T> {
@@ -338,6 +337,5 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         lastUseInstant = now();
         usedBy.fillInStackTrace();
     }
-
 
 }

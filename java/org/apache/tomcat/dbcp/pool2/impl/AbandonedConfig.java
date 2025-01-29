@@ -123,7 +123,6 @@ public class AbandonedConfig {
      *
      * @return boolean true if stack trace logging is turned on for abandoned
      * objects
-     *
      */
     public boolean getLogAbandoned() {
         return this.logAbandoned;
@@ -240,7 +239,6 @@ public class AbandonedConfig {
      *
      * @param logAbandoned true turns on abandoned stack trace logging
      * @see #getLogAbandoned()
-     *
      */
     public void setLogAbandoned(final boolean logAbandoned) {
         this.logAbandoned = logAbandoned;
