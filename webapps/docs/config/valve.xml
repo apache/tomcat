@@ -2678,6 +2678,49 @@
 
 </section>
 
+<section name="Parameter Limit Valve">
+
+  <subsection name="Introduction">
+
+    <p>The <strong>Parameter Limit Valve</strong> is used to limit the number of parameters allowed in HTTP requests
+    overriding the Connector's value. The valve can be configured with specific limits for certain URL patterns.
+    Requests exceeding the defined parameter limits will result in an HTTP 400 Bad Request error.</p>
+
+  </subsection>
+
+  <subsection name="Attributes">
+
+    <p>The <strong>Parameter Limit Valve</strong> supports the following
+    configuration attributes:</p>
+
+    <attributes>
+
+      <attribute name="className" required="true">
+        <p>Java class name of the implementation to use.  This MUST be set to
+        <strong>org.apache.catalina.valves.ParameterLimitValve</strong>.</p>
+      </attribute>
+
+      <attribute name="resourcePath" required="false">
+        <p>A file consisting of line-separated URL patterns and their respective parameter limits.
+        Each entry should follow the format <code>urlPattern=limit</code>.
+        The valve will apply the limit defined for a URL pattern when a request matches that pattern.
+        If no pattern matches, the Connector's limit will be used.
+        For example:
+          <code>
+            /api/.*=100
+            /admin/.*=50
+          </code>
+        Default value: <code>parameter_limit.config</code>.
+        It must be placed in the Host configuration folder or in the WEB-INF folder of the web application.
+        </p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
+
 </body>
 
 

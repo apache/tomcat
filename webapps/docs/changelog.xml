@@ -116,6 +116,11 @@
         in a single URL segment. Based on pull request <pr>860</pr> by Chenjp.
         (markt)
       </fix>
+      <add>
+        Added support for limiting the number of parameters in HTTP requests through
+        the new <code>ParameterLimitValve</code>. The valve allows configurable
+        URL-specific limits on the number of parameters. (dsoumis)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

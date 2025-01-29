@@ -144,6 +144,10 @@ public class Request implements HttpServletRequest {
     public Request(Connector connector) {
         this.connector = connector;
 
+        if (connector != null) {
+            this.maxParameterCount = connector.getMaxParameterCount();
+        }
+
         formats = new SimpleDateFormat[formatsTemplate.length];
         for (int i = 0; i < formats.length; i++) {
             formats[i] = (SimpleDateFormat) formatsTemplate[i].clone();
@@ -440,6 +444,10 @@ public class Request implements HttpServletRequest {
 
     private HttpServletRequest applicationRequest = null;
 
+    /**
+     * The maximum number of request parameters
+     */
+    private int maxParameterCount = -1;
 
     // --------------------------------------------------------- Public Methods
 
@@ -470,6 +478,11 @@ public class Request implements HttpServletRequest {
         userPrincipal = null;
         subject = null;
         parametersParsed = false;
+        if (connector != null) {
+            maxParameterCount = connector.getMaxParameterCount();
+        } else {
+            maxParameterCount = -1;
+        }
         if (parts != null) {
             for (Part part : parts) {
                 try {
@@ -857,6 +870,14 @@ public class Request implements HttpServletRequest {
         coyoteRequest.setServerPort(port);
     }
 
+    /**
+     * Set the maximum number of request parameters (GET plus POST) for a single request
+     *
+     * @param maxParameterCount The maximum number of request parameters
+     */
+    public void setMaxParameterCount(int maxParameterCount) {
+        this.maxParameterCount = maxParameterCount;
+    }
 
     // ------------------------------------------------- ServletRequest Methods
 
@@ -929,8 +950,8 @@ public class Request implements HttpServletRequest {
      * {@inheritDoc}
      * <p>
      * The attribute names returned will only be those for the attributes set via {@link #setAttribute(String, Object)}.
-     * Tomcat internal attributes will not be included even though they are accessible via {@link #getAttribute(String)}.
-     * The Tomcat internal attributes include:
+     * Tomcat internal attributes will not be included even though they are accessible via
+     * {@link #getAttribute(String)}. The Tomcat internal attributes include:
      * <ul>
      * <li>{@link Globals#DISPATCHER_TYPE_ATTR}</li>
      * <li>{@link Globals#DISPATCHER_REQUEST_PATH_ATTR}</li>
@@ -2561,7 +2582,6 @@ public class Request implements HttpServletRequest {
             }
         }
 
-        int maxParameterCount = getConnector().getMaxParameterCount();
         Parameters parameters = coyoteRequest.getParameters();
         parameters.setLimit(maxParameterCount);
 
@@ -2916,7 +2936,6 @@ public class Request implements HttpServletRequest {
         boolean success = false;
         try {
             // Set this every time in case limit has been changed via JMX
-            int maxParameterCount = getConnector().getMaxParameterCount();
             if (parts != null && maxParameterCount > 0) {
                 maxParameterCount -= parts.size();
             }
