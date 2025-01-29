@@ -253,6 +253,11 @@
         <code>mapperDirectoryRedirectEnabled</code> to <code>true</code>.
         (markt)
       </add>
+      <fix>
+        Documentation. Better document the default for the
+        <code>truststoreProvider</code> attribute of a
+        <code>SSLHostConfig</code> element. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
