@@ -272,6 +272,9 @@
       <update>
         Update Checkstyle to 10.21.2. (markt)
       </update>
+      <update>
+        Update SpotBugs to 4.9.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
