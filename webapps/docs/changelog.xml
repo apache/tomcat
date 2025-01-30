@@ -262,6 +262,10 @@
         <strong>allowBackslash</strong> attributes determines how the decoded
         URI is processed. (markt)
       </add>
+      <fix>
+        <bug>69545</bug>: Improve CRLF skipping for the <code>available</code>
+        method of the <code>ChunkedInputFilter</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

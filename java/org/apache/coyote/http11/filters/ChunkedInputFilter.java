@@ -199,13 +199,32 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             available = readChunk.remaining();
         }
 
-        // Handle some edge cases
+        if (available > 2 && (parseState == ParseState.CHUNK_BODY_CRLF || parseState == ParseState.CHUNK_HEADER)) {
+            if (parseState == ParseState.CHUNK_BODY_CRLF) {
+                skipCRLF();
+            }
+            if (parseState == ParseState.CHUNK_HEADER) {
+                skipChunkHeader();
+            }
+            available = readChunk.remaining();
+            // If ending as TRAILER_FIELDS, then the next read will be EOF and available can be > 0
+            // If ending as CHUNK_HEADER then there's nothing left to read for now
+            // If ending as CHUNK_BODY_CRLF, then if there's more than two left, there will be data to read or leading to EOF
+        }
         if (available == 1 && parseState == ParseState.CHUNK_BODY_CRLF) {
             // Either just the CR or just the LF are left in the buffer. There is no data to read.
-            available = 0;
+            if (!skipCRLF()) {
+                available = readChunk.remaining();
+            } else {
+                available = 0;
+            }
         } else if (available == 2 && !crFound && parseState == ParseState.CHUNK_BODY_CRLF) {
             // Just CRLF is left in the buffer. There is no data to read.
-            available = 0;
+            if (!skipCRLF()) {
+                available = readChunk.remaining();
+            } else {
+                available = 0;
+            }
         }
 
         if (available == 0) {
@@ -391,6 +410,69 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     }
 
 
+    private boolean skipChunkHeader() {
+
+        boolean eol = false;
+
+        while (!eol) {
+            if (readChunk == null || readChunk.position() >= readChunk.limit()) {
+                return false;
+            }
+
+            byte chr = readChunk.get(readChunk.position());
+            if (chr == Constants.CR || chr == Constants.LF) {
+                parsingExtension = false;
+                if (!skipCRLF()) {
+                    return false;
+                }
+                eol = true;
+            } else if (chr == Constants.SEMI_COLON && !parsingExtension) {
+                // First semi-colon marks the start of the extension. Further
+                // semi-colons may appear to separate multiple chunk-extensions.
+                // These need to be processed as part of parsing the extensions.
+                parsingExtension = true;
+                extensionSize++;
+            } else if (!parsingExtension) {
+                int charValue = HexUtils.getDec(chr);
+                if (charValue != -1 && chunkSizeDigitsRead < 8) {
+                    chunkSizeDigitsRead++;
+                    remaining = (remaining << 4) | charValue;
+                } else {
+                    // Isn't valid hex so this is an error condition
+                    return false;
+                }
+            } else {
+                // Extension 'parsing'
+                // Note that the chunk-extension is neither parsed nor
+                // validated. Currently it is simply ignored.
+                extensionSize++;
+                if (maxExtensionSize > -1 && extensionSize > maxExtensionSize) {
+                    return false;
+                }
+            }
+
+            // Parsing the CRLF increments pos
+            if (!eol) {
+                readChunk.position(readChunk.position() + 1);
+            }
+        }
+
+        if (chunkSizeDigitsRead == 0 || remaining < 0) {
+            return false;
+        } else {
+            chunkSizeDigitsRead = 0;
+        }
+
+        if (remaining == 0) {
+            parseState = ParseState.TRAILER_FIELDS;
+        } else {
+            parseState = ParseState.CHUNK_BODY;
+        }
+
+        return true;
+    }
+
+
     private int parseChunkBody(ApplicationBufferHandler handler) throws IOException {
         int result = 0;
 
@@ -457,6 +539,39 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         }
 
         crFound = false;
+        return true;
+    }
+
+
+    private boolean skipCRLF() {
+
+        boolean eol = false;
+
+        while (!eol) {
+            if (readChunk == null || readChunk.position() >= readChunk.limit()) {
+                return false;
+            }
+
+            byte chr = readChunk.get(readChunk.position());
+            if (chr == Constants.CR) {
+                if (crFound) {
+                    return false;
+                }
+                crFound = true;
+            } else if (chr == Constants.LF) {
+                if (!crFound) {
+                    return false;
+                }
+                eol = true;
+            } else {
+                return false;
+            }
+
+            readChunk.position(readChunk.position() + 1);
+        }
+
+        crFound = false;
+        parseState = ParseState.CHUNK_HEADER;
         return true;
     }
 
