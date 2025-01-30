@@ -266,6 +266,10 @@
         <bug>69545</bug>: Improve CRLF skipping for the <code>available</code>
         method of the <code>ChunkedInputFilter</code>. (remm)
       </fix>
+      <fix>
+        Improve the performance of repeated calls to <code>getHeader()</code>.
+        Pull request <pr>813</pr> provided by Adwait Kumar Singh. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
