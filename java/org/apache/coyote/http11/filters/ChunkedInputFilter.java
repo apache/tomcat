@@ -201,30 +201,29 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
         if (available > 2 && (parseState == ParseState.CHUNK_BODY_CRLF || parseState == ParseState.CHUNK_HEADER)) {
             if (parseState == ParseState.CHUNK_BODY_CRLF) {
-                skipCRLF();
+                if (skipCRLF()) {
+                    parseState = ParseState.CHUNK_HEADER;
+                }
             }
             if (parseState == ParseState.CHUNK_HEADER) {
                 skipChunkHeader();
             }
-            available = readChunk.remaining();
             // If ending as TRAILER_FIELDS, then the next read will be EOF and available can be > 0
             // If ending as CHUNK_HEADER then there's nothing left to read for now
-            // If ending as CHUNK_BODY_CRLF, then if there's more than two left, there will be data to read or leading to EOF
+            // If ending as CHUNK_BODY then data is available
+            // If failed, will throw when trying again on the next read for CRLF or header
+            available = readChunk.remaining();
         }
         if (available == 1 && parseState == ParseState.CHUNK_BODY_CRLF) {
-            // Either just the CR or just the LF are left in the buffer. There is no data to read.
-            if (!skipCRLF()) {
-                available = readChunk.remaining();
-            } else {
-                available = 0;
-            }
+            skipCRLF();
+            // LF to read next, or failed
+            available = readChunk.remaining();
         } else if (available == 2 && !crFound && parseState == ParseState.CHUNK_BODY_CRLF) {
             // Just CRLF is left in the buffer. There is no data to read.
-            if (!skipCRLF()) {
-                available = readChunk.remaining();
-            } else {
-                available = 0;
+            if (skipCRLF()) {
+                parseState = ParseState.CHUNK_HEADER;
             }
+            available = readChunk.remaining();
         }
 
         if (available == 0) {
@@ -571,7 +570,6 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         }
 
         crFound = false;
-        parseState = ParseState.CHUNK_HEADER;
         return true;
     }
 
