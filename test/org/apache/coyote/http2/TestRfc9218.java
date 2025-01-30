@@ -151,7 +151,7 @@ public class TestRfc9218 extends Http2TestBase {
 
         /*
          * Add 8k to the connection window. Should clear the connection window over allocation and fully allocate 17
-         * with the remainder split equally between 17 and 21.
+         * with the remainder split proportionally between 19 and 21.
          */
         sendWindowUpdate(0, 1024 * 8);
         // Use try/catch as third read has been failing on some tests runs
@@ -177,6 +177,18 @@ public class TestRfc9218 extends Http2TestBase {
         trace = trace.replace("21-Body-1365\n", "");
         Assert.assertEquals(0, trace.length());
 
-        // Test doesn't read the read of the body for streams 19 and 21.
+        // 19 - 5641 body left
+        // 21 - 4778 body left
+
+        // Add 16k to the connection window. Should fully allocate 19 and 21.
+        sendWindowUpdate(0, 1024 * 16);
+
+        try {
+            parser.readFrame();
+            parser.readFrame();
+        } catch (IOException ioe) {
+            // Dump for debugging purposes
+            ioe.printStackTrace();
+        }
     }
 }
