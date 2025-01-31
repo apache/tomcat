@@ -331,9 +331,10 @@ public abstract class SSLUtilBase implements SSLUtil {
             keyPassToUse = keyPass;
         }
 
-        if (keyPassToUse != null) {
-            keyPassArray = keyPassToUse.toCharArray();
+        if (keyPassToUse == null) {
+            keyPassToUse = "";
         }
+        keyPassArray = keyPassToUse.toCharArray();
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
         if (kmf.getProvider().getInfo().contains("FIPS")) {
