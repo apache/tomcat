@@ -161,6 +161,11 @@
         (remm)
       </update>
       <fix>
+        <bug>69285</bug>: Optimise the creation of the parameter map for
+        included requests. Based on sample code and test cases provided by John
+        Engebretson. (markt)
+      </fix>
+      <fix>
         <bug>69527</bug>: Avoid rare cases where a cached resource could be set
         with 0 content length, or could be evicted immediately. (remm)
       </fix>
