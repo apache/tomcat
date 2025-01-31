@@ -733,7 +733,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
         }
 
         Map<String,String[]> requestParameters = getRequest().getParameterMap();
-        if (requestParameters instanceof ParameterMap<String,String[]>) {
+        if (requestParameters instanceof ParameterMap<?,?>) {
             parameters = new ParameterMap<>((ParameterMap<String,String[]>) requestParameters);
         } else {
             parameters = new ParameterMap<>(requestParameters);
