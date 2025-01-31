@@ -25,6 +25,8 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.websocket.ClientEndpointConfig;
+import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.ContainerProvider;
 import javax.websocket.MessageHandler;
 import javax.websocket.Session;
@@ -158,11 +160,9 @@ public class TestWebSocketFrameClientSSL extends WebSocketBaseTest {
             Assert.fail("There are [" + openConnectionCount + "] connections still open");
         }
 
-        // Set a short session close timeout (milliseconds)
-        wsSession.getUserProperties().put(
-            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
-        // Close the client session.
-        wsSession.close();
+        // Cast so we can force the session to be closed quickly.
+        CloseReason cr = new CloseReason(CloseCodes.CLOSED_ABNORMALLY, "");
+        ((WsSession) wsSession).doClose(cr, cr, true);
     }
 
     @Override

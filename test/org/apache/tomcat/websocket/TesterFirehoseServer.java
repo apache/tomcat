@@ -41,7 +41,7 @@ public class TesterFirehoseServer {
     public static final String MESSAGE;
     public static final int MESSAGE_SIZE = 1024;
     public static final int WAIT_TIME_MILLIS = 300000;
-    public static final int SEND_TIME_OUT_MILLIS = 5000;
+    public static final int SEND_TIME_OUT_MILLIS = 2000;
 
     public static final String PATH = "/firehose";
 
