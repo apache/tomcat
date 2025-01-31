@@ -19,6 +19,8 @@ package org.apache.tomcat.websocket.server;
 import java.net.URI;
 
 import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
 import jakarta.websocket.ContainerProvider;
 import jakarta.websocket.MessageHandler;
 import jakarta.websocket.Session;
@@ -34,6 +36,7 @@ import org.apache.coyote.AbstractProtocol;
 import org.apache.tomcat.websocket.TesterFirehoseServer;
 import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEndpoint;
 import org.apache.tomcat.websocket.WebSocketBaseTest;
+import org.apache.tomcat.websocket.WsSession;
 
 public class TestSlowClient extends WebSocketBaseTest {
 
@@ -70,10 +73,10 @@ public class TestSlowClient extends WebSocketBaseTest {
             count++;
         }
         Assert.assertTrue(wsSession.isOpen());
-        // Set a short session close timeout (milliseconds)
-        wsSession.getUserProperties().put(
-            org.apache.tomcat.websocket.Constants.SESSION_CLOSE_TIMEOUT_PROPERTY, Long.valueOf(2000));
-        wsSession.close();
+
+        // Cast so we can force the session to be closed quickly.
+        CloseReason cr = new CloseReason(CloseCodes.CLOSED_ABNORMALLY, "");
+        ((WsSession) wsSession).doClose(cr, cr, true);
 
         // BZ 64848 (non-container thread variant)
         // Confirm there are no waiting processors
