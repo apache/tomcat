@@ -62,10 +62,10 @@ public class TestParameterMapPerformance {
             System.out.println("Done with standard in " + duration + "ms");
         }
         /*
-         * The CI systems tend to produce outliers that lead to false failures so skip the longest two runs.
+         * The CI systems tend to produce outliers that lead to false failures so skip the longest NUM_SKIP runs.
          */
         long standardTotalDuration =
-                standardDurations.stream().sorted().limit(NUM_TESTS - 2).reduce(Long::sum).get().longValue();
+                standardDurations.stream().sorted().limit(NUM_TESTS - NUM_SKIP).reduce(Long::sum).get().longValue();
 
         List<Long> optimizedDurations = new ArrayList<>();
         for (int i = 0; i < NUM_TESTS; i++) {
@@ -79,7 +79,7 @@ public class TestParameterMapPerformance {
             System.out.println("Done with optimized in " + duration + "ms");
         }
         /*
-         * The CI systems tend to produce outliers that lead to false failures so skip the longest two runs.
+         * The CI systems tend to produce outliers that lead to false failures so skip the longest NUM_SKIP runs.
          */
         long optimizedTotalDuration =
                 optimizedDurations.stream().sorted().limit(NUM_TESTS - NUM_SKIP).reduce(Long::sum).get().longValue();
