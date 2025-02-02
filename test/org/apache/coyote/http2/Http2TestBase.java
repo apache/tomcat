@@ -43,6 +43,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.startup.SimpleHttpClient;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.runner.RunWith;
@@ -66,6 +67,8 @@ import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.net.TesterSupport;
+
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 
 /**
  * Tests for compliance with the <a href="https://tools.ietf.org/html/rfc7540"> HTTP/2 specification</a>.
@@ -107,7 +110,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     static {
         byte[] empty = new byte[0];
-        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.getUrlEncoder().encodeToString(empty) + "\r\n";
+        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.getUrlEncoder().encodeToString(empty) + CRLF;
     }
 
     protected static final String TRAILER_HEADER_NAME = "x-trailertest";
@@ -692,8 +695,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void doHttpUpgrade(String connection, String upgrade, String settings, boolean validate)
             throws IOException {
-        byte[] upgradeRequest = ("GET /simple HTTP/1.1\r\n" + "Host: localhost:" + getPort() + "\r\n" + "Connection: " +
-                connection + "\r\n" + "Upgrade: " + upgrade + "\r\n" + settings + "\r\n")
+        byte[] upgradeRequest = ("GET /simple HTTP/1.1" + CRLF + "Host: localhost:" + getPort() + CRLF + "Connection: " +
+                connection + CRLF + "Upgrade: " + upgrade + CRLF + settings + CRLF)
                 .getBytes(StandardCharsets.ISO_8859_1);
         os.write(upgradeRequest);
         os.flush();
@@ -776,7 +779,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         String response = new String(data.array(), data.arrayOffset(), data.arrayOffset() + data.position(),
                 StandardCharsets.ISO_8859_1);
 
-        return response.split("\r\n");
+        return response.split(CRLF);
     }
 
 
