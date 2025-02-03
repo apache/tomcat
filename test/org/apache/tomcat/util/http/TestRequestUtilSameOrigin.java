@@ -42,7 +42,7 @@ public class TestRequestUtilSameOrigin {
         TesterRequest request2 = new TesterRequest("ws", "example.com", 80);
         TesterRequest request3 = new TesterRequest("http", "example.com", 443);
         TesterRequest request4 = new TesterRequest("http", "example.com", 8080);
-        TesterRequest request5 = new TesterRequest(null, "exmaple.com", 80);
+        TesterRequest request5 = new TesterRequest(null, "example.com", 80);
         TesterRequest request6 = new TesterRequest("http", null, 8080);
 
         parameterSets.add(new Object[] { request1, "http://example.com", Boolean.TRUE });
