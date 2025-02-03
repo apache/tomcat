@@ -16,43 +16,9 @@
  */
 package org.apache.tomcat.util.buf;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-import org.apache.juli.logging.Log;
-import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.util.res.StringManager;
-
 public class ByteBufferUtils {
-
-    private static final StringManager sm = StringManager.getManager(ByteBufferUtils.class);
-    private static final Log log = LogFactory.getLog(ByteBufferUtils.class);
-
-    private static final Object unsafe;
-    private static final Method invokeCleanerMethod;
-
-    static {
-        ByteBuffer tempBuffer = ByteBuffer.allocateDirect(0);
-        Object unsafeLocal = null;
-        Method invokeCleanerMethodLocal = null;
-        try {
-            Class<?> clazz = Class.forName("sun.misc.Unsafe");
-            Field theUnsafe = clazz.getDeclaredField("theUnsafe");
-            theUnsafe.setAccessible(true);
-            unsafeLocal = theUnsafe.get(null);
-            invokeCleanerMethodLocal = clazz.getMethod("invokeCleaner", ByteBuffer.class);
-            invokeCleanerMethodLocal.invoke(unsafeLocal, tempBuffer);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException |
-                SecurityException | ClassNotFoundException | NoSuchFieldException e) {
-            log.warn(sm.getString("byteBufferUtils.cleaner"), e);
-            unsafeLocal = null;
-            invokeCleanerMethodLocal = null;
-        }
-        unsafe = unsafeLocal;
-        invokeCleanerMethod = invokeCleanerMethodLocal;
-    }
 
     private ByteBufferUtils() {
         // Hide the default constructor since this is a utility class.
@@ -96,19 +62,10 @@ public class ByteBufferUtils {
 
     /**
      * Clean specified direct buffer. This will cause an unavoidable warning on Java 24 and newer.
+     *
      * @param buf the buffer to clean
      */
     public static void cleanDirectBuffer(ByteBuffer buf) {
-        if (invokeCleanerMethod != null) {
-            try {
-                invokeCleanerMethod.invoke(unsafe, buf);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException |
-                    SecurityException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("byteBufferUtils.cleaner"), e);
-                }
-            }
-        }
+        ByteBufferUtilsUnsafe.cleanDirectBuffer(buf);
     }
-
 }
