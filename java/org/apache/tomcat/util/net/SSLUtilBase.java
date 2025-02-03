@@ -318,7 +318,7 @@ public abstract class SSLUtilBase implements SSLUtil {
          * required key works around that.
          * Other keys stores (hardware, MS, etc.) will be used as is.
          */
-        char[] keyPassArray = null;
+        char[] keyPassArray = new char[0];
         String keyPassToUse = null;
         if (keyPassFile != null) {
             try (BufferedReader reader =
