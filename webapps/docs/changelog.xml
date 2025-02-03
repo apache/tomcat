@@ -275,6 +275,11 @@
         Improve the performance of repeated calls to <code>getHeader()</code>.
         Pull request <pr>813</pr> provided by Adwait Kumar Singh. (markt)
       </fix>
+      <fix>
+        <bug>69559</bug>: Ensure that the Java 24 warning regarding the use of
+        <code> sun.misc.Unsafe::invokeCleaner</code> is only reported by the JRE
+        when the code will be used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
