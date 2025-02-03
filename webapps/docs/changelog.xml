@@ -242,6 +242,11 @@
         characters in an EL identifier as defined by the Java Language
         Specification. (markt)
       </fix>
+      <fix>
+        <bug>69532</bug>: Optimise the creation of
+        <code>ExpressionFactory</code> instances. Patch provided by John
+        Engebretson. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
