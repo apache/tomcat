@@ -16,7 +16,6 @@
  */
 package jakarta.el;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -33,10 +32,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 class Util {
 
@@ -101,9 +96,7 @@ class Util {
         }
     }
 
-
-    private static final CacheValue nullTcclFactory = new CacheValue();
-    private static final Map<CacheKey,CacheValue> factoryCache = new ConcurrentHashMap<>();
+    private static final ExpressionFactoryCache factoryCache = new ExpressionFactoryCache();
 
     /**
      * Provides a per class loader cache of ExpressionFactory instances without pinning any in memory as that could
@@ -113,101 +106,7 @@ class Util {
 
         ClassLoader tccl = getContextClassLoader();
 
-        CacheValue cacheValue = null;
-        ExpressionFactory factory = null;
-
-        if (tccl == null) {
-            cacheValue = nullTcclFactory;
-        } else {
-            CacheKey key = new CacheKey(tccl);
-            cacheValue = factoryCache.get(key);
-            if (cacheValue == null) {
-                CacheValue newCacheValue = new CacheValue();
-                cacheValue = factoryCache.putIfAbsent(key, newCacheValue);
-                if (cacheValue == null) {
-                    cacheValue = newCacheValue;
-                }
-            }
-        }
-
-        final Lock readLock = cacheValue.getLock().readLock();
-        readLock.lock();
-        try {
-            factory = cacheValue.getExpressionFactory();
-        } finally {
-            readLock.unlock();
-        }
-
-        if (factory == null) {
-            final Lock writeLock = cacheValue.getLock().writeLock();
-            writeLock.lock();
-            try {
-                factory = cacheValue.getExpressionFactory();
-                if (factory == null) {
-                    factory = ExpressionFactory.newInstance();
-                    cacheValue.setExpressionFactory(factory);
-                }
-            } finally {
-                writeLock.unlock();
-            }
-        }
-
-        return factory;
-    }
-
-
-    /**
-     * Key used to cache default ExpressionFactory information per class loader. The class loader reference is never
-     * {@code null}, because {@code null} tccl is handled separately.
-     */
-    private static class CacheKey {
-        private final int hash;
-        private final WeakReference<ClassLoader> ref;
-
-        CacheKey(ClassLoader key) {
-            hash = key.hashCode();
-            ref = new WeakReference<>(key);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (!(obj instanceof CacheKey)) {
-                return false;
-            }
-            ClassLoader thisKey = ref.get();
-            if (thisKey == null) {
-                return false;
-            }
-            return thisKey == ((CacheKey) obj).ref.get();
-        }
-    }
-
-    private static class CacheValue {
-        private final ReadWriteLock lock = new ReentrantReadWriteLock();
-        private WeakReference<ExpressionFactory> ref;
-
-        CacheValue() {
-        }
-
-        public ReadWriteLock getLock() {
-            return lock;
-        }
-
-        public ExpressionFactory getExpressionFactory() {
-            return ref != null ? ref.get() : null;
-        }
-
-        public void setExpressionFactory(ExpressionFactory factory) {
-            ref = new WeakReference<>(factory);
-        }
+        return factoryCache.getOrCreateExpressionFactory(tccl);
     }
 
 
