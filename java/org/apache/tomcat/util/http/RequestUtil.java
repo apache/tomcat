@@ -138,7 +138,7 @@ public class RequestUtil {
             // ports. Therefore only append the port to the target if a
             // non-default port is used.
             if (("http".equals(scheme) || "ws".equals(scheme)) && port != 80 ||
-                ("https".equals(scheme) || "wss".equals(scheme)) && port != 443) {
+                    ("https".equals(scheme) || "wss".equals(scheme)) && port != 443) {
                 target.append(':');
                 target.append(port);
             }
