@@ -68,7 +68,7 @@ public class TestSlowClient extends WebSocketBaseTest {
          * Wait for server to experience a write timeout. This should take TesterFirehoseServer.SEND_TIME_OUT_MILLIS
          * plus however long it takes for the network buffer to fill up which should be a few milliseconds. An
          * additional 10s should be enough even for the slowest CI system.
-         * 
+         *
          * As soon as the server has experienced the write timeout, send the session close message from the client and
          * close the network connection.
          */
