@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.2 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.3 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -144,79 +144,6 @@
         <code>reject</code>. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Add <code>tableName</code> configuration on the
-        <code>DataSourcePropertyStore</code> that may be used by the WebDAV
-        Servlet. (remm)
-      </update>
-      <update>
-        Improve HTTP If headers processing according to RFC 9110. Based on pull
-        request <pr>796</pr> by Chenjp. (remm/markt)
-      </update>
-      <update>
-        Allow <code>readOnly</code> attribute configuration on the
-        <code>Resources</code> element and allow configure the
-        <code>readOnly</code> attribute value of the main resources. The
-        attribute value will also be used by the default and WebDAV Servlets.
-        (remm)
-      </update>
-      <fix>
-        <bug>69285</bug>: Optimise the creation of the parameter map for
-        included requests. Based on sample code and test cases provided by John
-        Engebretson. (markt)
-      </fix>
-      <fix>
-        <bug>69527</bug>: Avoid rare cases where a cached resource could be set
-        with 0 content length, or could be evicted immediately. (remm)
-      </fix>
-      <fix>
-        Fix possible edge cases (such as HTTP/1.0) with trying to detect
-        requests without body for WebDAV LOCK and PROPFIND. (remm)
-      </fix>
-      <fix>
-        <bug>69528</bug>: Add multi-release JAR support for the
-        <code>bloom</code> <code>archiveIndexStrategy</code> of the
-        <code>Resources</code>. (remm)
-      </fix>
-      <fix>
-        Improve checks for <code>WEB-INF</code> and <code>META-INF</code> in
-        the WebDAV servlet. Based on a patch submitted by Chenjp. (remm)
-      </fix>
-      <fix>
-        Remove unused session to client map from
-        <code>CrawlerSessionManagerValve</code>. Submitted by Brian Matzon.
-        (remm)
-      </fix>
-      <fix>
-        When using the WebDAV servlet with <code>serveSubpathOnly</code> set to
-        <code>true</code>, ensure that the destination for any requested WebDAV
-        operation is also restricted to the sub-path. (markt)
-      </fix>
-      <fix>
-        Generate an appropriate <code>Allow</code> HTTP header when the Default
-        servlet returns a 405 (method not allowed) response in response to a
-        <code>DELETE</code> request because the target resource cannot be
-        deleted. Pull request <pr>802</pr> provided by Chenjp. (markt)
-      </fix>
-      <scode>
-        Refactor creation of <code>RequestDispatcher</code> instances so that
-        the processing of the provided path is consistent with normal request
-        processing. (markt)
-      </scode>
-      <add>
-        Add <code>encodedReverseSolidusHandling</code> and
-        <code>encodedSolidusHandling</code> attributes to Context to provide
-        control over the handling of the path used to created a
-        <code>RequestDispatcher</code>. (markt)
-      </add>
-      <fix>
-        Handle a potential <code>NullPointerException</code> after an
-        <code>IOException</code> occurs on a non-container thread during
-        asynchronous processing. (markt)
-      </fix>
-      <fix>
-        Enhance lifecycle of temporary files used by partial PUT. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -232,54 +159,6 @@
         (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Don't log warnings for registered HTTP/2 settings that Tomcat does not
-        support. These settings are now silently ignored. (markt)
-      </fix>
-      <fix>
-        Avoid a rare <code>NullPointerException</code> when recycling the
-        <code>Http11InputBuffer</code>. (markt)
-      </fix>
-      <fix>
-        Lower the log level to debug for logging an invalid socket channel when
-        processing poller events for the NIO Connector as this may occur in
-        normal usage. (markt)
-      </fix>
-      <scode>
-        Refactor the <code>SavedRequestInputFilter</code> so the buffered data
-        is used directly rather than copied. (markt)
-      </scode>
-      <scode>
-        Replace the unused buffer in
-        <code>org.apache.catalina.connector.InputBuffer</code> with a static,
-        zero length buffer. (markt)
-      </scode>
-      <scode>
-        Clean-up references to the HTTP/2 stream once request processing has
-        completed to aid GC and reduce the size of the HTTP/2 recycled request
-        and response cache. (markt)
-      </scode>
-      <add>
-        Add a new Connector configuration attribute,
-        <code>encodedReverseSolidusHandling</code>, to control how
-        <code>%5c</code> sequences in URLs are handled. The default behaviour is
-        unchanged (decode) keeping mind mind that the
-        <strong>allowBackslash</strong> attributes determines how the decoded
-        URI is processed. (markt)
-      </add>
-      <fix>
-        <bug>69545</bug>: Improve CRLF skipping for the <code>available</code>
-        method of the <code>ChunkedInputFilter</code>. (remm)
-      </fix>
-      <fix>
-        Improve the performance of repeated calls to <code>getHeader()</code>.
-        Pull request <pr>813</pr> provided by Adwait Kumar Singh. (markt)
-      </fix>
-      <fix>
-        <bug>69559</bug>: Ensure that the Java 24 warning regarding the use of
-        <code> sun.misc.Unsafe::invokeCleaner</code> is only reported by the JRE
-        when the code will be used. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -299,43 +178,11 @@
         21 being the minimum Java version required for Tomcat 12. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69508</bug>: Correct a regression in the fix for <bug>69382</bug>
-        that broke JSP include actions if both the page attribute and the body
-        contained parameters. Pull request <pr>803</pr> provided by Chenjp.
-        (markt)
-      </fix>
-      <fix>
-        Update the identifier validation in the Expression Language parser to
-        reflect that, as of Java 9, <code>_</code> is also a Java keyword and
-        may not be used as an identifier. (markt)
-      </fix>
-      <fix>
-        <bug>69521</bug>: Update the EL Parser to allow the full range of valid
-        characters in an EL identifier as defined by the Java Language
-        Specification. (markt)
-      </fix>
-      <fix>
-        <bug>69532</bug>: Optimise the creation of
-        <code>ExpressionFactory</code> instances. Patch provided by John
-        Engebretson. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        Documentation. Expand the description of the security implications of
-        setting <code>mapperContextRootRedirectEnabled</code> and/or
-        <code>mapperDirectoryRedirectEnabled</code> to <code>true</code>.
-        (markt)
-      </add>
-      <fix>
-        Documentation. Better document the default for the
-        <code>truststoreProvider</code> attribute of a
-        <code>SSLHostConfig</code> element. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -344,37 +191,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update to Commons Daemon 1.4.1. (markt)
-      </update>
-      <update>
-        Update the packaged version of the Tomcat Migration Tool for Jakarta EE
-        to 1.0.9. (markt)
-      </update>
-      <update>
-        Update the internal fork of Commons Pool to 2.12.1. (markt)
-      </update>
-      <update>
-        Update Byte Buddy to 1.16.1. (markt)
-      </update>
-      <update>
-        Update UnboundID to 7.0.2. (markt)
-      </update>
-      <update>
-        Update Checkstyle to 10.21.2. (markt)
-      </update>
-      <update>
-        Update SpotBugs to 4.9.0. (markt)
-      </update>
-      <add>
-        Improvements to French translations. (remm)
-      </add>
-      <add>
-        Improvements to Japanese translations by tak7iji. (markt)
-      </add>
-      <add>
-        Improvements to Chinese translations by leeyazhou. (markt)
-      </add>
     </changelog>
   </subsection>
 </section>
