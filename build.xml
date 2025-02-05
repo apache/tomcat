@@ -2027,6 +2027,8 @@
   <condition property="opens.javautilconcurrent" value="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED" else="-Dtest14=1">
     <javaversion atleast="9"/>
   </condition>
+  <!-- Set memory properties (unset by default) -->
+  <property name="test.xmx" value="-Dnoop"/>
 
   <macrodef name="runtests"
             description="Runs the unit tests using the specified connector.
@@ -2046,11 +2048,11 @@
           errorproperty="test.result.error"
           failureproperty="test.result.failure"
           haltonfailure="${test.haltonfailure}"
-          threads="${test.threads}"
-          maxmemory="256m">
+          threads="${test.threads}">
 
           <jvmarg value="${test.jvmarg.egd}"/>
           <jvmarg value="-Dfile.encoding=UTF-8"/>
+          <jvmarg value="${test.xmx}"/>
           <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
           <jvmarg value="${test.formatter}"/>
           <jvmarg value="-Djava.net.preferIPv4Stack=${java.net.preferIPv4Stack}"/>
