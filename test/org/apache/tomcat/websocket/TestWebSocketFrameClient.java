@@ -77,7 +77,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
                 new URI("ws://localhost:" + getPort() + TesterFirehoseServer.PATH));
         CountDownLatch latch = new CountDownLatch(TesterFirehoseServer.MESSAGE_COUNT);
-        BasicText handler = new BasicText(latch);
+        BasicText handler = new BasicText(latch, TesterFirehoseServer.MESSAGE);
         wsSession.addMessageHandler(handler);
         wsSession.getBasicRemote().sendText("Hello");
 
@@ -87,11 +87,7 @@ public class TestWebSocketFrameClient extends WebSocketBaseTest {
         // if the right number of messages arrived
         handler.getLatch().await(TesterFirehoseServer.WAIT_TIME_MILLIS, TimeUnit.MILLISECONDS);
 
-        Queue<String> messages = handler.getMessages();
-        Assert.assertEquals(TesterFirehoseServer.MESSAGE_COUNT, messages.size());
-        for (String message : messages) {
-            Assert.assertEquals(TesterFirehoseServer.MESSAGE, message);
-        }
+        Assert.assertEquals(TesterFirehoseServer.MESSAGE_COUNT, handler.getMessageCount());
     }
 
     @Test
