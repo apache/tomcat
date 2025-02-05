@@ -231,7 +231,7 @@
         Add a new Connector configuration attribute,
         <code>encodedReverseSolidusHandling</code>, to control how
         <code>%5c</code> sequences in URLs are handled. The default behaviour is
-        unchanged (decode) keeping mind mind that the
+        unchanged (decode) keeping in mind that the
         <strong>allowBackslash</strong> attributes determines how the decoded
         URI is processed. (markt)
       </add>
