@@ -1120,7 +1120,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 }
                 return stream;
             }
-            notFoundClassResources.add(path);
+            if (!name.startsWith("/")) {
+                notFoundClassResources.add(path);
+            }
         }
 
         // (3) Delegate to parent unconditionally
