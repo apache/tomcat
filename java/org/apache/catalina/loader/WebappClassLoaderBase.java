@@ -1098,14 +1098,12 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             log.trace("  Searching local repositories");
         }
         String path = nameToPath(name);
-        if (!notFoundClassResources.contains(path)) {
+        if (name.startsWith("/") || !notFoundClassResources.contains(path)) {
             WebResource resource = resources.getClassLoaderResource(path);
             if (resource.exists()) {
                 stream = resource.getInputStream();
                 trackLastModified(path, resource);
             }
-        }
-        if (!notFoundClassResources.contains(name)) {
             try {
                 if (hasExternalRepositories && stream == null) {
                     URL url = super.findResource(name);
@@ -1116,18 +1114,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             } catch (IOException e) {
                 // Ignore
             }
-        }
-        if (stream != null) {
-            if (log.isTraceEnabled()) {
-                log.trace("  --> Returning stream from local");
+            if (stream != null) {
+                if (log.isTraceEnabled()) {
+                    log.trace("  --> Returning stream from local");
+                }
+                return stream;
             }
-            return stream;
-        }
-        if (!notFoundClassResources.contains(path)) {
             notFoundClassResources.add(path);
-        }
-        if (!notFoundClassResources.contains(name)) {
-            notFoundClassResources.add(name);
         }
 
         // (3) Delegate to parent unconditionally
