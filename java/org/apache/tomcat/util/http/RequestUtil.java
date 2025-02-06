@@ -123,19 +123,12 @@ public class RequestUtil {
         // Build scheme://host:port from request
         StringBuilder target = new StringBuilder();
         String scheme = request.getScheme();
-        if (scheme == null) {
-            return false;
-        } else {
-            scheme = scheme.toLowerCase(Locale.ENGLISH);
-        }
-        target.append(scheme);
-        target.append("://");
-
         String host = request.getServerName();
-        if (host == null) {
+        if (scheme == null || host == null) {
             return false;
         }
-        target.append(host);
+        scheme = scheme.toLowerCase(Locale.ENGLISH);
+        target.append(scheme).append("://").append(host);
 
         int port = request.getServerPort();
         // Origin may or may not include the (default) port.
@@ -161,7 +154,7 @@ public class RequestUtil {
 
         // Both scheme and host are case-insensitive but the CORS spec states
         // this check should be case-sensitive
-        return origin.equals(target.toString());
+        return origin.contentEquals(target);
     }
 
 
