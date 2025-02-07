@@ -235,7 +235,7 @@ public class Cookie implements Cloneable, Serializable {
      * The default value is <code>false</code>.
      *
      * @param secure if <code>true</code>, sends the cookie from the browser to the server only when using a secure
-     *                 protocol; if <code>false</code>, sent on any protocol
+     *                   protocol; if <code>false</code>, sent on any protocol
      *
      * @see #getSecure
      */

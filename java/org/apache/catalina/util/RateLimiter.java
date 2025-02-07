@@ -92,7 +92,7 @@ public interface RateLimiter {
     /**
      * Provide the quota header for this rate limit for a given request count within the current time window.
      *
-     * @param requestCount  The request count within the current time window
+     * @param requestCount The request count within the current time window
      *
      * @return the quota header for the given value of request count
      *

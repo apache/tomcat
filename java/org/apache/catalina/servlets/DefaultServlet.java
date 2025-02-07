@@ -1516,7 +1516,7 @@ public class DefaultServlet extends HttpServlet {
             if (response.isCommitted()) {
                 /*
                  * Ideally, checkIfRange() would be changed to return Boolean so the three states (satisfied,
-                 * unsatisfied  and error) could each be communicated via the return value. There isn't a backwards
+                 * unsatisfied and error) could each be communicated via the return value. There isn't a backwards
                  * compatible way to do that that doesn't involve changing the method name and there are benefits to
                  * retaining the consistency of the existing method name pattern. Hence, this 'trick'. For the error
                  * state, checkIfRange() will call response.sendError() which will commit the response which this method

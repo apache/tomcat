@@ -425,7 +425,7 @@ public interface WebResourceRoot extends Lifecycle {
 
     /**
      * @return {@code true} if the main resources are read only, otherwise {@code false}. The default implementation
-     *   returns {@code false}.
+     *             returns {@code false}.
      */
     default boolean isReadOnly() {
         return false;
