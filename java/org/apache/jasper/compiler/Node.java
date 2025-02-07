@@ -1685,8 +1685,12 @@ abstract class Node implements TagConstants {
         }
 
         /**
-         * A custom action is considered to have an empty body if the following holds true: - getBody() returns null, or
-         * - all immediate children are jsp:attribute actions, or - the action's jsp:body is empty.
+         * A custom action is considered to have an empty body if any of the following hold true:
+         * <ul>
+         * <li>getBody() returns null</li>
+         * <li>all immediate children are jsp:attribute actions</li>
+         * <li>the action's jsp:body is empty</li>
+         * </ul>
          *
          * @return {@code true} if this custom action has an empty body, and {@code false} otherwise.
          */
