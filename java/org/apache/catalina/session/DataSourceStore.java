@@ -649,7 +649,8 @@ public class DataSourceStore extends StoreBase {
                         Context envCtx = (Context) (new InitialContext()).lookup("java:comp/env");
                         this.dataSource = (DataSource) envCtx.lookup(this.dataSourceName);
                     } catch (NamingException e) {
-                        context.getLogger().error(sm.getString("dataSourceStore.wrongDataSource", this.dataSourceName), e);
+                        context.getLogger().error(sm.getString("dataSourceStore.wrongDataSource", this.dataSourceName),
+                                e);
                     }
                 }
             }

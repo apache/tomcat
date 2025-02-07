@@ -30,7 +30,7 @@ public class Validation {
             "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int",
             "interface", "long", "native", "new", "null", "package", "private", "protected", "public", "return",
             "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient",
-            "true", "try", "void", "volatile", "while"};
+            "true", "try", "void", "volatile", "while" };
 
     private static final boolean IS_SECURITY_ENABLED = (System.getSecurityManager() != null);
 

@@ -86,8 +86,8 @@ import org.xml.sax.SAXException;
  * users and WebDAV users, the WebDAV servlet may be mounted at a sub-path (e.g. <code>/webdav/*</code>) which creates
  * an additional mapping for the entire web application under that sub-path, with WebDAV access to all the resources.
  * <p>
- * By default, the <code>WEB-INF</code> and <code>META-INF</code> directories are not accessible via WebDAV. This may
- * be changed by setting the <code>allowSpecialPaths</code> initialisation parameter to <code>true</code>.
+ * By default, the <code>WEB-INF</code> and <code>META-INF</code> directories are not accessible via WebDAV. This may be
+ * changed by setting the <code>allowSpecialPaths</code> initialisation parameter to <code>true</code>.
  * <p>
  * It is also possible to enable WebDAV access to a sub-set of the standard web application URL space rather than
  * creating an additional, WebDAV specific mapping. To do this, map the WebDAV servlet to the desired sub-path and set
@@ -1860,8 +1860,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private boolean isSpecialPath(final String path) {
         if (!allowSpecialPaths) {
             String upperCasePath = path.toUpperCase(Locale.ENGLISH);
-            if (upperCasePath.startsWith("/WEB-INF/") || upperCasePath.startsWith("/META-INF/")
-                    || upperCasePath.equals("/WEB-INF") || upperCasePath.equals("/META-INF")) {
+            if (upperCasePath.startsWith("/WEB-INF/") || upperCasePath.startsWith("/META-INF/") ||
+                    upperCasePath.equals("/WEB-INF") || upperCasePath.equals("/META-INF")) {
                 return true;
             }
         }
