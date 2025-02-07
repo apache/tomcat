@@ -98,6 +98,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *
  * @author Andre de Jesus
  * @author Peter Rossbach
+ *
  * @deprecated Non scalable design, and not documented. Will be removed in Tomcat 12.
  */
 @Deprecated
@@ -577,6 +578,7 @@ public class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     /**
      * Prepare tables for processing. Used by subclasses for testing.
+     *
      * @throws SQLException if an exception occurs
      */
     protected void prepare() throws SQLException {
