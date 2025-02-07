@@ -52,8 +52,7 @@ import org.w3c.dom.Node;
  * </ul>
  * The table name used can be configured using the <code>tableName</code> property of the store.
  * <p>
- * Example table schema:
- * <code>CREATE TABLE properties (
+ * Example table schema: <code>CREATE TABLE properties (
  *    path         VARCHAR(1024) NOT NULL,
  *    namespace    VARCHAR(64) NOT NULL,
  *    name         VARCHAR(64) NOT NULL,
@@ -97,8 +96,7 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
     }
 
     /**
-     * @param dataSourceName the DataSource JNDI name, will be prefixed with
-     *  java:comp/env for the lookup.
+     * @param dataSourceName the DataSource JNDI name, will be prefixed with java:comp/env for the lookup.
      */
     public void setDataSourceName(String dataSourceName) {
         this.dataSourceName = dataSourceName;
@@ -129,7 +127,8 @@ public class DataSourcePropertyStore implements WebdavServlet.PropertyStore {
             try {
                 dataSource = (DataSource) ((new InitialContext()).lookup("java:comp/env/" + dataSourceName));
             } catch (NamingException e) {
-                throw new IllegalArgumentException(sm.getString("webdavservlet.dataSourceStore.noDataSource", dataSourceName), e);
+                throw new IllegalArgumentException(
+                        sm.getString("webdavservlet.dataSourceStore.noDataSource", dataSourceName), e);
             }
         }
         addPropertyStatement = "INSERT INTO " + tableName + " (path, namespace, name, node) VALUES (?, ?, ?, ?)";

@@ -448,7 +448,7 @@ public class Request implements HttpServletRequest {
         userPrincipal = null;
         subject = null;
         parametersParsed = false;
-        if (connector != null ) {
+        if (connector != null) {
             maxParameterCount = connector.getMaxParameterCount();
         } else {
             maxParameterCount = -1;
