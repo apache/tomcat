@@ -19,13 +19,10 @@ package org.apache.jasper.compiler;
 import java.io.PrintWriter;
 
 /**
- * This class filters duplicate newlines instructions from the compiler output,
- * and therefore from the runtime JSP. The duplicates typically happen because
- * the compiler has multiple branches that write them, but they operate
- * independently and don't realize that the previous output was identical.
- *
- * Removing these lines makes the JSP more efficient by executing fewer
- * operations during runtime.
+ * This class filters duplicate newlines instructions from the compiler output, and therefore from the runtime JSP. The
+ * duplicates typically happen because the compiler has multiple branches that write them, but they operate
+ * independently and don't realize that the previous output was identical. Removing these lines makes the JSP more
+ * efficient by executing fewer operations during runtime.
  */
 public class NewlineReductionServletWriter extends ServletWriter {
 
