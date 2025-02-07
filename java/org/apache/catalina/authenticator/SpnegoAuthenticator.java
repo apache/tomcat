@@ -48,7 +48,7 @@ import org.ietf.jgss.Oid;
  * depends on the correct configuration of multiple components. If the configuration is invalid, the error messages are
  * often cryptic although a Google search will usually point you in the right direction.
  */
-public class SpnegoAuthenticator extends AuthenticatorBase {
+public class SpnegoAuthenticator extends LoginlessAuthenticatorBase {
 
     private final Log log = LogFactory.getLog(SpnegoAuthenticator.class); // must not be static
     private static final String AUTH_HEADER_VALUE_NEGOTIATE = "Negotiate";
