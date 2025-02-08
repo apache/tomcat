@@ -209,8 +209,11 @@ public class OneLineFormatter extends Formatter {
 
     /**
      * LogRecord has threadID but no thread name.
+     *
+     * @param logRecordThreadId the thread id
+     * @return the thread name
      */
-    private static String getThreadName(long logRecordThreadId) {
+    protected static String getThreadName(long logRecordThreadId) {
         Map<Long, String> cache = threadNameCache.get();
         String result = cache.get(Long.valueOf(logRecordThreadId));
 

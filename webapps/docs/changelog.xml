@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.4 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Add <code>org.apache.juli.JsonFormatter</code> to format log as one
+        line JSON documents. (remm)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.3 (markt)" rtext="release in progress">
   <subsection name="Catalina">
