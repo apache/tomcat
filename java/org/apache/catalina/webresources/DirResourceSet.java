@@ -343,7 +343,10 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
      */
     private boolean isCaseSensitive() {
         try {
-            String canonicalPath = getFileBase().getCanonicalPath();
+            // Some file system (e.g. windows) treat files and directories as case insensitive by default, and also support
+            // setting case sensitivity per directory. Then we have to handle case sensitivity for each directory.
+            // Ensure file path contain ENGLISH string, otherwise its upper and lower maybe are same.
+            String canonicalPath = new File(getFileBase(),"Foo.TxT").getCanonicalPath();
             File upper = new File(canonicalPath.toUpperCase(Locale.ENGLISH));
             if (!canonicalPath.equals(upper.getCanonicalPath())) {
                 return true;
