@@ -213,8 +213,11 @@ public class OneLineFormatter extends Formatter {
      * <p>
      * Words fail me to describe what I think of the design decision to use an int in LogRecord for a long value and the
      * resulting mess that follows.
+     *
+     * @param logRecordThreadId the thread id
+     * @return the thread name
      */
-    private static String getThreadName(int logRecordThreadId) {
+    protected static String getThreadName(int logRecordThreadId) {
         Map<Integer, String> cache = threadNameCache.get();
         String result = cache.get(Integer.valueOf(logRecordThreadId));
 
