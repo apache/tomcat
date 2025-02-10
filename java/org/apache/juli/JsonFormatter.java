@@ -16,6 +16,7 @@
  */
 package org.apache.juli;
 
+import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 
 /**
@@ -25,7 +26,7 @@ import java.util.logging.LogRecord;
  * <p>
  * The LogRecord is mapped as attributes:
  * <ul>
- * <li>time: the log record timestamp</li>
+ * <li>time: the log record timestamp, with the default format as {@code yyyy-MM-dd'T'HH:mm:ss.SSSX}</li>
  * <li>level: the log level</li>
  * <li>thread: the current on which the log occurred</li>
  * <li>class: the class from which the log originated</li>
@@ -38,6 +39,16 @@ import java.util.logging.LogRecord;
  * </ul>
  */
 public class JsonFormatter extends OneLineFormatter {
+
+    private static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX";
+
+    public JsonFormatter() {
+        String timeFormat = LogManager.getLogManager().getProperty(JsonFormatter.class.getName() + ".timeFormat");
+        if (timeFormat == null) {
+            timeFormat = DEFAULT_TIME_FORMAT;
+        }
+        setTimeFormat(timeFormat);
+    }
 
     @Override
     public String format(LogRecord record) {
