@@ -61,6 +61,10 @@ public final class FastHttpDateFormat {
                 new ConcurrentDateFormat[] { FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME };
     }
 
+    private FastHttpDateFormat() {
+        // Utility class. Hide default constructor.
+    }
+
     /**
      * Instant on which the currentDate object was generated.
      */
