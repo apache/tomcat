@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -719,5 +720,92 @@ public class TestDefaultServlet extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
+    }
+
+    @Test
+    public void testLimitPutFileSize_Fully() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        File tempDocBase = Files.createTempDirectory(getTemporaryDirectory().toPath(), "put").toFile();
+        Context ctxt = tomcat.addContext("", tempDocBase.getAbsolutePath());
+
+        Wrapper w = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+        w.addInitParameter("readonly", "false");
+        w.addInitParameter("maxPutFileSize", "10");
+        ctxt.addServletMappingDecoded("/", "default");
+        tomcat.start();
+
+        SimpleHttpClient putClient = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        putClient.setPort(getPort());
+        putClient.setRequest(new String[] {
+                "PUT /test.txt HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Content-Length: " + 10 + CRLF +
+                CRLF +
+                "0123456789"
+        });
+        putClient.connect();
+        putClient.processRequest(false);
+        Assert.assertTrue(putClient.isResponse201());
+
+        putClient.setRequest(new String[] {
+                "PUT /test1.txt HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Content-Length: " + 20 + CRLF +
+                CRLF +
+                "01234567890123456789"
+        });
+        putClient.connect();
+        putClient.processRequest(false);
+        Assert.assertTrue(putClient.isResponse413());
+    }
+
+
+    @Test
+    public void testLimitPutFileSize_Partially() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        File tempDocBase = Files.createTempDirectory(getTemporaryDirectory().toPath(), "put").toFile();
+        Context ctxt = tomcat.addContext("", tempDocBase.getAbsolutePath());
+
+        Wrapper w = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+        w.addInitParameter("readonly", "false");
+        w.addInitParameter("maxPutFileSize", "10");
+        ctxt.addServletMappingDecoded("/", "default");
+        tomcat.start();
+
+        SimpleHttpClient putClient = new SimpleHttpClient() {
+            @Override
+            public boolean isResponseBodyOK() {
+                return true;
+            }
+        };
+        putClient.setPort(getPort());
+        putClient.setRequest(new String[] {
+                "PUT /test.txt HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Content-Length: " + 10 + CRLF +
+                "Content-Range: bytes 0-9/10" + CRLF +
+                CRLF +
+                "0123456789"
+        });
+        putClient.connect();
+        putClient.processRequest(false);
+        Assert.assertEquals(201, putClient.getStatusCode());
+
+        putClient.setRequest(new String[] {
+                "PUT /test1.txt HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Content-Length: " + 1 + CRLF +
+                "Content-Range: bytes 9-9/11" + CRLF +
+                CRLF +
+                "0"
+        });
+        putClient.connect();
+        putClient.processRequest(false);
+        Assert.assertEquals(413, putClient.getStatusCode());
     }
 }

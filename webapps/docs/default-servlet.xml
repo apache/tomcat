@@ -211,6 +211,12 @@ Tomcat.</p>
         When a directory redirect (trailing slash missing) is made, use this as
         the the HTTP response code. [302]
   </property>
+  <property name="maxPutFileSize">
+        Set the maximum file size(in bytes) of a PUT request that is allowd, 
+        including a partial PUT. Implicit file size that specified in 
+        Content-Range header field is also effected.
+        Use a non-negative value to limit it. [-1] 
+  </property>  
 </properties>
 </section>
 

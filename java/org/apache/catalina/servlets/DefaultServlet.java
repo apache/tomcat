@@ -260,6 +260,11 @@ public class DefaultServlet extends HttpServlet {
      */
     private boolean useStrongETags = false;
 
+    /**
+     * Maximum size of PUT target resource.
+     */
+    private long maxPutFileSize = -1L;
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -395,6 +400,9 @@ public class DefaultServlet extends HttpServlet {
             useStrongETags = Boolean.parseBoolean(getServletConfig().getInitParameter("useStrongETags"));
         }
 
+        if (getServletConfig().getInitParameter("maxPutFileSize") != null) {
+            maxPutFileSize = Long.parseLong(getServletConfig().getInitParameter("maxPutFileSize"));
+        }
     }
 
     private CompressionFormat[] parseCompressionFormats(String precompressed, String gzip) {
@@ -608,9 +616,24 @@ public class DefaultServlet extends HttpServlet {
             // resource - create a temp. file on the local filesystem to
             // perform this operation
             // Assume just one range is specified for now
-            if (range == IGNORE) {
+            if (maxPutFileSize >= 0 && req.getContentLength() > maxPutFileSize) {
+                try {
+                    resp.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+                } catch (IllegalStateException e) {
+                    // Already committed, ignore
+                }
+                return;
+            } else if (range == IGNORE) {
                 resourceInputStream = req.getInputStream();
             } else {
+                if (maxPutFileSize >= 0 && (range.getLength() > maxPutFileSize)||range.getEnd() >= maxPutFileSize) {
+                    try {
+                        resp.sendError(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+                    } catch (IllegalStateException e) {
+                        // Already committed, ignore
+                    }
+                    return;
+                }
                 tempContentFile = executePartialPut(req, range, path);
                 resourceInputStream = new FileInputStream(tempContentFile);
             }
