@@ -63,6 +63,7 @@ public abstract class AbstractProcessorLight implements Processor {
                 state = service(socketWrapper);
             } else if (status == SocketEvent.CONNECT_FAIL) {
                 logAccess(socketWrapper);
+                recycle();
             } else {
                 // Default to closing the socket if the SocketEvent passed in
                 // is not consistent with the current state of the Processor

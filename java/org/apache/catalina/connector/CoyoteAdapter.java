@@ -270,6 +270,7 @@ public class CoyoteAdapter implements Adapter {
         } finally {
             if (!success) {
                 res.setStatus(500);
+                updateWrapperErrorCount(request, response);
             }
 
             // Access logging
@@ -286,14 +287,12 @@ public class CoyoteAdapter implements Adapter {
                 }
             }
 
+            if (!success || !request.isAsync()) {
+                forceRecycle(request, response);
+            }
+
             req.getRequestProcessor().setWorkerThreadName(null);
             req.clearRequestThread();
-            // Recycle the wrapper request and response
-            if (!success || !request.isAsync()) {
-                updateWrapperErrorCount(request, response);
-                request.recycle();
-                response.recycle();
-            }
         }
         return success;
     }
@@ -450,18 +449,16 @@ public class CoyoteAdapter implements Adapter {
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
 
+        boolean newWrapper = false;
         if (request == null) {
-            // Create objects
+            // Create objects for logging purpose, recycle them in the end.
             request = connector.createRequest(req);
             response = connector.createResponse(res);
 
+            newWrapper = true;
             // Link objects
             request.setResponse(response);
             response.setRequest(request);
-
-            // Set as notes
-            req.setNote(ADAPTER_NOTES, request);
-            res.setNote(ADAPTER_NOTES, response);
 
             // Set query string encoding
             req.getParameters().setQueryStringCharset(connector.getURICharset());
@@ -471,8 +468,8 @@ public class CoyoteAdapter implements Adapter {
             // Log at the lowest level available. logAccess() will be
             // automatically called on parent containers.
             boolean logged = false;
-            Context context = request.mappingData.context;
-            Host host = request.mappingData.host;
+            Context context = request.getContext();
+            Host host = request.getHost();
             if (context != null) {
                 logged = true;
                 context.logAccess(request, response, time, true);
@@ -487,9 +484,10 @@ public class CoyoteAdapter implements Adapter {
             ExceptionUtils.handleThrowable(t);
             log.warn(sm.getString("coyoteAdapter.accesslogFail"), t);
         } finally {
-            updateWrapperErrorCount(request, response);
-            request.recycle();
-            response.recycle();
+            if(newWrapper) {
+                request.recycle();
+                response.recycle();
+            }
         }
     }
 
@@ -504,15 +502,17 @@ public class CoyoteAdapter implements Adapter {
         Response response = (Response) res.getNote(ADAPTER_NOTES);
         String messageKey = null;
         if (request != null && request.getHost() != null) {
+            // request has not been recycled.
             messageKey = "coyoteAdapter.checkRecycled.request";
         } else if (response != null && response.getContentWritten() != 0) {
+            // response has not been recycled.
             messageKey = "coyoteAdapter.checkRecycled.response";
         }
         if (messageKey != null) {
             // Log this request, as it has probably skipped the access log.
-            // The log() method will take care of recycling.
             log(req, res, 0L);
 
+            forceRecycle(request,response);
             if (connector.getState().isAvailable()) {
                 if (log.isInfoEnabled()) {
                     log.info(sm.getString(messageKey), new RecycleRequiredException());
@@ -525,6 +525,23 @@ public class CoyoteAdapter implements Adapter {
                     log.debug(sm.getString(messageKey), new RecycleRequiredException());
                 }
             }
+        }
+    }
+
+
+    /**
+     * Ensure the wrapper of request and response are recycled. They may be returned to a pool for reuse if came from
+     * pool.
+     *
+     * @param request Request
+     * @param response Response
+     */
+    private void forceRecycle(org.apache.catalina.connector.Request request, org.apache.catalina.connector.Response response) {
+        if (request != null) {
+            request.recycle();
+        }
+        if (response != null) {
+            response.recycle();
         }
     }
 
