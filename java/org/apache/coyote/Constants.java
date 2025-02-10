@@ -46,6 +46,10 @@ public final class Constants {
     public static final int DEFAULT_CONNECTION_LINGER = -1;
     public static final boolean DEFAULT_TCP_NO_DELAY = true;
 
+    private Constants() {
+        // Constant class. Hide default constructor.
+    }
+
     /**
      * The request attribute that is set to the value of {@code Boolean.TRUE} if connector processing this request
      * supports use of sendfile.
