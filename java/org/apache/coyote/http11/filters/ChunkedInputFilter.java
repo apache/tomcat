@@ -27,6 +27,7 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.coyote.http11.Constants;
 import org.apache.coyote.http11.InputFilter;
+import org.apache.tomcat.util.BufferUtil;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.parser.HttpHeaderParser;
@@ -245,7 +246,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     public void recycle() {
         remaining = 0;
         if (readChunk != null) {
-            readChunk.position(0).limit(0);
+            BufferUtil.resetBuff(readChunk);
         }
         trailingHeaders.clear();
         trailingHeaders.limit(0);

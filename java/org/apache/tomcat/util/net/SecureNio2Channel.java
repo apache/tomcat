@@ -41,6 +41,7 @@ import javax.net.ssl.SSLSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.BufferUtil;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.TLSClientHelloExtractor.ExtractorResult;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
@@ -493,10 +494,8 @@ public class SecureNio2Channel extends Nio2Channel  {
             throw new IOException(sm.getString("channel.nio.ssl.appOutputNotEmpty"));
         }
 
-        netOutBuffer.position(0);
-        netOutBuffer.limit(0);
-        netInBuffer.position(0);
-        netInBuffer.limit(0);
+        BufferUtil.resetBuff(netOutBuffer);
+        BufferUtil.resetBuff(netInBuffer);
         getBufHandler().reset();
 
         handshakeComplete = false;

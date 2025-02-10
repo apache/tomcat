@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Utilities to manipulate char chunks. While String is the easiest way to manipulate chars ( search, substrings, etc),
@@ -92,7 +93,13 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
         return super.clone();
     }
 
-
+    @Override
+    public void recycle() {
+        super.recycle();
+        if(buff!=null) {
+            Arrays.fill(buff, (char)0);
+        }
+    }
     // -------------------- Setup --------------------
 
     public void allocate(int initial, int limit) {

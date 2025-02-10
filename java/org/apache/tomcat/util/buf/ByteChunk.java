@@ -25,6 +25,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 /**
  * This class is used to represent a chunk of bytes, and utilities to manipulate byte[].
@@ -157,6 +158,9 @@ public final class ByteChunk extends AbstractChunk {
     public void recycle() {
         super.recycle();
         charset = null;
+        if(buff!=null) {
+            Arrays.fill(buff, (byte)0);
+        }
     }
 
 

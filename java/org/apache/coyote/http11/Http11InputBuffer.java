@@ -27,6 +27,7 @@ import org.apache.coyote.InputBuffer;
 import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.BufferUtil;
 import org.apache.tomcat.util.http.HeaderUtil;
 import org.apache.tomcat.util.http.parser.HttpHeaderParser;
 import org.apache.tomcat.util.http.parser.HttpHeaderParser.HeaderDataSource;
@@ -252,7 +253,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
 
         // Avoid rare NPE reported on users@ list
         if (byteBuffer != null) {
-            byteBuffer.limit(0).position(0);
+            BufferUtil.resetBuff(byteBuffer);
         }
         lastActiveFilter = -1;
         swallowInput = true;
@@ -286,8 +287,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                 byteBuffer.compact();
                 byteBuffer.flip();
             } else {
-                // Reset position and limit to 0
-                byteBuffer.position(0).limit(0);
+                BufferUtil.resetBuff(byteBuffer);
             }
         }
 
@@ -805,10 +805,8 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                 byteBuffer.limit(byteBuffer.position());
                 byteBuffer.position(mark);
             } else {
-                // Position and mark are inconsistent. Set position and limit to
-                // zero so effectively no data is reported as read.
-                byteBuffer.position(0);
-                byteBuffer.limit(0);
+                // Position and mark are inconsistent. Reset buffer to ensure no data can be read.
+                BufferUtil.resetBuff(byteBuffer);
             }
         }
 
