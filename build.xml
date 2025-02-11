@@ -2523,7 +2523,7 @@
   </target>
 
   <target name="-installer-init" depends="-installer-pre-init" unless="${installer.ok}">
-	  <fail message="The executable ${codesigning.tool} was not found on the current path.
+    <fail message="The executable ${codesigning.tool} was not found on the current path.
 Either wine or makensis are required to build the Windows installer on a non-Windows platform.
 Choose the tool by setting property codesigning.tool in build.properties.
 To skip building the Windows installer, set the skip.installer property in build.properties" />
