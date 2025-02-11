@@ -94,6 +94,10 @@ codesigning.storetype=DIGICERTONE
 # Set codesigning.storepass in build.properties with the following syntax
 #codesigning.storepass=<api-key>|/path/to/Certificate_pkcs12.p12|<password>
 
+# Which tool to use for building Windows installer
+# on unix platform: wine or makensis.
+codesigning.tool=wine
+
 # ----- Settings to control downloading of files -----
 execute.download=true
 trydownload.httpusecaches=true

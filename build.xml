@@ -2499,19 +2499,34 @@
     <property environment="env" />
     <condition property="wine.ok">
       <or>
+        <and>
+          <equals arg1="${codesigning.tool}" arg2="wine" forcestring="true"/>
+          <available file="wine" filepath="${env.PATH}" />
+        </and>
+      </or>
+    </condition>
+    <condition property="makensis.ok">
+      <or>
+        <and>
+          <equals arg1="${codesigning.tool}" arg2="makensis" forcestring="true"/>
+          <available file="makensis" filepath="${env.PATH}" />
+        </and>
+      </or>
+    </condition>
+    <condition property="installer.ok">
+      <or>
         <os family="windows" />
-        <available file="wine" filepath="${env.PATH}" />
-        <available file="makensis" filepath="${env.PATH}" />
-        <isset property="skip.installer"/>
+        <isset property="wine.ok"/>
+        <isset property="makensis.ok"/>
       </or>
     </condition>
   </target>
 
-  <target name="-installer-init" depends="-installer-pre-init" unless="${wine.ok}">
-    <fail message="The executable wine was not found on the current path.
-Wine is required to build the Windows installer when running a release build on
-a non-Windows platform. To skip building the Windows installer, set the
-skip.installer property in build.properties" />
+  <target name="-installer-init" depends="-installer-pre-init" unless="${installer.ok}">
+	  <fail message="The executable ${codesigning.tool} was not found on the current path.
+Either wine or makensis are required to build the Windows installer on a non-Windows platform.
+Choose the tool by setting property codesigning.tool in build.properties.
+To skip building the Windows installer, set the skip.installer property in build.properties" />
   </target>
 
   <target name="-installer-prep"
@@ -2543,16 +2558,28 @@ skip.installer property in build.properties" />
     </touch>
   </target>
 
-  <target name="-installer" unless="skip.installer"
-      depends="-installer-prep">
-    <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
+  <target name="-installer-wine" if="${wine.ok}">
+    <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
+      <arg value="${nsis.exe}" />
       <arg value="/DNSISDIR=${nsis.home}" />
       <arg value="/V2" />
       <arg value="tomcat.nsi" />
     </exec>
+  </target>
+
+  <target name="-installer-makensis" if="${makensis.ok}">
     <exec dir="${tomcat.dist}" executable="makensis" osfamily="unix">
       <arg value="-DNSISDIR=${nsis.home}" />
       <arg value="-V2" />
+      <arg value="tomcat.nsi" />
+    </exec>
+  </target>
+
+  <target name="-installer" unless="skip.installer"
+      depends="-installer-prep,-installer-wine,-installer-makensis">
+    <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
+      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="/V2" />
       <arg value="tomcat.nsi" />
     </exec>
   </target>
