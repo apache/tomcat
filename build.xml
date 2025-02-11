@@ -2253,6 +2253,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2278,6 +2279,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2302,6 +2304,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2326,6 +2329,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2350,6 +2354,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2374,6 +2379,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2396,6 +2402,7 @@
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
