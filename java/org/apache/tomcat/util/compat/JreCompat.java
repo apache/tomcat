@@ -129,7 +129,7 @@ public class JreCompat {
             Class<?> clazz = Class.forName("java.io.FileSystem");
             f1 = clazz.getDeclaredField("useCanonCaches");
             f1.setAccessible(true);
-        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+        } catch (ReflectiveOperationException | RuntimeException e) {
             /*
              * Log at debug level as this will only be an issue if the field needs to be accessed and most
              * configurations will not need to do so. Appropriate warnings will be logged if an attempt is made to use
