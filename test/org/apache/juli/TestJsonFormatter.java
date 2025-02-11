@@ -51,7 +51,7 @@ public class TestJsonFormatter {
         LinkedHashMap<String,Object> json = parser.object();
         Assert.assertEquals(json.get("method"), "testFormat");
         @SuppressWarnings("unchecked")
-        ArrayList<Object> trace = (ArrayList<Object>) json.get("trace");
+        ArrayList<Object> trace = (ArrayList<Object>) json.get("throwable");
         Assert.assertEquals(trace.get(0), "java.lang.IllegalStateException: Bad state");
 
     }
