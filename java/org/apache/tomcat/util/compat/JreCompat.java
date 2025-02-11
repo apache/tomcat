@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.compat;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InaccessibleObjectException;
 import java.net.SocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
@@ -99,7 +100,7 @@ public class JreCompat {
             Class<?> clazz = Class.forName("java.io.FileSystem");
             f1 = clazz.getDeclaredField("useCanonCaches");
             f1.setAccessible(true);
-        } catch (ReflectiveOperationException | IllegalArgumentException e) {
+        } catch (InaccessibleObjectException | ReflectiveOperationException | IllegalArgumentException e) {
             /*
              * Log at debug level as this will only be an issue if the field needs to be accessed and most
              * configurations will not need to do so. Appropriate warnings will be logged if an attempt is made to use
