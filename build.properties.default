@@ -96,7 +96,7 @@ codesigning.storetype=DIGICERTONE
 
 # Which tool to use for building Windows installer
 # on unix platform: wine or makensis.
-codesigning.tool=wine
+nsis.tool=wine
 
 # ----- Settings to control downloading of files -----
 execute.download=true
