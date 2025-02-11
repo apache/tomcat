@@ -22,10 +22,10 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.LongAdder;
 
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot.CacheStrategy;
+import org.apache.catalina.util.Counter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
@@ -49,8 +49,8 @@ public class Cache {
     private int objectMaxSize = (int) maxSize / OBJECT_MAX_SIZE_FACTOR;
     private CacheStrategy cacheStrategy;
 
-    private LongAdder lookupCount = new LongAdder();
-    private LongAdder hitCount = new LongAdder();
+    private Counter lookupCount = Counter.of(true);
+    private Counter hitCount = Counter.of(true);
 
     private final ConcurrentMap<String,CachedResource> resourceCache = new ConcurrentHashMap<>();
 
@@ -277,6 +277,11 @@ public class Cache {
         }
     }
 
+    public void setEnableCounters(boolean enabled) {
+        lookupCount = Counter.of(enabled);
+        hitCount = Counter.of(enabled);
+    }
+
     public CacheStrategy getCacheStrategy() {
         return cacheStrategy;
     }
@@ -304,11 +309,11 @@ public class Cache {
     }
 
     public long getLookupCount() {
-        return lookupCount.sum();
+        return lookupCount.get();
     }
 
     public long getHitCount() {
-        return hitCount.sum();
+        return hitCount.get();
     }
 
     public void setObjectMaxSize(int objectMaxSize) {
