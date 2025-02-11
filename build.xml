@@ -2281,6 +2281,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2306,6 +2307,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2330,6 +2332,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2354,6 +2357,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2378,6 +2382,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2402,6 +2407,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
@@ -2424,6 +2430,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
               &lt;br/&gt;
               Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo are either registered trademarks
               or trademarks of the Apache Software Foundation."
+      locale="${javadoc.locale}"
       encoding="UTF-8"
       docencoding="UTF-8"
       charset="UTF-8"
