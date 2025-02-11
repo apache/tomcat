@@ -156,8 +156,8 @@ Var ServiceInstallLog
   InstType Minimum
   InstType Full
 
-  !finalize 'ant -f ../../build.xml jsign-installer'
-  !uninstfinalize 'ant -f ../../build.xml -Dcodesigning.file_to_sign=%1 jsign-uninstaller'
+  !finalize 'ant -f @BASEDIR@/build.xml jsign-installer'
+  !uninstfinalize 'ant -f @BASEDIR@/build.xml -Dcodesigning.file_to_sign=%1 jsign-uninstaller'
 
   ReserveFile System.dll
   ReserveFile nsDialogs.dll

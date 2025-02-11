@@ -286,6 +286,11 @@
     <filter token="JASPIC_SPEC_VERSION" value="${jaspic.spec.version}"/>
   </filterset>
 
+  <!-- Path filter set -->
+  <filterset id="path.filters">
+    <filter token="BASEDIR" value="${basedir}"/>
+  </filterset>
+
   <!-- Files to change line endings for depending on target platform -->
   <patternset id="text.files" >
     <include name="**/INSTALLLICENSE"/>
@@ -2526,6 +2531,7 @@ skip.installer property in build.properties" />
     <copy file="${nsis.nsdialogs.dll}" todir="${tomcat.dist}" />
     <copy file="res/install-win/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
+      <filterset refid="path.filters"/>
     </copy>
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
         encoding="ISO-8859-1" fixlast="false" >
