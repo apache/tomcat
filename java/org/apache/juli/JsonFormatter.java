@@ -32,9 +32,8 @@ import java.util.logging.LogRecord;
  * <li>class: the class from which the log originated</li>
  * <li>method: the method from which the log originated</li>
  * <li>message: the log message</li>
- * <li>error: the message from an exception, if present</li>
- * <li>trace: the full stack trace from an exception, if present, represented as an array of string
- *  (the message first, then one string per stack trace element prefixed by a string,
+ * <li>throwable: the full stack trace from an exception, if present, represented as an array of string
+ *  (the message first, then one string per stack trace element prefixed by a whitespace,
  *  then moving on to the cause exception if any)</li>
  * </ul>
  */
@@ -93,13 +92,8 @@ public class JsonFormatter extends OneLineFormatter {
         if (t != null) {
             sb.append("\", ");
 
-            // Error
-            sb.append("\"error\": \"");
-            sb.append(JSONFilter.escape(t.toString()));
-            sb.append("\", ");
-
             // Stack trace
-            sb.append("\"trace\": [");
+            sb.append("\"throwable\": [");
             boolean first = true;
             do {
                 if (!first) {
@@ -113,9 +107,9 @@ public class JsonFormatter extends OneLineFormatter {
                 }
                 t = t.getCause();
             } while (t != null);
-            sb.append("]");
+            sb.append(']');
         } else {
-            sb.append("\"");
+            sb.append('\"');
         }
 
         sb.append('}');
