@@ -2672,7 +2672,7 @@ To skip building the Windows installer, set the skip.installer property in build
   </target>
 
   <!-- Called via a callback in the NSIS installer script -->
-  <target name="-jsign-installer"
+  <target name="jsign-installer"
       depends="setup-jsign" if="${do.codesigning}" >
       <echo>Signing ${tomcat.dist}/tomcat-installer.exe</echo>
       <!-- Copy pre-existing detachced signature to signing directory -->
@@ -2695,7 +2695,7 @@ To skip building the Windows installer, set the skip.installer property in build
   </target>
 
   <!-- Called via a callback in the NSIS installer script -->
-  <target name="-jsign-uninstaller"
+  <target name="jsign-uninstaller"
       depends="setup-jsign" if="${do.codesigning}" >
       <echo>Signing ${codesigning.file_to_sign}</echo>
       <!-- Copy pre-existing detachced signature to signing directory -->
