@@ -249,19 +249,42 @@ You can build them by using the following commands:
     cd ${tomcat.source}
     ant embed
 
+(5.4) Building the Windows installer
+
+The Windows installer uses the NSIS installer framework.
+It can be build on Windows, on any other platform which provides
+the Wine Windows emulator or the NSIS binary "makensis".
+
+Linux and MacOS are platforms, on which you can install Wine or
+"makensis".
+
+Selecting between Wine and makensis on non-Windows platforms can
+be done by setting the ant property "nsis.tool" to either "wine"
+or "makensis" in build.properties.
+
+If you want to sign the installer, you will need to set some
+properties with names prefixed with "codesigning" in your build.properties.
+For details see the targets "jsign-installer" and "jsign-uninstaller"
+in build.xml and the default property values in build.properties.default.
+
 
 (6) Building a full release (as provided via the ASF download pages)
 
+ 1. Remark on building the Windows installer
+
     A full release includes the Windows installer which requires a Windows
-    environment to be available to create it. If not building in a Windows
-    environment, the build scripts assume that Wine is available. If this is not
-    the case, the skip.installer property may be set to skip the creation of the
-    Windows installer.
+    environment, an installed Wine emulator or an installed native
+    "makensis" binary from the NSIS project. Creating a reproducible
+    installer using the "makensis" option needs a special build of "makensis".
+    For details see below.
 
-    Provided that Wine is available on non-Windows platforms, a full release
-    build may be made on Windows, Linux or MacOS.
+    Provided that Wine or "makensis" is available on non-Windows platforms,
+    a full release build may be made on Windows, Linux or MacOS.
 
- 1. Configure GPG, if needed
+    If you do not want to build the Windows installer, the skip.installer
+    property may be set to skip the creation of the Windows installer.
+
+ 2. Configure GPG, if needed
 
     If the released artifacts have to be cryptographically signed with a
     PGP signature, like the official ASF releases are, the following
@@ -278,14 +301,14 @@ You can build them by using the following commands:
     You will be prompted for the GPG passphrase when the release build
     starts, unless "gpg.passphrase" property is set.
 
- 2. If building the Windows installer
+ 3. If building the Windows installer on Windows
 
     If running the build in a UAC enabled environment, building the Windows
     installer requires elevated privileges. The simplest way to do this is to
     open the command prompt used for the build with the "Run as administrator"
     option.
 
- 3. Configure the code signing service
+ 4. Configure the code signing service
 
     ASF committers performing official releases will need to configure the code
     signing service so that the Windows installer is signed during the build
@@ -300,7 +323,42 @@ You can build them by using the following commands:
 
     Release managers will be provided with the necessary credentials by the PMC.
 
- 4. Build the release:
+    If you want to verify the installer from a release by rebuilding it,
+    you can use the detached signatures provided in the official releases.
+    In this case you have to use the sources from the source release
+    archive, which contains these signatures. You also have to build
+    on Windows, or use Wine, or use a special build of makensis to
+    create a reproducible installer, that fits the signature files.
+
+ 5. Using a special "makensis" build on non-Windows (optional)
+
+    If you want to build a reproducible installer on non-Windows
+    by using "makensis" instead of "Wine", you need to build
+    "makensis" from a source download yourself using the following
+    recipe. To build makensis, you need python, scons and a C compiler.
+
+    First detect the needed version by looking for nsis.version
+    in build.properties.default.
+
+    Download and extract NSIS for Windows by running "ant download-dist". Note
+    the NSIS installation PATH from the output or by checking "nsis.home" in
+    build.properties.default. For example:
+    /home/myuser/tomcat-build-libs/nsis-3.10
+
+    Download the correct sources from the same site and run the
+    following command in the extracted source directory:
+
+        scons UNICODE=yes PREFIX=/home/myuser/tomcat-build-libs/nsis-3.10/Bin SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA_PATH=no VERSION=3.10 install-compiler
+
+    You need to specify the correct value in VERSION (this ends up in the installer binary
+    so it needs to match). The PREFIX needs to be the bin directory of the NSIS
+    binary distribution that "ant download-dist" installed.
+
+    Use this "makensis" binary by making sure, that it gets found by setting
+    an appropriate PATH environment variable. In addition set the ant property
+    "nsis.tool" to "makensis" in build.properties.
+
+ 6. Build the release:
 
     Apache Tomcat releases are fully reproducible.
 
