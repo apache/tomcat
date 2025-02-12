@@ -340,6 +340,11 @@ in build.xml and the default property values in build.properties.default.
     First detect the needed version by looking for nsis.version
     in build.properties.default.
 
+    Download and extract NSIS for Windows by running
+    "ant download-dist". Note the NSIS installation
+    PATH form the outout or by checking "nsis.home"
+    in build.properties.default.
+
     Download the correct binary distribution for Windows from
     https://nsis.sourceforge.io/ and extract it to some path,
     for example /home/myuser/install/nsis-3.10/.
@@ -351,9 +356,9 @@ in build.xml and the default property values in build.properties.default.
 
     You need to specify the correct value in VERSION (this ends up in the installer binary
     so it needs to match). The PREFIX needs to be the bin directory of the NSIS
-    binary distribution that you extracted.
+    binary distribution that "ant download-dist" installed.
 
-    You this "makensis" binary by making sure, that it gets found by setting
+    Use this "makensis" binary by making sure, that it gets found by setting
     an appropriate PATH environment variable. In addition set the ant property
     "nsis.tool" to "makensis" in build.properties.
 
