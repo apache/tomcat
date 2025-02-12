@@ -2685,9 +2685,10 @@ To skip building the Windows installer, set the skip.installer property in build
       <jsign file="${tomcat.dist}/tomcat-installer.exe"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
+        keypass="${codesigning.keypass}"
         alias="${codesigning.alias}"
         alg="${codesigning.digest}"
-        tsaurl="http://timestamp.digicert.com"
+        tsaurl="http://ts.ssl.com"
         tsmode="RFC3161"
         detached="true"/>
       <!-- Move detached signature to source tree -->
