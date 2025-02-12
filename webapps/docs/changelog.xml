@@ -195,6 +195,10 @@
         Add <code>org.apache.juli.JsonFormatter</code> to format log as one
         line JSON documents. (remm)
       </add>
+      <add>
+        Add <code>makensis</code> as an option for building the Installer for
+        Windows on non-Windows platforms. (rjung)
+      </add>
     </changelog>
   </subsection>
 </section>
