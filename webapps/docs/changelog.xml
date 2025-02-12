@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.37 (schultz)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <add>
+        Add <code>makensis</code> as an option for building the Installer for
+        Windows on non-Windows platforms. (rjung/markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.36 (schultz)" rtext="release in progress">
   <subsection name="Catalina">

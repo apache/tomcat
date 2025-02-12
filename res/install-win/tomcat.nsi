@@ -17,11 +17,7 @@
 
 Unicode true
 
-!ifdef UNINSTALLONLY
-  OutFile "tempinstaller.exe"
-!else
-  OutFile tomcat-installer.exe
-!endif
+OutFile tomcat-installer.exe
 
   ;Compression options
   CRCCheck on
@@ -118,11 +114,9 @@ Var ServiceInstallLog
   Page custom CheckUserType
   !insertmacro MUI_PAGE_FINISH
 
-  !ifdef UNINSTALLONLY
-    ;Uninstall Page order
-    !insertmacro MUI_UNPAGE_CONFIRM
-    !insertmacro MUI_UNPAGE_INSTFILES
-  !endif
+  ;Uninstall Page order
+  !insertmacro MUI_UNPAGE_CONFIRM
+  !insertmacro MUI_UNPAGE_INSTFILES
 
   ;Language
   !insertmacro MUI_LANGUAGE English
@@ -163,6 +157,9 @@ Var ServiceInstallLog
   InstType Minimum
   InstType Full
 
+  !finalize 'ant -f @BASEDIR@/build.xml jsign-installer'
+  !uninstfinalize 'ant -f @BASEDIR@/build.xml -Dcodesigning.file_to_sign=%1 jsign-uninstaller'
+
   ReserveFile System.dll
   ReserveFile nsDialogs.dll
   ReserveFile tomcat-users_1.xml
@@ -200,6 +197,9 @@ Section "Core" SecTomcatCore
   File conf\*.*
   SetOutPath $INSTDIR\webapps\ROOT
   File /r webapps\ROOT\*.*
+
+  ;Create uninstaller
+  WriteUninstaller "$INSTDIR\Uninstall.exe"
 
   Call configure
 
@@ -349,12 +349,6 @@ Section -post
     Call createShortcuts
   ${EndIf}
 
-  !ifndef UNINSTALLONLY
-    SetOutPath $INSTDIR
-    ; this packages the signed uninstaller
-    File Uninstall.exe
-  !endif
-
   WriteRegStr HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName" "InstallPath" $INSTDIR
   WriteRegStr HKLM "SOFTWARE\Apache Software Foundation\Tomcat\@VERSION_MAJOR_MINOR@\$TomcatServiceName" "Version" @VERSION@
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apache Tomcat @VERSION_MAJOR_MINOR@ $TomcatServiceName" \
@@ -436,14 +430,6 @@ Function ReadFromConfigIni
 FunctionEnd
 
 Function .onInit
-  !ifdef UNINSTALLONLY
-    ; If UNINSTALLONLY is defined, then we aren't supposed to do anything except write out
-    ; the installer.  This is better than processing a command line option as it means
-    ; this entire code path is not present in the final (real) installer.
-    WriteUninstaller "$EXEDIR\Uninstall.exe"
-    Quit
-  !endif
-
   ${GetParameters} $R0
   ClearErrors
 
@@ -1248,7 +1234,6 @@ FunctionEnd
 ;--------------------------------
 ;Uninstaller Section
 
-!ifdef UNINSTALLONLY
   Section Uninstall
 
     ${If} $TomcatServiceName == ""
@@ -1382,7 +1367,5 @@ FunctionEnd
     ; DetailPrint "Search [$1] closed"
    FindClose $1
   FunctionEnd
-
-!endif
 
 ;eof
