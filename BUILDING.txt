@@ -340,19 +340,15 @@ in build.xml and the default property values in build.properties.default.
     First detect the needed version by looking for nsis.version
     in build.properties.default.
 
-    Download and extract NSIS for Windows by running
-    "ant download-dist". Note the NSIS installation
-    PATH form the outout or by checking "nsis.home"
-    in build.properties.default.
-
-    Download the correct binary distribution for Windows from
-    https://nsis.sourceforge.io/ and extract it to some path,
-    for example /home/myuser/install/nsis-3.10/.
+    Download and extract NSIS for Windows by running "ant download-dist". Note
+    the NSIS installation PATH from the output or by checking "nsis.home" in
+    build.properties.default. For example:
+    /home/myuser/tomcat-build-libs/nsis-3.10
 
     Download the correct sources from the same site and run the
     following command in the extracted source directory:
 
-        scons UNICODE=yes PREFIX=/home/myuser/install/nsis-3.10/Bin SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA_PATH=no VERSION=3.10 install-compiler
+        scons UNICODE=yes PREFIX=/home/myuser/tomcat-build-libs/nsis-3.10/Bin SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA_PATH=no VERSION=3.10 install-compiler
 
     You need to specify the correct value in VERSION (this ends up in the installer binary
     so it needs to match). The PREFIX needs to be the bin directory of the NSIS
