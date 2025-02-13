@@ -104,7 +104,9 @@
   They eventually become mixed with the numbered issues (i.e., numbered
   issues do not "pop up" wrt. others).
 -->
-<section name="Tomcat 10.1.35 (schultz)" rtext="in development">
+<section name="Tomcat 10.1.37 (schultz)" rtext="in development">
+</section>
+<section name="Tomcat 10.1.36 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
     <changelog>
       <fix>
@@ -123,7 +125,7 @@
     </changelog>
   </subsection>
 </section>
-<section name="Tomcat 10.1.35 (schultz)" rtext="release in progress">
+<section name="Tomcat 10.1.35 (schultz)" rtext="2025-02-10">
   <subsection name="Catalina">
     <changelog>
       <update>
