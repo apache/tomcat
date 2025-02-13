@@ -538,58 +538,41 @@ public class CorsFilter extends GenericFilter {
      * @return the CORS type
      */
     protected CORSRequestType checkRequestType(final HttpServletRequest request) {
-        CORSRequestType requestType = CORSRequestType.INVALID_CORS;
         if (request == null) {
             throw new IllegalArgumentException(sm.getString("corsFilter.nullRequest"));
         }
         String originHeader = request.getHeader(REQUEST_HEADER_ORIGIN);
-        // Section 6.1.1 and Section 6.2.1
-        if (originHeader != null) {
-            if (originHeader.isEmpty()) {
-                requestType = CORSRequestType.INVALID_CORS;
-            } else if (!RequestUtil.isValidOrigin(originHeader)) {
-                requestType = CORSRequestType.INVALID_CORS;
-            } else if (RequestUtil.isSameOrigin(request, originHeader)) {
-                return CORSRequestType.NOT_CORS;
-            } else {
-                String method = request.getMethod();
-                if (method != null) {
-                    if ("OPTIONS".equals(method)) {
-                        String accessControlRequestMethodHeader =
-                                request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
-                        if (accessControlRequestMethodHeader != null && !accessControlRequestMethodHeader.isEmpty()) {
-                            requestType = CORSRequestType.PRE_FLIGHT;
-                        } else if (accessControlRequestMethodHeader != null &&
-                                accessControlRequestMethodHeader.isEmpty()) {
-                            requestType = CORSRequestType.INVALID_CORS;
-                        } else {
-                            requestType = CORSRequestType.ACTUAL;
-                        }
-                    } else if ("GET".equals(method) || "HEAD".equals(method)) {
-                        requestType = CORSRequestType.SIMPLE;
-                    } else if ("POST".equals(method)) {
-                        String mediaType = MediaType.parseMediaTypeOnly(request.getContentType());
-                        if (mediaType == null) {
-                            requestType = CORSRequestType.SIMPLE;
-                        } else {
-                            if (SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES.contains(mediaType)) {
-                                requestType = CORSRequestType.SIMPLE;
-                            } else {
-                                requestType = CORSRequestType.ACTUAL;
-                            }
-                        }
-                    } else {
-                        requestType = CORSRequestType.ACTUAL;
-                    }
-                }
-            }
-        } else {
-            requestType = CORSRequestType.NOT_CORS;
+        if (originHeader == null || RequestUtil.isSameOrigin(request, originHeader)) {
+            return CORSRequestType.NOT_CORS;
         }
-
-        return requestType;
+        if (originHeader.isEmpty() ||!RequestUtil.isValidOrigin(originHeader)) {
+            return CORSRequestType.INVALID_CORS;
+        }
+        String method = request.getMethod();
+        if (method == null) {
+            return CORSRequestType.INVALID_CORS;
+        }
+        if ("OPTIONS".equals(method)) {
+            String accessControlRequestMethodHeader = request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+            if (accessControlRequestMethodHeader != null) {
+                if (!accessControlRequestMethodHeader.isEmpty()) {
+                    return CORSRequestType.PRE_FLIGHT;
+                }
+                return CORSRequestType.INVALID_CORS;
+            }
+            return CORSRequestType.ACTUAL;
+        }
+        if ("GET".equals(method) || "HEAD".equals(method)) {
+            return CORSRequestType.SIMPLE;
+        }
+        if ("POST".equals(method)) {
+            String mediaType = MediaType.parseMediaTypeOnly(request.getContentType());
+            if (mediaType == null || SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES.contains(mediaType)) {
+                return CORSRequestType.SIMPLE;
+            }
+        }
+        return CORSRequestType.ACTUAL;
     }
-
 
     /**
      * Checks if the Origin is allowed to make a CORS request.
