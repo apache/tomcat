@@ -558,10 +558,10 @@ public class CorsFilter extends GenericFilter {
         if ("OPTIONS".equals(method)) {
             String accessControlRequestMethodHeader = request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
             if (accessControlRequestMethodHeader != null) {
-                if (!accessControlRequestMethodHeader.isEmpty()) {
-                    return CORSRequestType.PRE_FLIGHT;
+                if (accessControlRequestMethodHeader.isEmpty()) {
+                    return CORSRequestType.INVALID_CORS;
                 }
-                return CORSRequestType.INVALID_CORS;
+                return CORSRequestType.PRE_FLIGHT;
             }
             return CORSRequestType.ACTUAL;
         }
