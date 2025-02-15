@@ -339,29 +339,25 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                     csrfLoggingHelper.debugNoNonce();
                     res.sendError(getDenyStatus());
                     return;
-                } else {
-                    csrfLoggingHelper.traceNoNonce();
                 }
+                csrfLoggingHelper.traceNoNonce();
             } else {
                 nonceCache = getNonceCache(req, session);
                 if (nonceCache == null) {
                     if (enforce(req, requestedPath)) {
                         csrfLoggingHelper.debugNoCache();
-
                         res.sendError(getDenyStatus());
                         return;
-                    } else {
-                        csrfLoggingHelper.traceNoCache();
                     }
-                } else if (!nonceCache.contains(previousNonce)) {
+                    csrfLoggingHelper.traceNoCache();
+                }
+                else if (!nonceCache.contains(previousNonce)) {
                     if (enforce(req, requestedPath)) {
                         csrfLoggingHelper.debugInvalidNonce(previousNonce);
-
                         res.sendError(getDenyStatus());
                         return;
-                    } else {
-                        csrfLoggingHelper.traceInvalidNonce(previousNonce);
                     }
+                    csrfLoggingHelper.traceInvalidNonce(previousNonce);
                 } else {
                     csrfLoggingHelper.traceValidNonce(previousNonce);
                 }
