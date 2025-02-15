@@ -470,7 +470,7 @@ elif [ "$1" = "stop" ] ; then
     fi
   fi
 
-  eval "\"$_RUNJAVA\"" $LOGGING_MANAGER "$JAVA_OPTS" \
+  eval "\"$_RUNJAVA\"" "\"$CATALINA_LOGGING_CONFIG\"" $LOGGING_MANAGER "$JAVA_OPTS" \
     -classpath "\"$CLASSPATH\"" \
     -Dcatalina.base="\"$CATALINA_BASE\"" \
     -Dcatalina.home="\"$CATALINA_HOME\"" \
@@ -556,7 +556,7 @@ elif [ "$1" = "stop" ] ; then
 
 elif [ "$1" = "configtest" ] ; then
 
-    eval "\"$_RUNJAVA\"" $LOGGING_MANAGER "$JAVA_OPTS" \
+    eval "\"$_RUNJAVA\"" "\"$CATALINA_LOGGING_CONFIG\"" $LOGGING_MANAGER "$JAVA_OPTS" \
       -classpath "\"$CLASSPATH\"" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \
       -Dcatalina.home="\"$CATALINA_HOME\"" \
