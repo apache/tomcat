@@ -319,112 +319,111 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             throws IOException, ServletException {
         ServletResponse wResponse = null;
 
-        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
+        if (!(request instanceof HttpServletRequest req) || !(response instanceof HttpServletResponse res)) {
+            chain.doFilter(request, response);
+            return;
+        }
 
-            HttpServletRequest req = (HttpServletRequest) request;
-            HttpServletResponse res = (HttpServletResponse) response;
+        HttpSession session = req.getSession(false);
 
-            HttpSession session = req.getSession(false);
+        String requestedPath = getRequestedPath(req);
+        boolean skipNonceCheck = skipNonceCheck(req);
+        NonceCache<String> nonceCache = null;
 
-            String requestedPath = getRequestedPath(req);
-            boolean skipNonceCheck = skipNonceCheck(req);
-            NonceCache<String> nonceCache = null;
+        if (!skipNonceCheck) {
+            String previousNonce = req.getParameter(nonceRequestParameterName);
 
-            if (!skipNonceCheck) {
-                String previousNonce = req.getParameter(nonceRequestParameterName);
+            if (previousNonce == null) {
+                if (enforce(req, requestedPath)) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("csrfPrevention.rejectNoNonce", getRequestedPath(req),
+                            (null == session ? "(null)" : session.getId())));
+                    }
 
-                if (previousNonce == null) {
+                    res.sendError(getDenyStatus());
+                    return;
+                } else {
+                    if (log.isTraceEnabled()) {
+                        log.trace("Would have rejected request for " + getRequestedPath(req) + ", session " +
+                            (null == session ? "(null)" : session.getId()) +
+                            " with no CSRF nonce found in request");
+                    }
+                }
+            } else {
+                nonceCache = getNonceCache(req, session);
+                if (nonceCache == null) {
                     if (enforce(req, requestedPath)) {
                         if (log.isDebugEnabled()) {
-                            log.debug(sm.getString("csrfPrevention.rejectNoNonce", getRequestedPath(req),
-                                    (null == session ? "(null)" : session.getId())));
+                            log.debug(sm.getString("csrfPrevention.rejectNoCache", getRequestedPath(req),
+                                (null == session ? "(null)" : session.getId())));
                         }
 
                         res.sendError(getDenyStatus());
                         return;
                     } else {
                         if (log.isTraceEnabled()) {
-                            log.trace("Would have rejected request for " + getRequestedPath(req) + ", session " +
-                                    (null == session ? "(null)" : session.getId()) +
-                                    " with no CSRF nonce found in request");
+                            log.trace("Would have rejecting request for " + getRequestedPath(req) + ", session " +
+                                (null == session ? "(null)" : session.getId()) +
+                                " due to empty / missing nonce cache");
+                        }
+                    }
+                } else if (!nonceCache.contains(previousNonce)) {
+                    if (enforce(req, requestedPath)) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("csrfPrevention.rejectInvalidNonce", getRequestedPath(req),
+                                (null == session ? "(null)" : session.getId()), previousNonce));
+                        }
+
+                        res.sendError(getDenyStatus());
+                        return;
+                    } else {
+                        if (log.isTraceEnabled()) {
+                            log.trace("Would have rejecting request for " + getRequestedPath(req) + ", session " +
+                                (null == session ? "(null)" : session.getId()) + " due to invalid nonce " +
+                                previousNonce);
                         }
                     }
                 } else {
-                    nonceCache = getNonceCache(req, session);
-                    if (nonceCache == null) {
-                        if (enforce(req, requestedPath)) {
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("csrfPrevention.rejectNoCache", getRequestedPath(req),
-                                        (null == session ? "(null)" : session.getId())));
-                            }
-
-                            res.sendError(getDenyStatus());
-                            return;
-                        } else {
-                            if (log.isTraceEnabled()) {
-                                log.trace("Would have rejecting request for " + getRequestedPath(req) + ", session " +
-                                        (null == session ? "(null)" : session.getId()) +
-                                        " due to empty / missing nonce cache");
-                            }
-                        }
-                    } else if (!nonceCache.contains(previousNonce)) {
-                        if (enforce(req, requestedPath)) {
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("csrfPrevention.rejectInvalidNonce", getRequestedPath(req),
-                                        (null == session ? "(null)" : session.getId()), previousNonce));
-                            }
-
-                            res.sendError(getDenyStatus());
-                            return;
-                        } else {
-                            if (log.isTraceEnabled()) {
-                                log.trace("Would have rejecting request for " + getRequestedPath(req) + ", session " +
-                                        (null == session ? "(null)" : session.getId()) + " due to invalid nonce " +
-                                        previousNonce);
-                            }
-                        }
-                    } else {
-                        if (log.isTraceEnabled()) {
-                            log.trace("Allowing request to " + getRequestedPath(req) + " with valid CSRF nonce " +
-                                    previousNonce);
-                        }
+                    if (log.isTraceEnabled()) {
+                        log.trace("Allowing request to " + getRequestedPath(req) + " with valid CSRF nonce " +
+                            previousNonce);
                     }
                 }
             }
+        }
 
-            if (!skipNonceGeneration(req)) {
-                if (skipNonceCheck) {
-                    // Didn't look up nonce cache earlier so look it up now.
-                    nonceCache = getNonceCache(req, session);
-                }
-                if (nonceCache == null) {
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("csrfPrevention.createCache", Integer.valueOf(nonceCacheSize),
-                                (null == session ? "(null)" : session.getId())));
-                    }
-
-                    if (session == null) {
-                        if (log.isTraceEnabled()) {
-                            log.trace("Creating new session to store CSRF nonce cache");
-                        }
-
-                        session = req.getSession(true);
-                    }
-
-                    nonceCache = createNonceCache(req, session);
-                }
-
-                String newNonce = generateNonce(req);
-
-                nonceCache.add(newNonce);
-
-                // Take this request's nonce and put it into the request
-                // attributes so pages can make direct use of it, rather than
-                // requiring the use of response.encodeURL.
-                request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
-
-                wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce, noNoncePredicates);
+        if (!skipNonceGeneration(req)) {
+            if (skipNonceCheck) {
+                // Didn't look up nonce cache earlier so look it up now.
+                nonceCache = getNonceCache(req, session);
             }
+            if (nonceCache == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("csrfPrevention.createCache", Integer.valueOf(nonceCacheSize),
+                        (null == session ? "(null)" : session.getId())));
+                }
+
+                if (session == null) {
+                    if (log.isTraceEnabled()) {
+                        log.trace("Creating new session to store CSRF nonce cache");
+                    }
+
+                    session = req.getSession(true);
+                }
+
+                nonceCache = createNonceCache(req, session);
+            }
+
+            String newNonce = generateNonce(req);
+
+            nonceCache.add(newNonce);
+
+            // Take this request's nonce and put it into the request
+            // attributes so pages can make direct use of it, rather than
+            // requiring the use of response.encodeURL.
+            request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
+
+            wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce, noNoncePredicates);
         }
 
         chain.doFilter(request, wResponse == null ? response : wResponse);
