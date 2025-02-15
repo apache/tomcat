@@ -317,7 +317,6 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        ServletResponse wResponse = null;
 
         if (!(request instanceof HttpServletRequest req) || !(response instanceof HttpServletResponse res)) {
             chain.doFilter(request, response);
@@ -389,10 +388,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             // requiring the use of response.encodeURL.
             request.setAttribute(Constants.CSRF_NONCE_REQUEST_ATTR_NAME, newNonce);
 
-            wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce, noNoncePredicates);
+            ServletResponse wResponse = new CsrfResponseWrapper(res, nonceRequestParameterName, newNonce,
+                noNoncePredicates);
+            chain.doFilter(request, wResponse);
         }
 
-        chain.doFilter(request, wResponse == null ? response : wResponse);
+        chain.doFilter(request, response);
     }
 
     /**
