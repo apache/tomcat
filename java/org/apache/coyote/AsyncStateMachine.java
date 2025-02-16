@@ -220,10 +220,13 @@ class AsyncStateMachine {
         return state == AsyncState.ERROR;
     }
 
+    public boolean isAsyncDispatched() {
+        return state == AsyncState.DISPATCHED;
+    }
+
     boolean isCompleting() {
         return state.isCompleting();
     }
-
     /**
      * Obtain the time that this connection last transitioned to async processing.
      *
