@@ -769,7 +769,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 url = super.findResource(name);
             }
 
-            if (url == null) {
+            // Skip caching results for invalid names (it might mask lookups for valid ones)
+            if (url == null && name.charAt(0) != '/') {
                 notFoundClassResources.add(path);
             }
         }
@@ -1015,7 +1016,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 return stream;
             }
 
-            notFoundClassResources.add(path);
+            // Skip caching results for invalid names (it might mask lookups for valid ones)
+            if (name.charAt(0) != '/') {
+                notFoundClassResources.add(path);
+            }
         }
 
         // (3) Delegate to parent unconditionally
