@@ -105,6 +105,19 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.101 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        When looking up class loader resources by resource name, the resource
+        name should not start with '/'. If the resource name does start with
+        '/', Tomcat is lenient and looks it up as if the '/' was not present.
+        When the web application class loader was configured with external
+        repositories and names starting with '/' were used for lookups, it was
+        possible that cached 'not found' results could effectively hide lookup
+        results using the correct resource name. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>

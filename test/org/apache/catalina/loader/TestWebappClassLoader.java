@@ -24,6 +24,7 @@ import java.net.URLClassLoader;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -170,5 +171,34 @@ public class TestWebappClassLoader extends TomcatBaseTest {
                 }
             }
         }
+    }
+
+
+    /*
+     * See https://github.com/apache/tomcat/pull/816 for details.
+     */
+    @Test
+    public void testResourceName() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        getProgrammaticRootContext();
+        tomcat.start();
+
+        // Add an external resource to the web application
+        WebappClassLoaderBase cl =
+                (WebappClassLoaderBase) ((Context) tomcat.getHost().findChildren()[0]).getLoader().getClassLoader();
+        File f = new File("test/conf");
+        cl.addURL(f.toURI().toURL());
+
+        /*
+         * External resources are loaded using URLClassLoader code so leading '/' characters are not permitted in
+         * resource names.
+         */
+        URL u1 = cl.getResource("/jaspic-test-01.xml");
+        Assert.assertNull(u1);
+
+        // Should now be visible if the correct name is used.
+        URL u2 = cl.getResource("jaspic-test-01.xml");
+        Assert.assertNotNull(u2);
     }
 }
