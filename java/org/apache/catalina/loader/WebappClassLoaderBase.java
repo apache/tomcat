@@ -711,6 +711,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         URL url = null;
 
+        if (name.startsWith("/")) {
+            return null;
+        }
+
         String path = nameToPath(name);
 
         if (!notFoundClassResources.contains(path)) {
@@ -762,6 +766,10 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         checkStateForResourceLoading(name);
 
         LinkedHashSet<URL> result = new LinkedHashSet<>();
+
+        if (name.startsWith("/")) {
+            return null;
+        }
 
         String path = nameToPath(name);
 
@@ -911,6 +919,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         // (2) Search local repositories
         if (log.isTraceEnabled()) {
             log.trace("  Searching local repositories");
+        }
+        if (name.startsWith("/")) {
+            return null;
         }
         String path = nameToPath(name);
         if (!notFoundClassResources.contains(path)) {
@@ -2154,9 +2165,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
 
     private String nameToPath(String name) {
-        if (name.startsWith("/")) {
-            return name;
-        }
         StringBuilder path = new StringBuilder(1 + name.length());
         path.append('/');
         path.append(name);

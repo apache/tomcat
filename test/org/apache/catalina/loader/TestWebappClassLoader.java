@@ -24,6 +24,7 @@ import java.net.URLClassLoader;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -171,5 +172,19 @@ public class TestWebappClassLoader extends TomcatBaseTest {
                 }
             }
         }
+    }
+
+
+    @Test
+    public void testResourceName() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        ClassLoader cl = ((Context) tomcat.getHost().findChildren()[0]).getLoader().getClassLoader();
+
+        URL u1 = cl.getResource("org/apache/tomcat/Bug58096.java");
+        Assert.assertNotNull(u1);
+
+        URL u2 = cl.getResource("/org/apache/tomcat/Bug58096.java");
+        Assert.assertNull(u2);
     }
 }

@@ -143,6 +143,12 @@
         of <strong>Context</strong> from <code>decode</code> to
         <code>reject</code>. (markt)
       </update>
+      <fix>
+        When searching the web application class loader for a resource or
+        resources by name, align the behaviour with the JRE class loaders and
+        always return <code>null</code> if the provided name starts with
+        <code>/</code>. (markt)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
