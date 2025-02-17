@@ -85,12 +85,12 @@ public class TestPropertiesRoleMappingListener extends TomcatBaseTest {
 
     @Test
     public void testFileFromClasspath() throws Exception {
-        doTest("classpath:/com/example/role-mapping.properties", null);
+        doTest("classpath:com/example/role-mapping.properties", null);
     }
 
     @Test
     public void testFileFromClasspathWithKeyPrefix() throws Exception {
-        doTest("classpath:/com/example/prefixed-role-mapping.properties", "app-roles.");
+        doTest("classpath:com/example/prefixed-role-mapping.properties", "app-roles.");
     }
 
     @Test
