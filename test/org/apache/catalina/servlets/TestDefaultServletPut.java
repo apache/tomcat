@@ -55,6 +55,9 @@ public class TestDefaultServletPut extends TomcatBaseTest {
                 "Content-Range: bytes 0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
                 "Content-Range: ByTeS 0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
+        // Valid partial PUT, only the first char is replaced.
+        parameterSets.add(new Object[] {
+                "Content-Range: ByTeS 0-" + 0 + "/" + START_LEN + CRLF, Boolean.TRUE, "Etarting text", Boolean.TRUE });
         // Full PUT
         parameterSets.add(new Object[] {
                 "", null, PATCH_TEXT, Boolean.TRUE });
