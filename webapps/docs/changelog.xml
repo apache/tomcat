@@ -116,6 +116,10 @@
         possible that cached 'not found' results could effectively hide lookup
         results using the correct resource name. (markt)
       </fix>
+      <fix>
+        Improve the mechanism for detecting whether a web application has been
+        deployed to a case sensitive or a case insensitive file system. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
