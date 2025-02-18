@@ -322,7 +322,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     @Override
     protected void initInternal() throws LifecycleException {
         super.initInternal();
-        caseSensitive = isCaseSensitive();
+        caseSensitive = isCaseSensitive(getFileBase());
         // Is this an exploded web application?
         if (getWebAppMount().equals("")) {
             // Look for a manifest
@@ -338,31 +338,37 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     }
 
 
-    /*
-     * Determines if this ResourceSet is based on a case sensitive file system or not.
-     */
-    private boolean isCaseSensitive() {
+    /* Determines if this ResourceSet is based on a case sensitive file system or not. */
+    private boolean isCaseSensitive(File dir) {
         try {
-            // Some file system (e.g. windows) treat files and directories as case insensitive by default, and also support
+            // Some file system (e.g. windows) treat files and directories as case insensitive by default, and also
+            // support
             // setting case sensitivity per directory. Then we have to handle case sensitivity for each directory.
             // Ensure file path contain ENGLISH string, otherwise its upper and lower maybe are same.
-            String canonicalPath = new File(getFileBase(),"Foo.TxT").getCanonicalPath();
-            File upper = new File(canonicalPath.toUpperCase(Locale.ENGLISH));
-            if (!canonicalPath.equals(upper.getCanonicalPath())) {
+            File baseDir = dir.getCanonicalFile();
+            String lastPartName = ".Tomcat_cs_verify";
+            File testFile = new File(baseDir, lastPartName);
+            if (!testFile.exists()) {
+                if (testFile.createNewFile()) {
+                    testFile.deleteOnExit();
+                } else {
+                    throw new IOException();
+                }
+            }
+            String canonicalPath = testFile.getCanonicalPath();
+            File upper = new File(baseDir, lastPartName.toUpperCase(Locale.ENGLISH));
+            if (!upper.getCanonicalPath().equals(canonicalPath)) {
                 return true;
             }
-            File lower = new File(canonicalPath.toLowerCase(Locale.ENGLISH));
-            if (!canonicalPath.equals(lower.getCanonicalPath())) {
+            File lower = new File(baseDir, lastPartName.toLowerCase(Locale.ENGLISH));
+            if (!lower.getCanonicalPath().equals(canonicalPath)) {
                 return true;
             }
-            /*
-             * Both upper and lower case versions of the current fileBase have the same canonical path so the file
-             * system must be case insensitive.
-             */
+            /* Both upper and lower case versions of the current fileBase have the same canonical path so the file
+             * system must be case insensitive. */
         } catch (IOException ioe) {
-            log.warn(sm.getString("dirResourceSet.isCaseSensitive.fail", getFileBase().getAbsolutePath()), ioe);
+            log.warn(sm.getString("dirResourceSet.isCaseSensitive.fail", dir.getAbsolutePath()), ioe);
         }
-
         return false;
     }
 
