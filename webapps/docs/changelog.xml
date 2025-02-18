@@ -122,6 +122,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>69575</bug>: Avoid using compression if a response is already
+        compressed using <code>compress</code>, <code>deflate</code> or
+        <code>zstd</code>. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
