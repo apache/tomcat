@@ -150,6 +150,10 @@
         <code>/</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Improve the mechanism for detecting whether a web application has been
+        deployed to a case sensitive or a case insensitive file system. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

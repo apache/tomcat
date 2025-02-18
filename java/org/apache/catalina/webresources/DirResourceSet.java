@@ -340,22 +340,48 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
 
     /*
      * Determines if this ResourceSet is based on a case sensitive file system or not.
+     *
+     * File systems are usually case sensitive or not. Windows, via the command 'fsutil.exe file setCaseSensitiveInfo
+     * <path> enable', may be case sensitive in some directories and case insensitive in others.
+     *
+     * If this method incorrectly determines that the DirResourceSet is case sensitive, the file locking mechanism that
+     * ensures write operations are performed atomically will not operate correctly. If this method incorrectly
+     * determines that the DirResourceSet is case insensitive, there is a small performance penalty for writes.
+     *
+     * Given the above, this method only reports the file system as case sensitive if no indication of case
+     * insensitivity is detected. This does mean that Windows based DirResourceSet instances will be reported as case
+     * insensitive even all of the directories in the DirResourceSet have been configured as case sensitive.
      */
     private boolean isCaseSensitive() {
         try {
             String canonicalPath = getFileBase().getCanonicalPath();
-            File upper = new File(canonicalPath.toUpperCase(Locale.ENGLISH));
-            if (!canonicalPath.equals(upper.getCanonicalPath())) {
-                return true;
-            }
-            File lower = new File(canonicalPath.toLowerCase(Locale.ENGLISH));
-            if (!canonicalPath.equals(lower.getCanonicalPath())) {
-                return true;
-            }
             /*
-             * Both upper and lower case versions of the current fileBase have the same canonical path so the file
-             * system must be case insensitive.
+             * If any lower case characters are found in the canonical file name formed by converting the test file name
+             * to upper case, the underlying file system must be, at least in part, case insensitive.
              */
+            File upper = new File(canonicalPath.toUpperCase(Locale.ENGLISH));
+            String upperCanonicalPath = upper.getCanonicalPath();
+            char[] upperCharacters = upperCanonicalPath.toCharArray();
+            for (char c : upperCharacters) {
+                if (Character.isLowerCase(c)) {
+                    return false;
+                }
+            }
+
+            /*
+             * If any upper case characters are found in the canonical file name formed by converting the test file name
+             * to lower case, the underlying file system must be, at least in part, case insensitive.
+             */
+            File lower = new File(canonicalPath.toLowerCase(Locale.ENGLISH));
+            String lowerCanonicalPath = lower.getCanonicalPath();
+            char[] lowerCharacters = lowerCanonicalPath.toCharArray();
+            for (char c : lowerCharacters) {
+                if (Character.isUpperCase(c)) {
+                    return false;
+                }
+            }
+
+            return true;
         } catch (IOException ioe) {
             log.warn(sm.getString("dirResourceSet.isCaseSensitive.fail", getFileBase().getAbsolutePath()), ioe);
         }
