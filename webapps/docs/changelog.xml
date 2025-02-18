@@ -169,6 +169,11 @@
         (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69575</bug>: Avoid using compression if a response is already
+        compressed using <code>compress</code>, <code>deflate</code> or
+        <code>zstd</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

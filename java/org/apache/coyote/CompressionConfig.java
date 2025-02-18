@@ -208,7 +208,8 @@ public class CompressionConfig {
                 log.warn(sm.getString("compressionConfig.ContentEncodingParseFail"), e);
                 return false;
             }
-            if (tokens.contains("gzip") || tokens.contains("br")) {
+            if (tokens.contains("gzip") || tokens.contains("compress") || tokens.contains("deflate")
+                    || tokens.contains("br") || tokens.contains("zstd")) {
                 return false;
             }
         }
