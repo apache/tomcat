@@ -147,7 +147,11 @@ import org.ietf.jgss.GSSName;
  */
 public class JNDIRealm extends RealmBase {
 
-    // ----------------------------------------------------- Instance Variables
+    /**
+     * Constant that holds the name of the environment property for specifying the manner in which aliases should be
+     * dereferenced.
+     */
+    public static final String DEREF_ALIASES = "java.naming.ldap.derefAliases";
 
     /**
      * The type of authentication to use
@@ -179,12 +183,6 @@ public class JNDIRealm extends RealmBase {
      * How aliases should be dereferenced during search operations.
      */
     protected String derefAliases = null;
-
-    /**
-     * Constant that holds the name of the environment property for specifying the manner in which aliases should be
-     * dereferenced.
-     */
-    public static final String DEREF_ALIASES = "java.naming.ldap.derefAliases";
 
     /**
      * The protocol that will be used in the communication with the directory server.
