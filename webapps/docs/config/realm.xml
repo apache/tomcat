@@ -278,9 +278,14 @@
       </attribute>
 
       <attribute name="authentication" required="false">
-        <p>A string specifying the type of authentication to use.
-        "none", "simple", "strong" or a provider specific definition
-        can be used. If no value is given the providers default is used.</p>
+        <p>A string specifying the type of authentication to use. "none",
+        "simple", "strong" or a provider specific definition can be used. If the
+        provider specific mechanism "GSSAPI" is specified and supported by the
+        provider, there are some circumstances, such as handling calls to
+        <code>HttpServletRequest.login(String username, String password)</code>,
+        where "GSSAPI" will not be used and the user will be
+        authenticated as described in <code>userPassword</code>. If no value is
+        given, the providers default is used.</p>
       </attribute>
 
       <attribute name="cipherSuites" required="false">

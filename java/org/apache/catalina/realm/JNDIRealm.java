@@ -1840,10 +1840,15 @@ public class JNDIRealm extends RealmBase {
         }
 
         boolean validated = false;
+        Hashtable<?, ?> preservedEnvironment = context.getEnvironment();
 
         // Elicit an LDAP bind operation using the provided user credentials
         try {
             userCredentialsAdd(context, dn, credentials);
+            // Need to make sure GSSAPI SASL authentication is not used if configured
+            if (AUTHENTICATION_NAME_GSSAPI.equals(preservedEnvironment.get(Context.SECURITY_AUTHENTICATION))) {
+                context.removeFromEnvironment(Context.SECURITY_AUTHENTICATION);
+            }
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace("  binding as " + dn);
             }
@@ -1854,6 +1859,8 @@ public class JNDIRealm extends RealmBase {
                 containerLog.trace("  bind attempt failed");
             }
         } finally {
+            // Restore GSSAPI SASL if previously configured
+            restoreEnvironmentParameter(context, Context.SECURITY_AUTHENTICATION, preservedEnvironment);
             userCredentialsRemove(context);
         }
 
