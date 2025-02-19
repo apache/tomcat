@@ -519,8 +519,12 @@
         <p>When the JNDIRealm is used with the SPNEGO authenticator, delegated
         credentials for the user may be available. If such credentials are
         present, this attribute controls whether or not they are used to
-        connect to the directory. If not specified, the default value of
-        <code>true</code> is used.</p>
+        connect to the directory. If delegated credentials are present but not
+        used because this attribute is <code>false</code>, the behaviour will be
+        as described in <code>roleSearchAsUser</code>, <code>userPattern</code>
+        and <code>userSearchAsUser</code> when delegated credentials are not
+        used. If not specified, the default value of <code>true</code> is
+        used.</p>
       </attribute>
 
       <attribute name="userBase" required="false">
