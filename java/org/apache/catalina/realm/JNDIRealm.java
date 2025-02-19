@@ -1837,11 +1837,11 @@ public class JNDIRealm extends RealmBase {
             containerLog.trace("  validating credentials by binding as the user");
         }
 
-        userCredentialsAdd(context, dn, credentials);
-
-        // Elicit an LDAP bind operation
         boolean validated = false;
+
+        // Elicit an LDAP bind operation using the provided user credentials
         try {
+            userCredentialsAdd(context, dn, credentials);
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace("  binding as " + dn);
             }
@@ -1851,9 +1851,9 @@ public class JNDIRealm extends RealmBase {
             if (containerLog.isTraceEnabled()) {
                 containerLog.trace("  bind attempt failed");
             }
+        } finally {
+            userCredentialsRemove(context);
         }
-
-        userCredentialsRemove(context);
 
         return validated;
     }
