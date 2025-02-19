@@ -2381,7 +2381,7 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * Get the principal associated with the specified certificate.
+     * Get the principal associated with the specified user name.
      *
      * @param connection    The directory context
      * @param username      The user name
