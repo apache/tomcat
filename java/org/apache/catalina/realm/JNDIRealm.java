@@ -153,6 +153,9 @@ public class JNDIRealm extends RealmBase {
      */
     public static final String DEREF_ALIASES = "java.naming.ldap.derefAliases";
 
+    private static final String AUTHENTICATION_NAME_GSSAPI = "GSSAPI";
+
+
     /**
      * The type of authentication to use
      */
@@ -2402,7 +2405,7 @@ public class JNDIRealm extends RealmBase {
                 // Preserve the current context environment parameters
                 preservedEnvironment = context.getEnvironment();
                 // Set up context
-                context.addToEnvironment(Context.SECURITY_AUTHENTICATION, "GSSAPI");
+                context.addToEnvironment(Context.SECURITY_AUTHENTICATION, AUTHENTICATION_NAME_GSSAPI);
                 context.addToEnvironment("javax.security.sasl.server.authentication", "true");
                 context.addToEnvironment("javax.security.sasl.qop", spnegoDelegationQop);
                 // Note: Subject already set in SPNEGO authenticator so no need
