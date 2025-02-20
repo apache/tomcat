@@ -29,24 +29,39 @@ import org.junit.runners.Parameterized.Parameter;
 @RunWith(Parameterized.class)
 public class TestCompressionConfig {
 
-    @Parameterized.Parameters(name = "{index}: accept-encoding[{0}], ETag [{1}], NoCompressionStrongETag[{2}], compress[{3}]")
+    @Parameterized.Parameters(name = "{index}: accept-encoding[{0}], ETag [{1}], NoCompressionStrongETag[{2}], compress[{3}], useTE[{4}]")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] { new String[] {  },              null, Boolean.TRUE,  Boolean.FALSE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.TRUE,  Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "xgzip" },       null, Boolean.TRUE,  Boolean.FALSE });
-        parameterSets.add(new Object[] { new String[] { "<>gzip" },      null, Boolean.TRUE,  Boolean.FALSE });
-        parameterSets.add(new Object[] { new String[] { "foo", "gzip" }, null, Boolean.TRUE,  Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "<>", "gzip" },  null, Boolean.TRUE,  Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] {  },              null, Boolean.TRUE,  Boolean.FALSE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.TRUE,  Boolean.TRUE,  Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "xgzip" },       null, Boolean.TRUE,  Boolean.FALSE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "<>gzip" },      null, Boolean.TRUE,  Boolean.FALSE, Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "foo", "gzip" }, null, Boolean.TRUE,  Boolean.TRUE,  Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "<>", "gzip" },  null, Boolean.TRUE,  Boolean.TRUE,  Boolean.FALSE });
 
-        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.TRUE,  Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        "W/", Boolean.TRUE,  Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        "XX", Boolean.TRUE,  Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.TRUE,  Boolean.TRUE,  Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        "W/", Boolean.TRUE,  Boolean.TRUE,  Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        "XX", Boolean.TRUE,  Boolean.FALSE, Boolean.FALSE });
 
-        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.FALSE, Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        "W/", Boolean.FALSE, Boolean.TRUE });
-        parameterSets.add(new Object[] { new String[] { "gzip" },        "XX", Boolean.FALSE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.FALSE, Boolean.TRUE,  Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        "W/", Boolean.FALSE, Boolean.TRUE,  Boolean.FALSE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        "XX", Boolean.FALSE, Boolean.TRUE,  Boolean.FALSE });
+
+        parameterSets.add(new Object[] { new String[] {  },              null, Boolean.TRUE,  Boolean.FALSE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.TRUE,  Boolean.TRUE,  Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "xgzip" },       null, Boolean.TRUE,  Boolean.FALSE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "<>gzip" },      null, Boolean.TRUE,  Boolean.FALSE, Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "foo", "gzip" }, null, Boolean.TRUE,  Boolean.TRUE,  Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "<>", "gzip" },  null, Boolean.TRUE,  Boolean.TRUE,  Boolean.TRUE });
+
+        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.TRUE,  Boolean.TRUE,  Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        "W/", Boolean.TRUE,  Boolean.TRUE,  Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        "XX", Boolean.TRUE,  Boolean.FALSE, Boolean.TRUE });
+
+        parameterSets.add(new Object[] { new String[] { "gzip" },        null, Boolean.FALSE, Boolean.TRUE,  Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        "W/", Boolean.FALSE, Boolean.TRUE,  Boolean.TRUE });
+        parameterSets.add(new Object[] { new String[] { "gzip" },        "XX", Boolean.FALSE, Boolean.TRUE,  Boolean.TRUE });
 
         return parameterSets;
     }
@@ -59,6 +74,8 @@ public class TestCompressionConfig {
     public Boolean noCompressionStrongETag;
     @Parameter(3)
     public Boolean compress;
+    @Parameter(4)
+    public Boolean useTE;
 
     @SuppressWarnings("deprecation")
     @Test
@@ -73,14 +90,34 @@ public class TestCompressionConfig {
         Response response = new Response();
 
         for (String header : headers) {
-            request.getMimeHeaders().addValue("accept-encoding").setString(header);
+            if (useTE.booleanValue()) {
+                request.getMimeHeaders().addValue("TE").setString(header);
+            } else {
+                request.getMimeHeaders().addValue("accept-encoding").setString(header);
+            }
         }
 
         if (eTag != null) {
             response.getMimeHeaders().addValue("ETag").setString(eTag);
         }
 
+        boolean useCompression = compressionConfig.useCompression(request, response);
+        Assert.assertEquals(compress, Boolean.valueOf(useCompression));
 
-        Assert.assertEquals(compress, Boolean.valueOf(compressionConfig.useCompression(request, response)));
+        if (useTE.booleanValue()) {
+            Assert.assertNull(response.getMimeHeaders().getHeader("Content-Encoding"));
+            if (useCompression) {
+                Assert.assertEquals("gzip", response.getMimeHeaders().getHeader("Transfer-Encoding"));
+            } else {
+                Assert.assertNull(response.getMimeHeaders().getHeader("Transfer-Encoding"));
+            }
+        } else {
+            Assert.assertNull(response.getMimeHeaders().getHeader("Transfer-Encoding"));
+            if (useCompression) {
+                Assert.assertEquals("gzip", response.getMimeHeaders().getHeader("Content-Encoding"));
+            } else {
+                Assert.assertNull(response.getMimeHeaders().getHeader("Content-Encoding"));
+            }
+        }
     }
 }
