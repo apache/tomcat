@@ -111,6 +111,7 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * <li><code>%{xxx}i</code> for incoming headers
  * <li><code>%{xxx}o</code> for outgoing response headers
  * <li><code>%{xxx}c</code> for a specific cookie
+ * <li><code>%{xxx}L</code> xxx is an attribute in the Connection
  * <li><code>%{xxx}r</code> xxx is an attribute in the ServletRequest
  * <li><code>%{xxx}s</code> xxx is an attribute in the HttpSession
  * <li><code>%{xxx}t</code> xxx is an enhanced SimpleDateFormat pattern (see Configuration Reference document for
@@ -157,6 +158,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     private enum PortType {
         LOCAL,
         REMOTE
+    }
+
+    private enum ConnectionType {
+        ID
     }
 
     /**
@@ -1245,6 +1250,48 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
+     * write connection id %{c}L
+     */
+    protected class ConnectionElement implements AccessLogElement, CachedElement {
+
+        /**
+         * data to log
+         */
+        private static final String id = "c";
+        private final ConnectionType connectionType;
+
+        public ConnectionElement() {
+            connectionType = ConnectionType.ID;
+        }
+
+        public ConnectionElement(String type) {
+            switch (type) {
+                case id:
+                    connectionType = ConnectionType.ID;
+                    break;
+                default:
+                    log.error(sm.getString("accessLogValve.invalidConnectionType", type));
+                    connectionType = ConnectionType.ID;
+                    break;
+            }
+        }
+
+        @Override
+        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+            if (connectionType == ConnectionType.ID) {
+                buf.append(request.getServletConnection().getConnectionId());
+            }
+        }
+
+        @Override
+        public void cache(Request request) {
+            if (connectionType == ConnectionType.ID) {
+                request.getServletConnection().getConnectionId();
+            }
+        }
+    }
+
+    /**
      * write bytes sent, excluding HTTP headers - %b, %B
      */
     protected static class ByteSentElement implements AccessLogElement {
@@ -1751,6 +1798,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 return new HeaderElement(name);
             case 'c':
                 return new CookieElement(name);
+            case 'L':
+                return new ConnectionElement(name);
             case 'o':
                 return new ResponseHeaderElement(name);
             case 'a':
