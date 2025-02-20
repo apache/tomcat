@@ -138,6 +138,11 @@
         compressed using <code>compress</code>, <code>deflate</code> or
         <code>zstd</code>. (remm)
       </fix>
+      <update>
+        Use <code>Transfer-Encoding</code> for compression rather than
+        <code>Content-Encoding</code> if the client submits a <code>TE</code>
+        header containing <code>gzip</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Other">
