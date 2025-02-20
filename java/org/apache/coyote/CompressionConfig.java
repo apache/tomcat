@@ -32,6 +32,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.parser.AcceptEncoding;
+import org.apache.tomcat.util.http.parser.TE;
 import org.apache.tomcat.util.http.parser.TokenList;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -192,6 +193,8 @@ public class CompressionConfig {
             return false;
         }
 
+        boolean useTE = false;
+
         MimeHeaders responseHeaders = response.getMimeHeaders();
 
         // Check if content is not already compressed
@@ -230,36 +233,59 @@ public class CompressionConfig {
             }
         }
 
-        // Check if the resource has a strong ETag
-        String eTag = responseHeaders.getHeader("ETag");
-        if (eTag != null && !eTag.trim().startsWith("W/")) {
-            // Has an ETag that doesn't start with "W/..." so it must be a
-            // strong ETag
-            return false;
-        }
-
-        // If processing reaches this far, the response might be compressed.
-        // Therefore, set the Vary header to keep proxies happy
-        ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
-
-        // Check if user-agent supports gzip encoding
-        // Only interested in whether gzip encoding is supported. Other
-        // encodings and weights can be ignored.
-        Enumeration<String> headerValues = request.getMimeHeaders().values("accept-encoding");
+        Enumeration<String> headerValues = request.getMimeHeaders().values("TE");
         boolean foundGzip = false;
+        // TE and accept-encoding seem to have equivalent syntax
         while (!foundGzip && headerValues.hasMoreElements()) {
-            List<AcceptEncoding> acceptEncodings = null;
+            List<TE> tes = null;
             try {
-                acceptEncodings = AcceptEncoding.parse(new StringReader(headerValues.nextElement()));
+                tes = TE.parse(new StringReader(headerValues.nextElement()));
             } catch (IOException ioe) {
                 // If there is a problem reading the header, disable compression
                 return false;
             }
 
-            for (AcceptEncoding acceptEncoding : acceptEncodings) {
-                if ("gzip".equalsIgnoreCase(acceptEncoding.getEncoding())) {
+            for (TE te : tes) {
+                if ("gzip".equalsIgnoreCase(te.getEncoding())) {
+                    useTE = true;
                     foundGzip = true;
                     break;
+                }
+            }
+        }
+
+        // Check if the resource has a strong ETag
+        String eTag = responseHeaders.getHeader("ETag");
+        if (!useTE && eTag != null && !eTag.trim().startsWith("W/")) {
+            // Has an ETag that doesn't start with "W/..." so it must be a
+            // strong ETag
+            return false;
+        }
+
+        if (!useTE) {
+            // If processing reaches this far, the response might be compressed.
+            // Therefore, set the Vary header to keep proxies happy
+            ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
+
+            // Check if user-agent supports gzip encoding
+            // Only interested in whether gzip encoding is supported. Other
+            // encodings and weights can be ignored.
+            headerValues = request.getMimeHeaders().values("accept-encoding");
+            foundGzip = false;
+            while (!foundGzip && headerValues.hasMoreElements()) {
+                List<AcceptEncoding> acceptEncodings = null;
+                try {
+                    acceptEncodings = AcceptEncoding.parse(new StringReader(headerValues.nextElement()));
+                } catch (IOException ioe) {
+                    // If there is a problem reading the header, disable compression
+                    return false;
+                }
+
+                for (AcceptEncoding acceptEncoding : acceptEncodings) {
+                    if ("gzip".equalsIgnoreCase(acceptEncoding.getEncoding())) {
+                        foundGzip = true;
+                        break;
+                    }
                 }
             }
         }
@@ -287,8 +313,13 @@ public class CompressionConfig {
 
         // Compressed content length is unknown so mark it as such.
         response.setContentLength(-1);
-        // Configure the content encoding for compressed content
-        responseHeaders.setValue("Content-Encoding").setString("gzip");
+        if (useTE) {
+            // Configure the transfer encoding for compressed content
+            responseHeaders.addValue("Transfer-Encoding").setString("gzip");
+        } else {
+            // Configure the content encoding for compressed content
+            responseHeaders.setValue("Content-Encoding").setString("gzip");
+        }
 
         return true;
     }
