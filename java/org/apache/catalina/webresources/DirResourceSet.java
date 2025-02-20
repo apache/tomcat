@@ -46,8 +46,6 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
 
     private static final Log log = LogFactory.getLog(DirResourceSet.class);
 
-    private boolean caseSensitive = true;
-
     private Map<String,ResourceLock> resourceLocksByPath = new HashMap<>();
     private Object resourceLocksByPathLock = new Object();
 
@@ -323,7 +321,6 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     @Override
     protected void initInternal() throws LifecycleException {
         super.initInternal();
-        caseSensitive = isCaseSensitive();
         // Is this an exploded web application?
         if (getWebAppMount().equals("")) {
             // Look for a manifest
@@ -337,10 +334,6 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
             }
         }
         // Check for exposure to CVE-2024-56337
-        if (caseSensitive) {
-            // CVE-2024-56337 (nor CVE-2024-50379) is not exploitable on a case sensitive file system
-            return;
-        }
         if (isReadOnly()) {
             // CVE-2024-56337 (nor CVE-2024-50379) is not exploitable on a read-only ResourceSet
             return;
@@ -367,65 +360,16 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     }
 
 
-    /*
-     * Determines if this ResourceSet is based on a case sensitive file system or not.
-     *
-     * File systems are usually case sensitive or not. Windows, via the command 'fsutil.exe file setCaseSensitiveInfo
-     * <path> enable', may be case sensitive in some directories and case insensitive in others.
-     *
-     * If this method incorrectly determines that the DirResourceSet is case sensitive, the file locking mechanism that
-     * ensures write operations are performed atomically will not operate correctly. If this method incorrectly
-     * determines that the DirResourceSet is case insensitive, there is a small performance penalty for writes.
-     *
-     * Given the above, this method only reports the file system as case sensitive if no indication of case
-     * insensitivity is detected. This does mean that Windows based DirResourceSet instances will be reported as case
-     * insensitive even all of the directories in the DirResourceSet have been configured as case sensitive.
-     */
-    private boolean isCaseSensitive() {
-        try {
-            String canonicalPath = getFileBase().getCanonicalPath();
-            /*
-             * If any lower case characters are found in the canonical file name formed by converting the test file name
-             * to upper case, the underlying file system must be, at least in part, case insensitive.
-             */
-            File upper = new File(canonicalPath.toUpperCase(Locale.ENGLISH));
-            String upperCanonicalPath = upper.getCanonicalPath();
-            char[] upperCharacters = upperCanonicalPath.toCharArray();
-            for (char c : upperCharacters) {
-                if (Character.isLowerCase(c)) {
-                    return false;
-                }
-            }
-
-            /*
-             * If any upper case characters are found in the canonical file name formed by converting the test file name
-             * to lower case, the underlying file system must be, at least in part, case insensitive.
-             */
-            File lower = new File(canonicalPath.toLowerCase(Locale.ENGLISH));
-            String lowerCanonicalPath = lower.getCanonicalPath();
-            char[] lowerCharacters = lowerCanonicalPath.toCharArray();
-            for (char c : lowerCharacters) {
-                if (Character.isUpperCase(c)) {
-                    return false;
-                }
-            }
-
-            return true;
-        } catch (IOException ioe) {
-            log.warn(sm.getString("dirResourceSet.isCaseSensitive.fail", getFileBase().getAbsolutePath()), ioe);
-        }
-
-        return false;
-    }
-
-
     private String getLockKey(String path) {
-        // Normalize path to ensure that the same key is used for the same path.
-        String normalisedPath = RequestUtil.normalize(path);
-        if (caseSensitive) {
-            return normalisedPath;
-        }
-        return normalisedPath.toLowerCase(Locale.ENGLISH);
+        /*
+         * Normalize path to ensure that the same key is used for the same path. Always convert path to lower case as
+         * the file system may be case insensitive. A minor performance improvement is possible by removing the
+         * conversion to lower case for case sensitive file systems but confirming that all the directories within a
+         * DirResourceSet are case sensitive is much harder than it might first appear due to various edge cases. In
+         * particular, Windows can make individual directories case sensitive and File.getCanonicalPath() doesn't return
+         * the canonical file name on Linux for some case insensitive file systems (such as mounted Windows shares).
+         */
+        return RequestUtil.normalize(path).toLowerCase(Locale.ENGLISH);
     }
 
 
