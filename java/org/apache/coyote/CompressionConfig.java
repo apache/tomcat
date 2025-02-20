@@ -221,6 +221,7 @@ public class CompressionConfig {
         }
 
         boolean useTE = false;
+        boolean useCE = true;
 
         MimeHeaders responseHeaders = response.getMimeHeaders();
 
@@ -238,8 +239,13 @@ public class CompressionConfig {
                 log.warn(sm.getString("compressionConfig.ContentEncodingParseFail"), e);
                 return false;
             }
-            if (tokens.contains("gzip") || tokens.contains("compress") || tokens.contains("deflate")
-                    || tokens.contains("br") || tokens.contains("zstd")) {
+            if (tokens.contains("identity")) {
+                // If identity, do not do content modifications
+                useCE = false;
+            } else if (tokens.contains("br") || tokens.contains("compress") || tokens.contains("dcb")
+                    || tokens.contains("dcz") || tokens.contains("deflate") || tokens.contains("gzip")
+                    || tokens.contains("pack200-gzip") || tokens.contains("zstd")) {
+                // Content should not be compressed twice
                 return false;
             }
         }
@@ -291,7 +297,7 @@ public class CompressionConfig {
             }
         }
 
-        if (!useTE) {
+        if (useCE && !useTE) {
             // If processing reaches this far, the response might be compressed.
             // Therefore, set the Vary header to keep proxies happy
             ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
@@ -347,7 +353,7 @@ public class CompressionConfig {
             responseHeaders.addValue("Transfer-Encoding").setString("gzip");
         } else {
             // Configure the content encoding for compressed content
-            responseHeaders.setValue("Content-Encoding").setString("gzip");
+            responseHeaders.addValue("Content-Encoding").setString("gzip");
         }
 
         return true;
