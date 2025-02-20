@@ -16,9 +16,16 @@
  */
 package org.apache.tomcat.util.compat;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodHandles.Lookup;
+import java.lang.invoke.VarHandle;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Field;
 import java.lang.reflect.InaccessibleObjectException;
+import java.lang.reflect.Modifier;
 import java.security.PrivilegedExceptionAction;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionException;
 
@@ -43,7 +50,11 @@ public class JreCompat {
     private static final boolean jre21Available;
     private static final boolean jre22Available;
 
-    private static final Field useCanonCachesField;
+    private static final String USE_CANON_CACHES_CMD_ARG = "-Dsun.io.useCanonCaches=";
+    private static volatile Boolean canonCachesDisabled;
+    private static final Object canonCachesDisabledLock = new Object();
+    private static volatile Optional<Field> useCanonCachesField;
+    private static final Object useCanonCachesFieldLock = new Object();
 
     static {
         boolean result = false;
@@ -80,21 +91,6 @@ public class JreCompat {
             jre21Available = false;
             jre19Available = false;
         }
-
-        Field f1 = null;
-        try {
-            Class<?> clazz = Class.forName("java.io.FileSystem");
-            f1 = clazz.getDeclaredField("useCanonCaches");
-            f1.setAccessible(true);
-        } catch (InaccessibleObjectException | ReflectiveOperationException | IllegalArgumentException e) {
-            /*
-             * Log at debug level as this will only be an issue if the field needs to be accessed and most
-             * configurations will not need to do so. Appropriate warnings will be logged if an attempt is made to use
-             * the field when it could not be found/accessed.
-             */
-            log.debug(sm.getString("jreCompat.useCanonCaches.init"), e);
-        }
-        useCanonCachesField = f1;
     }
 
 
@@ -234,28 +230,43 @@ public class JreCompat {
 
 
     /*
-     * The behaviour of the canonical file cache varies by Java version.
+     * The behaviour of the canonical file name cache varies by Java version.
      *
      * The cache was removed in Java 21 so these methods and the associated code can be removed once the minimum Java
      * version is 21.
      *
-     * For 12 <= Java <= 20, the cache was present but disabled by default. Since the user may have changed the default
-     * Tomcat has to assume the cache is enabled unless proven otherwise.
+     * For 12 <= Java <= 20, the cache was present but disabled by default.
      *
-     * For Java < 12, the cache was enabled by default. Tomcat assumes the cache is enabled unless proven otherwise.
+     * Tomcat 11 has a minimum Java version of 17.
+     *
+     * The static field in java.io.FileSystem will be set before any application code gets a chance to run. Therefore,
+     * the value of that field can be determined by looking at the command line arguments. This enables us to determine
+     * the status without having using reflection.
      */
     public boolean isCanonCachesDisabled() {
-        if (useCanonCachesField == null) {
-            // No need to log a warning. The warning will be logged when trying to disable the cache.
-            return false;
+        if (canonCachesDisabled != null) {
+            return canonCachesDisabled.booleanValue();
         }
-        boolean result = false;
-        try {
-            result = !((Boolean) useCanonCachesField.get(null)).booleanValue();
-        } catch (ReflectiveOperationException e) {
-            // No need to log a warning. The warning will be logged when trying to disable the cache.
+        synchronized (canonCachesDisabledLock) {
+            if (canonCachesDisabled != null) {
+                return canonCachesDisabled.booleanValue();
+            }
+
+            List<String> args = ManagementFactory.getRuntimeMXBean().getInputArguments();
+            for (String arg : args) {
+                // If any command line argument attempts to enable the cache, assume it is enabled.
+                if (arg.startsWith(USE_CANON_CACHES_CMD_ARG)) {
+                    String value = arg.substring(USE_CANON_CACHES_CMD_ARG.length());
+                    boolean cacheEnabled = Boolean.valueOf(value).booleanValue();
+                    if (cacheEnabled) {
+                        canonCachesDisabled = Boolean.FALSE;
+                        return false;
+                    }
+                }
+            }
+            canonCachesDisabled = Boolean.TRUE;
+            return true;
         }
-        return result;
     }
 
 
@@ -266,16 +277,62 @@ public class JreCompat {
      *             as a result of this call, otherwise {@code false}
      */
     public boolean disableCanonCaches() {
-        if (useCanonCachesField == null) {
+        ensureUseCanonCachesFieldIsPopulated();
+        if (useCanonCachesField.isEmpty()) {
             log.warn(sm.getString("jreCompat.useCanonCaches.none"));
             return false;
         }
         try {
-            useCanonCachesField.set(null, Boolean.FALSE);
+            useCanonCachesField.get().set(null, Boolean.FALSE);
         } catch (ReflectiveOperationException | IllegalArgumentException e) {
             log.warn(sm.getString("jreCompat.useCanonCaches.failed"), e);
             return false;
         }
+        synchronized (canonCachesDisabledLock) {
+            canonCachesDisabled = Boolean.TRUE;
+        }
         return true;
+    }
+
+
+    private void ensureUseCanonCachesFieldIsPopulated() {
+        if (useCanonCachesField != null) {
+            return;
+        }
+        synchronized (useCanonCachesFieldLock) {
+            if (useCanonCachesField != null) {
+                return;
+            }
+
+            Field f = null;
+            try {
+                Class<?> clazz = Class.forName("java.io.FileSystem");
+                f = clazz.getDeclaredField("useCanonCaches");
+                // Need this because the 'useCanonCaches' field is private
+                f.setAccessible(true);
+
+                /*
+                 * Need this in Java 17 (and it only works in Java 17) because the 'useCanonCaches' field is final.
+                 *
+                 * This will fail in Java 18 to 20 but since those versions are no longer supported it is acceptable for
+                 * the attempt to set the 'useCanonCaches' field to fail. Users that really want to use Java 18 to 20
+                 * will have to ensure that they do not explicitly enable the canonical file name cache.
+                 */
+                VarHandle modifiers;
+                Lookup lookup = MethodHandles.privateLookupIn(Field.class, MethodHandles.lookup());
+                modifiers = lookup.findVarHandle(Field.class, "modifiers", int.class);
+                modifiers.set(f, f.getModifiers() & ~Modifier.FINAL);
+            } catch (InaccessibleObjectException | ReflectiveOperationException | IllegalArgumentException e) {
+                // Make sure field is not set.
+                f = null;
+                log.warn(sm.getString("jreCompat.useCanonCaches.init"), e);
+            }
+
+            if (f == null) {
+                useCanonCachesField = Optional.empty();
+            } else {
+                useCanonCachesField = Optional.of(f);
+            }
+        }
     }
 }

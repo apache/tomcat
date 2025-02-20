@@ -125,6 +125,10 @@
         <code>HttpServletRequest.login(String username, String password)</code>
         when the realm is configured to use GSSAPI authentication. (markt)
       </fix>
+      <fix>
+        Improve the checks for exposure to and protection against CVE-2024-56337
+        so that reflection is not used unless required. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -151,7 +155,7 @@
       <fix>
         <bug>69576</bug>: Avoid possible failure intializing
         <code>JreCompat</code> due to uncaught exception introduced for the
-        check for CVE-2004-56337. (remm)
+        check for CVE-2024-56337. (remm)
       </fix>
     </changelog>
   </subsection>
