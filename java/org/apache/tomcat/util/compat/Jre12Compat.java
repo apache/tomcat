@@ -43,7 +43,6 @@ public class Jre12Compat extends Jre9Compat {
         Class<?> c1 = null;
         try {
             c1 = Class.forName("java.text.CompactNumberFormat");
-
         } catch (ReflectiveOperationException e) {
             // Must be pre-Java 12
             log.debug(sm.getString("jre12Compat.javaPre12"), e);
