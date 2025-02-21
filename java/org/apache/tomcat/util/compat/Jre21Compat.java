@@ -32,6 +32,7 @@ public class Jre21Compat extends Jre19Compat {
     private static final Log log = LogFactory.getLog(Jre21Compat.class);
     private static final StringManager sm = StringManager.getManager(Jre21Compat.class);
 
+    private static final boolean supported;
     private static final Method nameMethod;
     private static final Method startMethod;
     private static final Method ofVirtualMethod;
@@ -46,9 +47,14 @@ public class Jre21Compat extends Jre19Compat {
         Method m4 = null;
 
         try {
-            c1 = Class.forName("java.lang.Thread$Builder");
-            m1 = c1.getMethod("name", String.class, long.class);
-            m2 = c1.getMethod("start", Runnable.class);
+            // Note: Virtual threads is the main new feature in Java 21, but it was previously
+            // present as a preview. As a result, it is more accurate to test for another
+            // new class
+            c1 = Class.forName("java.util.SequencedCollection");
+
+            Class<?> c2 = Class.forName("java.lang.Thread$Builder");
+            m1 = c2.getMethod("name", String.class, long.class);
+            m2 = c2.getMethod("start", Runnable.class);
             m3 = Thread.class.getMethod("ofVirtual", (Class<?>[]) null);
             m4 = Subject.class.getMethod("callAs", Subject.class, Callable.class);
         } catch (ClassNotFoundException e) {
@@ -58,6 +64,7 @@ public class Jre21Compat extends Jre19Compat {
             // Should never happen
             log.error(sm.getString("jre21Compat.unexpected"), e);
         }
+        supported = (c1 != null);
         nameMethod = m1;
         startMethod = m2;
         ofVirtualMethod = m3;
@@ -65,7 +72,7 @@ public class Jre21Compat extends Jre19Compat {
     }
 
     static boolean isSupported() {
-        return ofVirtualMethod != null;
+        return supported;
     }
 
     @Override
