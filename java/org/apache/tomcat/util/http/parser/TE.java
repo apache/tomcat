@@ -27,10 +27,12 @@ public class TE {
 
     private final String encoding;
     private final Map<String,String> parameters;
+    private final double quality;
 
-    protected TE(String encoding, Map<String,String> parameters) {
+    protected TE(String encoding, Map<String,String> parameters, double quality) {
         this.encoding = encoding;
         this.parameters = parameters;
+        this.quality = quality;
     }
 
     public String getEncoding() {
@@ -39,6 +41,10 @@ public class TE {
 
     public Map<String,String> getParameters() {
         return parameters;
+    }
+
+    public double getQuality() {
+        return quality;
     }
 
 
@@ -59,9 +65,9 @@ public class TE {
                 break;
             }
 
-            Map<String,String> parameters = null;
+            Map<String,String> parameters = new HashMap<>();
 
-            // See if a quality has been provided
+            // Parse parameters (including optional quality)
             while (HttpParser.skipConstant(input, ";") == SkipResult.FOUND) {
                 String name = HttpParser.readToken(input);
                 String value = null;
@@ -69,14 +75,20 @@ public class TE {
                     value = HttpParser.readTokenOrQuotedString(input, true);
                 }
                 if (name != null && value != null) {
-                    if (parameters == null) {
-                        parameters = new HashMap<>();
-                    }
                     parameters.put(name, value);
                 }
             }
 
-            result.add(new TE(encoding, parameters));
+            // See if a quality has been provided in the parameters
+            double quality = 1;
+            String q = parameters.remove("q");
+            if (q != null) {
+                quality = HttpParser.readWeight(new StringReader("q=" + q), ',');
+            }
+
+            if (quality > 0) {
+                result.add(new TE(encoding, parameters, quality));
+            }
         } while (true);
 
         return result;
