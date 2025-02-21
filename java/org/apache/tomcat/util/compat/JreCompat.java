@@ -312,16 +312,19 @@ public class JreCompat {
                 f.setAccessible(true);
 
                 /*
-                 * Need this in Java 17 (and it only works in Java 17) because the 'useCanonCaches' field is final.
+                 * Need this in Java 17 because the 'useCanonCaches' field is final.
                  *
                  * This will fail in Java 18 to 20 but since those versions are no longer supported it is acceptable for
                  * the attempt to set the 'useCanonCaches' field to fail. Users that really want to use Java 18 to 20
                  * will have to ensure that they do not explicitly enable the canonical file name cache.
                  */
-                VarHandle modifiers;
                 Lookup lookup = MethodHandles.privateLookupIn(Field.class, MethodHandles.lookup());
-                modifiers = lookup.findVarHandle(Field.class, "modifiers", int.class);
+                VarHandle modifiers = lookup.findVarHandle(Field.class, "modifiers", int.class);
                 modifiers.set(f, f.getModifiers() & ~Modifier.FINAL);
+            } catch (UnsupportedOperationException e) {
+                // Make sure field is not set.
+                f = null;
+                log.warn(sm.getString("jreCompat.useCanonCaches.java18"), e);
             } catch (InaccessibleObjectException | ReflectiveOperationException | IllegalArgumentException e) {
                 // Make sure field is not set.
                 f = null;
