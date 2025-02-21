@@ -132,15 +132,18 @@ public class Jre12Compat extends Jre9Compat {
                  * the attempt to set the 'useCanonCaches' field to fail. Users that really want to use Java 18 to 20
                  * will have to ensure that they do not explicitly enable the canonical file name cache.
                  */
-                Method privateLookupInMethod = MethodHandles.class.getDeclaredMethod("privateLookupIn", Class.class, Lookup.class);
-                Method findVarHandleMethod = Lookup.class.getDeclaredMethod("findVarHandle", Class.class, String.class, Class.class);
+                Method privateLookupInMethod =
+                        MethodHandles.class.getDeclaredMethod("privateLookupIn", Class.class, Lookup.class);
+                Method findVarHandleMethod =
+                        Lookup.class.getDeclaredMethod("findVarHandle", Class.class, String.class, Class.class);
                 clazz = Class.forName("java.lang.invoke.VarHandle");
 
                 Lookup lookup = (Lookup) privateLookupInMethod.invoke(null, Field.class, MethodHandles.lookup());
                 Object modifiers = findVarHandleMethod.invoke(lookup, Field.class, "modifiers", int.class);
                 Method setMethod = null;
                 try {
-                    setMethod = modifiers.getClass().getDeclaredMethod("set", modifiers.getClass(), Object.class, int.class);
+                    setMethod = modifiers.getClass().getDeclaredMethod("set", modifiers.getClass(), Object.class,
+                            int.class);
                 } catch (NoSuchMethodException e) {
                     /*
                      * Method signature changed between Java 14 and Java 15. This hack avoids creating Jre15Compat for
