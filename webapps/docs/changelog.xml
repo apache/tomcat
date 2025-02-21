@@ -125,6 +125,10 @@
         <code>HttpServletRequest.login(String username, String password)</code>
         when the realm is configured to use GSSAPI authentication. (markt)
       </fix>
+      <fix>
+        Fix a bug in the JRE compatibility detection that incorrectly identified
+        Java 19 and Java 20 as supporting Java 21 features. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
