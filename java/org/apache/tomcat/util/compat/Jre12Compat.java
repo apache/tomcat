@@ -134,6 +134,10 @@ public class Jre12Compat extends JreCompat {
                 Lookup lookup = MethodHandles.privateLookupIn(Field.class, MethodHandles.lookup());
                 VarHandle modifiers = lookup.findVarHandle(Field.class, "modifiers", int.class);
                 modifiers.set(f, f.getModifiers() & ~Modifier.FINAL);
+            } catch (UnsupportedOperationException e) {
+                // Make sure field is not set.
+                f = null;
+                log.warn(sm.getString("jreCompat.useCanonCaches.java18"), e);
             } catch (InaccessibleObjectException | ReflectiveOperationException | IllegalArgumentException e) {
                 // Make sure field is not set.
                 f = null;
