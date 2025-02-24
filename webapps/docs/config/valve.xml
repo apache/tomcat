@@ -479,6 +479,7 @@
     <ul>
     <li><b><code>x-H(authType)</code></b>: getAuthType </li>
     <li><b><code>x-H(characterEncoding)</code></b>: getCharacterEncoding </li>
+    <li><b><code>x-H(connectionId)</code></b>: getServletConnection().getConnectionId</li>
     <li><b><code>x-H(contentLength)</code></b>: getContentLength </li>
     <li><b><code>x-H(locale)</code></b>:  getLocale</li>
     <li><b><code>x-H(protocol)</code></b>: getProtocol </li>

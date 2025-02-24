@@ -70,6 +70,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <li>For any of the x-H(...) the following method will be called from the HttpServletRequest object</li>
  * <li><code>x-H(authType)</code>: getAuthType</li>
  * <li><code>x-H(characterEncoding)</code>: getCharacterEncoding</li>
+ * <li><code>x-H(connectionId)</code>: getConnectionId</li>
  * <li><code>x-H(contentLength)</code>: getContentLength</li>
  * <li><code>x-H(locale)</code>: getLocale</li>
  * <li><code>x-H(protocol)</code>: getProtocol</li>
@@ -765,6 +766,13 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 @Override
                 public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
                     buf.append(wrap("" + request.getContentLengthLong()));
+                }
+            };
+        } else if ("connectionId".equals(parameter)) {
+            return new AccessLogElement() {
+                @Override
+                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                    buf.append(wrap("" + request.getServletConnection().getConnectionId()));
                 }
             };
         } else if ("characterEncoding".equals(parameter)) {
