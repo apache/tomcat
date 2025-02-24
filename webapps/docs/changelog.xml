@@ -133,6 +133,13 @@
         Improve the checks for exposure to and protection against CVE-2024-56337
         so that reflection is not used unless required. (markt)
       </fix>
+      <add>
+        Add support for logging the connection ID (as returned by
+        <code>ServletRequest.getServletConnection().getConnectionId()</code>)
+        with the <code>AccessLogValve</code> and
+        <code>ExtendedAccessLogValve</code>. Based on pull request <pr>814</pr>
+        by Dmole. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -115,6 +115,8 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * <li><code>%{xxx}s</code> xxx is an attribute in the HttpSession
  * <li><code>%{xxx}t</code> xxx is an enhanced SimpleDateFormat pattern (see Configuration Reference document for
  * details on supported time patterns)
+ * <li><code>%{xxx}L</code> xxx is the identifier to log (see Configuration Reference document for details on supported
+ * identifiers)
  * <li><code>%{xxx}T</code> xxx is the unit for the time taken to process the request (see Configuration Reference
  * document for details on supported units)
  * </ul>
@@ -167,7 +169,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         PEER
     }
 
-    // ------------------------------------------------------ Constructor
+    private enum IdentifierType {
+        CONNECTION,
+        UNKNOWN
+    }
+
+
     public AbstractAccessLogValve() {
         super(true);
     }
@@ -1677,6 +1684,48 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         }
     }
 
+
+
+    /**
+     * Write identifier element %{xxx}L
+     */
+    protected class IdentifierElement implements AccessLogElement {
+
+        /**
+         * Type of identifier to log
+         */
+        private final IdentifierType identifierType;
+
+        public IdentifierElement() {
+            this(null);
+        }
+
+
+        public IdentifierElement(String type) {
+            switch (type) {
+                case "c":
+                    identifierType = IdentifierType.CONNECTION;
+                    break;
+                default:
+                    log.error(sm.getString("accessLogValve.invalidIdentifierType", type));
+                    identifierType = IdentifierType.UNKNOWN;
+                    break;
+            }
+        }
+
+        @Override
+        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+            switch(identifierType) {
+                case CONNECTION:
+                    buf.append(request.getServletConnection().getConnectionId());
+                    break;
+                case UNKNOWN:
+                    buf.append("???");
+            }
+        }
+    }
+
+
     /**
      * Parse pattern string and create the array of AccessLogElement.
      *
@@ -1749,14 +1798,16 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      */
     protected AccessLogElement createAccessLogElement(String name, char pattern) {
         switch (pattern) {
-            case 'i':
-                return new HeaderElement(name);
-            case 'c':
-                return new CookieElement(name);
-            case 'o':
-                return new ResponseHeaderElement(name);
             case 'a':
                 return new RemoteAddrElement(name);
+            case 'c':
+                return new CookieElement(name);
+            case 'i':
+                return new HeaderElement(name);
+            case 'L':
+                return new IdentifierElement(name);
+            case 'o':
+                return new ResponseHeaderElement(name);
             case 'p':
                 return new PortElement(name);
             case 'r':
