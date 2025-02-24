@@ -337,6 +337,8 @@
         remote (client) port (<code>xxx=remote</code>)</li>
     <li><b><code>%{xxx}t</code></b> write timestamp at the end of the request formatted using the
         enhanced SimpleDateFormat pattern <code>xxx</code></li>
+    <li><b><code>%{xxx}L</code></b> write an identifier associated with the request where the only valid value for
+        <code>xxx</code> is <code>c</code> for connection.</li>
     <li><b><code>%{xxx}T</code></b> write time taken to process the request using unit <code>xxx</code>
         where valid units are <code>ns</code> for nanoseconds, <code>us</code> for microseconds,
         <code>ms</code> for milliseconds, <code>fracsec</code> for fractional seconds, or <code>s</code> for whole seconds.
