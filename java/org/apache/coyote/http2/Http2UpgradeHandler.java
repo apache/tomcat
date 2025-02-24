@@ -89,6 +89,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
     protected static final HeaderSink HEADER_SINK = new HeaderSink();
 
+    protected static final UserDataHelper userDataHelper = new UserDataHelper(log);
+
     protected final String connectionId;
 
     protected final Http2Protocol protocol;
@@ -136,8 +138,6 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private final AtomicLong overheadCount;
     private volatile int lastNonFinalDataPayload;
     private volatile int lastWindowUpdate;
-
-    protected final UserDataHelper userDataHelper = new UserDataHelper(log);
 
 
     Http2UpgradeHandler(Http2Protocol protocol, Adapter adapter, Request coyoteRequest,
