@@ -133,6 +133,13 @@
         Fix a bug in the JRE compatibility detection that incorrectly identified
         Java 19 and Java 20 as supporting Java 21 features. (markt)
       </fix>
+      <add>
+        Add support for logging the connection ID (as returned by
+        <code>ServletRequest.getServletConnection().getConnectionId()</code>)
+        with the <code>AccessLogValve</code> and
+        <code>ExtendedAccessLogValve</code>. Based on pull request <pr>814</pr>
+        by Dmole. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
