@@ -159,6 +159,12 @@
         <code>HttpServletRequest.login(String username, String password)</code>
         when the realm is configured to use GSSAPI authentication. (markt)
       </fix>
+      <add>
+        Add support for logging the connection ID (as returned by
+        <code>ServletRequest.getServletConnection().getConnectionId()</code>)
+        with the <code>ExtendedAccessLogValve</code>. Based on pull request
+        <pr>814</pr> by Dmole. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
