@@ -241,6 +241,9 @@
       <update>
         Update Checkstyle to 10.21.3. (markt)
       </update>
+      <update>
+        Update SpotBugs to 4.9.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
