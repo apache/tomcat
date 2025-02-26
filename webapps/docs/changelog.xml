@@ -147,6 +147,10 @@
         <code>Content-Encoding</code> if the client submits a <code>TE</code>
         header containing <code>gzip</code>. (remm)
       </update>
+      <fix>
+        Fix a race condition in the handling of HTTP/2 stream reset that could
+        cause unexpected 500 responses. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
