@@ -166,6 +166,10 @@
         <code>ExtendedAccessLogValve</code>. Based on pull request <pr>814</pr>
         by Dmole. (markt)
       </add>
+      <fix>
+        Avoid scenarios where temporary files used for partial PUT would not
+        be deleted. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

@@ -637,7 +637,9 @@ public class DefaultServlet extends HttpServlet {
                 }
             }
             if (tempContentFile != null) {
-                tempContentFile.delete();
+                if (!tempContentFile.delete()) {
+                    log(sm.getString("defaultServlet.deleteTempFileFailed", tempContentFile.getAbsolutePath()));
+                }
             }
         }
     }
@@ -692,6 +694,13 @@ public class DefaultServlet extends HttpServlet {
                     randAccessContentFile.write(transferBuffer, 0, numBytesRead);
                 }
             }
+
+        } catch (IOException | RuntimeException | Error e) {
+            // This has to be done this way to be able to close the file without changing the method signature
+            if (!contentFile.delete()) {
+                log(sm.getString("defaultServlet.deleteTempFileFailed", contentFile.getAbsolutePath()));
+            }
+            throw e;
         }
 
         return contentFile;
