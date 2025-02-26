@@ -182,7 +182,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        <bug>69576</bug>: Avoid possible failure intializing
+        <bug>69576</bug>: Avoid possible failure initializing
         <code>JreCompat</code> due to uncaught exception introduced for the
         check for CVE-2024-56337. (remm)
       </fix>
