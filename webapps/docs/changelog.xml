@@ -166,6 +166,9 @@
         Add <code>makensis</code> as an option for building the Installer for
         Windows on non-Windows platforms. (rjung/markt)
       </add>
+      <update>
+        Update Byte Buddy to 1.17.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
