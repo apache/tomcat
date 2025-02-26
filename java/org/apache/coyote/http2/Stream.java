@@ -1413,11 +1413,22 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 readStateLock.unlock();
             }
 
-            // Trigger ReadListener.onError()
-            getCoyoteRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION,
-                    new IOException(sm.getString("stream.clientResetRequest")));
-            coyoteRequest.action(ActionCode.DISPATCH_ERROR, null);
-            coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
+            /*
+             * There is a potential race between a reset being received by the Http2UpgradeHandler and the
+             * StreamProcessor recycling the Stream. The use of recycledLock ensures that an attempt is not made to
+             * notify the ReadListener after the Stream has been recycled.
+             */
+            if (!recycled) {
+                synchronized (recycledLock) {
+                    if (!recycled) {
+                        // Trigger ReadListener.onError()
+                        getCoyoteRequest().setAttribute(RequestDispatcher.ERROR_EXCEPTION,
+                                new IOException(sm.getString("stream.clientResetRequest")));
+                        coyoteRequest.action(ActionCode.DISPATCH_ERROR, null);
+                        coyoteRequest.action(ActionCode.DISPATCH_EXECUTE, null);
+                    }
+                }
+            }
         }
 
         @Override
