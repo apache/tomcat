@@ -117,10 +117,6 @@
         results using the correct resource name. (markt)
       </fix>
       <fix>
-        Improve the mechanism for detecting whether a web application has been
-        deployed to a case sensitive or a case insensitive file system. (markt)
-      </fix>
-      <fix>
         Enable the JNDIRealm to validate credentials provided to
         <code>HttpServletRequest.login(String username, String password)</code>
         when the realm is configured to use GSSAPI authentication. (markt)
@@ -131,7 +127,8 @@
       </fix>
       <fix>
         Improve the checks for exposure to and protection against CVE-2024-56337
-        so that reflection is not used unless required. (markt)
+        so that reflection is not used unless required. The checks for whether
+        the file system is case sensitive or not have been removed. (markt)
       </fix>
     </changelog>
   </subsection>
