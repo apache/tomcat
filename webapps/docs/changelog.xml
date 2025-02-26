@@ -130,6 +130,10 @@
         so that reflection is not used unless required. The checks for whether
         the file system is case sensitive or not have been removed. (markt)
       </fix>
+      <fix>
+        Avoid scenarios where temporary files used for partial PUT would not
+        be deleted. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
