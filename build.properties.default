@@ -251,10 +251,10 @@ objenesis.jar=${objenesis.home}/objenesis-${objenesis.version}.jar
 objenesis.loc=${base-maven.loc}/org/objenesis/objenesis/${objenesis.version}/objenesis-${objenesis.version}.jar
 
 # ----- byte-buddy, used by EasyMock, version 1.12.18 or later -----
-bytebuddy.version=1.16.1
+bytebuddy.version=1.17.1
 bytebuddy.checksum.enabled=true
 bytebuddy.checksum.algorithm=MD5|SHA-1
-bytebuddy.checksum.value=ba44d75d8a9a19e029ce52a8010b2238|f95f4d5efa5e07706129048a62b38a0acb35592c
+bytebuddy.checksum.value=133a95ba62ed6a61d83facee7e5823d8|8b5205fad48196a88d3d66dddff5a7417bce3596
 bytebuddy.home=${base.path}/byte-buddy-${bytebuddy.version}
 bytebuddy.jar=${bytebuddy.home}/byte-buddy-${bytebuddy.version}.jar
 bytebuddy.loc=${base-maven.loc}/net/bytebuddy/byte-buddy/${bytebuddy.version}/byte-buddy-${bytebuddy.version}.jar
