@@ -21,7 +21,7 @@ package org.apache.tomcat.jni;
  *
  * @author Mladen Turk
  *
- * @deprecated Unused. Will be removed in Tomcat 10.1
+ * @deprecated Unused. Will be removed in Tomcat 9.1 an has been removed in Tomcat 10.1.
  */
 @Deprecated
 public interface BIOCallback {

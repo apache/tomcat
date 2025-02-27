@@ -22,6 +22,7 @@ package org.apache.tomcat.jni;
  * @author Mladen Turk
  *
  * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
+ *              9.1.x / Tomcat Native 2.x and has been reduced in Tomcat
  *              10.1.x / Tomcat Native 2.x onwards to only include those
  *              components required to provide OpenSSL integration with the NIO
  *              and NIO2 connectors.
