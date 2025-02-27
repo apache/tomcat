@@ -24,6 +24,8 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -43,7 +45,12 @@ import org.apache.tomcat.util.json.JSONParser;
  */
 
 public class KubernetesMembershipProvider extends CloudMembershipProvider {
+
     private static final Log log = LogFactory.getLog(KubernetesMembershipProvider.class);
+
+    private Path saTokenPath;
+    private FileTime saTokenLastModifiedTime;
+
 
     @Override
     public void start(int level) throws Exception {
@@ -80,8 +87,10 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 saTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token";
             }
             try {
-                byte[] bytes = Files.readAllBytes(FileSystems.getDefault().getPath(saTokenFile));
+                saTokenPath = FileSystems.getDefault().getPath(saTokenFile);
+                byte[] bytes = Files.readAllBytes(saTokenPath);
                 streamProvider = new TokenStreamProvider(new String(bytes, StandardCharsets.US_ASCII), caCertFile);
+                saTokenLastModifiedTime = Files.getLastModifiedTime(saTokenPath);
             } catch (IOException e) {
                 log.error(sm.getString("kubernetesMembershipProvider.streamError"), e);
             }
@@ -122,6 +131,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         heartbeat();
     }
 
+
     @Override
     public boolean stop(int level) throws Exception {
         try {
@@ -131,11 +141,14 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         }
     }
 
+
     @Override
     protected Member[] fetchMembers() {
         if (streamProvider == null) {
             return new Member[0];
         }
+
+        reloadSaTokenIfChanged();
 
         List<MemberImpl> members = new ArrayList<>();
 
@@ -148,6 +161,31 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
 
         return members.toArray(new Member[0]);
     }
+
+
+    private void reloadSaTokenIfChanged() {
+        if (saTokenPath == null) {
+            // Service account token not being used.
+            return;
+        }
+        if (!Files.exists(saTokenPath)) {
+            // If the service account token is being used, this path should exist
+            log.warn(sm.getString("kubernetesMembershipProvider.serviceAccountTokenMissing", saTokenPath));
+            return;
+        }
+        try {
+            FileTime oldSaTokenLastModifiedTime = saTokenLastModifiedTime;
+            saTokenLastModifiedTime = Files.getLastModifiedTime(saTokenPath);
+            // Use != to protect against clock issues
+            if (!saTokenLastModifiedTime.equals(oldSaTokenLastModifiedTime)) {
+                byte[] bytes = Files.readAllBytes(saTokenPath);
+                ((TokenStreamProvider)streamProvider).setToken(new String(bytes, StandardCharsets.US_ASCII));
+            }
+        } catch (IOException e) {
+            log.error(sm.getString("kubernetesMembershipProvider.streamError"), e);
+        }
+    }
+
 
     @SuppressWarnings("unchecked")
     protected void parsePods(Reader reader, List<MemberImpl> members) {
@@ -239,5 +277,4 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
             log.error(sm.getString("kubernetesMembershipProvider.jsonError"), e);
         }
     }
-
 }
