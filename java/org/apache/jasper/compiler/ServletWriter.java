@@ -81,6 +81,7 @@ public class ServletWriter implements AutoCloseable {
 
     /**
      * Prints the given string followed by '\n'
+     *
      * @param s The string
      */
     public void println(String s) {
@@ -105,6 +106,7 @@ public class ServletWriter implements AutoCloseable {
 
     /**
      * Prints the current indentation, followed by the given string
+     *
      * @param s The string
      */
     public void printin(String s) {
@@ -114,6 +116,7 @@ public class ServletWriter implements AutoCloseable {
 
     /**
      * Prints the current indentation, and then the string, and a '\n'.
+     *
      * @param s The string
      */
     public void printil(String s) {
@@ -123,9 +126,8 @@ public class ServletWriter implements AutoCloseable {
     }
 
     /**
-     * Prints the given char.
+     * Prints the given char. Use println() to print a '\n'.
      *
-     * Use println() to print a '\n'.
      * @param c The char
      */
     public void print(char c) {
@@ -134,6 +136,7 @@ public class ServletWriter implements AutoCloseable {
 
     /**
      * Prints the given int.
+     *
      * @param i The int
      */
     public void print(int i) {
@@ -141,10 +144,8 @@ public class ServletWriter implements AutoCloseable {
     }
 
     /**
-     * Prints the given string.
+     * Prints the given string. The string must not contain any '\n', otherwise the line count will be off.
      *
-     * The string must not contain any '\n', otherwise the line count will be
-     * off.
      * @param s The string
      */
     public void print(String s) {
@@ -152,17 +153,15 @@ public class ServletWriter implements AutoCloseable {
     }
 
     /**
-     * Prints the given string.
+     * Prints the given string. If the string spans multiple lines, the line count will be adjusted accordingly.
      *
-     * If the string spans multiple lines, the line count will be adjusted
-     * accordingly.
      * @param s The string
      */
     public void printMultiLn(String s) {
         int index = 0;
 
         // look for hidden newlines inside strings
-        while ((index=s.indexOf('\n',index)) > -1 ) {
+        while ((index = s.indexOf('\n', index)) > -1) {
             javaLine++;
             index++;
         }
