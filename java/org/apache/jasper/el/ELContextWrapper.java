@@ -72,8 +72,7 @@ public final class ELContextWrapper extends ELContext {
     }
 
     @Override
-    public void putContext(@SuppressWarnings("rawtypes") Class key,
-            Object contextObject) throws NullPointerException {
+    public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) throws NullPointerException {
         this.target.putContext(key, contextObject);
     }
 

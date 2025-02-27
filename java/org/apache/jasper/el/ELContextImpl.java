@@ -53,7 +53,7 @@ public class ELContextImpl extends ELContext {
 
     private static final class VariableMapperImpl extends VariableMapper {
 
-        private Map<String, ValueExpression> vars;
+        private Map<String,ValueExpression> vars;
 
         @Override
         public ValueExpression resolveVariable(String variable) {
@@ -64,8 +64,7 @@ public class ELContextImpl extends ELContext {
         }
 
         @Override
-        public ValueExpression setVariable(String variable,
-                ValueExpression expression) {
+        public ValueExpression setVariable(String variable, ValueExpression expression) {
             if (vars == null) {
                 vars = new HashMap<>();
             }
@@ -84,8 +83,7 @@ public class ELContextImpl extends ELContext {
             DefaultResolver = null;
         } else {
             DefaultResolver = new CompositeELResolver();
-            ((CompositeELResolver) DefaultResolver).add(
-                    ELManager.getExpressionFactory().getStreamELResolver());
+            ((CompositeELResolver) DefaultResolver).add(ELManager.getExpressionFactory().getStreamELResolver());
             ((CompositeELResolver) DefaultResolver).add(new StaticFieldELResolver());
             ((CompositeELResolver) DefaultResolver).add(new MapELResolver());
             ((CompositeELResolver) DefaultResolver).add(new ResourceBundleELResolver());

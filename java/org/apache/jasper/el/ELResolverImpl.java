@@ -32,8 +32,7 @@ public final class ELResolverImpl extends ELResolver {
     private final VariableResolver variableResolver;
     private final ELResolver elResolver;
 
-    public ELResolverImpl(VariableResolver variableResolver,
-            ExpressionFactory factory) {
+    public ELResolverImpl(VariableResolver variableResolver, ExpressionFactory factory) {
         this.variableResolver = variableResolver;
         this.elResolver = ELContextImpl.getDefaultResolver(factory);
     }
@@ -46,8 +45,7 @@ public final class ELResolverImpl extends ELResolver {
             context.setPropertyResolved(base, property);
             if (property != null) {
                 try {
-                    return this.variableResolver.resolveVariable(property
-                            .toString());
+                    return this.variableResolver.resolveVariable(property.toString());
                 } catch (javax.servlet.jsp.el.ELException e) {
                     throw new ELException(e.getMessage(), e.getCause());
                 }
@@ -68,8 +66,7 @@ public final class ELResolverImpl extends ELResolver {
             context.setPropertyResolved(base, property);
             if (property != null) {
                 try {
-                    Object obj = this.variableResolver.resolveVariable(property
-                            .toString());
+                    Object obj = this.variableResolver.resolveVariable(property.toString());
                     return (obj != null) ? obj.getClass() : null;
                 } catch (javax.servlet.jsp.el.ELException e) {
                     throw new ELException(e.getMessage(), e.getCause());
@@ -84,14 +81,12 @@ public final class ELResolverImpl extends ELResolver {
     }
 
     @Override
-    public void setValue(ELContext context, Object base, Object property,
-            Object value) {
+    public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
 
         if (base == null) {
             context.setPropertyResolved(base, property);
-            throw new PropertyNotWritableException(
-                    "Legacy VariableResolver wrapped, not writable");
+            throw new PropertyNotWritableException("Legacy VariableResolver wrapped, not writable");
         }
 
         if (!context.isPropertyResolved()) {

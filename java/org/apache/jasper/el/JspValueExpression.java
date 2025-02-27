@@ -32,8 +32,7 @@ import javax.el.ValueExpression;
  *
  * @author Jacob Hookom
  */
-public final class JspValueExpression extends ValueExpression implements
-        Externalizable {
+public final class JspValueExpression extends ValueExpression implements Externalizable {
 
     private ValueExpression target;
 
@@ -54,8 +53,7 @@ public final class JspValueExpression extends ValueExpression implements
     }
 
     @Override
-    public Class<?> getType(ELContext context) throws NullPointerException,
-            PropertyNotFoundException, ELException {
+    public Class<?> getType(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException {
         context.notifyBeforeEvaluation(getExpressionString());
         try {
             Class<?> result = this.target.getType(context);
@@ -75,8 +73,7 @@ public final class JspValueExpression extends ValueExpression implements
     }
 
     @Override
-    public boolean isReadOnly(ELContext context) throws NullPointerException,
-            PropertyNotFoundException, ELException {
+    public boolean isReadOnly(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException {
         context.notifyBeforeEvaluation(getExpressionString());
         try {
             boolean result = this.target.isReadOnly(context);
@@ -97,8 +94,7 @@ public final class JspValueExpression extends ValueExpression implements
 
     @Override
     public void setValue(ELContext context, Object value)
-            throws NullPointerException, PropertyNotFoundException,
-            PropertyNotWritableException, ELException {
+            throws NullPointerException, PropertyNotFoundException, PropertyNotWritableException, ELException {
         context.notifyBeforeEvaluation(getExpressionString());
         try {
             this.target.setValue(context, value);
@@ -122,8 +118,7 @@ public final class JspValueExpression extends ValueExpression implements
     }
 
     @Override
-    public Object getValue(ELContext context) throws NullPointerException,
-            PropertyNotFoundException, ELException {
+    public Object getValue(ELContext context) throws NullPointerException, PropertyNotFoundException, ELException {
         context.notifyBeforeEvaluation(getExpressionString());
         try {
             Object result = this.target.getValue(context);
@@ -169,8 +164,7 @@ public final class JspValueExpression extends ValueExpression implements
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException,
-            ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         this.mark = in.readUTF();
         this.target = (ValueExpression) in.readObject();
     }
