@@ -18,8 +18,7 @@ package org.apache.jasper.el;
 
 import jakarta.el.PropertyNotWritableException;
 
-public class JspPropertyNotWritableException extends
-        PropertyNotWritableException {
+public class JspPropertyNotWritableException extends PropertyNotWritableException {
 
     private static final long serialVersionUID = 1L;
 
