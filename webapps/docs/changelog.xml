@@ -154,6 +154,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <add>
+        <bug>69598</bug>: Add detection of service account token changes to the
+        <code>KubernetesMembershipProvider</code> implementation and reload the
+        token if it changes. Based on a patch by Miroslav Jezbera. (markt)
+      </add>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <add>
