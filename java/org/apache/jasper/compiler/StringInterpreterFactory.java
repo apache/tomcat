@@ -19,14 +19,10 @@ package org.apache.jasper.compiler;
 import jakarta.servlet.ServletContext;
 
 /**
- * Provides {@link StringInterpreter} instances for JSP compilation.
- *
- * The search order is as follows:
+ * Provides {@link StringInterpreter} instances for JSP compilation. The search order is as follows:
  * <ol>
- * <li>StringInterpreter instance or implementation class name provided as a
- *     ServletContext attribute</li>
- * <li>Implementation class named in a ServletContext initialisation parameter
- *     </li>
+ * <li>StringInterpreter instance or implementation class name provided as a ServletContext attribute</li>
+ * <li>Implementation class named in a ServletContext initialisation parameter</li>
  * <li>Default implementation</li>
  * </ol>
  */
@@ -39,18 +35,20 @@ public class StringInterpreterFactory {
 
     /**
      * Obtain the correct String Interpreter for the given web application.
+     *
      * @param context The Servlet context
+     *
      * @return the String interpreter
+     *
      * @throws Exception If an error occurs creating the interpreter
      */
-    public static StringInterpreter getStringInterpreter(ServletContext context)
-            throws Exception {
+    public static StringInterpreter getStringInterpreter(ServletContext context) throws Exception {
 
         StringInterpreter result = null;
 
         // Search for an implementation
         // 1. ServletContext attribute (set by application or cached by a
-        //    previous call to this method).
+        // previous call to this method).
         Object attribute = context.getAttribute(STRING_INTERPRETER_CLASS_NAME);
         if (attribute instanceof StringInterpreter) {
             return (StringInterpreter) attribute;
@@ -77,10 +75,8 @@ public class StringInterpreterFactory {
     }
 
 
-    private static StringInterpreter createInstance(ServletContext context,
-            String className) throws Exception {
-        return (StringInterpreter) context.getClassLoader().loadClass(
-                    className).getConstructor().newInstance();
+    private static StringInterpreter createInstance(ServletContext context, String className) throws Exception {
+        return (StringInterpreter) context.getClassLoader().loadClass(className).getConstructor().newInstance();
     }
 
 
@@ -92,8 +88,8 @@ public class StringInterpreterFactory {
     public static class DefaultStringInterpreter implements StringInterpreter {
 
         @Override
-        public String convertString(Class<?> c, String s, String attrName,
-                Class<?> propEditorClass, boolean isNamedAttribute) {
+        public String convertString(Class<?> c, String s, String attrName, Class<?> propEditorClass,
+                boolean isNamedAttribute) {
 
             String quoted = s;
             if (!isNamedAttribute) {
@@ -102,11 +98,10 @@ public class StringInterpreterFactory {
 
             if (propEditorClass != null) {
                 String className = c.getCanonicalName();
-                return "("
-                        + className
-                        + ")org.apache.jasper.runtime.JspRuntimeLibrary.getValueFromBeanInfoPropertyEditor("
-                        + className + ".class, \"" + attrName + "\", " + quoted
-                        + ", " + propEditorClass.getCanonicalName() + ".class)";
+                return "(" + className +
+                        ")org.apache.jasper.runtime.JspRuntimeLibrary.getValueFromBeanInfoPropertyEditor(" + className +
+                        ".class, \"" + attrName + "\", " + quoted + ", " + propEditorClass.getCanonicalName() +
+                        ".class)";
             } else if (c == String.class) {
                 return quoted;
             } else if (c == boolean.class) {
@@ -152,22 +147,18 @@ public class StringInterpreterFactory {
             }
 
             String className = c.getCanonicalName();
-            return "("
-                    + className
-                    + ")org.apache.jasper.runtime.JspRuntimeLibrary.getValueFromPropertyEditorManager("
-                    + className + ".class, \"" + attrName + "\", " + quoted
-                    + ")";
+            return "(" + className + ")org.apache.jasper.runtime.JspRuntimeLibrary.getValueFromPropertyEditorManager(" +
+                    className + ".class, \"" + attrName + "\", " + quoted + ")";
         }
 
 
         /**
-         * Intended to be used by sub-classes that don't need/want to
-         * re-implement the logic in
+         * Intended to be used by sub-classes that don't need/want to re-implement the logic in
          * {@link #convertString(Class, String, String, Class, boolean)}.
          *
-         * @param c                 unused
-         * @param s                 unused
-         * @param isNamedAttribute  unused
+         * @param c                unused
+         * @param s                unused
+         * @param isNamedAttribute unused
          *
          * @return Always {@code null}
          */

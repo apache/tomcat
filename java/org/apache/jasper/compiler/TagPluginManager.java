@@ -38,19 +38,17 @@ import org.xml.sax.SAXException;
  */
 public class TagPluginManager {
 
-    private static final String META_INF_JASPER_TAG_PLUGINS_XML =
-            "META-INF/org.apache.jasper/tagPlugins.xml";
+    private static final String META_INF_JASPER_TAG_PLUGINS_XML = "META-INF/org.apache.jasper/tagPlugins.xml";
     private static final String TAG_PLUGINS_XML = "/WEB-INF/tagPlugins.xml";
     private final ServletContext ctxt;
-    private HashMap<String, TagPlugin> tagPlugins;
+    private HashMap<String,TagPlugin> tagPlugins;
     private boolean initialized = false;
 
     public TagPluginManager(ServletContext ctxt) {
         this.ctxt = ctxt;
     }
 
-    public void apply(Node.Nodes page, ErrorDispatcher err, PageInfo pageInfo)
-            throws JasperException {
+    public void apply(Node.Nodes page, ErrorDispatcher err, PageInfo pageInfo) throws JasperException {
 
         init(err);
         if (!tagPlugins.isEmpty()) {
@@ -63,8 +61,7 @@ public class TagPluginManager {
             return;
         }
 
-        String blockExternalString = ctxt.getInitParameter(
-                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        String blockExternalString = ctxt.getInitParameter(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
         boolean blockExternal;
         if (blockExternalString == null) {
             blockExternal = true;
@@ -80,8 +77,7 @@ public class TagPluginManager {
 
             parser = new TagPluginParser(ctxt, blockExternal);
 
-            Enumeration<URL> urls =
-                    ctxt.getClassLoader().getResources(META_INF_JASPER_TAG_PLUGINS_XML);
+            Enumeration<URL> urls = ctxt.getClassLoader().getResources(META_INF_JASPER_TAG_PLUGINS_XML);
             while (urls.hasMoreElements()) {
                 URL url = urls.nextElement();
                 parser.parse(url);
@@ -97,9 +93,9 @@ public class TagPluginManager {
             currentThread.setContextClassLoader(original);
         }
 
-        Map<String, String> plugins = parser.getPlugins();
+        Map<String,String> plugins = parser.getPlugins();
         tagPlugins = new HashMap<>(plugins.size());
-        for (Map.Entry<String, String> entry : plugins.entrySet()) {
+        for (Map.Entry<String,String> entry : plugins.entrySet()) {
             try {
                 String tagClass = entry.getKey();
                 String pluginName = entry.getValue();
@@ -114,8 +110,7 @@ public class TagPluginManager {
     }
 
     /**
-     * Invoke tag plugin for the given custom tag, if a plugin exists for
-     * the custom tag's tag handler.
+     * Invoke tag plugin for the given custom tag, if a plugin exists for the custom tag's tag handler.
      * <p/>
      * The given custom tag node will be manipulated by the plugin.
      */
@@ -149,7 +144,7 @@ public class TagPluginManager {
     private static class TagPluginContextImpl implements TagPluginContext {
         private final Node.CustomTag node;
         private final PageInfo pageInfo;
-        private final HashMap<String, Object> pluginAttributes;
+        private final HashMap<String,Object> pluginAttributes;
         private Node.Nodes curNodes;
 
         TagPluginContextImpl(Node.CustomTag n, PageInfo pageInfo) {
@@ -230,15 +225,12 @@ public class TagPluginManager {
 
         @Override
         public void generateJavaSource(String sourceCode) {
-            curNodes.add(new Node.Scriptlet(sourceCode, node.getStart(),
-                    null));
+            curNodes.add(new Node.Scriptlet(sourceCode, node.getStart(), null));
         }
 
         @Override
         public void generateAttribute(String attributeName) {
-            curNodes.add(new Node.AttributeGenerator(node.getStart(),
-                    attributeName,
-                    node));
+            curNodes.add(new Node.AttributeGenerator(node.getStart(), attributeName, node));
         }
 
         @Override

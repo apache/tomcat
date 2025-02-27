@@ -27,8 +27,7 @@ import jakarta.servlet.jsp.tagext.VariableInfo;
 import org.apache.jasper.JasperException;
 
 /**
- * Class responsible for determining the scripting variables that every
- * custom action needs to declare.
+ * Class responsible for determining the scripting variables that every custom action needs to declare.
  *
  * @author Jan Luehe
  */
@@ -37,9 +36,8 @@ class ScriptingVariabler {
     private static final Integer MAX_SCOPE = Integer.valueOf(Integer.MAX_VALUE);
 
     /*
-     * Assigns an identifier (of type integer) to every custom tag, in order
-     * to help identify, for every custom tag, the scripting variables that it
-     * needs to declare.
+     * Assigns an identifier (of type integer) to every custom tag, in order to help identify, for every custom tag, the
+     * scripting variables that it needs to declare.
      */
     private static class CustomTagCounter extends Node.Visitor {
 
@@ -58,13 +56,12 @@ class ScriptingVariabler {
     }
 
     /*
-     * For every custom tag, determines the scripting variables it needs to
-     * declare.
+     * For every custom tag, determines the scripting variables it needs to declare.
      */
     private static class ScriptingVariableVisitor extends Node.Visitor {
 
         private final ErrorDispatcher err;
-        private final Map<String, Integer> scriptVars;
+        private final Map<String,Integer> scriptVars;
 
         ScriptingVariableVisitor(ErrorDispatcher err) {
             this.err = err;
@@ -79,8 +76,7 @@ class ScriptingVariabler {
             setScriptingVars(n, VariableInfo.AT_END);
         }
 
-        private void setScriptingVars(Node.CustomTag n, int scope)
-                throws JasperException {
+        private void setScriptingVars(Node.CustomTag n, int scope) throws JasperException {
 
             TagVariableInfo[] tagVarInfos = n.getTagVariableInfos();
             VariableInfo[] varInfos = n.getVariableInfos();
@@ -92,8 +88,7 @@ class ScriptingVariabler {
 
             Integer ownRange = null;
             Node.CustomTag parent = n.getCustomTagParent();
-            if (scope == VariableInfo.AT_BEGIN
-                    || scope == VariableInfo.AT_END) {
+            if (scope == VariableInfo.AT_BEGIN || scope == VariableInfo.AT_END) {
                 if (parent == null) {
                     ownRange = MAX_SCOPE;
                 } else {
@@ -106,39 +101,33 @@ class ScriptingVariabler {
 
             if (varInfos.length > 0) {
                 for (VariableInfo varInfo : varInfos) {
-                    if (varInfo.getScope() != scope
-                            || !varInfo.getDeclare()) {
+                    if (varInfo.getScope() != scope || !varInfo.getDeclare()) {
                         continue;
                     }
                     String varName = varInfo.getVarName();
 
                     Integer currentRange = scriptVars.get(varName);
-                    if (currentRange == null ||
-                            ownRange.compareTo(currentRange) > 0) {
+                    if (currentRange == null || ownRange.compareTo(currentRange) > 0) {
                         scriptVars.put(varName, ownRange);
                         vec.add(varInfo);
                     }
                 }
             } else {
                 for (TagVariableInfo tagVarInfo : tagVarInfos) {
-                    if (tagVarInfo.getScope() != scope
-                            || !tagVarInfo.getDeclare()) {
+                    if (tagVarInfo.getScope() != scope || !tagVarInfo.getDeclare()) {
                         continue;
                     }
                     String varName = tagVarInfo.getNameGiven();
                     if (varName == null) {
-                        varName = n.getTagData().getAttributeString(
-                                tagVarInfo.getNameFromAttribute());
+                        varName = n.getTagData().getAttributeString(tagVarInfo.getNameFromAttribute());
                         if (varName == null) {
-                            err.jspError(n,
-                                    "jsp.error.scripting.variable.missing_name",
+                            err.jspError(n, "jsp.error.scripting.variable.missing_name",
                                     tagVarInfo.getNameFromAttribute());
                         }
                     }
 
                     Integer currentRange = scriptVars.get(varName);
-                    if (currentRange == null ||
-                            ownRange.compareTo(currentRange) > 0) {
+                    if (currentRange == null || ownRange.compareTo(currentRange) > 0) {
                         scriptVars.put(varName, ownRange);
                         vec.add(tagVarInfo);
                     }
@@ -149,8 +138,7 @@ class ScriptingVariabler {
         }
     }
 
-    public static void set(Node.Nodes page, ErrorDispatcher err)
-            throws JasperException {
+    public static void set(Node.Nodes page, ErrorDispatcher err) throws JasperException {
         page.visit(new CustomTagCounter());
         page.visit(new ScriptingVariableVisitor(err));
     }
