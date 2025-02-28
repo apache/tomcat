@@ -2566,7 +2566,7 @@
     </copy>
   </target>
 
-  <target name="-installer-pre-init">
+  <target name="-installer-pre-init" unless="skip.installer">
     <property environment="env" />
     <condition property="wine.ok">
       <or>
