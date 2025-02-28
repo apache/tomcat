@@ -2594,7 +2594,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </copy>
   </target>
 
-  <target name="-installer-pre-init">
+  <target name="-installer-pre-init" unless="skip.installer">
     <property environment="env" />
     <condition property="wine.ok">
       <or>
