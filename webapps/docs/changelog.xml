@@ -134,6 +134,11 @@
         Avoid scenarios where temporary files used for partial PUT would not
         be deleted. (remm)
       </fix>
+      <fix>
+        <bug>69602</bug>: Fix regression in releases from 12-2024 that were too
+        strict and rejected weak etags in the <code>If-Range</code> header.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
