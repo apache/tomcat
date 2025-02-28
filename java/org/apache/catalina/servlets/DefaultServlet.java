@@ -2376,40 +2376,46 @@ public class DefaultServlet extends HttpServlet {
             // If-Range is not present
             return true;
         }
-        String headerValue = headerEnum.nextElement();
+        String headerValue = headerEnum.nextElement().trim();
         if (headerEnum.hasMoreElements()) {
             // Multiple If-Range headers
             response.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return false;
         }
 
-        long headerValueTime = -1L;
-        try {
-            headerValueTime = request.getDateHeader("If-Range");
-        } catch (IllegalArgumentException e) {
-            // Ignore
-        }
-
-        if (headerValueTime == -1L) {
-            // Not HTTP-date so this should be a single strong etag
-            if (headerValue.length() < 2 || headerValue.charAt(0) != '"' ||
+        if (headerValue.length() > 2 && (headerValue.charAt(0) == '"' || headerValue.charAt(2) == '"')) {
+            boolean weakETag = headerValue.startsWith("W/\"");
+            if ((!weakETag && headerValue.charAt(0) != '"') ||
                     headerValue.charAt(headerValue.length() - 1) != '"' ||
-                    headerValue.indexOf('"', 1) != headerValue.length() - 1) {
-                // Not a single, strong entity tag
+                    headerValue.indexOf('"', weakETag ? 3 : 1) != headerValue.length() - 1) {
+                // Not a single entity tag
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return false;
             }
             // If the ETag the client gave does not match the entity
             // etag, then the entire entity is returned.
-            if (resourceETag != null && resourceETag.startsWith("\"") && resourceETag.equals(headerValue.trim())) {
+            if (resourceETag != null && resourceETag.equals(headerValue)) {
                 return true;
             } else {
                 return false;
             }
         } else {
-            // unit of HTTP date is second, ignore millisecond part.
-            return resourceLastModified >= headerValueTime && resourceLastModified < headerValueTime + 1000;
+            long headerValueTime = -1L;
+            try {
+                headerValueTime = request.getDateHeader("If-Range");
+            } catch (IllegalArgumentException e) {
+                // Ignore
+            }
+            if (headerValueTime >= 0) {
+                // unit of HTTP date is second, ignore millisecond part.
+                return resourceLastModified >= headerValueTime && resourceLastModified < headerValueTime + 1000;
+            } else {
+                // Not a single entity tag and not a valid date either
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return false;
+            }
         }
+
     }
 
     /**
