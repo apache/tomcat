@@ -31,32 +31,32 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * A non-specification compliant {@link ELInterpreter} that optimizes a subset
- * of setters for tag attributes.
+ * A non-specification compliant {@link ELInterpreter} that optimizes a subset of setters for tag attributes.
  * <p>
  * The cases optimized by this implementation are:
  * <ul>
  * <li>expressions that are solely a literal boolean</li>
- * <li>expressions that are solely a constant string used (with coercion where
- *     necessary) with a setter that accepts:</li>
- * <li><ul>
- *     <li>boolean / Boolean</li>
- *     <li>char / Character</li>
- *     <li>BigDecimal</li>
- *     <li>long / Long</li>
- *     <li>int / Integer</li>
- *     <li>short / Short</li>
- *     <li>byte / Byte</li>
- *     <li>double / Double</li>
- *     <li>float / Float</li>
- *     <li>BigInteger</li>
- *     <li>Enum</li>
- *     <li>String</li>
- *     </ul></li>
+ * <li>expressions that are solely a constant string used (with coercion where necessary) with a setter that
+ * accepts:</li>
+ * <li>
+ * <ul>
+ * <li>boolean / Boolean</li>
+ * <li>char / Character</li>
+ * <li>BigDecimal</li>
+ * <li>long / Long</li>
+ * <li>int / Integer</li>
+ * <li>short / Short</li>
+ * <li>byte / Byte</li>
+ * <li>double / Double</li>
+ * <li>float / Float</li>
+ * <li>BigInteger</li>
+ * <li>Enum</li>
+ * <li>String</li>
  * </ul>
- * The specification compliance issue is that it essentially skips the first
- * three {@link ELResolver}s listed in section JSP.2.9 and effectively hard
- * codes the use of the 4th {@link ELResolver} in that list.
+ * </li>
+ * </ul>
+ * The specification compliance issue is that it essentially skips the first three {@link ELResolver}s listed in section
+ * JSP.2.9 and effectively hard codes the use of the 4th {@link ELResolver} in that list.
  *
  * @see "https://bz.apache.org/bugzilla/show_bug.cgi?id=64872"
  */
@@ -70,8 +70,7 @@ public class ELInterpreterTagSetters implements ELInterpreter {
     private final Pattern PATTERN_NUMERIC = Pattern.compile("[$][{]([\"'])([+-]?\\d+(\\.\\d+)?)\\1[}]");
 
     @Override
-    public String interpreterCall(JspCompilationContext context,
-            boolean isTagFile, String expression,
+    public String interpreterCall(JspCompilationContext context, boolean isTagFile, String expression,
             Class<?> expectedType, String fnmapvar) {
 
         String result = null;
@@ -91,7 +90,7 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     result = "Boolean.FALSE";
                 }
             }
-        // Character
+            // Character
         } else if (Character.TYPE == expectedType) {
             Matcher m = PATTERN_STRING_CONSTANT.matcher(expression);
             if (m.matches()) {
@@ -102,7 +101,7 @@ public class ELInterpreterTagSetters implements ELInterpreter {
             if (m.matches()) {
                 return "Character.valueOf(\'" + m.group(2).charAt(0) + "\')";
             }
-        // Numeric - BigDecimal
+            // Numeric - BigDecimal
         } else if (BigDecimal.class == expectedType) {
             Matcher m = PATTERN_NUMERIC.matcher(expression);
             if (m.matches()) {
@@ -115,7 +114,7 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     // Continue and resolve the value at runtime
                 }
             }
-        // Numeric - long/Long
+            // Numeric - long/Long
         } else if (Long.TYPE == expectedType || Long.class == expectedType) {
             Matcher m = PATTERN_NUMERIC.matcher(expression);
             if (m.matches()) {
@@ -133,7 +132,7 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     // Continue and resolve the value at runtime
                 }
             }
-        // Numeric - int/Integer
+            // Numeric - int/Integer
         } else if (Integer.TYPE == expectedType || Integer.class == expectedType) {
             Matcher m = PATTERN_NUMERIC.matcher(expression);
             if (m.matches()) {
@@ -150,7 +149,7 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     // Continue and resolve the value at runtime
                 }
             }
-        // Numeric - short/Short
+            // Numeric - short/Short
         } else if (Short.TYPE == expectedType || Short.class == expectedType) {
             Matcher m = PATTERN_NUMERIC.matcher(expression);
             if (m.matches()) {
@@ -168,7 +167,7 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     // Continue and resolve the value at runtime
                 }
             }
-        // Numeric - byte/Byte
+            // Numeric - byte/Byte
         } else if (Byte.TYPE == expectedType || Byte.class == expectedType) {
             Matcher m = PATTERN_NUMERIC.matcher(expression);
             if (m.matches()) {
@@ -186,7 +185,7 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     // Continue and resolve the value at runtime
                 }
             }
-        // Numeric - double/Double
+            // Numeric - double/Double
         } else if (Double.TYPE == expectedType || Double.class == expectedType) {
             Matcher m = PATTERN_NUMERIC.matcher(expression);
             if (m.matches()) {
@@ -203,7 +202,7 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     // Continue and resolve the value at runtime
                 }
             }
-        // Numeric - float/Float
+            // Numeric - float/Float
         } else if (Float.TYPE == expectedType || Float.class == expectedType) {
             Matcher m = PATTERN_NUMERIC.matcher(expression);
             if (m.matches()) {
@@ -221,7 +220,7 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     // Continue and resolve the value at runtime
                 }
             }
-        // Numeric - BigInteger
+            // Numeric - BigInteger
         } else if (BigInteger.class == expectedType) {
             Matcher m = PATTERN_NUMERIC.matcher(expression);
             if (m.matches()) {
@@ -234,8 +233,8 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     // Continue and resolve the value at runtime
                 }
             }
-        // Enum
-        } else if (expectedType.isEnum()){
+            // Enum
+        } else if (expectedType.isEnum()) {
             Matcher m = PATTERN_STRING_CONSTANT.matcher(expression);
             if (m.matches()) {
                 try {
@@ -243,11 +242,12 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     Enum<?> enumValue = Enum.valueOf((Class<? extends Enum>) expectedType, m.group(2));
                     result = expectedType.getName() + "." + enumValue.name();
                 } catch (IllegalArgumentException iae) {
-                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Enum[" + expectedType.getName() + "]"), iae);
+                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2),
+                            "Enum[" + expectedType.getName() + "]"), iae);
                     // Continue and resolve the value at runtime
                 }
             }
-        // String
+            // String
         } else if (String.class == expectedType) {
             Matcher m = PATTERN_STRING_CONSTANT.matcher(expression);
             if (m.matches()) {
@@ -256,12 +256,12 @@ public class ELInterpreterTagSetters implements ELInterpreter {
         }
 
         if (result == null) {
-            result = JspUtil.interpreterCall(isTagFile, expression, expectedType,
-                    fnmapvar);
+            result = JspUtil.interpreterCall(isTagFile, expression, expectedType, fnmapvar);
         }
 
         if (log.isTraceEnabled()) {
-            log.trace("Expression [" + expression + "], type [" + expectedType.getName() + "], returns [" + result + "]");
+            log.trace(
+                    "Expression [" + expression + "], type [" + expectedType.getName() + "], returns [" + result + "]");
         }
 
         return result;
