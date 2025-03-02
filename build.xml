@@ -2617,7 +2617,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <os family="windows" />
         <isset property="wine.ok"/>
         <isset property="makensis.ok"/>
-	<istrue value="${skip.installer}"/>
+        <istrue value="${skip.installer}"/>
       </or>
     </condition>
   </target>
