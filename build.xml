@@ -2591,7 +2591,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </copy>
   </target>
 
-  <target name="-installer-pre-init" unless="skip.installer">
+  <target name="-installer-pre-init">
     <property environment="env" />
     <condition property="wine.ok">
       <or>
@@ -2614,6 +2614,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
         <os family="windows" />
         <isset property="wine.ok"/>
         <isset property="makensis.ok"/>
+        <istrue value="${skip.installer}"/>
       </or>
     </condition>
   </target>
