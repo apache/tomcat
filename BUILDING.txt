@@ -350,8 +350,10 @@ in build.xml and the default property values in build.properties.default.
         scons UNICODE=yes PREFIX=/home/myuser/tomcat-build-libs/nsis-3.10/Bin SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA_PATH=no VERSION=3.10 install-compiler
 
     You need to specify the correct value in VERSION (this ends up in the installer binary
-    so it needs to match). The PREFIX needs to be the bin directory of the NSIS
-    binary distribution that "ant download-dist" installed.
+    so it needs to match). The PREFIX is not important, but you need to make sure
+    that the created binary "makensis" gets finally put into the "Bin" directory of
+    the NSIS binary distribution that "ant download-dist" installed. When using
+    "NSIS_CONFIG_CONST_DATA_PATH=no" the binary is independent of the value of "PREFIX".
 
     Use this "makensis" binary by making sure, that it gets found by setting
     an appropriate PATH environment variable. In addition set the ant property
