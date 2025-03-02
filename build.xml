@@ -2566,7 +2566,7 @@
     </copy>
   </target>
 
-  <target name="-installer-pre-init" unless="skip.installer">
+  <target name="-installer-pre-init">
     <property environment="env" />
     <condition property="wine.ok">
       <or>
@@ -2589,6 +2589,7 @@
         <os family="windows" />
         <isset property="wine.ok"/>
         <isset property="makensis.ok"/>
+	<istrue value="${skip.installer}"/>
       </or>
     </condition>
   </target>
