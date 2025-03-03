@@ -2661,7 +2661,7 @@ To skip building the Windows installer, set the skip.installer property in build
   <target name="-installer-wine" if="${wine.ok}">
      <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
       <arg value="${nsis.exe}" />
-      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="/DNSISDIR=${nsis.bin.home}" />
       <arg value="/V2" />
       <arg value="tomcat.nsi" />
     </exec>
@@ -2669,7 +2669,7 @@ To skip building the Windows installer, set the skip.installer property in build
 
   <target name="-installer-makensis" if="${makensis.ok}">
     <exec dir="${tomcat.dist}" executable="makensis" osfamily="unix">
-      <arg value="-DNSISDIR=${nsis.home}" />
+      <arg value="-DNSISDIR=${nsis.bin.home}" />
       <arg value="-V2" />
       <arg value="tomcat.nsi" />
     </exec>
@@ -2678,7 +2678,7 @@ To skip building the Windows installer, set the skip.installer property in build
   <target name="-installer" unless="skip.installer"
       depends="-installer-prep,-installer-wine,-installer-makensis">
     <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
-      <arg value="/DNSISDIR=${nsis.home}" />
+      <arg value="/DNSISDIR=${nsis.bin.home}" />
       <arg value="/V2" />
       <arg value="tomcat.nsi" />
     </exec>
@@ -3653,12 +3653,21 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     </antcall>
 
     <antcall target="downloadzip">
-      <param name="sourcefile" value="${nsis.loc}"/>
+      <param name="sourcefile" value="${nsis.bin.loc}"/>
       <param name="destfile" value="${nsis.exe}"/>
-      <param name="destdir" value="${nsis.home}/.."/>
+      <param name="destdir" value="${nsis.bin.home}/.."/>
       <param name="checksum.enabled" value="${nsis.checksum.enabled}"/>
-      <param name="checksum.algorithm" value="${nsis.checksum.algorithm}"/>
-      <param name="checksum.value" value="${nsis.checksum.value}"/>
+      <param name="checksum.algorithm" value="${nsis.bin.checksum.algorithm}"/>
+      <param name="checksum.value" value="${nsis.bin.checksum.value}"/>
+    </antcall>
+
+    <antcall target="downloadbz2">
+      <param name="sourcefile" value="${nsis.src.loc}"/>
+      <param name="destfile" value="${nsis.exe}"/>
+      <param name="destdir" value="${nsis.bin.home}/.."/>
+      <param name="checksum.enabled" value="${nsis.checksum.enabled}"/>
+      <param name="checksum.algorithm" value="${nsis.src.checksum.algorithm}"/>
+      <param name="checksum.value" value="${nsis.src.checksum.value}"/>
     </antcall>
 
   </target>
@@ -3833,6 +3842,23 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <untar src="${temp.file}.tar" dest="${base.path}"/>
     <delete file="${temp.file}.tar"/>
     <delete file="${temp.file}.tar.gz"/>
+  </target>
+
+  <target name="downloadbz2" unless="exist" if="${execute.download}" depends="testexist,setproxy">
+    <!-- Download and extract the package -->
+    <local name="temp.file"/>
+    <mkdir dir="${base.path}"/>
+    <tempfile property="temp.file" destdir="${base.path}" prefix="download-"/>
+    <get src="${sourcefile}" httpusecaches="${trydownload.httpusecaches}" dest="${temp.file}.tar.bz2" />
+    <verifyChecksum
+      enabled="${checksum.enabled}"
+      algorithm="${checksum.algorithm}" value="${checksum.value}"
+      file="${temp.file}.tar.bz2" name="${sourcefile}" />
+
+    <bunzip2 src="${temp.file}.tar.bz2" dest="${temp.file}.tar"/>
+    <untar src="${temp.file}.tar" dest="${base.path}"/>
+    <delete file="${temp.file}.tar"/>
+    <delete file="${temp.file}.tar.bz2"/>
   </target>
 
   <target name="downloadzip" unless="exist" if="${execute.download}" depends="testexist,setproxy">

@@ -341,12 +341,13 @@ in build.xml and the default property values in build.properties.default.
     in build.properties.default.
 
     Download and extract NSIS for Windows by running "ant download-dist". Note
-    the NSIS installation path from the output or by checking "nsis.home" in
+    the NSIS installation path from the output or by checking "nsis.bin.home" in
     build.properties.default. For example by default:
-    nsis.home=${base.path}/nsis-${nsis.version}
+    nsis.bin.home=${base.path}/nsis-${nsis.version}
 
-    Download the corresponding sources from the same site at:
-    ${base-sf.loc}/nsis/nsis-${nsis.version}-src.tar.bz2
+    The corresponding sources will be downloaded to "nsis.src.home" in 
+    build.properties.default. For example by default:
+    nsis.src.home=${base.path}/nsis-${nsis.version}-src
 
     Install the scons Python software construction tool.
 
