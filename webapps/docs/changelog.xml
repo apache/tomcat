@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.4 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.5 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -150,32 +150,6 @@
         <code>/</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Improve the mechanism for detecting whether a web application has been
-        deployed to a case sensitive or a case insensitive file system. (markt)
-      </fix>
-      <fix>
-        Enable the JNDIRealm to validate credentials provided to
-        <code>HttpServletRequest.login(String username, String password)</code>
-        when the realm is configured to use GSSAPI authentication. (markt)
-      </fix>
-      <add>
-        Add support for logging the connection ID (as returned by
-        <code>ServletRequest.getServletConnection().getConnectionId()</code>)
-        with the <code>AccessLogValve</code> and
-        <code>ExtendedAccessLogValve</code>. Based on pull request <pr>814</pr>
-        by Dmole. (markt)
-      </add>
-      <fix>
-        Avoid scenarios where temporary files used for partial PUT would not
-        be deleted. (remm)
-      </fix>
-      <fix>
-        <bug>69602</bug>: Fix regression in releases from 12-2024 that were too
-        strict and rejected weak etags in the <code>If-Range</code> header with
-        a 400 response. Instead will consider it as a failed match since strong
-        etags are required for <code>If-Range</code>. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -191,20 +165,6 @@
         (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69575</bug>: Avoid using compression if a response is already
-        compressed using <code>compress</code>, <code>deflate</code> or
-        <code>zstd</code>. (remm)
-      </fix>
-      <update>
-        Use <code>Transfer-Encoding</code> for compression rather than
-        <code>Content-Encoding</code> if the client submits a <code>TE</code>
-        header containing <code>gzip</code>. (remm)
-      </update>
-      <fix>
-        Fix a race condition in the handling of HTTP/2 stream reset that could
-        cause unexpected 500 responses. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -229,11 +189,6 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        <bug>69598</bug>: Add detection of service account token changes to the
-        <code>KubernetesMembershipProvider</code> implementation and reload the
-        token if it changes. Based on a patch by Miroslav Jezbera. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">
@@ -247,32 +202,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        Add <code>makensis</code> as an option for building the Installer for
-        Windows on non-Windows platforms. (rjung)
-      </add>
-      <add>
-        Explicitly set the locale to be used for Javadoc. For official releases,
-        this locale will be English (US) to support reproducible builds. (schultz)
-      </add>
-      <update>
-        Update Byte Buddy to 1.17.1. (markt)
-      </update>
-      <update>
-        Update Checkstyle to 10.21.3. (markt)
-      </update>
-      <update>
-        Update SpotBugs to 4.9.1. (markt)
-      </update>
-      <update>
-        Update JSign to 7.1. (markt)
-      </update>
-      <add>
-        Improvements to French translations. (remm)
-      </add>
-      <add>
-        Improvements to Japanese translations by tak7iji. (markt)
-      </add>
     </changelog>
   </subsection>
 </section>
