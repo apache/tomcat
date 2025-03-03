@@ -172,8 +172,9 @@
       </fix>
       <fix>
         <bug>69602</bug>: Fix regression in releases from 12-2024 that were too
-        strict and rejected weak etags in the <code>If-Range</code> header.
-        (remm)
+        strict and rejected weak etags in the <code>If-Range</code> header with
+        a 400 response. Instead will consider it as a failed match since strong
+        etags are required for <code>If-Range</code>. (remm)
       </fix>
     </changelog>
   </subsection>

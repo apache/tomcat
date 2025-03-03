@@ -123,7 +123,7 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
                 "bytes=0-9", FastHttpDateFormat.formatDate(1000), Integer.valueOf(200), strLen, "" });
         // Valid weak etag
         parameterSets.add(new Object[] {
-                "bytes=0-9", weakETag, Integer.valueOf(206), "10", "0-9/" + len });
+                "bytes=0-9", weakETag, Integer.valueOf(200), strLen, "" });
         // Invalid strong etag
         parameterSets.add(new Object[] {
                 "bytes=0-9", "\"46273648\"", Integer.valueOf(200), strLen, "" });
