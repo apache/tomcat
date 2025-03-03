@@ -345,7 +345,7 @@ in build.xml and the default property values in build.properties.default.
     build.properties.default. For example by default:
     nsis.bin.home=${base.path}/nsis-${nsis.version}
 
-    The corresponding sources will be downloaded to "nsis.src.home" in 
+    The corresponding sources will be downloaded to "nsis.src.home" in
     build.properties.default. For example by default:
     nsis.src.home=${base.path}/nsis-${nsis.version}-src
 
