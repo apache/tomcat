@@ -341,14 +341,19 @@ in build.xml and the default property values in build.properties.default.
     in build.properties.default.
 
     Download and extract NSIS for Windows by running "ant download-dist". Note
-    the NSIS installation PATH from the output or by checking "nsis.home" in
-    build.properties.default. For example:
-    /home/myuser/tomcat-build-libs/nsis-3.10
+    the NSIS installation path from the output or by checking "nsis.home" in
+    build.properties.default. For example by default:
+    nsis.home=${base.path}/nsis-${nsis.version}
 
-    Download the correct sources from the same site and run the
-    following command in the extracted source directory:
+    Download the corresponding sources from the same site at:
+    ${base-sf.loc}/nsis/nsis-${nsis.version}-src.tar.bz2
 
-        scons UNICODE=yes PREFIX=/home/myuser/tomcat-build-libs/nsis-3.10/Bin SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA_PATH=no VERSION=3.10 install-compiler
+    Install the scons Python software construction tool.
+
+    Run the following command in the extracted NSIS source directory and set PATH:
+
+        scons UNICODE=yes PREFIX=${base.path}/nsis-${nsis.version}/Bin SKIPPLUGINS=all SKIPUTILS=all SKIPMISC=all NSIS_CONFIG_CONST_DATA_PATH=no VERSION=${nsis.version} install-compiler
+        export PATH=$PATH:${base.path}/nsis-${nsis.version}/Bin
 
     You need to specify the correct value in VERSION (this ends up in the installer binary
     so it needs to match). The PREFIX is not important, but you need to make sure
@@ -356,9 +361,11 @@ in build.xml and the default property values in build.properties.default.
     the NSIS binary distribution that "ant download-dist" installed. When using
     "NSIS_CONFIG_CONST_DATA_PATH=no" the binary is independent of the value of "PREFIX".
 
-    Use this "makensis" binary by making sure, that it gets found by setting
-    an appropriate PATH environment variable. In addition set the ant property
-    "nsis.tool" to "makensis" in build.properties.
+    Use this "makensis" binary to make sure that it gets found after setting
+    the PATH environment variable.
+
+    In addition set the ant property "nsis.tool" to "makensis" in
+    build.properties.
 
  6. Build the release:
 
