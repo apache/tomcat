@@ -2409,7 +2409,7 @@ public class DefaultServlet extends HttpServlet {
             }
             // If the ETag the client gave does not match the entity
             // etag, then the entire entity is returned.
-            if (resourceETag != null && resourceETag.equals(headerValue)) {
+            if (!weakETag && resourceETag != null && resourceETag.equals(headerValue)) {
                 return true;
             } else {
                 return false;
