@@ -2691,7 +2691,7 @@ To skip building the Windows installer, set the skip.installer property in build
     </exec>
   </target>
 
-  <target name="-installer-makensis" if="${nsis.executable.unix}">
+  <target name="-installer-makensis" if="nsis.executable.unix">
     <echo message="Using makensis: ${nsis.executable.unix}"/>
     <exec dir="${tomcat.dist}" executable="${nsis.executable.unix}" osfamily="unix">
       <arg value="-DNSISDIR=${nsis.bin.home}"/>
