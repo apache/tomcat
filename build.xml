@@ -2706,25 +2706,25 @@ To skip building the Windows installer, set the skip.installer property in build
   <target name="installer-sign"
       description="Builds and optionally signs the Windows installer"
       depends="-installer"  unless="skip.installer" >
-      <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
-      <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
-      <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
-      <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512" />
-      <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+    <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+    <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512" />
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
   </target>
 
   <!-- Called via a callback in the NSIS installer script -->
   <target name="jsign-installer"
       depends="setup-jsign" if="${do.codesigning}" >
-      <echo>Signing ${tomcat.dist}/tomcat-installer.exe</echo>
-      <!-- Copy pre-existing detachced signature to signing directory -->
-      <copy file="res/install-win/tomcat-installer.exe.sig"
-          tofile="${tomcat.dist}/tomcat-installer.exe.sig"
-          failonerror="false" />
-      <!-- If the detached signature doesn't exist, this will sign the file  -->
-      <!-- and create the detached signature. If the detached signature does -->
-      <!-- exist it will be attached to the file.                            -->
-      <jsign file="${tomcat.dist}/tomcat-installer.exe"
+    <echo>Signing ${tomcat.dist}/tomcat-installer.exe</echo>
+    <!-- Copy pre-existing detachced signature to signing directory -->
+    <copy file="res/install-win/tomcat-installer.exe.sig"
+        tofile="${tomcat.dist}/tomcat-installer.exe.sig"
+        failonerror="false" />
+    <!-- If the detached signature doesn't exist, this will sign the file  -->
+    <!-- and create the detached signature. If the detached signature does -->
+    <!-- exist it will be attached to the file.                            -->
+    <jsign file="${tomcat.dist}/tomcat-installer.exe"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
         keypass="${codesigning.keypass}"
@@ -2733,22 +2733,22 @@ To skip building the Windows installer, set the skip.installer property in build
         tsaurl="http://ts.ssl.com"
         tsmode="RFC3161"
         detached="true"/>
-      <!-- Move detached signature to source tree -->
-      <move file="${tomcat.dist}/tomcat-installer.exe.sig" tofile="res/install-win/tomcat-installer.exe.sig"/>
+    <!-- Move detached signature to source tree -->
+    <move file="${tomcat.dist}/tomcat-installer.exe.sig" tofile="res/install-win/tomcat-installer.exe.sig"/>
   </target>
 
   <!-- Called via a callback in the NSIS installer script -->
   <target name="jsign-uninstaller"
       depends="setup-jsign" if="${do.codesigning}" >
-      <echo>Signing ${codesigning.file_to_sign}</echo>
-      <!-- Copy pre-existing detachced signature to signing directory -->
-      <copy file="res/install-win/Uninstall.exe.sig"
-          tofile="${codesigning.file_to_sign}.sig"
-          failonerror="false" />
-      <!-- If the detached signature doesn't exist, this will sign the file  -->
-      <!-- and create the detached signature. If the detached signature does -->
-      <!-- exist it will be attached to the file.                            -->
-      <jsign file="${codesigning.file_to_sign}"
+    <echo>Signing ${codesigning.file_to_sign}</echo>
+    <!-- Copy pre-existing detachced signature to signing directory -->
+    <copy file="res/install-win/Uninstall.exe.sig"
+        tofile="${codesigning.file_to_sign}.sig"
+        failonerror="false" />
+    <!-- If the detached signature doesn't exist, this will sign the file  -->
+    <!-- and create the detached signature. If the detached signature does -->
+    <!-- exist it will be attached to the file.                            -->
+    <jsign file="${codesigning.file_to_sign}"
         storepass="${codesigning.storepass}"
         storetype="${codesigning.storetype}"
         keypass="${codesigning.keypass}"
@@ -2757,8 +2757,8 @@ To skip building the Windows installer, set the skip.installer property in build
         tsaurl="http://ts.ssl.com"
         tsmode="RFC3161"
         detached="true" />
-      <!-- Move detached signature to source tree -->
-      <move file="${codesigning.file_to_sign}.sig" tofile="res/install-win/Uninstall.exe.sig"/>
+    <!-- Move detached signature to source tree -->
+    <move file="${codesigning.file_to_sign}.sig" tofile="res/install-win/Uninstall.exe.sig"/>
   </target>
 
   <target name="release-version-check">
