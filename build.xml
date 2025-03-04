@@ -2591,7 +2591,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     </copy>
   </target>
 
-  <target name="-installer-set-properties-1">
+  <target name="-installer-set-properties">
     <property environment="env"/>
     <condition property="wine.ok">
       <or>
@@ -2642,7 +2642,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
   </target>
 
   <target name="-installer-check-available"
-      depends="-installer-set-properties-1"
+      depends="-installer-set-properties"
       unless="${installer.ok}">
     <fail message="The executable ${nsis.tool} was not found on the current path.
 Either wine or makensis are required to build the Windows installer on a non-Windows platform.
@@ -2651,7 +2651,7 @@ To skip building the Windows installer, set the skip.installer property in build
   </target>
 
   <target name="-installer-check-version"
-      depends="-installer-set-properties-1"
+      depends="-installer-set-properties"
       unless="${nsis.executable.unix.version.ok}">
     <fail message="An executable makensis was found at: ${nsis.executable.unix}
 with version [${nsis.executable.unix.version}] but version [v${nsis.version}] is required
