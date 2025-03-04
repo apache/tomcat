@@ -2621,7 +2621,7 @@
     <fail message="The executable ${nsis.tool} was not found on the current path.
 Either wine or makensis are required to build the Windows installer on a non-Windows platform.
 Choose the tool by setting property nsis.tool in build.properties.
-To skip building the Windows installer, set the skip.installer property in build.properties" />
+To skip building the Windows installer, set the skip.installer property in build.properties"/>
   </target>
 
   <target name="-installer-check-version"
