@@ -2614,12 +2614,12 @@
   </target>
 
   <target name="-installer-pre-init">
-    <property environment="env" />
+    <property environment="env"/>
     <condition property="wine.ok">
       <or>
         <and>
           <equals arg1="${nsis.tool}" arg2="wine" forcestring="true"/>
-          <available file="wine" filepath="${env.PATH}" />
+          <available file="wine" filepath="${env.PATH}"/>
         </and>
       </or>
     </condition>
@@ -2627,13 +2627,13 @@
       <or>
         <and>
           <equals arg1="${nsis.tool}" arg2="makensis" forcestring="true"/>
-          <available file="makensis" filepath="${env.PATH}" />
+          <available file="makensis" filepath="${env.PATH}"/>
         </and>
       </or>
     </condition>
     <condition property="installer.ok">
       <or>
-        <os family="windows" />
+        <os family="windows"/>
         <isset property="wine.ok"/>
         <isset property="makensis.ok"/>
         <istrue value="${skip.installer}"/>
@@ -2641,7 +2641,9 @@
     </condition>
   </target>
 
-  <target name="-installer-init" depends="-installer-pre-init" unless="${installer.ok}">
+  <target name="-installer-init"
+      depends="-installer-pre-init"
+      unless="${installer.ok}">
     <fail message="The executable ${nsis.tool} was not found on the current path.
 Either wine or makensis are required to build the Windows installer on a non-Windows platform.
 Choose the tool by setting property nsis.tool in build.properties.
@@ -2649,27 +2651,27 @@ To skip building the Windows installer, set the skip.installer property in build
   </target>
 
   <target name="-installer-prep"
-      unless="skip.installer" depends="dist-static,-installer-init">
+      depends="dist-static,-installer-init"
+      unless="skip.installer">
     <copy todir="${tomcat.dist}">
       <fileset dir="res/install-win">
-        <include name="INSTALLLICENSE" />
-        <include name="*.bmp" />
-        <include name="*.ico" />
-        <include name="*.xml" />
+        <include name="INSTALLLICENSE"/>
+        <include name="*.bmp"/>
+        <include name="*.ico"/>
+        <include name="*.xml"/>
       </fileset>
     </copy>
-    <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}" />
-    <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}" />
-    <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}" />
-    <copy file="${nsis.system.dll}" todir="${tomcat.dist}" />
-    <copy file="${nsis.nsdialogs.dll}" todir="${tomcat.dist}" />
+    <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}"/>
+    <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}"/>
+    <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}"/>
+    <copy file="${nsis.system.dll}" todir="${tomcat.dist}"/>
+    <copy file="${nsis.nsdialogs.dll}" todir="${tomcat.dist}"/>
     <copy file="res/install-win/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
       <filterset refid="path.filters"/>
     </copy>
-    <fixcrlf srcdir="${tomcat.dist}" eol="crlf"
-        encoding="ISO-8859-1" fixlast="false" >
-      <patternset refid="text.files" />
+    <fixcrlf srcdir="${tomcat.dist}" eol="crlf" encoding="ISO-8859-1" fixlast="false">
+      <patternset refid="text.files"/>
     </fixcrlf>
     <!-- Reproducible builds: consistent timestamps for installer files -->
     <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
@@ -2679,48 +2681,51 @@ To skip building the Windows installer, set the skip.installer property in build
 
   <target name="-installer-wine" if="${wine.ok}">
      <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
-      <arg value="${nsis.executable.windows}" />
-      <arg value="/DNSISDIR=${nsis.bin.home}" />
-      <arg value="/V2" />
-      <arg value="tomcat.nsi" />
+      <arg value="${nsis.executable.windows}"/>
+      <arg value="/DNSISDIR=${nsis.bin.home}"/>
+      <arg value="/V2"/>
+      <arg value="tomcat.nsi"/>
     </exec>
   </target>
 
   <target name="-installer-makensis" if="${makensis.ok}">
     <exec dir="${tomcat.dist}" executable="makensis" osfamily="unix">
-      <arg value="-DNSISDIR=${nsis.bin.home}" />
-      <arg value="-V2" />
-      <arg value="tomcat.nsi" />
+      <arg value="-DNSISDIR=${nsis.bin.home}"/>
+      <arg value="-V2"/>
+      <arg value="tomcat.nsi"/>
     </exec>
   </target>
 
-  <target name="-installer" unless="skip.installer"
-      depends="-installer-prep,-installer-wine,-installer-makensis">
+  <target name="-installer"
+      depends="-installer-prep,-installer-wine,-installer-makensis"
+      unless="skip.installer">
     <exec dir="${tomcat.dist}" executable="${nsis.executable.windows}" osfamily="windows">
-      <arg value="/DNSISDIR=${nsis.bin.home}" />
-      <arg value="/V2" />
-      <arg value="tomcat.nsi" />
+      <arg value="/DNSISDIR=${nsis.bin.home}"/>
+      <arg value="/V2"/>
+      <arg value="tomcat.nsi"/>
     </exec>
   </target>
 
   <target name="installer-sign"
       description="Builds and optionally signs the Windows installer"
-      depends="-installer"  unless="skip.installer" >
-    <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+      depends="-installer"
+      unless="skip.installer">
+    <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
     <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
-    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc" />
-    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512" />
-    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe" />
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc"/>
+    <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512"/>
+    <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
   </target>
 
   <!-- Called via a callback in the NSIS installer script -->
   <target name="jsign-installer"
-      depends="setup-jsign" if="${do.codesigning}" >
+      depends="setup-jsign"
+      if="${do.codesigning}">
     <echo>Signing ${tomcat.dist}/tomcat-installer.exe</echo>
     <!-- Copy pre-existing detachced signature to signing directory -->
     <copy file="res/install-win/tomcat-installer.exe.sig"
         tofile="${tomcat.dist}/tomcat-installer.exe.sig"
-        failonerror="false" />
+        failonerror="false"/>
     <!-- If the detached signature doesn't exist, this will sign the file  -->
     <!-- and create the detached signature. If the detached signature does -->
     <!-- exist it will be attached to the file.                            -->
@@ -2739,12 +2744,13 @@ To skip building the Windows installer, set the skip.installer property in build
 
   <!-- Called via a callback in the NSIS installer script -->
   <target name="jsign-uninstaller"
-      depends="setup-jsign" if="${do.codesigning}" >
+      depends="setup-jsign"
+      if="${do.codesigning}">
     <echo>Signing ${codesigning.file_to_sign}</echo>
     <!-- Copy pre-existing detachced signature to signing directory -->
     <copy file="res/install-win/Uninstall.exe.sig"
         tofile="${codesigning.file_to_sign}.sig"
-        failonerror="false" />
+        failonerror="false"/>
     <!-- If the detached signature doesn't exist, this will sign the file  -->
     <!-- and create the detached signature. If the detached signature does -->
     <!-- exist it will be attached to the file.                            -->
@@ -2756,7 +2762,7 @@ To skip building the Windows installer, set the skip.installer property in build
         alg="${codesigning.digest}"
         tsaurl="http://ts.ssl.com"
         tsmode="RFC3161"
-        detached="true" />
+        detached="true"/>
     <!-- Move detached signature to source tree -->
     <move file="${codesigning.file_to_sign}.sig" tofile="res/install-win/Uninstall.exe.sig"/>
   </target>
