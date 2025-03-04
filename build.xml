@@ -2784,6 +2784,39 @@ You may need a custom build of makensis. Instructions for this may be found in B
     <move file="${codesigning.file_to_sign}.sig" tofile="res/install-win/Uninstall.exe.sig"/>
   </target>
 
+  <target name="-local-makensis-set-properties">
+    <property environment="env"/>
+    <condition property="scons.ok">
+      <available file="scons" filepath="${env.PATH}"/>
+    </condition>
+    <condition property="local.makensis.ok">
+      <isset property="scons.ok"/>
+    </condition>
+  </target>
+
+  <target name="-local-makensis-check"
+      depends="-local-makensis-set-properties"
+      unless="${local.makensis.ok}">
+    <echo message="Unable to build local version of makensis. All following checks must pass."/>
+    <echo message="  Found scons on path: ${scons.ok}"/>
+  </target>
+
+  <target name="local-makensis"
+      description="Builds a local version of makensis with the same version as the equivalent Windows executable"
+      depends="-local-makensis-check"
+      if="${local.makensis.ok}">
+    <exec executable="scons" dir="${nsis.src.home}">
+      <arg value="UNICODE=yes"/>
+      <arg value="PREFIX=${nsis.bin.home}/Bin"/>
+      <arg value="SKIPPLUGINS=all"/>
+      <arg value="SKIPUTILS=all"/>
+      <arg value="SKIPMISC=all"/>
+      <arg value="NSIS_CONFIG_CONST_DATA_PATH=no"/>
+      <arg value="VERSION=${nsis.version}"/>
+      <arg value="install-compiler"/>
+    </exec>
+  </target>
+
   <target name="release-version-check">
     <!--FIXME: add version check for release once Java 22 has reasonable availability
     <fail message="Java version ${release.java.version} or newer is required for release (${java.version} is installed)">
