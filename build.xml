@@ -2624,10 +2624,14 @@
       </or>
     </condition>
     <condition property="nsis.executable.unix" value="${nsis.bin.home}/Bin/makensis">
-      <available file="makensis" filepath="${nsis.bin.home}/Bin"/>
+      <and>
+        <equals arg1="${nsis.tool}" arg2="makensis" forcestring="true"/>
+        <available file="makensis" filepath="${nsis.bin.home}/Bin"/>
+      </and>
     </condition>
     <condition property="nsis.executable.unix" value="makensis">
       <and>
+        <equals arg1="${nsis.tool}" arg2="makensis" forcestring="true"/>
         <available file="makensis" filepath="${env.PATH}"/>
         <not>
           <available file="makensis" filepath="${nsis.bin.home}/Bin"/>
