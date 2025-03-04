@@ -2660,7 +2660,7 @@ To skip building the Windows installer, set the skip.installer property in build
 
   <target name="-installer-wine" if="${wine.ok}">
      <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
-      <arg value="${nsis.exe}" />
+      <arg value="${nsis.executable.windows}" />
       <arg value="/DNSISDIR=${nsis.bin.home}" />
       <arg value="/V2" />
       <arg value="tomcat.nsi" />
@@ -2677,7 +2677,7 @@ To skip building the Windows installer, set the skip.installer property in build
 
   <target name="-installer" unless="skip.installer"
       depends="-installer-prep,-installer-wine,-installer-makensis">
-    <exec dir="${tomcat.dist}" executable="${nsis.exe}" osfamily="windows">
+    <exec dir="${tomcat.dist}" executable="${nsis.executable.windows}" osfamily="windows">
       <arg value="/DNSISDIR=${nsis.bin.home}" />
       <arg value="/V2" />
       <arg value="tomcat.nsi" />
@@ -3654,7 +3654,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
 
     <antcall target="downloadzip">
       <param name="sourcefile" value="${nsis.bin.loc}"/>
-      <param name="destfile" value="${nsis.exe}"/>
+      <param name="destfile" value="${nsis.executable.windows}"/>
       <param name="destdir" value="${nsis.bin.home}/.."/>
       <param name="checksum.enabled" value="${nsis.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${nsis.bin.checksum.algorithm}"/>
@@ -3663,7 +3663,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
 
     <antcall target="downloadbz2">
       <param name="sourcefile" value="${nsis.src.loc}"/>
-      <param name="destfile" value="${nsis.exe}"/>
+      <param name="destfile" value="${nsis.executable.windows}"/>
       <param name="destdir" value="${nsis.bin.home}/.."/>
       <param name="checksum.enabled" value="${nsis.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${nsis.src.checksum.algorithm}"/>
