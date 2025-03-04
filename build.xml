@@ -2634,7 +2634,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
     <condition property="nsis.executable.unix.version.ok">
       <or>
         <os family="windows"/>
-        <equals arg1="nsis.version" arg2="nsis.executable.unix.version"/>
+        <equals arg1="v${nsis.version}" arg2="${nsis.executable.unix.version}"/>
         <not>
           <!-- Zero length string for version.dev indicates a release build -->
           <equals arg1="${version.dev}" arg2=""/>
@@ -2656,7 +2656,7 @@ To skip building the Windows installer, set the skip.installer property in build
       depends="-installer-set-properties-2"
       unless="${nsis.executable.unix.version.ok}">
     <fail message="An executable makensis was found at: ${nsis.executable.unix}
-with version [${nsis.executable.unix.version}] but version [${nsis.version}] is required
+with version [${nsis.executable.unix.version}] but version [v${nsis.version}] is required
 for repeatable builds.
 You may need a custom build of makensis. Instructions for this may be found in BUILDING.txt"/>
   </target>
