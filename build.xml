@@ -3622,8 +3622,8 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
 
     <antcall target="downloadbz2">
       <param name="sourcefile" value="${nsis.src.loc}"/>
-      <param name="destfile" value="${nsis.executable.windows}"/>
-      <param name="destdir" value="${nsis.bin.home}/.."/>
+      <param name="destfile" value="${nsis.src.home}/INSTALL"/>
+      <param name="destdir" value="${nsis.src.home}/.."/>
       <param name="checksum.enabled" value="${nsis.checksum.enabled}"/>
       <param name="checksum.algorithm" value="${nsis.src.checksum.algorithm}"/>
       <param name="checksum.value" value="${nsis.src.checksum.value}"/>
