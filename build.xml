@@ -2576,19 +2576,22 @@
         </and>
       </or>
     </condition>
-    <condition property="makensis.ok">
-      <or>
-        <and>
-          <equals arg1="${nsis.tool}" arg2="makensis" forcestring="true"/>
-          <available file="makensis" filepath="${env.PATH}"/>
-        </and>
-      </or>
+    <condition property="nsis.executable.unix" value="${nsis.bin.home}/Bin/makensis">
+      <available file="makensis" filepath="${nsis.bin.home}/Bin"/>
+    </condition>
+    <condition property="nsis.executable.unix" value="makensis">
+      <and>
+        <available file="makensis" filepath="${env.PATH}"/>
+        <not>
+          <available file="makensis" filepath="${nsis.bin.home}/Bin"/>
+        </not>
+      </and>
     </condition>
     <condition property="installer.ok">
       <or>
         <os family="windows"/>
         <isset property="wine.ok"/>
-        <isset property="makensis.ok"/>
+        <isset property="nsis.executable.unix"/>
         <istrue value="${skip.installer}"/>
       </or>
     </condition>
@@ -2641,8 +2644,9 @@ To skip building the Windows installer, set the skip.installer property in build
     </exec>
   </target>
 
-  <target name="-installer-makensis" if="${makensis.ok}">
-    <exec dir="${tomcat.dist}" executable="makensis" osfamily="unix">
+  <target name="-installer-makensis" if="nsis.executable.unix">
+    <echo message="Using makensis: ${nsis.executable.unix}"/>
+    <exec dir="${tomcat.dist}" executable="${nsis.executable.unix}" osfamily="unix">
       <arg value="-DNSISDIR=${nsis.bin.home}"/>
       <arg value="-V2"/>
       <arg value="tomcat.nsi"/>
