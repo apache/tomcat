@@ -2696,7 +2696,7 @@ To skip building the Windows installer, set the skip.installer property in build
     </exec>
   </target>
 
-  <target name="-installer"
+  <target name="-installer-build"
       depends="-installer-prep,-installer-wine,-installer-makensis"
       unless="skip.installer">
     <exec dir="${tomcat.dist}" executable="${nsis.executable.windows}" osfamily="windows">
@@ -2706,9 +2706,9 @@ To skip building the Windows installer, set the skip.installer property in build
     </exec>
   </target>
 
-  <target name="installer-sign"
+  <target name="installer"
       description="Builds and optionally signs the Windows installer"
-      depends="-installer"
+      depends="-installer-build"
       unless="skip.installer">
     <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
     <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
@@ -2891,7 +2891,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
   </target>
 
   <target name="release"
-    depends="clean,release-init,dist-deployer,installer-sign,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
+    depends="clean,release-init,dist-deployer,installer,package-zip,package-winzip,package-tgz,package-deployer-zip,package-deployer-tgz,javadoc,package-docs-tgz,package-src-zip,package-src-tgz,package-src-jar"
     description="Create a Tomcat packaged distribution">
 
     <copy file="KEYS"
