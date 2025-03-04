@@ -2613,7 +2613,7 @@
     </copy>
   </target>
 
-  <target name="-installer-pre-init">
+  <target name="-installer-set-properties-1">
     <property environment="env"/>
     <condition property="wine.ok">
       <or>
@@ -2644,8 +2644,26 @@
     </condition>
   </target>
 
-  <target name="-installer-init"
-      depends="-installer-pre-init"
+  <target name="-installer-set-properties-2"
+      depends="-installer-set-properties-1"
+      if="nsis.executable.unix">
+    <exec executable="${nsis.executable.unix}" outputproperty="nsis.executable.unix.version">
+      <arg value="-VERSION"/>
+    </exec>
+    <condition property="nsis.executable.unix.version.ok">
+      <or>
+        <os family="windows"/>
+        <equals arg1="nsis.version" arg2="nsis.executable.unix.version"/>
+        <not>
+          <!-- Zero length string for version.dev indicates a release build -->
+          <equals arg1="${version.dev}" arg2=""/>
+        </not>
+      </or>
+    </condition>
+  </target>
+
+  <target name="-installer-check-available"
+      depends="-installer-set-properties-1"
       unless="${installer.ok}">
     <fail message="The executable ${nsis.tool} was not found on the current path.
 Either wine or makensis are required to build the Windows installer on a non-Windows platform.
@@ -2653,8 +2671,22 @@ Choose the tool by setting property nsis.tool in build.properties.
 To skip building the Windows installer, set the skip.installer property in build.properties" />
   </target>
 
+  <target name="-installer-check-version"
+      depends="-installer-set-properties-2"
+      unless="${nsis.executable.unix.version.ok}">
+    <fail message="An executable makensis was found at: ${nsis.executable.unix}
+with version [${nsis.executable.unix.version}] but version [${nsis.version}] is required
+for repeatable builds.
+You may need a custom build of makensis. Instructions for this may be found in BUILDING.txt"/>
+  </target>
+
+  <target name="-installer-checks"
+      depends="-installer-check-available,-installer-check-version"
+      unless="${installer.ok}">
+  </target>
+
   <target name="-installer-prep"
-      depends="dist-static,-installer-init"
+      depends="dist-static,-installer-checks"
       unless="skip.installer">
     <copy todir="${tomcat.dist}">
       <fileset dir="res/install-win">
@@ -2692,7 +2724,7 @@ To skip building the Windows installer, set the skip.installer property in build
   </target>
 
   <target name="-installer-makensis" if="nsis.executable.unix">
-    <echo message="Using makensis: ${nsis.executable.unix}"/>
+    <echo message="Using makensis: ${nsis.executable.unix} version [${nsis.executable.unix.version}]"/>
     <exec dir="${tomcat.dist}" executable="${nsis.executable.unix}" osfamily="unix">
       <arg value="-DNSISDIR=${nsis.bin.home}"/>
       <arg value="-V2"/>
