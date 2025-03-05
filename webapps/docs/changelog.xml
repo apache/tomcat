@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.103 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Return 400 if the amount of content sent for a partial PUT is
+        inconsistent with the range that was specified. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.102 (remm)" rtext="release in progress">
   <subsection name="Catalina">
