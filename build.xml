@@ -2661,6 +2661,7 @@
     <condition property="nsis.executable.unix.version.ok">
       <or>
         <os family="windows"/>
+        <isset property="wine.ok"/>
         <equals arg1="v${nsis.version}" arg2="${nsis.executable.unix.version}"/>
         <not>
           <!-- Zero length string for version.dev indicates a release build -->
