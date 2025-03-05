@@ -786,9 +786,54 @@
         the StandardContext. (markt)
       </fix>
       <fix>
-        Return 400 if the amount of content sent for a partial PUT is
-        inconsistent with the range that was specified. (remm)
+        Stop after <code>INITIALIZED</code> state should be a noop since it is
+        possible for subcomponents to be in <code>FAILED</code> after init.
+        (remm)
       </fix>
+      <fix>
+        Fix incorrect web resource cache size calculations when there are
+        concurrent <code>PUT</code> and <code>DELETE</code> requests for the
+        same resource. (markt)
+      </fix>
+      <add>
+        Add debug logging for the web resource cache so the current size can be
+        tracked as resources are added and removed. (markt)
+      </add>
+      <update>
+        Replace legacy WebDAV <code>opaquelocktoken:</code> scheme for lock
+        tokens with <code>urn:uuid:</code> as recommended by RFC 4918, and
+        remove <code>secret</code> init parameter. (remm)
+      </update>
+      <fix>
+        Concurrent reads and writes (e.g. <code>GET</code> and <code>PUT</code>
+        / <code>DELETE</code>) for the same path caused corruption of the
+        <code>FileResource</code> where some of the fields were set as if the
+        file exists and some were set as if it does not. This resulted in
+        inconsistent metadata. (markt)
+      </fix>
+      <fix>
+        <bug>69415</bug>: Ensure that the <code>ExpiresFilter</code> only sets
+        cache headers on <code>GET</code> and <code>HEAD</code> requests. Also
+        skip requests where the application has set <code>Cache-Control:
+        no-store</code>. (markt)
+      </fix>
+      <fix>
+        <bug>69419</bug>: Improve the performance of
+        <code>ServletRequest.getAttribute()</code> when there are multiple
+        levels of nested includes. Based on a patch provided by John
+        Engebretson. (markt)
+      </fix>
+      <fix>
+        <bug>69426</bug>: Restore providing a value (rather than null) for
+        <code>Class.getProtectionDomain().getCodeSource().getLocation()</code>
+        as a number of libraries and JRE features depend on this being non-null
+        even when a SecurityManager is not is use. (markt)
+      </fix>
+      <add>
+        All applications to send an early hints informational response by
+        calling <code>HttpServletResponse.sendError()</code> with a status code
+        of 103. (schultz)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
