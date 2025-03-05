@@ -612,10 +612,12 @@ public class DefaultServlet extends HttpServlet {
                 resourceInputStream = req.getInputStream();
             } else {
                 tempContentFile = executePartialPut(req, range, path);
-                resourceInputStream = new FileInputStream(tempContentFile);
+                if (tempContentFile != null) {
+                    resourceInputStream = new FileInputStream(tempContentFile);
+                }
             }
 
-            if (resources.write(path, resourceInputStream, true)) {
+            if (resourceInputStream != null && resources.write(path, resourceInputStream, true)) {
                 if (resource.exists()) {
                     resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
                 } else {
@@ -623,7 +625,8 @@ public class DefaultServlet extends HttpServlet {
                 }
             } else {
                 try {
-                    resp.sendError(HttpServletResponse.SC_CONFLICT);
+                    resp.sendError(resourceInputStream != null ?
+                            HttpServletResponse.SC_CONFLICT : HttpServletResponse.SC_BAD_REQUEST);
                 } catch (IllegalStateException e) {
                     // Already committed, ignore
                 }
@@ -687,11 +690,21 @@ public class DefaultServlet extends HttpServlet {
 
             // Append data in request input stream to contentFile
             randAccessContentFile.seek(range.getStart());
+            long received = 0;
             int numBytesRead;
             byte[] transferBuffer = new byte[BUFFER_SIZE];
             try (BufferedInputStream requestBufInStream = new BufferedInputStream(req.getInputStream(), BUFFER_SIZE)) {
                 while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
+                    received += numBytesRead;
+                    if (received > range.getEnd() - range.getStart()) {
+                        throw new IllegalStateException(sm.getString("defaultServlet.wrongByteCountForRange",
+                                String.valueOf(received), String.valueOf(range.getEnd() - range.getStart())));
+                    }
                     randAccessContentFile.write(transferBuffer, 0, numBytesRead);
+                }
+                if (received < range.getEnd() - range.getStart()) {
+                    throw new IllegalStateException(sm.getString("defaultServlet.wrongByteCountForRange",
+                            String.valueOf(received), String.valueOf(range.getEnd() - range.getStart())));
                 }
             }
 
@@ -700,7 +713,7 @@ public class DefaultServlet extends HttpServlet {
             if (!contentFile.delete()) {
                 log(sm.getString("defaultServlet.deleteTempFileFailed", contentFile.getAbsolutePath()));
             }
-            throw e;
+            return null;
         }
 
         return contentFile;

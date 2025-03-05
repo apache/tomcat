@@ -150,6 +150,10 @@
         <code>/</code>. (markt)
       </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Return 400 if the amount of content sent for a partial PUT is
+        inconsistent with the range that was specified. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
