@@ -86,6 +86,11 @@ public class TestDefaultServletPut extends TomcatBaseTest {
         // Valid partial PUT but partial PUT is disabled
         parameterSets.add(new Object[] {
                 "Content-Range: bytes 0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.TRUE, START_TEXT, Boolean.FALSE });
+        // Errors due to incorrect length
+        parameterSets.add(new Object[] {
+                "Content-Range: bytes 0-1/" + PATCH_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] {
+                "Content-Range: bytes 0-19/20" + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
 
         return parameterSets;
     }
