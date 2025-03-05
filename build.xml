@@ -2697,7 +2697,7 @@ You may need a custom build of makensis. Instructions for this may be found in B
 
   <target name="-installer-prep"
       depends="dist-static,-installer-checks"
-      unless="skip.installer">
+      unless="${skip.installer}">
     <copy todir="${tomcat.dist}">
       <fileset dir="res/install-win">
         <include name="INSTALLLICENSE"/>
@@ -2744,7 +2744,7 @@ You may need a custom build of makensis. Instructions for this may be found in B
 
   <target name="-installer-build"
       depends="-installer-prep,-installer-wine,-installer-makensis"
-      unless="skip.installer">
+      unless="${skip.installer}">
     <exec dir="${tomcat.dist}" executable="${nsis.executable.windows}" osfamily="windows">
       <arg value="/DNSISDIR=${nsis.bin.home}"/>
       <arg value="/V2"/>
@@ -2755,7 +2755,7 @@ You may need a custom build of makensis. Instructions for this may be found in B
   <target name="installer"
       description="Builds and optionally signs the Windows installer"
       depends="-installer-build"
-      unless="skip.installer">
+      unless="${skip.installer}">
     <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
     <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc"/>
