@@ -2613,6 +2613,7 @@
       depends="-installer-set-properties-2">
     <condition property="nsis.executable.unix.version.ok">
       <or>
+        <istrue value="${skip.installer}"/>
         <os family="windows"/>
         <isset property="wine.ok"/>
         <equals arg1="v${nsis.version}" arg2="${nsis.executable.unix.version}"/>
