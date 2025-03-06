@@ -47,11 +47,6 @@ import org.apache.tomcat.InstanceManager;
  * Bunch of util methods that are used by code generated for useBean,
  * getProperty and setProperty.
  *
- * The __begin, __end stuff is there so that the JSP engine can
- * actually parse this file and inline them if people don't want
- * runtime dependencies on this class. However, I'm not sure if that
- * works so well right now. It got forgotten at some point. -akv
- *
  * @author Mandar Raje
  * @author Shawn Bayern
  */
@@ -226,7 +221,7 @@ public class JspRuntimeLibrary {
         }
     }
 
-   // __begin convertMethod
+
     public static Object convert(String propertyName, String s, Class<?> t,
             Class<?> propertyEditorClass)
        throws JasperException
@@ -298,9 +293,8 @@ public class JspRuntimeLibrary {
             throw new JasperException(ex);
         }
     }
-    // __end convertMethod
 
-    // __begin introspectMethod
+
     public static void introspect(Object bean, ServletRequest request)
                                   throws JasperException
     {
@@ -311,9 +305,8 @@ public class JspRuntimeLibrary {
             introspecthelper(bean, name, value, request, name, true);
         }
     }
-    // __end introspectMethod
 
-    // __begin introspecthelperMethod
+
     public static void introspecthelper(Object bean, String prop,
                                         String value, ServletRequest request,
                                         String param, boolean ignoreMethodNF)
@@ -391,12 +384,11 @@ public class JspRuntimeLibrary {
             }
         }
     }
-    // __end introspecthelperMethod
+
 
     //-------------------------------------------------------------------
     // functions to convert builtin Java data types to string.
     //-------------------------------------------------------------------
-    // __begin toStringMethod
     public static String toString(Object o) {
         return String.valueOf(o);
     }
@@ -432,7 +424,6 @@ public class JspRuntimeLibrary {
     public static String toString(char c) {
         return Character.toString(c);
     }
-    // __end toStringMethod
 
 
     /**
@@ -600,7 +591,7 @@ public class JspRuntimeLibrary {
         return escStringBuilder.toString();
     }
 
-    // __begin lookupReadMethodMethod
+
     public static Object handleGetProperty(Object o, String prop)
     throws JasperException {
         if (o == null) {
@@ -618,7 +609,6 @@ public class JspRuntimeLibrary {
         }
         return value;
     }
-    // __end lookupReadMethodMethod
 
     // handles <jsp:setProperty> with EL expression for 'value' attribute
     public static void handleSetPropertyExpression(Object bean,
