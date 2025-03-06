@@ -2672,8 +2672,7 @@ You may need a custom build of makensis. Instructions for this may be found in B
   </target>
 
   <target name="-installer-checks"
-      depends="-installer-check-available,-installer-check-version"
-      unless="${installer.ok}">
+      depends="-installer-check-available,-installer-check-version">
   </target>
 
   <target name="-installer-prep"
@@ -2700,7 +2699,9 @@ You may need a custom build of makensis. Instructions for this may be found in B
     </touch>
   </target>
 
-  <target name="-installer-wine" if="${wine.ok}">
+  <target name="-installer-wine"
+      if="${wine.ok}"
+      unless="${skip.installer}">
      <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
       <arg value="${nsis.executable.windows}"/>
       <arg value="/DNSISDIR=${nsis.bin.home}"/>
@@ -2709,7 +2710,9 @@ You may need a custom build of makensis. Instructions for this may be found in B
     </exec>
   </target>
 
-  <target name="-installer-makensis" if="nsis.executable.unix">
+  <target name="-installer-makensis"
+      if="nsis.executable.unix"
+      unless="${skip.installer}">
     <echo message="Using makensis: ${nsis.executable.unix} version [${nsis.executable.unix.version}]"/>
     <exec dir="${tomcat.dist}" executable="${nsis.executable.unix}" osfamily="unix">
       <arg value="-DNSISDIR=${nsis.bin.home}"/>
