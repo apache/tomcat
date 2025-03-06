@@ -45,8 +45,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
 
     private static final String KEY = JspApplicationContextImpl.class.getName();
 
-    private final ExpressionFactory expressionFactory =
-            ExpressionFactory.newInstance();
+    private final ExpressionFactory expressionFactory = ExpressionFactory.newInstance();
 
     private final List<ELContextListener> contextListeners = new ArrayList<>();
 
@@ -72,8 +71,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
         if (context == null) {
             throw new IllegalArgumentException(Localizer.getMessage("jsp.error.nullArgument"));
         }
-        JspApplicationContextImpl impl = (JspApplicationContextImpl) context
-                .getAttribute(KEY);
+        JspApplicationContextImpl impl = (JspApplicationContextImpl) context.getAttribute(KEY);
         if (impl == null) {
             impl = new JspApplicationContextImpl();
             context.setAttribute(KEY, impl);
@@ -112,8 +110,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
     private ELResolver createELResolver() {
         this.instantiated = true;
         if (this.resolver == null) {
-            CompositeELResolver r = new JasperELResolver(this.resolvers,
-                    expressionFactory.getStreamELResolver());
+            CompositeELResolver r = new JasperELResolver(this.resolvers, expressionFactory.getStreamELResolver());
             this.resolver = r;
         }
         return this.resolver;

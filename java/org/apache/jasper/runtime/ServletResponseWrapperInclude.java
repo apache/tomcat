@@ -26,11 +26,8 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.jsp.JspWriter;
 
 /**
- * ServletResponseWrapper used by the JSP 'include' action.
- *
- * This wrapper response object is passed to RequestDispatcher.include(), so
- * that the output of the included resource is appended to that of the
- * including page.
+ * ServletResponseWrapper used by the JSP 'include' action. This wrapper response object is passed to
+ * RequestDispatcher.include(), so that the output of the included resource is appended to that of the including page.
  *
  * @author Pierre Delisle
  */
@@ -44,9 +41,8 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
 
     private final JspWriter jspWriter;
 
-    public ServletResponseWrapperInclude(ServletResponse response,
-                                         JspWriter jspWriter) {
-        super((HttpServletResponse)response);
+    public ServletResponseWrapperInclude(ServletResponse response, JspWriter jspWriter) {
+        super((HttpServletResponse) response);
         this.printWriter = new PrintWriter(jspWriter);
         this.jspWriter = jspWriter;
     }
@@ -65,8 +61,7 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
     }
 
     /**
-     * Clears the output buffer of the JspWriter associated with the including
-     * page.
+     * Clears the output buffer of the JspWriter associated with the including page.
      */
     @Override
     public void resetBuffer() {
