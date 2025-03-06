@@ -18,10 +18,11 @@ package org.apache.jasper.runtime;
 
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.lang.reflect.Method;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
 import jakarta.servlet.RequestDispatcher;
@@ -1002,76 +1003,25 @@ public class JspRuntimeLibrary {
 
     /**
      * URL encodes a string, based on the supplied character encoding.
-     * This performs the same function as java.next.URLEncode.encode
-     * in J2SDK1.4, and should be removed if the only platform supported
-     * is 1.4 or higher.
      * @param s The String to be URL encoded.
      * @param enc The character encoding
      * @return The URL encoded String
      */
     public static String URLEncode(String s, String enc) {
-
         if (s == null) {
             return "null";
         }
-
         if (enc == null) {
             enc = "ISO-8859-1";        // The default request encoding
         }
-
-        StringBuilder out = new StringBuilder(s.length());
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        OutputStreamWriter writer = null;
+        Charset cs = null;
         try {
-            writer = new OutputStreamWriter(buf, enc);
-        } catch (java.io.UnsupportedEncodingException ex) {
-            // Use the default encoding?
-            writer = new OutputStreamWriter(buf);
+            cs = Charset.forName(enc);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            cs = StandardCharsets.ISO_8859_1;
         }
-
-        for (int i = 0; i < s.length(); i++) {
-            int c = s.charAt(i);
-            if (c == ' ') {
-                out.append('+');
-            } else if (isSafeChar(c)) {
-                out.append((char)c);
-            } else {
-                // convert to external encoding before hex conversion
-                try {
-                    writer.write(c);
-                    writer.flush();
-                } catch(IOException e) {
-                    buf.reset();
-                    continue;
-                }
-                byte[] ba = buf.toByteArray();
-                for (byte b : ba) {
-                    out.append('%');
-                    // Converting each byte in the buffer
-                    out.append(Character.forDigit((b >> 4) & 0xf, 16));
-                    out.append(Character.forDigit(b & 0xf, 16));
-                }
-                buf.reset();
-            }
-        }
-        return out.toString();
-    }
-
-    private static boolean isSafeChar(int c) {
-        if (c >= 'a' && c <= 'z') {
-            return true;
-        }
-        if (c >= 'A' && c <= 'Z') {
-            return true;
-        }
-        if (c >= '0' && c <= '9') {
-            return true;
-        }
-        if (c == '-' || c == '_' || c == '.' || c == '!' ||
-            c == '~' || c == '*' || c == '\'' || c == '(' || c == ')') {
-            return true;
-        }
-        return false;
+        return URLEncoder.encode(s, cs);
     }
 
 
