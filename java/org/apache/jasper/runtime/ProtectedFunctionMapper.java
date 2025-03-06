@@ -20,8 +20,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 
 /**
- * Maps EL functions to their Java method counterparts. Keeps the actual Method
- * objects protected so that JSP pages can't indirectly do reflection.
+ * Maps EL functions to their Java method counterparts. Keeps the actual Method objects protected so that JSP pages
+ * can't indirectly do reflection.
  *
  * @author Mark Roth
  * @author Kin-man Chung
@@ -45,8 +45,8 @@ public final class ProtectedFunctionMapper extends jakarta.el.FunctionMapper {
     }
 
     /**
-     * Generated Servlet and Tag Handler implementations call this method to
-     * retrieve an instance of the ProtectedFunctionMapper.
+     * Generated Servlet and Tag Handler implementations call this method to retrieve an instance of the
+     * ProtectedFunctionMapper.
      *
      * @return A new protected function mapper.
      */
@@ -57,22 +57,16 @@ public final class ProtectedFunctionMapper extends jakarta.el.FunctionMapper {
     }
 
     /**
-     * Stores a mapping from the given EL function prefix and name to the given
-     * Java method.
+     * Stores a mapping from the given EL function prefix and name to the given Java method.
      *
-     * @param fnQName
-     *            The EL function qualified name (including prefix)
-     * @param c
-     *            The class containing the Java method
-     * @param methodName
-     *            The name of the Java method
-     * @param args
-     *            The arguments of the Java method
-     * @throws RuntimeException
-     *             if no method with the given signature could be found.
+     * @param fnQName    The EL function qualified name (including prefix)
+     * @param c          The class containing the Java method
+     * @param methodName The name of the Java method
+     * @param args       The arguments of the Java method
+     *
+     * @throws RuntimeException if no method with the given signature could be found.
      */
-    public void mapFunction(String fnQName, final Class<?> c,
-            final String methodName, final Class<?>[] args) {
+    public void mapFunction(String fnQName, final Class<?> c, final String methodName, final Class<?>[] args) {
         // Skip if null values were passed in. They indicate a function
         // added via a lambda or ImportHandler; nether of which need to be
         // placed in the Map.
@@ -83,33 +77,27 @@ public final class ProtectedFunctionMapper extends jakarta.el.FunctionMapper {
         try {
             method = c.getMethod(methodName, args);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(
-                    "Invalid function mapping - no such method: "
-                            + e.getMessage());
+            throw new RuntimeException("Invalid function mapping - no such method: " + e.getMessage());
         }
 
         this.fnmap.put(fnQName, method);
     }
 
     /**
-     * Creates an instance for this class, and stores the Method for the given
-     * EL function prefix and name. This method is used for the case when there
-     * is only one function in the EL expression.
+     * Creates an instance for this class, and stores the Method for the given EL function prefix and name. This method
+     * is used for the case when there is only one function in the EL expression.
      *
-     * @param fnQName
-     *            The EL function qualified name (including prefix)
-     * @param c
-     *            The class containing the Java method
-     * @param methodName
-     *            The name of the Java method
-     * @param args
-     *            The arguments of the Java method
-     * @throws RuntimeException
-     *             if no method with the given signature could be found.
+     * @param fnQName    The EL function qualified name (including prefix)
+     * @param c          The class containing the Java method
+     * @param methodName The name of the Java method
+     * @param args       The arguments of the Java method
+     *
+     * @throws RuntimeException if no method with the given signature could be found.
+     *
      * @return the mapped function
      */
-    public static ProtectedFunctionMapper getMapForFunction(String fnQName,
-            final Class<?> c, final String methodName, final Class<?>[] args) {
+    public static ProtectedFunctionMapper getMapForFunction(String fnQName, final Class<?> c, final String methodName,
+            final Class<?>[] args) {
         Method method = null;
         ProtectedFunctionMapper funcMapper = new ProtectedFunctionMapper();
         // Skip if null values were passed in. They indicate a function
@@ -119,9 +107,7 @@ public final class ProtectedFunctionMapper extends jakarta.el.FunctionMapper {
             try {
                 method = c.getMethod(methodName, args);
             } catch (NoSuchMethodException e) {
-                throw new RuntimeException(
-                        "Invalid function mapping - no such method: "
-                                + e.getMessage());
+                throw new RuntimeException("Invalid function mapping - no such method: " + e.getMessage());
             }
         }
         funcMapper.theMethod = method;
@@ -129,13 +115,12 @@ public final class ProtectedFunctionMapper extends jakarta.el.FunctionMapper {
     }
 
     /**
-     * Resolves the specified local name and prefix into a Java.lang.Method.
-     * Returns null if the prefix and local name are not found.
+     * Resolves the specified local name and prefix into a Java.lang.Method. Returns null if the prefix and local name
+     * are not found.
      *
-     * @param prefix
-     *            the prefix of the function
-     * @param localName
-     *            the short name of the function
+     * @param prefix    the prefix of the function
+     * @param localName the short name of the function
+     *
      * @return the result of the method mapping. Null means no entry found.
      */
     @Override

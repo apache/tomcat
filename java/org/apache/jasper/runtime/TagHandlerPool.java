@@ -93,14 +93,14 @@ public class TagHandlerPool {
     }
 
     /**
-     * Gets the next available tag handler from this tag handler pool,
-     * instantiating one if this tag handler pool is empty.
+     * Gets the next available tag handler from this tag handler pool, instantiating one if this tag handler pool is
+     * empty.
      *
-     * @param handlerClass
-     *            Tag handler class
+     * @param handlerClass Tag handler class
+     *
      * @return Reused or newly instantiated tag handler
-     * @throws JspException
-     *             if a tag handler cannot be instantiated
+     *
+     * @throws JspException if a tag handler cannot be instantiated
      */
     public Tag get(Class<? extends Tag> handlerClass) throws JspException {
         Tag handler;
@@ -115,8 +115,7 @@ public class TagHandlerPool {
         // wait for us to construct a tag for this thread.
         try {
             if (useInstanceManagerForTags) {
-                return (Tag) instanceManager.newInstance(
-                        handlerClass.getName(), handlerClass.getClassLoader());
+                return (Tag) instanceManager.newInstance(handlerClass.getName(), handlerClass.getClassLoader());
             } else {
                 Tag instance = handlerClass.getConstructor().newInstance();
                 instanceManager.newInstance(instance);
@@ -130,12 +129,10 @@ public class TagHandlerPool {
     }
 
     /**
-     * Adds the given tag handler to this tag handler pool, unless this tag
-     * handler pool has already reached its capacity, in which case the tag
-     * handler's release() method is called.
+     * Adds the given tag handler to this tag handler pool, unless this tag handler pool has already reached its
+     * capacity, in which case the tag handler's release() method is called.
      *
-     * @param handler
-     *            Tag handler to add to this tag handler pool
+     * @param handler Tag handler to add to this tag handler pool
      */
     public void reuse(Tag handler) {
         synchronized (this) {
@@ -149,8 +146,7 @@ public class TagHandlerPool {
     }
 
     /**
-     * Calls the release() method of all available tag handlers in this tag
-     * handler pool.
+     * Calls the release() method of all available tag handlers in this tag handler pool.
      */
     public synchronized void release() {
         for (int i = current; i >= 0; i--) {
@@ -159,8 +155,7 @@ public class TagHandlerPool {
     }
 
 
-    protected static String getOption(ServletConfig config, String name,
-            String defaultV) {
+    protected static String getOption(ServletConfig config, String name, String defaultV) {
         if (config == null) {
             return defaultV;
         }

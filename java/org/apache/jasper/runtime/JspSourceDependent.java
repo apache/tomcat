@@ -19,8 +19,8 @@ package org.apache.jasper.runtime;
 import java.util.Map;
 
 /**
- * Interface for tracking the source files dependencies, for the purpose
- * of compiling out of date pages.  This is used for:
+ * Interface for tracking the source files dependencies, for the purpose of compiling out of date pages. This is used
+ * for:
  * <ul>
  * <li>files that are included by page directives</li>
  * <li>files that are included by include-prelude and include-coda in jsp:config</li>
@@ -31,10 +31,10 @@ import java.util.Map;
 
 public interface JspSourceDependent {
 
-   /**
-    * Returns a map of file names and last modified time where the current page
-    * has a source dependency on the file.
-    * @return the map of dependent resources
-    */
+    /**
+     * Returns a map of file names and last modified time where the current page has a source dependency on the file.
+     *
+     * @return the map of dependent resources
+     */
     Map<String,Long> getDependants();
 }
