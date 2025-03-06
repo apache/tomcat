@@ -17,9 +17,8 @@
 package org.apache.jasper.runtime;
 
 /**
- * Provides runtime access to selected compile time directives. Page directives
- * are not added to this interface until there is a requirement to access them
- * at runtime.
+ * Provides runtime access to selected compile time directives. Page directives are not added to this interface until
+ * there is a requirement to access them at runtime.
  */
 public interface JspSourceDirectives {
 

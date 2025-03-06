@@ -27,11 +27,8 @@ import jakarta.servlet.jsp.tagext.BodyContent;
 import org.apache.jasper.compiler.Localizer;
 
 /**
- * Write text to a character-output stream, buffering characters so as
- * to provide for the efficient writing of single characters, arrays,
- * and strings.
- *
- * Provide support for discarding for the output that has been buffered.
+ * Write text to a character-output stream, buffering characters so as to provide for the efficient writing of single
+ * characters, arrays, and strings. Provide support for discarding for the output that has been buffered.
  *
  * @author Rajiv Mordani
  * @author Jan Luehe
@@ -52,9 +49,10 @@ public class BodyContentImpl extends BodyContent {
 
     /**
      * Constructor.
+     *
      * @param enclosingWriter The wrapped writer
-     * @param limitBuffer <code>true</code> to discard large buffers
-     * @param tagBufferSize the buffer size
+     * @param limitBuffer     <code>true</code> to discard large buffers
+     * @param tagBufferSize   the buffer size
      */
     public BodyContentImpl(JspWriter enclosingWriter, boolean limitBuffer, int tagBufferSize) {
         super(enclosingWriter);
@@ -73,7 +71,7 @@ public class BodyContentImpl extends BodyContent {
         } else {
             ensureOpen();
             if (nextChar >= bufferSize) {
-                reAllocBuff (1);
+                reAllocBuff(1);
             }
             cb[nextChar++] = (char) c;
         }
@@ -86,19 +84,18 @@ public class BodyContentImpl extends BodyContent {
         } else {
             ensureOpen();
 
-            if ((off < 0) || (off > cbuf.length) || (len < 0) ||
-                    ((off + len) > cbuf.length) || ((off + len) < 0)) {
+            if ((off < 0) || (off > cbuf.length) || (len < 0) || ((off + len) > cbuf.length) || ((off + len) < 0)) {
                 throw new IndexOutOfBoundsException();
             } else if (len == 0) {
                 return;
             }
 
             if (len >= bufferSize - nextChar) {
-                reAllocBuff (len);
+                reAllocBuff(len);
             }
 
             System.arraycopy(cbuf, off, cb, nextChar, len);
-            nextChar+=len;
+            nextChar += len;
         }
     }
 
@@ -264,7 +261,7 @@ public class BodyContentImpl extends BodyContent {
     }
 
     @Override
-    public void println(double x) throws IOException{
+    public void println(double x) throws IOException {
         print(x);
         println();
     }
@@ -327,12 +324,12 @@ public class BodyContentImpl extends BodyContent {
 
     @Override
     public int getRemaining() {
-        return (writer == null) ? bufferSize-nextChar : 0;
+        return (writer == null) ? bufferSize - nextChar : 0;
     }
 
     @Override
     public Reader getReader() {
-        return (writer == null) ? new CharArrayReader (cb, 0, nextChar) : null;
+        return (writer == null) ? new CharArrayReader(cb, 0, nextChar) : null;
     }
 
     @Override
@@ -361,13 +358,11 @@ public class BodyContentImpl extends BodyContent {
     }
 
     /**
-     * This method shall "reset" the internal state of a BodyContentImpl,
-     * releasing all internal references, and preparing it for potential
-     * reuse by a later invocation of {@link PageContextImpl#pushBody(Writer)}.
-     *
-     * <p>Note, that BodyContentImpl instances are usually owned by a
-     * PageContextImpl instance, and PageContextImpl instances are recycled
-     * and reused.
+     * This method shall "reset" the internal state of a BodyContentImpl, releasing all internal references, and
+     * preparing it for potential reuse by a later invocation of {@link PageContextImpl#pushBody(Writer)}.
+     * <p>
+     * Note, that BodyContentImpl instances are usually owned by a PageContextImpl instance, and PageContextImpl
+     * instances are recycled and reused.
      *
      * @see PageContextImpl#release()
      */
