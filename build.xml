@@ -2706,11 +2706,6 @@ You may need a custom build of makensis. Instructions for this may be found in B
         <include name="*.xml"/>
       </fileset>
     </copy>
-    <copy file="${nsis.installoptions.dll}" todir="${tomcat.dist}"/>
-    <copy file="${nsis.nsexec.dll}" todir="${tomcat.dist}"/>
-    <copy file="${nsis.nsisdl.dll}" todir="${tomcat.dist}"/>
-    <copy file="${nsis.system.dll}" todir="${tomcat.dist}"/>
-    <copy file="${nsis.nsdialogs.dll}" todir="${tomcat.dist}"/>
     <copy file="res/install-win/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
       <filterset refid="path.filters"/>
