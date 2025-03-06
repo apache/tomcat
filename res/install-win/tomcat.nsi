@@ -160,8 +160,8 @@ Var ServiceInstallLog
   !finalize 'ant -f @BASEDIR@/build.xml jsign-installer'
   !uninstfinalize 'ant -f @BASEDIR@/build.xml -Dcodesigning.file_to_sign=%1 jsign-uninstaller'
 
-  ReserveFile System.dll
-  ReserveFile nsDialogs.dll
+  ReserveFile /plugin System.dll
+  ReserveFile /plugin nsDialogs.dll
   ReserveFile tomcat-users_1.xml
   ReserveFile tomcat-users_2.xml
 
