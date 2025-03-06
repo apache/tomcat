@@ -41,9 +41,7 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
     }
 
     @Override
-    public final void init(ServletConfig config)
-        throws ServletException
-    {
+    public final void init(ServletConfig config) throws ServletException {
         super.init(config);
         jspInit();
         _jspInit();
@@ -62,8 +60,7 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
 
     @Override
     public final void service(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException
-    {
+            throws ServletException, IOException {
         _jspService(request, response);
     }
 
@@ -82,7 +79,6 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
     }
 
     @Override
-    public abstract void _jspService(HttpServletRequest request,
-                                     HttpServletResponse response)
-        throws ServletException, IOException;
+    public abstract void _jspService(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException;
 }
