@@ -19,10 +19,9 @@ package org.apache.jasper.runtime;
 import java.beans.PropertyEditor;
 import java.beans.PropertyEditorManager;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 
 import javax.servlet.RequestDispatcher;
@@ -1004,14 +1003,19 @@ public class JspRuntimeLibrary {
         if (enc == null) {
             enc = "ISO-8859-1";        // The default request encoding
         }
-        Charset cs = null;
+        String result = null;
+
         try {
-            cs = Charset.forName(enc);
-        } catch (Throwable t) {
-            ExceptionUtils.handleThrowable(t);
-            cs = StandardCharsets.ISO_8859_1;
+            result = URLEncoder.encode(s, enc);
+        } catch (UnsupportedEncodingException uee) {
+            // Fallback to default.
+            try {
+                result = URLEncoder.encode(s, "ISO-8859-1");
+            } catch (UnsupportedEncodingException e) {
+                /// Should never happen.
+            }
         }
-        return URLEncoder.encode(s, cs);
+        return result;
     }
 
 
