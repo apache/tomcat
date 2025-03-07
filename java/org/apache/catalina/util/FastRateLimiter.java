@@ -14,92 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.util;
 
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import jakarta.servlet.FilterConfig;
-
-import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
 
 /**
  * A RateLimiter that compromises accuracy for speed in order to provide maximum throughput.
  */
-public class FastRateLimiter implements RateLimiter {
-
-    private static AtomicInteger index = new AtomicInteger();
-
-    TimeBucketCounter bucketCounter;
-
-    int duration;
-
-    int requests;
-
-    int actualRequests;
-
-    int actualDuration;
-
-    // Initial policy name can be rewritten by setPolicyName()
-    private String policyName = "fast-" + index.incrementAndGet();
+public class FastRateLimiter extends RateLimiterBase {
 
     @Override
-    public String getPolicyName() {
-        return policyName;
+    protected String getDefaultPolicyName() {
+        return "fast";
     }
+
 
     @Override
-    public void setPolicyName(String name) {
-        this.policyName = name;
+    protected TimeBucketCounterBase newCounterInstance(int duration, ScheduledExecutorService executorService) {
+        return new TimeBucketCounter(duration, executorService);
     }
 
-    @Override
-    public int getDuration() {
-        return actualDuration;
-    }
-
-    @Override
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
-    @Override
-    public int getRequests() {
-        return actualRequests;
-    }
-
-    @Override
-    public void setRequests(int requests) {
-        this.requests = requests;
-    }
-
-    @Override
-    public int increment(String ipAddress) {
-        return bucketCounter.increment(ipAddress);
-    }
-
-    @Override
-    public void destroy() {
-        bucketCounter.destroy();
-    }
-
-    @Override
-    public void setFilterConfig(FilterConfig filterConfig) {
-
-        ScheduledExecutorService executorService = (ScheduledExecutorService) filterConfig.getServletContext()
-                .getAttribute(ScheduledThreadPoolExecutor.class.getName());
-
-        if (executorService == null) {
-            executorService = new java.util.concurrent.ScheduledThreadPoolExecutor(1);
-        }
-
-        bucketCounter = new TimeBucketCounter(duration, executorService);
-        actualRequests = (int) Math.round(bucketCounter.getRatio() * requests);
-        actualDuration = bucketCounter.getActualDuration() / 1000;
-    }
 
     public TimeBucketCounter getBucketCounter() {
-        return bucketCounter;
+        return (TimeBucketCounter) bucketCounter;
     }
 }
