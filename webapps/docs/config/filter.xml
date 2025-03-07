@@ -1022,13 +1022,21 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     from that IP are dropped with a &quot;429 Too many requests&quot; response
     until the bucket time ends and a new bucket starts.</p>
 
-    <p>The filter is optimized for efficiency and low overhead, so it converts
-    some configured values to more efficient values. For example, a configuration
-    of a 60 seconds time bucket is converted to 65.536 seconds. That allows
-    for very fast bucket calculation using bit shift arithmetic. In order to remain
-    true to the user intent, the configured number of requests is then multiplied
-    by the same ratio, so a configuration of 100 Requests per 60 seconds, has the
-    real values of 109 Requests per 65 seconds.</p>
+    <p>The RateLimiter implementation can be set via the <code>rateLimitClassName</code>
+    init param. The default implementation,
+    <code>org.apache.catalina.util.FastRateLimiter</code>, is optimized for
+    efficiency and low overhead so it converts some configured values to more
+    efficient values. For example, a configuration of a 60 seconds time bucket
+    is converted to 65.536 seconds. That allows for very fast bucket calculation
+    using bit shift arithmetic. In order to remain true to the user intent, the
+    configured number of requests is then multiplied by the same ratio, so a
+    configuration of 100 Requests per 60 seconds, has the real values of 109
+    Requests per 65 seconds. An alternative implementation,
+    <code>org.apache.catalina.util.ExactRateLimiter</code>, is intended to
+    provide a less efficient but more accurate control, whose effective duration
+    in seconds and number of requests allowed are consist with the configured
+    values. You can specify a different class as long as it implements the
+    <code>org.apache.catalina.util.RateLimiter</code> interface.</p>
 
     <p>It is common to set up different restrictions for different URIs.
     For example, a login page or authentication script is typically expected
@@ -1100,8 +1108,12 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </attribute>
 
       <attribute name="rateLimitClassName" required="false">
-        <p>The full class name of an implementation of the RateLimiter interface.
-        Default is &quot;org.apache.catalina.util.FastRateLimiter&quot;.</p>
+        <p>The full class name of an implementation of the RateLimiter
+        interface. Default is
+        &quot;org.apache.catalina.util.FastRateLimiter&quot;, which is optimized
+        for efficiency. If you need exact rate limiting and can accept a small
+        decrease in efficiency, you can use
+        &quot;org.apache.catalina.util.ExactRateLimiter&quot; instead.</p>
       </attribute>
 
       <attribute name="statusCode" required="false">

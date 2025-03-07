@@ -156,10 +156,7 @@ public abstract class TimeBucketCounterBase {
      * <strong>WARNING:</strong> This method is used for test purpose.
      *
      * @return the number of milliseconds until the next bucket
-     *
-     * @deprecated Will be made package private in Tomcat 12 onwards.
      */
-    @Deprecated
     public abstract long getMillisUntilNextBucket();
 
 
