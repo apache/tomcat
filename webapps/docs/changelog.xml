@@ -124,6 +124,10 @@
         rate limit based on the exact values configured. Based on pull request
         <pr>794</pr> by Chenjp. (markt)
       </add>
+      <fix>
+        Fix parsing of the <code>time-taken</code> token in the
+        <code>ExtendedAccessLogValve</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
