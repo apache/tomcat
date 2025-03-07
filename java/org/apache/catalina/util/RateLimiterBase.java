@@ -142,4 +142,14 @@ public abstract class RateLimiterBase implements RateLimiter {
         actualDuration = bucketCounter.getBucketDuration();
         actualRequests = (int) Math.round(bucketCounter.getRatio() * requests);
     }
+
+
+    /**
+     * Returns the internal instance of {@link TimeBucketCounterBase}.
+     *
+     * @return instance of {@link TimeBucketCounterBase}
+     */
+    public TimeBucketCounterBase getBucketCounter() {
+        return bucketCounter;
+    }
 }

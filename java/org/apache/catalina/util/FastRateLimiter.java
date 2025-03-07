@@ -35,6 +35,7 @@ public class FastRateLimiter extends RateLimiterBase {
     }
 
 
+    @Override
     public TimeBucketCounter getBucketCounter() {
         return (TimeBucketCounter) bucketCounter;
     }
