@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.valves;
 
+import java.io.CharArrayWriter;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,41 +25,57 @@ public class TestExtendedAccessLogValveWrap {
 
     @Test
     public void alpha() {
-        Assert.assertEquals("\"foo\"", ExtendedAccessLogValve.wrap("foo"));
+        CharArrayWriter buf = new CharArrayWriter();
+        ExtendedAccessLogValve.wrap("foo", buf);
+        Assert.assertEquals("\"foo\"", buf.toString());
     }
 
     @Test
     public void testNull() {
-        Assert.assertEquals("-", ExtendedAccessLogValve.wrap(null));
+        CharArrayWriter buf = new CharArrayWriter();
+        ExtendedAccessLogValve.wrap(null, buf);
+        Assert.assertEquals("-", buf.toString());
     }
 
     @Test
     public void empty() {
-        Assert.assertEquals("\"\"", ExtendedAccessLogValve.wrap(""));
+        CharArrayWriter buf = new CharArrayWriter();
+        ExtendedAccessLogValve.wrap("", buf);
+        Assert.assertEquals("\"\"", buf.toString());
     }
 
     @Test
     public void singleQuoteMiddle() {
-        Assert.assertEquals("\"foo'bar\"", ExtendedAccessLogValve.wrap("foo'bar"));
+        CharArrayWriter buf = new CharArrayWriter();
+        ExtendedAccessLogValve.wrap("foo'bar", buf);
+        Assert.assertEquals("\"foo'bar\"", buf.toString());
     }
 
     @Test
     public void doubleQuoteMiddle() {
-        Assert.assertEquals("\"foo\"\"bar\"", ExtendedAccessLogValve.wrap("foo\"bar"));
+        CharArrayWriter buf = new CharArrayWriter();
+        ExtendedAccessLogValve.wrap("foo\"bar", buf);
+        Assert.assertEquals("\"foo\"\"bar\"", buf.toString());
     }
 
     @Test
     public void doubleQuoteStart() {
-        Assert.assertEquals("\"\"\"foobar\"", ExtendedAccessLogValve.wrap("\"foobar"));
+        CharArrayWriter buf = new CharArrayWriter();
+        ExtendedAccessLogValve.wrap("\"foobar", buf);
+        Assert.assertEquals("\"\"\"foobar\"", buf.toString());
     }
 
     @Test
     public void doubleQuoteEnd() {
-        Assert.assertEquals("\"foobar\"\"\"", ExtendedAccessLogValve.wrap("foobar\""));
+        CharArrayWriter buf = new CharArrayWriter();
+        ExtendedAccessLogValve.wrap("foobar\"", buf);
+        Assert.assertEquals("\"foobar\"\"\"", buf.toString());
     }
 
     @Test
     public void doubleQuote() {
-        Assert.assertEquals("\"\"\"\"", ExtendedAccessLogValve.wrap("\""));
+        CharArrayWriter buf = new CharArrayWriter();
+        ExtendedAccessLogValve.wrap("\"", buf);
+        Assert.assertEquals("\"\"\"\"", buf.toString());
     }
 }
