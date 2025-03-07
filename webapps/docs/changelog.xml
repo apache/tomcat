@@ -117,6 +117,13 @@
         Return 400 if the amount of content sent for a partial PUT is
         inconsistent with the range that was specified. (remm)
       </fix>
+      <add>
+        Add a new <code>RateLimiter</code> implementation,
+        <code>org.apache.catalina.util.ExactRateLimiter</code>, that can be used
+        with <code>org.apache.catalina.filters.RateLimitFilter</code> to provide
+        rate limit based on the exact values configured. Based on pull request
+        <pr>794</pr> by Chenjp. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
