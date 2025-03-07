@@ -1816,6 +1816,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * encoding which may not be true for Tomcat so Tomcat uses the Java \\uXXXX encoding.
      */
     protected static void escapeAndAppend(String input, CharArrayWriter dest) {
+        escapeAndAppend(input, dest, false);
+    }
+
+    protected static void escapeAndAppend(String input, CharArrayWriter dest, boolean escapeQuoteAsDouble) {
         if (input == null || input.isEmpty()) {
             dest.append('-');
             return;
@@ -1851,7 +1855,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                             dest.write(input, next, current - next);
                         }
                         next = current + 1;
-                        dest.append("\\\"");
+                        if (escapeQuoteAsDouble) {
+                            dest.append("\"\"");
+                        } else {
+                            dest.append("\\\"");
+                        }
                         break;
                     // Don't output individual unchanged chars,
                     // write the sub string only when the first char to encode
