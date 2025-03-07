@@ -135,23 +135,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
 
         /* Wrap all values in double quotes. */
-        StringBuilder buffer = new StringBuilder(svalue.length() + 2);
-        buffer.append('\"');
-        int i = 0;
-        while (i < svalue.length()) {
-            int j = svalue.indexOf('\"', i);
-            if (j == -1) {
-                buffer.append(svalue.substring(i));
-                i = svalue.length();
-            } else {
-                buffer.append(svalue.substring(i, j + 1));
-                buffer.append('"');
-                i = j + 1;
-            }
-        }
-
-        buffer.append('\"');
-        return buffer.toString();
+        return "\"" + svalue.replace("\"", "\"\"") + "\"";
     }
 
     @Override
@@ -539,16 +523,19 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             if (tokenizer.hasSubToken()) {
                 String nextToken = tokenizer.getToken();
                 if ("taken".equals(nextToken)) {
-                    nextToken = tokenizer.getToken();
-
-                    if ("ns".equals(nextToken)) {
-                        return new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
-                    } else if ("us".equals(nextToken)) {
-                        return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
-                    } else if ("ms".equals(nextToken)) {
-                        return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
-                    } else if ("fracsec".equals(nextToken)) {
-                        return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
+                    if (tokenizer.hasSubToken()) {
+                        nextToken = tokenizer.getToken();
+                        if ("ns".equals(nextToken)) {
+                            return new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
+                        } else if ("us".equals(nextToken)) {
+                            return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
+                        } else if ("ms".equals(nextToken)) {
+                            return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
+                        } else if ("fracsec".equals(nextToken)) {
+                            return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
+                        } else {
+                            return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
+                        }
                     } else {
                         return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS);
                     }
