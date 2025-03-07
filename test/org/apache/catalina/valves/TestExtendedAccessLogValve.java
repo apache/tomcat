@@ -72,6 +72,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         File logDir = getTemporaryDirectory();
 
         ExtendedAccessLogValve valve = new ExtendedAccessLogValve();
+        valve.setBuffered(false);
         valve.setPattern(logPattern);
         valve.setDirectory(logDir.getAbsolutePath());
         valve.setPrefix("access_log_" + name);
