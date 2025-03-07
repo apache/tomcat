@@ -52,7 +52,13 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         patterns.add(new Object[]{"basic", "time cs-method cs-uri-stem cs-uri-query"});
         patterns.add(new Object[]{"ip", "time cs-method sc-status c-ip s-ip s-dns c-dns"});
         patterns.add(new Object[]{"headers", "time cs-method cs(Referer) cs(Cookie) sc(Content-Type)"});
-        patterns.add(new Object[]{"bytes", "date time cs-method cs-uri-stem bytes time-taken cached"});
+        patterns.add(new Object[]{"bytes", "date time cs-method cs-uri bytes time-taken cached"});
+        patterns.add(new Object[]{"time", "date time time-taken-ns time-taken-us time-taken-ms time-taken-fracsec time-taken-s"});
+        patterns.add(new Object[]{"tomcat1", "x-threadname x-A(testSCAttr) x-C(COOKIE-1_3) x-O(Custom)"});
+        patterns.add(new Object[]{"tomcat2", "x-R(testRAttr) x-S(sessionAttr) x-P(testParam)"});
+        patterns.add(new Object[]{"tomcat3", "x-H(authType) x-H(characterEncoding) x-H(connectionId) x-H(contentLength)"});
+        patterns.add(new Object[]{"tomcat4", "x-H(locale) x-H(protocol) x-H(remoteUser) x-H(requestedSessionId)"});
+        patterns.add(new Object[]{"tomcat5", "x-H(requestedSessionIdFromCookie) x-H(requestedSessionIdValid) x-H(scheme) x-H(secure)"});
         return patterns;
     }
 
@@ -85,6 +91,11 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
             private static final long serialVersionUID = 1L;
             @Override
             protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+                req.getServletContext().setAttribute("testSCAttr", "testSCAttrValue");
+                req.getSession(true).setAttribute("sessionAttr", "sessionAttrValue");
+                req.setAttribute("testRAttr", "testRValue");
+                resp.addHeader("Custom", "value1");
+                resp.addHeader("Custom", "value2");
                 resp.getWriter().write("Test response");
             }
         });
@@ -92,7 +103,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
 
         tomcat.start();
 
-        String url = "http://localhost:" + getPort() + "/test";
+        String url = "http://localhost:" + getPort() + "/test?testParam=testValue";
         ByteChunk out = new ByteChunk();
         Map<String, List<String>> reqHead = new HashMap<>();
         List<String> cookieHeaders = new ArrayList<>();
@@ -139,6 +150,8 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         Assert.assertTrue("No data entries found", !dataLines.isEmpty());
 
         String entryLine = dataLines.get(0);
+        System.out.println(name + ": " + entryLine);
+
         String[] parts = entryLine.split("\\s+");
 
         String[] expectedFields = logPattern.split("\\s+");
