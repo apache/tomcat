@@ -301,11 +301,6 @@
     <filter token="JASPIC_SPEC_VERSION" value="${jaspic.spec.version}"/>
   </filterset>
 
-  <!-- Path filter set -->
-  <filterset id="path.filters">
-    <filter token="BASEDIR" value="${basedir}"/>
-  </filterset>
-
   <!-- Files to change line endings for depending on target platform -->
   <patternset id="text.files" >
     <include name="**/INSTALLLICENSE"/>
@@ -2705,9 +2700,28 @@ You may need a custom build of makensis. Instructions for this may be found in B
         <include name="*.xml"/>
       </fileset>
     </copy>
+	<property name="uninstall.exe" value="${tomcat.dist}/Uninstall.exe"/>
+	<pathconvert property="win.uninstall.exe">
+      <path location="${uninstall.exe}"/>
+    </pathconvert>
+    <condition property="os.uninstall.exe" value="${win.uninstall.exe}" else="${uninstall.exe}">
+      <or>
+        <os family="windows"/>
+        <isset property="wine.ok"/>
+      </or>
+    </condition>
+    <condition property="os.cmd.copy" value="copy" else="cp">
+      <or>
+        <os family="windows"/>
+        <isset property="wine.ok"/>
+      </or>
+    </condition>
     <copy file="res/install-win/tomcat.nsi" tofile="${tomcat.dist}/tomcat.nsi" overwrite="true" encoding="ISO-8859-1">
       <filterset refid="version.filters"/>
-      <filterset refid="path.filters"/>
+      <filterset>
+        <filter token="OS.CMD.COPY" value="${os.cmd.copy}"/>
+        <filter token="OS.UNINSTALL.EXE" value="${os.uninstall.exe}"/>
+      </filterset>
     </copy>
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf" encoding="ISO-8859-1" fixlast="false">
       <patternset refid="text.files"/>
@@ -2716,6 +2730,41 @@ You may need a custom build of makensis. Instructions for this may be found in B
     <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
       <fileset dir="${tomcat.dist}"/>
     </touch>
+  </target>
+
+  <target name="-uninstaller-wine"
+      if="${wine.ok}"
+      unless="${skip.installer}">
+     <exec dir="${tomcat.dist}" executable="wine" osfamily="unix">
+      <arg value="${nsis.executable.windows}"/>
+      <arg value="/DNSISDIR=${nsis.bin.home}"/>
+      <arg value="/DUNINSTALLONLY"/>
+      <arg value="/V2"/>
+      <arg value="tomcat.nsi"/>
+    </exec>
+  </target>
+
+  <target name="-uninstaller-makensis"
+      if="nsis.executable.unix"
+      unless="${skip.installer}">
+    <echo message="Using makensis: ${nsis.executable.unix} version [${nsis.executable.unix.version}]"/>
+    <exec dir="${tomcat.dist}" executable="${nsis.executable.unix}" osfamily="unix">
+      <arg value="-DNSISDIR=${nsis.bin.home}"/>
+      <arg value="-DUNINSTALLONLY"/>
+      <arg value="-V2"/>
+      <arg value="tomcat.nsi"/>
+    </exec>
+  </target>
+
+  <target name="-uninstaller-build"
+      depends="-installer-prep,-uninstaller-wine,-uninstaller-makensis"
+      unless="${skip.installer}">
+    <exec dir="${tomcat.dist}" executable="${nsis.executable.windows}" osfamily="windows">
+      <arg value="/DNSISDIR=${nsis.bin.home}"/>
+      <arg value="/DUNINSTALLONLY"/>
+      <arg value="/V2"/>
+      <arg value="tomcat.nsi"/>
+    </exec>
   </target>
 
   <target name="-installer-wine"
@@ -2750,65 +2799,61 @@ You may need a custom build of makensis. Instructions for this may be found in B
     </exec>
   </target>
 
+  <target name="-file-jsign"
+    depends="setup-jsign">
+    <fail unless="file" />
+    <fail unless="dir" />
+    <fail unless="savedir" />
+    <echo>Signing ${file} in ${dir}, using/saving signature in ${savedir}</echo>
+    <!-- Copy pre-existing detached signature to signing directory -->
+    <copy file="${savedir}/${file}.sig"
+        todir="${dir}"
+        failonerror="false"/>
+    <!-- If the detached signature doesn't exist, this will sign the file  -->
+    <!-- and create the detached signature. If the detached signature does -->
+    <!-- exist it will be attached to the file.                            -->
+    <jsign file="${dir}/${file}"
+        storepass="${codesigning.storepass}"
+        storetype="${codesigning.storetype}"
+        keypass="${codesigning.keypass}"
+        alias="${codesigning.alias}"
+        alg="${codesigning.digest}"
+        tsaurl="http://ts.ssl.com"
+        tsmode="RFC3161"
+        detached="true"/>
+    <!-- Move detached signature to source tree -->
+    <move file="${dir}/${file}.sig" todir="${savedir}"/>
+  </target>
+
+  <target name="-uninstaller-jsign"
+      if="${do.codesigning}"
+      unless="${skip.installer}">
+      <antcall target="-file-jsign" >
+        <param name="dir" value="${tomcat.dist}" />
+        <param name="file" value="Uninstall.exe" />
+        <param name="savedir" value="res/install-win" />
+      </antcall>
+  </target>
+
+  <target name="-installer-jsign"
+      if="${do.codesigning}"
+      unless="${skip.installer}">
+      <antcall target="-file-jsign" >
+        <param name="dir" value="${tomcat.dist}" />
+        <param name="file" value="tomcat-installer.exe" />
+        <param name="savedir" value="res/install-win" />
+      </antcall>
+  </target>
+
   <target name="installer"
       description="Builds and optionally signs the Windows installer"
-      depends="-installer-build"
+      depends="-uninstaller-build,-uninstaller-jsign,-installer-build,-installer-jsign"
       unless="${skip.installer}">
     <move file="${tomcat.dist}/tomcat-installer.exe" tofile="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
     <!-- .exe has changed so need to redo checksums and OpenPGP signature -->
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.asc"/>
     <delete file="${tomcat.release}/v${version}/bin/${final.name}.exe.sha512"/>
     <hashAndSign file="${tomcat.release}/v${version}/bin/${final.name}.exe"/>
-  </target>
-
-  <!-- Called via a callback in the NSIS installer script -->
-  <target name="jsign-installer"
-      depends="setup-jsign"
-      if="${do.codesigning}">
-    <echo>Signing ${tomcat.dist}/tomcat-installer.exe</echo>
-    <!-- Copy pre-existing detachced signature to signing directory -->
-    <copy file="res/install-win/tomcat-installer.exe.sig"
-        tofile="${tomcat.dist}/tomcat-installer.exe.sig"
-        failonerror="false"/>
-    <!-- If the detached signature doesn't exist, this will sign the file  -->
-    <!-- and create the detached signature. If the detached signature does -->
-    <!-- exist it will be attached to the file.                            -->
-    <jsign file="${tomcat.dist}/tomcat-installer.exe"
-        storepass="${codesigning.storepass}"
-        storetype="${codesigning.storetype}"
-        keypass="${codesigning.keypass}"
-        alias="${codesigning.alias}"
-        alg="${codesigning.digest}"
-        tsaurl="http://ts.ssl.com"
-        tsmode="RFC3161"
-        detached="true"/>
-    <!-- Move detached signature to source tree -->
-    <move file="${tomcat.dist}/tomcat-installer.exe.sig" tofile="res/install-win/tomcat-installer.exe.sig"/>
-  </target>
-
-  <!-- Called via a callback in the NSIS installer script -->
-  <target name="jsign-uninstaller"
-      depends="setup-jsign"
-      if="${do.codesigning}">
-    <echo>Signing ${codesigning.file_to_sign}</echo>
-    <!-- Copy pre-existing detachced signature to signing directory -->
-    <copy file="res/install-win/Uninstall.exe.sig"
-        tofile="${codesigning.file_to_sign}.sig"
-        failonerror="false"/>
-    <!-- If the detached signature doesn't exist, this will sign the file  -->
-    <!-- and create the detached signature. If the detached signature does -->
-    <!-- exist it will be attached to the file.                            -->
-    <jsign file="${codesigning.file_to_sign}"
-        storepass="${codesigning.storepass}"
-        storetype="${codesigning.storetype}"
-        keypass="${codesigning.keypass}"
-        alias="${codesigning.alias}"
-        alg="${codesigning.digest}"
-        tsaurl="http://ts.ssl.com"
-        tsmode="RFC3161"
-        detached="true"/>
-    <!-- Move detached signature to source tree -->
-    <move file="${codesigning.file_to_sign}.sig" tofile="res/install-win/Uninstall.exe.sig"/>
   </target>
 
   <target name="-local-makensis-set-properties">
