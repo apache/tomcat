@@ -181,10 +181,17 @@ public abstract class TimeBucketCounterBase {
      * long run.
      */
     public void periodicEvict() {
-        String currentBucketPrefix = String.valueOf(getCurrentBucketPrefix());
+        /*
+         * The implementation of this method assumes that the time taken for eviction is less than 1 bucket duration.
+         * It is possible that the eviction process starts in one bucket but finishes in another. Therefore, keys for
+         * the current bucket and the next bucket when the eviction process starts are excluded from eviction.
+         */
+        long currentBucketIndex = getCurrentBucketPrefix();
+        String currentBucketPrefix = String.valueOf(currentBucketIndex);
+        String nextBucketPrefix = String.valueOf(currentBucketIndex + 1);
         ConcurrentHashMap.KeySetView<String,AtomicInteger> keys = map.keySet();
         // remove obsolete keys
-        keys.removeIf(k -> !k.startsWith(currentBucketPrefix));
+        keys.removeIf(k -> !k.startsWith(currentBucketPrefix) && !k.startsWith(nextBucketPrefix));
     }
 
 
