@@ -90,18 +90,15 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     // -------------------------------------------------------- Private Methods
 
     /**
-     * Wrap the incoming value with double quotes (") and escape any double quotes appearing in the value using two
-     * double quotes ("").
+     * Calls toString() on the object, wraps the result with double quotes (") and writes the result to the buffer. Any
+     * double quotes appearing in the value are escaped using two double quotes (""). If the value is null or if
+     * toString() fails, '-' will be written to the buffer.
      *
      * @param value - The value to wrap
      * @param buf the buffer to write to
-     *
-     * @return '-' if null. Otherwise, toString() will be called on the object and the value will be wrapped in quotes
-     *             and any quotes will be escaped with 2 sets of quotes.
      */
     static void wrap(Object value, CharArrayWriter buf) {
         String svalue;
-        // Does the value contain a " ? If so must encode it
         if (value == null || "-".equals(value)) {
             buf.append('-');
             return;
@@ -118,6 +115,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
         buf.append('\"');
         if (!svalue.isEmpty()) {
+            // Does the value contain a " ? If so must encode it
             escapeAndAppend(svalue, buf, true);
         }
         buf.append('\"');
