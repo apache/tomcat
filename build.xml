@@ -2678,8 +2678,8 @@ You may need a custom build of makensis. Instructions for this may be found in B
         <include name="*.xml"/>
       </fileset>
     </copy>
-	<property name="uninstall.exe" value="${tomcat.dist}/Uninstall.exe"/>
-	<pathconvert property="win.uninstall.exe">
+    <property name="uninstall.exe" value="${tomcat.dist}/Uninstall.exe"/>
+    <pathconvert property="win.uninstall.exe">
       <path location="${uninstall.exe}"/>
     </pathconvert>
     <condition property="os.uninstall.exe" value="${win.uninstall.exe}" else="${uninstall.exe}">

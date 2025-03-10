@@ -447,7 +447,7 @@ Function .onInit
     WriteUninstaller "$EXEDIR\Uninstall.exe"
     Quit
   !endif
-  
+
   ${GetParameters} $R0
   ClearErrors
 
