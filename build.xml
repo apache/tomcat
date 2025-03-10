@@ -2678,16 +2678,6 @@ You may need a custom build of makensis. Instructions for this may be found in B
         <include name="*.xml"/>
       </fileset>
     </copy>
-    <property name="uninstall.exe" value="${tomcat.dist}/Uninstall.exe"/>
-    <pathconvert property="win.uninstall.exe">
-      <path location="${uninstall.exe}"/>
-    </pathconvert>
-    <condition property="os.uninstall.exe" value="${win.uninstall.exe}" else="${uninstall.exe}">
-      <or>
-        <os family="windows"/>
-        <isset property="wine.ok"/>
-      </or>
-    </condition>
     <condition property="os.cmd.copy" value="copy" else="cp">
       <or>
         <os family="windows"/>
@@ -2698,7 +2688,6 @@ You may need a custom build of makensis. Instructions for this may be found in B
       <filterset refid="version.filters"/>
       <filterset>
         <filter token="OS.CMD.COPY" value="${os.cmd.copy}"/>
-        <filter token="OS.UNINSTALL.EXE" value="${os.uninstall.exe}"/>
       </filterset>
     </copy>
     <fixcrlf srcdir="${tomcat.dist}" eol="crlf" encoding="ISO-8859-1" fixlast="false">
