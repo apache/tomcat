@@ -180,6 +180,10 @@
         (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69607</bug>: Allow failed initialization of MD5. Based on code
+        submitted by Shivam Verma. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

@@ -23,6 +23,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -33,6 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class ConcurrentMessageDigest {
 
     private static final StringManager sm = StringManager.getManager(ConcurrentMessageDigest.class);
+    private static final Log log = LogFactory.getLog(ConcurrentMessageDigest.class);
 
     private static final String MD5 = "MD5";
     private static final String SHA1 = "SHA-1";
@@ -46,10 +49,14 @@ public class ConcurrentMessageDigest {
     }
 
     static {
+        // Init commonly used algorithms
         try {
-            // Init commonly used algorithms
             init(MD5);
-            init(SHA1);
+        } catch (NoSuchAlgorithmException e) {
+            log.warn(sm.getString("concurrentMessageDigest.noDigest"), e);
+        }
+        try {
+           init(SHA1);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(sm.getString("concurrentMessageDigest.noDigest"), e);
         }
