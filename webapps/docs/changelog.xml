@@ -138,6 +138,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Documentation. Add a link to the Log4j documentation that describes how
+        to use Log4j rather than JULI for Tomcat's internal logging. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.5 (markt)" rtext="release in progress">
   <subsection name="Catalina">

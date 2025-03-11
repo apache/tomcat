@@ -49,9 +49,11 @@
       To configure Tomcat to use an alternative logging framework for its
       internal logging, follow the instructions provided by the alternative
       logging framework for redirecting logging for applications that use
-      <code>java.util.logging</code>. Keep in mind that the alternative logging
-      framework will need to be capable of working in an environment where
-      different loggers with the same name may exist in different class loaders.
+      <code>java.util.logging</code>. Links to some of these instructions are
+      provided towards the end of this page. Keep in mind that the alternative
+      logging framework will need to be capable of working in an environment
+      where different loggers with the same name may exist in different class
+      loaders.
     </p>
 
     <p>
@@ -425,5 +427,12 @@ java.util.logging.ConsoleHandler.encoding = UTF-8]]></source>
 
   </section>
 
+  <section name="Using Log4j">
+
+    <p>The Log4j project provides <a
+    href="https://logging.apache.org/log4j/2.x/jakarta.html#replace-tomcat"
+    >instructions for using Log4J for Tomcat's internal logging</a>.</p>
+
+  </section>
 </body>
 </document>
