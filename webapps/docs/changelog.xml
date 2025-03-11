@@ -124,6 +124,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>69607</bug>: Allow failed initialization of MD5. Based on code
+        submitted by Shivam Verma. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.102 (remm)" rtext="2025-03-06">
   <subsection name="Catalina">
