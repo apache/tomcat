@@ -146,6 +146,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Documentation. Add a link to the Log4j documentation that describes how
+        to use Log4j rather than JULI for Tomcat's internal logging. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.37 (schultz)" rtext="not released">
   <subsection name="Catalina">
