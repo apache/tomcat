@@ -213,6 +213,10 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Documentation. Add a link to the Log4j documentation that describes how
+        to use Log4j rather than JULI for Tomcat's internal logging. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
