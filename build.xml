@@ -2793,6 +2793,10 @@ You may need a custom build of makensis. Instructions for this may be found in B
         detached="true"/>
     <!-- Move detached signature to source tree -->
     <move file="${dir}/${file}.sig" todir="${savedir}"/>
+    <!-- Reset timestamp of signed file -->
+    <touch datetime="${tstamp.file}" pattern="yyyy-MM-dd HH:mm:ss">
+      <fileset file="${dir}/${file}"/>
+    </touch>
   </target>
 
   <target name="-uninstaller-jsign"
