@@ -225,6 +225,9 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Revert JSign to 6.0 to avoid a file locking issue. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
