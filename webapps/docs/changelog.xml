@@ -146,6 +146,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Revert JSign to 6.0 to avoid a file locking issue. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.5 (markt)" rtext="2025-03-05">
   <subsection name="Catalina">
