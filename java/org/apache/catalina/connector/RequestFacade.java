@@ -58,7 +58,7 @@ public class RequestFacade implements HttpServletRequest {
     /**
      * The wrapped request.
      */
-    protected Request request = null;
+    protected Request request;
 
 
     /**
