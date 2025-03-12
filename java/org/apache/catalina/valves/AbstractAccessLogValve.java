@@ -360,7 +360,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         }
 
         /* Number of cached entries */
-        private int cacheSize = 0;
+        private final int cacheSize;
 
         private final Locale cacheDefaultLocale;
         private final DateFormatCache parent;
@@ -840,7 +840,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            String value = null;
+            String value;
             if (remoteAddressType == RemoteAddressType.PEER) {
                 value = request.getPeerAddr();
             } else {
@@ -1581,7 +1581,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            Object value = null;
+            Object value;
             if (request != null) {
                 value = request.getAttribute(attribute);
             } else {
@@ -1692,14 +1692,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
 
         public IdentifierElement(String type) {
-            switch (type) {
-                case "c":
-                    identifierType = IdentifierType.CONNECTION;
-                    break;
-                default:
-                    log.error(sm.getString("accessLogValve.invalidIdentifierType", type));
-                    identifierType = IdentifierType.UNKNOWN;
-                    break;
+            if ("c".equals(type)) {
+                identifierType = IdentifierType.CONNECTION;
+            } else {
+                log.error(sm.getString("accessLogValve.invalidIdentifierType", type));
+                identifierType = IdentifierType.UNKNOWN;
             }
         }
 
@@ -1787,44 +1784,32 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * @return the log element
      */
     protected AccessLogElement createAccessLogElement(String name, char pattern) {
-        switch (pattern) {
-            case 'a':
-                return new RemoteAddrElement(name);
-            case 'c':
-                return new CookieElement(name);
-            case 'i':
-                return new HeaderElement(name);
-            case 'L':
-                return new IdentifierElement(name);
-            case 'o':
-                return new ResponseHeaderElement(name);
-            case 'p':
-                return new PortElement(name);
-            case 'r':
+        return switch (pattern) {
+            case 'a' -> new RemoteAddrElement(name);
+            case 'c' -> new CookieElement(name);
+            case 'i' -> new HeaderElement(name);
+            case 'L' -> new IdentifierElement(name);
+            case 'o' -> new ResponseHeaderElement(name);
+            case 'p' -> new PortElement(name);
+            case 'r' -> {
                 if (TLSUtil.isTLSRequestAttribute(name)) {
                     tlsAttributeRequired = true;
                 }
-                return new RequestAttributeElement(name);
-            case 's':
-                return new SessionAttributeElement(name);
-            case 't':
-                return new DateAndTimeElement(name);
-            case 'T':
+                yield new RequestAttributeElement(name);
+            }
+            case 's' -> new SessionAttributeElement(name);
+            case 't' -> new DateAndTimeElement(name);
+            case 'T' ->
                 // ms for milliseconds, us for microseconds, and s for seconds
-                if ("ns".equals(name)) {
-                    return new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
-                } else if ("us".equals(name)) {
-                    return new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
-                } else if ("ms".equals(name)) {
-                    return new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
-                } else if ("fracsec".equals(name)) {
-                    return new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
-                } else {
-                    return new ElapsedTimeElement(false, false);
-                }
-            default:
-                return new StringElement("???");
-        }
+                switch (name) {
+                    case "ns" -> new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
+                    case "us" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
+                    case "ms" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
+                    case "fracsec" -> new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
+                    case null, default -> new ElapsedTimeElement(false, false);
+                };
+            default -> new StringElement("???");
+        };
     }
 
     /**
@@ -1835,54 +1820,31 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
      * @return the log element
      */
     protected AccessLogElement createAccessLogElement(char pattern) {
-        switch (pattern) {
-            case 'a':
-                return new RemoteAddrElement();
-            case 'A':
-                return new LocalAddrElement(ipv6Canonical);
-            case 'b':
-                return new ByteSentElement(true);
-            case 'B':
-                return new ByteSentElement(false);
-            case 'D':
-                return new ElapsedTimeElement(true, false);
-            case 'F':
-                return new FirstByteTimeElement();
-            case 'h':
-                return new HostElement();
-            case 'H':
-                return new ProtocolElement();
-            case 'l':
-                return new LogicalUserNameElement();
-            case 'm':
-                return new MethodElement();
-            case 'p':
-                return new PortElement();
-            case 'q':
-                return new QueryElement();
-            case 'r':
-                return new RequestElement();
-            case 's':
-                return new HttpStatusCodeElement();
-            case 'S':
-                return new SessionIdElement();
-            case 't':
-                return new DateAndTimeElement();
-            case 'T':
-                return new ElapsedTimeElement(false, false);
-            case 'u':
-                return new UserElement();
-            case 'U':
-                return new RequestURIElement();
-            case 'v':
-                return new LocalServerNameElement();
-            case 'I':
-                return new ThreadNameElement();
-            case 'X':
-                return new ConnectionStatusElement();
-            default:
-                return new StringElement("???" + pattern + "???");
-        }
+        return switch (pattern) {
+            case 'a' -> new RemoteAddrElement();
+            case 'A' -> new LocalAddrElement(ipv6Canonical);
+            case 'b' -> new ByteSentElement(true);
+            case 'B' -> new ByteSentElement(false);
+            case 'D' -> new ElapsedTimeElement(true, false);
+            case 'F' -> new FirstByteTimeElement();
+            case 'h' -> new HostElement();
+            case 'H' -> new ProtocolElement();
+            case 'l' -> new LogicalUserNameElement();
+            case 'm' -> new MethodElement();
+            case 'p' -> new PortElement();
+            case 'q' -> new QueryElement();
+            case 'r' -> new RequestElement();
+            case 's' -> new HttpStatusCodeElement();
+            case 'S' -> new SessionIdElement();
+            case 't' -> new DateAndTimeElement();
+            case 'T' -> new ElapsedTimeElement(false, false);
+            case 'u' -> new UserElement();
+            case 'U' -> new RequestURIElement();
+            case 'v' -> new LocalServerNameElement();
+            case 'I' -> new ThreadNameElement();
+            case 'X' -> new ConnectionStatusElement();
+            default -> new StringElement("???" + pattern + "???");
+        };
     }
 
 
@@ -1975,22 +1937,19 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 next = current + 1;
                 switch (c) {
                     // Standard escapes for some control chars
-                    case '\f': // dec 12
+                    case '\f' -> // dec 12
                         dest.append("\\f");
-                        break;
-                    case '\n': // dec 10
+                    case '\n' -> // dec 10
                         dest.append("\\n");
-                        break;
-                    case '\r': // dec 13
+                    case '\r' -> // dec 13
                         dest.append("\\r");
-                        break;
-                    case '\t': // dec 09
+                    case '\t' -> // dec 09
                         dest.append("\\t");
-                        break;
                     // Unicode escape \\uXXXX
-                    default:
+                    default -> {
                         dest.append("\\u");
                         dest.append(HexUtils.toHexString(c));
+                    }
                 }
             }
         }
