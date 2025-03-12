@@ -566,7 +566,7 @@ public class Request implements HttpServletRequest {
      *             this request
      */
     public boolean getDiscardFacades() {
-        return (connector == null) ? true : connector.getDiscardFacades();
+        return connector == null || connector.getDiscardFacades();
     }
 
 
@@ -1280,7 +1280,7 @@ public class Request implements HttpServletRequest {
 
         // Add the path info, if there is any
         String pathInfo = getPathInfo();
-        String requestPath = null;
+        String requestPath;
 
         if (pathInfo == null) {
             requestPath = servletPath;
@@ -1289,7 +1289,7 @@ public class Request implements HttpServletRequest {
         }
 
         int pos = requestPath.lastIndexOf('/');
-        String relative = null;
+        String relative;
         if (context.getDispatchersUseEncodedPaths()) {
             if (pos >= 0) {
                 relative = URLEncoder.DEFAULT.encode(requestPath.substring(0, pos + 1), StandardCharsets.UTF_8) + path;
@@ -1415,12 +1415,12 @@ public class Request implements HttpServletRequest {
         if (context == null) {
             return;
         }
-        Object listeners[] = context.getApplicationEventListeners();
+        Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
             return;
         }
         boolean replaced = (oldValue != null);
-        ServletRequestAttributeEvent event = null;
+        ServletRequestAttributeEvent event;
         if (replaced) {
             event = new ServletRequestAttributeEvent(context.getServletContext(), getRequest(), name, oldValue);
         } else {
@@ -1456,7 +1456,7 @@ public class Request implements HttpServletRequest {
      */
     private void notifyAttributeRemoved(String name, Object value) {
         Context context = getContext();
-        Object listeners[] = context.getApplicationEventListeners();
+        Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
             return;
         }
@@ -1999,7 +1999,7 @@ public class Request implements HttpServletRequest {
             return input;
         }
         StringBuilder result = new StringBuilder(input.length());
-        result.append(input.substring(0, nextSemiColon));
+        result.append(input, 0, nextSemiColon);
         while (true) {
             int nextSlash = input.indexOf('/', nextSemiColon);
             if (nextSlash == -1) {
@@ -2010,7 +2010,7 @@ public class Request implements HttpServletRequest {
                 result.append(input.substring(nextSlash));
                 break;
             } else {
-                result.append(input.substring(nextSlash, nextSemiColon));
+                result.append(input, nextSlash, nextSemiColon);
             }
         }
 
@@ -2397,7 +2397,7 @@ public class Request implements HttpServletRequest {
             return;
         }
 
-        if (response != null) {
+        if (response != null && context != null) {
             Cookie newCookie = ApplicationSessionCookieConfig.createSessionCookie(context, newSessionId, isSecure());
             response.addSessionCookieInternal(newCookie);
         }

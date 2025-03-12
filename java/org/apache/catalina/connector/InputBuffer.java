@@ -612,20 +612,14 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
 
     private boolean checkByteBufferEof() throws IOException {
         if (bb.remaining() == 0) {
-            int n = realReadBytes();
-            if (n < 0) {
-                return true;
-            }
+            return realReadBytes() < 0;
         }
         return false;
     }
 
     private boolean checkCharBufferEof() throws IOException {
         if (cb.remaining() == 0) {
-            int n = realReadChars();
-            if (n < 0) {
-                return true;
-            }
+            return realReadChars() < 0;
         }
         return false;
     }
@@ -660,7 +654,6 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         tmp.flip();
         tmp.position(oldPosition);
         cb = tmp;
-        tmp = null;
     }
 
 

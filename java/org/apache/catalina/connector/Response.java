@@ -714,11 +714,7 @@ public class Response implements HttpServletResponse {
             log.warn(sm.getString("coyoteResponse.encoding.invalid", encoding), e);
             return;
         }
-        if (encoding == null) {
-            isCharacterEncodingSet = false;
-        } else {
-            isCharacterEncodingSet = true;
-        }
+        isCharacterEncodingSet = encoding != null;
     }
 
 
@@ -1328,7 +1324,7 @@ public class Response implements HttpServletResponse {
 
     private static boolean doIsEncodeable(Context context, Request hreq, Session session, String location) {
         // Is this a valid absolute URL?
-        URL url = null;
+        URL url;
         try {
             URI uri = new URI(location);
             url = uri.toURL();
@@ -1370,9 +1366,7 @@ public class Response implements HttpServletResponse {
                 return false;
             }
             String tok = ";" + SessionConfig.getSessionUriParamName(context) + "=" + session.getIdInternal();
-            if (file.indexOf(tok, contextPath.length()) >= 0) {
-                return false;
-            }
+            return file.indexOf(tok, contextPath.length()) < 0;
         }
 
         // This URL belongs to our web application, so it is encodeable
@@ -1395,7 +1389,7 @@ public class Response implements HttpServletResponse {
     protected String toAbsolute(String location) {
 
         if (location == null) {
-            return location;
+            return null;
         }
 
         boolean leadingSlash = location.startsWith("/");
@@ -1495,7 +1489,6 @@ public class Response implements HttpServletResponse {
         char[] c = cc.getChars();
         int start = cc.getStart();
         int end = cc.getEnd();
-        int index = 0;
         int startIndex = 0;
 
         // Advance past the first three / characters (should place index just
@@ -1506,7 +1499,7 @@ public class Response implements HttpServletResponse {
         }
 
         // Remove /./
-        index = startIndex;
+        int index = startIndex;
         while (true) {
             index = cc.indexOf("/./", 0, 3, index);
             if (index < 0) {
@@ -1569,10 +1562,7 @@ public class Response implements HttpServletResponse {
             return false;
         }
         pos = uri.indexOf('/', pos + 3);
-        if (pos < 0) {
-            return false;
-        }
-        return true;
+        return pos >= 0;
     }
 
     /**
