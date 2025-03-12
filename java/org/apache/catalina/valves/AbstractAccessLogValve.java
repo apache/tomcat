@@ -257,11 +257,11 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             /* Helper object to be able to call SimpleDateFormat.format(). */
             private final Date currentDate = new Date();
 
-            protected final String cache[];
-            private SimpleDateFormat formatter;
+            protected final String[] cache;
+            private final SimpleDateFormat formatter;
             private boolean isCLF = false;
 
-            private Cache parent = null;
+            private final Cache parent;
 
             private Cache(Cache parent) {
                 this(null, parent);
@@ -351,11 +351,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     currentDate.setTime(time);
                     previousFormat = formatter.format(currentDate);
                     if (isCLF) {
-                        StringBuilder current = new StringBuilder(32);
-                        current.append('[');
-                        current.append(previousFormat);
-                        current.append(']');
-                        previousFormat = current.toString();
+                        previousFormat = "[" + previousFormat + "]";
                     }
                 }
                 cache[index] = previousFormat;
@@ -371,10 +367,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         protected final Cache cLFCache;
         private final Map<String,Cache> formatCache = new HashMap<>();
 
-        protected DateFormatCache(int size, Locale loc, DateFormatCache parent) {
+        protected DateFormatCache(int size, Locale loc, DateFormatCache parentFC) {
             cacheSize = size;
             cacheDefaultLocale = loc;
-            this.parent = parent;
+            parent = parentFC;
             Cache parentCache = null;
             if (parent != null) {
                 synchronized (parent) {
@@ -473,7 +469,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     /**
      * Buffer pool used for log message generation. Pool used to reduce garbage generation.
      */
-    private SynchronizedStack<CharArrayWriter> charArrayWriters = new SynchronizedStack<>();
+    private final SynchronizedStack<CharArrayWriter> charArrayWriters = new SynchronizedStack<>();
 
     /**
      * Log message buffers are usually recycled and re-used. To prevent excessive memory usage, if a buffer grows beyond
@@ -891,10 +887,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     value = host.toString();
                 }
             }
-            if (value == null || value.length() == 0) {
+            if (value == null || value.isEmpty()) {
                 value = request.getRemoteHost();
             }
-            if (value == null || value.length() == 0) {
+            if (value == null || value.isEmpty()) {
                 value = "-";
             }
 
@@ -1070,7 +1066,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     usesBegin = false;
                     format = format.substring(4);
                 }
-                if (format.length() == 0) {
+                if (format.isEmpty()) {
                     type = FormatType.CLF;
                 } else if (format.equals(secFormat)) {
                     type = FormatType.SEC;
@@ -1108,10 +1104,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 case MSEC_FRAC:
                     frac = timestamp % 1000;
                     if (frac < 100) {
+                        buf.append('0');
                         if (frac < 10) {
-                            buf.append('0');
-                            buf.append('0');
-                        } else {
                             buf.append('0');
                         }
                     }
@@ -1123,10 +1117,8 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                         frac = timestamp % 1000;
                         StringBuilder tripleMsec = new StringBuilder(4);
                         if (frac < 100) {
+                            tripleMsec.append('0');
                             if (frac < 10) {
-                                tripleMsec.append('0');
-                                tripleMsec.append('0');
-                            } else {
                                 tripleMsec.append('0');
                             }
                         }
@@ -1457,10 +1449,10 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     value = serverName.toString();
                 }
             }
-            if (value == null || value.length() == 0) {
+            if (value == null || value.isEmpty()) {
                 value = request.getServerName();
             }
-            if (value == null || value.length() == 0) {
+            if (value == null || value.isEmpty()) {
                 value = "-";
             }
 
@@ -1768,7 +1760,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 buf.append(ch);
             }
         }
-        if (buf.length() > 0) {
+        if (!buf.isEmpty()) {
             list.add(new StringElement(buf.toString()));
         }
         return list.toArray(new AccessLogElement[0]);
