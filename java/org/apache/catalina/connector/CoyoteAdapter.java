@@ -815,7 +815,7 @@ public class CoyoteAdapter implements Adapter {
         // Filter TRACE method
         if (!connector.getAllowTrace() && req.method().equals("TRACE")) {
             Wrapper wrapper = request.getWrapper();
-            String header = null;
+            StringBuilder header = null;
             if (wrapper != null) {
                 String[] methods = wrapper.getServletMethods();
                 if (methods != null) {
@@ -824,15 +824,15 @@ public class CoyoteAdapter implements Adapter {
                             continue;
                         }
                         if (header == null) {
-                            header = method;
+                            header = new StringBuilder(method);
                         } else {
-                            header += ", " + method;
+                            header.append(", ").append(method);
                         }
                     }
                 }
             }
             if (header != null) {
-                res.addHeader("Allow", header);
+                res.addHeader("Allow", header.toString());
             }
             response.sendError(405, sm.getString("coyoteAdapter.trace"));
             // Safe to skip the remainder of this method.
@@ -1123,14 +1123,12 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
-        int pos = 0;
-        int index = 0;
-
-
         // The URL must start with '/' (or '\' that will be replaced soon)
         if (b[start] != (byte) '/' && b[start] != (byte) '\\') {
             return false;
         }
+
+        int pos;
 
         // Replace '\' with '/'
         // Check for null byte
@@ -1168,7 +1166,7 @@ public class CoyoteAdapter implements Adapter {
 
         uriBC.setEnd(end);
 
-        index = 0;
+        int index = 0;
 
         // Resolve occurrences of "/./" in the normalized path
         while (true) {
