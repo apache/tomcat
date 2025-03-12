@@ -231,11 +231,7 @@ public class OutputBuffer extends Writer {
             coyoteResponse.setContentLength(bb.remaining());
         }
 
-        if (coyoteResponse.getStatus() == HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
-            doFlush(true);
-        } else {
-            doFlush(false);
-        }
+        doFlush(coyoteResponse.getStatus() == HttpServletResponse.SC_SWITCHING_PROTOCOLS);
         closed = true;
 
         // The request should have been completely read by the time the response
@@ -338,7 +334,7 @@ public class OutputBuffer extends Writer {
     }
 
 
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
 
         if (suspended) {
             return;
@@ -360,7 +356,7 @@ public class OutputBuffer extends Writer {
     }
 
 
-    private void writeBytes(byte b[], int off, int len) throws IOException {
+    private void writeBytes(byte[] b, int off, int len) throws IOException {
 
         if (closed) {
             throw new IOException(sm.getString("outputBuffer.closed"));
@@ -486,7 +482,7 @@ public class OutputBuffer extends Writer {
 
 
     @Override
-    public void write(char c[]) throws IOException {
+    public void write(char[] c) throws IOException {
 
         if (suspended) {
             return;
@@ -498,7 +494,7 @@ public class OutputBuffer extends Writer {
 
 
     @Override
-    public void write(char c[], int off, int len) throws IOException {
+    public void write(char[] c, int off, int len) throws IOException {
 
         if (suspended) {
             return;
@@ -656,7 +652,7 @@ public class OutputBuffer extends Writer {
      *
      * @throws IOException Writing overflow data to the output channel failed
      */
-    public void append(byte src[], int off, int len) throws IOException {
+    public void append(byte[] src, int off, int len) throws IOException {
         if (bb.remaining() == 0) {
             appendByteArray(src, off, len);
         } else {
@@ -679,7 +675,7 @@ public class OutputBuffer extends Writer {
      *
      * @throws IOException Writing overflow data to the output channel failed
      */
-    public void append(char src[], int off, int len) throws IOException {
+    public void append(char[] src, int off, int len) throws IOException {
         // if we have limit and we're below
         if (len <= cb.capacity() - cb.limit()) {
             transfer(src, off, len, cb);
@@ -730,7 +726,7 @@ public class OutputBuffer extends Writer {
     }
 
 
-    private void appendByteArray(byte src[], int off, int len) throws IOException {
+    private void appendByteArray(byte[] src, int off, int len) throws IOException {
         if (len == 0) {
             return;
         }

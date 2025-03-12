@@ -116,12 +116,6 @@ public class CoyoteReader extends BufferedReader {
 
 
     @Override
-    public boolean markSupported() {
-        return true;
-    }
-
-
-    @Override
     public void mark(int readAheadLimit) throws IOException {
         ib.mark(readAheadLimit);
     }
@@ -139,8 +133,6 @@ public class CoyoteReader extends BufferedReader {
         if (lineBuffer == null) {
             lineBuffer = new char[MAX_LINE_LENGTH];
         }
-
-        String result = null;
 
         int pos = 0;
         int end = -1;
@@ -192,6 +184,7 @@ public class CoyoteReader extends BufferedReader {
             }
         }
 
+        String result;
         if (aggregator == null) {
             result = new String(lineBuffer, 0, end);
         } else {

@@ -60,7 +60,7 @@ public class ResponseFacade implements HttpServletResponse {
     /**
      * The wrapped response.
      */
-    protected Response response = null;
+    protected Response response;
 
 
     // --------------------------------------------------------- Public Methods
