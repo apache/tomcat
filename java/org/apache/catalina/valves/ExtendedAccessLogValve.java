@@ -41,8 +41,9 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 
 /**
- * An implementation of the W3c Extended Log File Format. See http://www.w3.org/TR/WD-logfile.html for more information
- * about the format. The following fields are supported:
+ * An implementation of the W3c Extended Log File Format. See
+ * <a href="http://www.w3.org/TR/WD-logfile.html">WD-logfile-960323</a>
+ * for more information about the format. The following fields are supported:
  * <ul>
  * <li><code>c-dns</code>: Client hostname (or ip address if <code>enableLookups</code> for the connector is false)</li>
  * <li><code>c-ip</code>: Client ip address</li>
@@ -235,7 +236,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                     value.append(c[i].getValue());
                 }
             }
-            if (value.length() == 0) {
+            if (value.isEmpty()) {
                 buf.append('-');
             } else {
                 wrap(value, buf);
@@ -321,7 +322,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
          * urlEncode the given string. If null or empty, return null.
          */
         private String urlEncode(String value) {
-            if (null == value || value.length() == 0) {
+            if (null == value || value.isEmpty()) {
                 return null;
             }
             return URLEncoder.QUERY.encode(value, StandardCharsets.UTF_8);
@@ -393,7 +394,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 c = sr.read();
             }
             ended = true;
-            if (buf.length() != 0) {
+            if (!buf.isEmpty()) {
                 return buf.toString();
             } else {
                 return null;
@@ -424,7 +425,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 return "";
             }
             StringBuilder whiteSpaces = new StringBuilder();
-            if (buf.length() > 0) {
+            if (!buf.isEmpty()) {
                 whiteSpaces.append(buf);
                 buf = new StringBuilder();
             }
@@ -484,7 +485,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 }
                 list.add(element);
                 String whiteSpaces = tokenizer.getWhiteSpaces();
-                if (whiteSpaces.length() > 0) {
+                if (!whiteSpaces.isEmpty()) {
                     list.add(new StringElement(whiteSpaces));
                 }
                 if (tokenizer.isEnded()) {
@@ -604,10 +605,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                         public void addElement(CharArrayWriter buf, Date date, Request request, Response response,
                                 long time) {
                             String query = request.getQueryString();
-                            if (query == null) {
-                                buf.append(request.getRequestURI());
-                            } else {
-                                buf.append(request.getRequestURI());
+                            buf.append(request.getRequestURI());
+                            if (query != null) {
                                 buf.append('?');
                                 buf.append(request.getQueryString());
                             }
@@ -648,7 +647,6 @@ public class ExtendedAccessLogValve extends AccessLogValve {
     }
 
     protected AccessLogElement getProxyElement(PatternTokenizer tokenizer) throws IOException {
-        String token = null;
         if (tokenizer.hasSubToken()) {
             tokenizer.getToken();
             return new StringElement("-");
@@ -656,7 +654,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             tokenizer.getParameter();
             return new StringElement("-");
         }
-        log.error(sm.getString("extendedAccessLogValve.decodeError", token));
+        log.error(sm.getString("extendedAccessLogValve.decodeError", tokenizer.getRemains()));
         return null;
     }
 
