@@ -345,7 +345,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
      * @param encoding The name of the character set.
      */
     public void setEncoding(String encoding) {
-        if (encoding != null && encoding.length() > 0) {
+        if (encoding != null && !encoding.isEmpty()) {
             this.encoding = encoding;
         } else {
             this.encoding = null;
@@ -377,14 +377,14 @@ public class AccessLogValve extends AbstractAccessLogValve {
                     for (String oldAccessLog : oldAccessLogs) {
                         boolean match = false;
 
-                        if (prefix != null && prefix.length() > 0) {
+                        if (prefix != null && !prefix.isEmpty()) {
                             if (!oldAccessLog.startsWith(prefix)) {
                                 continue;
                             }
                             match = true;
                         }
 
-                        if (suffix != null && suffix.length() > 0) {
+                        if (suffix != null && !suffix.isEmpty()) {
                             if (!oldAccessLog.endsWith(suffix)) {
                                 continue;
                             }
