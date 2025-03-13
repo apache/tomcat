@@ -289,7 +289,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         Container current = this;
         while (current != null) {
             String name = current.getName();
-            if ((name == null) || (name.equals(""))) {
+            if ((name == null) || (name.isEmpty())) {
                 name = "/";
             } else if (name.startsWith("##")) {
                 name = "/" + name;
@@ -340,7 +340,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     @Override
     public void setCluster(Cluster cluster) {
 
-        Cluster oldCluster = null;
+        Cluster oldCluster;
         Lock writeLock = clusterLock.writeLock();
         writeLock.lock();
         try {
@@ -495,7 +495,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     @Override
     public void setRealm(Realm realm) {
 
-        Realm oldRealm = null;
+        Realm oldRealm;
         Lock l = realmLock.writeLock();
         l.lock();
         try {
@@ -968,7 +968,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
     @Override
     public void fireContainerEvent(String type, Object data) {
 
-        if (listeners.size() < 1) {
+        if (listeners.isEmpty()) {
             return;
         }
 
@@ -1089,7 +1089,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         StringBuilder sb = new StringBuilder();
         Container parent = getParent();
         if (parent != null) {
-            sb.append(parent.toString());
+            sb.append(parent);
             sb.append('.');
         }
         sb.append(this.getClass().getSimpleName());
@@ -1159,7 +1159,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     private static class StartChild implements Callable<Void> {
 
-        private Container child;
+        private final Container child;
 
         StartChild(Container child) {
             this.child = child;
@@ -1174,7 +1174,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     private static class StopChild implements Callable<Void> {
 
-        private Container child;
+        private final Container child;
 
         StopChild(Container child) {
             this.child = child;

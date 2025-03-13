@@ -62,7 +62,7 @@ public final class ApplicationFilterFactory {
         }
 
         // Create and initialize a filter chain object
-        ApplicationFilterChain filterChain = null;
+        ApplicationFilterChain filterChain;
         if (request instanceof Request) {
             Request req = (Request) request;
             filterChain = (ApplicationFilterChain) req.getFilterChain();
@@ -81,7 +81,7 @@ public final class ApplicationFilterFactory {
         // Acquire the filter mappings for this Context
         StandardContext context = (StandardContext) wrapper.getParent();
         filterChain.setDispatcherWrapsSameObject(context.getDispatcherWrapsSameObject());
-        FilterMap filterMaps[] = context.findFilterMaps();
+        FilterMap[] filterMaps = context.findFilterMaps();
 
         // If there are no filter mappings, we are done
         if (filterMaps == null || filterMaps.length == 0) {

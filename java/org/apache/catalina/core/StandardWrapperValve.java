@@ -127,7 +127,7 @@ final class StandardWrapperValve extends ValveBase {
             container.getLogger().error(sm.getString("standardWrapper.allocateException", wrapper.getName()), e);
             throwable = e;
             exception(request, response, e);
-            servlet = null;
+            // servlet = null; is set here
         }
 
         MessageBytes requestPathMB = request.getRequestPathMB();
@@ -156,7 +156,7 @@ final class StandardWrapperValve extends ValveBase {
                         }
                     } finally {
                         String log = SystemLogHandler.stopCapture();
-                        if (log != null && log.length() > 0) {
+                        if (log != null && !log.isEmpty()) {
                             context.getLogger().info(log);
                         }
                     }
