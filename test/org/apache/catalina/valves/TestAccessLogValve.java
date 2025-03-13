@@ -208,12 +208,6 @@ public class TestAccessLogValve extends TomcatBaseTest {
             this.writer = writer;
         }
 
-        /**
-         * Log the specified message to the log file, switching files if
-         * the date has changed since the previous log call.
-         *
-         * @param message Message to be logged
-         */
         @Override
         public void log(CharArrayWriter message) {
             try {
@@ -235,12 +229,6 @@ public class TestAccessLogValve extends TomcatBaseTest {
             this.writer = writer;
         }
 
-        /**
-         * Log the specified message to the log file, switching files if
-         * the date has changed since the previous log call.
-         *
-         * @param message Message to be logged
-         */
         @Override
         public void log(CharArrayWriter message) {
             try {
