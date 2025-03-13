@@ -653,18 +653,17 @@ public class CoyoteAdapter implements Adapter {
             } else {
                 /*
                  * The URI is chars or String, and has been sent using an in-memory protocol handler. The following
-                 * assumptions are made: - req.requestURI() has been set to the 'original' non-decoded, non-normalized
-                 * URI - req.decodedURI() has been set to the decoded, normalized form of req.requestURI() -
-                 * 'suspicious' URI filtering - if required - has already been performed
+                 * assumptions are made:
+                 *
+                 * - req.requestURI() has been set to the 'original' non-decoded, non-normalized URI that includes path
+                 * parameters (if any)
+                 *
+                 * - req.decodedURI() has been set to the decoded, normalized form of req.requestURI() with any path
+                 * parameters removed
+                 *
+                 * - 'suspicious' URI filtering, if required, has already been performed
                  */
                 decodedURI.toChars();
-                // Remove all path parameters; any needed path parameter should be set
-                // using the request object rather than passing it in the URL
-                CharChunk uriCC = decodedURI.getCharChunk();
-                int semicolon = uriCC.indexOf(';');
-                if (semicolon > 0) {
-                    decodedURI.setChars(uriCC.getBuffer(), uriCC.getStart(), semicolon);
-                }
             }
         }
 

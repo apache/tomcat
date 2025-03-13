@@ -56,6 +56,28 @@
 
 </section>
 
+<section name="Using rewrite rules with special characters">
+
+  <p>The URL presented to the rewrite valve is the same URL used for request
+  mapping with any literal <code>'%'</code>, <code>';'</code> and/or
+  <code>'?'</code> characters encoded in <code>%nn</code> form.</p>
+
+  <p>A rewrite rule that wishes to insert a literal <code>'%'</code>,
+  <code>';'</code>, <code>'?'</code>, <code>'&amp;'</code> or <code>'='</code>
+  character should do so in <code>%nn</code> form. Other characters maybe
+  inserted in either literal or <code>%nn</code> form.</p>
+
+  <p>This enables the rewrite rules to:
+  <ul>
+  <li>process URLs containing literal <code>'?'</code> characters;</li>
+  <li>add a query string;</li>
+  <li>insert a literal <code>'%'</code> character without it being confused with
+  <code>%nn</code> encoding.</li>
+  </ul>
+  </p>
+
+</section>
+
 <section name="Directives">
 
   <p>The rewrite.config file contains a list of directives which closely
