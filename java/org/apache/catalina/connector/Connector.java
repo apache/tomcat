@@ -661,7 +661,7 @@ public class Connector extends LifecycleMBeanBase {
      */
     public void setProxyName(String proxyName) {
 
-        if (proxyName != null && proxyName.length() > 0) {
+        if (proxyName != null && !proxyName.isEmpty()) {
             this.proxyName = proxyName;
         } else {
             this.proxyName = null;
@@ -975,7 +975,7 @@ public class Connector extends LifecycleMBeanBase {
             } else if (addressObj != null) {
                 address = addressObj.toString();
             }
-            if (address.length() > 0) {
+            if (!address.isEmpty()) {
                 sb.append(",address=");
                 sb.append(ObjectName.quote(address));
             }

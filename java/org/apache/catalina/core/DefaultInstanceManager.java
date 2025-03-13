@@ -166,7 +166,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
     private Map<String,String> assembleInjectionsFromClassHierarchy(Class<?> clazz) {
         Map<String,String> injections = new HashMap<>();
-        Map<String,String> currentInjections = null;
+        Map<String,String> currentInjections;
         while (clazz != null) {
             currentInjections = this.injectionMap.get(clazz.getName());
             if (currentInjections != null) {
@@ -308,30 +308,30 @@ public class DefaultInstanceManager implements InstanceManager {
                         }
                         if (!metadataComplete) {
                             Resource resourceAnnotation;
-                            Annotation ejbAnnotation;
-                            Annotation webServiceRefAnnotation;
-                            Annotation persistenceContextAnnotation;
-                            Annotation persistenceUnitAnnotation;
+                            EJB ejbAnnotation;
+                            WebServiceRef webServiceRefAnnotation;
+                            PersistenceContext persistenceContextAnnotation;
+                            PersistenceUnit persistenceUnitAnnotation;
                             if ((resourceAnnotation = method.getAnnotation(Resource.class)) != null) {
                                 annotations.add(new AnnotationCacheEntry(method.getName(), method.getParameterTypes(),
                                         resourceAnnotation.name(), AnnotationCacheEntryType.SETTER));
                             } else if (EJB_PRESENT && (ejbAnnotation = method.getAnnotation(EJB.class)) != null) {
                                 annotations.add(new AnnotationCacheEntry(method.getName(), method.getParameterTypes(),
-                                        ((EJB) ejbAnnotation).name(), AnnotationCacheEntryType.SETTER));
+                                        ejbAnnotation.name(), AnnotationCacheEntryType.SETTER));
                             } else if (WS_PRESENT &&
                                     (webServiceRefAnnotation = method.getAnnotation(WebServiceRef.class)) != null) {
                                 annotations.add(new AnnotationCacheEntry(method.getName(), method.getParameterTypes(),
-                                        ((WebServiceRef) webServiceRefAnnotation).name(),
+                                        webServiceRefAnnotation.name(),
                                         AnnotationCacheEntryType.SETTER));
                             } else if (JPA_PRESENT && (persistenceContextAnnotation =
                                     method.getAnnotation(PersistenceContext.class)) != null) {
                                 annotations.add(new AnnotationCacheEntry(method.getName(), method.getParameterTypes(),
-                                        ((PersistenceContext) persistenceContextAnnotation).name(),
+                                        persistenceContextAnnotation.name(),
                                         AnnotationCacheEntryType.SETTER));
                             } else if (JPA_PRESENT &&
                                     (persistenceUnitAnnotation = method.getAnnotation(PersistenceUnit.class)) != null) {
                                 annotations.add(new AnnotationCacheEntry(method.getName(), method.getParameterTypes(),
-                                        ((PersistenceUnit) persistenceUnitAnnotation).name(),
+                                        persistenceUnitAnnotation.name(),
                                         AnnotationCacheEntryType.SETTER));
                             }
                         }
@@ -363,10 +363,10 @@ public class DefaultInstanceManager implements InstanceManager {
                     Field[] fields = clazz.getDeclaredFields();
                     for (Field field : fields) {
                         Resource resourceAnnotation;
-                        Annotation ejbAnnotation;
-                        Annotation webServiceRefAnnotation;
-                        Annotation persistenceContextAnnotation;
-                        Annotation persistenceUnitAnnotation;
+                        EJB ejbAnnotation;
+                        WebServiceRef webServiceRefAnnotation;
+                        PersistenceContext persistenceContextAnnotation;
+                        PersistenceUnit persistenceUnitAnnotation;
                         String fieldName = field.getName();
                         if (injections != null && injections.containsKey(fieldName) &&
                                 !injectionsMatchedToSetter.contains(fieldName)) {
@@ -377,22 +377,22 @@ public class DefaultInstanceManager implements InstanceManager {
                                 annotations.add(new AnnotationCacheEntry(fieldName, null, resourceAnnotation.name(),
                                         AnnotationCacheEntryType.FIELD));
                             } else if (EJB_PRESENT && (ejbAnnotation = field.getAnnotation(EJB.class)) != null) {
-                                annotations.add(new AnnotationCacheEntry(fieldName, null, ((EJB) ejbAnnotation).name(),
+                                annotations.add(new AnnotationCacheEntry(fieldName, null, ejbAnnotation.name(),
                                         AnnotationCacheEntryType.FIELD));
                             } else if (WS_PRESENT &&
                                     (webServiceRefAnnotation = field.getAnnotation(WebServiceRef.class)) != null) {
                                 annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                        ((WebServiceRef) webServiceRefAnnotation).name(),
+                                        webServiceRefAnnotation.name(),
                                         AnnotationCacheEntryType.FIELD));
                             } else if (JPA_PRESENT && (persistenceContextAnnotation =
                                     field.getAnnotation(PersistenceContext.class)) != null) {
                                 annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                        ((PersistenceContext) persistenceContextAnnotation).name(),
+                                        persistenceContextAnnotation.name(),
                                         AnnotationCacheEntryType.FIELD));
                             } else if (JPA_PRESENT &&
                                     (persistenceUnitAnnotation = field.getAnnotation(PersistenceUnit.class)) != null) {
                                 annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                        ((PersistenceUnit) persistenceUnitAnnotation).name(),
+                                        persistenceUnitAnnotation.name(),
                                         AnnotationCacheEntryType.FIELD));
                             }
                         }
@@ -514,7 +514,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         String normalizedName = normalize(name);
 
-        if ((normalizedName != null) && (normalizedName.length() > 0)) {
+        if ((normalizedName != null) && (!normalizedName.isEmpty())) {
             lookedupResource = context.lookup(normalizedName);
         } else {
             lookedupResource = context.lookup(clazz.getName() + "/" + field.getName());
@@ -551,7 +551,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
         String normalizedName = normalize(name);
 
-        if ((normalizedName != null) && (normalizedName.length() > 0)) {
+        if ((normalizedName != null) && (!normalizedName.isEmpty())) {
             lookedupResource = context.lookup(normalizedName);
         } else {
             lookedupResource = context.lookup(clazz.getName() + "/" + Introspection.getPropertyName(method));

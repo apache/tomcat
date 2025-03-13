@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import jakarta.servlet.DispatcherType;
@@ -305,11 +306,7 @@ final class StandardHostValve extends ValveBase {
          * Need to ensure message attribute is set even if there is no message (e.g. if error was triggered by an
          * exception with a null message).
          */
-        if (message == null) {
-            request.setAttribute(RequestDispatcher.ERROR_MESSAGE, "");
-        } else {
-            request.setAttribute(RequestDispatcher.ERROR_MESSAGE, message);
-        }
+        request.setAttribute(RequestDispatcher.ERROR_MESSAGE, Objects.requireNonNullElse(message, ""));
 
         if (exception != null) {
             request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, exception);

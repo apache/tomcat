@@ -50,7 +50,7 @@ class ApplicationRequest extends ServletRequestWrapper {
                     RequestDispatcher.FORWARD_QUERY_STRING, RequestDispatcher.FORWARD_MAPPING));
 
     private static final int shortestSpecialNameLength =
-            specialsSet.stream().mapToInt(s -> s.length()).min().getAsInt();
+            specialsSet.stream().mapToInt(String::length).min().getAsInt();
 
 
     /**

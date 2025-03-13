@@ -105,7 +105,7 @@ public class StandardPipeline extends LifecycleBase implements Pipeline {
         Valve valve = (first != null) ? first : basic;
         boolean supported = true;
         while (supported && valve != null) {
-            supported = supported & valve.isAsyncSupported();
+            supported = valve.isAsyncSupported();
             valve = valve.getNext();
         }
         return supported;
