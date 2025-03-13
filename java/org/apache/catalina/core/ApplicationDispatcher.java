@@ -141,13 +141,13 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         /**
          * The outermost request that will be passed on to the invoked servlet.
          */
-        ServletRequest outerRequest = null;
+        ServletRequest outerRequest;
 
 
         /**
          * The outermost response that will be passed on to the invoked servlet.
          */
-        ServletResponse outerResponse = null;
+        ServletResponse outerResponse;
 
         /**
          * The request wrapper we have created and installed (if any).
@@ -163,7 +163,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         /**
          * Are we performing an include() instead of a forward()?
          */
-        boolean including = false;
+        boolean including;
 
         /**
          * Outermost HttpServletRequest in the chain
@@ -292,11 +292,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         if (response.isCommitted()) {
             throw new IllegalStateException(sm.getString("applicationDispatcher.forward.ise"));
         }
-        try {
-            response.resetBuffer();
-        } catch (IllegalStateException e) {
-            throw e;
-        }
+        response.resetBuffer();
 
         // Set up to handle the specified request and response
         State state = new State(request, response, false);
@@ -403,13 +399,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
 
         DispatcherType disInt = (DispatcherType) request.getAttribute(Globals.DISPATCHER_TYPE_ATTR);
         if (disInt != null) {
-            boolean doInvoke = true;
-
-            if (context.getFireRequestListenersOnForwards() && !context.fireRequestInitEvent(request)) {
-                doInvoke = false;
-            }
-
-            if (doInvoke) {
+            if (!context.getFireRequestListenersOnForwards() || context.fireRequestInitEvent(request)) {
                 if (disInt != DispatcherType.ERROR) {
                     state.outerRequest.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR, getCombinedPath());
                     state.outerRequest.setAttribute(Globals.DISPATCHER_TYPE_ATTR, DispatcherType.FORWARD);
@@ -629,7 +619,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             wrapper.getLogger().error(sm.getString("applicationDispatcher.allocateException", wrapper.getName()), e);
             servletException =
                     new ServletException(sm.getString("applicationDispatcher.allocateException", wrapper.getName()), e);
-            servlet = null;
+            // servlet = null; is already done so no need to do it explicitly
         }
 
         // Get the FilterChain Here
@@ -819,14 +809,12 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         }
 
         // Instantiate a new wrapper at this point and insert it in the chain
-        ServletRequest wrapper = null;
-        if (current instanceof ApplicationHttpRequest || current instanceof Request ||
-                current instanceof HttpServletRequest) {
+        ServletRequest wrapper;
+        if (current instanceof HttpServletRequest) {
             // Compute a crossContext flag
             HttpServletRequest hcurrent = (HttpServletRequest) current;
             boolean crossContext = false;
-            if (state.outerRequest instanceof ApplicationHttpRequest || state.outerRequest instanceof Request ||
-                    state.outerRequest instanceof HttpServletRequest) {
+            if (state.outerRequest instanceof HttpServletRequest) {
                 HttpServletRequest houterRequest = (HttpServletRequest) state.outerRequest;
                 Object contextPath = houterRequest.getAttribute(INCLUDE_CONTEXT_PATH);
                 if (contextPath == null) {
@@ -879,9 +867,8 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         }
 
         // Instantiate a new wrapper at this point and insert it in the chain
-        ServletResponse wrapper = null;
-        if (current instanceof ApplicationHttpResponse || current instanceof Response ||
-                current instanceof HttpServletResponse) {
+        ServletResponse wrapper;
+        if (current instanceof HttpServletResponse) {
             wrapper = new ApplicationHttpResponse((HttpServletResponse) current, state.including);
         } else {
             wrapper = new ApplicationResponse(current, state.including);

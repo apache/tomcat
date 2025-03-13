@@ -38,7 +38,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     private String domain;
     private String name;
     private String path;
-    private StandardContext context;
+    private final StandardContext context;
 
     public ApplicationSessionCookieConfig(StandardContext context) {
         this.context = context;

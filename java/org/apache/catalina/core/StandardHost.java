@@ -231,7 +231,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     @Override
     public void setAppBase(String appBase) {
-        if (appBase.trim().equals("")) {
+        if (appBase.trim().isEmpty()) {
             log.warn(sm.getString("standardHost.problematicAppBase", getName()));
         }
         String oldAppBase = this.appBase;
@@ -260,7 +260,7 @@ public class StandardHost extends ContainerBase implements Host {
         if (hostConfigBase != null) {
             return hostConfigBase;
         }
-        String path = null;
+        String path;
         if (getXmlBase() != null) {
             path = getXmlBase();
         } else {
@@ -568,7 +568,7 @@ public class StandardHost extends ContainerBase implements Host {
                 }
             }
             // Add this alias to the list
-            String newAliases[] = Arrays.copyOf(aliases, aliases.length + 1);
+            String[] newAliases = Arrays.copyOf(aliases, aliases.length + 1);
             newAliases[aliases.length] = alias;
             aliases = newAliases;
         }
@@ -628,7 +628,7 @@ public class StandardHost extends ContainerBase implements Host {
      * reload. Note: This method attempts to force a full garbage collection. This should be used with extreme caution
      * on a production system.
      *
-     * @return a list of possibly leaking contexts
+     * @return an array of possibly leaking contexts
      */
     public String[] findReloadedContextMemoryLeaks() {
 
@@ -677,7 +677,7 @@ public class StandardHost extends ContainerBase implements Host {
 
             // Remove the specified alias
             int j = 0;
-            String results[] = new String[aliases.length - 1];
+            String[] results = new String[aliases.length - 1];
             for (int i = 0; i < aliases.length; i++) {
                 if (i != n) {
                     results[j++] = aliases[i];
@@ -698,7 +698,7 @@ public class StandardHost extends ContainerBase implements Host {
 
         // Set error report valve
         String errorValve = getErrorReportValveClass();
-        if ((errorValve != null) && (!errorValve.equals(""))) {
+        if ((errorValve != null) && (!errorValve.isEmpty())) {
             try {
                 boolean found = false;
                 Valve[] valves = getPipeline().getValves();
@@ -751,11 +751,7 @@ public class StandardHost extends ContainerBase implements Host {
 
     @Override
     protected String getObjectNameKeyProperties() {
-
-        StringBuilder keyProperties = new StringBuilder("type=Host");
-        keyProperties.append(getMBeanKeyProperties());
-
-        return keyProperties.toString();
+        return "type=Host" + getMBeanKeyProperties();
     }
 
 }

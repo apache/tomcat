@@ -178,13 +178,11 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("ApplicationFilterConfig[");
-        sb.append("name=");
-        sb.append(filterDef.getFilterName());
-        sb.append(", filterClass=");
-        sb.append(filterDef.getFilterClass());
-        sb.append(']');
-        return sb.toString();
+        return "ApplicationFilterConfig[" + "name=" +
+            filterDef.getFilterName() +
+            ", filterClass=" +
+            filterDef.getFilterClass() +
+            ']';
     }
 
     // --------------------------------------------------------- Public Methods
@@ -309,7 +307,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         String domain = context.getParent().getParent().getName();
 
         String webMod = "//" + hostName + parentName;
-        String onameStr = null;
+        String onameStr;
         String filterName = filterDef.getFilterName();
         if (Util.objectNameValueNeedsQuote(filterName)) {
             filterName = ObjectName.quote(filterName);

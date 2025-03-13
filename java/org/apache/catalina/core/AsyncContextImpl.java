@@ -255,16 +255,14 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     @Override
     public <T extends AsyncListener> T createListener(Class<T> clazz) throws ServletException {
         check();
-        T listener = null;
+        T listener;
         try {
             listener = (T) context.getInstanceManager().newInstance(clazz.getName(), clazz.getClassLoader());
         } catch (ReflectiveOperationException | NamingException e) {
-            ServletException se = new ServletException(e);
-            throw se;
+            throw new ServletException(e);
         } catch (Exception e) {
             ExceptionUtils.handleThrowable(e.getCause());
-            ServletException se = new ServletException(e);
-            throw se;
+            throw new ServletException(e);
         }
         return listener;
     }

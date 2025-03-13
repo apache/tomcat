@@ -62,7 +62,7 @@ public final class ApplicationFilterFactory {
         }
 
         // Create and initialize a filter chain object
-        ApplicationFilterChain filterChain = null;
+        ApplicationFilterChain filterChain;
         if (request instanceof Request) {
             Request req = (Request) request;
             if (Globals.IS_SECURITY_ENABLED) {

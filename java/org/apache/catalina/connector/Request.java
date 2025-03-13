@@ -1050,7 +1050,7 @@ public class Request implements HttpServletRequest {
             parseLocales();
         }
 
-        if (locales.size() > 0) {
+        if (!locales.isEmpty()) {
             return locales.get(0);
         }
 
@@ -1065,7 +1065,7 @@ public class Request implements HttpServletRequest {
             parseLocales();
         }
 
-        if (locales.size() > 0) {
+        if (!locales.isEmpty()) {
             return Collections.enumeration(locales);
         }
         ArrayList<Locale> results = new ArrayList<>();
@@ -2426,7 +2426,7 @@ public class Request implements HttpServletRequest {
     public void changeSessionId(String newSessionId) {
         // This should only ever be called if there was an old session ID but
         // double check to be sure
-        if (requestedSessionId != null && requestedSessionId.length() > 0) {
+        if (requestedSessionId != null && !requestedSessionId.isEmpty()) {
             requestedSessionId = newSessionId;
         }
 

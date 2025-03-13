@@ -189,7 +189,7 @@ public class ApplicationContext implements ServletContext {
     /**
      * Session Cookie config
      */
-    private SessionCookieConfig sessionCookieConfig;
+    private final SessionCookieConfig sessionCookieConfig;
 
     /**
      * Session tracking modes
@@ -228,7 +228,7 @@ public class ApplicationContext implements ServletContext {
             return null;
         }
 
-        Context child = null;
+        Context child;
         try {
             // Look for an exact match
             Container host = context.getParent();
@@ -492,7 +492,7 @@ public class ApplicationContext implements ServletContext {
             if (nextSemiColon < 0) {
                 nextSemiColon = limit;
             }
-            sb.append(input.substring(pos, nextSemiColon));
+            sb.append(input, pos, nextSemiColon);
             int followingSlash = input.indexOf('/', nextSemiColon);
             if (followingSlash < 0) {
                 pos = limit;
@@ -636,20 +636,18 @@ public class ApplicationContext implements ServletContext {
     @Override
     public void removeAttribute(String name) {
 
-        Object value = null;
-
         // Remove the specified attribute
         // Check for read only attribute
         if (readOnlyAttributes.containsKey(name)) {
             return;
         }
-        value = attributes.remove(name);
+        Object value = attributes.remove(name);
         if (value == null) {
             return;
         }
 
         // Notify interested application event listeners
-        Object listeners[] = context.getApplicationEventListeners();
+        Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
             return;
         }
@@ -695,11 +693,11 @@ public class ApplicationContext implements ServletContext {
         boolean replaced = oldValue != null;
 
         // Notify interested application event listeners
-        Object listeners[] = context.getApplicationEventListeners();
+        Object[] listeners = context.getApplicationEventListeners();
         if (listeners == null || listeners.length == 0) {
             return;
         }
-        ServletContextAttributeEvent event = null;
+        ServletContextAttributeEvent event;
         if (replaced) {
             event = new ServletContextAttributeEvent(context.getServletContext(), name, oldValue);
         } else {
@@ -755,7 +753,7 @@ public class ApplicationContext implements ServletContext {
     private FilterRegistration.Dynamic addFilter(String filterName, String filterClass, Filter filter)
             throws IllegalStateException {
 
-        if (filterName == null || filterName.equals("")) {
+        if (filterName == null || filterName.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("applicationContext.invalidFilterName", filterName));
         }
 
@@ -838,11 +836,11 @@ public class ApplicationContext implements ServletContext {
             throw new IllegalArgumentException(sm.getString("applicationContext.addJspFile.iae", jspFile));
         }
 
-        String jspServletClassName = null;
         Map<String,String> jspFileInitParams = new HashMap<>();
 
         Wrapper jspServlet = (Wrapper) context.findChild("jsp");
 
+        String jspServletClassName;
         if (jspServlet == null) {
             // No JSP servlet currently defined.
             // Use default JSP Servlet class name
@@ -868,7 +866,7 @@ public class ApplicationContext implements ServletContext {
     private ServletRegistration.Dynamic addServlet(String servletName, String servletClass, Servlet servlet,
             Map<String,String> initParams) throws IllegalStateException {
 
-        if (servletName == null || servletName.equals("")) {
+        if (servletName == null || servletName.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("applicationContext.invalidServletName", servletName));
         }
 

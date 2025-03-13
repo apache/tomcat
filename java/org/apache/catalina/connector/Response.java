@@ -907,7 +907,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void addDateHeader(String name, long value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -932,7 +932,7 @@ public class Response implements HttpServletResponse {
 
     private void addHeader(String name, String value, Charset charset) {
 
-        if (name == null || name.length() == 0 || value == null) {
+        if (name == null || name.isEmpty() || value == null) {
             return;
         }
 
@@ -975,7 +975,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void addIntHeader(String name, int value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -1251,7 +1251,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void setDateHeader(String name, long value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -1271,7 +1271,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void setHeader(String name, String value) {
 
-        if (name == null || name.length() == 0 || value == null) {
+        if (name == null || name.isEmpty() || value == null) {
             return;
         }
 
@@ -1298,7 +1298,7 @@ public class Response implements HttpServletResponse {
     @Override
     public void setIntHeader(String name, int value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 

@@ -508,15 +508,20 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
             for (int i = 0; methods != null && i < methods.length; i++) {
                 Method m = methods[i];
 
-                if (m.getName().equals("doGet")) {
-                    allow.add("GET");
-                    allow.add("HEAD");
-                } else if (m.getName().equals("doPost")) {
-                    allow.add("POST");
-                } else if (m.getName().equals("doPut")) {
-                    allow.add("PUT");
-                } else if (m.getName().equals("doDelete")) {
-                    allow.add("DELETE");
+                switch (m.getName()) {
+                    case "doGet":
+                        allow.add("GET");
+                        allow.add("HEAD");
+                        break;
+                    case "doPost":
+                        allow.add("POST");
+                        break;
+                    case "doPut":
+                        allow.add("PUT");
+                        break;
+                    case "doDelete":
+                        allow.add("DELETE");
+                        break;
                 }
             }
         }
@@ -562,7 +567,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
      */
     public static Throwable getRootCause(ServletException e) {
         Throwable rootCause = e;
-        Throwable rootCauseCheck = null;
+        Throwable rootCauseCheck;
         // Extra aggressive rootCause finding
         int loops = 0;
         do {
@@ -789,7 +794,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
     @Override
     public String findSecurityReference(String name) {
-        String reference = null;
+        String reference;
 
         referencesLock.readLock().lock();
         try {
@@ -946,7 +951,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         } finally {
             if (swallowOutput) {
                 String log = SystemLogHandler.stopCapture();
-                if (log != null && log.length() > 0) {
+                if (log != null && !log.isEmpty()) {
                     if (getServletContext() != null) {
                         getServletContext().log(log);
                     } else {
@@ -1129,7 +1134,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                 // Write captured output
                 if (swallowOutput) {
                     String log = SystemLogHandler.stopCapture();
-                    if (log != null && log.length() > 0) {
+                    if (log != null && !log.isEmpty()) {
                         if (getServletContext() != null) {
                             getServletContext().log(log);
                         } else {

@@ -285,9 +285,9 @@ public class AprLifecycleListener implements LifecycleListener {
         sslInitialized = true;
 
         String methodName = "randSet";
-        Class<?> paramTypes[] = new Class[1];
+        Class<?>[] paramTypes = new Class[1];
         paramTypes[0] = String.class;
-        Object paramValues[] = new Object[1];
+        Object[] paramValues = new Object[1];
         paramValues[0] = SSLRandomSeed;
         Class<?> clazz = Class.forName("org.apache.tomcat.jni.SSL");
         Method method = clazz.getMethod(methodName, paramTypes);
