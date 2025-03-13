@@ -171,6 +171,11 @@
         Fix stack trace trimming in <code>ErrorReportValve</code> after removal
         of the security manager support. (remm)
       </fix>
+      <fix>
+        Improve the handling of <code>%nn</code> URL encoding in the
+        RewriteValve and document how <code>%nn</code> URL encoding may be used
+        with rewrite rules. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
