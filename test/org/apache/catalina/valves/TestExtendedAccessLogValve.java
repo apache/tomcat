@@ -16,10 +16,9 @@
  */
 package org.apache.catalina.valves;
 
+import java.io.CharArrayWriter;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,6 +45,10 @@ import org.apache.tomcat.util.buf.ByteChunk;
 @RunWith(Parameterized.class)
 public class TestExtendedAccessLogValve extends TomcatBaseTest {
 
+    // Requests can return in the client before log() has been called
+    private static final long SLEEP = 2;
+    private static final long SLEEP_MAX = 1000;
+
     @Parameterized.Parameters(name = "{index}: pattern=[{0}]")
     public static Collection<Object[]> data() {
         List<Object[]> patterns = new ArrayList<>();
@@ -67,6 +70,29 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
     @Parameter(1)
     public String logPattern;
 
+
+    /**
+     * Extend AbstractAccessLogValve to retrieve log output.
+     */
+    public final class TesterExtendedAccessLogValve extends ExtendedAccessLogValve {
+
+        private CharArrayWriter writer;
+
+        public TesterExtendedAccessLogValve(CharArrayWriter writer) {
+            this.writer = writer;
+        }
+
+        @Override
+        public void log(CharArrayWriter message) {
+            try {
+                message.writeTo(writer);
+            } catch (IOException ex) {
+                log.error("Could not write to writer", ex);
+            }
+        }
+    }
+
+
     @Test
     public void testLogFormat() throws Exception {
 
@@ -76,7 +102,8 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         // Create temporary directory for logs
         File logDir = getTemporaryDirectory();
 
-        ExtendedAccessLogValve valve = new ExtendedAccessLogValve();
+        CharArrayWriter writer = new CharArrayWriter();
+        TesterExtendedAccessLogValve valve = new TesterExtendedAccessLogValve(writer);
         valve.setBuffered(false);
         valve.setPattern(logPattern);
         valve.setDirectory(logDir.getAbsolutePath());
@@ -120,17 +147,20 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
 
         tomcat.stop();
 
-        // Read log file
-        File[] logFiles = logDir.listFiles((dir, fname) -> fname.startsWith("access_log_" + name));
-        Assert.assertNotNull(logFiles);
-        Assert.assertTrue(logFiles.length > 0);
-
-        File logFile = logFiles[0];
-        String content = new String(Files.readAllBytes(logFile.toPath()), StandardCharsets.UTF_8);
+        long startWait = System.currentTimeMillis();
+        String content = writer.toString();
+        while ("".equals(content) && System.currentTimeMillis() - startWait < SLEEP_MAX) {
+            try {
+                Thread.sleep(SLEEP);
+            } catch (InterruptedException ex) {
+                log.error("Exception during sleep", ex);
+            }
+            content = writer.toString();
+        }
 
         processLogContent(content);
-
     }
+
 
     private void processLogContent(String content) {
         String[] lines = content.split("\\r?\\n");
@@ -162,6 +192,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         }
     }
 
+
     private void checkField(String fieldId, String value) {
         if ("time".equals(fieldId)) {
             Assert.assertTrue("Invalid time format", isTimeFormat(value));
@@ -184,6 +215,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
             Assert.assertTrue(value.matches("^\\d+(\\.\\d+)?$"));
         }
     }
+
 
     private boolean isTimeFormat(String s) {
         return Pattern.matches("^\\d{2}:\\d{2}(:\\d{2}(\\.\\d+)?)?$", s);
