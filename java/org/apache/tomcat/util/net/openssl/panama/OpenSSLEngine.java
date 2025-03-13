@@ -63,6 +63,7 @@ import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationPars
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
 import org.apache.tomcat.util.openssl.SSL_set_info_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_set_verify$callback;
+import org.apache.tomcat.util.openssl.openssl_h;
 import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -120,7 +121,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
     private final EngineState state;
     private final Arena engineArena;
     private final Cleanable cleanable;
-    private MemorySegment bufSegment = null;
+    private MemorySegment bufSegment;
 
     private enum Accepted { NOT, IMPLICIT, EXPLICIT }
     private Accepted accepted = Accepted.NOT;
@@ -230,7 +231,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     /**
      * Write plain text data to the OpenSSL internal BIO
-     *
      * Calling this function with src.remaining == 0 is undefined.
      * @throws SSLException if the OpenSSL error check fails
      */
@@ -388,7 +388,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             }
             while (src.hasRemaining()) {
 
-                int bytesWritten = 0;
+                int bytesWritten;
                 // Write plain text application data to the SSL engine
                 try {
                     bytesWritten = writePlaintextData(state.ssl, src);
@@ -476,7 +476,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         // Write encrypted data to network BIO
-        int written = 0;
+        int written;
         try {
             written = writeEncryptedData(state.networkBIO, src);
         } catch (Exception e) {
@@ -641,8 +641,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public String[] getSupportedCipherSuites() {
-        Set<String> availableCipherSuites = AVAILABLE_CIPHER_SUITES;
-        return availableCipherSuites.toArray(new String[0]);
+        return AVAILABLE_CIPHER_SUITES.toArray(new String[0]);
     }
 
     @Override
@@ -651,17 +650,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             return new String[0];
         }
         String[] enabled = OpenSSLLibrary.getCiphers(state.ssl);
-        if (enabled == null) {
-            return new String[0];
-        } else {
-            for (int i = 0; i < enabled.length; i++) {
-                String mapped = OpenSSLCipherConfigurationParser.openSSLToJsse(enabled[i]);
-                if (mapped != null) {
-                    enabled[i] = mapped;
-                }
+        for (int i = 0; i < enabled.length; i++) {
+            String mapped = OpenSSLCipherConfigurationParser.openSSLToJsse(enabled[i]);
+            if (mapped != null) {
+                enabled[i] = mapped;
             }
-            return enabled;
         }
+        return enabled;
     }
 
     @Override
@@ -692,7 +687,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             buf.append(':');
         }
 
-        if (buf.length() == 0) {
+        if (buf.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("engine.emptyCipherSuite"));
         }
         buf.setLength(buf.length() - 1);
@@ -738,11 +733,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             enabled.add(Constants.SSL_PROTO_SSLv3);
         }
         int size = enabled.size();
-        if (size == 0) {
-            return new String[0];
-        } else {
-            return enabled.toArray(new String[size]);
-        }
+        return enabled.toArray(new String[size]);
     }
 
     @Override
@@ -767,18 +758,13 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (!IMPLEMENTED_PROTOCOLS_SET.contains(p)) {
                 throw new IllegalArgumentException(sm.getString("engine.unsupportedProtocol", p));
             }
-            if (p.equals(Constants.SSL_PROTO_SSLv2)) {
-                sslv2 = true;
-            } else if (p.equals(Constants.SSL_PROTO_SSLv3)) {
-                sslv3 = true;
-            } else if (p.equals(Constants.SSL_PROTO_TLSv1)) {
-                tlsv1 = true;
-            } else if (p.equals(Constants.SSL_PROTO_TLSv1_1)) {
-                tlsv1_1 = true;
-            } else if (p.equals(Constants.SSL_PROTO_TLSv1_2)) {
-                tlsv1_2 = true;
-            } else if (p.equals(Constants.SSL_PROTO_TLSv1_3)) {
-                tlsv1_3 = true;
+            switch (p) {
+                case Constants.SSL_PROTO_SSLv2 -> sslv2 = true;
+                case Constants.SSL_PROTO_SSLv3 -> sslv3 = true;
+                case Constants.SSL_PROTO_TLSv1 -> tlsv1 = true;
+                case Constants.SSL_PROTO_TLSv1_1 -> tlsv1_1 = true;
+                case Constants.SSL_PROTO_TLSv1_2 -> tlsv1_2 = true;
+                case Constants.SSL_PROTO_TLSv1_3 -> tlsv1_3 = true;
             }
         }
         // Enable all and then disable what we not want
@@ -1340,7 +1326,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 return V_OCSP_CERTSTATUS_UNKNOWN();
             }
             InputStream is = connection.getInputStream();
-            int read = 0;
+            int read;
             byte[] responseBuf = new byte[1024];
             while ((read = is.read(responseBuf)) > 0) {
                 baos.write(responseBuf, 0, read);
@@ -1684,9 +1670,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // Use another arena to avoid keeping a reference through segments
             // This also allows making further accesses to the main pointers safer
             this.ssl = ssl.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
-                    (MemorySegment t) -> SSL_free(t));
+                openssl_h::SSL_free);
             this.networkBIO = networkBIO.reinterpret(ValueLayout.ADDRESS.byteSize(), stateArena,
-                    (MemorySegment t) -> BIO_free(t));
+                openssl_h::BIO_free);
         }
 
         @Override

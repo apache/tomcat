@@ -229,7 +229,7 @@ public class OpenSSLLibrary {
 
                 // Set the random seed, translated to the Java way
                 boolean seedDone = false;
-                if (SSLRandomSeed != null && SSLRandomSeed.length() != 0 && !"builtin".equals(SSLRandomSeed)) {
+                if (SSLRandomSeed != null && !SSLRandomSeed.isEmpty() && !"builtin".equals(SSLRandomSeed)) {
                     var randomSeed = memorySession.allocateFrom(SSLRandomSeed);
                     seedDone = RAND_load_file(randomSeed, 128) > 0;
                     if (!seedDone) {
@@ -440,7 +440,7 @@ public class OpenSSLLibrary {
                 try {
                     for (String c : getCiphers(ssl)) {
                         // Filter out bad input.
-                        if (c == null || c.length() == 0 || ciphersList.contains(c)) {
+                        if (c == null || c.isEmpty() || ciphersList.contains(c)) {
                             continue;
                         }
                         ciphersList.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
@@ -461,7 +461,7 @@ public class OpenSSLLibrary {
         MemorySegment sk = SSL_get_ciphers(ssl);
         int len = openssl_h_Compatibility.OPENSSL_sk_num(sk);
         if (len <= 0) {
-            return null;
+            return new String[0];
         }
         ArrayList<String> ciphers = new ArrayList<>(len);
         for (int i = 0; i < len; i++) {
