@@ -105,7 +105,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
     /**
      * Global naming resources.
      */
-    private NamingResourcesImpl globalNamingResources = null;
+    private NamingResourcesImpl globalNamingResources;
 
 
     /**
@@ -462,7 +462,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         servicesWriteLock.lock();
         try {
-            Service results[] = new Service[services.length + 1];
+            Service[] results = new Service[services.length + 1];
             System.arraycopy(services, 0, results, 0, services.length);
             results[services.length] = service;
             services = results;
@@ -584,7 +584,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         expected += random.nextInt() % 1024;
                     }
                     while (expected > 0) {
-                        int ch = -1;
+                        int ch;
                         try {
                             ch = stream.read();
                         } catch (IOException e) {

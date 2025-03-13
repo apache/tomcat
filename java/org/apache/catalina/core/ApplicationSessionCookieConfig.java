@@ -43,7 +43,7 @@ public class ApplicationSessionCookieConfig implements SessionCookieConfig {
     private final Map<String,String> attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
     private String name;
-    private StandardContext context;
+    private final StandardContext context;
 
     public ApplicationSessionCookieConfig(StandardContext context) {
         this.context = context;

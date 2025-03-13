@@ -360,110 +360,119 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      */
     private void processGlobalResourcesChange(String name, Object oldValue, Object newValue) {
 
-        if (name.equals("ejb")) {
-            if (oldValue != null) {
-                ContextEjb ejb = (ContextEjb) oldValue;
-                if (ejb.getName() != null) {
-                    removeEjb(ejb.getName());
+        switch (name) {
+            case "ejb":
+                if (oldValue != null) {
+                    ContextEjb ejb = (ContextEjb) oldValue;
+                    if (ejb.getName() != null) {
+                        removeEjb(ejb.getName());
+                    }
                 }
-            }
-            if (newValue != null) {
-                ContextEjb ejb = (ContextEjb) newValue;
-                if (ejb.getName() != null) {
-                    addEjb(ejb);
+                if (newValue != null) {
+                    ContextEjb ejb = (ContextEjb) newValue;
+                    if (ejb.getName() != null) {
+                        addEjb(ejb);
+                    }
                 }
-            }
-        } else if (name.equals("environment")) {
-            if (oldValue != null) {
-                ContextEnvironment env = (ContextEnvironment) oldValue;
-                if (env.getName() != null) {
-                    removeEnvironment(env.getName());
+                break;
+            case "environment":
+                if (oldValue != null) {
+                    ContextEnvironment env = (ContextEnvironment) oldValue;
+                    if (env.getName() != null) {
+                        removeEnvironment(env.getName());
+                    }
                 }
-            }
-            if (newValue != null) {
-                ContextEnvironment env = (ContextEnvironment) newValue;
-                if (env.getName() != null) {
-                    addEnvironment(env);
+                if (newValue != null) {
+                    ContextEnvironment env = (ContextEnvironment) newValue;
+                    if (env.getName() != null) {
+                        addEnvironment(env);
+                    }
                 }
-            }
-        } else if (name.equals("localEjb")) {
-            if (oldValue != null) {
-                ContextLocalEjb ejb = (ContextLocalEjb) oldValue;
-                if (ejb.getName() != null) {
-                    removeLocalEjb(ejb.getName());
+                break;
+            case "localEjb":
+                if (oldValue != null) {
+                    ContextLocalEjb ejb = (ContextLocalEjb) oldValue;
+                    if (ejb.getName() != null) {
+                        removeLocalEjb(ejb.getName());
+                    }
                 }
-            }
-            if (newValue != null) {
-                ContextLocalEjb ejb = (ContextLocalEjb) newValue;
-                if (ejb.getName() != null) {
-                    addLocalEjb(ejb);
+                if (newValue != null) {
+                    ContextLocalEjb ejb = (ContextLocalEjb) newValue;
+                    if (ejb.getName() != null) {
+                        addLocalEjb(ejb);
+                    }
                 }
-            }
-        } else if (name.equals("messageDestinationRef")) {
-            if (oldValue != null) {
-                MessageDestinationRef mdr = (MessageDestinationRef) oldValue;
-                if (mdr.getName() != null) {
-                    removeMessageDestinationRef(mdr.getName());
+                break;
+            case "messageDestinationRef":
+                if (oldValue != null) {
+                    MessageDestinationRef mdr = (MessageDestinationRef) oldValue;
+                    if (mdr.getName() != null) {
+                        removeMessageDestinationRef(mdr.getName());
+                    }
                 }
-            }
-            if (newValue != null) {
-                MessageDestinationRef mdr = (MessageDestinationRef) newValue;
-                if (mdr.getName() != null) {
-                    addMessageDestinationRef(mdr);
+                if (newValue != null) {
+                    MessageDestinationRef mdr = (MessageDestinationRef) newValue;
+                    if (mdr.getName() != null) {
+                        addMessageDestinationRef(mdr);
+                    }
                 }
-            }
-        } else if (name.equals("resource")) {
-            if (oldValue != null) {
-                ContextResource resource = (ContextResource) oldValue;
-                if (resource.getName() != null) {
-                    removeResource(resource.getName());
+                break;
+            case "resource":
+                if (oldValue != null) {
+                    ContextResource resource = (ContextResource) oldValue;
+                    if (resource.getName() != null) {
+                        removeResource(resource.getName());
+                    }
                 }
-            }
-            if (newValue != null) {
-                ContextResource resource = (ContextResource) newValue;
-                if (resource.getName() != null) {
-                    addResource(resource);
+                if (newValue != null) {
+                    ContextResource resource = (ContextResource) newValue;
+                    if (resource.getName() != null) {
+                        addResource(resource);
+                    }
                 }
-            }
-        } else if (name.equals("resourceEnvRef")) {
-            if (oldValue != null) {
-                ContextResourceEnvRef resourceEnvRef = (ContextResourceEnvRef) oldValue;
-                if (resourceEnvRef.getName() != null) {
-                    removeResourceEnvRef(resourceEnvRef.getName());
+                break;
+            case "resourceEnvRef":
+                if (oldValue != null) {
+                    ContextResourceEnvRef resourceEnvRef = (ContextResourceEnvRef) oldValue;
+                    if (resourceEnvRef.getName() != null) {
+                        removeResourceEnvRef(resourceEnvRef.getName());
+                    }
                 }
-            }
-            if (newValue != null) {
-                ContextResourceEnvRef resourceEnvRef = (ContextResourceEnvRef) newValue;
-                if (resourceEnvRef.getName() != null) {
-                    addResourceEnvRef(resourceEnvRef);
+                if (newValue != null) {
+                    ContextResourceEnvRef resourceEnvRef = (ContextResourceEnvRef) newValue;
+                    if (resourceEnvRef.getName() != null) {
+                        addResourceEnvRef(resourceEnvRef);
+                    }
                 }
-            }
-        } else if (name.equals("resourceLink")) {
-            if (oldValue != null) {
-                ContextResourceLink rl = (ContextResourceLink) oldValue;
-                if (rl.getName() != null) {
-                    removeResourceLink(rl.getName());
+                break;
+            case "resourceLink":
+                if (oldValue != null) {
+                    ContextResourceLink rl = (ContextResourceLink) oldValue;
+                    if (rl.getName() != null) {
+                        removeResourceLink(rl.getName());
+                    }
                 }
-            }
-            if (newValue != null) {
-                ContextResourceLink rl = (ContextResourceLink) newValue;
-                if (rl.getName() != null) {
-                    addResourceLink(rl);
+                if (newValue != null) {
+                    ContextResourceLink rl = (ContextResourceLink) newValue;
+                    if (rl.getName() != null) {
+                        addResourceLink(rl);
+                    }
                 }
-            }
-        } else if (name.equals("service")) {
-            if (oldValue != null) {
-                ContextService service = (ContextService) oldValue;
-                if (service.getName() != null) {
-                    removeService(service.getName());
+                break;
+            case "service":
+                if (oldValue != null) {
+                    ContextService service = (ContextService) oldValue;
+                    if (service.getName() != null) {
+                        removeService(service.getName());
+                    }
                 }
-            }
-            if (newValue != null) {
-                ContextService service = (ContextService) newValue;
-                if (service.getName() != null) {
-                    addService(service);
+                if (newValue != null) {
+                    ContextService service = (ContextService) newValue;
+                    if (service.getName() != null) {
+                        addService(service);
+                    }
                 }
-            }
+                break;
         }
 
 
@@ -658,61 +667,72 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             // initializing it.
             String type = env.getType();
             try {
-                if (type.equals("java.lang.String")) {
-                    value = env.getValue();
-                } else if (type.equals("java.lang.Byte")) {
-                    if (env.getValue() == null) {
-                        value = Byte.valueOf((byte) 0);
-                    } else {
-                        value = Byte.decode(env.getValue());
-                    }
-                } else if (type.equals("java.lang.Short")) {
-                    if (env.getValue() == null) {
-                        value = Short.valueOf((short) 0);
-                    } else {
-                        value = Short.decode(env.getValue());
-                    }
-                } else if (type.equals("java.lang.Integer")) {
-                    if (env.getValue() == null) {
-                        value = Integer.valueOf(0);
-                    } else {
-                        value = Integer.decode(env.getValue());
-                    }
-                } else if (type.equals("java.lang.Long")) {
-                    if (env.getValue() == null) {
-                        value = Long.valueOf(0);
-                    } else {
-                        value = Long.decode(env.getValue());
-                    }
-                } else if (type.equals("java.lang.Boolean")) {
-                    value = Boolean.valueOf(env.getValue());
-                } else if (type.equals("java.lang.Double")) {
-                    if (env.getValue() == null) {
-                        value = Double.valueOf(0);
-                    } else {
-                        value = Double.valueOf(env.getValue());
-                    }
-                } else if (type.equals("java.lang.Float")) {
-                    if (env.getValue() == null) {
-                        value = Float.valueOf(0);
-                    } else {
-                        value = Float.valueOf(env.getValue());
-                    }
-                } else if (type.equals("java.lang.Character")) {
-                    if (env.getValue() == null) {
-                        value = Character.valueOf((char) 0);
-                    } else {
-                        if (env.getValue().length() == 1) {
-                            value = Character.valueOf(env.getValue().charAt(0));
+                switch (type) {
+                    case "java.lang.String":
+                        value = env.getValue();
+                        break;
+                    case "java.lang.Byte":
+                        if (env.getValue() == null) {
+                            value = Byte.valueOf((byte) 0);
                         } else {
-                            throw new IllegalArgumentException();
+                            value = Byte.decode(env.getValue());
                         }
-                    }
-                } else {
-                    value = constructEnvEntry(env.getType(), env.getValue());
-                    if (value == null) {
-                        log.error(sm.getString("naming.invalidEnvEntryType", env.getName()));
-                    }
+                        break;
+                    case "java.lang.Short":
+                        if (env.getValue() == null) {
+                            value = Short.valueOf((short) 0);
+                        } else {
+                            value = Short.decode(env.getValue());
+                        }
+                        break;
+                    case "java.lang.Integer":
+                        if (env.getValue() == null) {
+                            value = Integer.valueOf(0);
+                        } else {
+                            value = Integer.decode(env.getValue());
+                        }
+                        break;
+                    case "java.lang.Long":
+                        if (env.getValue() == null) {
+                            value = Long.valueOf(0);
+                        } else {
+                            value = Long.decode(env.getValue());
+                        }
+                        break;
+                    case "java.lang.Boolean":
+                        value = Boolean.valueOf(env.getValue());
+                        break;
+                    case "java.lang.Double":
+                        if (env.getValue() == null) {
+                            value = Double.valueOf(0);
+                        } else {
+                            value = Double.valueOf(env.getValue());
+                        }
+                        break;
+                    case "java.lang.Float":
+                        if (env.getValue() == null) {
+                            value = Float.valueOf(0);
+                        } else {
+                            value = Float.valueOf(env.getValue());
+                        }
+                        break;
+                    case "java.lang.Character":
+                        if (env.getValue() == null) {
+                            value = Character.valueOf((char) 0);
+                        } else {
+                            if (env.getValue().length() == 1) {
+                                value = Character.valueOf(env.getValue().charAt(0));
+                            } else {
+                                throw new IllegalArgumentException();
+                            }
+                        }
+                        break;
+                    default:
+                        value = constructEnvEntry(env.getType(), env.getValue());
+                        if (value == null) {
+                            log.error(sm.getString("naming.invalidEnvEntryType", env.getName()));
+                        }
+                        break;
                 }
             } catch (IllegalArgumentException e) {
                 log.error(sm.getString("naming.invalidEnvEntryValue", env.getName()));
@@ -737,7 +757,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
     private Object constructEnvEntry(String type, String value) {
         try {
             Class<?> clazz = Class.forName(type);
-            Constructor<?> c = null;
+            Constructor<?> c;
             try {
                 c = clazz.getConstructor(String.class);
                 return c.newInstance(value);
@@ -1197,7 +1217,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
         StringTokenizer tokenizer = new StringTokenizer(name, "/");
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
-            if ((!token.equals("")) && (tokenizer.hasMoreTokens())) {
+            if ((!token.isEmpty()) && (tokenizer.hasMoreTokens())) {
                 try {
                     currentContext = currentContext.createSubcontext(token);
                 } catch (NamingException e) {
@@ -1219,7 +1239,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
      */
     private LookupRef lookForLookupRef(ResourceBase resourceBase) {
         String lookupName = resourceBase.getLookupName();
-        if ((lookupName != null && !lookupName.equals(""))) {
+        if ((lookupName != null && !lookupName.isEmpty())) {
             return new LookupRef(resourceBase.getType(), lookupName);
         }
         return null;

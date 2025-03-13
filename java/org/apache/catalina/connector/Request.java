@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -1020,7 +1021,7 @@ public class Request implements HttpServletRequest {
             parseLocales();
         }
 
-        if (locales.size() > 0) {
+        if (!locales.isEmpty()) {
             return locales.get(0);
         }
 
@@ -1035,7 +1036,7 @@ public class Request implements HttpServletRequest {
             parseLocales();
         }
 
-        if (locales.size() > 0) {
+        if (!locales.isEmpty()) {
             return Collections.enumeration(locales);
         }
         ArrayList<Locale> results = new ArrayList<>();
@@ -1610,11 +1611,7 @@ public class Request implements HttpServletRequest {
 
     @Override
     public DispatcherType getDispatcherType() {
-        if (internalDispatcherType == null) {
-            return DispatcherType.REQUEST;
-        }
-
-        return this.internalDispatcherType;
+        return Objects.requireNonNullElse(internalDispatcherType, DispatcherType.REQUEST);
     }
 
 
@@ -2387,7 +2384,7 @@ public class Request implements HttpServletRequest {
     public void changeSessionId(String newSessionId) {
         // This should only ever be called if there was an old session ID but
         // double check to be sure
-        if (requestedSessionId != null && requestedSessionId.length() > 0) {
+        if (requestedSessionId != null && !requestedSessionId.isEmpty()) {
             requestedSessionId = newSessionId;
         }
 
