@@ -26,13 +26,17 @@ import org.apache.tomcat.util.buf.UDecoder;
 public class InternalRewriteMap {
 
     public static RewriteMap toMap(String name) {
-        return switch (name) {
-            case "toupper" -> new UpperCase();
-            case "tolower" -> new LowerCase();
-            case "escape" -> new Escape();
-            case "unescape" -> new Unescape();
-            case null, default -> null;
-        };
+        if ("toupper".equals(name)) {
+            return new UpperCase();
+        } else if ("tolower".equals(name)) {
+            return new LowerCase();
+        } else if ("escape".equals(name)) {
+            return new Escape();
+        } else if ("unescape".equals(name)) {
+            return new Unescape();
+        } else {
+            return null;
+        }
     }
 
     public static class LowerCase implements RewriteMap {

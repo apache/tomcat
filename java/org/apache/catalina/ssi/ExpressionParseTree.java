@@ -225,7 +225,7 @@ public class ExpressionParseTree {
         if (!oppStack.isEmpty()) {
             throw new ParseException(sm.getString("expressionParseTree.unusedOpCodes"), et.getIndex());
         }
-        root = nodeStack.getFirst();
+        root = nodeStack.get(0);
     }
 
     /**
@@ -309,8 +309,8 @@ public class ExpressionParseTree {
          * @param values The list from which to pop the values
          */
         public void popValues(List<Node> values) {
-            right = values.removeFirst();
-            left = values.removeFirst();
+            right = values.remove(0);
+            left = values.remove(0);
         }
     }
 
@@ -332,7 +332,7 @@ public class ExpressionParseTree {
          */
         @Override
         public void popValues(List<Node> values) {
-            left = values.removeFirst();
+            left = values.remove(0);
         }
 
 
