@@ -191,7 +191,7 @@ public class RewriteValve extends ValveBase {
         for (String mapConfiguration : mapsConfiguration) {
             buffer.append(mapConfiguration).append("\r\n");
         }
-        if (mapsConfiguration.size() > 0) {
+        if (!mapsConfiguration.isEmpty()) {
             buffer.append("\r\n");
         }
         for (RewriteRule rule : rules) {
@@ -226,11 +226,10 @@ public class RewriteValve extends ValveBase {
                     }
                     for (RewriteCond condition : conditions) {
                         if (containerLog.isTraceEnabled()) {
-                            RewriteCond cond = condition;
-                            containerLog.trace("Add condition " + cond.getCondPattern() + " test " +
-                                    cond.getTestString() + " to rule with pattern " + rule.getPatternString() +
+                            containerLog.trace("Add condition " + condition.getCondPattern() + " test " +
+                                condition.getTestString() + " to rule with pattern " + rule.getPatternString() +
                                     " and substitution " + rule.getSubstitutionString() +
-                                    (cond.isOrnext() ? " [OR]" : "") + (cond.isNocase() ? " [NC]" : ""));
+                                    (condition.isOrnext() ? " [OR]" : "") + (condition.isNocase() ? " [NC]" : ""));
                         }
                         rule.addCondition(condition);
                     }
@@ -371,7 +370,7 @@ public class RewriteValve extends ValveBase {
 
                     StringBuilder urlStringEncoded =
                             new StringBuilder(URLEncoder.DEFAULT.encode(urlStringDecoded, uriCharset));
-                    if (!qsd && originalQueryStringEncoded != null && originalQueryStringEncoded.length() > 0) {
+                    if (!qsd && originalQueryStringEncoded != null && !originalQueryStringEncoded.isEmpty()) {
                         if (rewrittenQueryStringDecoded == null) {
                             urlStringEncoded.append('?');
                             urlStringEncoded.append(originalQueryStringEncoded);
@@ -505,7 +504,7 @@ public class RewriteValve extends ValveBase {
                         request.getCoyoteRequest().queryString().setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
                         chunk = request.getCoyoteRequest().queryString().getCharChunk();
                         chunk.append(URLEncoder.QUERY.encode(queryStringDecoded, uriCharset));
-                        if (qsa && originalQueryStringEncoded != null && originalQueryStringEncoded.length() > 0) {
+                        if (qsa && originalQueryStringEncoded != null && !originalQueryStringEncoded.isEmpty()) {
                             chunk.append('&');
                             chunk.append(originalQueryStringEncoded);
                         }

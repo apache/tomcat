@@ -149,7 +149,7 @@ public abstract class RequestFilterValve extends ValveBase {
      * @param allow The new allow expression
      */
     public void setAllow(String allow) {
-        if (allow == null || allow.length() == 0) {
+        if (allow == null || allow.isEmpty()) {
             this.allow = null;
             allowValue = null;
             allowValid = true;
@@ -183,7 +183,7 @@ public abstract class RequestFilterValve extends ValveBase {
      * @param deny The new deny expression
      */
     public void setDeny(String deny) {
-        if (deny == null || deny.length() == 0) {
+        if (deny == null || deny.isEmpty()) {
             this.deny = null;
             denyValue = null;
             denyValid = true;
@@ -420,11 +420,7 @@ public abstract class RequestFilterValve extends ValveBase {
         }
 
         // Allow if denies specified but not allows
-        if (deny != null && allow == null) {
-            return true;
-        }
-
-        // Deny this request
-        return false;
+        // Otherwise deny this request
+        return deny != null && allow == null;
     }
 }

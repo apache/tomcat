@@ -92,12 +92,12 @@ public class SecurityListener implements LifecycleListener {
      * @param userNameList A comma separated list of operating system users not permitted to run Tomcat
      */
     public void setCheckedOsUsers(String userNameList) {
-        if (userNameList == null || userNameList.length() == 0) {
+        if (userNameList == null || userNameList.isEmpty()) {
             checkedOsUsers.clear();
         } else {
             String[] userNames = userNameList.split(",");
             for (String userName : userNames) {
-                if (userName.length() > 0) {
+                if (!userName.isEmpty()) {
                     checkedOsUsers.add(userName.toLowerCase(Locale.getDefault()));
                 }
             }
@@ -121,7 +121,7 @@ public class SecurityListener implements LifecycleListener {
      * @param umask The 4-digit umask as returned by the OS command <i>umask</i>
      */
     public void setMinimumUmask(String umask) {
-        if (umask == null || umask.length() == 0) {
+        if (umask == null || umask.isEmpty()) {
             minimumUmask = Integer.valueOf(0);
         } else {
             minimumUmask = Integer.valueOf(umask, 8);
@@ -201,13 +201,12 @@ public class SecurityListener implements LifecycleListener {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("SecurityListener.checkUmaskSkip"));
                 }
-                return;
             } else {
                 if (minimumUmask.intValue() > 0) {
                     log.warn(sm.getString("SecurityListener.checkUmaskNone", UMASK_PROPERTY_NAME, getMinimumUmask()));
                 }
-                return;
             }
+            return;
         }
 
         if ((umask.intValue() & minimumUmask.intValue()) != minimumUmask.intValue()) {
@@ -222,7 +221,7 @@ public class SecurityListener implements LifecycleListener {
         if (allowedAgeDays >= 0) {
             String buildDateString = ServerInfo.getServerBuiltISO();
 
-            if (null == buildDateString || buildDateString.length() < 1 ||
+            if (null == buildDateString || buildDateString.isEmpty() ||
                     !Character.isDigit(buildDateString.charAt(0))) {
                 log.warn(sm.getString("SecurityListener.buildDateUnreadable", buildDateString));
             } else {

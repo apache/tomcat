@@ -39,7 +39,7 @@ public class ExactRateLimiter extends RateLimiterBase {
      * An accurate counter with exact bucket index, but slightly less efficient than another fast counter provided with
      * the {@link FastRateLimiter}.
      */
-    class ExactTimeBucketCounter extends TimeBucketCounterBase {
+    static class ExactTimeBucketCounter extends TimeBucketCounterBase {
 
         ExactTimeBucketCounter(int bucketDuration, ScheduledExecutorService executorService) {
             super(bucketDuration, executorService);
@@ -59,10 +59,8 @@ public class ExactRateLimiter extends RateLimiterBase {
         @Override
         public long getMillisUntilNextBucket() {
             long millis = System.currentTimeMillis();
-
             long nextTimeBucketMillis = (getBucketIndex(millis) + 1) * getBucketDuration() * 1000;
-            long delta = nextTimeBucketMillis - millis;
-            return delta;
+            return nextTimeBucketMillis - millis;
         }
     }
 }

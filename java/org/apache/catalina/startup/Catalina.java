@@ -314,7 +314,7 @@ public class Catalina {
      *
      * @return <code>true</code> if we should continue processing
      */
-    protected boolean arguments(String args[]) {
+    protected boolean arguments(String[] args) {
 
         boolean isConfig = false;
         boolean isGenerateCode = false;
@@ -497,8 +497,8 @@ public class Catalina {
      * Cluster support is optional. The JARs may have been removed.
      */
     private void addClusterRuleSet(Digester digester, String prefix) {
-        Class<?> clazz = null;
-        Constructor<?> constructor = null;
+        Class<?> clazz;
+        Constructor<?> constructor;
         try {
             clazz = Class.forName("org.apache.catalina.ha.ClusterRuleSet");
             constructor = clazz.getConstructor(String.class);
@@ -728,7 +728,7 @@ public class Catalina {
     /*
      * Load using arguments
      */
-    public void load(String args[]) {
+    public void load(String[] args) {
 
         try {
             if (arguments(args)) {
@@ -1003,7 +1003,7 @@ public class Catalina {
 
         }
 
-        ClassLoader parentClassLoader = null;
+        ClassLoader parentClassLoader;
 
         @Override
         public void begin(String namespace, String name, Attributes attributes) throws Exception {

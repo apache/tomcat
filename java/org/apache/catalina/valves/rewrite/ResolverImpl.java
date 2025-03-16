@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
@@ -42,7 +43,7 @@ import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationPars
 
 public class ResolverImpl extends Resolver {
 
-    protected Request request = null;
+    protected Request request;
 
     public ResolverImpl(Request request) {
         this.request = request;
@@ -324,12 +325,7 @@ public class ResolverImpl extends Resolver {
 
     @Override
     public String resolveHttp(String key) {
-        String header = request.getHeader(key);
-        if (header == null) {
-            return "";
-        } else {
-            return header;
-        }
+        return Objects.requireNonNullElse(request.getHeader(key), "");
     }
 
     @Override
@@ -353,11 +349,7 @@ public class ResolverImpl extends Resolver {
     }
 
     private static String emptyStringIfNull(String value) {
-        if (value == null) {
-            return "";
-        } else {
-            return value;
-        }
+        return Objects.requireNonNullElse(value, "");
     }
 
     @Override

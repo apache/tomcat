@@ -35,7 +35,7 @@ public class StoreAppender {
     /**
      * The set of classes that represent persistable properties.
      */
-    private static Class<?> persistables[] = { String.class, Integer.class, Integer.TYPE, Boolean.class, Boolean.TYPE,
+    private static final Class<?>[] persistables = { String.class, Integer.class, Integer.TYPE, Boolean.class, Boolean.TYPE,
             Byte.class, Byte.TYPE, Character.class, Character.TYPE, Double.class, Double.TYPE, Float.class, Float.TYPE,
             Long.class, Long.TYPE, Short.class, Short.TYPE, InetAddress.class };
 
@@ -211,7 +211,7 @@ public class StoreAppender {
         }
 
         // Acquire the list of properties for this bean
-        PropertyDescriptor descriptors[] = Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors();
+        PropertyDescriptor[] descriptors = Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors();
         if (descriptors == null) {
             descriptors = new PropertyDescriptor[0];
         }

@@ -64,15 +64,15 @@ public class CatalinaClusterSF extends StoreFactoryBase {
             }
             // Store nested <Valve> element
             // ClusterValve are not store at Hosts element, see
-            Valve valves[] = cluster.getValves();
+            Valve[] valves = cluster.getValves();
             storeElementArray(aWriter, indent, valves);
 
             if (aCluster instanceof SimpleTcpCluster) {
                 // Store nested <Listener> elements
-                LifecycleListener listeners[] = ((SimpleTcpCluster) cluster).findLifecycleListeners();
+                LifecycleListener[] listeners = ((SimpleTcpCluster) cluster).findLifecycleListeners();
                 storeElementArray(aWriter, indent, listeners);
                 // Store nested <ClusterListener> elements
-                ClusterListener mlisteners[] = ((SimpleTcpCluster) cluster).findClusterListeners();
+                ClusterListener[] mlisteners = ((SimpleTcpCluster) cluster).findClusterListeners();
                 List<ClusterListener> clusterListeners = new ArrayList<>();
                 for (ClusterListener clusterListener : mlisteners) {
                     if (clusterListener != deployer) {

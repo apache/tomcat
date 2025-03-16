@@ -181,9 +181,9 @@ public class StandardManager extends ManagerBase {
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("standardManager.loading", pathname));
         }
-        Loader loader = null;
+        Loader loader;
         ClassLoader classLoader = null;
-        Log logger = null;
+        Log logger;
         try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
                 BufferedInputStream bis = new BufferedInputStream(fis)) {
             Context c = getContext();
@@ -377,7 +377,7 @@ public class StandardManager extends ManagerBase {
         }
 
         // Expire all active sessions
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
         for (Session session : sessions) {
             try {
                 if (session.isValid()) {
@@ -405,7 +405,7 @@ public class StandardManager extends ManagerBase {
      * @return the file
      */
     protected File file() {
-        if (pathname == null || pathname.length() == 0) {
+        if (pathname == null || pathname.isEmpty()) {
             return null;
         }
         File file = new File(pathname);

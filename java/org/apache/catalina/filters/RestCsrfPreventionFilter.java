@@ -85,8 +85,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     private static final Predicate<String> nonModifyingMethods =
             m -> Objects.nonNull(m) && NON_MODIFYING_METHODS_PATTERN.matcher(m).matches();
 
-    private Set<String> pathsAcceptingParams = new HashSet<>();
-
+    private final Set<String> pathsAcceptingParams = new HashSet<>();
     private String pathsDelimiter = ",";
 
     @Override
@@ -110,13 +109,10 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
             }
 
             RestCsrfPreventionStrategy strategy;
-            switch (mType) {
-                case NON_MODIFYING_METHOD:
-                    strategy = new FetchRequest();
-                    break;
-                default:
-                    strategy = new StateChangingRequest();
-                    break;
+            if (mType == MethodType.NON_MODIFYING_METHOD) {
+                strategy = new FetchRequest();
+            } else {
+                strategy = new StateChangingRequest();
             }
 
             if (!strategy.apply((HttpServletRequest) request, (HttpServletResponse) response)) {

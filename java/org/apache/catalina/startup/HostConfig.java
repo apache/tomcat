@@ -144,7 +144,7 @@ public class HostConfig implements LifecycleListener {
     /**
      * Set of applications which are being serviced, and shouldn't be deployed/undeployed/redeployed at the moment.
      */
-    private Set<String> servicedSet = ConcurrentHashMap.newKeySet();
+    private final Set<String> servicedSet = ConcurrentHashMap.newKeySet();
 
     /**
      * The <code>Digester</code> instance used to parse context descriptors.
@@ -315,10 +315,7 @@ public class HostConfig implements LifecycleListener {
      * @return {@code true} if the application was not already in the list
      */
     public boolean tryAddServiced(String name) {
-        if (servicedSet.add(name)) {
-            return true;
-        }
-        return false;
+        return servicedSet.add(name);
     }
 
 
@@ -570,7 +567,7 @@ public class HostConfig implements LifecycleListener {
         Context context = null;
         boolean isExternalWar = false;
         boolean isExternal = false;
-        File expandedDocBase = null;
+        File expandedDocBase;
 
         try {
             synchronized (digesterLock) {
@@ -793,7 +790,7 @@ public class HostConfig implements LifecycleListener {
         // not end with File.separator for a directory
 
         StringBuilder docBase;
-        String canonicalDocBase = null;
+        String canonicalDocBase;
 
         try {
             String canonicalAppBase = appBase.getCanonicalPath();
@@ -819,7 +816,7 @@ public class HostConfig implements LifecycleListener {
 
         // Compare the two. If they are not the same, the contextPath must
         // have /../ like sequences in it
-        return canonicalDocBase.equals(docBase.toString());
+        return canonicalDocBase.contentEquals(docBase);
     }
 
     /**
@@ -849,12 +846,9 @@ public class HostConfig implements LifecycleListener {
         // If there is an expanded directory then any xml in that directory
         // should only be used if the directory is not out of date and
         // unpackWARs is true. Note the code below may apply further limits
-        boolean useXml = false;
+        boolean useXml = xml.exists() && unpackWARs && (!warTracker.exists() || warTracker.lastModified() == war.lastModified());
         // If the xml file exists then expandedDir must exists so no need to
         // test that here
-        if (xml.exists() && unpackWARs && (!warTracker.exists() || warTracker.lastModified() == war.lastModified())) {
-            useXml = true;
-        }
 
         Context context = null;
         boolean deployThisXML = isDeployThisXML(war, cn);
@@ -1099,7 +1093,7 @@ public class HostConfig implements LifecycleListener {
                     }
                 }
 
-                if (copyThisXml == false && context instanceof StandardContext) {
+                if (!copyThisXml && context instanceof StandardContext) {
                     // Host is using default value. Context may override it.
                     copyThisXml = ((StandardContext) context).getCopyXML();
                 }
@@ -1224,7 +1218,7 @@ public class HostConfig implements LifecycleListener {
 
     protected void migrateLegacyApp(File source, File destination) {
         File tempNew = null;
-        File tempOld = null;
+        File tempOld;
         try {
             tempNew = File.createTempFile("new", null, host.getLegacyAppBaseFile());
             tempOld = File.createTempFile("old", null, host.getLegacyAppBaseFile());
@@ -1580,13 +1574,9 @@ public class HostConfig implements LifecycleListener {
             return false;
         }
 
-        if (canonicalLocation.equals(canonicalConfigBase) && resource.getName().endsWith(".xml")) {
-            // Resource is an xml file in the configBase so it may be deleted
-            return true;
-        }
-
+        // Resource is a xml file in the configBase so it may be deleted
+        return canonicalLocation.equals(canonicalConfigBase) && resource.getName().endsWith(".xml");
         // All other resources should not be deleted
-        return false;
     }
 
 
@@ -1873,9 +1863,9 @@ public class HostConfig implements LifecycleListener {
 
     private static class DeployDescriptor implements Runnable {
 
-        private HostConfig config;
-        private ContextName cn;
-        private File descriptor;
+        private final HostConfig config;
+        private final ContextName cn;
+        private final File descriptor;
 
         DeployDescriptor(HostConfig config, ContextName cn, File descriptor) {
             this.config = config;
@@ -1895,9 +1885,9 @@ public class HostConfig implements LifecycleListener {
 
     private static class DeployWar implements Runnable {
 
-        private HostConfig config;
-        private ContextName cn;
-        private File war;
+        private final HostConfig config;
+        private final ContextName cn;
+        private final File war;
 
         DeployWar(HostConfig config, ContextName cn, File war) {
             this.config = config;
@@ -1917,9 +1907,9 @@ public class HostConfig implements LifecycleListener {
 
     private static class DeployDirectory implements Runnable {
 
-        private HostConfig config;
-        private ContextName cn;
-        private File dir;
+        private final HostConfig config;
+        private final ContextName cn;
+        private final File dir;
 
         DeployDirectory(HostConfig config, ContextName cn, File dir) {
             this.config = config;
@@ -1940,10 +1930,10 @@ public class HostConfig implements LifecycleListener {
 
     private static class MigrateApp implements Runnable {
 
-        private HostConfig config;
-        private ContextName cn;
-        private File source;
-        private File destination;
+        private final HostConfig config;
+        private final ContextName cn;
+        private final File source;
+        private final File destination;
 
         MigrateApp(HostConfig config, ContextName cn, File source, File destination) {
             this.config = config;

@@ -235,7 +235,7 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
                 filter.init(this);
             } finally {
                 String capturedlog = SystemLogHandler.stopCapture();
-                if (capturedlog != null && capturedlog.length() > 0) {
+                if (capturedlog != null && !capturedlog.isEmpty()) {
                     getServletContext().log(capturedlog);
                 }
             }

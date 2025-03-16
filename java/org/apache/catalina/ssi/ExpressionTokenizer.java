@@ -138,10 +138,9 @@ public class ExpressionTokenizer {
                 // Otherwise it's a string
                 break;
         }
-        int end = index;
+        int end;
         if (currentChar == '"' || currentChar == '\'') {
             // It's a quoted string and the end is the next unescaped quote
-            char endChar = currentChar;
             boolean escaped = false;
             start++;
             for (; index < length; index++) {
@@ -149,7 +148,7 @@ public class ExpressionTokenizer {
                     escaped = true;
                     continue;
                 }
-                if (expr[index] == endChar && !escaped) {
+                if (expr[index] == currentChar && !escaped) {
                     break;
                 }
                 escaped = false;
@@ -158,14 +157,13 @@ public class ExpressionTokenizer {
             index++; // Skip the end quote
         } else if (currentChar == '/') {
             // It's a regular expression and the end is the next unescaped /
-            char endChar = currentChar;
             boolean escaped = false;
             for (; index < length; index++) {
                 if (expr[index] == '\\' && !escaped) {
                     escaped = true;
                     continue;
                 }
-                if (expr[index] == endChar && !escaped) {
+                if (expr[index] == currentChar && !escaped) {
                     break;
                 }
                 escaped = false;

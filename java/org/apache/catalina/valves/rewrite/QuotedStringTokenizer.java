@@ -27,8 +27,8 @@ public class QuotedStringTokenizer {
 
     protected static final StringManager sm = StringManager.getManager(QuotedStringTokenizer.class);
 
-    private Iterator<String> tokenIterator;
-    private int tokenCount;
+    private final Iterator<String> tokenIterator;
+    private final int tokenCount;
     private int returnedTokens = 0;
 
     enum WordMode {
@@ -79,7 +79,7 @@ public class QuotedStringTokenizer {
                     break;
                 default:
                     throw new IllegalStateException(sm.getString("quotedStringTokenizer.tokenizeError", inputText,
-                            Integer.valueOf(pos), currentMode));
+                        Integer.valueOf(pos), currentMode));
             }
             pos++;
         }

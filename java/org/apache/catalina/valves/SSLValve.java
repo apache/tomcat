@@ -158,7 +158,7 @@ public class SSLValve extends ValveBase {
                 String header = "-----BEGIN CERTIFICATE-----\n";
                 String strcerts = header.concat(body);
                 ByteArrayInputStream bais = new ByteArrayInputStream(strcerts.getBytes(StandardCharsets.ISO_8859_1));
-                X509Certificate jsseCerts[] = null;
+                X509Certificate[] jsseCerts = null;
                 String providerName = (String) request.getConnector().getProperty("clientCertProvider");
                 try {
                     CertificateFactory cf;

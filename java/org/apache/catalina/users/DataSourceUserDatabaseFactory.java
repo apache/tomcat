@@ -69,7 +69,7 @@ public class DataSourceUserDatabaseFactory implements ObjectFactory {
 
         // We only know how to deal with <code>javax.naming.Reference</code>s
         // that specify a class name of "org.apache.catalina.UserDatabase"
-        if ((obj == null) || !(obj instanceof Reference)) {
+        if (!(obj instanceof Reference)) {
             return null;
         }
         Reference ref = (Reference) obj;
@@ -79,9 +79,7 @@ public class DataSourceUserDatabaseFactory implements ObjectFactory {
 
         DataSource dataSource = null;
         String dataSourceName = null;
-        RefAddr ra = null;
-
-        ra = ref.get("dataSourceName");
+        RefAddr ra = ref.get("dataSourceName");
         if (ra != null) {
             dataSourceName = ra.getContent().toString();
             dataSource = (DataSource) nameCtx.lookup(dataSourceName);

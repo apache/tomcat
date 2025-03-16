@@ -27,6 +27,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.Objects;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -49,7 +50,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SSIServletExternalResolver implements SSIExternalResolver {
     private static final StringManager sm = StringManager.getManager(SSIServletExternalResolver.class);
-    protected final String VARIABLE_NAMES[] = { "AUTH_TYPE", "CONTENT_LENGTH", "CONTENT_TYPE", "DOCUMENT_NAME",
+    protected final String[] VARIABLE_NAMES = { "AUTH_TYPE", "CONTENT_LENGTH", "CONTENT_TYPE", "DOCUMENT_NAME",
             "DOCUMENT_URI", "GATEWAY_INTERFACE", "HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING", "HTTP_ACCEPT_LANGUAGE",
             "HTTP_CONNECTION", "HTTP_HOST", "HTTP_REFERER", "HTTP_USER_AGENT", "PATH_INFO", "PATH_TRANSLATED",
             "QUERY_STRING", "QUERY_STRING_UNESCAPED", "REMOTE_ADDR", "REMOTE_HOST", "REMOTE_PORT", "REMOTE_USER",
@@ -141,7 +142,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
 
     @Override
     public String getVariableValue(String name) {
-        String retVal = null;
+        String retVal;
         Object object = getReqAttributeIgnoreCase(name);
         if (object != null) {
             retVal = object.toString();
@@ -256,13 +257,11 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
                         Charset queryStringCharset;
 
                         // If valid, apply settings from request / connector
+                        // Use default as a last resort
                         if (useBodyEncodingForURI && requestCharset != null) {
                             queryStringCharset = requestCharset;
-                        } else if (uriCharset != null) {
-                            queryStringCharset = uriCharset;
                         } else {
-                            // Use default as a last resort
-                            queryStringCharset = StandardCharsets.UTF_8;
+                            queryStringCharset = Objects.requireNonNullElse(uriCharset, StandardCharsets.UTF_8);
                         }
 
                         retVal = UDecoder.URLDecode(queryString, queryStringCharset);
@@ -385,9 +384,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             throw new IOException(
                     sm.getString("ssiServletExternalResolver.pathTraversalNonVirtualPath", nonVirtualPath));
         }
-        String path = getAbsolutePath(nonVirtualPath);
-        ServletContextAndPath csAndP = new ServletContextAndPath(context, path);
-        return csAndP;
+        return new ServletContextAndPath(context, getAbsolutePath(nonVirtualPath));
     }
 
 
@@ -427,16 +424,14 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
 
 
     protected ServletContextAndPath getServletContextAndPath(String originalPath, boolean virtual) throws IOException {
-        ServletContextAndPath csAndP = null;
         if (debug > 0) {
             log("SSIServletExternalResolver.getServletContextAndPath( " + originalPath + ", " + virtual + ")", null);
         }
         if (virtual) {
-            csAndP = getServletContextAndPathFromVirtualPath(originalPath);
+            return getServletContextAndPathFromVirtualPath(originalPath);
         } else {
-            csAndP = getServletContextAndPathFromNonVirtualPath(originalPath);
+            return getServletContextAndPathFromNonVirtualPath(originalPath);
         }
-        return csAndP;
     }
 
 
@@ -448,8 +443,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         if (url == null) {
             throw new IOException(sm.getString("ssiServletExternalResolver.noResource", path));
         }
-        URLConnection urlConnection = url.openConnection();
-        return urlConnection;
+        return url.openConnection();
     }
 
 
@@ -512,7 +506,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
              * Make an assumption that an empty response is a failure. This is a problem if a truly empty file were
              * included, but not sure how else to tell.
              */
-            if (retVal.equals("") && !req.getMethod().equalsIgnoreCase("HEAD")) {
+            if (retVal.isEmpty() && !req.getMethod().equalsIgnoreCase("HEAD")) {
                 throw new IOException(sm.getString("ssiServletExternalResolver.noFile", path));
             }
             return retVal;

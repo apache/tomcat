@@ -133,22 +133,22 @@ public class XMLWriter {
      * @param type          Element type
      */
     public void writeElement(String namespace, String namespaceInfo, String name, int type) {
-        if ((namespace != null) && (namespace.length() > 0)) {
+        if ((namespace != null) && (!namespace.isEmpty())) {
             switch (type) {
                 case OPENING:
                     if (lastWriteWasOpen) {
                         buffer.append('\n');
                     }
                     if (namespaceInfo != null) {
-                        buffer.append(
-                                "<" + namespace + ":" + name + " xmlns:" + namespace + "=\"" + namespaceInfo + "\">");
+                        buffer.append("<").append(namespace).append(":").append(name).append(" xmlns:")
+                            .append(namespace).append("=\"").append(namespaceInfo).append("\">");
                     } else {
-                        buffer.append("<" + namespace + ":" + name + ">");
+                        buffer.append("<").append(namespace).append(":").append(name).append(">");
                     }
                     lastWriteWasOpen = true;
                     break;
                 case CLOSING:
-                    buffer.append("</" + namespace + ":" + name + ">\n");
+                    buffer.append("</").append(namespace).append(":").append(name).append(">\n");
                     lastWriteWasOpen = false;
                     break;
                 case NO_CONTENT:
@@ -157,25 +157,25 @@ public class XMLWriter {
                         buffer.append('\n');
                     }
                     if (namespaceInfo != null) {
-                        buffer.append("<" + namespace + ":" + name + " xmlns:" + namespace + "=\"" + namespaceInfo +
-                                "\"/>\n");
+                        buffer.append("<").append(namespace).append(":").append(name).append(" xmlns:")
+                            .append(namespace).append("=\"").append(namespaceInfo).append("\"/>\n");
                     } else {
-                        buffer.append("<" + namespace + ":" + name + "/>\n");
+                        buffer.append("<").append(namespace).append(":").append(name).append("/>\n");
                     }
                     lastWriteWasOpen = false;
                     break;
             }
-        } else if ((namespaceInfo != null) && (namespaceInfo.length() > 0)) {
+        } else if ((namespaceInfo != null) && (!namespaceInfo.isEmpty())) {
             switch (type) {
                 case OPENING:
                     if (lastWriteWasOpen) {
                         buffer.append('\n');
                     }
-                    buffer.append("<" + name + " xmlns=\"" + namespaceInfo + "\">");
+                    buffer.append("<").append(name).append(" xmlns=\"").append(namespaceInfo).append("\">");
                     lastWriteWasOpen = true;
                     break;
                 case CLOSING:
-                    buffer.append("</" + name + ">\n");
+                    buffer.append("</").append(name).append(">\n");
                     lastWriteWasOpen = false;
                     break;
                 case NO_CONTENT:
@@ -183,7 +183,7 @@ public class XMLWriter {
                     if (lastWriteWasOpen) {
                         buffer.append('\n');
                     }
-                    buffer.append("<" + name + " xmlns=\"" + namespaceInfo + "\"/>\n");
+                    buffer.append("<").append(name).append(" xmlns=\"").append(namespaceInfo).append("\"/>\n");
                     lastWriteWasOpen = false;
                     break;
             }
@@ -193,11 +193,11 @@ public class XMLWriter {
                     if (lastWriteWasOpen) {
                         buffer.append('\n');
                     }
-                    buffer.append("<" + name + ">");
+                    buffer.append("<").append(name).append(">");
                     lastWriteWasOpen = true;
                     break;
                 case CLOSING:
-                    buffer.append("</" + name + ">\n");
+                    buffer.append("</").append(name).append(">\n");
                     lastWriteWasOpen = false;
                     break;
                 case NO_CONTENT:
@@ -205,7 +205,7 @@ public class XMLWriter {
                     if (lastWriteWasOpen) {
                         buffer.append('\n');
                     }
-                    buffer.append("<" + name + "/>\n");
+                    buffer.append("<").append(name).append("/>\n");
                     lastWriteWasOpen = false;
                     break;
             }
@@ -239,7 +239,7 @@ public class XMLWriter {
      * @param data Data to append
      */
     public void writeData(String data) {
-        buffer.append("<![CDATA[" + data + "]]>");
+        buffer.append("<![CDATA[").append(data).append("]]>");
     }
 
 

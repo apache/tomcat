@@ -1108,7 +1108,7 @@ public class ExpiresFilter extends FilterBase {
      * @return {@code true} if the given {@code str} is {@code null} or has a zero characters length.
      */
     protected static boolean isEmpty(String str) {
-        return str == null || str.length() == 0;
+        return str == null || str.isEmpty();
     }
 
     /**

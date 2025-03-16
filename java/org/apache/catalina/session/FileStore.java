@@ -127,7 +127,7 @@ public final class FileStore extends StoreBase {
         if (dir == null) {
             return 0;
         }
-        String files[] = dir.list();
+        String[] files = dir.list();
 
         // Figure out which files are sessions
         int keycount = 0;
@@ -160,7 +160,7 @@ public final class FileStore extends StoreBase {
         if (dir == null) {
             return new String[0];
         }
-        String files[] = dir.list();
+        String[] files = dir.list();
 
         // Bugzilla 32130
         if (files == null || files.length < 1) {

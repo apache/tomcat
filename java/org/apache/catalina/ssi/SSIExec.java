@@ -65,7 +65,7 @@ public class SSIExec implements SSICommand {
                 char[] buf = new char[BUFFER_SIZE];
                 try (BufferedReader stdOutReader = new BufferedReader(new InputStreamReader(proc.getInputStream()));
                         BufferedReader stdErrReader =
-                                new BufferedReader(new InputStreamReader(proc.getErrorStream()));) {
+                                new BufferedReader(new InputStreamReader(proc.getErrorStream()))) {
                     IOTools.flow(stdErrReader, writer, buf);
                     IOTools.flow(stdOutReader, writer, buf);
                 }

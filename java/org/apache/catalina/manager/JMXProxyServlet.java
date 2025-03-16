@@ -168,7 +168,7 @@ public class JMXProxyServlet extends HttpServlet {
 
     public void listBeans(PrintWriter writer, String qry) {
 
-        Set<ObjectName> names = null;
+        Set<ObjectName> names;
         try {
             names = mBeanServer.queryNames(new ObjectName(qry), null);
             writer.println("OK - Number of results: " + names.size());
@@ -259,7 +259,7 @@ public class JMXProxyServlet extends HttpServlet {
         MBeanOperationInfo methodInfo = registry.getMethodInfo(oname, operation, paramCount);
         if (null == methodInfo) {
             // getMethodInfo returns null for both "object not found" and "operation not found"
-            MBeanInfo info = null;
+            MBeanInfo info;
             try {
                 info = registry.getMBeanServer().getMBeanInfo(oname);
             } catch (InstanceNotFoundException infe) {

@@ -55,13 +55,13 @@ public class SessionConfig {
         // 3. Default defined by spec
         if (context != null) {
             String cookieName = context.getSessionCookieName();
-            if (cookieName != null && cookieName.length() > 0) {
+            if (cookieName != null && !cookieName.isEmpty()) {
                 return cookieName;
             }
 
             SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
             cookieName = scc.getName();
-            if (cookieName != null && cookieName.length() > 0) {
+            if (cookieName != null && !cookieName.isEmpty()) {
                 return cookieName;
             }
         }
@@ -81,10 +81,10 @@ public class SessionConfig {
         SessionCookieConfig scc = context.getServletContext().getSessionCookieConfig();
 
         String contextPath = context.getSessionCookiePath();
-        if (contextPath == null || contextPath.length() == 0) {
+        if (contextPath == null || contextPath.isEmpty()) {
             contextPath = scc.getPath();
         }
-        if (contextPath == null || contextPath.length() == 0) {
+        if (contextPath == null || contextPath.isEmpty()) {
             contextPath = context.getEncodedPath();
         }
         if (context.getSessionCookiePathUsesTrailingSlash()) {
@@ -98,7 +98,7 @@ public class SessionConfig {
         } else {
             // Only handle special case of ROOT context where cookies require a
             // path of '/' but the servlet spec uses an empty string
-            if (contextPath.length() == 0) {
+            if (contextPath.isEmpty()) {
                 contextPath = "/";
             }
         }

@@ -113,7 +113,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         // Acquire the list of properties for this bean
         ProtocolHandler protocolHandler = bean.getProtocolHandler();
         // Acquire the list of properties for this bean
-        PropertyDescriptor descriptors[] = Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors();
+        PropertyDescriptor[] descriptors = Introspector.getBeanInfo(bean.getClass()).getPropertyDescriptors();
         if (descriptors == null) {
             descriptors = new PropertyDescriptor[0];
         }
@@ -255,6 +255,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         try {
             file = file.getCanonicalFile();
         } catch (IOException e) {
+            // Ignore
         }
         return file;
     }

@@ -53,8 +53,7 @@ public class SecretKeyCredentialHandler extends DigestCredentialHandlerBase {
 
     @Override
     public void setAlgorithm(String algorithm) throws NoSuchAlgorithmException {
-        SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance(algorithm);
-        this.secretKeyFactory = secretKeyFactory;
+        this.secretKeyFactory = SecretKeyFactory.getInstance(algorithm);
     }
 
 

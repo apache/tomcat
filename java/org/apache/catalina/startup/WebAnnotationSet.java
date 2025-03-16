@@ -18,6 +18,7 @@ package org.apache.catalina.startup;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import jakarta.annotation.Resource;
 import jakarta.annotation.Resources;
@@ -333,11 +334,7 @@ public class WebAnnotationSet {
     private static String getType(Resource annotation, Class<?> defaultType) {
         Class<?> type = annotation.type();
         if (type == null || type.equals(Object.class)) {
-            if (defaultType != null) {
-                type = defaultType;
-            } else {
-                type = Object.class;
-            }
+            type = Objects.requireNonNullElse(defaultType, Object.class);
         }
         return Introspection.convertPrimitiveType(type).getCanonicalName();
     }
@@ -345,7 +342,7 @@ public class WebAnnotationSet {
 
     private static String getName(Resource annotation, String defaultName) {
         String name = annotation.name();
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             if (defaultName != null) {
                 name = defaultName;
             }
