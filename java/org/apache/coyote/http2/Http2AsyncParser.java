@@ -152,11 +152,14 @@ class Http2AsyncParser extends Http2Parser {
         if (error != null) {
             Throwable error = this.error;
             this.error = null;
-            switch (error) {
-                case Http2Exception http2Exception -> throw http2Exception;
-                case IOException ioException -> throw ioException;
-                case RuntimeException runtimeException -> throw runtimeException;
-                case null, default -> throw new RuntimeException(error);
+            if (error instanceof Http2Exception) {
+                throw (Http2Exception) error;
+            } else if (error instanceof IOException) {
+                throw (IOException) error;
+            } else if (error instanceof RuntimeException) {
+                throw (RuntimeException) error;
+            } else {
+                throw new RuntimeException(error);
             }
         }
     }
