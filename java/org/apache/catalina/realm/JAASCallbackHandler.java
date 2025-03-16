@@ -177,7 +177,7 @@ public class JAASCallbackHandler implements CallbackHandler {
      * @exception UnsupportedCallbackException if the login method requests an unsupported callback type
      */
     @Override
-    public void handle(Callback callbacks[]) throws IOException, UnsupportedCallbackException {
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 
         for (Callback callback : callbacks) {
 
@@ -196,26 +196,17 @@ public class JAASCallbackHandler implements CallbackHandler {
                 ((PasswordCallback) callback).setPassword(passwordcontents);
             } else if (callback instanceof TextInputCallback) {
                 TextInputCallback cb = ((TextInputCallback) callback);
-                if (cb.getPrompt().equals("nonce")) {
-                    cb.setText(nonce);
-                } else if (cb.getPrompt().equals("nc")) {
-                    cb.setText(nc);
-                } else if (cb.getPrompt().equals("cnonce")) {
-                    cb.setText(cnonce);
-                } else if (cb.getPrompt().equals("qop")) {
-                    cb.setText(qop);
-                } else if (cb.getPrompt().equals("realmName")) {
-                    cb.setText(realmName);
-                } else if (cb.getPrompt().equals("digestA2")) {
-                    cb.setText(digestA2);
-                } else if (cb.getPrompt().equals("authMethod")) {
-                    cb.setText(authMethod);
-                } else if (cb.getPrompt().equals("algorithm")) {
-                    cb.setText(algorithm);
-                } else if (cb.getPrompt().equals("catalinaBase")) {
-                    cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
-                } else {
-                    throw new UnsupportedCallbackException(callback);
+                switch (cb.getPrompt()) {
+                    case "nonce" -> cb.setText(nonce);
+                    case "nc" -> cb.setText(nc);
+                    case "cnonce" -> cb.setText(cnonce);
+                    case "qop" -> cb.setText(qop);
+                    case "realmName" -> cb.setText(realmName);
+                    case "digestA2" -> cb.setText(digestA2);
+                    case "authMethod" -> cb.setText(authMethod);
+                    case "algorithm" -> cb.setText(algorithm);
+                    case "catalinaBase" -> cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
+                    default -> throw new UnsupportedCallbackException(callback);
                 }
             } else {
                 throw new UnsupportedCallbackException(callback);

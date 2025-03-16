@@ -169,10 +169,8 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
 
         PrintWriter writer = response.getWriter();
 
-        boolean completeStatus = false;
-        if (request.getPathInfo() != null && request.getPathInfo().equals("/all")) {
-            completeStatus = true;
-        }
+        boolean completeStatus = request.getPathInfo() != null && request.getPathInfo().equals("/all");
+
         // use StatusTransformer to output status
         Object[] args = new Object[1];
         args[0] = getServletContext().getContextPath();
@@ -308,23 +306,19 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
             if (notification.getType().equals(MBeanServerNotification.REGISTRATION_NOTIFICATION)) {
                 String type = objectName.getKeyProperty("type");
                 if (type != null) {
-                    if (type.equals("ThreadPool")) {
-                        threadPools.add(objectName);
-                    } else if (type.equals("GlobalRequestProcessor")) {
-                        globalRequestProcessors.add(objectName);
-                    } else if (type.equals("RequestProcessor")) {
-                        requestProcessors.add(objectName);
+                    switch (type) {
+                        case "ThreadPool" -> threadPools.add(objectName);
+                        case "GlobalRequestProcessor" -> globalRequestProcessors.add(objectName);
+                        case "RequestProcessor" -> requestProcessors.add(objectName);
                     }
                 }
             } else if (notification.getType().equals(MBeanServerNotification.UNREGISTRATION_NOTIFICATION)) {
                 String type = objectName.getKeyProperty("type");
                 if (type != null) {
-                    if (type.equals("ThreadPool")) {
-                        threadPools.remove(objectName);
-                    } else if (type.equals("GlobalRequestProcessor")) {
-                        globalRequestProcessors.remove(objectName);
-                    } else if (type.equals("RequestProcessor")) {
-                        requestProcessors.remove(objectName);
+                    switch (type) {
+                        case "ThreadPool" -> threadPools.remove(objectName);
+                        case "GlobalRequestProcessor" -> globalRequestProcessors.remove(objectName);
+                        case "RequestProcessor" -> requestProcessors.remove(objectName);
                     }
                 }
             }

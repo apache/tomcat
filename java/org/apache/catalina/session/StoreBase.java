@@ -101,7 +101,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     /**
      * Get only those keys of sessions, that are saved in the Store and are to be expired.
      *
-     * @return list of session keys, that are to be expired
+     * @return array of session keys, that are to be expired
      *
      * @throws IOException if an input-/output error occurred
      */
@@ -114,7 +114,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
      * so expire the Session and remove it from the Store.
      */
     public void processExpires() {
-        String[] keys = null;
+        String[] keys;
 
         if (!getState().isAvailable()) {
             return;

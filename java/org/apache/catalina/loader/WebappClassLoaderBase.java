@@ -18,6 +18,7 @@ package org.apache.catalina.loader;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.instrument.ClassFileTransformer;
@@ -308,7 +309,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     /**
      * Repositories managed by this class rather than the super class.
      */
-    private List<URL> localRepositories = new ArrayList<>();
+    private final List<URL> localRepositories = new ArrayList<>();
 
 
     private volatile LifecycleState state = LifecycleState.NEW;
@@ -597,7 +598,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             sb.append(this.parent.toString());
             sb.append("\r\n");
         }
-        if (this.transformers.size() > 0) {
+        if (!this.transformers.isEmpty()) {
             sb.append("----------> Class file transformers:\r\n");
             for (ClassFileTransformer transformer : this.transformers) {
                 sb.append(transformer).append("\r\n");
@@ -817,7 +818,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         checkStateForResourceLoading(name);
 
-        URL url = null;
+        URL url;
 
         boolean delegateFirst = delegate || filter(name, false);
 
@@ -929,7 +930,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (resource.exists()) {
                 stream = resource.getInputStream();
                 // Filter out .class resources through the ClassFileTranformer
-                if (name.endsWith(CLASS_FILE_SUFFIX) && transformers.size() > 0) {
+                if (name.endsWith(CLASS_FILE_SUFFIX) && !transformers.isEmpty()) {
                     // If the resource is a class, decorate it with any attached transformers
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     byte[] buf = new byte[8192];
@@ -945,6 +946,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         try {
                             stream.close();
                         } catch (IOException e) {
+                            // Ignore
                         }
                     }
                     byte[] binaryContent = baos.toByteArray();
@@ -1046,7 +1048,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             if (log.isTraceEnabled()) {
                 log.trace("loadClass(" + name + ", " + resolve + ")");
             }
-            Class<?> clazz = null;
+            Class<?> clazz;
 
             // Log access to stopped class loader
             checkStateForClassLoading(name);
@@ -1425,6 +1427,9 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         byte[] classBytes = new byte[2048];
         int offset = 0;
         try (InputStream is = getResourceAsStream("org/apache/catalina/loader/JdbcLeakPrevention.class")) {
+            if (is == null) {
+                throw new FileNotFoundException("org/apache/catalina/loader/JdbcLeakPrevention.class");
+            }
             int read = is.read(classBytes, offset, classBytes.length - offset);
             while (read > -1) {
                 offset += read;
@@ -1585,7 +1590,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 target = targetField.get(thread);
                 break;
             } catch (NoSuchFieldException nfe) {
-                continue;
+                // Ignore
             }
         }
 
@@ -1601,8 +1606,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         }
 
         if (result == null) {
-            Object holder = null;
-            Object task = null;
+            Object holder;
+            Object task;
             try {
                 Field holderField = thread.getClass().getDeclaredField("holder");
                 holderField.setAccessible(true);
@@ -1636,7 +1641,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         StackTraceElement[] elements = thread.getStackTrace();
 
-        if (elements == null || elements.length == 0) {
+        if (elements.length == 0) {
             // Must have stopped already. Too late to ignore it. Assume not a
             // request processing thread.
             return false;
@@ -1876,7 +1881,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
     /**
-     * @return the set of current threads as an array.
+     * @return the current threads as an array.
      */
     private Thread[] getThreads() {
         // Get the current thread group
@@ -2075,7 +2080,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             URL codeBase = resource.getCodeBase();
             Certificate[] certificates = resource.getCertificates();
 
-            if (transformers.size() > 0) {
+            if (!transformers.isEmpty()) {
                 // If the resource is a class just being loaded, decorate it
                 // with any attached transformers
 

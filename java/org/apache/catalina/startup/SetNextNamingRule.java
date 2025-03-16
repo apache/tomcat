@@ -78,7 +78,7 @@ public class SetNextNamingRule extends Rule {
         Object parent = digester.peek(1);
         boolean context = false;
 
-        NamingResourcesImpl namingResources = null;
+        NamingResourcesImpl namingResources;
         if (parent instanceof Context) {
             namingResources = ((Context) parent).getNamingResources();
             context = true;

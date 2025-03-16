@@ -73,7 +73,7 @@ public class TimeBucketCounter extends TimeBucketCounterBase {
      *
      * @return bits to be shifted
      */
-    protected static final int determineShiftBitsOfDuration(int duration) {
+    protected static int determineShiftBitsOfDuration(int duration) {
         int bits = 0;
         int pof2 = nextPowerOf2(duration * 1000);
         int bitCheck = pof2;
@@ -142,7 +142,6 @@ public class TimeBucketCounter extends TimeBucketCounterBase {
     public long getMillisUntilNextBucket() {
         long millis = System.currentTimeMillis();
         long nextTimeBucketMillis = ((millis + (long) Math.pow(2, numBits)) >> numBits) << numBits;
-        long delta = nextTimeBucketMillis - millis;
-        return delta;
+        return nextTimeBucketMillis - millis;
     }
 }

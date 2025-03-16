@@ -95,7 +95,6 @@ public class SSIProcessor {
         StringWriter stringWriter = new StringWriter();
         IOTools.flow(reader, stringWriter);
         String fileContents = stringWriter.toString();
-        stringWriter = null;
         int index = 0;
         boolean inside = false;
         StringBuilder command = new StringBuilder();
@@ -175,7 +174,7 @@ public class SSIProcessor {
     protected String[] parseParamNames(StringBuilder cmd, int start) {
         int bIdx = start;
         int i = 0;
-        int quotes = 0;
+        int quotes;
         boolean inside = false;
         StringBuilder retBuf = new StringBuilder();
         while (bIdx < cmd.length()) {
@@ -186,14 +185,14 @@ public class SSIProcessor {
                 if (bIdx >= cmd.length()) {
                     break;
                 }
-                inside = !inside;
+                inside = true;
             } else {
                 while (bIdx < cmd.length() && cmd.charAt(bIdx) != '=') {
                     retBuf.append(cmd.charAt(bIdx));
                     bIdx++;
                 }
                 retBuf.append('=');
-                inside = !inside;
+                inside = false;
                 quotes = 0;
                 boolean escaped = false;
                 for (; bIdx < cmd.length() && quotes != 2; bIdx++) {
@@ -242,7 +241,7 @@ public class SSIProcessor {
                 if (bIdx >= cmd.length()) {
                     break;
                 }
-                inside = !inside;
+                inside = true;
                 endQuote = cmd.charAt(bIdx);
             } else {
                 boolean escaped = false;
@@ -273,7 +272,7 @@ public class SSIProcessor {
                 }
                 vals[valIndex++] = sb.toString();
                 sb.delete(0, sb.length()); // clear the buffer
-                inside = !inside;
+                inside = false;
             }
         }
         return vals;

@@ -64,7 +64,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
 
         StringManager smClient = StringManager.getManager(Constants.Package, request.getLocales());
         response.setLocale(smClient.getLocale());
-        String type = null;
+        String type;
         if (throwable != null) {
             type = smClient.getString("errorReportValve.exceptionReport");
         } else {
@@ -74,8 +74,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
         if (message == null && throwable != null) {
             message = throwable.getMessage();
         }
-        String description = null;
-        description = smClient.getString("http." + statusCode + ".desc");
+        String description = smClient.getString("http." + statusCode + ".desc");
         if (description == null) {
             if (message == null || message.isEmpty()) {
                 return;
@@ -100,7 +99,6 @@ public class JsonErrorReportValve extends ErrorReportValve {
             if (writer != null) {
                 writer.write(jsonReport);
                 response.finishResponse();
-                return;
             }
         } catch (IOException | IllegalStateException e) {
             // Ignore

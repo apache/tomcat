@@ -68,7 +68,7 @@ import org.apache.tomcat.util.security.Escape;
  *
  * @see ManagerServlet
  */
-public final class HTMLManagerServlet extends ManagerServlet {
+public class HTMLManagerServlet extends ManagerServlet {
 
     private static final long serialVersionUID = 1L;
 
@@ -156,11 +156,11 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String deployWar = request.getParameter("deployWar");
         String deployConfig = request.getParameter("deployConfig");
         ContextName deployCn = null;
-        if (deployPath != null && deployPath.length() > 0) {
+        if (deployPath != null && !deployPath.isEmpty()) {
             deployCn = new ContextName(deployPath, request.getParameter("deployVersion"));
-        } else if (deployConfig != null && deployConfig.length() > 0) {
+        } else if (deployConfig != null && !deployConfig.isEmpty()) {
             deployCn = ContextName.extractFromPath(deployConfig);
-        } else if (deployWar != null && deployWar.length() > 0) {
+        } else if (deployWar != null && !deployWar.isEmpty()) {
             deployCn = ContextName.extractFromPath(deployWar);
         }
 
@@ -171,7 +171,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         String message = "";
 
-        if (command == null || command.length() == 0) {
+        if (command == null || command.isEmpty()) {
             // No command == list
             // List always displayed -> do nothing
         } else if (command.equals("/upload")) {
@@ -317,7 +317,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         // Message Section
         args = new Object[3];
         args[0] = smClient.getString("htmlManagerServlet.messageLabel");
-        if (message == null || message.length() == 0) {
+        if (message == null || message.isEmpty()) {
             args[1] = "OK";
         } else {
             args[1] = Escape.htmlElementContent(message);
@@ -353,8 +353,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         // Apps Row Section
         // Create sorted map of deployed applications by context name.
-        Container children[] = host.findChildren();
-        String contextNames[] = new String[children.length];
+        Container[] children = host.findChildren();
+        String[] contextNames = new String[children.length];
         for (int i = 0; i < children.length; i++) {
             contextNames[i] = children[i].getName();
         }
@@ -369,8 +369,8 @@ public final class HTMLManagerServlet extends ManagerServlet {
         String noVersion = "<i>" + smClient.getString("htmlManagerServlet.noVersion") + "</i>";
 
         boolean isHighlighted = true;
-        boolean isDeployed = true;
-        String highlightColor = null;
+        boolean isDeployed;
+        String highlightColor;
 
         for (String contextName : contextNames) {
             Context ctxt = (Context) host.findChild(contextName);
@@ -386,7 +386,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
                 String contextPath = ctxt.getPath();
                 String displayPath = contextPath;
-                if (displayPath.equals("")) {
+                if (displayPath.isEmpty()) {
                     displayPath = "/";
                 }
 
@@ -394,7 +394,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
                 tmp.append("path=");
                 tmp.append(URLEncoder.DEFAULT.encode(displayPath, StandardCharsets.UTF_8));
                 final String webappVersion = ctxt.getWebappVersion();
-                if (webappVersion != null && webappVersion.length() > 0) {
+                if (webappVersion != null && !webappVersion.isEmpty()) {
                     tmp.append("&version=");
                     tmp.append(URLEncoder.DEFAULT.encode(webappVersion, StandardCharsets.UTF_8));
                 }
@@ -684,7 +684,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
 
         String writerText = stringWriter.toString();
 
-        if (writerText.length() > 0) {
+        if (!writerText.isEmpty()) {
             if (!writerText.startsWith("FAIL -")) {
                 msg.append(smClient.getString("htmlManagerServlet.findleaksList"));
             }
@@ -738,8 +738,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         super.init();
 
         // Set our properties from the initialization parameters
-        String value = null;
-        value = getServletConfig().getInitParameter("showProxySessions");
+        String value = getServletConfig().getInitParameter("showProxySessions");
         showProxySessions = Boolean.parseBoolean(value);
 
         htmlSubTitle = getServletConfig().getInitParameter("htmlSubTitle");
@@ -795,7 +794,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         } else if ("invalidateSessions".equals(action)) {
             String[] sessionIds = req.getParameterValues("sessionIds");
             int i = invalidateSessions(cn, sessionIds, smClient);
-            req.setAttribute(APPLICATION_MESSAGE, "" + i + " sessions invalidated.");
+            req.setAttribute(APPLICATION_MESSAGE, Integer.toString(i) + " sessions invalidated.");
         } else if ("removeSessionAttribute".equals(action)) {
             String sessionId = req.getParameter("sessionId");
             String name = req.getParameter("attributeName");
@@ -810,7 +809,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
 
     protected List<Session> getSessionsForName(ContextName cn, StringManager smClient) {
-        if (cn == null || !(cn.getPath().startsWith("/") || cn.getPath().equals(""))) {
+        if (cn == null || !(cn.getPath().startsWith("/") || cn.getPath().isEmpty())) {
             String path = null;
             if (cn != null) {
                 path = cn.getPath();
@@ -871,7 +870,7 @@ public final class HTMLManagerServlet extends ManagerServlet {
         List<Session> sessions = getSessionsForName(cn, smClient);
         String sortBy = req.getParameter("sort");
         String orderBy = null;
-        if (null != sortBy && !"".equals(sortBy.trim())) {
+        if (null != sortBy && !sortBy.trim().isEmpty()) {
             Comparator<Session> comparator = getComparator(sortBy);
             if (comparator != null) {
                 orderBy = req.getParameter("order");
@@ -1000,39 +999,29 @@ public final class HTMLManagerServlet extends ManagerServlet {
     }
 
     protected Comparator<Session> getComparator(String sortBy) {
-        Comparator<Session> comparator = null;
         if ("CreationTime".equalsIgnoreCase(sortBy)) {
             return Comparator.comparingLong(Session::getCreationTime);
-
         } else if ("id".equalsIgnoreCase(sortBy)) {
             return comparingNullable(Session::getId);
-
         } else if ("LastAccessedTime".equalsIgnoreCase(sortBy)) {
             return Comparator.comparingLong(Session::getLastAccessedTime);
-
         } else if ("MaxInactiveInterval".equalsIgnoreCase(sortBy)) {
             return Comparator.comparingInt(Session::getMaxInactiveInterval);
-
         } else if ("new".equalsIgnoreCase(sortBy)) {
             return Comparator.comparing(s -> Boolean.valueOf(s.getSession().isNew()));
-
         } else if ("locale".equalsIgnoreCase(sortBy)) {
             return Comparator.comparing(JspHelper::guessDisplayLocaleFromSession);
-
         } else if ("user".equalsIgnoreCase(sortBy)) {
             return comparingNullable(JspHelper::guessDisplayUserFromSession);
-
         } else if ("UsedTime".equalsIgnoreCase(sortBy)) {
             return Comparator.comparingLong(SessionUtils::getUsedTimeForSession);
-
         } else if ("InactiveTime".equalsIgnoreCase(sortBy)) {
             return Comparator.comparingLong(SessionUtils::getInactiveTimeForSession);
-
         } else if ("TTL".equalsIgnoreCase(sortBy)) {
             return Comparator.comparingLong(SessionUtils::getTTLForSession);
-
+        } else {
+            return null;
         }
-        return comparator;
     }
 
 

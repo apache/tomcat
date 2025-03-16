@@ -29,7 +29,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class ManagerSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(ManagerSF.class);
+    private static final Log log = LogFactory.getLog(ManagerSF.class);
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
@@ -62,10 +62,7 @@ public class ManagerSF extends StoreFactoryBase {
      */
     protected boolean isDefaultManager(StandardManager smanager) {
 
-        if (!"SESSIONS.ser".equals(smanager.getPathname()) || (smanager.getMaxActiveSessions() != -1)) {
-            return false;
-        }
-        return true;
+        return "SESSIONS.ser".equals(smanager.getPathname()) && (smanager.getMaxActiveSessions() == -1);
 
     }
 

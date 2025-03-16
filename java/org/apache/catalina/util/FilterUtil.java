@@ -92,8 +92,8 @@ public class FilterUtil {
             if (testPath.regionMatches(0, requestPath, 0, testPath.length() - 2)) {
                 if (requestPath.length() == (testPath.length() - 2)) {
                     return true;
-                } else if ('/' == requestPath.charAt(testPath.length() - 2)) {
-                    return true;
+                } else {
+                    return '/' == requestPath.charAt(testPath.length() - 2);
                 }
             }
             return false;

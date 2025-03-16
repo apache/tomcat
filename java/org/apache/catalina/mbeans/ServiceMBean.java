@@ -39,7 +39,7 @@ public class ServiceMBean extends BaseCatalinaMBean<Service> {
         Service service = doGetManagedResource();
         String protocol = isAjp ? "AJP/1.3" : "HTTP/1.1";
         Connector connector = new Connector(protocol);
-        if ((address != null) && (address.length() > 0)) {
+        if ((address != null) && (!address.isEmpty())) {
             connector.setProperty("address", address);
         }
         connector.setPort(port);

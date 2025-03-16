@@ -30,17 +30,17 @@ public class ToStringUtil {
     }
 
 
-    public static final String toString(Contained contained) {
+    public static String toString(Contained contained) {
         return toString(contained, contained.getContainer());
     }
 
 
-    public static final String toString(Object obj, Container container) {
+    public static String toString(Object obj, Container container) {
         return containedToString(obj, container, "Container");
     }
 
 
-    public static final String toString(Object obj, Manager manager) {
+    public static String toString(Object obj, Manager manager) {
         return containedToString(obj, manager, "Manager");
     }
 

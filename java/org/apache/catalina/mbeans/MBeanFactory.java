@@ -115,15 +115,13 @@ public class MBeanFactory {
             String path = name.substring(i);
             Container host = engine.findChild(hostName);
             String pathStr = getPathStr(path);
-            Container context = host.findChild(pathStr);
-            return context;
+            return host.findChild(pathStr);
         } else if (type != null) {
             if (type.equals("Engine")) {
                 return engine;
             } else if (type.equals("Host")) {
                 String hostName = pname.getKeyProperty("host");
-                Container host = engine.findChild(hostName);
-                return host;
+                return engine.findChild(hostName);
             }
         }
         return null;
@@ -145,14 +143,12 @@ public class MBeanFactory {
             return engine;
         } else if (path == null) {
             // child's container is Host
-            Container host = engine.findChild(hostName);
-            return host;
+            return engine.findChild(hostName);
         } else {
             // child's container is Context
             Container host = engine.findChild(hostName);
             path = getPathStr(path);
-            Container context = host.findChild(path);
-            return context;
+            return host.findChild(path);
         }
     }
 
@@ -285,7 +281,7 @@ public class MBeanFactory {
         // Set the protocol in the constructor
         String protocol = isAjp ? "AJP/1.3" : "HTTP/1.1";
         Connector retobj = new Connector(protocol);
-        if ((address != null) && (address.length() > 0)) {
+        if ((address != null) && (!address.isEmpty())) {
             retobj.setProperty("address", address);
         }
         // Set port number
@@ -646,7 +642,7 @@ public class MBeanFactory {
             address = ObjectName.unquote(address);
         }
 
-        Connector conns[] = service.findConnectors();
+        Connector[] conns = service.findConnectors();
 
         for (Connector conn : conns) {
             String connAddress = null;

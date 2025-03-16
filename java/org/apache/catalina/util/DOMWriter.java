@@ -63,7 +63,7 @@ public class DOMWriter {
             case Node.ELEMENT_NODE:
                 out.print('<');
                 out.print(node.getLocalName());
-                Attr attrs[] = sortAttributes(node.getAttributes());
+                Attr[] attrs = sortAttributes(node.getAttributes());
                 boolean xmlns = false;
                 for (Attr attr : attrs) {
                     if ("xmlns".equals(attr.getPrefix())) {
@@ -109,7 +109,7 @@ public class DOMWriter {
                 out.print(node.getLocalName());
 
                 String data = node.getNodeValue();
-                if (data != null && data.length() > 0) {
+                if (data != null && !data.isEmpty()) {
                     out.print(' ');
                     out.print(data);
                 }
@@ -152,17 +152,15 @@ public class DOMWriter {
         }
 
         int len = attrs.getLength();
-        Attr array[] = new Attr[len];
+        Attr[] array = new Attr[len];
         for (int i = 0; i < len; i++) {
             array[i] = (Attr) attrs.item(i);
         }
         for (int i = 0; i < len - 1; i++) {
-            String name = null;
-            name = array[i].getLocalName();
+            String name = array[i].getLocalName();
             int index = i;
             for (int j = i + 1; j < len; j++) {
-                String curName = null;
-                curName = array[j].getLocalName();
+                String curName = array[j].getLocalName();
                 if (curName.compareTo(name) < 0) {
                     name = curName;
                     index = j;

@@ -49,10 +49,10 @@ import org.apache.tomcat.util.res.StringManager;
  * Central StoreRegistry for all server.xml elements
  */
 public class StoreRegistry {
-    private static Log log = LogFactory.getLog(StoreRegistry.class);
-    private static StringManager sm = StringManager.getManager(StoreRegistry.class);
+    private static final Log log = LogFactory.getLog(StoreRegistry.class);
+    private static final StringManager sm = StringManager.getManager(StoreRegistry.class);
 
-    private Map<String,StoreDescription> descriptors = new HashMap<>();
+    private final Map<String,StoreDescription> descriptors = new HashMap<>();
 
     private String encoding = "UTF-8";
 
@@ -61,7 +61,7 @@ public class StoreRegistry {
     private String version;
 
     // Access Information
-    private static Class<?> interfaces[] = { CatalinaCluster.class, ChannelSender.class, ChannelReceiver.class,
+    private static final Class<?>[] interfaces = { CatalinaCluster.class, ChannelSender.class, ChannelReceiver.class,
             Channel.class, MembershipService.class, ClusterDeployer.class, Realm.class, Manager.class, DirContext.class,
             LifecycleListener.class, Valve.class, ClusterListener.class, MessageListener.class, DataSender.class,
             ChannelInterceptor.class, Member.class, WebResourceRoot.class, WebResourceSet.class,
@@ -197,7 +197,7 @@ public class StoreRegistry {
      */
     public StoreDescription unregisterDescription(StoreDescription desc) {
         String key = desc.getId();
-        if (key == null || "".equals(key)) {
+        if (key == null || key.isEmpty()) {
             key = desc.getTagClass();
         }
         return descriptors.remove(key);

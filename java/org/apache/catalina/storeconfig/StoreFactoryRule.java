@@ -54,16 +54,16 @@ public class StoreFactoryRule extends Rule {
     /**
      * The attribute name of an attribute that can override the implementation class name.
      */
-    private String attributeName;
+    private final String attributeName;
 
-    private String appenderAttributeName;
+    private final String appenderAttributeName;
 
     /**
      * The name of the <code>IStoreFactory</code> implementation class.
      */
-    private String storeFactoryClass;
+    private final String storeFactoryClass;
 
-    private String storeAppenderClass;
+    private final String storeAppenderClass;
 
     // --------------------------------------------------------- Public Methods
 

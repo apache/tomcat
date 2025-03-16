@@ -93,14 +93,14 @@ public class ExpressionParseTree {
     private void pushOpp(OppNode node) {
         // If node is null then it's just a group marker
         if (node == null) {
-            oppStack.add(0, node);
+            oppStack.addFirst(null);
             return;
         }
         while (true) {
-            if (oppStack.size() == 0) {
+            if (oppStack.isEmpty()) {
                 break;
             }
-            OppNode top = oppStack.get(0);
+            OppNode top = oppStack.getFirst();
             // If the top is a spacer then don't pop
             // anything
             if (top == null) {
@@ -112,14 +112,14 @@ public class ExpressionParseTree {
                 break;
             }
             // Remove the top node
-            oppStack.remove(0);
+            oppStack.removeFirst();
             // Let it fill its branches
             top.popValues(nodeStack);
             // Stick it on the resolved node stack
-            nodeStack.add(0, top);
+            nodeStack.addFirst(top);
         }
         // Add the new node to the opp stack
-        oppStack.add(0, node);
+        oppStack.addFirst(node);
     }
 
 
@@ -127,12 +127,12 @@ public class ExpressionParseTree {
      * Resolves all pending opp nodes on the stack until the next group marker is reached.
      */
     private void resolveGroup() {
-        OppNode top = null;
-        while ((top = oppStack.remove(0)) != null) {
+        OppNode top;
+        while ((top = oppStack.removeFirst()) != null) {
             // Let it fill its branches
             top.popValues(nodeStack);
             // Stick it on the resolved node stack
-            nodeStack.add(0, top);
+            nodeStack.addFirst(top);
         }
     }
 
@@ -159,7 +159,7 @@ public class ExpressionParseTree {
                 case ExpressionTokenizer.TOKEN_STRING:
                     if (currStringNode == null) {
                         currStringNode = new StringNode(et.getTokenValue());
-                        nodeStack.add(0, currStringNode);
+                        nodeStack.addFirst(currStringNode);
                     } else {
                         // Add to the existing
                         currStringNode.value.append(' ');
@@ -182,7 +182,7 @@ public class ExpressionParseTree {
                     pushOpp(new NotNode());
                     // Sneak the regular node in. The NOT will
                     // be resolved when the next opp comes along.
-                    oppStack.add(0, new EqualNode());
+                    oppStack.addFirst(new EqualNode());
                     break;
                 case ExpressionTokenizer.TOKEN_RBRACE:
                     // Closeout the current group
@@ -196,13 +196,13 @@ public class ExpressionParseTree {
                     pushOpp(new NotNode());
                     // Similar strategy to NOT_EQ above, except this
                     // is NOT less than
-                    oppStack.add(0, new LessThanNode());
+                    oppStack.addFirst(new LessThanNode());
                     break;
                 case ExpressionTokenizer.TOKEN_LE:
                     pushOpp(new NotNode());
                     // Similar strategy to NOT_EQ above, except this
                     // is NOT greater than
-                    oppStack.add(0, new GreaterThanNode());
+                    oppStack.addFirst(new GreaterThanNode());
                     break;
                 case ExpressionTokenizer.TOKEN_GT:
                     pushOpp(new GreaterThanNode());
@@ -216,16 +216,16 @@ public class ExpressionParseTree {
         }
         // Finish off the rest of the opps
         resolveGroup();
-        if (nodeStack.size() == 0) {
+        if (nodeStack.isEmpty()) {
             throw new ParseException(sm.getString("expressionParseTree.noNodes"), et.getIndex());
         }
         if (nodeStack.size() > 1) {
             throw new ParseException(sm.getString("expressionParseTree.extraNodes"), et.getIndex());
         }
-        if (oppStack.size() != 0) {
+        if (!oppStack.isEmpty()) {
             throw new ParseException(sm.getString("expressionParseTree.unusedOpCodes"), et.getIndex());
         }
-        root = nodeStack.get(0);
+        root = nodeStack.getFirst();
     }
 
     /**
@@ -269,7 +269,7 @@ public class ExpressionParseTree {
          */
         @Override
         public boolean evaluate() {
-            return !(getValue().length() == 0);
+            return !(getValue().isEmpty());
         }
 
 
@@ -309,8 +309,8 @@ public class ExpressionParseTree {
          * @param values The list from which to pop the values
          */
         public void popValues(List<Node> values) {
-            right = values.remove(0);
-            left = values.remove(0);
+            right = values.removeFirst();
+            left = values.removeFirst();
         }
     }
 
@@ -332,7 +332,7 @@ public class ExpressionParseTree {
          */
         @Override
         public void popValues(List<Node> values) {
-            left = values.remove(0);
+            left = values.removeFirst();
         }
 
 

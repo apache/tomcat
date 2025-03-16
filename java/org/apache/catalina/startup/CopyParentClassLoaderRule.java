@@ -54,7 +54,7 @@ public class CopyParentClassLoaderRule extends Rule {
         }
         Container child = (Container) digester.peek(0);
         Object parent = digester.peek(1);
-        Method method = parent.getClass().getMethod("getParentClassLoader", new Class[0]);
+        Method method = parent.getClass().getMethod("getParentClassLoader");
         ClassLoader classLoader = (ClassLoader) method.invoke(parent, new Object[0]);
         child.setParentClassLoader(classLoader);
 

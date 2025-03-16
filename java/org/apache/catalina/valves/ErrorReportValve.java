@@ -217,7 +217,7 @@ public class ErrorReportValve extends ValveBase {
         if (message == null) {
             if (throwable != null) {
                 String exceptionMessage = throwable.getMessage();
-                if (exceptionMessage != null && exceptionMessage.length() > 0) {
+                if (exceptionMessage != null && !exceptionMessage.isEmpty()) {
                     try (Scanner scanner = new Scanner(exceptionMessage)) {
                         message = Escape.htmlElementContent(scanner.nextLine());
                     }
@@ -389,7 +389,8 @@ public class ErrorReportValve extends ValveBase {
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
 
-        try (OutputStream os = response.getOutputStream(); InputStream is = new FileInputStream(file);) {
+        try (OutputStream os = response.getOutputStream();
+             InputStream is = new FileInputStream(file)) {
             IOTools.flow(is, os);
         } catch (IOException e) {
             getContainer().getLogger().warn(sm.getString("errorReportValve.errorPageIOException", location), e);

@@ -57,7 +57,7 @@ public class RandomizedTextRewriteMap implements RewriteMap {
                 if (keyValuePair.length > 1) {
                     String key = keyValuePair[0];
                     String value = keyValuePair[1];
-                    String[] possibleValues = null;
+                    String[] possibleValues;
                     if (useRandom && value.contains("|")) {
                         possibleValues = value.split("\\|");
                     } else {

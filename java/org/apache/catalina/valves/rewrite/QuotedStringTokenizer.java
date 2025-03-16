@@ -27,8 +27,8 @@ public class QuotedStringTokenizer {
 
     protected static final StringManager sm = StringManager.getManager(QuotedStringTokenizer.class);
 
-    private Iterator<String> tokenIterator;
-    private int tokenCount;
+    private final Iterator<String> tokenIterator;
+    private final int tokenCount;
     private int returnedTokens = 0;
 
     enum WordMode {
@@ -59,27 +59,21 @@ public class QuotedStringTokenizer {
         while (pos < length) {
             char currentChar = inputText.charAt(pos);
             switch (currentMode) {
-                case SPACES:
-                    currentMode = handleSpaces(currentToken, currentChar);
-                    break;
-                case QUOTED:
-                    currentMode = handleQuoted(tokens, currentToken, currentChar);
-                    break;
-                case ESCAPED:
+                case SPACES -> currentMode = handleSpaces(currentToken, currentChar);
+                case QUOTED -> currentMode = handleQuoted(tokens, currentToken, currentChar);
+                case ESCAPED -> {
                     currentToken.append(currentChar);
                     currentMode = WordMode.QUOTED;
-                    break;
-                case SIMPLE:
-                    currentMode = handleSimple(tokens, currentToken, currentChar);
-                    break;
-                case COMMENT:
+                }
+                case SIMPLE -> currentMode = handleSimple(tokens, currentToken, currentChar);
+                case COMMENT -> {
                     if (currentChar == '\r' || currentChar == '\n') {
                         currentMode = WordMode.SPACES;
                     }
-                    break;
-                default:
+                }
+                default ->
                     throw new IllegalStateException(sm.getString("quotedStringTokenizer.tokenizeError", inputText,
-                            Integer.valueOf(pos), currentMode));
+                        Integer.valueOf(pos), currentMode));
             }
             pos++;
         }

@@ -122,7 +122,7 @@ public class ServerInfo {
         return serverNumber;
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         System.out.println("Server version: " + getServerInfo());
         System.out.println("Server built:   " + getServerBuilt());
         System.out.println("Server number:  " + getServerNumber());

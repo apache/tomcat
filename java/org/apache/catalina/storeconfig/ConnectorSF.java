@@ -35,7 +35,7 @@ public class ConnectorSF extends StoreFactoryBase {
         if (aConnector instanceof Connector) {
             Connector connector = (Connector) aConnector;
             // Store nested <Listener> elements
-            LifecycleListener listeners[] = connector.findLifecycleListeners();
+            LifecycleListener[] listeners = connector.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);
             // Store nested <UpgradeProtocol> elements
             UpgradeProtocol[] upgradeProtocols = connector.findUpgradeProtocols();
