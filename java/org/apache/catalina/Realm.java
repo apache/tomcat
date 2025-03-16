@@ -131,7 +131,7 @@ public interface Realm extends Contained {
      *
      * @return the associated principal, or {@code null} if there is none
      */
-    Principal authenticate(X509Certificate certs[]);
+    Principal authenticate(X509Certificate[] certs);
 
 
     /**

@@ -62,7 +62,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
     private static final String SERVLET_LAYER_ID = "HttpServlet";
 
-    private static String DEFAULT_REGISTRATION_ID = getRegistrationID(null, null);
+    private static final String DEFAULT_REGISTRATION_ID = getRegistrationID(null, null);
 
     private final Map<String,RegistrationContextImpl> layerAppContextRegistrations = new ConcurrentHashMap<>();
     private final Map<String,RegistrationContextImpl> appContextRegistrations = new ConcurrentHashMap<>();
@@ -122,7 +122,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     private AuthConfigProvider createAuthConfigProvider(String className, Map<String,String> properties)
             throws SecurityException {
         Class<?> clazz = null;
-        AuthConfigProvider provider = null;
+        AuthConfigProvider provider;
         try {
             clazz = Class.forName(className, true, Thread.currentThread().getContextClassLoader());
         } catch (ClassNotFoundException e) {
@@ -158,14 +158,14 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
     private void addRegistrationContextImpl(String layer, String appContext, String registrationID,
             RegistrationContextImpl registrationContextImpl) {
-        RegistrationContextImpl previous = null;
+        RegistrationContextImpl previous;
 
         // Add the registration, noting any registration it replaces
         if (layer != null && appContext != null) {
             previous = layerAppContextRegistrations.put(registrationID, registrationContextImpl);
         } else if (layer == null && appContext != null) {
             previous = appContextRegistrations.put(registrationID, registrationContextImpl);
-        } else if (layer != null && appContext == null) {
+        } else if (layer != null) {
             previous = layerRegistrations.put(registrationID, registrationContextImpl);
         } else {
             previous = defaultRegistration.put(registrationID, registrationContextImpl);
@@ -360,10 +360,10 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
 
 
     private static String getRegistrationID(String layer, String appContext) {
-        if (layer != null && layer.length() == 0) {
+        if (layer != null && layer.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("authConfigFactoryImpl.zeroLengthMessageLayer"));
         }
-        if (appContext != null && appContext.length() == 0) {
+        if (appContext != null && appContext.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("authConfigFactoryImpl.zeroLengthAppContext"));
         }
         return (layer == null ? "" : layer) + ":" + (appContext == null ? "" : appContext);

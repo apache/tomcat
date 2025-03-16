@@ -208,7 +208,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     public String getAlgorithms() {
         StringBuilder result = new StringBuilder();
-        StringUtils.join(algorithms, ',', (x) -> x.getRfcName(), result);
+        StringUtils.join(algorithms, ',', AuthDigest::getRfcName, result);
         return result.toString();
     }
 
@@ -462,7 +462,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         private final long nonceValidity;
         private final String key;
         private final Map<String,NonceInfo> nonces;
-        private boolean validateUri = true;
+        private final boolean validateUri;
 
         private String userName = null;
         private String method = null;
@@ -555,7 +555,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                         absolute.append("://");
                         absolute.append(host);
                         absolute.append(uriQuery);
-                        if (!uri.equals(absolute.toString())) {
+                        if (!uri.contentEquals(absolute)) {
                             return false;
                         }
                     } else {
@@ -645,11 +645,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             }
 
             // Validate algorithm is one of the algorithms configured for the authenticator
-            if (!algorithms.contains(algorithm)) {
-                return false;
-            }
-
-            return true;
+            return algorithms.contains(algorithm);
         }
 
         public boolean isNonceStale() {
@@ -671,7 +667,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
     public static class NonceInfo {
         private final long timestamp;
-        private final boolean seen[];
+        private final boolean[] seen;
         private final int offset;
         private int count = 0;
 

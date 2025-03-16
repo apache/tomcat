@@ -1036,7 +1036,7 @@ public class Request implements HttpServletRequest {
         }
 
         if (!locales.isEmpty()) {
-            return locales.get(0);
+            return locales.getFirst();
         }
 
         return defaultLocale;
@@ -1827,7 +1827,7 @@ public class Request implements HttpServletRequest {
             // is the protocol that must have been selected
             List<Upgrade> upgradeProtocols = Upgrade.parse(getHeaders(HTTP_UPGRADE_HEADER_NAME));
             if (upgradeProtocols != null && upgradeProtocols.size() == 1) {
-                result = upgradeProtocols.get(0).toString();
+                result = upgradeProtocols.getFirst().toString();
             }
         }
 
@@ -2413,12 +2413,12 @@ public class Request implements HttpServletRequest {
         parseParts();
 
         if (partsParseException != null) {
-            if (partsParseException instanceof IOException) {
-                throw (IOException) partsParseException;
-            } else if (partsParseException instanceof IllegalStateException) {
-                throw (IllegalStateException) partsParseException;
-            } else if (partsParseException instanceof ServletException) {
-                throw (ServletException) partsParseException;
+            switch (partsParseException) {
+                case IOException ioException -> throw ioException;
+                case IllegalStateException illegalStateException -> throw illegalStateException;
+                case ServletException servletException -> throw servletException;
+                default -> {
+                }
             }
         }
 

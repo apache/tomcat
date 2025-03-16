@@ -29,10 +29,10 @@ public class UpgradeGroupInfo extends BaseModelMBean {
 
     private final Set<UpgradeInfo> upgradeInfos = (new ConcurrentHashMap<UpgradeInfo,Boolean>()).keySet(Boolean.TRUE);
 
-    private LongAdder deadBytesReceived = new LongAdder();
-    private LongAdder deadBytesSent = new LongAdder();
-    private LongAdder deadMsgsReceived = new LongAdder();
-    private LongAdder deadMsgsSent = new LongAdder();
+    private final LongAdder deadBytesReceived = new LongAdder();
+    private final LongAdder deadBytesSent = new LongAdder();
+    private final LongAdder deadMsgsReceived = new LongAdder();
+    private final LongAdder deadMsgsSent = new LongAdder();
 
 
     public void addUpgradeInfo(UpgradeInfo ui) {

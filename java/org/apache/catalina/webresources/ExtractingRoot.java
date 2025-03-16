@@ -79,8 +79,7 @@ public class ExtractingRoot extends StandardRoot {
 
     private File getExpansionTarget() {
         File tmpDir = (File) getContext().getServletContext().getAttribute(ServletContext.TEMPDIR);
-        File expansionTarget = new File(tmpDir, APPLICATION_JARS_DIR);
-        return expansionTarget;
+        return new File(tmpDir, APPLICATION_JARS_DIR);
     }
 
 

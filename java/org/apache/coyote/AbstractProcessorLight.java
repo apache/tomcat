@@ -33,7 +33,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
  */
 public abstract class AbstractProcessorLight implements Processor {
 
-    private Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
+    private final Set<DispatchType> dispatches = new CopyOnWriteArraySet<>();
 
 
     @Override

@@ -235,8 +235,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
     @Override
     protected Processor createProcessor() {
-        AjpProcessor processor = new AjpProcessor(this, getAdapter());
-        return processor;
+        return new AjpProcessor(this, getAdapter());
     }
 
 
@@ -251,7 +250,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     public void start() throws Exception {
         if (getSecretRequired()) {
             String secret = getSecret();
-            if (secret == null || secret.length() == 0) {
+            if (secret == null || secret.isEmpty()) {
                 throw new IllegalArgumentException(sm.getString("ajpprotocol.noSecret"));
             }
         }

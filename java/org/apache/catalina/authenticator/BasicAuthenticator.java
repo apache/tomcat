@@ -76,7 +76,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
         if (authorization != null) {
             authorization.toBytes();
             ByteChunk authorizationBC = authorization.getByteChunk();
-            BasicCredentials credentials = null;
+            BasicCredentials credentials;
             try {
                 credentials = new BasicCredentials(authorizationBC, charset);
                 String username = credentials.getUsername();

@@ -71,7 +71,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         if (path.startsWith(webAppMount)) {
             String pathInJar = getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path
-            if (pathInJar.length() > 0 && pathInJar.charAt(0) == '/') {
+            if (!pathInJar.isEmpty() && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
             for (String name : getArchiveEntries(false).keySet()) {
@@ -81,13 +81,13 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
                     } else {
                         name = name.substring(pathInJar.length());
                     }
-                    if (name.length() == 0) {
+                    if (name.isEmpty()) {
                         continue;
                     }
                     if (name.charAt(0) == '/') {
                         name = name.substring(1);
                     }
-                    if (name.length() > 0 && name.lastIndexOf('/') == -1) {
+                    if (!name.isEmpty() && name.lastIndexOf('/') == -1) {
                         result.add(name);
                     }
                 }
@@ -118,7 +118,7 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
             String pathInJar = getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path and make
             // sure it ends in '/'
-            if (pathInJar.length() > 0) {
+            if (!pathInJar.isEmpty()) {
                 if (pathInJar.charAt(pathInJar.length() - 1) != '/') {
                     pathInJar = pathInJar.substring(1) + '/';
                 }
@@ -228,10 +228,10 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         if (path.startsWith(webAppMount)) {
             String pathInJar = getInternalPath() + path.substring(webAppMount.length());
             // Always strip off the leading '/' to get the JAR path
-            if (pathInJar.length() > 0 && pathInJar.charAt(0) == '/') {
+            if (!pathInJar.isEmpty() && pathInJar.charAt(0) == '/') {
                 pathInJar = pathInJar.substring(1);
             }
-            if (pathInJar.equals("")) {
+            if (pathInJar.isEmpty()) {
                 // Special case
                 // This is a directory resource so the path must end with /
                 if (!path.endsWith("/")) {

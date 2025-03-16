@@ -61,7 +61,7 @@ public class AjpMessage {
     /**
      * Fixed size buffer.
      */
-    protected final byte buf[];
+    protected final byte[] buf;
 
 
     /**
@@ -373,7 +373,7 @@ public class AjpMessage {
     // ------------------------------------------------------ Protected Methods
 
 
-    protected static String hexLine(byte buf[], int start, int len) {
+    protected static String hexLine(byte[] buf, int start, int len) {
         StringBuilder sb = new StringBuilder();
         for (int i = start; i < start + 16; i++) {
             if (i < len + 4) {

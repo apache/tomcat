@@ -61,7 +61,7 @@ public class HpackDecoder {
     /**
      * The maximum allowed memory size set by the container.
      */
-    private int maxMemorySizeHard;
+    private final int maxMemorySizeHard;
     /**
      * The maximum memory size currently in use. May be less than the hard limit.
      */
