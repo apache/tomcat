@@ -70,8 +70,7 @@ public class MBeanDumper {
                 buf.append(code);
                 buf.append(CRLF);
 
-                MBeanAttributeInfo attrs[] = minfo.getAttributes();
-                Object value = null;
+                MBeanAttributeInfo[] attrs = minfo.getAttributes();
 
                 for (MBeanAttributeInfo attr : attrs) {
                     if (!attr.isReadable()) {
@@ -85,6 +84,7 @@ public class MBeanDumper {
                         continue;
                     }
 
+                    Object value;
                     try {
                         value = mbeanServer.getAttribute(oname, attName);
                     } catch (JMRuntimeException rme) {
@@ -190,11 +190,11 @@ public class MBeanDumper {
 
         int pos = start;
         while (end - pos > 78) {
-            sb.append(value.substring(pos, pos + 78));
+            sb.append(value, pos, pos + 78);
             sb.append("\n ");
             pos = pos + 78;
         }
-        sb.append(value.substring(pos, end));
+        sb.append(value, pos, end);
     }
 
 

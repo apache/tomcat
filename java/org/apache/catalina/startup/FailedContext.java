@@ -184,7 +184,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
             } else if (c == null) {
                 // May happen in unit testing and/or some embedding scenarios
                 keyProperties.append(",container");
-                keyProperties.append(containerCount++);
+                keyProperties.append(containerCount);
                 keyProperties.append("=null");
                 break;
             } else {

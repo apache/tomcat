@@ -56,7 +56,7 @@ public class MBeanUtils {
      * The set of exceptions to the normal rules used by <code>createManagedBean()</code>. The first element of each
      * pair is a class name, and the second element is the managed bean name.
      */
-    private static final String exceptions[][] = { { "org.apache.catalina.users.MemoryGroup", "Group" },
+    private static final String[][] exceptions = { { "org.apache.catalina.users.MemoryGroup", "Group" },
             { "org.apache.catalina.users.MemoryRole", "Role" }, { "org.apache.catalina.users.MemoryUser", "User" },
             { "org.apache.catalina.users.GenericGroup", "Group" }, { "org.apache.catalina.users.GenericRole", "Role" },
             { "org.apache.catalina.users.GenericUser", "User" } };
@@ -449,10 +449,8 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, Group group) throws MalformedObjectNameException {
 
-        ObjectName name = null;
-        name = new ObjectName(domain + ":type=Group,groupname=" + ObjectName.quote(group.getGroupname()) +
-                ",database=" + group.getUserDatabase().getId());
-        return name;
+        return new ObjectName(domain + ":type=Group,groupname=" + ObjectName.quote(group.getGroupname()) +
+            ",database=" + group.getUserDatabase().getId());
 
     }
 
@@ -469,9 +467,9 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, Role role) throws MalformedObjectNameException {
 
-        ObjectName name = new ObjectName(domain + ":type=Role,rolename=" + ObjectName.quote(role.getRolename()) +
-                ",database=" + role.getUserDatabase().getId());
-        return name;
+        return new ObjectName(domain + ":type=Role,rolename=" + ObjectName.quote(role.getRolename()) +
+            ",database=" + role.getUserDatabase().getId());
+
     }
 
 
@@ -487,9 +485,8 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, User user) throws MalformedObjectNameException {
 
-        ObjectName name = new ObjectName(domain + ":type=User,username=" + ObjectName.quote(user.getUsername()) +
-                ",database=" + user.getUserDatabase().getId());
-        return name;
+        return new ObjectName(domain + ":type=User,username=" + ObjectName.quote(user.getUsername()) +
+            ",database=" + user.getUserDatabase().getId());
     }
 
 
@@ -505,9 +502,7 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, UserDatabase userDatabase) throws MalformedObjectNameException {
 
-        ObjectName name = null;
-        name = new ObjectName(domain + ":type=UserDatabase,database=" + userDatabase.getId());
-        return name;
+        return new ObjectName(domain + ":type=UserDatabase,database=" + userDatabase.getId());
 
     }
 
@@ -725,8 +720,8 @@ public class MBeanUtils {
      */
     static void destroyMBeanUserDatabase(String userDatabase) throws Exception {
 
-        ObjectName query = null;
-        Set<ObjectName> results = null;
+        ObjectName query;
+        Set<ObjectName> results;
 
         // Groups
         query = new ObjectName("Users:type=Group,database=" + userDatabase + ",*");

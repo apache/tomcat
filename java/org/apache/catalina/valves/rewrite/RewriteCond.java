@@ -28,7 +28,7 @@ public class RewriteCond {
 
     public static class PatternCondition extends Condition {
         public Pattern pattern;
-        private ThreadLocal<Matcher> matcher = new ThreadLocal<>();
+        private final ThreadLocal<Matcher> matcher = new ThreadLocal<>();
 
         @Override
         public boolean evaluate(String value, Resolver resolver) {

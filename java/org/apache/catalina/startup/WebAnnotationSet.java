@@ -345,7 +345,7 @@ public class WebAnnotationSet {
 
     private static String getName(Resource annotation, String defaultName) {
         String name = annotation.name();
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             if (defaultName != null) {
                 name = defaultName;
             }

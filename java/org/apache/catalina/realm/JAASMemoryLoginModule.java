@@ -139,7 +139,6 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         if (committed) {
             logout();
         } else {
-            committed = false;
             principal = null;
         }
         if (log.isTraceEnabled()) {
@@ -166,7 +165,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             // Add the roles as additional subjects as per the contract with the
             // JAASRealm
             if (principal instanceof GenericPrincipal) {
-                String roles[] = ((GenericPrincipal) principal).getRoles();
+                String[] roles = ((GenericPrincipal) principal).getRoles();
                 for (String role : roles) {
                     subject.getPrincipals().add(new GenericPrincipal(role, null, null));
                 }
@@ -238,7 +237,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         if (callbackHandler == null) {
             throw new LoginException(sm.getString("jaasMemoryLoginModule.noCallbackHandler"));
         }
-        Callback callbacks[] = new Callback[10];
+        Callback[] callbacks = new Callback[10];
         callbacks[0] = new NameCallback("Username: ");
         callbacks[1] = new PasswordCallback("Password: ", false);
         callbacks[2] = new TextInputCallback("nonce");
@@ -251,16 +250,16 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         callbacks[9] = new TextInputCallback("authMethod");
 
         // Interact with the user to retrieve the username and password
-        String username = null;
-        String password = null;
-        String nonce = null;
-        String nc = null;
-        String cnonce = null;
-        String qop = null;
-        String realmName = null;
-        String digestA2 = null;
-        String algorithm = null;
-        String authMethod = null;
+        String username;
+        String password;
+        String nonce;
+        String nc;
+        String cnonce;
+        String qop;
+        String realmName;
+        String digestA2;
+        String algorithm;
+        String authMethod;
 
         try {
             callbackHandler.handle(callbacks);
@@ -359,10 +358,10 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             return null;
         }
 
-        Callback callbacks[] = new Callback[1];
+        Callback[] callbacks = new Callback[1];
         callbacks[0] = new TextInputCallback("catalinaBase");
 
-        String result = null;
+        String result;
 
         try {
             callbackHandler.handle(callbacks);

@@ -185,10 +185,8 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
 
         PrintWriter writer = response.getWriter();
 
-        boolean completeStatus = false;
-        if (request.getPathInfo() != null && request.getPathInfo().equals("/all")) {
-            completeStatus = true;
-        }
+        boolean completeStatus = request.getPathInfo() != null && request.getPathInfo().equals("/all");
+
         // use StatusTransformer to output status
         Object[] args = new Object[1];
         args[0] = getServletContext().getContextPath();

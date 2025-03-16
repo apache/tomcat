@@ -216,9 +216,9 @@ public class JsonAccessLogValve extends AccessLogValve {
 
     private static class JsonWrappedElement implements AccessLogElement, CachedElement {
 
-        private CharSequence attributeName;
-        private boolean quoteValue;
-        private AccessLogElement delegate;
+        private final CharSequence attributeName;
+        private final boolean quoteValue;
+        private final AccessLogElement delegate;
 
         private CharSequence escapeJsonString(CharSequence nonEscaped) {
             return JSONFilter.escape(nonEscaped);
@@ -231,7 +231,7 @@ public class JsonAccessLogValve extends AccessLogValve {
             if (patternAttribute == null) {
                 patternAttribute = "other-" + Character.toString(pattern);
             }
-            if (key != null && !"".equals(key)) {
+            if (key != null && !key.isEmpty()) {
                 if (SUB_OBJECT_PATTERNS.containsKey(Character.valueOf(pattern))) {
                     this.attributeName = escapeJsonString(key);
                 } else {

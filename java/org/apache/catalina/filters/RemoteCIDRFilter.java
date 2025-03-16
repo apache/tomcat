@@ -187,12 +187,9 @@ public final class RemoteCIDRFilter extends FilterBase {
         }
 
         // Allow if deny is specified but allow isn't
-        if (!deny.isEmpty() && allow.isEmpty()) {
-            return true;
-        }
+        // Deny this request otherwise
+        return !deny.isEmpty() && allow.isEmpty();
 
-        // Deny this request
-        return false;
     }
 
 

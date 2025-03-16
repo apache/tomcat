@@ -92,7 +92,7 @@ public final class SSIFsize implements SSICommand {
     // All the 'magic' numbers are from the util_script.c httpd source file.
     // Should use KiB and MiB in output but use k and M for consistency with httpd.
     protected String formatSize(long size, String format) {
-        String retString = "";
+        String retString;
         if (format.equalsIgnoreCase("bytes")) {
             DecimalFormat decimalFormat = new DecimalFormat("#,##0");
             retString = decimalFormat.format(size);

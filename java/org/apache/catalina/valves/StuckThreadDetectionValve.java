@@ -61,7 +61,7 @@ public class StuckThreadDetectionValve extends ValveBase {
     /**
      * Keeps count of the number of stuck threads that have been interrupted
      */
-    private AtomicLong interruptedThreadsCount = new AtomicLong();
+    private final AtomicLong interruptedThreadsCount = new AtomicLong();
 
     /**
      * In seconds. Default 600 (10 minutes).

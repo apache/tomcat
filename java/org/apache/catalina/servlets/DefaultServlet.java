@@ -476,7 +476,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         StringBuilder result = new StringBuilder();
-        if (servletPath.length() > 0) {
+        if (!servletPath.isEmpty()) {
             result.append(servletPath);
         }
         if (pathInfo != null) {
@@ -795,13 +795,9 @@ public class DefaultServlet extends HttpServlet {
             }
         }
         if (request.getHeader("If-None-Match") != null) {
-            if (!checkIfNoneMatch(request, response, resource)) {
-                return false;
-            }
+            return checkIfNoneMatch(request, response, resource);
         } else if (request.getHeader("If-Modified-Since") != null) {
-            if (!checkIfModifiedSince(request, response, resource)) {
-                return false;
-            }
+            return checkIfModifiedSince(request, response, resource);
         }
         return true;
     }
@@ -847,7 +843,7 @@ public class DefaultServlet extends HttpServlet {
             }
         }
 
-        if (path.length() == 0) {
+        if (path.isEmpty()) {
             // Context root redirect
             doDirectoryRedirect(request, response);
             return;
@@ -1868,7 +1864,7 @@ public class DefaultServlet extends HttpServlet {
             String parent = directoryWebappPath.substring(0, slash);
             sb.append(" \u2013 <a href=\"");
             sb.append(rewrittenContextPath);
-            if (parent.equals("")) {
+            if (parent.isEmpty()) {
                 parent = "/";
             }
             sb.append(rewriteUrl(parent));
@@ -2025,7 +2021,7 @@ public class DefaultServlet extends HttpServlet {
             rightSide = 1;
         }
 
-        return ("" + leftSide + "." + rightSide + " KiB");
+        return (String.valueOf(leftSide) + "." + String.valueOf(rightSide) + " KiB");
 
     }
 
@@ -2073,6 +2069,7 @@ public class DefaultServlet extends HttpServlet {
                         try {
                             reader.close();
                         } catch (IOException e) {
+                            // Ignore
                         }
                     }
                 }
@@ -2144,7 +2141,7 @@ public class DefaultServlet extends HttpServlet {
                     log("globalXsltFile [" + f.getAbsolutePath() + "] is too big to buffer");
                 } else {
                     try (FileInputStream fis = new FileInputStream(f)) {
-                        byte b[] = new byte[(int) f.length()];
+                        byte[] b = new byte[(int) f.length()];
                         IOTools.readFully(fis, b);
                         return new StreamSource(new ByteArrayInputStream(b));
                     }
@@ -2401,7 +2398,6 @@ public class DefaultServlet extends HttpServlet {
                 hasAsteriskValue = true;
                 if (headerCount > 1 || headerValues.hasMoreElements()) {
                     conditionSatisfied = false;
-                    break;
                 } else {
                     // asterisk '*' is the only field value.
                     // RFC9110: If the field value is "*", the condition is false if the origin server has a current
@@ -2409,8 +2405,8 @@ public class DefaultServlet extends HttpServlet {
                     if (resourceETag != null) {
                         conditionSatisfied = false;
                     }
-                    break;
                 }
+                break;
             } else {
                 // RFC 7232 requires weak comparison for If-None-Match headers
                 Boolean matched = EntityTag.compareEntityTag(new StringReader(headerValue), true, resourceETag);
@@ -2545,11 +2541,7 @@ public class DefaultServlet extends HttpServlet {
             }
             // If the ETag the client gave does not match the entity
             // etag, then the entire entity is returned.
-            if (!weakETag && resourceETag != null && resourceETag.equals(headerValue)) {
-                return true;
-            } else {
-                return false;
-            }
+            return !weakETag && resourceETag != null && resourceETag.equals(headerValue);
         } else {
             long headerValueTime = -1L;
             try {
@@ -2607,11 +2599,10 @@ public class DefaultServlet extends HttpServlet {
      */
     protected void copy(InputStream is, ServletOutputStream ostream) throws IOException {
 
-        IOException exception = null;
         InputStream istream = new BufferedInputStream(is, input);
 
         // Copy the input stream to the output stream
-        exception = copyRange(istream, ostream);
+        IOException exception = copyRange(istream, ostream);
 
         // Clean up the input stream
         istream.close();
@@ -2634,7 +2625,6 @@ public class DefaultServlet extends HttpServlet {
      * @exception IOException if an input/output error occurs
      */
     protected void copy(InputStream is, PrintWriter writer, String encoding) throws IOException {
-        IOException exception = null;
 
         Reader reader;
         if (encoding == null) {
@@ -2644,7 +2634,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         // Copy the input stream to the output stream
-        exception = copyRange(reader, writer);
+        IOException exception = copyRange(reader, writer);
 
         // Clean up the reader
         reader.close();
@@ -2668,11 +2658,9 @@ public class DefaultServlet extends HttpServlet {
      */
     protected void copy(WebResource resource, ServletOutputStream ostream, Range range) throws IOException {
 
-        IOException exception = null;
-
         InputStream resourceInputStream = resource.getInputStream();
         InputStream istream = new BufferedInputStream(resourceInputStream, input);
-        exception = copyRange(istream, ostream, range.start, range.end);
+        IOException exception = copyRange(istream, ostream, range.start, range.end);
 
         // Clean up the input stream
         istream.close();
@@ -2747,18 +2735,16 @@ public class DefaultServlet extends HttpServlet {
 
         // Copy the input stream to the output stream
         IOException exception = null;
-        byte buffer[] = new byte[input];
-        int len = buffer.length;
+        byte[] buffer = new byte[input];
         while (true) {
             try {
-                len = istream.read(buffer);
+                int len = istream.read(buffer);
                 if (len == -1) {
                     break;
                 }
                 ostream.write(buffer, 0, len);
             } catch (IOException e) {
                 exception = e;
-                len = -1;
                 break;
             }
         }
@@ -2780,18 +2766,16 @@ public class DefaultServlet extends HttpServlet {
 
         // Copy the input stream to the output stream
         IOException exception = null;
-        char buffer[] = new char[input];
-        int len = buffer.length;
+        char[] buffer = new char[input];
         while (true) {
             try {
-                len = reader.read(buffer);
+                int len = reader.read(buffer);
                 if (len == -1) {
                     break;
                 }
                 writer.write(buffer, 0, len);
             } catch (IOException e) {
                 exception = e;
-                len = -1;
                 break;
             }
         }
@@ -2817,7 +2801,7 @@ public class DefaultServlet extends HttpServlet {
             log("Serving bytes: " + start + "-" + end);
         }
 
-        long skipped = 0;
+        long skipped;
         try {
             skipped = istream.skip(start);
         } catch (IOException e) {
@@ -2830,7 +2814,7 @@ public class DefaultServlet extends HttpServlet {
         IOException exception = null;
         long bytesToRead = end - start + 1;
 
-        byte buffer[] = new byte[input];
+        byte[] buffer = new byte[input];
         int len = buffer.length;
         while ((bytesToRead > 0) && (len >= buffer.length)) {
             try {
@@ -2845,9 +2829,6 @@ public class DefaultServlet extends HttpServlet {
             } catch (IOException e) {
                 exception = e;
                 len = -1;
-            }
-            if (len < buffer.length) {
-                break;
             }
         }
 
@@ -3067,7 +3048,7 @@ public class DefaultServlet extends HttpServlet {
          * @return An Order specifying the column and ascending/descending to be applied to resources.
          */
         public Order getOrder(String order) {
-            if (null == order || 0 == order.trim().length()) {
+            if (null == order || order.trim().isEmpty()) {
                 return Order.DEFAULT;
             }
 

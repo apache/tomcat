@@ -45,7 +45,7 @@ public class StandardServerSF extends StoreFactoryBase {
         if (aObject instanceof StandardServer) {
             StandardServer server = (StandardServer) aObject;
             // Store nested <Listener> elements
-            LifecycleListener listeners[] = server.findLifecycleListeners();
+            LifecycleListener[] listeners = server.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);
             // Store nested <GlobalNamingResources> element
             NamingResourcesImpl globalNamingResources = server.getGlobalNamingResources();
@@ -55,7 +55,7 @@ public class StandardServerSF extends StoreFactoryBase {
                 elementDesc.getStoreFactory().store(aWriter, indent, globalNamingResources);
             }
             // Store nested <Service> elements
-            Service services[] = server.findServices();
+            Service[] services = server.findServices();
             storeElementArray(aWriter, indent, services);
         }
     }

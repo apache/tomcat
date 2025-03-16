@@ -71,11 +71,9 @@ public class DataSourceStore extends JDBCStore {
      * @param expiredOnly flag, whether only keys of expired sessions should be returned
      *
      * @return array containing the list of session IDs
-     *
-     * @exception IOException if an input/output error occurred
      */
-    private String[] keys(boolean expiredOnly) throws IOException {
-        String keys[] = null;
+    private String[] keys(boolean expiredOnly) {
+        String[] keys = null;
         int numberOfTries = 2;
         while (numberOfTries > 0) {
 
@@ -273,7 +271,6 @@ public class DataSourceStore extends JDBCStore {
 
     @Override
     public void save(Session session) throws IOException {
-        ByteArrayOutputStream bos = null;
         String saveSql = "INSERT INTO " + sessionTable + " (" + sessionIdCol + ", " + sessionAppCol + ", " +
                 sessionDataCol + ", " + sessionValidCol + ", " + sessionMaxInactiveCol + ", " + sessionLastAccessedCol +
                 ") VALUES (?, ?, ?, ?, ?, ?)";
@@ -290,7 +287,7 @@ public class DataSourceStore extends JDBCStore {
                     // Remove session if it exists and insert again.
                     remove(session.getIdInternal(), _conn);
 
-                    bos = new ByteArrayOutputStream();
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
                     try (ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(bos))) {
                         ((StandardSession) session).writeObjectData(oos);
                     }

@@ -148,7 +148,7 @@ public class RateLimitFilter extends FilterBase {
 
     private String policyName = null;
 
-    private transient Log log = LogFactory.getLog(RateLimitFilter.class);
+    private final transient Log log = LogFactory.getLog(RateLimitFilter.class);
 
     private static final StringManager sm = StringManager.getManager(RateLimitFilter.class);
 

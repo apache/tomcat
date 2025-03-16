@@ -259,7 +259,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
     @Override
     public Group createGroup(String groupname, String description) {
-        if (groupname == null || groupname.length() == 0) {
+        if (groupname == null || groupname.isEmpty()) {
             String msg = sm.getString("memoryUserDatabase.nullGroup");
             log.warn(msg);
             throw new IllegalArgumentException(msg);
@@ -278,7 +278,7 @@ public class MemoryUserDatabase implements UserDatabase {
 
     @Override
     public Role createRole(String rolename, String description) {
-        if (rolename == null || rolename.length() == 0) {
+        if (rolename == null || rolename.isEmpty()) {
             String msg = sm.getString("memoryUserDatabase.nullRole");
             log.warn(msg);
             throw new IllegalArgumentException(msg);
@@ -298,7 +298,7 @@ public class MemoryUserDatabase implements UserDatabase {
     @Override
     public User createUser(String username, String password, String fullName) {
 
-        if (username == null || username.length() == 0) {
+        if (username == null || username.isEmpty()) {
             String msg = sm.getString("memoryUserDatabase.nullUser");
             log.warn(msg);
             throw new IllegalArgumentException(msg);
@@ -501,8 +501,7 @@ public class MemoryUserDatabase implements UserDatabase {
                 writer.println("              version=\"1.0\">");
 
                 // Print entries for each defined role, group, and user
-                Iterator<?> values = null;
-                values = getRoles();
+                Iterator<?> values = getRoles();
                 while (values.hasNext()) {
                     Role role = (Role) values.next();
                     writer.print("  <role rolename=\"");
@@ -711,8 +710,8 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
             }
         }
         if (roles != null) {
-            while (roles.length() > 0) {
-                String rolename = null;
+            while (!roles.isEmpty()) {
+                String rolename;
                 int comma = roles.indexOf(',');
                 if (comma >= 0) {
                     rolename = roles.substring(0, comma).trim();
@@ -721,7 +720,7 @@ class MemoryGroupCreationFactory extends AbstractObjectCreationFactory {
                     rolename = roles.trim();
                     roles = "";
                 }
-                if (rolename.length() > 0) {
+                if (!rolename.isEmpty()) {
                     Role role = database.findRole(rolename);
                     if (role == null) {
                         role = database.createRole(rolename, null);
@@ -793,8 +792,8 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
         String roles = attributes.getValue("roles");
         User user = database.createUser(username, password, fullName);
         if (groups != null) {
-            while (groups.length() > 0) {
-                String groupname = null;
+            while (!groups.isEmpty()) {
+                String groupname;
                 int comma = groups.indexOf(',');
                 if (comma >= 0) {
                     groupname = groups.substring(0, comma).trim();
@@ -803,7 +802,7 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                     groupname = groups.trim();
                     groups = "";
                 }
-                if (groupname.length() > 0) {
+                if (!groupname.isEmpty()) {
                     Group group = database.findGroup(groupname);
                     if (group == null) {
                         group = database.createGroup(groupname, null);
@@ -813,8 +812,8 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
             }
         }
         if (roles != null) {
-            while (roles.length() > 0) {
-                String rolename = null;
+            while (!roles.isEmpty()) {
+                String rolename;
                 int comma = roles.indexOf(',');
                 if (comma >= 0) {
                     rolename = roles.substring(0, comma).trim();
@@ -823,7 +822,7 @@ class MemoryUserCreationFactory extends AbstractObjectCreationFactory {
                     rolename = roles.trim();
                     roles = "";
                 }
-                if (rolename.length() > 0) {
+                if (!rolename.isEmpty()) {
                     Role role = database.findRole(rolename);
                     if (role == null) {
                         role = database.createRole(rolename, null);

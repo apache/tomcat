@@ -258,7 +258,7 @@ public class MapperListener extends LifecycleMBeanBase implements ContainerListe
 
         boolean found = false;
 
-        if (defaultHost != null && defaultHost.length() > 0) {
+        if (defaultHost != null && !defaultHost.isEmpty()) {
             Container[] containers = engine.findChildren();
 
             for (Container container : containers) {

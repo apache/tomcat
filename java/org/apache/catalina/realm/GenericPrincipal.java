@@ -174,7 +174,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     /**
      * The user's delegated credentials.
      */
-    protected transient GSSCredential gssCredential = null;
+    protected transient GSSCredential gssCredential;
 
     @Override
     public GSSCredential getGssCredential() {

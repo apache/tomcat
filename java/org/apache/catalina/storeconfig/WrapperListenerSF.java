@@ -23,7 +23,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 public class WrapperListenerSF extends StoreFactoryBase {
-    private static Log log = LogFactory.getLog(WrapperListenerSF.class);
+    private static final Log log = LogFactory.getLog(WrapperListenerSF.class);
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {

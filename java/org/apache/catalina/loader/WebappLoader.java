@@ -294,7 +294,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
     }
 
     public String getLoaderRepositoriesString() {
-        String repositories[] = getLoaderRepositories();
+        String[] repositories = getLoaderRepositories();
         StringBuilder sb = new StringBuilder();
         for (String repository : repositories) {
             sb.append(repository).append(':');
@@ -315,7 +315,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
 
     @Override
     public boolean modified() {
-        return classLoader != null ? classLoader.modified() : false;
+        return classLoader != null && classLoader.modified();
     }
 
 
@@ -481,14 +481,12 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
         }
 
         Class<?> clazz = Class.forName(loaderClass);
-        WebappClassLoaderBase classLoader = null;
 
         Class<?>[] argTypes = { ClassLoader.class };
         Object[] args = { parentClassLoader };
         Constructor<?> constr = clazz.getConstructor(argTypes);
-        classLoader = (WebappClassLoaderBase) constr.newInstance(args);
 
-        return classLoader;
+        return (WebappClassLoaderBase) constr.newInstance(args);
     }
 
 
@@ -573,7 +571,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
 
     private boolean buildClassPath(StringBuilder classpath, ClassLoader loader) {
         if (loader instanceof URLClassLoader) {
-            URL repositories[] = ((URLClassLoader) loader).getURLs();
+            URL[] repositories = ((URLClassLoader) loader).getURLs();
             for (URL url : repositories) {
                 String repository = url.toString();
                 if (repository.startsWith("file://")) {
@@ -595,7 +593,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
             // Java 9 onwards. The internal class loaders no longer extend
             // URLCLassLoader
             String cp = System.getProperty("java.class.path");
-            if (cp != null && cp.length() > 0) {
+            if (cp != null && !cp.isEmpty()) {
                 if (classpath.length() > 0) {
                     classpath.append(File.pathSeparator);
                 }

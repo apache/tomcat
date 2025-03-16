@@ -583,7 +583,7 @@ public class StatusTransformer {
         int stage = stageValue.intValue();
         boolean fullStatus = true;
         boolean showRequest = true;
-        String stageStr = null;
+        String stageStr;
 
         switch (stage) {
 
@@ -661,7 +661,7 @@ public class StatusTransformer {
                     writer.write(' ');
                     writer.write(Escape.htmlElementContent(mBeanServer.getAttribute(pName, "currentUri")));
                     String queryString = (String) mBeanServer.getAttribute(pName, "currentQueryString");
-                    if (queryString != null && !queryString.equals("")) {
+                    if (queryString != null && !queryString.isEmpty()) {
                         writer.write("?");
                         writer.print(Escape.htmlElementContent(queryString));
                     }
@@ -707,7 +707,7 @@ public class StatusTransformer {
                             Escape.htmlElementContent(mBeanServer.getAttribute(pName, "currentUri")) + "\"");
 
                     String queryString = (String) mBeanServer.getAttribute(pName, "currentQueryString");
-                    if (queryString != null && !queryString.equals("")) {
+                    if (queryString != null && !queryString.isEmpty()) {
                         writer.write(" currentQueryString=\"" + Escape.htmlElementContent(queryString) + "\"");
                     } else {
                         writer.write(" currentQueryString=\"&#63;\"");
@@ -833,8 +833,8 @@ public class StatusTransformer {
             return;
         }
 
-        String hostName = null;
-        String contextName = null;
+        String hostName;
+        String contextName;
         if (name.startsWith("//")) {
             name = name.substring(2);
         }

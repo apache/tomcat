@@ -410,7 +410,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             serverDigestValue = digestA1 + ":" + nonce + ":" + nc + ":" + cnonce + ":" + qop + ":" + digestA2;
         }
 
-        byte[] valueBytes = null;
+        byte[] valueBytes;
         try {
             valueBytes = serverDigestValue.getBytes(getDigestCharset());
         } catch (UnsupportedEncodingException uee) {
@@ -435,7 +435,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     @Override
-    public Principal authenticate(X509Certificate certs[]) {
+    public Principal authenticate(X509Certificate[] certs) {
 
         if ((certs == null) || (certs.length < 1)) {
             return null;
@@ -529,7 +529,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         ArrayList<SecurityConstraint> results = null;
         // Are there any defined security constraints?
-        SecurityConstraint constraints[] = context.findConstraints();
+        SecurityConstraint[] constraints = context.findConstraints();
         if (constraints == null || constraints.length == 0) {
             if (log.isTraceEnabled()) {
                 log.trace("  No applicable constraints defined");
@@ -541,7 +541,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         String uri = request.getRequestPathMB().toString();
         // Bug47080 - in rare cases this may be null or ""
         // Mapper treats as '/' do the same to prevent NPE
-        if (uri == null || uri.length() == 0) {
+        if (uri == null || uri.isEmpty()) {
             uri = "/";
         }
 
@@ -573,7 +573,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
                 for (String pattern : patterns) {
                     // Exact match including special case for the context root.
-                    if (uri.equals(pattern) || pattern.length() == 0 && uri.equals("/")) {
+                    if (uri.equals(pattern) || pattern.isEmpty() && uri.equals("/")) {
                         found = true;
                         if (securityCollection.findMethod(method)) {
                             if (results == null) {
@@ -761,7 +761,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * Convert an ArrayList to a SecurityConstraint [].
      */
     private SecurityConstraint[] resultsToArray(ArrayList<SecurityConstraint> results) {
-        if (results == null || results.size() == 0) {
+        if (results == null || results.isEmpty()) {
             return null;
         }
         return results.toArray(new SecurityConstraint[0]);
@@ -781,7 +781,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         boolean status = false;
         boolean denyfromall = false;
         for (SecurityConstraint constraint : constraints) {
-            String roles[];
+            String[] roles;
             if (constraint.getAllRoles()) {
                 // * means all roles defined in web.xml
                 roles = request.getContext().findSecurityRoles();
@@ -840,7 +840,6 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
             // Check for an all roles(role-name="*")
             for (SecurityConstraint constraint : constraints) {
-                String roles[];
                 // If the all roles mode exists, sets
                 if (constraint.getAllRoles()) {
                     if (allRolesMode == AllRolesMode.AUTH_ONLY_MODE) {
@@ -852,7 +851,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
                     }
 
                     // For AllRolesMode.STRICT_AUTH_ONLY_MODE there must be zero roles
-                    roles = request.getContext().findSecurityRoles();
+                    String[] roles = request.getContext().findSecurityRoles();
                     if (roles == null) {
                         roles = new String[0];
                     }
@@ -930,7 +929,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
         List<String> attrs = new ArrayList<>();
         for (String name : userAttributes.split(USER_ATTRIBUTES_DELIMITER)) {
             name = name.trim();
-            if (name.length() == 0) {
+            if (name.isEmpty()) {
                 continue;
             }
             if (name.equals(USER_ATTRIBUTES_WILDCARD)) {
@@ -942,7 +941,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
             }
             attrs.add(name);
         }
-        return attrs.size() > 0 ? attrs : null;
+        return !attrs.isEmpty() ? attrs : null;
     }
 
 
@@ -1156,7 +1155,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
         String digestValue = username + ":" + realmName + ":" + getPassword(username);
 
-        byte[] valueBytes = null;
+        byte[] valueBytes;
         try {
             valueBytes = digestValue.getBytes(getDigestCharset());
         } catch (UnsupportedEncodingException uee) {
@@ -1350,7 +1349,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      *
      * @throws IOException If an error occurs reading the password file
      */
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) throws IOException {
 
         // Use negative values since null is not an option to indicate 'not set'
         int saltLength = -1;
@@ -1520,12 +1519,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     @Override
     public String getObjectNameKeyProperties() {
-
-        StringBuilder keyProperties = new StringBuilder("type=Realm");
-        keyProperties.append(getRealmSuffix());
-        keyProperties.append(container.getMBeanKeyProperties());
-
-        return keyProperties.toString();
+        return "type=Realm" + getRealmSuffix() + container.getMBeanKeyProperties();
     }
 
     @Override

@@ -402,7 +402,7 @@ public class CorsFilter extends GenericFilter {
         // Local copy to avoid concurrency issues if getExposedHeaders()
         // is overridden.
         Collection<String> exposedHeaders = getExposedHeaders();
-        if (exposedHeaders != null && exposedHeaders.size() > 0) {
+        if (exposedHeaders != null && !exposedHeaders.isEmpty()) {
             String exposedHeadersString = join(exposedHeaders, ",");
             response.addHeader(RESPONSE_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS, exposedHeadersString);
         }
@@ -555,24 +555,25 @@ public class CorsFilter extends GenericFilter {
         if (method == null) {
             return CORSRequestType.INVALID_CORS;
         }
-        if ("OPTIONS".equals(method)) {
-            String accessControlRequestMethodHeader = request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
-            if (accessControlRequestMethodHeader != null) {
-                if (accessControlRequestMethodHeader.isEmpty()) {
-                    return CORSRequestType.INVALID_CORS;
+        switch (method) {
+            case "OPTIONS":
+                String accessControlRequestMethodHeader = request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+                if (accessControlRequestMethodHeader != null) {
+                    if (accessControlRequestMethodHeader.isEmpty()) {
+                        return CORSRequestType.INVALID_CORS;
+                    }
+                    return CORSRequestType.PRE_FLIGHT;
                 }
-                return CORSRequestType.PRE_FLIGHT;
-            }
-            return CORSRequestType.ACTUAL;
-        }
-        if ("GET".equals(method) || "HEAD".equals(method)) {
-            return CORSRequestType.SIMPLE;
-        }
-        if ("POST".equals(method)) {
-            String mediaType = MediaType.parseMediaTypeOnly(request.getContentType());
-            if (mediaType == null || SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES.contains(mediaType)) {
+                return CORSRequestType.ACTUAL;
+            case "GET":
+            case "HEAD":
                 return CORSRequestType.SIMPLE;
-            }
+            case "POST":
+                String mediaType = MediaType.parseMediaTypeOnly(request.getContentType());
+                if (mediaType == null || SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES.contains(mediaType)) {
+                    return CORSRequestType.SIMPLE;
+                }
+                break;
         }
         return CORSRequestType.ACTUAL;
     }
@@ -669,17 +670,15 @@ public class CorsFilter extends GenericFilter {
     private Set<String> parseStringToSet(final String data) {
         String[] splits;
 
-        if (data != null && data.length() > 0) {
+        if (data != null && !data.isEmpty()) {
             splits = data.split(",");
         } else {
             splits = new String[] {};
         }
 
         Set<String> set = new HashSet<>();
-        if (splits.length > 0) {
-            for (String split : splits) {
-                set.add(split.trim());
-            }
+        for (String split : splits) {
+            set.add(split.trim());
         }
 
         return set;

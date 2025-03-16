@@ -114,7 +114,7 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
      */
     @Deprecated
     protected String generateNonce() {
-        byte random[] = new byte[16];
+        byte[] random = new byte[16];
 
         // Render the result as a String of hexadecimal digits
         StringBuilder buffer = new StringBuilder();

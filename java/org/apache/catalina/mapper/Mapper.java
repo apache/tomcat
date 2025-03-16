@@ -438,8 +438,8 @@ public final class Mapper {
      *                         false otherwise
      * @param resourceOnly true if this wrapper always expects a physical resource to be present (such as a JSP)
      */
-    protected void addWrapper(ContextVersion context, String path, Wrapper wrapper, boolean jspWildCard,
-            boolean resourceOnly) {
+    private void addWrapper(ContextVersion context, String path, Wrapper wrapper, boolean jspWildCard,
+                            boolean resourceOnly) {
 
         synchronized (context) {
             if (path.endsWith("/*")) {
@@ -471,7 +471,7 @@ public final class Mapper {
             } else {
                 // Exact wrapper
                 final String name;
-                if (path.length() == 0) {
+                if (path.isEmpty()) {
                     // Special case for the Context Root mapping which is
                     // treated as an exact match
                     name = "/";
@@ -506,7 +506,7 @@ public final class Mapper {
         removeWrapper(contextVersion, path);
     }
 
-    protected void removeWrapper(ContextVersion context, String path) {
+    private void removeWrapper(ContextVersion context, String path) {
 
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("mapper.removeWrapper", context.name, path));
@@ -549,7 +549,7 @@ public final class Mapper {
             } else {
                 // Exact wrapper
                 String name;
-                if (path.length() == 0) {
+                if (path.isEmpty()) {
                     // Special case for the Context Root mapping which is
                     // treated as an exact match
                     name = "/";
@@ -748,13 +748,12 @@ public final class Mapper {
 
         int lastSlash = -1;
         int uriEnd = uri.getEnd();
-        int length = -1;
         boolean found = false;
         MappedContext context = null;
         while (pos >= 0) {
             context = contexts[pos];
             if (uri.startsWith(context.name)) {
-                length = context.name.length();
+                int length = context.name.length();
                 if (uri.getLength() == length) {
                     found = true;
                     break;
@@ -774,7 +773,7 @@ public final class Mapper {
         uri.setEnd(uriEnd);
 
         if (!found) {
-            if (contexts[0].name.equals("")) {
+            if (contexts[0].name.isEmpty()) {
                 context = contexts[0];
             } else {
                 context = null;
@@ -966,7 +965,7 @@ public final class Mapper {
                 if (contextVersion.object.getMapperDirectoryRedirectEnabled()) {
                     WebResource file;
                     // Handle context root
-                    if (pathStr.length() == 0) {
+                    if (pathStr.isEmpty()) {
                         file = contextVersion.resources.getResource("/");
                     } else {
                         file = contextVersion.resources.getResource(pathStr);
@@ -1141,7 +1140,7 @@ public final class Mapper {
             return 0;
         }
 
-        int i = 0;
+        int i;
         while (true) {
             i = (b + a) >>> 1;
             int result = compare(name, start, end, map[i].name);
@@ -1193,7 +1192,7 @@ public final class Mapper {
             return 0;
         }
 
-        int i = 0;
+        int i;
         while (true) {
             i = (b + a) >>> 1;
             int result = compareIgnoreCase(name, start, end, map[i].name);
@@ -1240,7 +1239,7 @@ public final class Mapper {
             return 0;
         }
 
-        int i = 0;
+        int i;
         while (true) {
             i = (b + a) >>> 1;
             int result = name.compareTo(map[i].name);
@@ -1402,8 +1401,7 @@ public final class Mapper {
     private static int nthSlash(CharChunk name, int n) {
         char[] c = name.getBuffer();
         int end = name.getEnd();
-        int start = name.getStart();
-        int pos = start;
+        int pos = name.getStart();
         int count = 0;
 
         while (pos < end) {

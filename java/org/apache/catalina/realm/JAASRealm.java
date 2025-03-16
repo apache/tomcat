@@ -270,7 +270,7 @@ public class JAASRealm extends RealmBase {
 
         String[] classNames = classNamesString.split("[ ]*,[ ]*");
         for (String className : classNames) {
-            if (className.length() == 0) {
+            if (className.isEmpty()) {
                 continue;
             }
             try {
@@ -337,7 +337,6 @@ public class JAASRealm extends RealmBase {
 
         // Establish a LoginContext to use for authentication
         try {
-            LoginContext loginContext = null;
             if (appName == null) {
                 appName = "Tomcat";
             }
@@ -356,6 +355,7 @@ public class JAASRealm extends RealmBase {
                 currentThread.setContextClassLoader(this.getClass().getClassLoader());
             }
 
+            LoginContext loginContext;
             try {
                 Configuration config = getConfig();
                 loginContext = new LoginContext(appName, null, callbackHandler, config);
@@ -377,7 +377,7 @@ public class JAASRealm extends RealmBase {
             }
 
             // Negotiate a login via this LoginContext
-            Subject subject = null;
+            Subject subject;
             try {
                 loginContext.login();
                 subject = loginContext.getSubject();
@@ -527,7 +527,7 @@ public class JAASRealm extends RealmBase {
             }
             return null;
         } else {
-            if (roles.size() == 0) {
+            if (roles.isEmpty()) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("jaasRealm.rolePrincipalFailure"));
                 }
@@ -600,7 +600,7 @@ public class JAASRealm extends RealmBase {
                         (Class<Configuration>) Class.forName("com.sun.security.auth.login.ConfigFile");
                 Constructor<Configuration> constructor = sunConfigFile.getConstructor(URI.class);
                 URL resource = Thread.currentThread().getContextClassLoader().getResource(configFile);
-                Configuration config = null;
+                Configuration config;
                 if (resource == null) {
                     try (ConfigurationSource.Resource configFileResource =
                             ConfigFileLoader.getSource().getResource(configFile)) {

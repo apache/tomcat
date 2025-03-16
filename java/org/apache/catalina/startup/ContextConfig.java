@@ -667,7 +667,6 @@ public class ContextConfig implements LifecycleListener {
                 } catch (Exception e) {
                     log.warn(sm.getString("contextConfig.loadError"), e);
                 }
-                contextXml = null;
             } else if (!useGeneratedCode) {
                 if (generateCode) {
                     contextXmlJavaSource = getContextXmlJavaSource(contextXmlPackageName, contextXmlSimpleClassName);
@@ -730,7 +729,7 @@ public class ContextConfig implements LifecycleListener {
             XmlErrorHandler errorHandler = new XmlErrorHandler();
             digester.setErrorHandler(errorHandler);
             digester.parse(source);
-            if (errorHandler.getWarnings().size() > 0 || errorHandler.getErrors().size() > 0) {
+            if (!errorHandler.getWarnings().isEmpty() || !errorHandler.getErrors().isEmpty()) {
                 errorHandler.logFindings(log, contextXml.toString());
                 ok = false;
             }
@@ -988,7 +987,7 @@ public class ContextConfig implements LifecycleListener {
         if (log.isTraceEnabled()) {
             log.trace("Pipeline Configuration:");
             Pipeline pipeline = context.getPipeline();
-            Valve valves[] = null;
+            Valve[] valves = null;
             if (pipeline != null) {
                 valves = pipeline.getValves();
             }
@@ -1161,9 +1160,9 @@ public class ContextConfig implements LifecycleListener {
     protected void validateSecurityRoles() {
 
         // Check role names used in <security-constraint> elements
-        SecurityConstraint constraints[] = context.findConstraints();
+        SecurityConstraint[] constraints = context.findConstraints();
         for (SecurityConstraint constraint : constraints) {
-            String roles[] = constraint.findAuthRoles();
+            String[] roles = constraint.findAuthRoles();
             for (String role : roles) {
                 if (!"*".equals(role) && !context.findSecurityRole(role)) {
                     log.warn(sm.getString("contextConfig.role.auth", role));
@@ -1173,7 +1172,7 @@ public class ContextConfig implements LifecycleListener {
         }
 
         // Check role names used in <servlet> elements
-        Container wrappers[] = context.findChildren();
+        Container[] wrappers = context.findChildren();
         for (Container container : wrappers) {
             Wrapper wrapper = (Wrapper) container;
             String runAs = wrapper.getRunAs();
@@ -1181,7 +1180,7 @@ public class ContextConfig implements LifecycleListener {
                 log.warn(sm.getString("contextConfig.role.runas", runAs));
                 context.addSecurityRole(runAs);
             }
-            String names[] = wrapper.findSecurityReferences();
+            String[] names = wrapper.findSecurityReferences();
             for (String name : names) {
                 String link = wrapper.findSecurityReference(name);
                 if ((link != null) && !context.findSecurityRole(link)) {
@@ -1260,15 +1259,14 @@ public class ContextConfig implements LifecycleListener {
         Map<String,WebXml> fragments = processJarsForWebFragments(webXml, webXmlParser);
 
         // Step 2. Order the fragments.
-        Set<WebXml> orderedFragments = null;
-        orderedFragments = WebXml.orderWebFragments(webXml, fragments, sContext);
+        Set<WebXml> orderedFragments = WebXml.orderWebFragments(webXml, fragments, sContext);
 
         // Step 3. Look for ServletContainerInitializer implementations
         if (ok) {
             processServletContainerInitializers();
         }
 
-        if (!webXml.isMetadataComplete() || typeInitializerMap.size() > 0) {
+        if (!webXml.isMetadataComplete() || !typeInitializerMap.isEmpty()) {
             // Steps 4 & 5.
             processClasses(webXml, orderedFragments);
         }
@@ -1530,7 +1528,7 @@ public class ContextConfig implements LifecycleListener {
             if (sessionConfig.getCookieMaxAge() != null) {
                 scc.setMaxAge(sessionConfig.getCookieMaxAge().intValue());
             }
-            if (sessionConfig.getSessionTrackingModes().size() > 0) {
+            if (!sessionConfig.getSessionTrackingModes().isEmpty()) {
                 context.getServletContext().setSessionTrackingModes(sessionConfig.getSessionTrackingModes());
             }
         }
@@ -1542,7 +1540,7 @@ public class ContextConfig implements LifecycleListener {
              * The following will result in a welcome file of "" so don't add that to the context <welcome-file-list>
              * <welcome-file/> </welcome-file-list>
              */
-            if (welcomeFile != null && welcomeFile.length() > 0) {
+            if (welcomeFile != null && !welcomeFile.isEmpty()) {
                 context.addWelcomeFile(welcomeFile);
             }
         }
@@ -1901,7 +1899,7 @@ public class ContextConfig implements LifecycleListener {
         InputSource source = null;
         URL url = null;
 
-        String altDDName = null;
+        String altDDName;
 
         // Open the application web.xml file, if it exists
         ServletContext servletContext = context.getServletContext();
@@ -1977,7 +1975,7 @@ public class ContextConfig implements LifecycleListener {
      * @return the input source
      */
     protected InputSource getWebXmlSource(String filename, boolean global) {
-        ConfigurationSource.Resource webXmlResource = null;
+        ConfigurationSource.Resource webXmlResource;
         try {
             if (global) {
                 if (Constants.DefaultWebXml.equals(filename)) {
@@ -2172,7 +2170,6 @@ public class ContextConfig implements LifecycleListener {
             Map<String,JavaClassCacheEntry> javaClassCache) {
         if (url == null) {
             // Nothing to do.
-            return;
         } else if ("jar".equals(url.getProtocol()) || url.toString().endsWith(".jar")) {
             processAnnotationsJar(url, fragment, handlesTypesOnly, javaClassCache);
         } else if ("file".equals(url.getProtocol())) {
@@ -2284,7 +2281,7 @@ public class ContextConfig implements LifecycleListener {
     protected void checkHandlesTypes(JavaClass javaClass, Map<String,JavaClassCacheEntry> javaClassCache) {
 
         // Skip this if we can
-        if (typeInitializerMap.size() == 0) {
+        if (typeInitializerMap.isEmpty()) {
             return;
         }
 
@@ -2354,7 +2351,6 @@ public class ContextConfig implements LifecycleListener {
 
     private String classHierarchyToString(String className, JavaClassCacheEntry entry,
             Map<String,JavaClassCacheEntry> javaClassCache) {
-        JavaClassCacheEntry start = entry;
         StringBuilder msg = new StringBuilder(className);
         msg.append("->");
 
@@ -2362,7 +2358,7 @@ public class ContextConfig implements LifecycleListener {
         JavaClassCacheEntry parent = javaClassCache.get(parentName);
         int count = 0;
 
-        while (count < 100 && parent != null && parent != start) {
+        while (count < 100 && parent != null && parent != entry) {
             msg.append(parentName);
             msg.append("->");
 

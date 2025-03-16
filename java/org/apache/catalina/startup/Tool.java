@@ -110,7 +110,7 @@ public final class Tool {
      * @param args Command line arguments to be processed
      */
     @SuppressWarnings("null")
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         // Verify that "catalina.home" was passed.
         if (catalinaHome == null) {
@@ -120,27 +120,29 @@ public final class Tool {
 
         // Process command line options
         int index = 0;
+        label:
         while (true) {
             if (index == args.length) {
                 usage();
                 System.exit(1);
             }
-            if ("-ant".equals(args[index])) {
-                ant = true;
-            } else if ("-common".equals(args[index])) {
-                common = true;
-            } else if ("-server".equals(args[index])) {
-                server = true;
-            } else if ("-shared".equals(args[index])) {
-                shared = true;
-            } else {
-                break;
+            switch (args[index]) {
+                case "-ant":
+                    ant = true;
+                    break;
+                case "-common":
+                    common = true;
+                    break;
+                case "-server":
+                    server = true;
+                    break;
+                case "-shared":
+                    shared = true;
+                    break;
+                default:
+                    break label;
             }
             index++;
-        }
-        if (index > args.length) {
-            usage();
-            System.exit(1);
         }
 
         // Set "ant.home" if requested
@@ -191,14 +193,14 @@ public final class Tool {
         }
 
         Method method = null;
-        String params[] = new String[args.length - index];
+        String[] params = new String[args.length - index];
         System.arraycopy(args, index, params, 0, params.length);
         try {
             if (log.isTraceEnabled()) {
                 log.trace("Identifying main() method");
             }
             String methodName = "main";
-            Class<?> paramTypes[] = new Class[1];
+            Class<?>[] paramTypes = new Class[1];
             paramTypes[0] = params.getClass();
             method = clazz.getMethod(methodName, paramTypes);
         } catch (Throwable t) {
@@ -212,7 +214,7 @@ public final class Tool {
             if (log.isTraceEnabled()) {
                 log.trace("Calling main() method");
             }
-            Object paramValues[] = new Object[1];
+            Object[] paramValues = new Object[1];
             paramValues[0] = params;
             method.invoke(null, paramValues);
         } catch (Throwable t) {

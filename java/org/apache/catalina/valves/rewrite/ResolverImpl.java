@@ -42,7 +42,7 @@ import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationPars
 
 public class ResolverImpl extends Resolver {
 
-    protected Request request = null;
+    protected Request request;
 
     public ResolverImpl(Request request) {
         this.request = request;

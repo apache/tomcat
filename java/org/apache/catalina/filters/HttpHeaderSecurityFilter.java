@@ -160,11 +160,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
 
 
     public void setHstsMaxAgeSeconds(int hstsMaxAgeSeconds) {
-        if (hstsMaxAgeSeconds < 0) {
-            this.hstsMaxAgeSeconds = 0;
-        } else {
-            this.hstsMaxAgeSeconds = hstsMaxAgeSeconds;
-        }
+        this.hstsMaxAgeSeconds = Math.max(hstsMaxAgeSeconds, 0);
     }
 
 

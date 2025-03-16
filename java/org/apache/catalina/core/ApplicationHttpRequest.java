@@ -849,7 +849,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
      */
     private void mergeParameters() {
 
-        if ((queryParamString == null) || (queryParamString.length() < 1)) {
+        if ((queryParamString == null) || (queryParamString.isEmpty())) {
             return;
         }
 

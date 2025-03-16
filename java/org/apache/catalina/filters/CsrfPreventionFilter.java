@@ -103,7 +103,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * @param entryPoints Comma separated list of URLs to be configured as entry points.
      */
     public void setEntryPoints(String entryPoints) {
-        String values[] = entryPoints.split(",");
+        String[] values = entryPoints.split(",");
         for (String value : values) {
             this.entryPoints.add(value.trim());
         }
@@ -176,7 +176,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * @return A collection of predicates representing the URL patterns.
      */
     protected static Collection<Predicate<String>> createNoNoncePredicates(ServletContext context, String patterns) {
-        if (null == patterns || 0 == patterns.trim().length()) {
+        if (null == patterns || patterns.trim().isEmpty()) {
             return null;
         }
 
@@ -184,7 +184,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             return Collections.singleton(new PatternPredicate(patterns.substring(1, patterns.length() - 1)));
         }
 
-        String values[] = patterns.split(",");
+        String[] values = patterns.split(",");
 
         ArrayList<Predicate<String>> matchers = new ArrayList<>(values.length);
         for (String value : values) {
@@ -209,7 +209,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      * @return A Predicate which can match the specified pattern, or <code>null</code> if the pattern is null or blank.
      */
     protected static Predicate<String> createNoNoncePredicate(ServletContext context, String pattern) {
-        if (null == pattern || 0 == pattern.trim().length()) {
+        if (null == pattern || pattern.trim().isEmpty()) {
             return null;
         }
         if (pattern.startsWith("mime:")) {
@@ -578,11 +578,9 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 return true;
             }
 
-            if (null != noNoncePatterns) {
-                for (Predicate<String> p : noNoncePatterns) {
-                    if (p.test(url)) {
-                        return false;
-                    }
+            for (Predicate<String> p : noNoncePatterns) {
+                if (p.test(url)) {
+                    return false;
                 }
             }
 
@@ -614,7 +612,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                 path = path.substring(0, question);
             }
             StringBuilder sb = new StringBuilder(path);
-            if (query.length() > 0) {
+            if (!query.isEmpty()) {
                 sb.append(query);
                 sb.append('&');
             } else {
@@ -656,10 +654,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
                 @Override
                 protected boolean removeEldestEntry(Map.Entry<T,T> eldest) {
-                    if (size() > cacheSize) {
-                        return true;
-                    }
-                    return false;
+                    return size() > cacheSize;
                 }
             };
         }

@@ -209,7 +209,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
         String ejbLink = ejb.getLink();
         String lookupName = ejb.getLookupName();
 
-        if (ejbLink != null && ejbLink.length() > 0 && lookupName != null && lookupName.length() > 0) {
+        if (ejbLink != null && !ejbLink.isEmpty() && lookupName != null && !lookupName.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("namingResources.ejbLookupLink", ejb.getName()));
         }
 
@@ -261,12 +261,12 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
         String lookupName = environment.getLookupName();
 
         // Entries with injection targets but no value are effectively ignored
-        if (injectionTargets != null && injectionTargets.size() > 0 && (value == null || value.length() == 0)) {
+        if (injectionTargets != null && !injectionTargets.isEmpty() && (value == null || value.isEmpty())) {
             return;
         }
 
         // Entries with lookup-name and value are an error (EE.5.4.1.3)
-        if (value != null && value.length() > 0 && lookupName != null && lookupName.length() > 0) {
+        if (value != null && !value.isEmpty() && lookupName != null && !lookupName.isEmpty()) {
             throw new IllegalArgumentException(
                     sm.getString("namingResources.envEntryLookupValue", environment.getName()));
         }
@@ -514,7 +514,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the set of defined environment entries for this web application. If none have been defined, a zero-length
+     * @return the array of defined environment entries for this web application. If none have been defined, a zero-length
      *             array is returned.
      */
     public ContextEnvironment[] findEnvironments() {
@@ -650,7 +650,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the set of resource environment reference names for this web application. If none have been specified, a
+     * @return the array of resource environment reference names for this web application. If none have been specified, a
      *             zero-length array is returned.
      */
     public ContextResourceEnvRef[] findResourceEnvRefs() {
@@ -698,7 +698,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         entries.remove(name);
 
-        ContextEjb ejb = null;
+        ContextEjb ejb;
         synchronized (ejbs) {
             ejb = ejbs.remove(name);
         }
@@ -715,7 +715,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         entries.remove(name);
 
-        ContextEnvironment environment = null;
+        ContextEnvironment environment;
         synchronized (envs) {
             environment = envs.remove(name);
         }
@@ -743,7 +743,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         entries.remove(name);
 
-        ContextLocalEjb localEjb = null;
+        ContextLocalEjb localEjb;
         synchronized (localEjbs) {
             localEjb = localEjbs.remove(name);
         }
@@ -764,7 +764,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         entries.remove(name);
 
-        MessageDestinationRef mdr = null;
+        MessageDestinationRef mdr;
         synchronized (mdrs) {
             mdr = mdrs.remove(name);
         }
@@ -793,7 +793,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         entries.remove(name);
 
-        ContextResource resource = null;
+        ContextResource resource;
         synchronized (resources) {
             resource = resources.remove(name);
         }
@@ -821,7 +821,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         entries.remove(name);
 
-        ContextResourceEnvRef resourceEnvRef = null;
+        ContextResourceEnvRef resourceEnvRef;
         synchronized (resourceEnvRefs) {
             resourceEnvRef = resourceEnvRefs.remove(name);
         }
@@ -838,7 +838,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         entries.remove(name);
 
-        ContextResourceLink resourceLink = null;
+        ContextResourceLink resourceLink;
         synchronized (resourceLinks) {
             resourceLink = resourceLinks.remove(name);
         }
@@ -866,7 +866,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
         entries.remove(name);
 
-        ContextService service = null;
+        ContextService service;
         synchronized (services) {
             service = services.remove(name);
         }
@@ -932,7 +932,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      * Close those resources that an explicit close may help clean-up faster.
      */
     private void cleanUp() {
-        if (resources.size() == 0) {
+        if (resources.isEmpty()) {
             return;
         }
         javax.naming.Context ctxt;
@@ -950,7 +950,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
         for (ContextResource cr : resources.values()) {
             if (cr.getSingleton()) {
                 String closeMethod = cr.getCloseMethod();
-                if (closeMethod != null && closeMethod.length() > 0) {
+                if (closeMethod != null && !closeMethod.isEmpty()) {
                     String name = cr.getName();
                     Object resource;
                     try {
@@ -974,7 +974,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      */
     private void cleanUp(Object resource, String name, String closeMethod) {
         // Look for a zero-arg close() method
-        Method m = null;
+        Method m;
         try {
             m = resource.getClass().getMethod(closeMethod, (Class<?>[]) null);
         } catch (SecurityException e) {
@@ -1070,7 +1070,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
             return true;
         }
 
-        if (resource.getInjectionTargets() == null || resource.getInjectionTargets().size() == 0) {
+        if (resource.getInjectionTargets() == null || resource.getInjectionTargets().isEmpty()) {
             // No injection targets so use the defined type for the resource
             return true;
         }
