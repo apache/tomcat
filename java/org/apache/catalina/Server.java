@@ -231,7 +231,7 @@ public interface Server extends Lifecycle {
 
 
     /**
-     * @return the set of Services defined within this Server.
+     * @return the array of Services defined within this Server.
      */
     Service[] findServices();
 

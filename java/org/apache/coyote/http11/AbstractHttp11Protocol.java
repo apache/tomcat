@@ -435,7 +435,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      *                                 "gorilla|desesplorer|tigrus"
      */
     public void setRestrictedUserAgents(String restrictedUserAgents) {
-        if (restrictedUserAgents == null || restrictedUserAgents.length() == 0) {
+        if (restrictedUserAgents == null || restrictedUserAgents.isEmpty()) {
             this.restrictedUserAgents = null;
         } else {
             this.restrictedUserAgents = Pattern.compile(restrictedUserAgents);
@@ -537,7 +537,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * The names of headers that are allowed to be sent via a trailer when using chunked encoding. They are stored in
      * lower case.
      */
-    private Set<String> allowedTrailerHeaders = ConcurrentHashMap.newKeySet();
+    private final Set<String> allowedTrailerHeaders = ConcurrentHashMap.newKeySet();
 
     public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
         // Jump through some hoops so we don't end up with an empty set while
@@ -614,7 +614,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         // HTTP Upgrade
         String httpUpgradeName = upgradeProtocol.getHttpUpgradeName(getEndpoint().isSSLEnabled());
         boolean httpUpgradeConfigured = false;
-        if (httpUpgradeName != null && httpUpgradeName.length() > 0) {
+        if (httpUpgradeName != null && !httpUpgradeName.isEmpty()) {
             httpUpgradeProtocols.put(httpUpgradeName, upgradeProtocol);
             httpUpgradeConfigured = true;
             getLog().info(sm.getString("abstractHttp11Protocol.httpUpgradeConfigured", getName(), httpUpgradeName));
@@ -623,7 +623,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
         // ALPN
         String alpnName = upgradeProtocol.getAlpnName();
-        if (alpnName != null && alpnName.length() > 0) {
+        if (alpnName != null && !alpnName.isEmpty()) {
             // ALPN is only available with TLS
             if (getEndpoint().isSSLEnabled()) {
                 negotiatedProtocols.put(alpnName, upgradeProtocol);
@@ -796,8 +796,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     protected Processor createProcessor() {
-        Http11Processor processor = new Http11Processor(this, adapter);
-        return processor;
+        return new Http11Processor(this, adapter);
     }
 
 

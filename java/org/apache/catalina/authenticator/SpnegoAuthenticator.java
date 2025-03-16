@@ -86,7 +86,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     }
 
     public void setNoKeepAliveUserAgents(String noKeepAliveUserAgents) {
-        if (noKeepAliveUserAgents == null || noKeepAliveUserAgents.length() == 0) {
+        if (noKeepAliveUserAgents == null || noKeepAliveUserAgents.isEmpty()) {
             this.noKeepAliveUserAgents = null;
         } else {
             this.noKeepAliveUserAgents = Pattern.compile(noKeepAliveUserAgents);
@@ -184,8 +184,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         LoginContext lc = null;
         GSSContext gssContext = null;
-        byte[] outToken = null;
-        Principal principal = null;
+        byte[] outToken;
+        Principal principal;
         try {
             try {
                 lc = new LoginContext(getLoginConfigName());

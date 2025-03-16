@@ -147,7 +147,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                 }
             }
         }
-        if (result.size() == 0) {
+        if (result.isEmpty()) {
             return null;
         }
         return result;
@@ -241,7 +241,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             throw new IllegalStateException(sm.getString("standardRoot.checkStateNotStarted"));
         }
 
-        if (path == null || path.length() == 0 || !path.startsWith("/")) {
+        if (path == null || !path.startsWith("/")) {
             throw new IllegalArgumentException(sm.getString("standardRoot.invalidPath", path));
         }
 
@@ -255,7 +255,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             // convert it to '/'
             result = RequestUtil.normalize(path, false);
         }
-        if (result == null || result.length() == 0 || !result.startsWith("/")) {
+        if (result == null || !result.startsWith("/")) {
             throw new IllegalArgumentException(sm.getString("standardRoot.invalidPathNormal", path, result));
         }
 
@@ -263,7 +263,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
     }
 
     protected final WebResource getResourceInternal(String path, boolean useClassLoaderResources) {
-        WebResource result = null;
+        WebResource result;
         WebResource virtual = null;
         WebResource mainEmpty = null;
         for (List<WebResourceSet> list : allResources) {
@@ -322,7 +322,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
             }
         }
 
-        if (result.size() == 0) {
+        if (result.isEmpty()) {
             result.add(main.getResource(path));
         }
 
@@ -676,10 +676,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
     @Override
     protected String getObjectNameKeyProperties() {
-        StringBuilder keyProperties = new StringBuilder("type=WebResourceRoot");
-        keyProperties.append(context.getMBeanKeyProperties());
-
-        return keyProperties.toString();
+        return "type=WebResourceRoot" + context.getMBeanKeyProperties();
     }
 
     // --------------------------------------------------------------- Lifecycle
@@ -823,11 +820,11 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
         private final String archivePath;
 
         BaseLocation(URL url) {
-            File f = null;
+            File f;
 
             if ("jar".equals(url.getProtocol()) || "war".equals(url.getProtocol())) {
                 String jarUrl = url.toString();
-                int endOfFileUrl = -1;
+                int endOfFileUrl;
                 if ("jar".equals(url.getProtocol())) {
                     endOfFileUrl = jarUrl.indexOf("!/");
                 } else {

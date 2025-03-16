@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -93,7 +94,7 @@ public final class Response {
     /**
      * Notes.
      */
-    final Object notes[] = new Object[Constants.MAX_NOTES];
+    final Object[] notes = new Object[Constants.MAX_NOTES];
 
 
     /**
@@ -183,7 +184,7 @@ public final class Response {
     }
 
 
-    protected void setHook(ActionHook hook) {
+    void setHook(ActionHook hook) {
         this.hook = hook;
     }
 
@@ -204,11 +205,7 @@ public final class Response {
 
     public void action(ActionCode actionCode, Object param) {
         if (hook != null) {
-            if (param == null) {
-                hook.action(actionCode, this);
-            } else {
-                hook.action(actionCode, param);
-            }
+            hook.action(actionCode, Objects.requireNonNullElse(param, this));
         }
     }
 
@@ -576,7 +573,7 @@ public final class Response {
             // There is a charset so have to rebuild content-type without it
             this.contentType = m.toStringNoCharset();
             charsetValue = charsetValue.trim();
-            if (charsetValue.length() > 0) {
+            if (!charsetValue.isEmpty()) {
                 try {
                     charset = B2CConverter.getCharset(charsetValue);
                 } catch (UnsupportedEncodingException e) {
@@ -767,7 +764,7 @@ public final class Response {
             return false;
         }
         // Assume write is not possible
-        boolean ready = false;
+        boolean ready;
         synchronized (nonBlockingStateLock) {
             if (registeredForWrite) {
                 fireListener = true;

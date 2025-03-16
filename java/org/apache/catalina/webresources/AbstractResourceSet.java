@@ -40,7 +40,7 @@ public abstract class AbstractResourceSet extends LifecycleBase implements WebRe
 
 
     protected final void checkPath(String path) {
-        if (path == null || path.length() == 0 || path.charAt(0) != '/') {
+        if (path == null || path.isEmpty() || path.charAt(0) != '/') {
             throw new IllegalArgumentException(sm.getString("abstractResourceSet.checkPath", path));
         }
     }

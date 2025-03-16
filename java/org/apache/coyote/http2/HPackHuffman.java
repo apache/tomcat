@@ -324,11 +324,11 @@ public class HPackHuffman {
             int newLength = length + 1;
             HuffmanCode high = new HuffmanCode(code << 1 | 1, newLength);
             HuffmanCode low = new HuffmanCode(code << 1, newLength);
-            int newVal = 0;
+            int newVal;
             boolean highTerminal = allCodes.remove(high);
             if (highTerminal) {
                 // bah, linear search
-                int i = 0;
+                int i;
                 for (i = 0; i < codes.length; ++i) {
                     if (codes[i].equals(high)) {
                         break;
@@ -344,7 +344,7 @@ public class HPackHuffman {
             boolean lowTerminal = allCodes.remove(low);
             if (lowTerminal) {
                 // bah, linear search
-                int i = 0;
+                int i;
                 for (i = 0; i < codes.length; ++i) {
                     if (codes[i].equals(low)) {
                         break;
@@ -470,7 +470,7 @@ public class HPackHuffman {
             HuffmanCode code = HUFFMAN_CODES[c];
             if (code.length + bytePos <= 8) {
                 // it fits in the current byte
-                currentBufferByte |= ((code.value & 0xFF) << 8 - (code.length + bytePos));
+                currentBufferByte |= (byte) ((code.value & 0xFF) << 8 - (code.length + bytePos));
                 bytePos += code.length;
             } else {
                 // it does not fit, it may need up to 4 bytes
@@ -483,9 +483,9 @@ public class HPackHuffman {
                     }
                     int remainingInByte = 8 - bytePos;
                     if (rem > remainingInByte) {
-                        currentBufferByte |= (val >> (rem - remainingInByte));
+                        currentBufferByte |= (byte) (val >> (rem - remainingInByte));
                     } else {
-                        currentBufferByte |= (val << (remainingInByte - rem));
+                        currentBufferByte |= (byte) (val << (remainingInByte - rem));
                     }
                     if (rem > remainingInByte) {
                         buffer.put(currentBufferByte);
@@ -563,11 +563,7 @@ public class HPackHuffman {
             if (length != that.length) {
                 return false;
             }
-            if (value != that.value) {
-                return false;
-            }
-
-            return true;
+            return value == that.value;
         }
 
         @Override

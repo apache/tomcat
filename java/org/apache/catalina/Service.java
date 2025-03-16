@@ -101,7 +101,7 @@ public interface Service extends Lifecycle {
     /**
      * Find and return the set of Connectors associated with this Service.
      *
-     * @return the set of associated Connectors
+     * @return the array of associated Connectors
      */
     Connector[] findConnectors();
 

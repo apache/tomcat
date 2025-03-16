@@ -402,8 +402,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     }
                     return;
                 }
-                sendfile.streamReservation -= bytesWritten;
-                sendfile.connectionReservation -= bytesWritten;
+                sendfile.streamReservation -= (int) bytesWritten;
+                sendfile.connectionReservation -= (int) bytesWritten;
                 sendfile.pos += bytesWritten;
                 try {
                     if (sendfile.connectionReservation == 0) {
@@ -497,7 +497,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
         @Override
         public void receivePing(byte[] payload, boolean ack) throws IOException {
             if (ack) {
-                super.receivePing(payload, ack);
+                super.receivePing(payload, true);
             } else {
                 // Client originated ping. Echo it back.
                 socketWrapper.write(BlockingMode.SEMI_BLOCK, protocol.getWriteTimeout(), TimeUnit.MILLISECONDS, null,

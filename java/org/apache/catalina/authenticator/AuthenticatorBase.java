@@ -721,7 +721,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
 
     private CallbackHandler createCallbackHandler() {
-        CallbackHandler callbackHandler = null;
+        CallbackHandler callbackHandler;
 
         Class<?> clazz = null;
         try {
@@ -822,7 +822,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 if (requirePrincipal) {
                     return false;
                 }
-            } else if (cachedAuth == false || !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
+            } else if (!cachedAuth || !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
                 // Skip registration if authentication credentials were
                 // cached and the Principal did not change.
 
@@ -936,7 +936,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                     authorized = new GenericPrincipal(username);
                 }
                 String authType = request.getAuthType();
-                if (authType == null || authType.length() == 0) {
+                if (authType == null || authType.isEmpty()) {
                     authType = getAuthMethod();
                 }
                 register(request, response, authorized, authType, username, null);
@@ -1208,7 +1208,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         // path, if there is one
         Container parent = context.getParent();
         while ((sso == null) && (parent != null)) {
-            Valve valves[] = parent.getPipeline().getValves();
+            Valve[] valves = parent.getPipeline().getValves();
             for (Valve valve : valves) {
                 if (valve instanceof SingleSignOn) {
                     sso = (SingleSignOn) valve;

@@ -22,6 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -120,7 +121,7 @@ public final class Request {
     /**
      * Notes.
      */
-    private final Object notes[] = new Object[Constants.MAX_NOTES];
+    private final Object[] notes = new Object[Constants.MAX_NOTES];
 
 
     /**
@@ -236,7 +237,7 @@ public final class Request {
 
     public boolean isReady() {
         // Assume read is not possible
-        boolean ready = false;
+        boolean ready;
         synchronized (nonBlockingStateLock) {
             if (registeredForRead) {
                 fireListener = true;
@@ -511,17 +512,13 @@ public final class Request {
         response.setRequest(this);
     }
 
-    protected void setHook(ActionHook hook) {
+    void setHook(ActionHook hook) {
         this.hook = hook;
     }
 
     public void action(ActionCode actionCode, Object param) {
         if (hook != null) {
-            if (param == null) {
-                hook.action(actionCode, this);
-            } else {
-                hook.action(actionCode, param);
-            }
+            hook.action(actionCode, Objects.requireNonNullElse(param, this));
         }
     }
 
@@ -603,10 +600,7 @@ public final class Request {
     }
 
     public boolean getSupportsRelativeRedirects() {
-        if (protocol().equals("") || protocol().equals("HTTP/1.0")) {
-            return false;
-        }
-        return true;
+        return !protocol().equals("") && !protocol().equals("HTTP/1.0");
     }
 
 

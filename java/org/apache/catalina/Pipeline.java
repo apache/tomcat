@@ -80,8 +80,8 @@ public interface Pipeline extends Contained {
 
 
     /**
-     * @return the set of Valves in the pipeline associated with this Container, including the basic Valve (if any). If
-     *             there are no such Valves, a zero-length array is returned.
+     * @return the array of Valves in the pipeline associated with this Container, including the basic Valve (if any).
+     *   If there are no such Valves, a zero-length array is returned.
      */
     Valve[] getValves();
 

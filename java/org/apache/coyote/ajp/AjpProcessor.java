@@ -27,9 +27,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -131,28 +128,19 @@ public class AjpProcessor extends AbstractProcessor {
         System.arraycopy(pongMessage.getBuffer(), 0, pongMessageArray, 0, pongMessage.getLen());
 
         // Build Map of Java Servlet to Jakarta Servlet attribute names
-        Map<String,String> m = new HashMap<>();
-        m.put("jakarta.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite");
-        m.put("jakarta.servlet.request.key_size", "jakarta.servlet.request.key_size");
-        m.put("jakarta.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session");
-        m.put("jakarta.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate");
-        m.put("javax.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite");
-        m.put("javax.servlet.request.key_size", "jakarta.servlet.request.key_size");
-        m.put("javax.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session");
-        m.put("javax.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate");
-        jakartaAttributeMapping = Collections.unmodifiableMap(m);
+        jakartaAttributeMapping = Map.of(
+            "jakarta.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite",
+            "jakarta.servlet.request.key_size", "jakarta.servlet.request.key_size",
+            "jakarta.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session",
+            "jakarta.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate",
+            "javax.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite",
+            "javax.servlet.request.key_size", "jakarta.servlet.request.key_size",
+            "javax.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session",
+            "javax.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate");
 
-        Set<String> s = new HashSet<>();
-        s.add("CERT_ISSUER");
-        s.add("CERT_SUBJECT");
-        s.add("CERT_COOKIE");
-        s.add("HTTPS_SERVER_SUBJECT");
-        s.add("CERT_FLAGS");
-        s.add("HTTPS_SECRETKEYSIZE");
-        s.add("CERT_SERIALNUMBER");
-        s.add("HTTPS_SERVER_ISSUER");
-        s.add("HTTPS_KEYSIZE");
-        iisTlsAttributes = Collections.unmodifiableSet(s);
+        iisTlsAttributes = Set.of(
+            "CERT_ISSUER", "CERT_SUBJECT", "CERT_COOKIE", "HTTPS_SERVER_SUBJECT", "CERT_FLAGS", "HTTPS_SECRETKEYSIZE",
+            "CERT_SERIALNUMBER", "HTTPS_SERVER_ISSUER", "HTTPS_KEYSIZE");
     }
 
 
@@ -678,7 +666,7 @@ public class AjpProcessor extends AbstractProcessor {
         boolean contentLengthSet = false;
         int hCount = requestHeaderMessage.getInt();
         for (int i = 0; i < hCount; i++) {
-            String hName = null;
+            String hName;
 
             // Header names are encoded as either an integer code starting
             // with 0xA0, or as a normal string (in which case the first
@@ -686,7 +674,7 @@ public class AjpProcessor extends AbstractProcessor {
             int isc = requestHeaderMessage.peekInt();
             int hId = isc & 0xFF;
 
-            MessageBytes vMB = null;
+            MessageBytes vMB;
             isc &= 0xFF00;
             if (0xA000 == isc) {
                 requestHeaderMessage.getInt(); // To advance the read position
@@ -777,12 +765,12 @@ public class AjpProcessor extends AbstractProcessor {
 
                 case Constants.SC_A_CONTEXT:
                     requestHeaderMessage.getBytes(tmpMB);
-                    // nothing
+                // nothing
                     break;
 
                 case Constants.SC_A_SERVLET_PATH:
                     requestHeaderMessage.getBytes(tmpMB);
-                    // nothing
+                // nothing
                     break;
 
                 case Constants.SC_A_REMOTE_USER:
@@ -813,7 +801,7 @@ public class AjpProcessor extends AbstractProcessor {
 
                 case Constants.SC_A_JVM_ROUTE:
                     requestHeaderMessage.getBytes(tmpMB);
-                    // nothing
+                // nothing
                     break;
 
                 case Constants.SC_A_SSL_CERT:
@@ -841,7 +829,7 @@ public class AjpProcessor extends AbstractProcessor {
 
                 case Constants.SC_A_SECRET:
                     requestHeaderMessage.getBytes(tmpMB);
-                    if (secret != null && secret.length() > 0) {
+                    if (secret != null && !secret.isEmpty()) {
                         secretPresentInRequest = true;
                         if (!tmpMB.equals(secret)) {
                             response.setStatus(403);
@@ -851,7 +839,7 @@ public class AjpProcessor extends AbstractProcessor {
                     break;
 
                 default:
-                    // Ignore unknown attribute for backward compatibility
+                // Ignore unknown attribute for backward compatibility
                     break;
 
             }
@@ -859,7 +847,7 @@ public class AjpProcessor extends AbstractProcessor {
         }
 
         // Check if secret was submitted if required
-        if (secret != null && secret.length() > 0 && !secretPresentInRequest) {
+        if (secret != null && !secret.isEmpty() && !secretPresentInRequest) {
             response.setStatus(403);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
         }
@@ -870,10 +858,9 @@ public class AjpProcessor extends AbstractProcessor {
 
             int pos = uriBC.indexOf("://", 0, 3, 4);
             int uriBCStart = uriBC.getStart();
-            int slashPos = -1;
             if (pos != -1) {
                 byte[] uriB = uriBC.getBytes();
-                slashPos = uriBC.indexOf('/', pos + 3);
+                int slashPos = uriBC.indexOf('/', pos + 3);
                 if (slashPos == -1) {
                     slashPos = uriBC.getLength();
                     // Set URI as "/"

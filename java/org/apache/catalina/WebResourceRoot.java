@@ -205,7 +205,7 @@ public interface WebResourceRoot extends Lifecycle {
     void addPreResources(WebResourceSet webResourceSet);
 
     /**
-     * @return the list of WebResourceSet configured to this web application as a 'Pre' resource.
+     * @return the array of WebResourceSet configured to this web application as a 'Pre' resource.
      */
     WebResourceSet[] getPreResources();
 
@@ -217,7 +217,7 @@ public interface WebResourceRoot extends Lifecycle {
     void addJarResources(WebResourceSet webResourceSet);
 
     /**
-     * @return the list of WebResourceSet configured to this web application as a 'Jar' resource.
+     * @return the array of WebResourceSet configured to this web application as a 'Jar' resource.
      */
     WebResourceSet[] getJarResources();
 
@@ -229,7 +229,7 @@ public interface WebResourceRoot extends Lifecycle {
     void addPostResources(WebResourceSet webResourceSet);
 
     /**
-     * @return the list of WebResourceSet configured to this web application as a 'Post' resource.
+     * @return the array of WebResourceSet configured to this web application as a 'Post' resource.
      */
     WebResourceSet[] getPostResources();
 
@@ -380,7 +380,7 @@ public interface WebResourceRoot extends Lifecycle {
     void deregisterTrackedResource(TrackedWebResource trackedResource);
 
     /**
-     * @return the set of {@link WebResourceSet#getBaseUrl()} for all {@link WebResourceSet}s used by this root.
+     * @return the list of {@link WebResourceSet#getBaseUrl()} for all {@link WebResourceSet}s used by this root.
      */
     List<URL> getBaseUrls();
 

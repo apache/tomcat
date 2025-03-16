@@ -53,7 +53,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
             resourceName = resourceName.substring(0, resourceName.length() - 1);
         }
         String internalPath = archiveResourceSet.getInternalPath();
-        if (internalPath.length() > 0 && resourceName.equals(internalPath.subSequence(1, internalPath.length()))) {
+        if (!internalPath.isEmpty() && resourceName.contentEquals(internalPath.subSequence(1, internalPath.length()))) {
             name = "";
         } else {
             int index = resourceName.lastIndexOf('/');

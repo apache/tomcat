@@ -39,7 +39,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SimpleServerAuthConfig implements ServerAuthConfig {
 
-    private static StringManager sm = StringManager.getManager(SimpleServerAuthConfig.class);
+    private static final StringManager sm = StringManager.getManager(SimpleServerAuthConfig.class);
 
     private static final String SERVER_AUTH_MODULE_KEY_PREFIX =
             "org.apache.catalina.authenticator.jaspic.ServerAuthModule.";
@@ -116,9 +116,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                             module.initialize(null, null, handler, mergedProperties);
                             modules.add(module);
                         } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
-                            AuthException ae = new AuthException();
-                            ae.initCause(e);
-                            throw ae;
+                            throw new AuthException(e);
                         }
 
                         // Look for the next module
@@ -127,7 +125,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                         moduleClassName = mergedProperties.get(key);
                     }
 
-                    if (modules.size() == 0) {
+                    if (modules.isEmpty()) {
                         throw new AuthException(sm.getString("simpleServerAuthConfig.noModules"));
                     }
 
