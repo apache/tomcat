@@ -175,7 +175,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     @Override
     public long end() throws IOException {
         long swallowed = 0;
-        int read = 0;
+        int read;
         // Consume extra bytes : parse the stream until the end chunk is found
         while ((read = doRead(this)) >= 0) {
             swallowed += read;
@@ -325,8 +325,8 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
             if (read < 0) {
                 // Unexpected end of stream
                 throwBadRequestException(sm.getString("chunkedInputFilter.invalidHeader"));
-            } else if (read == 0) {
-                return false;
+            } else {
+                return read != 0;
             }
         }
         return true;
@@ -473,7 +473,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
 
 
     private int parseChunkBody(ApplicationBufferHandler handler) throws IOException {
-        int result = 0;
+        int result;
 
         if (!fill()) {
             return 0;
@@ -584,7 +584,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
      */
     private boolean parseTrailerFields() throws IOException {
         // Handle optional trailer headers
-        HeaderParseStatus status = HeaderParseStatus.HAVE_MORE_HEADERS;
+        HeaderParseStatus status;
         do {
             try {
                 status = httpHeaderParser.parseHeader();

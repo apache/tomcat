@@ -101,7 +101,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     private volatile Http2Parser parser;
 
     // Simple state machine (sequence of states)
-    private AtomicReference<ConnectionState> connectionState = new AtomicReference<>(ConnectionState.NEW);
+    private final AtomicReference<ConnectionState> connectionState = new AtomicReference<>(ConnectionState.NEW);
     private volatile long pausedNanoTime = Long.MAX_VALUE;
 
     /**
@@ -152,7 +152,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // Over time the count should be a slowly decreasing negative number.
         // Therefore, the longer a connection is 'well-behaved', the greater
         // tolerance it will have for a period of 'bad' behaviour.
-        overheadCount = new AtomicLong(-10 * protocol.getOverheadCountFactor());
+        overheadCount = new AtomicLong(-10L * protocol.getOverheadCountFactor());
 
         lastNonFinalDataPayload = protocol.getOverheadDataThreshold() * 2;
         lastWindowUpdate = protocol.getOverheadWindowUpdateThreshold() * 2;
@@ -1183,12 +1183,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             int leftToAllocate = allocation;
 
             if (stream.getConnectionAllocationRequested() > 0) {
-                int allocatedThisTime;
-                if (allocation >= stream.getConnectionAllocationRequested()) {
-                    allocatedThisTime = stream.getConnectionAllocationRequested();
-                } else {
-                    allocatedThisTime = allocation;
-                }
+                int allocatedThisTime = Math.min(allocation, stream.getConnectionAllocationRequested());
                 stream.setConnectionAllocationRequested(stream.getConnectionAllocationRequested() - allocatedThisTime);
                 stream.setConnectionAllocationMade(stream.getConnectionAllocationMade() + allocatedThisTime);
                 leftToAllocate = leftToAllocate - allocatedThisTime;
@@ -1404,7 +1399,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         int len = length;
         int pos = offset;
         boolean nextReadBlock = block;
-        int thisRead = 0;
+        int thisRead;
 
         while (len > 0) {
             // Blocking reads use the protocol level read timeout. Non-blocking

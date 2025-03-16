@@ -49,8 +49,8 @@ public class Cache {
     private int objectMaxSize = (int) maxSize / OBJECT_MAX_SIZE_FACTOR;
     private CacheStrategy cacheStrategy;
 
-    private LongAdder lookupCount = new LongAdder();
-    private LongAdder hitCount = new LongAdder();
+    private final LongAdder lookupCount = new LongAdder();
+    private final LongAdder hitCount = new LongAdder();
 
     private final ConcurrentMap<String,CachedResource> resourceCache = new ConcurrentHashMap<>();
 
@@ -233,11 +233,8 @@ public class Cache {
     private boolean noCache(String path) {
         // Don't cache classes. The class loader handles this.
         // Don't cache JARs. The ResourceSet handles this.
-        if ((path.endsWith(".class") && (path.startsWith("/WEB-INF/classes/") || path.startsWith("/WEB-INF/lib/"))) ||
-                (path.startsWith("/WEB-INF/lib/") && path.endsWith(".jar"))) {
-            return true;
-        }
-        return false;
+        return (path.endsWith(".class") && (path.startsWith("/WEB-INF/classes/") || path.startsWith("/WEB-INF/lib/"))) ||
+            (path.startsWith("/WEB-INF/lib/") && path.endsWith(".jar"));
     }
 
     private long evict(long targetSize, Iterator<CachedResource> iter) {
@@ -315,9 +312,10 @@ public class Cache {
         if (objectMaxSize * 1024L > Integer.MAX_VALUE) {
             log.warn(sm.getString("cache.objectMaxSizeTooBigBytes", Integer.valueOf(objectMaxSize)));
             this.objectMaxSize = Integer.MAX_VALUE;
+        } else {
+            // Internally bytes, externally kilobytes
+            this.objectMaxSize = objectMaxSize * 1024;
         }
-        // Internally bytes, externally kilobytes
-        this.objectMaxSize = objectMaxSize * 1024;
     }
 
     public int getObjectMaxSize() {

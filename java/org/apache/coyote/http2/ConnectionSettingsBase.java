@@ -71,34 +71,23 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
         }
 
         switch (setting) {
-            case HEADER_TABLE_SIZE:
-                validateHeaderTableSize(value);
-                break;
-            case ENABLE_PUSH:
-                validateEnablePush(value);
-                break;
-            case MAX_CONCURRENT_STREAMS:
+            case HEADER_TABLE_SIZE -> validateHeaderTableSize(value);
+            case ENABLE_PUSH -> validateEnablePush(value);
+            case MAX_CONCURRENT_STREAMS, MAX_HEADER_LIST_SIZE -> {
                 // No further validation required
-                break;
-            case INITIAL_WINDOW_SIZE:
-                validateInitialWindowSize(value);
-                break;
-            case MAX_FRAME_SIZE:
-                validateMaxFrameSize(value);
-                break;
-            case MAX_HEADER_LIST_SIZE:
-                // No further validation required
-                break;
-            case NO_RFC7540_PRIORITIES:
-                validateNoRfc7540Priorities(value);
-                break;
-            case ENABLE_CONNECT_PROTOCOL:
-            case TLS_RENEG_PERMITTED:
+            }
+            case INITIAL_WINDOW_SIZE -> validateInitialWindowSize(value);
+            case MAX_FRAME_SIZE -> validateMaxFrameSize(value);
+            case NO_RFC7540_PRIORITIES -> validateNoRfc7540Priorities(value);
+            case ENABLE_CONNECT_PROTOCOL, TLS_RENEG_PERMITTED -> {
                 // Not supported. Ignore it.
                 return;
-            case UNKNOWN:
+                // Not supported. Ignore it.
+            }
+            case UNKNOWN -> {
                 // Unrecognised. Ignore it.
                 return;
+            }
         }
 
         set(setting, Long.valueOf(value));

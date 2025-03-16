@@ -642,9 +642,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         }
 
         endpoint.start();
-        monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(() -> {
-            startAsyncTimeout();
-        }, 0, 60, TimeUnit.SECONDS);
+        monitorFuture = getUtilityExecutor().scheduleWithFixedDelay(this::startAsyncTimeout, 0, 60, TimeUnit.SECONDS);
     }
 
 
@@ -853,7 +851,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                     String negotiatedProtocol = wrapper.getNegotiatedProtocol();
                     // OpenSSL typically returns null whereas JSSE typically
                     // returns "" when no protocol is negotiated
-                    if (negotiatedProtocol != null && negotiatedProtocol.length() > 0) {
+                    if (negotiatedProtocol != null && !negotiatedProtocol.isEmpty()) {
                         UpgradeProtocol upgradeProtocol = getProtocol().getNegotiatedProtocol(negotiatedProtocol);
                         if (upgradeProtocol != null) {
                             processor = upgradeProtocol.getProcessor(wrapper, getProtocol().getAdapter());
@@ -900,7 +898,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
                 processor.setSslSupport(wrapper.getSslSupport());
 
-                SocketState state = SocketState.CLOSED;
+                SocketState state;
                 do {
                     state = processor.process(wrapper, status);
 
@@ -1006,7 +1004,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                     // Connection closed. OK to recycle the processor.
                     // Processors handling upgrades require additional clean-up
                     // before release.
-                    if (processor != null && processor.isUpgrade()) {
+                    if (processor.isUpgrade()) {
                         UpgradeToken upgradeToken = processor.getUpgradeToken();
                         HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
                         InstanceManager instanceManager = upgradeToken.getInstanceManager();
@@ -1200,7 +1198,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         @Override
         public boolean push(Processor processor) {
             int cacheSize = handler.getProtocol().getProcessorCache();
-            boolean offer = cacheSize == -1 ? true : size.get() < cacheSize;
+            boolean offer = cacheSize == -1 || size.get() < cacheSize;
             // avoid over growing our cache or add after we have stopped
             boolean result = false;
             if (offer) {

@@ -202,12 +202,8 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
      * Must hold writeLock to call this method.
      */
     private void writeInternal(byte[] b, int off, int len) throws IOException {
-        if (listener == null) {
-            // Simple case - blocking IO
-            socketWrapper.write(true, b, off, len);
-        } else {
-            socketWrapper.write(false, b, off, len);
-        }
+        // Blocking IO if no listener
+        socketWrapper.write(listener == null, b, off, len);
         upgradeInfo.addBytesSent(len);
     }
 

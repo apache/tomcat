@@ -3865,9 +3865,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     ApplicationFilterConfig filterConfig = new ApplicationFilterConfig(this, entry.getValue());
                     filterConfigs.put(name, filterConfig);
                 } catch (Throwable t) {
-                    t = ExceptionUtils.unwrapInvocationTargetException(t);
-                    ExceptionUtils.handleThrowable(t);
-                    getLogger().error(sm.getString("standardContext.filterStart", name), t);
+                    Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                    ExceptionUtils.handleThrowable(throwable);
+                    getLogger().error(sm.getString("standardContext.filterStart", name), throwable);
                     ok = false;
                 }
             }
@@ -3942,9 +3942,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 String listener = listeners[i];
                 results[i] = getInstanceManager().newInstance(listener);
             } catch (Throwable t) {
-                t = ExceptionUtils.unwrapInvocationTargetException(t);
-                ExceptionUtils.handleThrowable(t);
-                getLogger().error(sm.getString("standardContext.applicationListener", listeners[i]), t);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(throwable);
+                getLogger().error(sm.getString("standardContext.applicationListener", listeners[i]), throwable);
                 ok = false;
             }
         }
@@ -4075,10 +4075,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                         getInstanceManager().destroyInstance(listeners[j]);
                     }
                 } catch (Throwable t) {
-                    t = ExceptionUtils.unwrapInvocationTargetException(t);
-                    ExceptionUtils.handleThrowable(t);
+                    Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                    ExceptionUtils.handleThrowable(throwable);
                     getLogger().error(sm.getString("standardContext.listenerStop", listeners[j].getClass().getName()),
-                            t);
+                        throwable);
                     ok = false;
                 }
             }
@@ -4097,10 +4097,10 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                         getInstanceManager().destroyInstance(listeners[j]);
                     }
                 } catch (Throwable t) {
-                    t = ExceptionUtils.unwrapInvocationTargetException(t);
-                    ExceptionUtils.handleThrowable(t);
+                    Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                    ExceptionUtils.handleThrowable(throwable);
                     getLogger().error(sm.getString("standardContext.listenerStop", listeners[j].getClass().getName()),
-                            t);
+                        throwable);
                     ok = false;
                 }
             }
@@ -5308,7 +5308,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         // Create this directory if necessary
         File dir = new File(workDir);
         if (!dir.isAbsolute()) {
-            String catalinaHomePath = null;
+            String catalinaHomePath;
             try {
                 catalinaHomePath = getCatalinaBase().getCanonicalPath();
                 dir = new File(catalinaHomePath, workDir);

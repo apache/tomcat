@@ -90,13 +90,10 @@ public class SingleSignOnSessionKey implements Serializable {
             return false;
         }
         if (hostName == null) {
-            if (other.hostName != null) {
-                return false;
-            }
-        } else if (!hostName.equals(other.hostName)) {
-            return false;
+            return other.hostName == null;
+        } else {
+            return hostName.equals(other.hostName);
         }
-        return true;
     }
 
     @Override

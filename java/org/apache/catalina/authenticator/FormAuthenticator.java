@@ -159,7 +159,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
         // References to objects we will need later
         Session session = null;
-        Principal principal = null;
+        Principal principal;
 
         // Have we authenticated this user before but have caching disabled?
         if (!cache) {
@@ -227,7 +227,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             // If this request was to the root of the context without a trailing
             // '/', need to redirect to add it else the submit of the login form
             // may not go to the correct web application
-            if (request.getServletPath().length() == 0 && request.getPathInfo() == null) {
+            if (request.getServletPath().isEmpty() && request.getPathInfo() == null) {
                 StringBuilder location = new StringBuilder(requestURI);
                 location.append('/');
                 if (request.getQueryString() != null) {
@@ -424,7 +424,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         }
 
         String loginPage = config.getLoginPage();
-        if (loginPage == null || loginPage.length() == 0) {
+        if (loginPage == null || loginPage.isEmpty()) {
             String msg = sm.getString("formAuthenticator.noLoginPage", context.getName());
             log.warn(msg);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
@@ -480,7 +480,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             throws IOException {
 
         String errorPage = config.getErrorPage();
-        if (errorPage == null || errorPage.length() == 0) {
+        if (errorPage == null || errorPage.isEmpty()) {
             String msg = sm.getString("formAuthenticator.noErrorPage", context.getName());
             log.warn(msg);
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
@@ -663,7 +663,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
         // Create and populate a SavedRequest object for this request
         SavedRequest saved = new SavedRequest();
-        Cookie cookies[] = request.getCookies();
+        Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 saved.addCookie(cookie);

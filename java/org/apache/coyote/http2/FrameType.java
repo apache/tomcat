@@ -87,31 +87,19 @@ enum FrameType {
 
 
     static FrameType valueOf(int i) {
-        switch (i) {
-            case 0:
-                return DATA;
-            case 1:
-                return HEADERS;
-            case 2:
-                return PRIORITY;
-            case 3:
-                return RST;
-            case 4:
-                return SETTINGS;
-            case 5:
-                return PUSH_PROMISE;
-            case 6:
-                return PING;
-            case 7:
-                return GOAWAY;
-            case 8:
-                return WINDOW_UPDATE;
-            case 9:
-                return CONTINUATION;
-            case 16:
-                return PRIORITY_UPDATE;
-            default:
-                return UNKNOWN;
-        }
+        return switch (i) {
+            case 0 -> DATA;
+            case 1 -> HEADERS;
+            case 2 -> PRIORITY;
+            case 3 -> RST;
+            case 4 -> SETTINGS;
+            case 5 -> PUSH_PROMISE;
+            case 6 -> PING;
+            case 7 -> GOAWAY;
+            case 8 -> WINDOW_UPDATE;
+            case 9 -> CONTINUATION;
+            case 16 -> PRIORITY_UPDATE;
+            default -> UNKNOWN;
+        };
     }
 }

@@ -98,7 +98,7 @@ public class Http2Protocol implements UpgradeProtocol {
     // Reference to HTTP/1.1 protocol that this instance is configured under
     private AbstractHttp11Protocol<?> http11Protocol = null;
 
-    private RequestGroupInfo global = new RequestGroupInfo();
+    private final RequestGroupInfo global = new RequestGroupInfo();
 
     /*
      * Setting discardRequestsAndResponses can have a significant performance impact. The magnitude of the impact is
@@ -133,11 +133,9 @@ public class Http2Protocol implements UpgradeProtocol {
 
     @Override
     public Processor getProcessor(SocketWrapperBase<?> socketWrapper, Adapter adapter) {
-        String upgradeProtocol = getUpgradeProtocolName();
-        UpgradeProcessorInternal processor = new UpgradeProcessorInternal(socketWrapper,
-                new UpgradeToken(getInternalUpgradeHandler(socketWrapper, adapter, null), null, null, upgradeProtocol),
-                null);
-        return processor;
+        return new UpgradeProcessorInternal(socketWrapper,
+                new UpgradeToken(getInternalUpgradeHandler(socketWrapper, adapter, null), null,
+                    null, getUpgradeProtocolName()),null);
     }
 
 
@@ -312,11 +310,7 @@ public class Http2Protocol implements UpgradeProtocol {
 
 
     public void setOverheadResetFactor(int overheadResetFactor) {
-        if (overheadResetFactor < 0) {
-            this.overheadResetFactor = 0;
-        } else {
-            this.overheadResetFactor = overheadResetFactor;
-        }
+        this.overheadResetFactor = Math.max(overheadResetFactor, 0);
     }
 
 
