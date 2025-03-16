@@ -104,7 +104,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private volatile StringBuilder cookieHeader = null;
     private volatile boolean hostHeaderSeen = false;
 
-    private Object pendingWindowUpdateForStreamLock = new Object();
+    private final Object pendingWindowUpdateForStreamLock = new Object();
     private int pendingWindowUpdateForStream = 0;
 
     private volatile int urgency = Priority.DEFAULT_URGENCY;
@@ -351,7 +351,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             return;
         }
 
-        if (name.length() == 0) {
+        if (name.isEmpty()) {
             throw new HpackException(sm.getString("stream.header.empty", getConnectionId(), getIdAsString()));
         }
 
@@ -393,7 +393,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                     throw new HpackException(
                             sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":path"));
                 }
-                if (value.length() == 0) {
+                if (value.isEmpty()) {
                     throw new HpackException(sm.getString("stream.header.noPath", getConnectionId(), getIdAsString()));
                 }
                 int queryStart = value.indexOf('?');
@@ -696,10 +696,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
     final boolean isContentLengthInconsistent() {
         long contentLengthHeader = coyoteRequest.getContentLengthLong();
-        if (contentLengthHeader > -1 && contentLengthReceived != contentLengthHeader) {
-            return true;
-        }
-        return false;
+        return contentLengthHeader > -1 && contentLengthReceived != contentLengthHeader;
     }
 
 
@@ -1145,12 +1142,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 // Bug 63682
                 // Only want to return false if the window size is zero AND we are
                 // already waiting for an allocation.
-                if (getWindowSize() > 0 && allocationManager.isWaitingForStream() ||
-                        handler.getWindowSize() > 0 && allocationManager.isWaitingForConnection() || dataLeft) {
-                    return false;
-                } else {
-                    return true;
-                }
+                return (getWindowSize() <= 0 || !allocationManager.isWaitingForStream()) &&
+                    (handler.getWindowSize() <= 0 || !allocationManager.isWaitingForConnection()) && !dataLeft;
             } finally {
                 writeLock.unlock();
             }
@@ -1281,7 +1274,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
             ensureBuffersExist();
 
-            int written = -1;
+            int written;
 
             // It is still possible that the stream has been closed and inBuffer
             // set to null between the call to ensureBuffersExist() above and
@@ -1547,7 +1540,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
                 readStateLock.unlock();
             }
             if (inBuffer != null) {
-                int unreadByteCount = 0;
+                int unreadByteCount;
                 synchronized (inBuffer) {
                     unreadByteCount = inBuffer.position();
                     if (log.isTraceEnabled()) {

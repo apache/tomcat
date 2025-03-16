@@ -421,7 +421,7 @@ public class CachedResource implements WebResource {
         // Longer paths use a noticeable amount of memory so account for this in
         // the cache size. The fixed component of a String instance's memory
         // usage is accounted for in the 500 bytes above.
-        result += getWebappPath().length() * 2;
+        result += getWebappPath().length() * 2L;
         if (getContentLength() <= objectMaxSizeBytes) {
             result += getContentLength();
         }

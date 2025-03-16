@@ -92,7 +92,7 @@ public final class Response {
     /**
      * Notes.
      */
-    final Object notes[] = new Object[Constants.MAX_NOTES];
+    final Object[] notes = new Object[Constants.MAX_NOTES];
 
 
     /**
@@ -182,7 +182,7 @@ public final class Response {
     }
 
 
-    protected void setHook(ActionHook hook) {
+    void setHook(ActionHook hook) {
         this.hook = hook;
     }
 
@@ -566,7 +566,7 @@ public final class Response {
             // There is a charset so have to rebuild content-type without it
             this.contentType = m.toStringNoCharset();
             charsetValue = charsetValue.trim();
-            if (charsetValue.length() > 0) {
+            if (!charsetValue.isEmpty()) {
                 try {
                     charset = B2CConverter.getCharset(charsetValue);
                 } catch (UnsupportedEncodingException e) {
@@ -757,7 +757,7 @@ public final class Response {
             return false;
         }
         // Assume write is not possible
-        boolean ready = false;
+        boolean ready;
         synchronized (nonBlockingStateLock) {
             if (registeredForWrite) {
                 fireListener = true;

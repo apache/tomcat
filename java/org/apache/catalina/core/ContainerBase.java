@@ -1049,7 +1049,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
             } else if (c == null) {
                 // May happen in unit testing and/or some embedding scenarios
                 keyProperties.append(",container");
-                keyProperties.append(containerCount++);
+                keyProperties.append(containerCount);
                 keyProperties.append("=null");
                 break;
             } else {

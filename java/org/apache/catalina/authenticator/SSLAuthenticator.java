@@ -77,7 +77,7 @@ public class SSLAuthenticator extends AuthenticatorBase {
             containerLog.trace(" Looking up certificates");
         }
 
-        X509Certificate certs[] = getRequestCertificates(request);
+        X509Certificate[] certs = getRequestCertificates(request);
 
         if ((certs == null) || (certs.length < 1)) {
             if (containerLog.isDebugEnabled()) {
@@ -128,7 +128,7 @@ public class SSLAuthenticator extends AuthenticatorBase {
      */
     protected X509Certificate[] getRequestCertificates(final Request request) throws IllegalStateException {
 
-        X509Certificate certs[] = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
+        X509Certificate[] certs = (X509Certificate[]) request.getAttribute(Globals.CERTIFICATES_ATTR);
 
         if ((certs == null) || (certs.length < 1)) {
             try {

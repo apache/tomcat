@@ -46,8 +46,8 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
 
     private static final Log log = LogFactory.getLog(DirResourceSet.class);
 
-    private Map<String,ResourceLock> resourceLocksByPath = new HashMap<>();
-    private Object resourceLocksByPathLock = new Object();
+    private final Map<String,ResourceLock> resourceLocksByPath = new HashMap<>();
+    private final Object resourceLocksByPathLock = new Object();
 
 
     /**
@@ -276,7 +276,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
             return false;
         }
 
-        File dest = null;
+        File dest;
         /*
          * Lock the path for writing until the write is complete. The lock prevents concurrent reads and writes (e.g.
          * HTTP GET and PUT / DELETE) for the same path causing corruption of the FileResource where some of the fields
@@ -311,7 +311,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
 
     @Override
     protected void checkType(File file) {
-        if (file.isDirectory() == false) {
+        if (!file.isDirectory()) {
             throw new IllegalArgumentException(
                     sm.getString("dirResourceSet.notDirectory", getBase(), File.separator, getInternalPath()));
         }
@@ -322,7 +322,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     protected void initInternal() throws LifecycleException {
         super.initInternal();
         // Is this an exploded web application?
-        if (getWebAppMount().equals("")) {
+        if (getWebAppMount().isEmpty()) {
             // Look for a manifest
             File mf = file("META-INF/MANIFEST.MF", true);
             if (mf != null && mf.isFile()) {
@@ -376,7 +376,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     @Override
     public ResourceLock lockForRead(String path) {
         String key = getLockKey(path);
-        ResourceLock resourceLock = null;
+        ResourceLock resourceLock;
         synchronized (resourceLocksByPathLock) {
             /*
              * Obtain the ResourceLock and increment the usage count inside the sync to ensure that that map always has
@@ -414,7 +414,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     @Override
     public ResourceLock lockForWrite(String path) {
         String key = getLockKey(path);
-        ResourceLock resourceLock = null;
+        ResourceLock resourceLock;
         synchronized (resourceLocksByPathLock) {
             /*
              * Obtain the ResourceLock and increment the usage count inside the sync to ensure that that map always has

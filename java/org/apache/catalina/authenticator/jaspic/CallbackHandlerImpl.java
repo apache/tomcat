@@ -125,7 +125,7 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
                             mergedRoles.addAll(Arrays.asList(groups));
                         }
 
-                        if (mergedRoles.size() == 0) {
+                        if (mergedRoles.isEmpty()) {
                             mergedRoles = Collections.emptyList();
                         }
 

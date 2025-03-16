@@ -671,7 +671,7 @@ public class AjpProcessor extends AbstractProcessor {
         boolean contentLengthSet = false;
         int hCount = requestHeaderMessage.getInt();
         for (int i = 0; i < hCount; i++) {
-            String hName = null;
+            String hName;
 
             // Header names are encoded as either an integer code starting
             // with 0xA0, or as a normal string (in which case the first
@@ -679,7 +679,7 @@ public class AjpProcessor extends AbstractProcessor {
             int isc = requestHeaderMessage.peekInt();
             int hId = isc & 0xFF;
 
-            MessageBytes vMB = null;
+            MessageBytes vMB;
             isc &= 0xFF00;
             if (0xA000 == isc) {
                 requestHeaderMessage.getInt(); // To advance the read position
@@ -768,12 +768,12 @@ public class AjpProcessor extends AbstractProcessor {
 
                 case Constants.SC_A_CONTEXT:
                     requestHeaderMessage.getBytes(tmpMB);
-                    // nothing
+                // nothing
                     break;
 
                 case Constants.SC_A_SERVLET_PATH:
                     requestHeaderMessage.getBytes(tmpMB);
-                    // nothing
+                // nothing
                     break;
 
                 case Constants.SC_A_REMOTE_USER:
@@ -804,7 +804,7 @@ public class AjpProcessor extends AbstractProcessor {
 
                 case Constants.SC_A_JVM_ROUTE:
                     requestHeaderMessage.getBytes(tmpMB);
-                    // nothing
+                // nothing
                     break;
 
                 case Constants.SC_A_SSL_CERT:
@@ -832,7 +832,7 @@ public class AjpProcessor extends AbstractProcessor {
 
                 case Constants.SC_A_SECRET:
                     requestHeaderMessage.getBytes(tmpMB);
-                    if (secret != null && secret.length() > 0) {
+                    if (secret != null && !secret.isEmpty()) {
                         secretPresentInRequest = true;
                         if (!tmpMB.equals(secret)) {
                             response.setStatus(403);
@@ -842,7 +842,7 @@ public class AjpProcessor extends AbstractProcessor {
                     break;
 
                 default:
-                    // Ignore unknown attribute for backward compatibility
+                // Ignore unknown attribute for backward compatibility
                     break;
 
             }
@@ -850,7 +850,7 @@ public class AjpProcessor extends AbstractProcessor {
         }
 
         // Check if secret was submitted if required
-        if (secret != null && secret.length() > 0 && !secretPresentInRequest) {
+        if (secret != null && !secret.isEmpty() && !secretPresentInRequest) {
             response.setStatus(403);
             setErrorState(ErrorState.CLOSE_CLEAN, null);
         }
@@ -861,10 +861,9 @@ public class AjpProcessor extends AbstractProcessor {
 
             int pos = uriBC.indexOf("://", 0, 3, 4);
             int uriBCStart = uriBC.getStart();
-            int slashPos = -1;
             if (pos != -1) {
                 byte[] uriB = uriBC.getBytes();
-                slashPos = uriBC.indexOf('/', pos + 3);
+                int slashPos = uriBC.indexOf('/', pos + 3);
                 if (slashPos == -1) {
                     slashPos = uriBC.getLength();
                     // Set URI as "/"

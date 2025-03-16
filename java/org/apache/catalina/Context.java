@@ -132,7 +132,7 @@ public interface Context extends Container, ContextBind {
      *
      * @param listeners The set of instantiated listener objects.
      */
-    void setApplicationEventListeners(Object listeners[]);
+    void setApplicationEventListeners(Object[] listeners);
 
 
     /**
@@ -150,7 +150,7 @@ public interface Context extends Container, ContextBind {
      *
      * @param listeners The set of instantiated listener objects.
      */
-    void setApplicationLifecycleListeners(Object listeners[]);
+    void setApplicationLifecycleListeners(Object[] listeners);
 
 
     /**
@@ -920,19 +920,19 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the set of application listener class names configured for this application.
+     * @return the array of application listener class names configured for this application.
      */
     String[] findApplicationListeners();
 
 
     /**
-     * @return the set of application parameters for this application.
+     * @return the array of application parameters for this application.
      */
     ApplicationParameter[] findApplicationParameters();
 
 
     /**
-     * @return the set of security constraints for this web application. If there are none, a zero-length array is
+     * @return the array of security constraints for this web application. If there are none, a zero-length array is
      *             returned.
      */
     SecurityConstraint[] findConstraints();
@@ -970,7 +970,7 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the set of defined error pages for all specified error codes and exception types.
+     * @return the array of defined error pages for all specified error codes and exception types.
      */
     ErrorPage[] findErrorPages();
 
@@ -984,13 +984,13 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the set of defined filters for this Context.
+     * @return the array of defined filters for this Context.
      */
     FilterDef[] findFilterDefs();
 
 
     /**
-     * @return the set of filter mappings for this Context.
+     * @return the array of filter mappings for this Context.
      */
     FilterMap[] findFilterMaps();
 
@@ -1105,7 +1105,8 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the set of watched resources for this Context. If none are defined, a zero length array will be returned.
+     * @return the array of watched resources for this Context. If none are defined, a zero length array will be
+     * returned.
      */
     String[] findWatchedResources();
 
@@ -1120,19 +1121,20 @@ public interface Context extends Container, ContextBind {
 
 
     /**
-     * @return the set of welcome files defined for this Context. If none are defined, a zero-length array is returned.
+     * @return the array of welcome files defined for this Context. If none are defined, a zero-length array is
+     * returned.
      */
     String[] findWelcomeFiles();
 
 
     /**
-     * @return the set of LifecycleListener classes that will be added to newly created Wrappers automatically.
+     * @return the array of LifecycleListener classes that will be added to newly created Wrappers automatically.
      */
     String[] findWrapperLifecycles();
 
 
     /**
-     * @return the set of ContainerListener classes that will be added to newly created Wrappers automatically.
+     * @return the array of ContainerListener classes that will be added to newly created Wrappers automatically.
      */
     String[] findWrapperListeners();
 

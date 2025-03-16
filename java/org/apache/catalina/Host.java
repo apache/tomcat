@@ -220,7 +220,7 @@ public interface Host extends Container {
 
 
     /**
-     * @return the set of alias names for this Host. If none are defined, a zero length array is returned.
+     * @return the array of alias names for this Host. If none are defined, a zero length array is returned.
      */
     String[] findAliases();
 

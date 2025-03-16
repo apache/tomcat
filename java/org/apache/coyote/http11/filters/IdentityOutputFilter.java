@@ -55,7 +55,7 @@ public class IdentityOutputFilter implements OutputFilter {
     @Override
     public int doWrite(ByteBuffer chunk) throws IOException {
 
-        int result = -1;
+        int result;
 
         if (contentLength >= 0) {
             if (remaining > 0) {

@@ -22,6 +22,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -95,7 +96,7 @@ public class Http11Processor extends AbstractProcessor {
      * Tracks how many internal filters are in the filter library so they are skipped when looking for pluggable
      * filters.
      */
-    private int pluggableFilterIndex = Integer.MAX_VALUE;
+    private final int pluggableFilterIndex;
 
 
     /**
@@ -453,11 +454,7 @@ public class Http11Processor extends AbstractProcessor {
 
             if (!protocol.getDisableUploadTimeout()) {
                 int connectionTimeout = protocol.getConnectionTimeout();
-                if (connectionTimeout > 0) {
-                    socketWrapper.setReadTimeout(connectionTimeout);
-                } else {
-                    socketWrapper.setReadTimeout(0);
-                }
+                socketWrapper.setReadTimeout(Math.max(connectionTimeout, 0));
             }
 
             rp.setStage(org.apache.coyote.Constants.STAGE_KEEPALIVE);
@@ -882,7 +879,7 @@ public class Http11Processor extends AbstractProcessor {
 
         OutputFilter[] outputFilters = outputBuffer.getFilters();
 
-        if (http09 == true) {
+        if (http09) {
             // HTTP/0.9
             outputBuffer.addActiveFilter(outputFilters[Constants.IDENTITY_FILTER]);
             outputBuffer.commit();
@@ -1423,17 +1420,14 @@ public class Http11Processor extends AbstractProcessor {
                 sendfileData.keepAliveState = SendfileKeepAliveState.NONE;
             }
             result = socketWrapper.processSendfile(sendfileData);
-            switch (result) {
-                case ERROR:
-                    // Write failed
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("http11processor.sendfile.error"));
-                    }
-                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
-                    //$FALL-THROUGH$
-                default:
-                    sendfileData = null;
+            if (Objects.requireNonNull(result) == SendfileState.ERROR) {
+                // Write failed
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("http11processor.sendfile.error"));
+                }
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
             }
+            sendfileData = null;
         }
         return result;
     }

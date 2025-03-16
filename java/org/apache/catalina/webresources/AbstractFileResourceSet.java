@@ -117,7 +117,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         canPath = canPath.substring(canonicalBase.length());
 
         // The remaining request path must start with '/' if it has non-zero length
-        if (canPath.length() > 0 && canPath.charAt(0) != File.separatorChar) {
+        if (!canPath.isEmpty() && canPath.charAt(0) != File.separatorChar) {
             return null;
         }
 
@@ -132,7 +132,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         //
         // absPath is normalized so canPath needs to be normalized as well
         // Can't normalize canPath earlier as canonicalBase is not normalized
-        if (canPath.length() > 0) {
+        if (!canPath.isEmpty()) {
             canPath = normalize(canPath);
         }
         if (!canPath.equals(absPath)) {
@@ -182,10 +182,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // level APIs are used to create the files that bypass various checks.
         // File names that end in ' ' are known to cause problems when using
         // File#getCanonicalPath().
-        if (name.charAt(len - 1) == ' ') {
-            return true;
-        }
-        return false;
+        return name.charAt(len - 1) == ' ';
     }
 
 

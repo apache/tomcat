@@ -104,7 +104,7 @@ public final class Request {
     /**
      * Notes.
      */
-    private final Object notes[] = new Object[Constants.MAX_NOTES];
+    private final Object[] notes = new Object[Constants.MAX_NOTES];
 
 
     /**
@@ -220,7 +220,7 @@ public final class Request {
 
     public boolean isReady() {
         // Assume read is not possible
-        boolean ready = false;
+        boolean ready;
         synchronized (nonBlockingStateLock) {
             if (registeredForRead) {
                 fireListener = true;
@@ -495,7 +495,7 @@ public final class Request {
         response.setRequest(this);
     }
 
-    protected void setHook(ActionHook hook) {
+    void setHook(ActionHook hook) {
         this.hook = hook;
     }
 
@@ -587,10 +587,7 @@ public final class Request {
     }
 
     public boolean getSupportsRelativeRedirects() {
-        if (protocol().equals("") || protocol().equals("HTTP/1.0")) {
-            return false;
-        }
-        return true;
+        return !protocol().equals("") && !protocol().equals("HTTP/1.0");
     }
 
 

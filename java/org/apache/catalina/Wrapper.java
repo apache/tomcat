@@ -231,7 +231,7 @@ public interface Wrapper extends Container {
 
 
     /**
-     * @return the set of security role reference names associated with this servlet, if any; otherwise return a
+     * @return the array of security role reference names associated with this servlet, if any; otherwise return a
      *             zero-length array.
      */
     String[] findSecurityReferences();

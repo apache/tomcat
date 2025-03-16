@@ -975,7 +975,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                 if (displayPath.isEmpty()) {
                     displayPath = "/";
                 }
-                List<String> parts = null;
+                List<String> parts;
                 if (context.getState().isAvailable()) {
                     parts = Arrays.asList(displayPath, "running", "" + context.getManager().findSessions().length,
                             context.getDocBase());
