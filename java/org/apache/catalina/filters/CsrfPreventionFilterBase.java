@@ -100,7 +100,7 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
      * @return the generated nonce
      */
     protected String generateNonce(HttpServletRequest request) {
-        byte random[] = new byte[16];
+        byte[] random = new byte[16];
 
         // Render the result as a String of hexadecimal digits
         StringBuilder buffer = new StringBuilder();

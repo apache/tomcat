@@ -534,7 +534,7 @@ public class RemoteIpFilter extends GenericFilter {
         public Enumeration<String> getHeaders(String name) {
             Map.Entry<String,List<String>> header = getHeaderEntry(name);
             if (header == null || header.getValue() == null) {
-                return Collections.enumeration(Collections.<String>emptyList());
+                return Collections.enumeration(Collections.emptyList());
             }
             return Collections.enumeration(header.getValue());
         }
@@ -740,7 +740,7 @@ public class RemoteIpFilter extends GenericFilter {
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
 
             for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
-                if (concatRemoteIpHeaderValue.length() > 0) {
+                if (!concatRemoteIpHeaderValue.isEmpty()) {
                     concatRemoteIpHeaderValue.append(", ");
                 }
 
@@ -793,13 +793,13 @@ public class RemoteIpFilter extends GenericFilter {
                     xRequest.setRemoteHost(remoteIp);
                 }
 
-                if (proxiesHeaderValue.size() == 0) {
+                if (proxiesHeaderValue.isEmpty()) {
                     xRequest.removeHeader(proxiesHeader);
                 } else {
                     String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
                     xRequest.setHeader(proxiesHeader, commaDelimitedListOfProxies);
                 }
-                if (newRemoteIpHeaderValue.size() == 0) {
+                if (newRemoteIpHeaderValue.isEmpty()) {
                     xRequest.removeHeader(remoteIpHeader);
                 } else {
                     String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
@@ -1116,7 +1116,7 @@ public class RemoteIpFilter extends GenericFilter {
      * @param internalProxies The regexp
      */
     public void setInternalProxies(String internalProxies) {
-        if (internalProxies == null || internalProxies.length() == 0) {
+        if (internalProxies == null || internalProxies.isEmpty()) {
             this.internalProxies = null;
         } else {
             this.internalProxies = Pattern.compile(internalProxies);
@@ -1251,7 +1251,7 @@ public class RemoteIpFilter extends GenericFilter {
      * @param trustedProxies The trusted proxies regexp
      */
     public void setTrustedProxies(String trustedProxies) {
-        if (trustedProxies == null || trustedProxies.length() == 0) {
+        if (trustedProxies == null || trustedProxies.isEmpty()) {
             this.trustedProxies = null;
         } else {
             this.trustedProxies = Pattern.compile(trustedProxies);

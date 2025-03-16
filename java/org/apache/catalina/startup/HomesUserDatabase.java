@@ -76,7 +76,7 @@ public final class HomesUserDatabase implements UserDatabase {
         if (!homeBaseDir.exists() || !homeBaseDir.isDirectory()) {
             return;
         }
-        String homeBaseFiles[] = homeBaseDir.list();
+        String[] homeBaseFiles = homeBaseDir.list();
         if (homeBaseFiles == null) {
             return;
         }

@@ -83,7 +83,7 @@ public class CharsetMapper {
     /**
      * The mapping properties that have been initialized from the specified or default properties resource.
      */
-    private Properties map = new Properties();
+    private final Properties map = new Properties();
 
 
     // ------------------------------------------------------- Public Methods

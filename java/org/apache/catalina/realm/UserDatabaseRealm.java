@@ -210,7 +210,7 @@ public class UserDatabaseRealm extends RealmBase {
             synchronized (databaseLock) {
                 if (database == null) {
                     try {
-                        Context context = null;
+                        Context context;
                         if (localJndiResource) {
                             context = ContextBindings.getClassLoader();
                             context = (Context) context.lookup("comp/env");
@@ -268,7 +268,7 @@ public class UserDatabaseRealm extends RealmBase {
 
     @Override
     public boolean isAvailable() {
-        return (database == null) ? false : database.isAvailable();
+        return database != null && database.isAvailable();
     }
 
 

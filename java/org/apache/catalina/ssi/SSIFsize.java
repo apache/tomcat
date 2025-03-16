@@ -66,23 +66,11 @@ public final class SSIFsize implements SSICommand {
     }
 
 
-    public String repeat(char aChar, int numChars) {
-        if (numChars < 0) {
-            throw new IllegalArgumentException(sm.getString("ssiFsize.invalidNumChars"));
-        }
-        StringBuilder buf = new StringBuilder();
-        for (int i = 0; i < numChars; i++) {
-            buf.append(aChar);
-        }
-        return buf.toString();
-    }
-
-
     public String padLeft(String str, int maxChars) {
         String result = str;
         int charsToAdd = maxChars - str.length();
         if (charsToAdd > 0) {
-            result = repeat(' ', charsToAdd) + str;
+            result = " ".repeat(charsToAdd) + str;
         }
         return result;
     }
@@ -92,7 +80,7 @@ public final class SSIFsize implements SSICommand {
     // All the 'magic' numbers are from the util_script.c httpd source file.
     // Should use KiB and MiB in output but use k and M for consistency with httpd.
     protected String formatSize(long size, String format) {
-        String retString = "";
+        String retString;
         if (format.equalsIgnoreCase("bytes")) {
             DecimalFormat decimalFormat = new DecimalFormat("#,##0");
             retString = decimalFormat.format(size);

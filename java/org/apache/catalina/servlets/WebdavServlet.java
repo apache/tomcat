@@ -360,11 +360,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     resourceLocks.remove(currentLock.path);
                 }
             } else {
-                for (String token : currentLock.sharedTokens) {
-                    if (sharedLocks.get(token) == null) {
-                        currentLock.sharedTokens.remove(token);
-                    }
-                }
+                currentLock.sharedTokens.removeIf(token -> sharedLocks.get(token) == null);
                 if (currentLock.sharedTokens.isEmpty()) {
                     resourceLocks.remove(currentLock.path);
                 }
@@ -504,7 +500,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Type of PROPFIND request.
      */
-    enum PropfindType {
+    public enum PropfindType {
         FIND_BY_PROPERTY,
         FIND_ALL_PROP,
         FIND_PROPERTY_NAMES
@@ -514,7 +510,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     /**
      * Type of property update in a PROPPATCH.
      */
-    enum PropertyUpdateType {
+    public enum PropertyUpdateType {
         SET,
         REMOVE
     }
@@ -532,10 +528,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      *                              exception)
      */
     protected DocumentBuilder getDocumentBuilder() throws ServletException {
-        DocumentBuilder documentBuilder = null;
-        DocumentBuilderFactory documentBuilderFactory = null;
+        DocumentBuilder documentBuilder;
         try {
-            documentBuilderFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
             documentBuilderFactory.setNamespaceAware(true);
             documentBuilderFactory.setExpandEntityReferences(false);
             documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -576,23 +571,16 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             log("[" + method + "] " + path);
         }
 
-        if (method.equals(METHOD_PROPFIND)) {
-            doPropfind(req, resp);
-        } else if (method.equals(METHOD_PROPPATCH)) {
-            doProppatch(req, resp);
-        } else if (method.equals(METHOD_MKCOL)) {
-            doMkcol(req, resp);
-        } else if (method.equals(METHOD_COPY)) {
-            doCopy(req, resp);
-        } else if (method.equals(METHOD_MOVE)) {
-            doMove(req, resp);
-        } else if (method.equals(METHOD_LOCK)) {
-            doLock(req, resp);
-        } else if (method.equals(METHOD_UNLOCK)) {
-            doUnlock(req, resp);
-        } else {
+        switch (method) {
+            case METHOD_PROPFIND -> doPropfind(req, resp);
+            case METHOD_PROPPATCH -> doProppatch(req, resp);
+            case METHOD_MKCOL -> doMkcol(req, resp);
+            case METHOD_COPY -> doCopy(req, resp);
+            case METHOD_MOVE -> doMove(req, resp);
+            case METHOD_LOCK -> doLock(req, resp);
+            case METHOD_UNLOCK -> doUnlock(req, resp);
             // DefaultServlet processing
-            super.service(req, resp);
+            default -> super.service(req, resp);
         }
     }
 
@@ -618,9 +606,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             // Get all hrefs from the if header
             Iterator<String> hrefs = ifHeader.getResources();
 
-            String currentPath = null;
-            String currentHref = null;
-            WebResource currentWebResource = null;
+            String currentPath;
+            String currentHref;
+            WebResource currentWebResource;
             if (hrefs.hasNext()) {
                 currentHref = hrefs.next();
                 currentPath = getPathFromHref(currentHref, request);
@@ -653,23 +641,19 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                             if (parentLock.hasExpired()) {
                                 resourceLocks.remove(parentPath);
                             } else {
-                                if ((parentPath != currentPath && parentLock.depth > 0) || parentPath == currentPath) {
+                                // parentPath == currentPath is a check for the first loop
+                                if (parentPath == currentPath || parentLock.depth > 0) {
                                     if (parentLock.isExclusive()) {
                                         lockTokens.add(LOCK_SCHEME + parentLock.token);
                                     } else {
-                                        for (String token : parentLock.sharedTokens) {
-                                            if (sharedLocks.get(token) == null) {
-                                                parentLock.sharedTokens.remove(token);
-                                            }
-                                        }
+                                        parentLock.sharedTokens.removeIf(token -> sharedLocks.get(token) == null);
                                         if (parentLock.sharedTokens.isEmpty()) {
                                             resourceLocks.remove(parentLock.path);
                                         }
                                         for (String token : parentLock.sharedTokens) {
                                             LockInfo sharedLock = sharedLocks.get(token);
                                             if (sharedLock != null) {
-                                                if ((parentPath != currentPath && sharedLock.depth > 0) ||
-                                                        parentPath == currentPath) {
+                                                if (parentPath == currentPath || sharedLock.depth > 0) {
                                                     lockTokens.add(LOCK_SCHEME + token);
                                                 }
                                             }
@@ -736,7 +720,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         if (pathInfo != null) {
             result.append(pathInfo);
         }
-        if (result.length() == 0) {
+        if (result.isEmpty()) {
             result.append('/');
         }
         String resultString = result.toString();
@@ -826,7 +810,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         // Properties which are to be displayed.
         List<Node> properties = new ArrayList<>();
         // Propfind depth
-        int depth = maxDepth;
+        int depth;
         // Propfind type
         PropfindType type = null;
 
@@ -835,19 +819,18 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         if (depthStr == null) {
             depth = maxDepth;
         } else {
-            if (depthStr.equals("0")) {
-                depth = 0;
-            } else if (depthStr.equals("1")) {
-                depth = 1;
-            } else if (depthStr.equals("infinity")) {
-                depth = maxDepth;
-            } else {
-                resp.sendError(WebdavStatus.SC_BAD_REQUEST);
-                return;
+            switch (depthStr) {
+                case "0" -> depth = 0;
+                case "1" -> depth = 1;
+                case "infinity" -> depth = maxDepth;
+                default -> {
+                    resp.sendError(WebdavStatus.SC_BAD_REQUEST);
+                    return;
+                }
             }
         }
 
-        byte[] body = null;
+        byte[] body;
         try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             IOTools.flow(is, os);
             body = os.toByteArray();
@@ -1048,7 +1031,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         DocumentBuilder documentBuilder = getDocumentBuilder();
         ArrayList<ProppatchOperation> operations = new ArrayList<>();
 
-        byte[] body = null;
+        byte[] body;
         try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             IOTools.flow(is, os);
             body = os.toByteArray();
@@ -1056,7 +1039,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             resp.sendError(WebdavStatus.SC_BAD_REQUEST);
             return;
         }
-        if (body.length <= 0) {
+        if (body.length == 0) {
             resp.sendError(WebdavStatus.SC_BAD_REQUEST);
             return;
         }
@@ -1087,18 +1070,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                         break;
                                     case Node.ELEMENT_NODE:
                                         if ("prop".equals(getDAVNode(currentNode2))) {
-                                            NodeList propChildList = currentNode2.getChildNodes();
-                                            Node property = null;
-                                            for (int k = 0; k < propChildList.getLength(); k++) {
-                                                Node currentNode3 = propChildList.item(k);
-                                                switch (currentNode3.getNodeType()) {
-                                                    case Node.TEXT_NODE:
-                                                        break;
-                                                    case Node.ELEMENT_NODE:
-                                                        property = currentNode3;
-                                                        break;
-                                                }
-                                            }
+                                            Node property = getNode(currentNode2);
                                             if (property != null) {
                                                 operations
                                                         .add(new ProppatchOperation(PropertyUpdateType.SET, property));
@@ -1120,18 +1092,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                         break;
                                     case Node.ELEMENT_NODE:
                                         if ("prop".equals(getDAVNode(currentNode2))) {
-                                            NodeList propChildList = currentNode2.getChildNodes();
-                                            Node property = null;
-                                            for (int k = 0; k < propChildList.getLength(); k++) {
-                                                Node currentNode3 = propChildList.item(k);
-                                                switch (currentNode3.getNodeType()) {
-                                                    case Node.TEXT_NODE:
-                                                        break;
-                                                    case Node.ELEMENT_NODE:
-                                                        property = currentNode3;
-                                                        break;
-                                                }
-                                            }
+                                            Node property = getNode(currentNode2);
                                             if (property != null) {
                                                 operations.add(
                                                         new ProppatchOperation(PropertyUpdateType.REMOVE, property));
@@ -1193,6 +1154,22 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         generatedXML.sendData();
 
+    }
+
+    private static Node getNode(Node currentNode2) {
+        NodeList propChildList = currentNode2.getChildNodes();
+        Node property = null;
+        for (int k = 0; k < propChildList.getLength(); k++) {
+            Node currentNode3 = propChildList.item(k);
+            switch (currentNode3.getNodeType()) {
+                case Node.TEXT_NODE:
+                    break;
+                case Node.ELEMENT_NODE:
+                    property = currentNode3;
+                    break;
+            }
+        }
+        return property;
     }
 
 
@@ -1402,13 +1379,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 lockDuration = MAX_TIMEOUT;
             }
         }
-        lock.expiresAt = System.currentTimeMillis() + (lockDuration * 1000);
+        lock.expiresAt = System.currentTimeMillis() + (lockDuration * 1000L);
 
         boolean lockCreation = false;
 
         Node lockInfoNode = null;
 
-        byte[] body = null;
+        byte[] body;
         try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             IOTools.flow(is, os);
             body = os.toByteArray();
@@ -1441,8 +1418,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             // Reading lock information
 
             NodeList childList = lockInfoNode.getChildNodes();
-            StringWriter strWriter = null;
-            DOMWriter domWriter = null;
+            StringWriter strWriter;
+            DOMWriter domWriter;
 
             Node lockScopeNode = null;
             Node lockTypeNode = null;
@@ -1693,7 +1670,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     if (parentLock.hasExpired()) {
                         resourceLocks.remove(parentPath);
                     } else {
-                        if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
+                        // parentPath == currentPath is a check for the first loop
+                        if (parentPath == path || parentLock.depth > 0) {
                             if (parentLock.isExclusive()) {
                                 if (ifHeader.contains(":" + parentLock.token + ">") && (parentLock.principal == null ||
                                         parentLock.principal.equals(req.getRemoteUser()))) {
@@ -1706,7 +1684,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                         LockInfo sharedLock = sharedLocks.get(token);
                                         if (sharedLock != null && (sharedLock.principal == null ||
                                                 sharedLock.principal.equals(req.getRemoteUser()))) {
-                                            if ((parentPath != path && sharedLock.depth > 0) || parentPath == path) {
+                                            if (parentPath == path || sharedLock.depth > 0) {
                                                 toRenew = sharedLock;
                                                 break;
                                             }
@@ -1794,19 +1772,19 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (parentLock.hasExpired()) {
                     resourceLocks.remove(parentPath);
                 } else {
-                    if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
+                    // parentPath == currentPath is a check for the first loop
+                    if (parentPath == path || parentLock.depth > 0) {
                         if (parentLock.isExclusive()) {
                             if (lockTokenHeader.contains(":" + parentLock.token + ">") &&
                                     (parentLock.principal == null ||
                                             parentLock.principal.equals(req.getRemoteUser()))) {
                                 resourceLocks.remove(parentPath);
                                 unlocked = true;
-                                break;
                             } else {
                                 // No parent exclusive lock will be found
                                 unlocked = false;
-                                break;
                             }
+                            break;
                         } else {
                             for (String token : parentLock.sharedTokens) {
                                 if (lockTokenHeader.contains(":" + token + ">")) {
@@ -1815,7 +1793,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                         parentLock.sharedTokens.remove(token);
                                     } else if (lock.principal == null || lock.principal.equals(req.getRemoteUser())) {
                                         // The shared lock might not have the same depth
-                                        if ((parentPath != path && lock.depth > 0) || parentPath == path) {
+                                        if (parentPath == path || lock.depth > 0) {
                                             parentLock.sharedTokens.remove(token);
                                             sharedLocks.remove(token);
                                             unlocked = true;
@@ -1860,10 +1838,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
     private boolean isSpecialPath(final String path) {
         if (!allowSpecialPaths) {
             String upperCasePath = path.toUpperCase(Locale.ENGLISH);
-            if (upperCasePath.startsWith("/WEB-INF/") || upperCasePath.startsWith("/META-INF/") ||
-                    upperCasePath.equals("/WEB-INF") || upperCasePath.equals("/META-INF")) {
-                return true;
-            }
+            return upperCasePath.startsWith("/WEB-INF/") || upperCasePath.startsWith("/META-INF/") ||
+                upperCasePath.equals("/WEB-INF") || upperCasePath.equals("/META-INF");
         }
         return false;
     }
@@ -1987,19 +1963,17 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (parentLock.hasExpired()) {
                     resourceLocks.remove(parentPath);
                 } else {
-                    if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
+                    // parentPath == currentPath is a check for the first loop
+                    if (parentPath == path || parentLock.depth > 0) {
                         if (parentLock.isExclusive()) {
-                            if (ifHeader.contains(":" + parentLock.token + ">") &&
-                                    (parentLock.principal == null || parentLock.principal.equals(principal))) {
-                                return false;
-                            }
-                            return true;
+                            return !ifHeader.contains(":" + parentLock.token + ">") ||
+                                (parentLock.principal != null && !parentLock.principal.equals(principal));
                         } else {
                             for (String token : parentLock.sharedTokens) {
                                 LockInfo lock = sharedLocks.get(token);
                                 if (lock != null) {
                                     // The shared lock might not have the same depth
-                                    if ((parentPath != path && lock.depth > 0) || parentPath == path) {
+                                    if (parentPath == path || lock.depth > 0) {
                                         if (ifHeader.contains(":" + token + ">") &&
                                                 (lock.principal == null || lock.principal.equals(principal))) {
                                             return false;
@@ -2144,11 +2118,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         boolean overwrite = true;
         String overwriteHeader = req.getHeader("Overwrite");
         if (overwriteHeader != null) {
-            if (overwriteHeader.equalsIgnoreCase("T")) {
-                overwrite = true;
-            } else {
-                overwrite = false;
-            }
+            overwrite = overwriteHeader.equalsIgnoreCase("T");
         }
 
         // Overwriting the destination
@@ -2515,7 +2485,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         generatedXML.writeElement("D", DEFAULT_NAMESPACE, "error", XMLWriter.OPENING);
 
-        if (errorPath != null && errorPath.length() > 0) {
+        if (errorPath != null && !errorPath.isEmpty()) {
             generatedXML.writeElement("D", error, XMLWriter.OPENING);
             generatedXML.writeElement("D", "href", XMLWriter.OPENING);
             generatedXML.writeText(getEncodedPath(errorPath, null, req));
@@ -2544,12 +2514,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         generatedXML.writeElement("D", "href", XMLWriter.OPENING);
         generatedXML.writeText(rewrittenUrl);
         generatedXML.writeElement("D", "href", XMLWriter.CLOSING);
-
-        String resourceName = path;
-        int lastSlash = path.lastIndexOf('/');
-        if (lastSlash != -1) {
-            resourceName = resourceName.substring(lastSlash + 1);
-        }
 
         switch (propFindType) {
 
@@ -2728,7 +2692,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (parentLock.hasExpired()) {
                     resourceLocks.remove(parentPath);
                 } else {
-                    if ((parentPath != path && parentLock.depth > 0) || parentPath == path) {
+                    // parentPath == currentPath is a check for the first loop
+                    if (parentPath == path || parentLock.depth > 0) {
                         if (parentLock.isExclusive()) {
                             parentLock.toXML(generatedXML);
                         } else {
@@ -2738,7 +2703,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                                     if (sharedLock.hasExpired()) {
                                         sharedLocks.remove(lockToken);
                                     } else {
-                                        if ((parentPath != path && sharedLock.depth > 0) || parentPath == path) {
+                                        if (parentPath == path || sharedLock.depth > 0) {
                                             sharedLock.toXML(generatedXML);
                                         }
                                     }
@@ -2778,12 +2743,9 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
 
     private static boolean propertyEquals(Node node1, Node node2) {
-        if (node1.getLocalName().equals(node2.getLocalName()) &&
-                ((node1.getNamespaceURI() == null && node2.getNamespaceURI() == null) ||
-                        (node1.getNamespaceURI() != null && node1.getNamespaceURI().equals(node2.getNamespaceURI())))) {
-            return true;
-        }
-        return false;
+        return node1.getLocalName().equals(node2.getLocalName()) &&
+            ((node1.getNamespaceURI() == null && node2.getNamespaceURI() == null) ||
+                (node1.getNamespaceURI() != null && node1.getNamespaceURI().equals(node2.getNamespaceURI())));
     }
 
 
@@ -2843,7 +2805,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
          * @return true if the lock has expired.
          */
         public boolean hasExpired() {
-            return sharedTokens.size() == 0 && System.currentTimeMillis() > expiresAt;
+            return sharedTokens.isEmpty() && System.currentTimeMillis() > expiresAt;
         }
 
 
@@ -2915,7 +2877,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
      * references are filtered out for security reasons. See CVE-2007-5461.
      */
     private static class WebdavResolver implements EntityResolver {
-        private ServletContext context;
+        private final ServletContext context;
 
         WebdavResolver(ServletContext theContext) {
             context = theContext;
@@ -3044,11 +3006,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     }
                 }
             } else {
-                ArrayList<Node> properties = deadProperties.get(resource);
-                if (properties == null) {
-                    properties = new ArrayList<>();
-                    deadProperties.put(resource, properties);
-                }
+                ArrayList<Node> properties = deadProperties.computeIfAbsent(resource, k -> new ArrayList<>());
                 synchronized (properties) {
                     for (ProppatchOperation operation : operations) {
                         if (operation.getUpdateType() == PropertyUpdateType.SET) {

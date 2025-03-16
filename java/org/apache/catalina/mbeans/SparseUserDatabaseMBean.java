@@ -338,8 +338,8 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
         try {
             UserDatabase database = (UserDatabase) this.resource;
             if (database.isSparse()) {
-                ObjectName query = null;
-                Set<ObjectName> results = null;
+                ObjectName query;
+                Set<ObjectName> results;
 
                 // Groups
                 query = new ObjectName("Users:type=Group,database=" + database.getId() + ",*");

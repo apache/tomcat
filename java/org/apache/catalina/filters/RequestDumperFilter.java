@@ -109,7 +109,7 @@ public class RequestDumperFilter extends GenericFilter {
             doLog("            header", NON_HTTP_REQ_MSG);
         } else {
             doLog("       contextPath", hRequest.getContextPath());
-            Cookie cookies[] = hRequest.getCookies();
+            Cookie[] cookies = hRequest.getCookies();
             if (cookies != null) {
                 for (Cookie cookie : cookies) {
                     doLog("            cookie", cookie.getName() + "=" + cookie.getValue());
@@ -138,7 +138,7 @@ public class RequestDumperFilter extends GenericFilter {
             Enumeration<String> pnames = request.getParameterNames();
             while (pnames.hasMoreElements()) {
                 String pname = pnames.nextElement();
-                String pvalues[] = request.getParameterValues(pname);
+                String[] pvalues = request.getParameterValues(pname);
                 StringBuilder result = new StringBuilder(pname);
                 result.append('=');
                 for (int i = 0; i < pvalues.length; i++) {
@@ -233,13 +233,8 @@ public class RequestDumperFilter extends GenericFilter {
     }
 
     private void doLog(String attribute, String value) {
-        StringBuilder sb = new StringBuilder(80);
-        sb.append(Thread.currentThread().getName());
-        sb.append(' ');
-        sb.append(attribute);
-        sb.append('=');
-        sb.append(value);
-        log.info(sb.toString());
+        String sb = Thread.currentThread().getName() + " " + attribute + "=" + value;
+        log.info(sb);
     }
 
     private String getTimestamp() {

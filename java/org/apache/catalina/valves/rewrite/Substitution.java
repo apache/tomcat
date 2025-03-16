@@ -149,9 +149,9 @@ public class Substitution {
 
         List<SubstitutionElement> elements = new ArrayList<>();
         int pos = 0;
-        int percentPos = 0;
-        int dollarPos = 0;
-        int backslashPos = 0;
+        int percentPos;
+        int dollarPos;
+        int backslashPos;
 
         while (pos < sub.length()) {
             percentPos = sub.indexOf('%', pos);
@@ -203,7 +203,7 @@ public class Substitution {
                         throw new IllegalArgumentException(
                                 sm.getString("substitution.noMap", sub.substring(open + 1, colon), sub));
                     }
-                    String key = null;
+                    String key;
                     String defaultValue = null;
                     if (def > -1) {
                         if (!(colon < def && def < close)) {
@@ -242,7 +242,7 @@ public class Substitution {
                     elements.add(newElement);
                 } else if (sub.charAt(percentPos + 1) == '{') {
                     // %: server variable as %{variable}
-                    SubstitutionElement newElement = null;
+                    SubstitutionElement newElement;
                     int open = sub.indexOf('{', percentPos);
                     int colon = findMatchingColonOrBar(true, sub, open);
                     int close = findMatchingBrace(sub, open);

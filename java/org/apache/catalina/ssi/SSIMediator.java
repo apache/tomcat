@@ -230,8 +230,8 @@ public class SSIMediator {
             }
             int nameStart = i;
             int start = i - 1;
-            int end = -1;
-            int nameEnd = -1;
+            int end;
+            int nameEnd;
             char endChar = ' ';
             // Check for {} wrapped var
             if (sb.charAt(i) == '{') {
@@ -280,7 +280,7 @@ public class SSIMediator {
 
 
     protected String encode(String value, String encoding) {
-        String retVal = null;
+        String retVal;
         if (encoding.equalsIgnoreCase(ENCODING_URL)) {
             retVal = URLEncoder.DEFAULT.encode(value, StandardCharsets.UTF_8);
         } else if (encoding.equalsIgnoreCase(ENCODING_NONE)) {

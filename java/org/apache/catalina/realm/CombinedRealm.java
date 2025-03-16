@@ -67,7 +67,7 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
-     * @return the set of Realms that this Realm is wrapping
+     * @return the array of Realms that this Realm is wrapping
      */
     public ObjectName[] getRealms() {
         ObjectName[] result = new ObjectName[realms.size()];
@@ -81,7 +81,7 @@ public class CombinedRealm extends RealmBase {
 
 
     /**
-     * @return the list of Realms contained by this Realm.
+     * @return the array of Realms contained by this Realm.
      */
     public Realm[] getNestedRealms() {
         return realms.toArray(new Realm[0]);
@@ -283,7 +283,7 @@ public class CombinedRealm extends RealmBase {
     public Principal authenticate(GSSContext gssContext, boolean storeCred) {
         if (gssContext.isEstablished()) {
             Principal authenticatedUser = null;
-            GSSName gssName = null;
+            GSSName gssName;
             try {
                 gssName = gssContext.getSrcName();
             } catch (GSSException e) {

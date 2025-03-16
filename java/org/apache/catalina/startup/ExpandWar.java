@@ -81,7 +81,7 @@ public class ExpandWar {
         boolean success = false;
         File docBase = new File(host.getAppBaseFile(), pathname);
         File warTracker = new File(host.getAppBaseFile(), pathname + Constants.WarTracker);
-        long warLastModified = -1;
+        long warLastModified;
 
         try (@SuppressWarnings("unused")
         InputStream is = jfuc.getInputStream()) {
@@ -96,7 +96,7 @@ public class ExpandWar {
             // changes to the WAR while Tomcat is stopped can be detected
             if (!warTracker.exists() || warTracker.lastModified() == warLastModified) {
                 // No (detectable) changes to the WAR
-                success = true;
+                // success = true;
                 return docBase.getAbsolutePath();
             }
 
@@ -171,8 +171,6 @@ public class ExpandWar {
             }
 
             success = true;
-        } catch (IOException e) {
-            throw e;
         } finally {
             if (!success) {
                 // If something went wrong, delete expanded dir to keep things
@@ -217,8 +215,6 @@ public class ExpandWar {
                             expandedFile.getCanonicalPath(), canonicalDocBasePath));
                 }
             }
-        } catch (IOException e) {
-            throw e;
         }
     }
 
@@ -235,7 +231,7 @@ public class ExpandWar {
 
         boolean result = true;
 
-        String files[] = null;
+        String[] files;
         if (src.isDirectory()) {
             files = src.list();
             result = dest.mkdir();
@@ -340,7 +336,7 @@ public class ExpandWar {
      */
     public static boolean deleteDir(File dir, boolean logFailure) {
 
-        String files[] = dir.list();
+        String[] files = dir.list();
         if (files == null) {
             files = new String[0];
         }
@@ -378,7 +374,7 @@ public class ExpandWar {
      */
     private static void expand(InputStream input, File file) throws IOException {
         try (BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(file))) {
-            byte buffer[] = new byte[2048];
+            byte[] buffer = new byte[2048];
             while (true) {
                 int n = input.read(buffer);
                 if (n <= 0) {

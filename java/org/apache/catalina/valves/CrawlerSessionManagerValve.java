@@ -76,7 +76,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
      */
     public void setCrawlerUserAgents(String crawlerUserAgents) {
         this.crawlerUserAgents = crawlerUserAgents;
-        if (crawlerUserAgents == null || crawlerUserAgents.length() == 0) {
+        if (crawlerUserAgents == null || crawlerUserAgents.isEmpty()) {
             uaPattern = null;
         } else {
             uaPattern = Pattern.compile(crawlerUserAgents);
@@ -101,7 +101,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
      */
     public void setCrawlerIps(String crawlerIps) {
         this.crawlerIps = crawlerIps;
-        if (crawlerIps == null || crawlerIps.length() == 0) {
+        if (crawlerIps == null || crawlerIps.isEmpty()) {
             ipPattern = null;
         } else {
             ipPattern = Pattern.compile(crawlerIps);

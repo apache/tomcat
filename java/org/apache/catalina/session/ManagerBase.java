@@ -265,7 +265,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      * @throws PatternSyntaxException If the expression is not valid
      */
     public void setSessionAttributeNameFilter(String sessionAttributeNameFilter) throws PatternSyntaxException {
-        if (sessionAttributeNameFilter == null || sessionAttributeNameFilter.length() == 0) {
+        if (sessionAttributeNameFilter == null || sessionAttributeNameFilter.isEmpty()) {
             sessionAttributeNamePattern = null;
         } else {
             sessionAttributeNamePattern = Pattern.compile(sessionAttributeNameFilter);
@@ -323,7 +323,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
      */
     public void setSessionAttributeValueClassNameFilter(String sessionAttributeValueClassNameFilter)
             throws PatternSyntaxException {
-        if (sessionAttributeValueClassNameFilter == null || sessionAttributeValueClassNameFilter.length() == 0) {
+        if (sessionAttributeValueClassNameFilter == null || sessionAttributeValueClassNameFilter.isEmpty()) {
             sessionAttributeValueClassNamePattern = null;
         } else {
             sessionAttributeValueClassNamePattern = Pattern.compile(sessionAttributeValueClassNameFilter);
@@ -563,7 +563,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
     public void processExpires() {
 
         long timeNow = System.currentTimeMillis();
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
         int expireHere = 0;
 
         if (log.isTraceEnabled()) {

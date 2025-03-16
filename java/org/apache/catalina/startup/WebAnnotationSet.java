@@ -18,6 +18,7 @@ package org.apache.catalina.startup;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 import jakarta.annotation.Resource;
 import jakarta.annotation.Resources;
@@ -196,15 +197,12 @@ public class WebAnnotationSet {
 
     protected static void loadFieldsAnnotation(Context context, Class<?> clazz) {
         // Initialize the annotations
-        Field[] fields = clazz.getDeclaredFields();
-        if (fields != null && fields.length > 0) {
-            for (Field field : fields) {
-                Resource annotation = field.getAnnotation(Resource.class);
-                if (annotation != null) {
-                    String defaultName = clazz.getName() + SEPARATOR + field.getName();
-                    Class<?> defaultType = field.getType();
-                    addResource(context, annotation, defaultName, defaultType);
-                }
+        for (Field field : clazz.getDeclaredFields()) {
+            Resource annotation = field.getAnnotation(Resource.class);
+            if (annotation != null) {
+                String defaultName = clazz.getName() + SEPARATOR + field.getName();
+                Class<?> defaultType = field.getType();
+                addResource(context, annotation, defaultName, defaultType);
             }
         }
     }
@@ -212,20 +210,17 @@ public class WebAnnotationSet {
 
     protected static void loadMethodsAnnotation(Context context, Class<?> clazz) {
         // Initialize the annotations
-        Method[] methods = clazz.getDeclaredMethods();
-        if (methods != null && methods.length > 0) {
-            for (Method method : methods) {
-                Resource annotation = method.getAnnotation(Resource.class);
-                if (annotation != null) {
-                    if (!Introspection.isValidSetter(method)) {
-                        throw new IllegalArgumentException(sm.getString("webAnnotationSet.invalidInjection"));
-                    }
-
-                    String defaultName = clazz.getName() + SEPARATOR + Introspection.getPropertyName(method);
-
-                    Class<?> defaultType = (method.getParameterTypes()[0]);
-                    addResource(context, annotation, defaultName, defaultType);
+        for (Method method : clazz.getDeclaredMethods()) {
+            Resource annotation = method.getAnnotation(Resource.class);
+            if (annotation != null) {
+                if (!Introspection.isValidSetter(method)) {
+                    throw new IllegalArgumentException(sm.getString("webAnnotationSet.invalidInjection"));
                 }
+
+                String defaultName = clazz.getName() + SEPARATOR + Introspection.getPropertyName(method);
+
+                Class<?> defaultType = (method.getParameterTypes()[0]);
+                addResource(context, annotation, defaultName, defaultType);
             }
         }
     }
@@ -335,11 +330,7 @@ public class WebAnnotationSet {
     private static String getType(Resource annotation, Class<?> defaultType) {
         Class<?> type = annotation.type();
         if (type == null || type.equals(Object.class)) {
-            if (defaultType != null) {
-                type = defaultType;
-            } else {
-                type = Object.class;
-            }
+            type = Objects.requireNonNullElse(defaultType, Object.class);
         }
         return Introspection.convertPrimitiveType(type).getCanonicalName();
     }
@@ -347,7 +338,7 @@ public class WebAnnotationSet {
 
     private static String getName(Resource annotation, String defaultName) {
         String name = annotation.name();
-        if (name == null || name.equals("")) {
+        if (name == null || name.isEmpty()) {
             if (defaultName != null) {
                 name = defaultName;
             }

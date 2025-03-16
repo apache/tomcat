@@ -65,7 +65,7 @@ public abstract class TimeBucketCounterBase {
         this.bucketDuration = bucketDuration;
 
         int cleanupsPerBucketDuration = (bucketDuration >= 60) ? 6 : 3;
-        sleeptime = bucketDuration * 1000 / cleanupsPerBucketDuration;
+        sleeptime = bucketDuration * 1000L / cleanupsPerBucketDuration;
 
         // Start our thread
         if (sleeptime > 0) {

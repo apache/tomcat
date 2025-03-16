@@ -302,8 +302,7 @@ public final class NetMask {
 
     @Override
     public int hashCode() {
-        int result = 31 * Arrays.hashCode(netaddr) + lastByteShift;
-        return result;
+        return 31 * Arrays.hashCode(netaddr) + lastByteShift;
     }
 
 }

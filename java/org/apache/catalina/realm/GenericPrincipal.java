@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.security.auth.login.LoginContext;
 
@@ -149,11 +150,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
     @Override
     public Principal getUserPrincipal() {
-        if (userPrincipal != null) {
-            return userPrincipal;
-        } else {
-            return this;
-        }
+        return Objects.requireNonNullElse(userPrincipal, this);
     }
 
 
@@ -166,7 +163,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     /**
      * The user's delegated credentials.
      */
-    protected transient GSSCredential gssCredential = null;
+    protected transient GSSCredential gssCredential;
 
     @Override
     public GSSCredential getGssCredential() {

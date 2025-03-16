@@ -314,7 +314,7 @@ public class ApplicationContext implements ServletContext {
             return null;
         }
         String extension = file.substring(period + 1);
-        if (extension.length() < 1) {
+        if (extension.isEmpty()) {
             return null;
         }
         return context.findMimeMapping(extension);

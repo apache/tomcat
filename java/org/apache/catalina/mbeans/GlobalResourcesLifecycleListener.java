@@ -93,7 +93,7 @@ public class GlobalResourcesLifecycleListener implements LifecycleListener {
      */
     protected void createMBeans() {
         // Look up our global naming context
-        Context context = null;
+        Context context;
         try {
             context = (Context) (new InitialContext()).lookup("java:/");
         } catch (NamingException e) {

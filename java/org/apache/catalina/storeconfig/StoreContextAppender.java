@@ -127,7 +127,7 @@ public class StoreContextAppender extends StoreAppender {
     protected String getDefaultWorkDir(StandardContext context) {
         String defaultWorkDir = null;
         String contextWorkDir = context.getName();
-        if (contextWorkDir.length() == 0) {
+        if (contextWorkDir.isEmpty()) {
             contextWorkDir = "_";
         }
         if (contextWorkDir.startsWith("/")) {

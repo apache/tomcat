@@ -240,10 +240,8 @@ public class DataSourceRealm extends RealmBase {
             return null;
         }
 
-        Connection dbConnection = null;
-
         // Ensure that we have an open database connection
-        dbConnection = open();
+        Connection dbConnection = open();
         if (dbConnection == null) {
             // If the db connection open fails, return "not authenticated"
             return null;
@@ -362,7 +360,7 @@ public class DataSourceRealm extends RealmBase {
     protected Connection open() {
 
         try {
-            Context context = null;
+            Context context;
             if (localDataSource) {
                 context = ContextBindings.getClassLoader();
                 context = (Context) context.lookup("comp/env");
@@ -390,10 +388,8 @@ public class DataSourceRealm extends RealmBase {
     @Override
     protected String getPassword(String username) {
 
-        Connection dbConnection = null;
-
         // Ensure that we have an open database connection
-        dbConnection = open();
+        Connection dbConnection = open();
         if (dbConnection == null) {
             return null;
         }
@@ -459,10 +455,8 @@ public class DataSourceRealm extends RealmBase {
      */
     protected ArrayList<String> getRoles(String username) {
 
-        Connection dbConnection = null;
-
         // Ensure that we have an open database connection
-        dbConnection = open();
+        Connection dbConnection = open();
         if (dbConnection == null) {
             return null;
         }
@@ -491,14 +485,11 @@ public class DataSourceRealm extends RealmBase {
             return null;
         }
 
-        ArrayList<String> list = null;
-
         try (PreparedStatement stmt = dbConnection.prepareStatement(preparedRoles)) {
             stmt.setString(1, username);
 
             try (ResultSet rs = stmt.executeQuery()) {
-                list = new ArrayList<>();
-
+                ArrayList<String> list = new ArrayList<>();
                 while (rs.next()) {
                     String role = rs.getString(1);
                     if (role != null) {

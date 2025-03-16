@@ -388,10 +388,8 @@ public final class CGIServlet extends HttpServlet {
      * </p>
      *
      * @param req HttpServletRequest object used as source of information
-     *
-     * @exception IOException if a write operation exception occurs
      */
-    private void printServletEnvironment(HttpServletRequest req) throws IOException {
+    private void printServletEnvironment(HttpServletRequest req) {
 
         // Document the properties from ServletRequest
         log.trace("ServletRequest Properties");
@@ -432,7 +430,7 @@ public final class CGIServlet extends HttpServlet {
         log.trace("HttpServletRequest Properties");
         log.trace("Auth Type: [" + req.getAuthType() + "]");
         log.trace("Context Path: [" + req.getContextPath() + "]");
-        Cookie cookies[] = req.getCookies();
+        Cookie[] cookies = req.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 log.trace("Cookie: " + cookie.getName() + ": [" + cookie.getValue() + "]");
@@ -700,12 +698,9 @@ public final class CGIServlet extends HttpServlet {
          */
         protected boolean setupFromRequest(HttpServletRequest req) throws UnsupportedEncodingException {
 
-            boolean isIncluded = false;
+            boolean isIncluded = req.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI) != null;
 
             // Look to see if this request is an include
-            if (req.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI) != null) {
-                isIncluded = true;
-            }
             if (isIncluded) {
                 this.contextPath = (String) req.getAttribute(RequestDispatcher.INCLUDE_CONTEXT_PATH);
                 this.servletPath = (String) req.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
@@ -813,9 +808,9 @@ public final class CGIServlet extends HttpServlet {
          */
         protected String[] findCGI(String pathInfo, String webAppRootDir, String contextPath, String servletPath,
                 String cgiPathPrefix) {
-            String path = null;
-            String name = null;
-            String scriptname = null;
+            String path;
+            String name;
+            String scriptname;
 
             if (webAppRootDir.lastIndexOf(File.separator) == (webAppRootDir.length() - 1)) {
                 // strip the trailing "/" from the webAppRootDir
@@ -885,13 +880,13 @@ public final class CGIServlet extends HttpServlet {
             Map<String,String> envp = new HashMap<>(shellEnv);
 
             // Add the CGI environment variables
-            String sPathInfoOrig = null;
-            String sPathInfoCGI = null;
+            String sPathInfoOrig;
+            String sPathInfoCGI;
             String sPathTranslatedCGI = null;
-            String sCGIFullPath = null;
-            String sCGIScriptName = null;
-            String sCGIFullName = null;
-            String sCGIName = null;
+            String sCGIFullPath;
+            String sCGIScriptName;
+            String sCGIFullName;
+            String sCGIName;
             String[] sCGINames;
 
 
@@ -973,7 +968,7 @@ public final class CGIServlet extends HttpServlet {
             if (!sPathInfoCGI.isEmpty()) {
                 sPathTranslatedCGI = context.getRealPath(sPathInfoCGI);
             }
-            if (sPathTranslatedCGI == null || "".equals(sPathTranslatedCGI)) {
+            if (sPathTranslatedCGI == null || sPathTranslatedCGI.isEmpty()) {
                 // NOOP
             } else {
                 envp.put("PATH_TRANSLATED", nullsToBlanks(sPathTranslatedCGI));
@@ -1007,9 +1002,8 @@ public final class CGIServlet extends HttpServlet {
 
 
             Enumeration<String> headers = req.getHeaderNames();
-            String header = null;
+            String header;
             while (headers.hasMoreElements()) {
-                header = null;
                 header = headers.nextElement().toUpperCase(Locale.ENGLISH);
                 // REMIND: rewrite multiple headers as if received as single
                 // REMIND: change character set
@@ -1337,11 +1331,7 @@ public final class CGIServlet extends HttpServlet {
          * Checks and sets ready status
          */
         protected void updateReadyStatus() {
-            if (command != null && env != null && wd != null && params != null && response != null) {
-                readyToRun = true;
-            } else {
-                readyToRun = false;
-            }
+            readyToRun = command != null && env != null && wd != null && params != null && response != null;
         }
 
 
@@ -1454,17 +1444,17 @@ public final class CGIServlet extends HttpServlet {
              * original content/structure of this section taken from
              * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4216884 with major modifications by Martin Dengler
              */
-            Runtime rt = null;
+            Runtime rt;
             BufferedReader cgiHeaderReader = null;
             InputStream cgiOutput = null;
-            BufferedReader commandsStdErr = null;
+            BufferedReader commandsStdErr ;
             Thread errReaderThread = null;
-            BufferedOutputStream commandsStdIn = null;
+            BufferedOutputStream commandsStdIn;
             Process proc = null;
             int bufRead = -1;
 
             List<String> cmdAndArgs = new ArrayList<>();
-            if (cgiExecutable.length() != 0) {
+            if (!cgiExecutable.isEmpty()) {
                 cmdAndArgs.add(cgiExecutable);
             }
             if (cgiExecutableArgs != null) {
@@ -1510,7 +1500,7 @@ public final class CGIServlet extends HttpServlet {
                 while (isRunning) {
                     try {
                         // set headers
-                        String line = null;
+                        String line;
                         while (((line = cgiHeaderReader.readLine()) != null) && !line.isEmpty()) {
                             if (log.isTraceEnabled()) {
                                 log.trace("addHeader(\"" + line + "\")");
@@ -1597,7 +1587,6 @@ public final class CGIServlet extends HttpServlet {
                 }
                 if (proc != null) {
                     proc.destroy();
-                    proc = null;
                 }
             }
         }
@@ -1664,7 +1653,7 @@ public final class CGIServlet extends HttpServlet {
         }
 
         private void sendToLog(BufferedReader rdr) {
-            String line = null;
+            String line;
             int lineCount = 0;
             try {
                 while ((line = rdr.readLine()) != null) {

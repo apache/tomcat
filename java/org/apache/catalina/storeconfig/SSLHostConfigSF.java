@@ -31,7 +31,7 @@ import org.apache.tomcat.util.net.openssl.OpenSSLConf;
  */
 public class SSLHostConfigSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(SSLHostConfigSF.class);
+    private static final Log log = LogFactory.getLog(SSLHostConfigSF.class);
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
@@ -48,7 +48,7 @@ public class SSLHostConfigSF extends StoreFactoryBase {
                 SSLHostConfig bean2 = (SSLHostConfig) getStoreAppender().defaultInstance(aElement);
                 SSLHostConfig sslHostConfig = (SSLHostConfig) aElement;
                 if (!bean2.getProtocols().equals(sslHostConfig.getProtocols())) {
-                    StringBuffer protocolsValue = new StringBuffer();
+                    StringBuilder protocolsValue = new StringBuilder();
                     for (String protocol : sslHostConfig.getProtocols()) {
                         protocolsValue.append('+').append(protocol);
                     }

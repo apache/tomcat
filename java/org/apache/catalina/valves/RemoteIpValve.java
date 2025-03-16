@@ -583,7 +583,7 @@ public class RemoteIpValve extends ValveBase {
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
 
             for (Enumeration<String> e = request.getHeaders(remoteIpHeader); e.hasMoreElements();) {
-                if (concatRemoteIpHeaderValue.length() > 0) {
+                if (!concatRemoteIpHeaderValue.isEmpty()) {
                     concatRemoteIpHeaderValue.append(", ");
                 }
 
@@ -634,14 +634,14 @@ public class RemoteIpValve extends ValveBase {
                     request.setRemoteHost(remoteIp);
                 }
 
-                if (proxiesHeaderValue.size() == 0) {
+                if (proxiesHeaderValue.isEmpty()) {
                     request.getCoyoteRequest().getMimeHeaders().removeHeader(proxiesHeader);
                 } else {
                     String commaDelimitedListOfProxies = StringUtils.join(proxiesHeaderValue);
                     request.getCoyoteRequest().getMimeHeaders().setValue(proxiesHeader)
                             .setString(commaDelimitedListOfProxies);
                 }
-                if (newRemoteIpHeaderValue.size() == 0) {
+                if (newRemoteIpHeaderValue.isEmpty()) {
                     request.getCoyoteRequest().getMimeHeaders().removeHeader(remoteIpHeader);
                 } else {
                     String commaDelimitedRemoteIpHeaderValue = StringUtils.join(newRemoteIpHeaderValue);
@@ -729,13 +729,13 @@ public class RemoteIpValve extends ValveBase {
                 request.setLocalPort(originalLocalPort);
 
                 MimeHeaders headers = request.getCoyoteRequest().getMimeHeaders();
-                if (originalProxiesHeader == null || originalProxiesHeader.length() == 0) {
+                if (originalProxiesHeader == null || originalProxiesHeader.isEmpty()) {
                     headers.removeHeader(proxiesHeader);
                 } else {
                     headers.setValue(proxiesHeader).setString(originalProxiesHeader);
                 }
 
-                if (originalRemoteIpHeader == null || originalRemoteIpHeader.length() == 0) {
+                if (originalRemoteIpHeader == null || originalRemoteIpHeader.isEmpty()) {
                     headers.removeHeader(remoteIpHeader);
                 } else {
                     headers.setValue(remoteIpHeader).setString(originalRemoteIpHeader);
@@ -823,7 +823,7 @@ public class RemoteIpValve extends ValveBase {
      * @param internalProxies The proxy regular expression
      */
     public void setInternalProxies(String internalProxies) {
-        if (internalProxies == null || internalProxies.length() == 0) {
+        if (internalProxies == null || internalProxies.isEmpty()) {
             this.internalProxies = null;
         } else {
             this.internalProxies = Pattern.compile(internalProxies);
@@ -929,7 +929,7 @@ public class RemoteIpValve extends ValveBase {
      * @param trustedProxies The regular expression
      */
     public void setTrustedProxies(String trustedProxies) {
-        if (trustedProxies == null || trustedProxies.length() == 0) {
+        if (trustedProxies == null || trustedProxies.isEmpty()) {
             this.trustedProxies = null;
         } else {
             this.trustedProxies = Pattern.compile(trustedProxies);

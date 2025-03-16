@@ -29,7 +29,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class RealmSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(RealmSF.class);
+    private static final Log log = LogFactory.getLog(RealmSF.class);
 
     @Override
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {

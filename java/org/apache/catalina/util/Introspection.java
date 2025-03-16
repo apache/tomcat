@@ -55,11 +55,8 @@ public class Introspection {
      * @return <code>true</code> if the method does have a valid name and signature, else <code>false</code>
      */
     public static boolean isValidSetter(Method method) {
-        if (method.getName().startsWith("set") && method.getName().length() > 3 &&
-                method.getParameterTypes().length == 1 && method.getReturnType().getName().equals("void")) {
-            return true;
-        }
-        return false;
+        return method.getName().startsWith("set") && method.getName().length() > 3 &&
+            method.getParameterTypes().length == 1 && method.getReturnType().getName().equals("void");
     }
 
     /**
@@ -70,11 +67,8 @@ public class Introspection {
      * @return <code>true</code> if the method is a valid lifecycle callback method, else <code>false</code>
      */
     public static boolean isValidLifecycleCallback(Method method) {
-        if (method.getParameterTypes().length != 0 || Modifier.isStatic(method.getModifiers()) ||
-                method.getExceptionTypes().length > 0 || !method.getReturnType().getName().equals("void")) {
-            return false;
-        }
-        return true;
+        return method.getParameterTypes().length == 0 && !Modifier.isStatic(method.getModifiers()) &&
+            method.getExceptionTypes().length <= 0 && method.getReturnType().getName().equals("void");
     }
 
     /**

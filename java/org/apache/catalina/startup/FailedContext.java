@@ -21,6 +21,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import jakarta.servlet.ServletContainerInitializer;
@@ -184,7 +185,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
             } else if (c == null) {
                 // May happen in unit testing and/or some embedding scenarios
                 keyProperties.append(",container");
-                keyProperties.append(containerCount++);
+                keyProperties.append(containerCount);
                 keyProperties.append("=null");
                 break;
             } else {
@@ -206,11 +207,7 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
         StringBuilder keyProperties = new StringBuilder("j2eeType=WebModule,name=//");
 
         String hostname = getParent().getName();
-        if (hostname == null) {
-            keyProperties.append("DEFAULT");
-        } else {
-            keyProperties.append(hostname);
-        }
+        keyProperties.append(Objects.requireNonNullElse(hostname, "DEFAULT"));
 
         String contextName = getName();
         if (!contextName.startsWith("/")) {

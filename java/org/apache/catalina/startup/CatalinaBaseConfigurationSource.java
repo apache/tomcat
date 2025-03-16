@@ -108,7 +108,7 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
         }
 
         // Then try URI.
-        URI uri = null;
+        URI uri;
         try {
             uri = getURIInternal(name);
         } catch (IllegalArgumentException e) {

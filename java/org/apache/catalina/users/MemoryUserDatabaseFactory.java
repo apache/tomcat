@@ -71,7 +71,7 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
 
         // We only know how to deal with <code>javax.naming.Reference</code>s
         // that specify a class name of "org.apache.catalina.UserDatabase"
-        if ((obj == null) || !(obj instanceof Reference)) {
+        if (!(obj instanceof Reference)) {
             return null;
         }
         Reference ref = (Reference) obj;
@@ -82,9 +82,7 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
         // Create and configure a MemoryUserDatabase instance based on the
         // RefAddr values associated with this Reference
         MemoryUserDatabase database = new MemoryUserDatabase(name.toString());
-        RefAddr ra = null;
-
-        ra = ref.get("pathname");
+        RefAddr ra = ref.get("pathname");
         if (ra != null) {
             database.setPathname(ra.getContent().toString());
         }
