@@ -21,8 +21,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Static class used to preload java classes when using the
- * Java SecurityManager so that the defineClassInPackage
+ * Static class used to preload java classes when using the Java SecurityManager so that the defineClassInPackage
  * RuntimePermission does not trigger an AccessControlException.
  */
 public final class SecurityClassLoad {
