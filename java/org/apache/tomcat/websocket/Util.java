@@ -88,52 +88,42 @@ public class Util {
         if (code > 2999 && code < 5000) {
             return CloseCodes.getCloseCode(code);
         }
-        switch (code) {
-            case 1000:
-                return CloseCodes.NORMAL_CLOSURE;
-            case 1001:
-                return CloseCodes.GOING_AWAY;
-            case 1002:
-                return CloseCodes.PROTOCOL_ERROR;
-            case 1003:
-                return CloseCodes.CANNOT_ACCEPT;
-            case 1004:
+        return switch (code) {
+            case 1000 -> CloseCodes.NORMAL_CLOSURE;
+            case 1001 -> CloseCodes.GOING_AWAY;
+            case 1002 -> CloseCodes.PROTOCOL_ERROR;
+            case 1003 -> CloseCodes.CANNOT_ACCEPT;
+            case 1004 ->
                 // Should not be used in a close frame
                 // return CloseCodes.RESERVED;
-                return CloseCodes.PROTOCOL_ERROR;
-            case 1005:
+                CloseCodes.PROTOCOL_ERROR;
+            case 1005 ->
                 // Should not be used in a close frame
                 // return CloseCodes.NO_STATUS_CODE;
-                return CloseCodes.PROTOCOL_ERROR;
-            case 1006:
+                CloseCodes.PROTOCOL_ERROR;
+            case 1006 ->
                 // Should not be used in a close frame
                 // return CloseCodes.CLOSED_ABNORMALLY;
-                return CloseCodes.PROTOCOL_ERROR;
-            case 1007:
-                return CloseCodes.NOT_CONSISTENT;
-            case 1008:
-                return CloseCodes.VIOLATED_POLICY;
-            case 1009:
-                return CloseCodes.TOO_BIG;
-            case 1010:
-                return CloseCodes.NO_EXTENSION;
-            case 1011:
-                return CloseCodes.UNEXPECTED_CONDITION;
-            case 1012:
+                CloseCodes.PROTOCOL_ERROR;
+            case 1007 -> CloseCodes.NOT_CONSISTENT;
+            case 1008 -> CloseCodes.VIOLATED_POLICY;
+            case 1009 -> CloseCodes.TOO_BIG;
+            case 1010 -> CloseCodes.NO_EXTENSION;
+            case 1011 -> CloseCodes.UNEXPECTED_CONDITION;
+            case 1012 ->
                 // Not in RFC6455
                 // return CloseCodes.SERVICE_RESTART;
-                return CloseCodes.PROTOCOL_ERROR;
-            case 1013:
+                CloseCodes.PROTOCOL_ERROR;
+            case 1013 ->
                 // Not in RFC6455
                 // return CloseCodes.TRY_AGAIN_LATER;
-                return CloseCodes.PROTOCOL_ERROR;
-            case 1015:
+                CloseCodes.PROTOCOL_ERROR;
+            case 1015 ->
                 // Should not be used in a close frame
                 // return CloseCodes.TLS_HANDSHAKE_FAILURE;
-                return CloseCodes.PROTOCOL_ERROR;
-            default:
-                return CloseCodes.PROTOCOL_ERROR;
-        }
+                CloseCodes.PROTOCOL_ERROR;
+            default -> CloseCodes.PROTOCOL_ERROR;
+        };
     }
 
 
@@ -206,7 +196,7 @@ public class Util {
         Class<? extends T> superClazz = (Class<? extends T>) clazz.getSuperclass();
         if (superClazz == null) {
             // Finished looking up the class hierarchy without finding anything
-            return null;
+            throw new IllegalStateException();
         }
 
         TypeResult superClassTypeResult = getGenericType(type, superClazz);
@@ -234,9 +224,7 @@ public class Util {
 
         if (superClassTypeResult.getDimension() > 0) {
             StringBuilder className = new StringBuilder();
-            for (int i = 0; i < dimension; i++) {
-                className.append('[');
-            }
+            className.append("[".repeat(Math.max(0, dimension)));
             className.append('L');
             className.append(superClassTypeResult.getClazz().getCanonicalName());
             className.append(';');
@@ -252,7 +240,7 @@ public class Util {
         }
 
         // Error will be logged further up the call stack
-        return null;
+        throw new IllegalStateException();
     }
 
 
@@ -277,7 +265,7 @@ public class Util {
                     return new TypeResult(null, i, 0);
                 }
             }
-            return null;
+            throw new IllegalStateException();
         }
     }
 
@@ -285,12 +273,11 @@ public class Util {
     public static boolean isPrimitive(Class<?> clazz) {
         if (clazz.isPrimitive()) {
             return true;
-        } else if (clazz.equals(Boolean.class) || clazz.equals(Byte.class) || clazz.equals(Character.class) ||
+        } else {
+            return clazz.equals(Boolean.class) || clazz.equals(Byte.class) || clazz.equals(Character.class) ||
                 clazz.equals(Double.class) || clazz.equals(Float.class) || clazz.equals(Integer.class) ||
-                clazz.equals(Long.class) || clazz.equals(Short.class)) {
-            return true;
+                clazz.equals(Long.class) || clazz.equals(Short.class);
         }
-        return false;
     }
 
 
@@ -409,14 +396,14 @@ public class Util {
             DecoderMatch decoderMatch = matchDecoders(target, endpointConfig,
                     ((WsSession) session).getInstanceManager());
             Method m = getOnMessageMethod(listener);
-            if (decoderMatch.getBinaryDecoders().size() > 0) {
+            if (!decoderMatch.getBinaryDecoders().isEmpty()) {
                 MessageHandlerResult result = new MessageHandlerResult(
                         new PojoMessageHandlerWholeBinary(listener, m, session, endpointConfig,
                                 decoderMatch.getBinaryDecoders(), new Object[1], 0, false, -1, false, -1),
                         MessageHandlerResultType.BINARY);
                 results.add(result);
             }
-            if (decoderMatch.getTextDecoders().size() > 0) {
+            if (!decoderMatch.getTextDecoders().isEmpty()) {
                 MessageHandlerResult result = new MessageHandlerResult(
                         new PojoMessageHandlerWholeText(listener, m, session, endpointConfig,
                                 decoderMatch.getTextDecoders(), new Object[1], 0, false, -1, -1),
@@ -425,7 +412,7 @@ public class Util {
             }
         }
 
-        if (results.size() == 0) {
+        if (results.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("wsSession.unknownHandler", listener, target));
         }
 
@@ -436,10 +423,10 @@ public class Util {
             boolean binary, InstanceManager instanceManager) {
         DecoderMatch decoderMatch = matchDecoders(target, endpointConfig, instanceManager);
         if (binary) {
-            if (decoderMatch.getBinaryDecoders().size() > 0) {
+            if (!decoderMatch.getBinaryDecoders().isEmpty()) {
                 return decoderMatch.getBinaryDecoders();
             }
-        } else if (decoderMatch.getTextDecoders().size() > 0) {
+        } else if (!decoderMatch.getTextDecoders().isEmpty()) {
             return decoderMatch.getTextDecoders();
         }
         return null;
@@ -475,11 +462,11 @@ public class Util {
 
         // Step one, split the header into individual extensions using ',' as a
         // separator
-        String unparsedExtensions[] = header.split(",");
+        String[] unparsedExtensions = header.split(",");
         for (String unparsedExtension : unparsedExtensions) {
             // Step two, split the extension into the registered name and
             // parameter/value pairs using ';' as a separator
-            String unparsedParameters[] = unparsedExtension.split(";");
+            String[] unparsedParameters = unparsedExtension.split(";");
             WsExtension extension = new WsExtension(unparsedParameters[0].trim());
 
             for (int i = 1; i < unparsedParameters.length; i++) {
@@ -516,7 +503,7 @@ public class Util {
 
 
     private static boolean containsDelims(String input) {
-        if (input == null || input.length() == 0) {
+        if (input == null || input.isEmpty()) {
             return false;
         }
         for (char c : input.toCharArray()) {
@@ -605,7 +592,7 @@ public class Util {
 
 
         public boolean hasMatches() {
-            return (textDecoders.size() > 0) || (binaryDecoders.size() > 0);
+            return (!textDecoders.isEmpty()) || (!binaryDecoders.isEmpty());
         }
     }
 

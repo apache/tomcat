@@ -80,14 +80,11 @@ public abstract class PojoMessageHandlerBase<T> implements WrappedMessageHandler
 
         RemoteEndpoint.Basic remoteEndpoint = session.getBasicRemote();
         try {
-            if (result instanceof String) {
-                remoteEndpoint.sendText((String) result);
-            } else if (result instanceof ByteBuffer) {
-                remoteEndpoint.sendBinary((ByteBuffer) result);
-            } else if (result instanceof byte[]) {
-                remoteEndpoint.sendBinary(ByteBuffer.wrap((byte[]) result));
-            } else {
-                remoteEndpoint.sendObject(result);
+            switch (result) {
+                case String s -> remoteEndpoint.sendText(s);
+                case ByteBuffer byteBuffer -> remoteEndpoint.sendBinary(byteBuffer);
+                case byte[] bytes -> remoteEndpoint.sendBinary(ByteBuffer.wrap(bytes));
+                default -> remoteEndpoint.sendObject(result);
             }
         } catch (IOException | EncodeException ioe) {
             throw new IllegalStateException(ioe);

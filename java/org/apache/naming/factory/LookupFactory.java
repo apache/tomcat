@@ -83,7 +83,7 @@ public class LookupFactory implements ObjectFactory {
                     String factoryClassName = factoryRefAddr.getContent().toString();
                     // Loading factory
                     ClassLoader tcl = Thread.currentThread().getContextClassLoader();
-                    Class<?> factoryClass = null;
+                    Class<?> factoryClass;
                     if (tcl != null) {
                         try {
                             factoryClass = tcl.loadClass(factoryClassName);
@@ -107,9 +107,6 @@ public class LookupFactory implements ObjectFactory {
                         try {
                             factory = (ObjectFactory) factoryClass.getConstructor().newInstance();
                         } catch (Throwable t) {
-                            if (t instanceof NamingException) {
-                                throw (NamingException) t;
-                            }
                             NamingException ex = new NamingException(
                                     sm.getString("lookupFactory.createFailed"));
                             ex.initCause(t);

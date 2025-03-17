@@ -150,11 +150,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         if (configurator != null) {
             builder.configurator(configurator);
         }
-        ClientEndpointConfig config = builder.decoders(Arrays.asList(annotation.decoders()))
+        return builder.decoders(Arrays.asList(annotation.decoders()))
                 .encoders(Arrays.asList(annotation.encoders()))
                 .preferredSubprotocols(Arrays.asList(annotation.subprotocols())).build();
-
-        return config;
     }
 
 
@@ -340,13 +338,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     List<String> locationHeader = httpResponse.getHandshakeResponse().getHeaders()
                             .get(Constants.LOCATION_HEADER_NAME);
 
-                    if (locationHeader == null || locationHeader.isEmpty() || locationHeader.get(0) == null ||
-                            locationHeader.get(0).isEmpty()) {
+                    if (locationHeader == null || locationHeader.isEmpty() || locationHeader.getFirst() == null ||
+                            locationHeader.getFirst().isEmpty()) {
                         throw new DeploymentException(sm.getString("wsWebSocketContainer.missingLocationHeader",
                                 Integer.toString(httpResponse.status)));
                     }
 
-                    URI redirectLocation = URI.create(locationHeader.get(0)).normalize();
+                    URI redirectLocation = URI.create(locationHeader.getFirst()).normalize();
 
                     if (!redirectLocation.isAbsolute()) {
                         redirectLocation = path.resolve(redirectLocation);
@@ -383,10 +381,10 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
             // Sub-protocol
             List<String> protocolHeaders = handshakeResponse.getHeaders().get(Constants.WS_PROTOCOL_HEADER_NAME);
-            if (protocolHeaders == null || protocolHeaders.size() == 0) {
+            if (protocolHeaders == null || protocolHeaders.isEmpty()) {
                 subProtocol = null;
             } else if (protocolHeaders.size() == 1) {
-                subProtocol = protocolHeaders.get(0);
+                subProtocol = protocolHeaders.getFirst();
             } else {
                 throw new DeploymentException(sm.getString("wsWebSocketContainer.invalidSubProtocol"));
             }
@@ -439,7 +437,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         WsRemoteEndpointImplClient wsRemoteEndpointClient = new WsRemoteEndpointImplClient(channel);
 
         WsSession wsSession = new WsSession(clientEndpointHolder, wsRemoteEndpointClient, this, extensionsAgreed,
-                subProtocol, Collections.<String, String>emptyMap(), secure, clientEndpointConfiguration);
+                subProtocol, Collections.emptyMap(), secure, clientEndpointConfiguration);
 
         WsFrameClient wsFrameClient = new WsFrameClient(response, channel, wsSession, transformation);
         // WsFrame adds the necessary final transformations. Copy the
@@ -476,13 +474,13 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         List<String> authenticateHeaders = httpResponse.getHandshakeResponse().getHeaders()
                 .get(authenticationType.getAuthenticateHeaderName());
 
-        if (authenticateHeaders == null || authenticateHeaders.isEmpty() || authenticateHeaders.get(0) == null ||
-                authenticateHeaders.get(0).isEmpty()) {
+        if (authenticateHeaders == null || authenticateHeaders.isEmpty() || authenticateHeaders.getFirst() == null ||
+                authenticateHeaders.getFirst().isEmpty()) {
             throw new DeploymentException(sm.getString("wsWebSocketContainer.missingAuthenticateHeader",
                     Integer.toString(httpResponse.status), authenticationType.getAuthenticateHeaderName()));
         }
 
-        String authScheme = authenticateHeaders.get(0).split("\\s+", 2)[0];
+        String authScheme = authenticateHeaders.getFirst().split("\\s+", 2)[0];
 
         Authenticator auth = AuthenticatorFactory.getAuthenticator(authScheme);
 
@@ -494,7 +492,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         String requestUri = new String(request.array(), StandardCharsets.ISO_8859_1).split("\\s", 3)[1];
 
         userProperties.put(authenticationType.getAuthorizationHeaderName(),
-                auth.getAuthorization(requestUri, authenticateHeaders.get(0),
+                auth.getAuthorization(requestUri, authenticateHeaders.getFirst(),
                         (String) userProperties.get(authenticationType.getUserNameProperty()),
                         (String) userProperties.get(authenticationType.getUserPasswordProperty()),
                         (String) userProperties.get(authenticationType.getUserRealmProperty())));
@@ -572,7 +570,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             return;
         }
         synchronized (endPointSessionMapLock) {
-            if (endpointSessionMap.size() == 0) {
+            if (endpointSessionMap.isEmpty()) {
                 BackgroundProcessManager.getInstance().register(this);
             }
             endpointSessionMap.computeIfAbsent(key, k -> new HashSet<>()).add(wsSession);
@@ -587,11 +585,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             Set<WsSession> wsSessions = endpointSessionMap.get(key);
             if (wsSessions != null) {
                 wsSessions.remove(wsSession);
-                if (wsSessions.size() == 0) {
+                if (wsSessions.isEmpty()) {
                     endpointSessionMap.remove(key);
                 }
             }
-            if (endpointSessionMap.size() == 0) {
+            if (endpointSessionMap.isEmpty()) {
                 BackgroundProcessManager.getInstance().unregister(this);
             }
         }
@@ -661,12 +659,12 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         headers.put(Constants.WS_KEY_HEADER_NAME, wsKeyValues);
 
         // WebSocket sub-protocols
-        if (subProtocols != null && subProtocols.size() > 0) {
+        if (subProtocols != null && !subProtocols.isEmpty()) {
             headers.put(Constants.WS_PROTOCOL_HEADER_NAME, subProtocols);
         }
 
         // WebSocket extensions
-        if (extensions != null && extensions.size() > 0) {
+        if (extensions != null && !extensions.isEmpty()) {
             headers.put(Constants.WS_EXTENSIONS_HEADER_NAME, generateExtensionHeaders(extensions));
         }
 
@@ -683,7 +681,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 header.append(';');
                 header.append(param.getName());
                 String value = param.getValue();
-                if (value != null && value.length() > 0) {
+                if (value != null && !value.isEmpty()) {
                     header.append('=');
                     header.append(value);
                 }
@@ -863,7 +861,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         // All ISO-8859-1
         StringBuilder sb = new StringBuilder();
 
-        char c = 0;
+        char c;
         while (response.hasRemaining()) {
             c = (char) response.get();
             sb.append(c);

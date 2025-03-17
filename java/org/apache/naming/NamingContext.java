@@ -191,7 +191,7 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -247,7 +247,7 @@ public class NamingContext implements Context {
     public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -280,7 +280,7 @@ public class NamingContext implements Context {
     public NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -316,7 +316,7 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -398,7 +398,7 @@ public class NamingContext implements Context {
     public NameParser getNameParser(Name name)
         throws NamingException {
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -505,7 +505,7 @@ public class NamingContext implements Context {
         throws NamingException {
 
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -604,7 +604,7 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -638,22 +638,20 @@ public class NamingContext implements Context {
                 // NamingEntry
                 Object toBind =
                     NamingManager.getStateToBind(obj, name, this, env);
-                if (toBind instanceof Context) {
-                    entry = new NamingEntry(name.get(0), toBind,
-                                            NamingEntry.CONTEXT);
-                } else if (toBind instanceof LinkRef) {
-                    entry = new NamingEntry(name.get(0), toBind,
-                                            NamingEntry.LINK_REF);
-                } else if (toBind instanceof Reference) {
-                    entry = new NamingEntry(name.get(0), toBind,
-                                            NamingEntry.REFERENCE);
-                } else if (toBind instanceof Referenceable) {
-                    toBind = ((Referenceable) toBind).getReference();
-                    entry = new NamingEntry(name.get(0), toBind,
-                                            NamingEntry.REFERENCE);
-                } else {
-                    entry = new NamingEntry(name.get(0), toBind,
-                                            NamingEntry.ENTRY);
+                switch (toBind) {
+                    case Context context -> entry = new NamingEntry(name.get(0), toBind,
+                        NamingEntry.CONTEXT);
+                    case LinkRef linkRef -> entry = new NamingEntry(name.get(0), toBind,
+                        NamingEntry.LINK_REF);
+                    case Reference reference -> entry = new NamingEntry(name.get(0), toBind,
+                        NamingEntry.REFERENCE);
+                    case Referenceable referenceable -> {
+                        toBind = referenceable.getReference();
+                        entry = new NamingEntry(name.get(0), toBind,
+                            NamingEntry.REFERENCE);
+                    }
+                    case null, default -> entry = new NamingEntry(name.get(0), toBind,
+                        NamingEntry.ENTRY);
                 }
                 bindings.put(name.get(0), entry);
             }

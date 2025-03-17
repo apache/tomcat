@@ -888,19 +888,19 @@ final class SetPublicIdRule extends Rule {
         this.method = method;
     }
 
-    private String method = null;
+    private final String method;
 
     @Override
     public void begin(String namespace, String name, Attributes attributes)
         throws Exception {
 
         Object top = digester.peek();
-        Class<?> paramClasses[] = new Class[1];
+        Class<?>[] paramClasses = new Class[1];
         paramClasses[0] = "String".getClass();
-        String paramValues[] = new String[1];
+        String[] paramValues = new String[1];
         paramValues[0] = digester.getPublicId();
 
-        Method m = null;
+        Method m;
         try {
             m = top.getClass().getMethod(method, paramClasses);
         } catch (NoSuchMethodException e) {
@@ -910,7 +910,7 @@ final class SetPublicIdRule extends Rule {
 
         m.invoke(top, (Object [])paramValues);
         if (digester.getLogger().isTraceEnabled()) {
-            digester.getLogger().trace("" + top.getClass().getName() + "."
+            digester.getLogger().trace(top.getClass().getName() + "."
                                        + method + "(" + paramValues[0] + ")");
         }
 
@@ -985,7 +985,7 @@ final class CallParamMultiRule extends CallParamRule {
     public void end(String namespace, String name) {
         if (bodyTextStack != null && !bodyTextStack.empty()) {
             // what we do now is push one parameter onto the top set of parameters
-            Object parameters[] = (Object[]) digester.peekParams();
+            Object[] parameters = (Object[]) digester.peekParams();
             @SuppressWarnings("unchecked")
             ArrayList<String> params = (ArrayList<String>) parameters[paramIndex];
             if (params == null) {
@@ -1025,7 +1025,7 @@ final class CallMethodMultiRule extends CallMethodRule {
     public void end(String namespace, String name) throws Exception {
 
         // Retrieve or construct the parameter values array
-        Object parameters[] = null;
+        Object[] parameters;
         if (paramCount > 0) {
             parameters = (Object[]) digester.popParams();
         } else {
@@ -1038,7 +1038,7 @@ final class CallMethodMultiRule extends CallMethodRule {
         // Construct the parameter values array we will need
         // We only do the conversion if the param value is a String and
         // the specified paramType is not String.
-        Object paramValues[] = new Object[paramTypes.length];
+        Object[] paramValues = new Object[paramTypes.length];
         for (int i = 0; i < paramTypes.length; i++) {
             if (i != multiParamIndex) {
                 // convert nulls and convert stringy parameters
@@ -1064,7 +1064,6 @@ final class CallMethodMultiRule extends CallMethodRule {
         if (target == null) {
             StringBuilder sb = new StringBuilder();
             sb.append("[CallMethodRule]{");
-            sb.append("");
             sb.append("} Call target is null (");
             sb.append("targetOffset=");
             sb.append(targetOffset);

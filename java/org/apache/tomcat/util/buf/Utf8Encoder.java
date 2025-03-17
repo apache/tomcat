@@ -45,11 +45,11 @@ public class Utf8Encoder extends CharsetEncoder {
         int limit = in.limit();
         byte[] bArr;
         char[] cArr;
-        int x = pos;
         bArr = out.array();
         cArr = in.array();
         int outPos = out.position();
         int rem = in.remaining();
+        int x;
         for (x = pos; x < pos + rem; x++) {
             int jchar = (cArr[x] & 0xFFFF);
 

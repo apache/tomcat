@@ -204,9 +204,7 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         if (hasHashCode) {
             return hashCode;
         }
-        int code = 0;
-
-        code = hash();
+        int code = hash();
         hashCode = code;
         hasHashCode = true;
         return code;

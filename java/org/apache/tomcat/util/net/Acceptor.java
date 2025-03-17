@@ -121,7 +121,7 @@ public class Acceptor<U> implements Runnable {
                         continue;
                     }
 
-                    U socket = null;
+                    U socket;
                     try {
                         // Accept the next incoming connection from the server
                         // socket

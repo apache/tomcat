@@ -75,7 +75,7 @@ public class ToStringUtil {
             // From Java 9 the internal class loaders no longer extend
             // URLCLassLoader
             String cp = System.getProperty("java.class.path");
-            if (cp != null && cp.length() > 0) {
+            if (cp != null && !cp.isEmpty()) {
                 String[] paths = cp.split(File.pathSeparator);
                 for (String path : paths) {
                     result.append(INDENT);

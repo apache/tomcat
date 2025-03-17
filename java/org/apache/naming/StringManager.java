@@ -68,16 +68,16 @@ public class StringManager {
         ResourceBundle tempBundle = null;
         try {
             tempBundle = ResourceBundle.getBundle(bundleName, Locale.getDefault());
-        } catch( MissingResourceException ex ) {
+        } catch (MissingResourceException ex) {
             // Try from the current loader (that's the case for trusted apps)
             // Should only be required if using a TC5 style classloader structure
             // where common != shared != server
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
-            if( cl != null ) {
+            if (cl != null) {
                 try {
                     tempBundle = ResourceBundle.getBundle(
                             bundleName, Locale.getDefault(), cl);
-                } catch(MissingResourceException ex2) {
+                } catch (MissingResourceException ex2) {
                     // Ignore
                 }
             }
@@ -101,7 +101,7 @@ public class StringManager {
      *  @throws IllegalArgumentException if <i>key</i> is null.
      */
     public String getString(String key) {
-        if(key == null){
+        if (key == null) {
             String msg = "key may not have a null value";
 
             throw new IllegalArgumentException(msg);
@@ -114,7 +114,7 @@ public class StringManager {
             if (bundle != null) {
                 str = bundle.getString(key);
             }
-        } catch(MissingResourceException mre) {
+        } catch (MissingResourceException mre) {
             //bad: shouldn't mask an exception the following way:
             //   str = "[cannot find message associated with key '" + key + "' due to " + mre + "]";
             //     because it hides the fact that the String was missing
@@ -125,7 +125,7 @@ public class StringManager {
             //better: consistent with container pattern to
             //      simply return null.  Calling code can then do
             //      a null check.
-            str = null;
+            // str is already set to null
         }
 
         return str;
@@ -167,7 +167,7 @@ public class StringManager {
      *
      * @return The instance associated with the given package
      */
-    public static final synchronized StringManager getManager(String packageName) {
+    public static synchronized StringManager getManager(String packageName) {
         StringManager mgr = managers.get(packageName);
         if (mgr == null) {
             mgr = new StringManager(packageName);
@@ -177,7 +177,7 @@ public class StringManager {
     }
 
 
-    public static final StringManager getManager(Class<?> clazz) {
+    public static StringManager getManager(Class<?> clazz) {
         return getManager(clazz.getPackage().getName());
     }
 }

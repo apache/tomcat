@@ -113,7 +113,7 @@ public class MimeHeaders {
         this.limit = limit;
         if (limit > 0 && headers.length > limit && count < limit) {
             // shrink header list array
-            MimeHeaderField tmp[] = new MimeHeaderField[limit];
+            MimeHeaderField[] tmp = new MimeHeaderField[limit];
             System.arraycopy(headers, 0, tmp, 0, count);
             headers = tmp;
         }
@@ -274,7 +274,7 @@ public class MimeHeaders {
             if (limit > 0 && newLength > limit) {
                 newLength = limit;
             }
-            MimeHeaderField tmp[] = new MimeHeaderField[newLength];
+            MimeHeaderField[] tmp = new MimeHeaderField[newLength];
             System.arraycopy(headers, 0, tmp, 0, len);
             headers = tmp;
         }
@@ -308,7 +308,7 @@ public class MimeHeaders {
      *
      * @return the message bytes container for the value
      */
-    public MessageBytes addValue(byte b[], int startN, int len) {
+    public MessageBytes addValue(byte[] b, int startN, int len) {
         MimeHeaderField mhf = createHeader();
         mhf.getName().setBytes(b, startN, len);
         return mhf.getValue();

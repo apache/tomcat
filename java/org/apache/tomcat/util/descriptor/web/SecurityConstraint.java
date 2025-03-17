@@ -102,14 +102,14 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
      * The set of roles permitted to access resources protected by this
      * security constraint.
      */
-    private String authRoles[] = new String[0];
+    private String[] authRoles = new String[0];
 
 
     /**
      * The set of web resource collections protected by this security
      * constraint.
      */
-    private SecurityCollection collections[] = new SecurityCollection[0];
+    private SecurityCollection[] collections = new SecurityCollection[0];
 
 
     /**
@@ -291,7 +291,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
 
         collection.setCharset(getCharset());
 
-        SecurityCollection results[] = Arrays.copyOf(collections, collections.length + 1);
+        SecurityCollection[] results = Arrays.copyOf(collections, collections.length + 1);
         results[collections.length] = collection;
         collections = results;
 
@@ -382,7 +382,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
             if (!collection.findMethod(method)) {
                 continue;
             }
-            String patterns[] = collection.findPatterns();
+            String[] patterns = collection.findPatterns();
             for (String pattern : patterns) {
                 if (matchPattern(uri, pattern)) {
                     return true;
@@ -427,7 +427,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
         }
         if (n >= 0) {
             int j = 0;
-            String results[] = new String[authRoles.length - 1];
+            String[] results = new String[authRoles.length - 1];
             for (int i = 0; i < authRoles.length; i++) {
                 if (i != n) {
                     results[j++] = authRoles[i];
@@ -458,7 +458,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
         }
         if (n >= 0) {
             int j = 0;
-            SecurityCollection results[] =
+            SecurityCollection[] results =
                 new SecurityCollection[collections.length - 1];
             for (int i = 0; i < collections.length; i++) {
                 if (i != n) {
@@ -503,10 +503,10 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
     private boolean matchPattern(String path, String pattern) {
 
         // Normalize the argument strings
-        if (path == null || path.length() == 0) {
+        if (path == null || path.isEmpty()) {
             path = "/";
         }
-        if (pattern == null || pattern.length() == 0) {
+        if (pattern == null || pattern.isEmpty()) {
             pattern = "/";
         }
 
@@ -518,8 +518,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
         // Check for path prefix matching
         if (pattern.startsWith("/") && pattern.endsWith("/*")) {
             pattern = pattern.substring(0, pattern.length() - 2);
-            if (pattern.length() == 0)
-             {
+            if (pattern.isEmpty()) {
                 return true;  // "/*" is the same as "/"
             }
             if (path.endsWith("/")) {
@@ -542,19 +541,12 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
         if (pattern.startsWith("*.")) {
             int slash = path.lastIndexOf('/');
             int period = path.lastIndexOf('.');
-            if ((slash >= 0) && (period > slash) &&
-                path.endsWith(pattern.substring(1))) {
-                return true;
-            }
-            return false;
+            return (slash >= 0) && (period > slash) &&
+                path.endsWith(pattern.substring(1));
         }
 
         // Check for universal mapping
-        if (pattern.equals("/")) {
-            return true;
-        }
-
-        return false;
+        return pattern.equals("/");
 
     }
 
@@ -754,7 +746,7 @@ public class SecurityConstraint extends XmlEncodingBase implements Serializable 
 
     private static void handleOmittedMethods(Set<String> omittedMethods, String pattern,
             boolean denyUncoveredHttpMethods, List<SecurityConstraint> newConstraints, Log log) {
-        if (omittedMethods.size() > 0) {
+        if (!omittedMethods.isEmpty()) {
             StringBuilder msg = new StringBuilder();
             for (String method : omittedMethods) {
                 msg.append(method);

@@ -79,7 +79,7 @@ public class SystemLogHandler extends PrintStream {
      * Start capturing thread's output.
      */
     public static void startCapture() {
-        CaptureLog log = null;
+        CaptureLog log;
         if (!reuse.isEmpty()) {
             try {
                 log = reuse.remove();

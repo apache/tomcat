@@ -72,28 +72,28 @@ public class DigestAuthenticator extends Authenticator {
         }
 
         challenge.append("Digest ");
-        challenge.append("username =\"" + userName + "\",");
-        challenge.append("realm=\"" + realm + "\",");
-        challenge.append("nonce=\"" + nonce + "\",");
-        challenge.append("uri=\"" + requestUri + "\",");
+        challenge.append("username =\"").append(userName).append("\",");
+        challenge.append("realm=\"").append(realm).append("\",");
+        challenge.append("nonce=\"").append(nonce).append("\",");
+        challenge.append("uri=\"").append(requestUri).append("\",");
 
         try {
-            challenge.append("response=\"" +
-                    calculateRequestDigest(requestUri, userName, userPassword, realm, nonce, messageQop, algorithm) +
-                    "\",");
+            challenge.append("response=\"");
+            challenge.append(calculateRequestDigest(requestUri, userName, userPassword, realm, nonce, messageQop, algorithm));
+            challenge.append("\",");
         }
 
         catch (NoSuchAlgorithmException e) {
             throw new AuthenticationException(sm.getString("digestAuthenticator.algorithm", e.getMessage()));
         }
 
-        challenge.append("algorithm=" + algorithm + ",");
-        challenge.append("opaque=\"" + opaque + "\",");
+        challenge.append("algorithm=").append(algorithm).append(",");
+        challenge.append("opaque=\"").append(opaque).append("\",");
 
         if (!messageQop.isEmpty()) {
-            challenge.append("qop=\"" + messageQop + "\"");
-            challenge.append(",cnonce=\"" + cNonce + "\",");
-            challenge.append("nc=" + String.format("%08X", Integer.valueOf(nonceCount)));
+            challenge.append("qop=\"").append(messageQop).append("\"");
+            challenge.append(",cnonce=\"").append(cNonce).append("\",");
+            challenge.append("nc=").append(String.format("%08X", Integer.valueOf(nonceCount)));
         }
 
         return challenge.toString();

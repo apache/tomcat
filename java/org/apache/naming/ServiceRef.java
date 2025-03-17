@@ -94,7 +94,7 @@ public class ServiceRef extends AbstractRef {
                        String wsdl, String jaxrpcmapping,
                        String factory, String factoryLocation) {
         super(serviceInterface, factory, factoryLocation);
-        StringRefAddr refAddr = null;
+        StringRefAddr refAddr;
         if (serviceInterface != null) {
             refAddr = new StringRefAddr(SERVICE_INTERFACE, serviceInterface);
             add(refAddr);
@@ -123,7 +123,7 @@ public class ServiceRef extends AbstractRef {
      * @return the handler
      */
     public HandlerRef getHandler() {
-        return handlers.remove(0);
+        return handlers.removeFirst();
     }
 
 

@@ -255,7 +255,7 @@ public class ContextService extends ResourceBase {
             sb.append(", port-component/service-endpoint-interface=");
             sb.append(this.getServiceendpoints());
         }
-        if (handlers != null) {
+        if (!handlers.isEmpty()) {
             sb.append(", handler=");
             sb.append(handlers);
         }
@@ -270,10 +270,8 @@ public class ContextService extends ResourceBase {
         int result = super.hashCode();
         result = prime * result +
                 ((displayname == null) ? 0 : displayname.hashCode());
+        result = prime * result + handlers.hashCode();
         result = prime * result +
-                ((handlers == null) ? 0 : handlers.hashCode());
-        result = prime *
-                result +
                 ((jaxrpcmappingfile == null) ? 0 : jaxrpcmappingfile.hashCode());
         result = prime * result +
                 ((largeIcon == null) ? 0 : largeIcon.hashCode());
@@ -307,11 +305,7 @@ public class ContextService extends ResourceBase {
         } else if (!displayname.equals(other.displayname)) {
             return false;
         }
-        if (handlers == null) {
-            if (other.handlers != null) {
-                return false;
-            }
-        } else if (!handlers.equals(other.handlers)) {
+        if (!handlers.equals(other.handlers)) {
             return false;
         }
         if (jaxrpcmappingfile == null) {
@@ -346,12 +340,9 @@ public class ContextService extends ResourceBase {
             return false;
         }
         if (wsdlfile == null) {
-            if (other.wsdlfile != null) {
-                return false;
-            }
-        } else if (!wsdlfile.equals(other.wsdlfile)) {
-            return false;
+            return other.wsdlfile == null;
+        } else {
+            return wsdlfile.equals(other.wsdlfile);
         }
-        return true;
     }
 }

@@ -69,16 +69,16 @@ public final class IntrospectionUtils {
         String setter = "set" + capitalize(name);
 
         try {
-            Method methods[] = findMethods(o.getClass());
+            Method[] methods = findMethods(o.getClass());
             Method setPropertyMethodVoid = null;
             Method setPropertyMethodBool = null;
 
             // First, the ideal case - a setFoo( String ) method
             for (Method item : methods) {
-                Class<?> paramT[] = item.getParameterTypes();
+                Class<?>[] paramT = item.getParameterTypes();
                 if (setter.equals(item.getName()) && paramT.length == 1
                         && "java.lang.String".equals(paramT[0].getName())) {
-                    item.invoke(o, new Object[]{value});
+                    item.invoke(o, value);
                     if (actualMethod != null) {
                         actualMethod.append(item.getName()).append("(\"").append(escape(value)).append("\")");
                     }
@@ -94,68 +94,70 @@ public final class IntrospectionUtils {
 
                     // match - find the type and invoke it
                     Class<?> paramType = method.getParameterTypes()[0];
-                    Object params[] = new Object[1];
+                    Object[] params = new Object[1];
 
                     // Try a setFoo ( int )
-                    if ("java.lang.Integer".equals(paramType.getName())
-                            || "int".equals(paramType.getName())) {
-                        try {
-                            params[0] = Integer.valueOf(value);
-                        } catch (NumberFormatException ex) {
-                            ok = false;
-                        }
-                        if (actualMethod != null) {
-                            if ("java.lang.Integer".equals(paramType.getName())) {
-                                actualMethod.append(method.getName()).append("(Integer.valueOf(\"").append(value).append("\"))");
-                            } else {
-                                actualMethod.append(method.getName()).append("(Integer.parseInt(\"").append(value).append("\"))");
+                    switch (paramType.getName()) {
+                        case "java.lang.Integer", "int" -> {
+                            try {
+                                params[0] = Integer.valueOf(value);
+                            } catch (NumberFormatException ex) {
+                                ok = false;
                             }
-                        }
-                        // Try a setFoo ( long )
-                    } else if ("java.lang.Long".equals(paramType.getName())
-                            || "long".equals(paramType.getName())) {
-                        try {
-                            params[0] = Long.valueOf(value);
-                        } catch (NumberFormatException ex) {
-                            ok = false;
-                        }
-                        if (actualMethod != null) {
-                            if ("java.lang.Long".equals(paramType.getName())) {
-                                actualMethod.append(method.getName()).append("(Long.valueOf(\"").append(value).append("\"))");
-                            } else {
-                                actualMethod.append(method.getName()).append("(Long.parseLong(\"").append(value).append("\"))");
+                            if (actualMethod != null) {
+                                if ("java.lang.Integer".equals(paramType.getName())) {
+                                    actualMethod.append(method.getName()).append("(Integer.valueOf(\"").append(value).append("\"))");
+                                } else {
+                                    actualMethod.append(method.getName()).append("(Integer.parseInt(\"").append(value).append("\"))");
+                                }
                             }
+                            // Try a setFoo ( long )
                         }
-                        // Try a setFoo ( boolean )
-                    } else if ("java.lang.Boolean".equals(paramType.getName())
-                            || "boolean".equals(paramType.getName())) {
-                        params[0] = Boolean.valueOf(value);
-                        if (actualMethod != null) {
-                            if ("java.lang.Boolean".equals(paramType.getName())) {
-                                actualMethod.append(method.getName()).append("(Boolean.valueOf(\"").append(value).append("\"))");
-                            } else {
-                                actualMethod.append(method.getName()).append("(Boolean.parseBoolean(\"").append(value).append("\"))");
+                        case "java.lang.Long", "long" -> {
+                            try {
+                                params[0] = Long.valueOf(value);
+                            } catch (NumberFormatException ex) {
+                                ok = false;
                             }
-                        }
-                        // Try a setFoo ( InetAddress )
-                    } else if ("java.net.InetAddress".equals(paramType
-                            .getName())) {
-                        try {
-                            params[0] = InetAddress.getByName(value);
-                        } catch (UnknownHostException exc) {
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("introspectionUtils.hostResolutionFail", value));
+                            if (actualMethod != null) {
+                                if ("java.lang.Long".equals(paramType.getName())) {
+                                    actualMethod.append(method.getName()).append("(Long.valueOf(\"").append(value).append("\"))");
+                                } else {
+                                    actualMethod.append(method.getName()).append("(Long.parseLong(\"").append(value).append("\"))");
+                                }
                             }
-                            ok = false;
+                            // Try a setFoo ( boolean )
                         }
-                        if (actualMethod != null) {
-                            actualMethod.append(method.getName()).append("(InetAddress.getByName(\"").append(value).append("\"))");
+                        case "java.lang.Boolean", "boolean" -> {
+                            params[0] = Boolean.valueOf(value);
+                            if (actualMethod != null) {
+                                if ("java.lang.Boolean".equals(paramType.getName())) {
+                                    actualMethod.append(method.getName()).append("(Boolean.valueOf(\"").append(value).append("\"))");
+                                } else {
+                                    actualMethod.append(method.getName()).append("(Boolean.parseBoolean(\"").append(value).append("\"))");
+                                }
+                            }
+                            // Try a setFoo ( InetAddress )
                         }
-                        // Unknown type
-                    } else {
-                        if (log.isTraceEnabled()) {
-                            log.trace("IntrospectionUtils: Unknown type " +
+                        case "java.net.InetAddress" -> {
+                            try {
+                                params[0] = InetAddress.getByName(value);
+                            } catch (UnknownHostException exc) {
+                                if (log.isDebugEnabled()) {
+                                    log.debug(sm.getString("introspectionUtils.hostResolutionFail", value));
+                                }
+                                ok = false;
+                            }
+                            if (actualMethod != null) {
+                                actualMethod.append(method.getName()).append("(InetAddress.getByName(\"").append(value).append("\"))");
+                            }
+                            // Unknown type
+                        }
+                        default -> {
+                            if (log.isTraceEnabled()) {
+                                log.trace("IntrospectionUtils: Unknown type " +
                                     paramType.getName());
+                            }
                         }
                     }
 
@@ -182,7 +184,7 @@ public final class IntrospectionUtils {
                 if (actualMethod != null) {
                     actualMethod.append("setProperty(\"").append(name).append("\", \"").append(escape(value)).append("\")");
                 }
-                Object params[] = new Object[2];
+                Object[] params = new Object[2];
                 params[0] = name;
                 params[1] = value;
                 if (setPropertyMethodBool != null) {
@@ -251,12 +253,12 @@ public final class IntrospectionUtils {
         String isGetter = "is" + capitalize(name);
 
         try {
-            Method methods[] = findMethods(o.getClass());
+            Method[] methods = findMethods(o.getClass());
             Method getPropertyMethod = null;
 
             // First, the ideal case - a getFoo() method
             for (Method method : methods) {
-                Class<?> paramT[] = method.getParameterTypes();
+                Class<?>[] paramT = method.getParameterTypes();
                 if (getter.equals(method.getName()) && paramT.length == 0) {
                     return method.invoke(o, (Object[]) null);
                 }
@@ -271,7 +273,7 @@ public final class IntrospectionUtils {
 
             // Ok, no setXXX found, try a getProperty("name")
             if (getPropertyMethod != null) {
-                Object params[] = new Object[1];
+                Object[] params = new Object[1];
                 params[0] = name;
                 return getPropertyMethod.invoke(o, params);
             }
@@ -308,15 +310,15 @@ public final class IntrospectionUtils {
      * @return the replacement value
      */
     public static String replaceProperties(String value,
-            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
-            ClassLoader classLoader) {
+                                           Hashtable<Object,Object> staticProp, PropertySource[] dynamicProp,
+                                           ClassLoader classLoader) {
             return replaceProperties(value, staticProp, dynamicProp, classLoader, 0);
     }
 
     private static String replaceProperties(String value,
-            Hashtable<Object,Object> staticProp, PropertySource dynamicProp[],
-            ClassLoader classLoader, int iterationCount) {
-        if (value == null || value.indexOf("${") < 0) {
+                                            Hashtable<Object,Object> staticProp, PropertySource[] dynamicProp,
+                                            ClassLoader classLoader, int iterationCount) {
+        if (value == null || !value.contains("${")) {
             return value;
         }
         if (iterationCount >=20) {
@@ -329,7 +331,7 @@ public final class IntrospectionUtils {
         int pos;
         while ((pos = value.indexOf('$', prev)) >= 0) {
             if (pos > 0) {
-                sb.append(value.substring(prev, pos));
+                sb.append(value, prev, pos);
             }
             if (pos == (value.length() - 1)) {
                 sb.append('$');
@@ -368,7 +370,7 @@ public final class IntrospectionUtils {
             sb.append(value.substring(prev));
         }
         String newval = sb.toString();
-        if (newval.indexOf("${") < 0) {
+        if (!newval.contains("${")) {
             return newval;
         }
         if (newval.equals(value)) {
@@ -402,10 +404,10 @@ public final class IntrospectionUtils {
      * @return the capitalized string
      */
     public static String capitalize(String name) {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return name;
         }
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toUpperCase(chars[0]);
         return new String(chars);
     }
@@ -418,7 +420,7 @@ public final class IntrospectionUtils {
     private static final Map<Class<?>,Method[]> objectMethods = new ConcurrentHashMap<>();
 
     public static Method[] findMethods(Class<?> c) {
-        Method methods[] = objectMethods.get(c);
+        Method[] methods = objectMethods.get(c);
         if (methods != null) {
             return methods;
         }
@@ -429,11 +431,11 @@ public final class IntrospectionUtils {
     }
 
     public static Method findMethod(Class<?> c, String name,
-            Class<?> params[]) {
-        Method methods[] = findMethods(c);
+                                    Class<?>[] params) {
+        Method[] methods = findMethods(c);
         for (Method method : methods) {
             if (method.getName().equals(name)) {
-                Class<?> methodParams[] = method.getParameterTypes();
+                Class<?>[] methodParams = method.getParameterTypes();
                 if (params == null) {
                     if (methodParams.length == 0) {
                         return method;
@@ -470,7 +472,7 @@ public final class IntrospectionUtils {
                     param1.getClass().getName() + " " + typeParam1);
         }
 
-        Class<?> params[] = new Class[1];
+        Class<?>[] params = new Class[1];
         if (typeParam1 == null) {
             params[0] = param1.getClass();
         } else {
@@ -481,7 +483,7 @@ public final class IntrospectionUtils {
             throw new NoSuchMethodException(sm.getString("introspectionUtils.noMethod", methodN, target, target.getClass()));
         }
         try {
-            return m.invoke(target, new Object[] { param1 });
+            return m.invoke(target, param1);
         } catch (InvocationTargetException ie) {
             ExceptionUtils.handleThrowable(ie.getCause());
             throw ie;
@@ -489,9 +491,8 @@ public final class IntrospectionUtils {
     }
 
     public static Object callMethodN(Object target, String methodN,
-            Object params[], Class<?> typeParams[]) throws Exception {
-        Method m = null;
-        m = findMethod(target.getClass(), methodN, typeParams);
+                                     Object[] params, Class<?>[] typeParams) throws Exception {
+        Method m = findMethod(target.getClass(), methodN, typeParams);
         if (m == null) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("introspectionUtils.noMethod", methodN, target, target.getClass()));
@@ -522,35 +523,36 @@ public final class IntrospectionUtils {
 
     public static Object convert(String object, Class<?> paramType) {
         Object result = null;
-        if ("java.lang.String".equals(paramType.getName())) {
-            result = object;
-        } else if ("java.lang.Integer".equals(paramType.getName())
-                || "int".equals(paramType.getName())) {
-            try {
-                result = Integer.valueOf(object);
-            } catch (NumberFormatException ex) {
+        switch (paramType.getName()) {
+            case "java.lang.String" -> result = object;
+            case "java.lang.Integer", "int" -> {
+                try {
+                    result = Integer.valueOf(object);
+                } catch (NumberFormatException ex) {
+                    // Ignore
+                }
+                // Try a setFoo ( boolean )
             }
-            // Try a setFoo ( boolean )
-        } else if ("java.lang.Boolean".equals(paramType.getName())
-                || "boolean".equals(paramType.getName())) {
-            result = Boolean.valueOf(object);
+            case "java.lang.Boolean", "boolean" -> result = Boolean.valueOf(object);
+
 
             // Try a setFoo ( InetAddress )
-        } else if ("java.net.InetAddress".equals(paramType
-                .getName())) {
-            try {
-                result = InetAddress.getByName(object);
-            } catch (UnknownHostException exc) {
-                if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("introspectionUtils.hostResolutionFail", object));
+            case "java.net.InetAddress" -> {
+                try {
+                    result = InetAddress.getByName(object);
+                } catch (UnknownHostException exc) {
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("introspectionUtils.hostResolutionFail", object));
+                    }
                 }
-            }
 
-            // Unknown type
-        } else {
-            if (log.isTraceEnabled()) {
-                log.trace("IntrospectionUtils: Unknown type " +
+                // Unknown type
+            }
+            default -> {
+                if (log.isTraceEnabled()) {
+                    log.trace("IntrospectionUtils: Unknown type " +
                         paramType.getName());
+                }
             }
         }
         if (result == null) {

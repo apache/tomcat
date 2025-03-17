@@ -108,7 +108,7 @@ public class FilterDef implements Serializable {
     }
 
     public void setFilterName(String filterName) {
-        if (filterName == null || filterName.equals("")) {
+        if (filterName == null || filterName.isEmpty()) {
             throw new IllegalArgumentException(
                     sm.getString("filterDef.invalidFilterName", filterName));
         }

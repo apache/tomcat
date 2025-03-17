@@ -91,7 +91,7 @@ public class HandlerRef extends AbstractRef {
     public HandlerRef(String refname, String handlerClass,
                     String factory, String factoryLocation) {
         super(refname, factory, factoryLocation);
-        StringRefAddr refAddr = null;
+        StringRefAddr refAddr;
         if (refname != null) {
             refAddr = new StringRefAddr(HANDLER_NAME, refname);
             add(refAddr);

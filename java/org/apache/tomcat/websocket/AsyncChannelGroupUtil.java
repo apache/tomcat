@@ -96,7 +96,7 @@ public class AsyncChannelGroupUtil {
 
     private static class AsyncIOThreadFactory implements ThreadFactory {
 
-        private static AtomicInteger count = new AtomicInteger(0);
+        private static final AtomicInteger count = new AtomicInteger(0);
 
         @Override
         public Thread newThread(final Runnable r) {

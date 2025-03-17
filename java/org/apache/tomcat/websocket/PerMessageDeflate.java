@@ -394,14 +394,14 @@ public class PerMessageDeflate implements Transformation {
                         compressedPart = new MessagePart(false, getRsv(uncompressedPart), opCode, compressedPayload,
                                 uncompressedIntermediateHandler, uncompressedIntermediateHandler,
                                 blockingWriteTimeoutExpiry);
-                    } else if (!fin && full && needsInput) {
+                    } else if (!fin && full/* note: needsInput is true here*/) {
                         // Write buffer full and input message not fully read.
                         // Output and get more data.
                         compressedPart = new MessagePart(false, getRsv(uncompressedPart), opCode, compressedPayload,
                                 uncompressedIntermediateHandler, uncompressedIntermediateHandler,
                                 blockingWriteTimeoutExpiry);
                         deflateRequired = false;
-                    } else if (fin && full && needsInput) {
+                    } else if (fin && full/* note: needsInput is true here*/) {
                         // Write buffer full. Input fully read. Deflater may be
                         // in one of four states:
                         // - output complete (just happened to align with end of

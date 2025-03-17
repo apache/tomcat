@@ -147,12 +147,9 @@ public class MessageDestination extends ResourceBase {
             return false;
         }
         if (smallIcon == null) {
-            if (other.smallIcon != null) {
-                return false;
-            }
-        } else if (!smallIcon.equals(other.smallIcon)) {
-            return false;
+            return other.smallIcon == null;
+        } else {
+            return smallIcon.equals(other.smallIcon);
         }
-        return true;
     }
 }

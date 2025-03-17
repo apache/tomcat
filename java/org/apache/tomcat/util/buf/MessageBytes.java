@@ -315,7 +315,7 @@ public final class MessageBytes implements Cloneable, Serializable {
                 toString();
                 //$FALL-THROUGH$
             case T_STR: {
-                char cc[] = strValue.toCharArray();
+                char[] cc = strValue.toCharArray();
                 charC.setChars(cc, 0, cc.length);
             }
         }
@@ -356,19 +356,17 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @return <code>true</code> if the comparison succeeded, <code>false</code> otherwise
      */
     public boolean equals(String s) {
-        switch (type) {
-            case T_STR:
+        return switch (type) {
+            case T_STR -> {
                 if (strValue == null) {
-                    return s == null;
+                    yield s == null;
                 }
-                return strValue.equals(s);
-            case T_CHARS:
-                return charC.equals(s);
-            case T_BYTES:
-                return byteC.equals(s);
-            default:
-                return false;
-        }
+                yield strValue.equals(s);
+            }
+            case T_CHARS -> charC.equals(s);
+            case T_BYTES -> byteC.equals(s);
+            default -> false;
+        };
     }
 
     /**
@@ -379,19 +377,17 @@ public final class MessageBytes implements Cloneable, Serializable {
      * @return <code>true</code> if the comparison succeeded, <code>false</code> otherwise
      */
     public boolean equalsIgnoreCase(String s) {
-        switch (type) {
-            case T_STR:
+        return switch (type) {
+            case T_STR -> {
                 if (strValue == null) {
-                    return s == null;
+                    yield s == null;
                 }
-                return strValue.equalsIgnoreCase(s);
-            case T_CHARS:
-                return charC.equalsIgnoreCase(s);
-            case T_BYTES:
-                return byteC.equalsIgnoreCase(s);
-            default:
-                return false;
-        }
+                yield strValue.equalsIgnoreCase(s);
+            }
+            case T_CHARS -> charC.equalsIgnoreCase(s);
+            case T_BYTES -> byteC.equalsIgnoreCase(s);
+            default -> false;
+        };
     }
 
     @Override
@@ -403,9 +399,8 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     public boolean equals(MessageBytes mb) {
-        switch (type) {
-            case T_STR:
-                return mb.equals(strValue);
+        if (type == T_STR) {
+            return mb.equals(strValue);
         }
 
         if (mb.type != T_CHARS && mb.type != T_BYTES) {
@@ -472,9 +467,7 @@ public final class MessageBytes implements Cloneable, Serializable {
         if (hasHashCode) {
             return hashCode;
         }
-        int code = 0;
-
-        code = hash();
+        int code = hash();
         hashCode = code;
         hasHashCode = true;
         return code;
@@ -482,21 +475,19 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     // normal hash.
     private int hash() {
-        int code = 0;
-        switch (type) {
-            case T_STR:
+        return switch (type) {
+            case T_STR -> {
+                int code = 0;
                 // We need to use the same hash function
                 for (int i = 0; i < strValue.length(); i++) {
                     code = code * 37 + strValue.charAt(i);
                 }
-                return code;
-            case T_CHARS:
-                return charC.hash();
-            case T_BYTES:
-                return byteC.hash();
-            default:
-                return 0;
-        }
+                yield code;
+            }
+            case T_CHARS -> charC.hash();
+            case T_BYTES -> byteC.hash();
+            default -> 0;
+        };
     }
 
     // Inefficient initial implementation. Will be replaced on the next
@@ -606,12 +597,10 @@ public final class MessageBytes implements Cloneable, Serializable {
             return longValue;
         }
 
-        switch (type) {
-            case T_BYTES:
-                longValue = byteC.getLong();
-                break;
-            default:
-                longValue = Long.parseLong(toString());
+        if (type == T_BYTES) {
+            longValue = byteC.getLong();
+        } else {
+            longValue = Long.parseLong(toString());
         }
 
         hasLongValue = true;

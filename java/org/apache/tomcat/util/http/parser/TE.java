@@ -60,7 +60,7 @@ public class TE {
                 continue;
             }
 
-            if (encoding.length() == 0) {
+            if (encoding.isEmpty()) {
                 // No more data to read
                 break;
             }

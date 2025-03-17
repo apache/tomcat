@@ -40,7 +40,7 @@ public class NotificationInfo extends FeatureInfo {
      * to this <code>NotificationInfo</code> instance.
      */
     transient MBeanNotificationInfo info = null;
-    protected String notifTypes[] = new String[0];
+    protected String[] notifTypes = new String[0];
     protected final ReadWriteLock notifTypesLock = new ReentrantReadWriteLock();
 
     // ------------------------------------------------------------- Properties
@@ -71,7 +71,7 @@ public class NotificationInfo extends FeatureInfo {
 
 
     /**
-     * @return the set of notification types for this MBean.
+     * @return the array of notification types for this MBean.
      */
     public String[] getNotifTypes() {
         Lock readLock = notifTypesLock.readLock();
@@ -98,7 +98,7 @@ public class NotificationInfo extends FeatureInfo {
         writeLock.lock();
         try {
 
-            String results[] = new String[notifTypes.length + 1];
+            String[] results = new String[notifTypes.length + 1];
             System.arraycopy(notifTypes, 0, results, 0, notifTypes.length);
             results[notifTypes.length] = notifType;
             notifTypes = results;

@@ -121,12 +121,9 @@ public class MessageDestinationRef extends ResourceBase {
             return false;
         }
         if (usage == null) {
-            if (other.usage != null) {
-                return false;
-            }
-        } else if (!usage.equals(other.usage)) {
-            return false;
+            return other.usage == null;
+        } else {
+            return usage.equals(other.usage);
         }
-        return true;
     }
 }

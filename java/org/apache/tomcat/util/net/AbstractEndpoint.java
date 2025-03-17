@@ -288,7 +288,7 @@ public abstract class AbstractEndpoint<S,U> {
      */
     public void addSslHostConfig(SSLHostConfig sslHostConfig, boolean replace) throws IllegalArgumentException {
         String key = sslHostConfig.getHostName();
-        if (key == null || key.length() == 0) {
+        if (key == null || key.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("endpoint.noSslHostName"));
         }
         if (bindState != BindState.UNBOUND && bindState != BindState.SOCKET_CLOSED_ON_STOP &&
@@ -524,14 +524,14 @@ public abstract class AbstractEndpoint<S,U> {
         SSLParameters sslParameters = engine.getSSLParameters();
         sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
         if (clientRequestedApplicationProtocols != null
-                && clientRequestedApplicationProtocols.size() > 0
-                && negotiableProtocols.size() > 0) {
+                && !clientRequestedApplicationProtocols.isEmpty()
+                && !negotiableProtocols.isEmpty()) {
             // Only try to negotiate if both client and server have at least
             // one protocol in common
             // Note: Tomcat does not explicitly negotiate http/1.1
             List<String> commonProtocols = new ArrayList<>(negotiableProtocols);
             commonProtocols.retainAll(clientRequestedApplicationProtocols);
-            if (commonProtocols.size() > 0) {
+            if (!commonProtocols.isEmpty()) {
                 String[] commonProtocolsArray = commonProtocols.toArray(new String[0]);
                 sslParameters.setApplicationProtocols(commonProtocolsArray);
             }
@@ -1104,7 +1104,7 @@ public abstract class AbstractEndpoint<S,U> {
         negotiableProtocols.add(negotiableProtocol);
     }
     public boolean hasNegotiableProtocols() {
-        return (negotiableProtocols.size() > 0);
+        return (!negotiableProtocols.isEmpty());
     }
 
 
@@ -1191,15 +1191,12 @@ public abstract class AbstractEndpoint<S,U> {
     public int getCurrentThreadCount() {
         Executor executor = this.executor;
         if (executor != null) {
-            if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor) executor).getPoolSize();
-            } else if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-                return ((java.util.concurrent.ThreadPoolExecutor) executor).getPoolSize();
-            } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor) executor).getPoolSize();
-            } else {
-                return -1;
-            }
+            return switch (executor) {
+                case ThreadPoolExecutor threadPoolExecutor -> threadPoolExecutor.getPoolSize();
+                case java.util.concurrent.ThreadPoolExecutor threadPoolExecutor -> threadPoolExecutor.getPoolSize();
+                case ResizableExecutor resizableExecutor -> resizableExecutor.getPoolSize();
+                default -> -1;
+            };
         } else {
             return -2;
         }
@@ -1213,15 +1210,12 @@ public abstract class AbstractEndpoint<S,U> {
     public int getCurrentThreadsBusy() {
         Executor executor = this.executor;
         if (executor != null) {
-            if (executor instanceof ThreadPoolExecutor) {
-                return ((ThreadPoolExecutor) executor).getActiveCount();
-            } else if (executor instanceof java.util.concurrent.ThreadPoolExecutor) {
-                return ((java.util.concurrent.ThreadPoolExecutor) executor).getActiveCount();
-            } else if (executor instanceof ResizableExecutor) {
-                return ((ResizableExecutor) executor).getActiveCount();
-            } else {
-                return -1;
-            }
+            return switch (executor) {
+                case ThreadPoolExecutor threadPoolExecutor -> threadPoolExecutor.getActiveCount();
+                case java.util.concurrent.ThreadPoolExecutor threadPoolExecutor -> threadPoolExecutor.getActiveCount();
+                case ResizableExecutor resizableExecutor -> resizableExecutor.getActiveCount();
+                default -> -1;
+            };
         } else {
             return -2;
         }
@@ -1285,7 +1279,7 @@ public abstract class AbstractEndpoint<S,U> {
             return;
         }
 
-        InetSocketAddress unlockAddress = null;
+        InetSocketAddress unlockAddress;
         InetSocketAddress localAddress = null;
         try {
             localAddress = getLocalAddress();
@@ -1507,7 +1501,7 @@ public abstract class AbstractEndpoint<S,U> {
             // Before init the domain is null
             return;
         }
-        ObjectName sslOname = null;
+        ObjectName sslOname;
         try {
             sslOname = new ObjectName(domain + ":type=SSLHostConfig,ThreadPool=\"" +
                     getName() + "\",name=" + ObjectName.quote(sslHostConfig.getHostName()));
@@ -1523,7 +1517,7 @@ public abstract class AbstractEndpoint<S,U> {
         }
 
         for (SSLHostConfigCertificate sslHostConfigCert : sslHostConfig.getCertificates()) {
-            ObjectName sslCertOname = null;
+            ObjectName sslCertOname;
             try {
                 sslCertOname = new ObjectName(domain +
                         ":type=SSLHostConfigCertificate,ThreadPool=\"" + getName() +

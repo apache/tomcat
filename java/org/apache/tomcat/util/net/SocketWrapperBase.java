@@ -619,7 +619,7 @@ public abstract class SocketWrapperBase<E> {
             while (len > 0) {
                 off = off + thisTime;
                 doWrite(false);
-                if (len > 0 && socketBufferHandler.isWriteBufferWritable()) {
+                if (socketBufferHandler.isWriteBufferWritable()) {
                     socketBufferHandler.configureWriteBufferForWrite();
                     thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
                 } else {
@@ -912,35 +912,27 @@ public abstract class SocketWrapperBase<E> {
      * all remaining data. If the operation completes inline, the
      * completion handler will not be called.
      */
-    public static final CompletionCheck COMPLETE_WRITE = new CompletionCheck() {
-        @Override
-        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
-                int offset, int length) {
-            for (int i = 0; i < length; i++) {
-                if (buffers[offset + i].hasRemaining()) {
-                    return CompletionHandlerCall.CONTINUE;
-                }
+    public static final CompletionCheck COMPLETE_WRITE = (state, buffers, offset, length) -> {
+        for (int i = 0; i < length; i++) {
+            if (buffers[offset + i].hasRemaining()) {
+                return CompletionHandlerCall.CONTINUE;
             }
-            return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE
-                    : CompletionHandlerCall.NONE;
         }
+        return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE
+                : CompletionHandlerCall.NONE;
     };
 
     /**
      * This utility CompletionCheck will cause the write to fully write
      * all remaining data. The completion handler will then be called.
      */
-    public static final CompletionCheck COMPLETE_WRITE_WITH_COMPLETION = new CompletionCheck() {
-        @Override
-        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
-                int offset, int length) {
-            for (int i = 0; i < length; i++) {
-                if (buffers[offset + i].hasRemaining()) {
-                    return CompletionHandlerCall.CONTINUE;
-                }
+    public static final CompletionCheck COMPLETE_WRITE_WITH_COMPLETION = (state, buffers, offset, length) -> {
+        for (int i = 0; i < length; i++) {
+            if (buffers[offset + i].hasRemaining()) {
+                return CompletionHandlerCall.CONTINUE;
             }
-            return CompletionHandlerCall.DONE;
         }
+        return CompletionHandlerCall.DONE;
     };
 
     /**
@@ -948,14 +940,8 @@ public abstract class SocketWrapperBase<E> {
      * to be called once some data has been read. If the operation
      * completes inline, the completion handler will not be called.
      */
-    public static final CompletionCheck READ_DATA = new CompletionCheck() {
-        @Override
-        public CompletionHandlerCall callHandler(CompletionState state, ByteBuffer[] buffers,
-                int offset, int length) {
-            return (state == CompletionState.DONE) ? CompletionHandlerCall.DONE
-                    : CompletionHandlerCall.NONE;
-        }
-    };
+    public static final CompletionCheck READ_DATA = (state, buffers, offset, length) ->
+        (state == CompletionState.DONE) ? CompletionHandlerCall.DONE : CompletionHandlerCall.NONE;
 
     /**
      * This utility CompletionCheck will cause the completion handler

@@ -39,7 +39,7 @@ public class LookupRef extends AbstractRef {
 
     public LookupRef(String resourceType, String factory, String factoryLocation, String lookupName) {
         super(resourceType, factory, factoryLocation);
-        if (lookupName != null && !lookupName.equals("")) {
+        if (lookupName != null && !lookupName.isEmpty()) {
             RefAddr ref = new StringRefAddr(LOOKUP_NAME, lookupName);
             add(ref);
         }

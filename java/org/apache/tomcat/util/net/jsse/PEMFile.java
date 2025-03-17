@@ -115,7 +115,7 @@ public class PEMFile {
         return result.toString();
     }
 
-    private List<X509Certificate> certificates = new ArrayList<>();
+    private final List<X509Certificate> certificates = new ArrayList<>();
     private PrivateKey privateKey;
 
     public List<X509Certificate> getCertificates() {
@@ -193,7 +193,7 @@ public class PEMFile {
             }
         }
 
-        String passwordToUse = null;
+        String passwordToUse;
         if (passwordFileStream != null) {
             try (BufferedReader reader =
                     new BufferedReader(new InputStreamReader(passwordFileStream, StandardCharsets.UTF_8))) {
@@ -408,7 +408,7 @@ public class PEMFile {
                     // PBKDF2 PRF
                     p.parseTagSequence();
                     p.parseLength();
-                    String prf = null;
+                    String prf;
                     // This tag is optional. If present the nested sequence level will be 6 else if will be 4.
                     if (p.getNestedSequenceLevel() == 6) {
                         byte[] oidPRF = p.parseOIDAsBytes();

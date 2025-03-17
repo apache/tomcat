@@ -95,7 +95,7 @@ public final class C2BConverter {
             cb.limit(cc.getEnd());
             cb.position(cc.getStart());
         }
-        CoderResult result = null;
+        CoderResult result;
         // Parse leftover if any are present
         if (leftovers.position() > 0) {
             int pos = bb.position();
@@ -160,7 +160,7 @@ public final class C2BConverter {
             cb.limit(cc.limit());
             cb.position(cc.position());
         }
-        CoderResult result = null;
+        CoderResult result;
         // Parse leftover if any are present
         if (leftovers.position() > 0) {
             int pos = bb.position();

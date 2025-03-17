@@ -145,15 +145,13 @@ public class WsHandshakeRequest implements HandshakeRequest {
             port = 80;
         }
 
-        if ("http".equals(scheme)) {
-            uri.append("ws");
-        } else if ("https".equals(scheme)) {
-            uri.append("wss");
-        } else if ("wss".equals(scheme) || "ws".equals(scheme)) {
-            uri.append(scheme);
-        } else {
-            // Should never happen
-            throw new IllegalArgumentException(sm.getString("wsHandshakeRequest.unknownScheme", scheme));
+        switch (scheme) {
+            case "http" -> uri.append("ws");
+            case "https" -> uri.append("wss");
+            case "wss", "ws" -> uri.append(scheme);
+            case null, default ->
+                // Should never happen
+                throw new IllegalArgumentException(sm.getString("wsHandshakeRequest.unknownScheme", scheme));
         }
 
         uri.append("://");
