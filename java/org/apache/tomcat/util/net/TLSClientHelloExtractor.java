@@ -274,10 +274,7 @@ public class TLSClientHelloExtractor {
         // Next two bytes are major/minor version. We need at least 3.1.
         byte b2 = bb.get();
         byte b3 = bb.get();
-        if (b2 < 3 || b2 == 3 && b3 == 0) {
-            return false;
-        }
-        return true;
+        return b2 >= 3 && (b2 != 3 || b3 != 0);
     }
 
 
@@ -286,7 +283,7 @@ public class TLSClientHelloExtractor {
         // Note: The actual request is not important. This code only checks that
         //       the buffer contains a correctly formatted HTTP request line.
         //       The method, target and protocol are not validated.
-        byte chr = 0;
+        byte chr;
         bb.position(0);
 
         // Skip blank lines
@@ -352,10 +349,7 @@ public class TLSClientHelloExtractor {
 
     private static boolean isClientHello(ByteBuffer bb) {
         // Client hello is handshake type 1
-        if (bb.get() == 1) {
-            return true;
-        }
-        return false;
+        return bb.get() == 1;
     }
 
 
@@ -419,7 +413,7 @@ public class TLSClientHelloExtractor {
             bb.get(inputBuffer, 0, len);
             protocolNames.add(new String(inputBuffer, 0, len, StandardCharsets.UTF_8));
             toRead--;
-            toRead -= len;
+            toRead -= (char) len;
         }
     }
 

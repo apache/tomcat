@@ -49,7 +49,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      * The set of registered <code>BaseNotificationBroadcasterEntry</code>
      * entries.
      */
-    protected ArrayList<BaseNotificationBroadcasterEntry> entries =
+    protected final ArrayList<BaseNotificationBroadcasterEntry> entries =
             new ArrayList<>();
 
 
@@ -80,13 +80,12 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
                 BaseAttributeFilter newFilter = (BaseAttributeFilter) filter;
                 for (BaseNotificationBroadcasterEntry item : entries) {
                     if ((item.listener == listener) &&
-                        (item.filter != null) &&
                         (item.filter instanceof BaseAttributeFilter) &&
                         (item.handback == handback)) {
                         BaseAttributeFilter oldFilter =
                             (BaseAttributeFilter) item.filter;
-                        String newNames[] = newFilter.getNames();
-                        String oldNames[] = oldFilter.getNames();
+                        String[] newNames = newFilter.getNames();
+                        String[] oldNames = oldFilter.getNames();
                         if (newNames.length == 0) {
                             oldFilter.clear();
                         } else {
@@ -175,10 +174,10 @@ class BaseNotificationBroadcasterEntry {
         this.handback = handback;
     }
 
-    public NotificationFilter filter = null;
+    public NotificationFilter filter;
 
-    public Object handback = null;
+    public Object handback;
 
-    public NotificationListener listener = null;
+    public NotificationListener listener;
 
 }

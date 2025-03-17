@@ -120,7 +120,7 @@ public final class ObjectReflectionPropertyInspector {
             InetAddress.class
         )
     ));
-    private static Map<Class<?>, SetPropertyClass> classes = new LinkedHashMap<>();
+    private static final Map<Class<?>, SetPropertyClass> classes = new LinkedHashMap<>();
 
     public static void generateCode(Set<SetPropertyClass> baseClasses, String packageName, File location, String className) throws Exception {
         String packageDirectory = packageName.replace('.','/');
@@ -135,7 +135,6 @@ public final class ObjectReflectionPropertyInspector {
 
     private static boolean isAllowedSetMethod(Method method) {
         return method.getName().startsWith("set") &&
-            method.getParameterTypes() != null &&
             method.getParameterTypes().length == 1 &&
             ALLOWED_TYPES.contains(method.getParameterTypes()[0]) &&
             !Modifier.isPrivate(method.getModifiers());
@@ -143,8 +142,7 @@ public final class ObjectReflectionPropertyInspector {
 
     private static boolean isAllowedGetMethod(Method method) {
         return (method.getName().startsWith("get") || method.getName().startsWith("is")) &&
-            (method.getParameterTypes() == null ||
-            method.getParameterTypes().length == 0) &&
+            method.getParameterTypes().length == 0 &&
             ALLOWED_TYPES.contains(method.getReturnType()) &&
             !Modifier.isPrivate(method.getModifiers()) &&
             isPresentInJava8Api(method);
@@ -212,14 +210,14 @@ public final class ObjectReflectionPropertyInspector {
     }
 
     static String decapitalize(String name) {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return name;
         }
         if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) &&
             Character.isUpperCase(name.charAt(0))) {
             return name;
         }
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
     }

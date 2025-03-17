@@ -205,7 +205,7 @@ public class Util {
         Class<? extends T> superClazz = (Class<? extends T>) clazz.getSuperclass();
         if (superClazz == null) {
             // Finished looking up the class hierarchy without finding anything
-            return null;
+            throw new IllegalStateException();
         }
 
         TypeResult superClassTypeResult = getGenericType(type, superClazz);
@@ -251,7 +251,7 @@ public class Util {
         }
 
         // Error will be logged further up the call stack
-        return null;
+        throw new IllegalStateException();
     }
 
 
@@ -276,7 +276,7 @@ public class Util {
                     return new TypeResult(null, i, 0);
                 }
             }
-            return null;
+            throw new IllegalStateException();
         }
     }
 
@@ -284,12 +284,11 @@ public class Util {
     public static boolean isPrimitive(Class<?> clazz) {
         if (clazz.isPrimitive()) {
             return true;
-        } else if (clazz.equals(Boolean.class) || clazz.equals(Byte.class) || clazz.equals(Character.class) ||
+        } else {
+            return clazz.equals(Boolean.class) || clazz.equals(Byte.class) || clazz.equals(Character.class) ||
                 clazz.equals(Double.class) || clazz.equals(Float.class) || clazz.equals(Integer.class) ||
-                clazz.equals(Long.class) || clazz.equals(Short.class)) {
-            return true;
+                clazz.equals(Long.class) || clazz.equals(Short.class);
         }
-        return false;
     }
 
 
@@ -426,14 +425,14 @@ public class Util {
             DecoderMatch decoderMatch = matchDecoders(target, endpointConfig,
                     ((WsSession) session).getInstanceManager());
             Method m = getOnMessageMethod(listener);
-            if (decoderMatch.getBinaryDecoders().size() > 0) {
+            if (!decoderMatch.getBinaryDecoders().isEmpty()) {
                 MessageHandlerResult result = new MessageHandlerResult(
                         new PojoMessageHandlerWholeBinary(listener, m, session, endpointConfig,
                                 decoderMatch.getBinaryDecoders(), new Object[1], 0, false, -1, false, -1),
                         MessageHandlerResultType.BINARY);
                 results.add(result);
             }
-            if (decoderMatch.getTextDecoders().size() > 0) {
+            if (!decoderMatch.getTextDecoders().isEmpty()) {
                 MessageHandlerResult result = new MessageHandlerResult(
                         new PojoMessageHandlerWholeText(listener, m, session, endpointConfig,
                                 decoderMatch.getTextDecoders(), new Object[1], 0, false, -1, -1),
@@ -442,7 +441,7 @@ public class Util {
             }
         }
 
-        if (results.size() == 0) {
+        if (results.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("wsSession.unknownHandler", listener, target));
         }
 
@@ -453,10 +452,10 @@ public class Util {
             boolean binary, InstanceManager instanceManager) {
         DecoderMatch decoderMatch = matchDecoders(target, endpointConfig, instanceManager);
         if (binary) {
-            if (decoderMatch.getBinaryDecoders().size() > 0) {
+            if (!decoderMatch.getBinaryDecoders().isEmpty()) {
                 return decoderMatch.getBinaryDecoders();
             }
-        } else if (decoderMatch.getTextDecoders().size() > 0) {
+        } else if (!decoderMatch.getTextDecoders().isEmpty()) {
             return decoderMatch.getTextDecoders();
         }
         return null;
@@ -492,11 +491,11 @@ public class Util {
 
         // Step one, split the header into individual extensions using ',' as a
         // separator
-        String unparsedExtensions[] = header.split(",");
+        String[] unparsedExtensions = header.split(",");
         for (String unparsedExtension : unparsedExtensions) {
             // Step two, split the extension into the registered name and
             // parameter/value pairs using ';' as a separator
-            String unparsedParameters[] = unparsedExtension.split(";");
+            String[] unparsedParameters = unparsedExtension.split(";");
             WsExtension extension = new WsExtension(unparsedParameters[0].trim());
 
             for (int i = 1; i < unparsedParameters.length; i++) {
@@ -533,7 +532,7 @@ public class Util {
 
 
     private static boolean containsDelims(String input) {
-        if (input == null || input.length() == 0) {
+        if (input == null || input.isEmpty()) {
             return false;
         }
         for (char c : input.toCharArray()) {
@@ -622,7 +621,7 @@ public class Util {
 
 
         public boolean hasMatches() {
-            return (textDecoders.size() > 0) || (binaryDecoders.size() > 0);
+            return (!textDecoders.isEmpty()) || (!binaryDecoders.isEmpty());
         }
     }
 

@@ -59,8 +59,8 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     private final ByteBuffer socketWriteBuffer;
     // One thread for read, one for write
     private final ExecutorService executor = Executors.newFixedThreadPool(2, new SecureIOThreadFactory());
-    private AtomicBoolean writing = new AtomicBoolean(false);
-    private AtomicBoolean reading = new AtomicBoolean(false);
+    private final AtomicBoolean writing = new AtomicBoolean(false);
+    private final AtomicBoolean reading = new AtomicBoolean(false);
 
     public AsyncChannelWrapperSecure(AsynchronousSocketChannel socketChannel, SSLEngine sslEngine) {
         this.socketChannel = socketChannel;
@@ -113,8 +113,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
         executor.execute(writeTask);
 
-        Future<Integer> future = new LongToIntegerFuture(inner);
-        return future;
+        return new LongToIntegerFuture(inner);
     }
 
     @Override
@@ -376,7 +375,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
                             break;
                         }
                         case NEED_TASK: {
-                            Runnable r = null;
+                            Runnable r;
                             while ((r = sslEngine.getDelegatedTask()) != null) {
                                 r.run();
                             }
@@ -426,7 +425,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
         private volatile T result = null;
         private volatile Throwable throwable = null;
-        private CountDownLatch completionLatch = new CountDownLatch(1);
+        private final CountDownLatch completionLatch = new CountDownLatch(1);
 
         WrapperFuture() {
             this(null, null);
@@ -482,7 +481,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
         @Override
         public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
             boolean latchResult = completionLatch.await(timeout, unit);
-            if (latchResult == false) {
+            if (!latchResult) {
                 throw new TimeoutException();
             }
             if (throwable != null) {
@@ -538,7 +537,7 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
 
     private static class SecureIOThreadFactory implements ThreadFactory {
 
-        private AtomicInteger count = new AtomicInteger(0);
+        private final AtomicInteger count = new AtomicInteger(0);
 
         @Override
         public Thread newThread(Runnable r) {

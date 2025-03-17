@@ -209,10 +209,7 @@ public class StructuredField {
 
 
     static void parseSfParameters(Reader input, SfListMember listMember) throws IOException {
-        while (true) {
-            if (peek(input) != ';') {
-                break;
-            }
+        while (peek(input) == ';') {
             requireChar(input, ';');
             skipSP(input);
             String key = parseSfKey(input);
@@ -502,7 +499,7 @@ public class StructuredField {
 
 
     static class SfDictionary {
-        private Map<String,SfListMember> dictionary = new LinkedHashMap<>();
+        private final Map<String,SfListMember> dictionary = new LinkedHashMap<>();
 
         void addDictionaryMember(String key, SfListMember value) {
             dictionary.put(key, value);
@@ -514,7 +511,7 @@ public class StructuredField {
     }
 
     static class SfList {
-        private List<SfListMember> listMembers = new ArrayList<>();
+        private final List<SfListMember> listMembers = new ArrayList<>();
 
         void addListMember(SfListMember listMember) {
             listMembers.add(listMember);

@@ -97,17 +97,17 @@ public class WebdavIfHeader {
     /**
      * The list of resources present in the If header.
      */
-    private List<String> resources = new ArrayList<>();
+    private final List<String> resources = new ArrayList<>();
 
     /**
      * The list of all positive tokens present in the If header.
      */
-    private List<String> allTokens = new ArrayList<>();
+    private final List<String> allTokens = new ArrayList<>();
 
     /**
      * The list of all NOT tokens present in the If header.
      */
-    private List<String> allNotTokens = new ArrayList<>();
+    private final List<String> allNotTokens = new ArrayList<>();
 
     private String uriPrefix;
 
@@ -120,7 +120,7 @@ public class WebdavIfHeader {
      */
     public WebdavIfHeader(String[] tokens) throws IOException {
         allTokens.addAll(Arrays.asList(tokens));
-        StringBuffer b = new StringBuffer();
+        StringBuilder b = new StringBuilder();
         for (String token : tokens) {
             b.append("(").append("<");
             b.append(token);
@@ -233,12 +233,10 @@ public class WebdavIfHeader {
     private IfHeaderInterface parse()
             throws IOException  {
         IfHeaderInterface ifHeader;
-        if (headerValue != null && headerValue.length() > 0) {
-            StringReader reader = null;
-            int firstChar = 0;
+        if (headerValue != null && !headerValue.isEmpty()) {
 
-            try {
-                reader = new StringReader(headerValue);
+            int firstChar = 0;
+            try (StringReader reader = new StringReader(headerValue)) {
                 // get the first character to decide - expect '(' or '<'
                 try {
                     reader.mark(1);
@@ -256,11 +254,6 @@ public class WebdavIfHeader {
                 } else {
                     logIllegalState("If", firstChar, "(<", null);
                     ifHeader = null;
-                }
-
-            } finally  {
-                if (reader != null) {
-                    reader.close();
                 }
             }
 
@@ -480,7 +473,7 @@ public class WebdavIfHeader {
      * @throws IOException if a problem occurs during reading.
      */
     private String readWord(Reader reader, char end) throws IOException {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         // read the word value
         int c = reader.read();

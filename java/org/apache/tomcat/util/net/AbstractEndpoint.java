@@ -271,7 +271,7 @@ public abstract class AbstractEndpoint<S,U> {
      */
     public void addSslHostConfig(SSLHostConfig sslHostConfig, boolean replace) throws IllegalArgumentException {
         String key = sslHostConfig.getHostName();
-        if (key == null || key.length() == 0) {
+        if (key == null || key.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("endpoint.noSslHostName"));
         }
         if (bindState != BindState.UNBOUND && bindState != BindState.SOCKET_CLOSED_ON_STOP &&
@@ -1002,7 +1002,7 @@ public abstract class AbstractEndpoint<S,U> {
         negotiableProtocols.add(negotiableProtocol);
     }
     public boolean hasNegotiableProtocols() {
-        return (negotiableProtocols.size() > 0);
+        return (!negotiableProtocols.isEmpty());
     }
 
 
@@ -1182,7 +1182,7 @@ public abstract class AbstractEndpoint<S,U> {
             return;
         }
 
-        InetSocketAddress unlockAddress = null;
+        InetSocketAddress unlockAddress;
         InetSocketAddress localAddress = null;
         try {
             localAddress = getLocalAddress();
@@ -1408,7 +1408,7 @@ public abstract class AbstractEndpoint<S,U> {
             // Before init the domain is null
             return;
         }
-        ObjectName sslOname = null;
+        ObjectName sslOname;
         try {
             sslOname = new ObjectName(domain + ":type=SSLHostConfig,ThreadPool=\"" +
                     getName() + "\",name=" + ObjectName.quote(sslHostConfig.getHostName()));
@@ -1424,7 +1424,7 @@ public abstract class AbstractEndpoint<S,U> {
         }
 
         for (SSLHostConfigCertificate sslHostConfigCert : sslHostConfig.getCertificates()) {
-            ObjectName sslCertOname = null;
+            ObjectName sslCertOname;
             try {
                 sslCertOname = new ObjectName(domain +
                         ":type=SSLHostConfigCertificate,ThreadPool=\"" + getName() +

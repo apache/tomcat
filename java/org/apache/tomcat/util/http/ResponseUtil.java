@@ -60,7 +60,7 @@ public class ResponseUtil {
         }
 
         // Short-cut if no headers have been set
-        if (varyHeaders.size() == 0) {
+        if (varyHeaders.isEmpty()) {
             adapter.addHeader(VARY_HEADER, name);
             return;
         }

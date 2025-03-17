@@ -74,7 +74,7 @@ public final class UriUtil {
      *
      * @param c The character to test
      *
-     * @return {@code true} if a the character is allowed, otherwise {@code
+     * @return {@code true} if the character is allowed, otherwise {@code
      *         false}
      */
     private static boolean isSchemeChar(char c) {
@@ -196,7 +196,7 @@ public final class UriUtil {
      *
      * @param path The path to test
      *
-     * @return {@code true} if the supplied path starts with once of the recognised sequences.
+     * @return {@code true} if the supplied path starts with one of the recognised sequences.
      */
     public static boolean isAbsoluteURI(String path) {
         // Special case as only a single /
@@ -217,10 +217,7 @@ public final class UriUtil {
         }
         // path starts with something that might be a protocol. Look for a
         // following "://"
-        if (i + 2 < path.length() && path.charAt(i++) == ':' && path.charAt(i++) == '/' && path.charAt(i) == '/') {
-            return true;
-        }
-        return false;
+        return i + 2 < path.length() && path.charAt(i++) == ':' && path.charAt(i++) == '/' && path.charAt(i) == '/';
     }
 
 

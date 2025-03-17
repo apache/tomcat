@@ -213,13 +213,10 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
             return false;
         }
         if (realmName == null) {
-            if (other.realmName != null) {
-                return false;
-            }
-        } else if (!realmName.equals(other.realmName)) {
-            return false;
+            return other.realmName == null;
+        } else {
+            return realmName.equals(other.realmName);
         }
-        return true;
     }
 
 

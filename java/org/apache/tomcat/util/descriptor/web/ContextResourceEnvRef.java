@@ -89,9 +89,6 @@ public class ContextResourceEnvRef extends ResourceBase {
             return false;
         }
         ContextResourceEnvRef other = (ContextResourceEnvRef) obj;
-        if (override != other.override) {
-            return false;
-        }
-        return true;
+        return override == other.override;
     }
 }

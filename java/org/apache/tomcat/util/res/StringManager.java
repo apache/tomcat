@@ -46,7 +46,7 @@ import java.util.ResourceBundle;
  */
 public class StringManager {
 
-    private static int LOCALE_CACHE_SIZE = 10;
+    private static final int LOCALE_CACHE_SIZE = 10;
 
     /**
      * The ResourceBundle for this StringManager.
@@ -135,7 +135,6 @@ public class StringManager {
             // better: consistent with container pattern to
             // simply return null. Calling code can then do
             // a null check.
-            str = null;
         }
 
         return str;
@@ -188,7 +187,7 @@ public class StringManager {
      *
      * @return The instance associated with the package of the provide class
      */
-    public static final StringManager getManager(Class<?> clazz) {
+    public static StringManager getManager(Class<?> clazz) {
         return getManager(clazz.getPackage().getName());
     }
 
@@ -201,7 +200,7 @@ public class StringManager {
      *
      * @return The instance associated with the given package and the default Locale
      */
-    public static final StringManager getManager(String packageName) {
+    public static StringManager getManager(String packageName) {
         return getManager(packageName, Locale.getDefault());
     }
 
@@ -215,7 +214,7 @@ public class StringManager {
      *
      * @return The instance associated with the given package and Locale
      */
-    public static final synchronized StringManager getManager(String packageName, Locale locale) {
+    public static synchronized StringManager getManager(String packageName, Locale locale) {
 
         Map<Locale, StringManager> map = managers.get(packageName);
         if (map == null) {
@@ -229,10 +228,7 @@ public class StringManager {
 
                 @Override
                 protected boolean removeEldestEntry(Map.Entry<Locale, StringManager> eldest) {
-                    if (size() > (LOCALE_CACHE_SIZE - 1)) {
-                        return true;
-                    }
-                    return false;
+                    return size() > (LOCALE_CACHE_SIZE - 1);
                 }
             };
             managers.put(packageName, map);

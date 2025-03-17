@@ -66,7 +66,7 @@ public class HttpParser {
             }
 
             // Token: Anything 0-127 that is not a control and not a separator
-            if (!IS_CONTROL[i] && !IS_SEPARATOR[i] && i < 128) {
+            if (!IS_CONTROL[i] && !IS_SEPARATOR[i]) {
                 IS_TOKEN[i] = true;
             }
 
@@ -494,7 +494,7 @@ public class HttpParser {
     static long readLong(Reader input) throws IOException {
         String digits = readDigits(input);
 
-        if (digits.length() == 0) {
+        if (digits.isEmpty()) {
             return -1;
         }
 
@@ -971,7 +971,7 @@ public class HttpParser {
 
 
     private void relax(boolean[] flags, String relaxedChars) {
-        if (relaxedChars != null && relaxedChars.length() > 0) {
+        if (relaxedChars != null && !relaxedChars.isEmpty()) {
             char[] chars = relaxedChars.toCharArray();
             for (char c : chars) {
                 if (isRelaxable(c)) {

@@ -240,7 +240,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
                     configurator = annotation.configurator().getConstructor().newInstance();
                 } catch (ReflectiveOperationException e) {
                     throw new DeploymentException(sm.getString("serverContainer.configuratorFail",
-                            annotation.configurator().getName(), pojo.getClass().getName()), e);
+                            annotation.configurator().getName(), pojo.getName()), e);
                 }
             }
             sec = ServerEndpointConfig.Builder.create(pojo, path).decoders(Arrays.asList(annotation.decoders()))
@@ -346,11 +346,11 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
         // Check an exact match. Simple case as there are no templates.
         ExactPathMatch match = configExactMatchMap.get(path);
         if (match != null) {
-            return new WsMappingResult(match.getConfig(), Collections.<String, String>emptyMap());
+            return new WsMappingResult(match.getConfig(), Collections.emptyMap());
         }
 
         // No exact match. Need to look for template matches.
-        UriTemplate pathUriTemplate = null;
+        UriTemplate pathUriTemplate;
         try {
             pathUriTemplate = new UriTemplate(path);
         } catch (DeploymentException e) {

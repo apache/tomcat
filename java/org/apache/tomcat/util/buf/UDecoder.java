@@ -122,7 +122,7 @@ public final class UDecoder {
             EncodedSolidusHandling encodedReverseSolidusHandling) throws IOException {
 
         int start = mb.getStart();
-        byte buff[] = mb.getBytes();
+        byte[] buff = mb.getBytes();
         int end = mb.getEnd();
 
         int idx = ByteChunk.findByte(buff, start, end, (byte) '%');

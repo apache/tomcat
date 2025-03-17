@@ -90,10 +90,10 @@ public class SSLHostConfig implements Serializable {
     // Need to know if TLS 1.3 has been explicitly requested as a warning needs
     // to generated if it is explicitly requested for a JVM that does not
     // support it. Uses a set so it is extensible for TLS 1.4 etc.
-    private Set<String> explicitlyRequestedProtocols = new HashSet<>();
+    private final Set<String> explicitlyRequestedProtocols = new HashSet<>();
     // Nested
     private SSLHostConfigCertificate defaultCertificate = null;
-    private Set<SSLHostConfigCertificate> certificates = new LinkedHashSet<>(4);
+    private final Set<SSLHostConfigCertificate> certificates = new LinkedHashSet<>(4);
     // Common
     private String certificateRevocationListFile;
     private CertificateVerification certificateVerification = CertificateVerification.NONE;
@@ -104,7 +104,7 @@ public class SSLHostConfig implements Serializable {
     private LinkedHashSet<Cipher> cipherList = null;
     private List<String> jsseCipherNames = null;
     private boolean honorCipherOrder = false;
-    private Set<String> protocols = new HashSet<>();
+    private final Set<String> protocols = new HashSet<>();
     // Values <0 mean use the implementation default
     private int sessionCacheSize = -1;
     private int sessionTimeout = 86400;
@@ -248,7 +248,7 @@ public class SSLHostConfig implements Serializable {
     public void addCertificate(SSLHostConfigCertificate certificate) {
         // Need to make sure that if there is more than one certificate, none of
         // them have a type of undefined.
-        if (certificates.size() == 0) {
+        if (certificates.isEmpty()) {
             certificates.add(certificate);
             return;
         }
@@ -286,7 +286,7 @@ public class SSLHostConfig implements Serializable {
 
 
     public Set<SSLHostConfigCertificate> getCertificates(boolean createDefaultIfEmpty) {
-        if (certificates.size() == 0 && createDefaultIfEmpty) {
+        if (certificates.isEmpty() && createDefaultIfEmpty) {
             registerDefaultCertificate();
         }
         return certificates;
@@ -415,10 +415,10 @@ public class SSLHostConfig implements Serializable {
             StringBuilder sb = new StringBuilder();
             // Not obviously in OpenSSL format. May be a single OpenSSL or JSSE
             // cipher name. May be a comma separated list of cipher names
-            String ciphers[] = ciphersList.split(",");
+            String[] ciphers = ciphersList.split(",");
             for (String cipher : ciphers) {
                 String trimmed = cipher.trim();
-                if (trimmed.length() > 0) {
+                if (!trimmed.isEmpty()) {
                     String openSSLName = OpenSSLCipherConfigurationParser.jsseToOpenSSL(trimmed);
                     if (openSSLName == null) {
                         // Not a JSSE name. Maybe an OpenSSL name or alias
@@ -1023,7 +1023,7 @@ public class SSLHostConfig implements Serializable {
     public static String adjustRelativePath(String path) throws FileNotFoundException {
         // Empty or null path can't point to anything useful. The assumption is
         // that the value is deliberately empty / null so leave it that way.
-        if (path == null || path.length() == 0) {
+        if (path == null || path.isEmpty()) {
             return path;
         }
         String newPath = path;

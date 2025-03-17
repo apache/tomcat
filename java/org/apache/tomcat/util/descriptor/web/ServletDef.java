@@ -106,7 +106,7 @@ public class ServletDef implements Serializable {
     }
 
     public void setServletName(String servletName) {
-        if (servletName == null || servletName.equals("")) {
+        if (servletName == null || servletName.isEmpty()) {
             throw new IllegalArgumentException(
                     sm.getString("servletDef.invalidServletName", servletName));
         }

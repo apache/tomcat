@@ -85,7 +85,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     private final AtomicBoolean batchingAllowed = new AtomicBoolean(false);
     private volatile long sendTimeout = -1;
     private WsSession wsSession;
-    private List<EncoderEntry> encoderEntries = new ArrayList<>();
+    private final List<EncoderEntry> encoderEntries = new ArrayList<>();
 
 
     protected void setTransformation(Transformation transformation) {
@@ -289,7 +289,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         // Some extensions/transformations may buffer messages so it is possible
         // that no message parts will be returned. If this is the case simply
         // return.
-        if (messageParts.size() == 0) {
+        if (messageParts.isEmpty()) {
             return;
         }
 
@@ -415,7 +415,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     void endMessage(SendHandler handler, SendResult result) {
         boolean doWrite = false;
-        MessagePart mpNext = null;
+        MessagePart mpNext;
         synchronized (messagePartLock) {
 
             fragmented = nextFragmented;
@@ -766,10 +766,10 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         if (fin) {
             // Set the fin bit
-            b -= 128;
+            b -= (byte) 128;
         }
 
-        b += (rsv << 4);
+        b += (byte) (rsv << 4);
 
         if (first) {
             // This is the first fragment of this message

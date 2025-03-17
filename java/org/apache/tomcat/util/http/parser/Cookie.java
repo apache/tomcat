@@ -81,19 +81,11 @@ public class Cookie {
         // %x21 / %x23-2B / %x2D-3A / %x3C-5B / %x5D-7E (RFC6265)
         // %x80 to %xFF (UTF-8)
         for (int i = 0; i < 256; i++) {
-            if (i < 0x21 || i == QUOTE_BYTE || i == COMMA_BYTE || i == SEMICOLON_BYTE || i == SLASH_BYTE ||
-                    i == DEL_BYTE) {
-                isCookieOctet[i] = false;
-            } else {
-                isCookieOctet[i] = true;
-            }
+            isCookieOctet[i] = !(i < 0x21 || i == QUOTE_BYTE || i == COMMA_BYTE ||
+                i == SEMICOLON_BYTE || i == SLASH_BYTE || i == DEL_BYTE);
         }
         for (int i = 0; i < 256; i++) {
-            if (i < TAB_BYTE || (i > TAB_BYTE && i < SPACE_BYTE) || i == DEL_BYTE) {
-                isText[i] = false;
-            } else {
-                isText[i] = true;
-            }
+            isText[i] = !(i < TAB_BYTE || (i > TAB_BYTE && i < SPACE_BYTE) || i == DEL_BYTE);
         }
     }
 
@@ -672,8 +664,8 @@ public class Cookie {
     private static class ByteBuffer {
 
         private final byte[] bytes;
-        private int limit;
-        private int position = 0;
+        private final int limit;
+        private int position;
 
         ByteBuffer(byte[] bytes, int offset, int len) {
             this.bytes = bytes;

@@ -85,7 +85,7 @@ public class Ranges {
 
         // Units (required)
         String units = HttpParser.readToken(input);
-        if (units == null || units.length() == 0) {
+        if (units == null || units.isEmpty()) {
             return null;
         }
 

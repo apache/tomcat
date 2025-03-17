@@ -180,9 +180,6 @@ public class ContextResource extends ResourceBase {
         } else if (!scope.equals(other.scope)) {
             return false;
         }
-        if (singleton != other.singleton) {
-            return false;
-        }
-        return true;
+        return singleton == other.singleton;
     }
 }

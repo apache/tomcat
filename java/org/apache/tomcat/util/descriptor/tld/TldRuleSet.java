@@ -144,11 +144,10 @@ public class TldRuleSet implements RuleSet {
     }
 
     private static class TagAttributeRule extends Rule {
-        private boolean allowShortNames = false;
         @Override
         public void begin(String namespace, String name, Attributes attributes) throws Exception {
             TaglibXml taglibXml = (TaglibXml) digester.peek(digester.getCount() - 1);
-            allowShortNames = "1.2".equals(taglibXml.getJspVersion());
+            boolean allowShortNames = "1.2".equals(taglibXml.getJspVersion());
             Attribute attribute = new Attribute(allowShortNames);
             digester.push(attribute);
 

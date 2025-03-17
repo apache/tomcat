@@ -402,7 +402,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
             }
 
-            if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
+            if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {
                 List<String> protocols = new ArrayList<>(negotiableProtocols);
                 protocols.add("http/1.1");
                 String[] protocolsArray = protocols.toArray(new String[0]);
@@ -480,7 +480,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         // Load Server key and certificate
         if (certificate.getCertificateFile() != null) {
             // Set certificate
-            String passwordToUse = null;
+            String passwordToUse;
             if (certificate.getCertificateKeyPasswordFile() != null) {
                 try (BufferedReader reader =
                         new BufferedReader(new InputStreamReader(

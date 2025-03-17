@@ -336,7 +336,7 @@ public class StandardJarScanner implements JarScanner {
     protected void addClassPath(Deque<URL> classPathUrlsToProcess) {
         String classPath = System.getProperty("java.class.path");
 
-        if (classPath == null || classPath.length() == 0) {
+        if (classPath == null || classPath.isEmpty()) {
             return;
         }
 
@@ -441,7 +441,7 @@ public class StandardJarScanner implements JarScanner {
             String[] classPathEntries = classPathAttribute.split(" ");
             for (String classPathEntry : classPathEntries) {
                 classPathEntry = classPathEntry.trim();
-                if (classPathEntry.length() == 0) {
+                if (classPathEntry.isEmpty()) {
                     continue;
                 }
                 URL jarURL = jar.getJarFileURL();

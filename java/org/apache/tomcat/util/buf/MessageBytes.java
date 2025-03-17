@@ -337,7 +337,7 @@ public final class MessageBytes implements Cloneable, Serializable {
                 toString();
                 //$FALL-THROUGH$
             case T_STR: {
-                char cc[] = strValue.toCharArray();
+                char[] cc = strValue.toCharArray();
                 charC.setChars(cc, 0, cc.length);
             }
         }
@@ -425,9 +425,8 @@ public final class MessageBytes implements Cloneable, Serializable {
     }
 
     public boolean equals(MessageBytes mb) {
-        switch (type) {
-            case T_STR:
-                return mb.equals(strValue);
+        if (type == T_STR) {
+            return mb.equals(strValue);
         }
 
         if (mb.type != T_CHARS && mb.type != T_BYTES) {
@@ -494,9 +493,7 @@ public final class MessageBytes implements Cloneable, Serializable {
         if (hasHashCode) {
             return hashCode;
         }
-        int code = 0;
-
-        code = hash();
+        int code = hash();
         hashCode = code;
         hasHashCode = true;
         return code;
@@ -628,12 +625,10 @@ public final class MessageBytes implements Cloneable, Serializable {
             return longValue;
         }
 
-        switch (type) {
-            case T_BYTES:
-                longValue = byteC.getLong();
-                break;
-            default:
-                longValue = Long.parseLong(toString());
+        if (type == T_BYTES) {
+            longValue = byteC.getLong();
+        } else {
+            longValue = Long.parseLong(toString());
         }
 
         hasLongValue = true;

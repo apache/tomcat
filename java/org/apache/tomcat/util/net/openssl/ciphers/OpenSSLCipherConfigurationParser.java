@@ -831,7 +831,7 @@ public class OpenSSLCipherConfigurationParser {
             }
             builder.append(separator);
         }
-        return builder.toString().substring(0, builder.length() - 1);
+        return builder.substring(0, builder.length() - 1);
     }
 
     public static void usage() {
@@ -883,7 +883,7 @@ public class OpenSSLCipherConfigurationParser {
         }
         Set<Cipher> ciphers = parse(cipherSpec);
         boolean first = true;
-        if(null != ciphers && 0 < ciphers.size()) {
+        if(!ciphers.isEmpty()) {
             for(Cipher cipher : ciphers)
             {
                 if(first) {

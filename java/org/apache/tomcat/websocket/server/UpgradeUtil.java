@@ -84,7 +84,7 @@ public class UpgradeUtil {
         // Validate the rest of the headers and reject the request if that
         // validation fails
         String key;
-        String subProtocol = null;
+        String subProtocol;
         if (!headerContainsToken(req, Constants.CONNECTION_HEADER_NAME, Constants.CONNECTION_HEADER_VALUE)) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -122,8 +122,8 @@ public class UpgradeUtil {
         // Negotiation phase 1. By default this simply filters out the
         // extensions that the server does not support but applications could
         // use a custom configurator to do more than this.
-        List<Extension> installedExtensions = null;
-        if (sec.getExtensions().size() == 0) {
+        List<Extension> installedExtensions;
+        if (sec.getExtensions().isEmpty()) {
             installedExtensions = Constants.INSTALLED_EXTENSIONS;
         } else {
             installedExtensions = new ArrayList<>();
@@ -176,7 +176,7 @@ public class UpgradeUtil {
         resp.setHeader(Constants.UPGRADE_HEADER_NAME, Constants.UPGRADE_HEADER_VALUE);
         resp.setHeader(Constants.CONNECTION_HEADER_NAME, Constants.CONNECTION_HEADER_VALUE);
         resp.setHeader(HandshakeResponse.SEC_WEBSOCKET_ACCEPT, getWebSocketAccept(key));
-        if (subProtocol != null && subProtocol.length() > 0) {
+        if (subProtocol != null && !subProtocol.isEmpty()) {
             // RFC6455 4.2.2 explicitly states "" is not valid here
             resp.setHeader(Constants.WS_PROTOCOL_HEADER_NAME, subProtocol);
         }
@@ -274,7 +274,7 @@ public class UpgradeUtil {
 
 
     private static void append(StringBuilder sb, Extension extension) {
-        if (extension == null || extension.getName() == null || extension.getName().length() == 0) {
+        if (extension == null || extension.getName() == null || extension.getName().isEmpty()) {
             return;
         }
 

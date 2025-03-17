@@ -47,14 +47,14 @@ public abstract class FactoryBase implements ObjectFactory {
                 return linked;
             }
 
-            ObjectFactory factory = null;
+            ObjectFactory factory;
             RefAddr factoryRefAddr = ref.get(Constants.FACTORY);
             if (factoryRefAddr != null) {
                 // Using the specified factory
                 String factoryClassName = factoryRefAddr.getContent().toString();
                 // Loading factory
                 ClassLoader tcl = Thread.currentThread().getContextClassLoader();
-                Class<?> factoryClass = null;
+                Class<?> factoryClass;
                 try {
                     if (tcl != null) {
                         factoryClass = tcl.loadClass(factoryClassName);

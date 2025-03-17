@@ -76,7 +76,7 @@ public class JspPropertyGroup extends XmlEncodingBase {
     }
     public Boolean getTrimWhitespace() { return trimWhitespace; }
 
-    private LinkedHashSet<String> urlPattern = new LinkedHashSet<>();
+    private final LinkedHashSet<String> urlPattern = new LinkedHashSet<>();
     public void addUrlPattern(String urlPattern) {
         addUrlPatternDecoded(UDecoder.URLDecode(urlPattern, getCharset()));
     }

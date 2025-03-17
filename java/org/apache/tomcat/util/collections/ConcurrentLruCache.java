@@ -97,7 +97,7 @@ public class ConcurrentLruCache<T> {
     private static class LimitedLinkedHashMap<K,V> extends LinkedHashMap<K,V> {
         private static final long serialVersionUID = 1L;
 
-        private volatile int limit;
+        private final int limit;
 
         LimitedLinkedHashMap(int limit) {
             super(16, 0.75F, true);
@@ -106,10 +106,7 @@ public class ConcurrentLruCache<T> {
 
         @Override
         protected boolean removeEldestEntry(Map.Entry<K,V> eldest) {
-            if (size() > limit) {
-                return true;
-            }
-            return false;
+            return size() > limit;
         }
 
         private int getLimit() {

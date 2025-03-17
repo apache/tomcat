@@ -54,7 +54,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     private final ClassLoader applicationClassLoader;
 
     private SocketWrapperBase<?> socketWrapper;
-    private UpgradeInfo upgradeInfo = new UpgradeInfo();
+    private final UpgradeInfo upgradeInfo = new UpgradeInfo();
 
     private Endpoint ep;
     private ServerEndpointConfig serverEndpointConfig;

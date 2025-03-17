@@ -373,10 +373,10 @@ public class PojoMethodMapping {
         private int indexInputStream = -1;
         private int indexReader = -1;
         private int indexPrimitive = -1;
-        private Map<Integer, PojoPathParam> indexPathParams = new HashMap<>();
+        private final Map<Integer, PojoPathParam> indexPathParams = new HashMap<>();
         private int indexPayload = -1;
         private DecoderMatch decoderMatch = null;
-        private long maxMessageSize = -1;
+        private final long maxMessageSize;
 
         MessageHandlerInfo(Method m, List<DecoderEntry> decoderEntries) throws DeploymentException {
 
@@ -583,13 +583,13 @@ public class PojoMethodMapping {
 
         private boolean isText() {
             return indexString >= 0 || indexPrimitive >= 0 || indexReader >= 0 ||
-                    (decoderMatch != null && decoderMatch.getTextDecoders().size() > 0);
+                    (decoderMatch != null && !decoderMatch.getTextDecoders().isEmpty());
         }
 
 
         private boolean isBinary() {
             return indexByteArray >= 0 || indexByteBuffer >= 0 || indexInputStream >= 0 ||
-                    (decoderMatch != null && decoderMatch.getBinaryDecoders().size() > 0);
+                    (decoderMatch != null && !decoderMatch.getBinaryDecoders().isEmpty());
         }
 
 
@@ -600,7 +600,7 @@ public class PojoMethodMapping {
             for (Map.Entry<Integer, PojoPathParam> entry : indexPathParams.entrySet()) {
                 PojoPathParam pathParam = entry.getValue();
                 String valueString = pathParameters.get(pathParam.getName());
-                Object value = null;
+                Object value;
                 try {
                     value = Util.coerceToType(pathParam.getType(), valueString);
                 } catch (Exception e) {
@@ -636,13 +636,13 @@ public class PojoMethodMapping {
                             indexInputStream, true, indexSession, true, maxMessageSize);
                     results.add(mh);
                 } else if (decoderMatch != null && decoderMatch.hasMatches()) {
-                    if (decoderMatch.getBinaryDecoders().size() > 0) {
+                    if (!decoderMatch.getBinaryDecoders().isEmpty()) {
                         MessageHandler mh = new PojoMessageHandlerWholeBinary(pojo, m, session, config,
                                 decoderMatch.getBinaryDecoders(), params, indexPayload, true, indexSession, true,
                                 maxMessageSize);
                         results.add(mh);
                     }
-                    if (decoderMatch.getTextDecoders().size() > 0) {
+                    if (!decoderMatch.getTextDecoders().isEmpty()) {
                         MessageHandler mh = new PojoMessageHandlerWholeText(pojo, m, session, config,
                                 decoderMatch.getTextDecoders(), params, indexPayload, true, indexSession,
                                 maxMessageSize);

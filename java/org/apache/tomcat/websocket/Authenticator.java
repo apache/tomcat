@@ -142,7 +142,7 @@ public abstract class Authenticator {
         }
 
         userRealm = userRealm.trim();
-        if (userRealm.length() == 0) {
+        if (userRealm.isEmpty()) {
             return;
         }
 

@@ -45,7 +45,7 @@ public class WsSci implements ServletContainerInitializer {
 
         WsServerContainer sc = init(ctx, true);
 
-        if (clazzes == null || clazzes.size() == 0) {
+        if (clazzes == null || clazzes.isEmpty()) {
             return;
         }
 

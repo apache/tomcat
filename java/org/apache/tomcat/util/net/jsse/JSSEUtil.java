@@ -129,7 +129,7 @@ public class JSSEUtil extends SSLUtilBase {
                         implementedProtocols.add(protocol);
                     }
 
-                    if (implementedProtocols.size() == 0) {
+                    if (implementedProtocols.isEmpty()) {
                         log.warn(sm.getString("jsseUtil.noDefaultProtocols"));
                     }
 

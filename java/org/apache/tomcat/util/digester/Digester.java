@@ -428,7 +428,7 @@ public class Digester extends DefaultHandler2 {
     public String toVariableName(Object object) {
         boolean found = false;
         int pos = 0;
-        if (known.size() > 0) {
+        if (!known.isEmpty()) {
             for (int i = known.size() - 1; i >= 0; i--) {
                 if (known.get(i) == object) {
                     pos = i;
@@ -918,7 +918,7 @@ public class Digester extends DefaultHandler2 {
      * @exception SAXException if a parsing error is to be reported
      */
     @Override
-    public void characters(char buffer[], int start, int length) throws SAXException {
+    public void characters(char[] buffer, int start, int length) throws SAXException {
 
         if (saxLog.isTraceEnabled()) {
             saxLog.trace("characters(" + new String(buffer, start, length) + ")");
@@ -1000,17 +1000,16 @@ public class Digester extends DefaultHandler2 {
         // the actual element name is either in localName or qName, depending
         // on whether the parser is namespace aware
         String name = localName;
-        if ((name == null) || (name.length() < 1)) {
+        if ((name == null) || (name.isEmpty())) {
             name = qName;
         }
 
         // Fire "body" events for all relevant rules
         List<Rule> rules = matches.pop();
-        if ((rules != null) && (rules.size() > 0)) {
+        if ((rules != null) && (!rules.isEmpty())) {
             String bodyText = this.bodyText.toString().intern();
-            for (Rule value : rules) {
+            for (Rule rule : rules) {
                 try {
-                    Rule rule = value;
                     if (debug) {
                         log.trace("  Fire body() for " + rule);
                     }
@@ -1108,7 +1107,7 @@ public class Digester extends DefaultHandler2 {
      * @exception SAXException if a parsing error is to be reported
      */
     @Override
-    public void ignorableWhitespace(char buffer[], int start, int len) throws SAXException {
+    public void ignorableWhitespace(char[] buffer, int start, int len) throws SAXException {
 
         if (saxLog.isTraceEnabled()) {
             saxLog.trace("ignorableWhitespace(" + new String(buffer, start, len) + ")");
@@ -1250,13 +1249,13 @@ public class Digester extends DefaultHandler2 {
         // the actual element name is either in localName or qName, depending
         // on whether the parser is namespace aware
         String name = localName;
-        if ((name == null) || (name.length() < 1)) {
+        if ((name == null) || (name.isEmpty())) {
             name = qName;
         }
 
         // Compute the current matching rule
         StringBuilder sb = new StringBuilder(match);
-        if (match.length() > 0) {
+        if (!match.isEmpty()) {
             sb.append('/');
         }
         sb.append(name);
@@ -1268,10 +1267,9 @@ public class Digester extends DefaultHandler2 {
         // Fire "begin" events for all relevant rules
         List<Rule> rules = getRules().match(namespaceURI, match);
         matches.push(rules);
-        if ((rules != null) && (rules.size() > 0)) {
-            for (Rule value : rules) {
+        if ((rules != null) && (!rules.isEmpty())) {
+            for (Rule rule : rules) {
                 try {
-                    Rule rule = value;
                     if (debug) {
                         log.trace("  Fire begin() for " + rule);
                     }
@@ -1838,7 +1836,7 @@ public class Digester extends DefaultHandler2 {
      */
     public void push(Object object) {
 
-        if (stack.size() == 0) {
+        if (stack.isEmpty()) {
             root = object;
         }
         stack.push(object);
@@ -1953,7 +1951,7 @@ public class Digester extends DefaultHandler2 {
      * @return the new exception
      */
     public SAXException createSAXException(String message, Exception e) {
-        if ((e != null) && (e instanceof InvocationTargetException)) {
+        if ((e instanceof InvocationTargetException)) {
             Throwable t = e.getCause();
             if (t instanceof ThreadDeath) {
                 throw (ThreadDeath) t;

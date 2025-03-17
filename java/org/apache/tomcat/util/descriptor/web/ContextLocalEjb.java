@@ -149,12 +149,9 @@ public class ContextLocalEjb extends ResourceBase {
             return false;
         }
         if (local == null) {
-            if (other.local != null) {
-                return false;
-            }
-        } else if (!local.equals(other.local)) {
-            return false;
+            return other.local == null;
+        } else {
+            return local.equals(other.local);
         }
-        return true;
     }
 }

@@ -150,12 +150,9 @@ public class ContextEjb extends ResourceBase {
             return false;
         }
         if (remote == null) {
-            if (other.remote != null) {
-                return false;
-            }
-        } else if (!remote.equals(other.remote)) {
-            return false;
+            return other.remote == null;
+        } else {
+            return remote.equals(other.remote);
         }
-        return true;
     }
 }
