@@ -484,6 +484,7 @@ public final class Bootstrap {
                         System.exit(1);
                     }
                     System.exit(0);
+                    break;
                 default:
                     log.warn("Bootstrap: command \"" + command + "\" does not exist.");
                     break;
