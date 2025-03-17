@@ -328,7 +328,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         OpenSSLConfCmd cmd;
         String name;
         String value;
-        int rc;
+        boolean ok;
         for (OpenSSLConfCmd command : conf.getCommands()) {
             cmd = command;
             name = cmd.getName();
@@ -343,25 +343,25 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
             try (var localArena = Arena.ofConfined()) {
                 if (name.equals("NO_OCSP_CHECK")) {
-                    rc = 1;
+                    ok = true;
                 } else {
                     int code = SSL_CONF_cmd_value_type(state.confCtx, localArena.allocateFrom(name));
-                    rc = 1;
+                    ok = true;
                     String errorMessage = OpenSSLLibrary.getLastError();
                     if (errorMessage != null) {
                         log.error(sm.getString("opensslconf.checkFailed", errorMessage));
-                        rc = 0;
+                        ok = false;
                     }
                     if (code == SSL_CONF_TYPE_UNKNOWN()) {
                         log.error(sm.getString("opensslconf.typeUnknown", name));
-                        rc = 0;
+                        ok = false;
                     }
                     if (code == SSL_CONF_TYPE_FILE()) {
                         // Check file
                         File file = new File(value);
                         if (!file.isFile() && !file.canRead()) {
                             log.error(sm.getString("opensslconf.badFile", name, value));
-                            rc = 0;
+                            ok = false;
                         }
                     }
                     if (code == SSL_CONF_TYPE_DIR()) {
@@ -369,7 +369,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         File file = new File(value);
                         if (!file.isDirectory()) {
                             log.error(sm.getString("opensslconf.badDirectory", name, value));
-                            rc = 0;
+                            ok = false;
                         }
                     }
                 }
@@ -377,13 +377,11 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 log.error(sm.getString("opensslconf.checkFailed", e.getLocalizedMessage()));
                 return false;
             }
-            if (rc <= 0) {
-                log.error(sm.getString("opensslconf.failedCommand", name, value,
-                        Integer.toString(rc)));
+            if (!ok) {
+                log.error(sm.getString("opensslconf.failedCommand", name, value, Boolean.FALSE));
                 result = false;
             } else if (log.isTraceEnabled()) {
-                log.trace(sm.getString("opensslconf.resultCommand", name, value,
-                        Integer.toString(rc)));
+                log.trace(sm.getString("opensslconf.resultCommand", name, value, Boolean.TRUE));
             }
         }
         if (!result) {
@@ -504,6 +502,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     log.warn(sm.getString("engine.failedCipherList", sslHostConfig.getCiphers()));
                 }
             }
+            // Check if the ciphers have been changed from the defaults
             if (maxTlsVersion >= TLS1_3_VERSION() && (sslHostConfig.getCiphers() != SSLHostConfig.DEFAULT_TLS_CIPHERS)) {
                 if (SSL_CTX_set_ciphersuites(state.sslCtx,
                         localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
@@ -1166,13 +1165,13 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 alias = findAlias(x509KeyManager, certificate);
                 chain = x509KeyManager.getCertificateChain(alias);
             }
-            String sb =
+            String encodedKey =
                 BEGIN_KEY +
                 Base64.getMimeEncoder(64, new byte[]{'\n'}).encodeToString(x509KeyManager.getPrivateKey(alias).getEncoded()) +
                 END_KEY;
             var rawCertificate = localArena.allocateFrom(ValueLayout.JAVA_BYTE, chain[0].getEncoded());
             var rawCertificatePointer = localArena.allocateFrom(ValueLayout.ADDRESS, rawCertificate);
-            var rawKey = localArena.allocateFrom(ValueLayout.JAVA_BYTE, sb.getBytes(StandardCharsets.US_ASCII));
+            var rawKey = localArena.allocateFrom(ValueLayout.JAVA_BYTE, encodedKey.getBytes(StandardCharsets.US_ASCII));
             var x509cert = d2i_X509(MemorySegment.NULL, rawCertificatePointer, rawCertificate.byteSize());
             if (MemorySegment.NULL.equals(x509cert)) {
                 logLastError("openssl.errorLoadingCertificate");

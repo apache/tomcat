@@ -481,7 +481,7 @@ public class SocketProperties {
                 return 0;
             } else {
                 long actualBufferPoolSize = bufferPoolSize;
-                long poolSize = 0;
+                long poolSize;
                 if (actualBufferPoolSize == -2) {
                     long maxMemory = Runtime.getRuntime().maxMemory();
                     if (maxMemory > Integer.MAX_VALUE) {

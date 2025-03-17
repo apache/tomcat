@@ -82,16 +82,16 @@ public class Authorization {
         if (field == null) {
             return null;
         }
-        while (!field.equals("")) {
+        while (!field.isEmpty()) {
             if (HttpParser.skipConstant(input, "=") != SkipResult.FOUND) {
                 return null;
             }
-            String value = null;
             FieldType type = fieldTypes.get(field.toLowerCase(Locale.ENGLISH));
             if (type == null) {
                 // auth-param = token "=" ( token | quoted-string )
                 type = FieldType.TOKEN_OR_QUOTED_STRING;
             }
+            String value = null;
             switch (type) {
                 case QUOTED_STRING:
                     value = HttpParser.readQuotedString(input, false);
@@ -131,6 +131,6 @@ public class Authorization {
         QUOTED_STRING,
         TOKEN_OR_QUOTED_STRING,
         LHEX,
-        QUOTED_TOKEN;
+        QUOTED_TOKEN
     }
 }

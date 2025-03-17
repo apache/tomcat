@@ -44,6 +44,7 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
@@ -594,7 +595,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
      */
     public class Poller implements Runnable {
 
-        private Selector selector;
+        private final Selector selector;
         private final SynchronizedQueue<PollerEvent> events =
                 new SynchronizedQueue<>();
 
@@ -602,7 +603,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         // Optimize expiration handling
         private long nextExpiration = 0;
 
-        private AtomicLong wakeupCounter = new AtomicLong(0);
+        private final AtomicLong wakeupCounter = new AtomicLong(0);
 
         private volatile int keyCount = 0;
 
@@ -672,7 +673,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         public boolean events() {
             boolean result = false;
 
-            PollerEvent pe = null;
+            PollerEvent pe;
             for (int i = 0, size = events.size(); i < size && (pe = events.poll()) != null; i++ ) {
                 result = true;
                 NioSocketWrapper socketWrapper = pe.getSocketWrapper();
@@ -1128,8 +1129,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
             fillReadBuffer(false);
 
-            boolean isReady = socketBufferHandler.getReadBuffer().position() > 0;
-            return isReady;
+            return socketBufferHandler.getReadBuffer().position() > 0;
         }
 
 
@@ -1248,7 +1248,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
 
         private int fillReadBuffer(boolean block, ByteBuffer buffer) throws IOException {
-            int n = 0;
+            int n;
             if (getSocket() == NioChannel.CLOSED_NIO_CHANNEL) {
                 throw new ClosedChannelException();
             }
@@ -1340,7 +1340,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
 
         @Override
         protected void doWrite(boolean block, ByteBuffer buffer) throws IOException {
-            int n = 0;
+            int n;
             if (getSocket() == NioChannel.CLOSED_NIO_CHANNEL) {
                 throw new ClosedChannelException();
             }
@@ -1629,7 +1629,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                                     }
                                 }
                                 if (doWrite) {
-                                    long n = 0;
+                                    long n;
                                     do {
                                         n = getSocket().write(buffers, offset, length);
                                         if (n == -1) {
@@ -1703,7 +1703,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
             }
 
             try {
-                int handshake = -1;
+                int handshake;
                 try {
                     if (socketWrapper.getSocket().isHandshakeComplete()) {
                         // No TLS handshaking required. Let the handler
@@ -1735,13 +1735,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     handshake = -1;
                 }
                 if (handshake == 0) {
-                    SocketState state = SocketState.OPEN;
+                    SocketState state;
                     // Process the request from this socket
-                    if (event == null) {
-                        state = getHandler().process(socketWrapper, SocketEvent.OPEN_READ);
-                    } else {
-                        state = getHandler().process(socketWrapper, event);
-                    }
+                    state = getHandler().process(socketWrapper, Objects.requireNonNullElse(event, SocketEvent.OPEN_READ));
                     if (state == SocketState.CLOSED) {
                         socketWrapper.close();
                     }

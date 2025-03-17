@@ -37,7 +37,7 @@ import org.apache.tomcat.util.net.SSLContext;
 
 class JSSESSLContext implements SSLContext {
 
-    private javax.net.ssl.SSLContext context;
+    private final javax.net.ssl.SSLContext context;
     private KeyManager[] kms;
     private TrustManager[] tms;
 

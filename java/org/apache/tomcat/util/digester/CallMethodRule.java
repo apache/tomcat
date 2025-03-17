@@ -183,7 +183,7 @@ public class CallMethodRule extends Rule {
     /**
      * The parameter types of the parameters to be collected.
      */
-    protected Class<?> paramTypes[] = null;
+    protected final Class<?>[] paramTypes;
 
 
     /**
@@ -272,7 +272,7 @@ public class CallMethodRule extends Rule {
     public void end(String namespace, String name) throws Exception {
 
         // Retrieve or construct the parameter values array
-        Object parameters[] = null;
+        Object[] parameters = null;
         if (paramCount > 0) {
 
             parameters = (Object[]) digester.popParams();
@@ -308,7 +308,7 @@ public class CallMethodRule extends Rule {
         // Construct the parameter values array we will need
         // We only do the conversion if the param value is a String and
         // the specified paramType is not String.
-        Object paramValues[] = new Object[paramTypes.length];
+        Object[] paramValues = new Object[paramTypes.length];
         for (int i = 0; i < paramTypes.length; i++) {
             // convert nulls and convert stringy parameters
             // for non-stringy param types

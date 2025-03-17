@@ -27,7 +27,6 @@ package org.apache.tomcat.util.threads;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.BlockingQueue;
@@ -394,7 +393,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     // runState is stored in the high-order bits
     private static final int RUNNING    = -1 << COUNT_BITS;
-    private static final int SHUTDOWN   =  0 << COUNT_BITS;
+    private static final int SHUTDOWN   =  0;
     private static final int STOP       =  1 << COUNT_BITS;
     private static final int TIDYING    =  2 << COUNT_BITS;
     private static final int TERMINATED =  3 << COUNT_BITS;
@@ -1881,13 +1880,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     public void purge() {
         final BlockingQueue<Runnable> q = workQueue;
         try {
-            Iterator<Runnable> it = q.iterator();
-            while (it.hasNext()) {
-                Runnable r = it.next();
-                if (r instanceof Future<?> && ((Future<?>)r).isCancelled()) {
-                    it.remove();
-                }
-            }
+            q.removeIf(r -> r instanceof Future<?> && ((Future<?>) r).isCancelled());
         } catch (ConcurrentModificationException fallThrough) {
             // Take slow path if we encounter interference during traversal.
             // Make copy for traversal and call remove for cancelled entries.
@@ -2195,10 +2188,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         Thread currentThread = Thread.currentThread();
         if (threadRenewalDelay >= 0 && currentThread instanceof TaskThread) {
             TaskThread currentTaskThread = (TaskThread) currentThread;
-            if (currentTaskThread.getCreationTime() <
-                    this.lastContextStoppedTime.longValue()) {
-                return true;
-            }
+            return currentTaskThread.getCreationTime() < this.lastContextStoppedTime.longValue();
         }
         return false;
     }

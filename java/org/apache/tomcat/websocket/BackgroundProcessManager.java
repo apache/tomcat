@@ -55,7 +55,7 @@ public class BackgroundProcessManager {
 
     public void register(BackgroundProcess process) {
         synchronized (processesLock) {
-            if (processes.size() == 0) {
+            if (processes.isEmpty()) {
                 wsBackgroundThread = new WsBackgroundThread(this);
                 wsBackgroundThread.setContextClassLoader(this.getClass().getClassLoader());
                 wsBackgroundThread.setDaemon(true);
@@ -69,7 +69,7 @@ public class BackgroundProcessManager {
     public void unregister(BackgroundProcess process) {
         synchronized (processesLock) {
             processes.remove(process);
-            if (wsBackgroundThread != null && processes.size() == 0) {
+            if (wsBackgroundThread != null && processes.isEmpty()) {
                 wsBackgroundThread.halt();
                 wsBackgroundThread = null;
             }

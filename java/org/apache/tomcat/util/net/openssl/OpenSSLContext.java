@@ -46,7 +46,6 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jni.CertificateVerifier;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
 import org.apache.tomcat.jni.SSLConf;
@@ -359,18 +358,15 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (tms != null) {
                 // Client certificate verification based on custom trust managers
                 x509TrustManager = chooseTrustManager(tms);
-                SSLContext.setCertVerifyCallback(state.ctx, new CertificateVerifier() {
-                    @Override
-                    public boolean verify(long ssl, byte[][] chain, String auth) {
-                        X509Certificate[] peerCerts = certificates(chain);
-                        try {
-                            x509TrustManager.checkClientTrusted(peerCerts, auth);
-                            return true;
-                        } catch (Exception e) {
-                            log.debug(sm.getString("openssl.certificateVerificationFailed"), e);
-                        }
-                        return false;
+                SSLContext.setCertVerifyCallback(state.ctx, (ssl, chain, auth) -> {
+                    X509Certificate[] peerCerts = certificates(chain);
+                    try {
+                        x509TrustManager.checkClientTrusted(peerCerts, auth);
+                        return true;
+                    } catch (Exception e) {
+                        log.debug(sm.getString("openssl.certificateVerificationFailed"), e);
                     }
+                    return false;
                 });
                 // Pass along the DER encoded certificates of the accepted client
                 // certificate issuers, so that their subjects can be presented
@@ -389,7 +385,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
             }
 
-            if (negotiableProtocols != null && negotiableProtocols.size() > 0) {
+            if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {
                 List<String> protocols = new ArrayList<>(negotiableProtocols);
                 protocols.add("http/1.1");
                 String[] protocolsArray = protocols.toArray(new String[0]);
@@ -467,7 +463,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         // Load Server key and certificate
         if (certificate.getCertificateFile() != null) {
             // Set certificate
-            String passwordToUse = null;
+            String passwordToUse;
             if (certificate.getCertificateKeyPasswordFile() != null) {
                 try (BufferedReader reader =
                         new BufferedReader(new InputStreamReader(
@@ -504,12 +500,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 chain = x509KeyManager.getCertificateChain(alias);
             }
             PrivateKey key = x509KeyManager.getPrivateKey(alias);
-            StringBuilder sb = new StringBuilder(BEGIN_KEY);
-            sb.append(Base64.getMimeEncoder(64, new byte[] {'\n'}).encodeToString(key.getEncoded()));
-            sb.append(END_KEY);
+            String encodedKey =
+                BEGIN_KEY +
+                Base64.getMimeEncoder(64, new byte[]{'\n'}).encodeToString(key.getEncoded()) +
+                END_KEY;
             SSLContext.setCertificateRaw(state.ctx, chain[0].getEncoded(),
-                    sb.toString().getBytes(StandardCharsets.US_ASCII),
-                    getCertificateIndex(certificate));
+                encodedKey.getBytes(StandardCharsets.US_ASCII), getCertificateIndex(certificate));
             for (int i = 1; i < chain.length; i++) {
                 SSLContext.addChainCertificateRaw(state.ctx, chain[i].getEncoded());
             }
@@ -592,7 +588,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     @Override
     public SSLEngine createSSLEngine() {
         return new OpenSSLEngine(cleaner, state.ctx, defaultProtocol, false, sessionContext,
-                (negotiableProtocols != null && negotiableProtocols.size() > 0), initialized,
+                (negotiableProtocols != null && !negotiableProtocols.isEmpty()), initialized,
                 sslHostConfig.getCertificateVerificationDepth(),
                 sslHostConfig.getCertificateVerification() == CertificateVerification.OPTIONAL_NO_CA);
     }

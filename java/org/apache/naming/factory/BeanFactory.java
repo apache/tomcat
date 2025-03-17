@@ -84,7 +84,7 @@ public class BeanFactory implements ObjectFactory {
             try {
                 Reference ref = (Reference) obj;
                 String beanClassName = ref.getClassName();
-                Class<?> beanClass = null;
+                Class<?> beanClass;
                 ClassLoader tcl = Thread.currentThread().getContextClassLoader();
                 try {
                     if (tcl != null) {
@@ -128,7 +128,7 @@ public class BeanFactory implements ObjectFactory {
 
                     Object[] valueArray = new Object[1];
 
-                    int i = 0;
+                    int i;
                     for (i = 0; i < pda.length; i++) {
 
                         if (pda[i].getName().equals(propName)) {

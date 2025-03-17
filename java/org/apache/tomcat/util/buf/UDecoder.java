@@ -118,7 +118,7 @@ public final class UDecoder {
             EncodedSolidusHandling encodedReverseSolidusHandling) throws IOException {
 
         int start = mb.getStart();
-        byte buff[] = mb.getBytes();
+        byte[] buff = mb.getBytes();
         int end = mb.getEnd();
 
         int idx = ByteChunk.findByte(buff, start, end, (byte) '%');
@@ -347,7 +347,7 @@ public final class UDecoder {
             }
             osw.flush();
 
-            return baos.toString(charset.name());
+            return baos.toString(charset);
         } catch (IOException ioe) {
             throw new IllegalArgumentException(sm.getString("uDecoder.urlDecode.conversionError", str, charset.name()),
                     ioe);

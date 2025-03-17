@@ -19,6 +19,7 @@ package org.apache.tomcat.util.descriptor.web;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -333,7 +334,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     public void addServlet(ServletDef servletDef) {
         servlets.put(servletDef.getServletName(), servletDef);
         if (overridable) {
-            servletDef.setOverridable(overridable);
+            servletDef.setOverridable(true);
         }
     }
     public Map<String,ServletDef> getServlets() { return servlets; }
@@ -594,7 +595,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
     // post-construct elements
-    private Map<String, String> postConstructMethods = new HashMap<>();
+    private final Map<String, String> postConstructMethods = new HashMap<>();
     public void addPostConstructMethods(String clazz, String method) {
         if (!postConstructMethods.containsKey(clazz)) {
             postConstructMethods.put(clazz, method);
@@ -605,7 +606,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
     // pre-destroy elements
-    private Map<String, String> preDestroyMethods = new HashMap<>();
+    private final Map<String, String> preDestroyMethods = new HashMap<>();
     public void addPreDestroyMethods(String clazz, String method) {
         if (!preDestroyMethods.containsKey(clazz)) {
             preDestroyMethods.put(clazz, method);
@@ -976,7 +977,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
         sb.append('\n');
 
-        if (welcomeFiles.size() > 0) {
+        if (!welcomeFiles.isEmpty()) {
             sb.append("  <welcome-file-list>\n");
             for (String welcomeFile : welcomeFiles) {
                 appendElement(sb, INDENT4, "welcome-file", welcomeFile);
@@ -1006,7 +1007,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         // jsp-config was added in Servlet 2.4. Prior to that, tag-libs was used
         // directly and jsp-property-group did not exist
-        if (taglibs.size() > 0 || jspPropertyGroups.size() > 0) {
+        if (!taglibs.isEmpty() || !jspPropertyGroups.isEmpty()) {
             if (getMajorVersion() > 2 || getMinorVersion() > 3) {
                 sb.append("  <jsp-config>\n");
             }
@@ -1363,7 +1364,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         // locale-encoding-mapping-list was introduced in Servlet 2.4
         if (getMajorVersion() > 2 || getMinorVersion() > 3) {
-            if (localeEncodingMappings.size() > 0) {
+            if (!localeEncodingMappings.isEmpty()) {
                 sb.append("  <locale-encoding-mapping-list>\n");
                 for (Map.Entry<String, String> entry :
                         localeEncodingMappings.entrySet()) {
@@ -1397,12 +1398,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
 
     private String encodeUrl(String input) {
-        try {
-            return URLEncoder.encode(input, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            // Impossible. UTF-8 is a required character set
-            return null;
-        }
+        return URLEncoder.encode(input, StandardCharsets.UTF_8);
     }
 
 
@@ -1411,7 +1407,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         if (value == null) {
             return;
         }
-        if (value.length() == 0) {
+        if (value.isEmpty()) {
             sb.append(indent);
             sb.append('<');
             sb.append(elementName);
@@ -1810,12 +1806,12 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
         mainAttributes.putAll(mergedFragmentAttributes);
 
-        if (sessionConfig.getSessionTrackingModes().size() == 0) {
+        if (sessionConfig.getSessionTrackingModes().isEmpty()) {
             for (WebXml fragment : fragments) {
                 EnumSet<SessionTrackingMode> value =
                     fragment.getSessionConfig().getSessionTrackingModes();
-                if (value.size() > 0) {
-                    if (temp.getSessionConfig().getSessionTrackingModes().size() == 0) {
+                if (!value.isEmpty()) {
+                    if (temp.getSessionConfig().getSessionTrackingModes().isEmpty()) {
                         temp.getSessionConfig().getSessionTrackingModes().addAll(value);
                     } else if (value.equals(
                             temp.getSessionConfig().getSessionTrackingModes())) {
@@ -1842,7 +1838,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         taglibs.putAll(temp.getTaglibs());
 
         for (WebXml fragment : fragments) {
-            if (fragment.alwaysAddWelcomeFiles || welcomeFiles.size() == 0) {
+            if (fragment.alwaysAddWelcomeFiles || welcomeFiles.isEmpty()) {
                 for (String welcomeFile : fragment.getWelcomeFiles()) {
                     addWelcomeFile(welcomeFile);
                 }
@@ -2041,10 +2037,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 dest.setAsyncSupported(src.getAsyncSupported().toString());
             }
         } else if (src.getAsyncSupported() != null) {
-            if (failOnConflict &&
-                    !src.getAsyncSupported().equals(dest.getAsyncSupported())) {
-                return false;
-            }
+            return !failOnConflict ||
+                src.getAsyncSupported().equals(dest.getAsyncSupported());
         }
 
         return true;
@@ -2084,11 +2078,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         if (dest.getMaxRequestSize() == null) {
             dest.setMaxRequestSize(src.getMaxRequestSize());
         } else if (src.getMaxRequestSize() != null) {
-            if (failOnConflict &&
-                    !src.getMaxRequestSize().equals(
-                            dest.getMaxRequestSize())) {
-                return false;
-            }
+            return !failOnConflict ||
+                src.getMaxRequestSize().equals(dest.getMaxRequestSize());
         }
 
         return true;
@@ -2282,7 +2273,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         // The remainder of the processing needs to know about container
         // fragments
-        if (containerFragments.size() > 0) {
+        if (!containerFragments.isEmpty()) {
             Set<WebXml> result = new LinkedHashSet<>();
             if (containerFragments.iterator().next().getDelegate()) {
                 result.addAll(containerFragments);
@@ -2310,7 +2301,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             Set<WebXml> unordered) {
         Set<WebXml> addedThisRound = new HashSet<>();
         Set<WebXml> addedLastRound = new HashSet<>();
-        while (unordered.size() > 0) {
+        while (!unordered.isEmpty()) {
             Iterator<WebXml> source = unordered.iterator();
             while (source.hasNext()) {
                 WebXml fragment = source.next();
@@ -2323,7 +2314,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                     source.remove();
                 }
             }
-            if (addedThisRound.size() == 0) {
+            if (addedThisRound.isEmpty()) {
                 // Circular
                 throw new IllegalArgumentException(
                         sm.getString("webXml.mergeConflictOrder"));

@@ -244,9 +244,6 @@ public class IPv6Utils {
                 colonsCounter++;
             }
         }
-        if (colonsCounter < 2) {
-            return false;
-        }
-        return true;
+        return colonsCounter >= 2;
     }
 }

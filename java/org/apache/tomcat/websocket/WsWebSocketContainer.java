@@ -156,11 +156,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         if (configurator != null) {
             builder.configurator(configurator);
         }
-        ClientEndpointConfig config = builder.decoders(Arrays.asList(annotation.decoders()))
+        return builder.decoders(Arrays.asList(annotation.decoders()))
                 .encoders(Arrays.asList(annotation.encoders()))
                 .preferredSubprotocols(Arrays.asList(annotation.subprotocols())).build();
-
-        return config;
     }
 
 
@@ -389,7 +387,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
             // Sub-protocol
             List<String> protocolHeaders = handshakeResponse.getHeaders().get(Constants.WS_PROTOCOL_HEADER_NAME);
-            if (protocolHeaders == null || protocolHeaders.size() == 0) {
+            if (protocolHeaders == null || protocolHeaders.isEmpty()) {
                 subProtocol = null;
             } else if (protocolHeaders.size() == 1) {
                 subProtocol = protocolHeaders.get(0);
@@ -445,7 +443,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         WsRemoteEndpointImplClient wsRemoteEndpointClient = new WsRemoteEndpointImplClient(channel);
 
         WsSession wsSession = new WsSession(clientEndpointHolder, wsRemoteEndpointClient, this, extensionsAgreed,
-                subProtocol, Collections.<String, String>emptyMap(), secure, clientEndpointConfiguration);
+                subProtocol, Collections.emptyMap(), secure, clientEndpointConfiguration);
 
         WsFrameClient wsFrameClient = new WsFrameClient(response, channel, wsSession, transformation);
         // WsFrame adds the necessary final transformations. Copy the
@@ -578,7 +576,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             return;
         }
         synchronized (endPointSessionMapLock) {
-            if (endpointSessionMap.size() == 0) {
+            if (endpointSessionMap.isEmpty()) {
                 BackgroundProcessManager.getInstance().register(this);
             }
             endpointSessionMap.computeIfAbsent(key, k -> new HashSet<>()).add(wsSession);
@@ -593,11 +591,11 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             Set<WsSession> wsSessions = endpointSessionMap.get(key);
             if (wsSessions != null) {
                 wsSessions.remove(wsSession);
-                if (wsSessions.size() == 0) {
+                if (wsSessions.isEmpty()) {
                     endpointSessionMap.remove(key);
                 }
             }
-            if (endpointSessionMap.size() == 0) {
+            if (endpointSessionMap.isEmpty()) {
                 BackgroundProcessManager.getInstance().unregister(this);
             }
         }
@@ -667,12 +665,12 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         headers.put(Constants.WS_KEY_HEADER_NAME, wsKeyValues);
 
         // WebSocket sub-protocols
-        if (subProtocols != null && subProtocols.size() > 0) {
+        if (subProtocols != null && !subProtocols.isEmpty()) {
             headers.put(Constants.WS_PROTOCOL_HEADER_NAME, subProtocols);
         }
 
         // WebSocket extensions
-        if (extensions != null && extensions.size() > 0) {
+        if (extensions != null && !extensions.isEmpty()) {
             headers.put(Constants.WS_EXTENSIONS_HEADER_NAME, generateExtensionHeaders(extensions));
         }
 
@@ -689,7 +687,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 header.append(';');
                 header.append(param.getName());
                 String value = param.getValue();
-                if (value != null && value.length() > 0) {
+                if (value != null && !value.isEmpty()) {
                     header.append('=');
                     header.append(value);
                 }
@@ -869,7 +867,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         // All ISO-8859-1
         StringBuilder sb = new StringBuilder();
 
-        char c = 0;
+        char c;
         while (response.hasRemaining()) {
             c = (char) response.get();
             sb.append(c);

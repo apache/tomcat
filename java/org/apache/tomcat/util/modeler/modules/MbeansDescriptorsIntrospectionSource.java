@@ -142,10 +142,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 return true;
             }
         }
-        if (isBeanCompatible(ret)) {
-            return true;
-        }
-        return false;
+        return isBeanCompatible(ret);
     }
 
     /**
@@ -169,7 +166,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
         }
 
         try {
-            javaType.getConstructor(new Class[]{});
+            javaType.getConstructor();
         } catch (NoSuchMethodException e) {
             return false;
         }
@@ -180,9 +177,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
             superClass != Object.class &&
             superClass != Exception.class &&
             superClass != Throwable.class) {
-            if (!isBeanCompatible(superClass)) {
-                return false;
-            }
+            return isBeanCompatible(superClass);
         }
         return true;
     }
@@ -312,16 +307,12 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
                 if (gm != null) {
                     ai.setGetMethod(gm.getName());
                     Class<?> t = gm.getReturnType();
-                    if (t != null) {
-                        ai.setType(t.getName());
-                    }
+                    ai.setType(t.getName());
                 }
                 Method sm = setAttMap.get(name);
                 if (sm != null) {
                     Class<?> t = sm.getParameterTypes()[0];
-                    if (t != null) {
-                        ai.setType(t.getName());
-                    }
+                    ai.setType(t.getName());
                     ai.setSetMethod(sm.getName());
                 }
                 ai.setDescription("Introspected attribute " + name);
@@ -378,10 +369,10 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      * @return String
      */
     private static String unCapitalize(String name) {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return name;
         }
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
     }

@@ -39,8 +39,8 @@ class ByteBufferUtilsUnsafe {
 
     static {
         ByteBuffer tempBuffer = ByteBuffer.allocateDirect(0);
-        Object unsafeLocal = null;
-        Method invokeCleanerMethodLocal = null;
+        Object unsafeLocal;
+        Method invokeCleanerMethodLocal;
         try {
             Class<?> clazz = Class.forName("sun.misc.Unsafe");
             Field theUnsafe = clazz.getDeclaredField("theUnsafe");

@@ -92,7 +92,7 @@ public class ResourceRef extends AbstractRef {
                        String scope, String auth, boolean singleton,
                        String factory, String factoryLocation) {
         super(resourceClass, factory, factoryLocation);
-        StringRefAddr refAddr = null;
+        StringRefAddr refAddr;
         if (description != null) {
             refAddr = new StringRefAddr(DESCRIPTION, description);
             add(refAddr);

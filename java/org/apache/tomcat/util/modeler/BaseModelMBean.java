@@ -154,7 +154,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
         }
 
         Method m=managedBean.getGetter(name, this, resource);
-        Object result = null;
+        Object result;
         try {
             Class<?> declaring = m.getDeclaringClass();
             // workaround for catalina weird mbeans - the declaring class is BaseModelMBean.
@@ -190,7 +190,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
 
 
     @Override
-    public AttributeList getAttributes(String names[]) {
+    public AttributeList getAttributes(String[] names) {
 
         // Validate the input parameters
         if (names == null) {
@@ -234,11 +234,10 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
      * MBean.</p>
      */
     @Override
-    public Object invoke(String name, Object params[], String signature[])
-        throws MBeanException, ReflectionException
-    {
-        if( (resource instanceof DynamicMBean) &&
-             ! ( resource instanceof BaseModelMBean )) {
+    public Object invoke(String name, Object[] params, String[] signature)
+        throws MBeanException, ReflectionException {
+        if ((resource instanceof DynamicMBean) &&
+             ! (resource instanceof BaseModelMBean)) {
             return ((DynamicMBean)resource).invoke(name, params, signature);
         }
 
@@ -253,13 +252,13 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
             log.trace("Invoke " + name);
         }
 
-        Method method= managedBean.getInvoke(name, params, signature, this, resource);
+        Method method = managedBean.getInvoke(name, params, signature, this, resource);
 
         // Invoke the selected method on the appropriate object
-        Object result = null;
+        Object result;
         try {
-            if( method.getDeclaringClass().isAssignableFrom( this.getClass()) ) {
-                result = method.invoke(this, params );
+            if (method.getDeclaringClass().isAssignableFrom( this.getClass())) {
+                result = method.invoke(this, params);
             } else {
                 result = method.invoke(resource, params);
             }
@@ -291,8 +290,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
     }
 
     static Class<?> getAttributeClass(String signature)
-        throws ReflectionException
-    {
+        throws ReflectionException {
         if (signature.equals(Boolean.TYPE.getName())) {
             return Boolean.TYPE;
         } else if (signature.equals(Byte.TYPE.getName())) {
@@ -311,11 +309,12 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
             return Short.TYPE;
         } else {
             try {
-                ClassLoader cl=Thread.currentThread().getContextClassLoader();
-                if( cl!=null ) {
+                ClassLoader cl = Thread.currentThread().getContextClassLoader();
+                if (cl!=null) {
                     return cl.loadClass(signature);
                 }
-            } catch( ClassNotFoundException e ) {
+            } catch(ClassNotFoundException e) {
+                // Ignore
             }
             try {
                 return Class.forName(signature);
@@ -328,8 +327,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
     @Override
     public void setAttribute(Attribute attribute)
         throws AttributeNotFoundException, MBeanException,
-        ReflectionException
-    {
+        ReflectionException {
         if( log.isTraceEnabled() ) {
             log.trace("Setting attribute " + this + " " + attribute );
         }
@@ -368,9 +366,9 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
 
         try {
             if( m.getDeclaringClass().isAssignableFrom( this.getClass()) ) {
-                m.invoke(this, new Object[] { value });
+                m.invoke(this, value);
             } else {
-                m.invoke(resource, new Object[] { value });
+                m.invoke(resource, value);
             }
         } catch (InvocationTargetException e) {
             Throwable t = e.getTargetException();
@@ -423,7 +421,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
         }
 
         // Prepare and return our response, eating all exceptions
-        String names[] = new String[attributes.size()];
+        String[] names = new String[attributes.size()];
         int n = 0;
         for (Object attribute : attributes) {
             Attribute item = (Attribute) attribute;
@@ -593,7 +591,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
         throws MBeanException, RuntimeOperationsException {
 
         // Calculate the class name for the change notification
-        String type = null;
+        String type;
         if (newValue.getValue() != null) {
             type = newValue.getValue().getClass().getName();
         } else if (oldValue.getValue() != null) {
@@ -692,8 +690,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
     public MBeanNotificationInfo[] getNotificationInfo() {
 
         // Acquire the set of application notifications
-        MBeanNotificationInfo current[] = getMBeanInfo().getNotifications();
-        MBeanNotificationInfo response[] =
+        MBeanNotificationInfo[] current = getMBeanInfo().getNotifications();
+        MBeanNotificationInfo[] response =
             new MBeanNotificationInfo[current.length + 2];
  //       Descriptor descriptor = null;
 

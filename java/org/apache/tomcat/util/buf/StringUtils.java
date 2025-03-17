@@ -112,7 +112,7 @@ public final class StringUtils {
      * @return An array of String values.
      */
     public static String[] splitCommaSeparated(String s) {
-        if (s == null || s.length() == 0) {
+        if (s == null || s.isEmpty()) {
             return new String[0];
         }
 

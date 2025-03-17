@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -73,7 +74,7 @@ public class WsSession implements Session {
 
     private static final boolean SEC_CONFIGURATOR_USES_IMPL_DEFAULT;
 
-    private static AtomicLong ids = new AtomicLong(0);
+    private static final AtomicLong ids = new AtomicLong(0);
 
     static {
         // Use fake end point and path. They are never used, they just need to
@@ -108,14 +109,14 @@ public class WsSession implements Session {
     // Expected to handle message types of <ByteBuffer> only
     private volatile MessageHandler binaryMessageHandler = null;
     private volatile MessageHandler.Whole<PongMessage> pongMessageHandler = null;
-    private AtomicReference<State> state = new AtomicReference<>(State.OPEN);
+    private final AtomicReference<State> state = new AtomicReference<>(State.OPEN);
     private final Map<String, Object> userProperties = new ConcurrentHashMap<>();
     private volatile int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
     private volatile long lastActiveRead = System.currentTimeMillis();
     private volatile long lastActiveWrite = System.currentTimeMillis();
-    private Map<FutureToSendHandler, FutureToSendHandler> futures = new ConcurrentHashMap<>();
+    private final Map<FutureToSendHandler, FutureToSendHandler> futures = new ConcurrentHashMap<>();
     private volatile Long sessionCloseTimeoutExpiry;
 
 
@@ -156,11 +157,7 @@ public class WsSession implements Session {
         this.userPrincipal = null;
         this.httpSessionId = null;
         this.negotiatedExtensions = negotiatedExtensions;
-        if (subProtocol == null) {
-            this.subProtocol = "";
-        } else {
-            this.subProtocol = subProtocol;
-        }
+        this.subProtocol = Objects.requireNonNullElse(subProtocol, "");
         this.pathParameters = pathParameters;
         this.secure = secure;
         this.wsRemoteEndpoint.setEncoders(clientEndpointConfig);
@@ -220,20 +217,12 @@ public class WsSession implements Session {
         this.maxTextMessageBufferSize = webSocketContainer.getDefaultMaxTextMessageBufferSize();
         this.maxIdleTimeout = webSocketContainer.getDefaultMaxSessionIdleTimeout();
         this.requestUri = requestUri;
-        if (requestParameterMap == null) {
-            this.requestParameterMap = Collections.emptyMap();
-        } else {
-            this.requestParameterMap = requestParameterMap;
-        }
+        this.requestParameterMap = Objects.requireNonNullElse(requestParameterMap, Collections.emptyMap());
         this.queryString = queryString;
         this.userPrincipal = userPrincipal;
         this.httpSessionId = httpSessionId;
         this.negotiatedExtensions = negotiatedExtensions;
-        if (subProtocol == null) {
-            this.subProtocol = "";
-        } else {
-            this.subProtocol = subProtocol;
-        }
+        this.subProtocol = Objects.requireNonNullElse(subProtocol, "");
         this.pathParameters = pathParameters;
         this.secure = secure;
         this.wsRemoteEndpoint.setEncoders(serverEndpointConfig);
@@ -280,11 +269,8 @@ public class WsSession implements Session {
         if (configurator.getClass().equals(DefaultServerEndpointConfigurator.class)) {
             return true;
         }
-        if (SEC_CONFIGURATOR_USES_IMPL_DEFAULT &&
-                configurator.getClass().equals(ServerEndpointConfig.Configurator.class)) {
-            return true;
-        }
-        return false;
+        return SEC_CONFIGURATOR_USES_IMPL_DEFAULT &&
+            configurator.getClass().equals(Configurator.class);
     }
 
 
@@ -781,7 +767,7 @@ public class WsSession implements Session {
         }
 
         String reason = closeReason.getReasonPhrase();
-        if (reason != null && reason.length() > 0) {
+        if (reason != null && !reason.isEmpty()) {
             appendCloseReasonWithTruncation(msg, reason);
         }
         msg.flip();

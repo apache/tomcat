@@ -80,7 +80,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 try {
                     for (String c: SSL.getCiphers(ssl)) {
                         // Filter out bad input.
-                        if (c == null || c.length() == 0 || availableCipherSuites.contains(c)) {
+                        if (c == null || c.isEmpty() || availableCipherSuites.contains(c)) {
                             continue;
                         }
                         availableCipherSuites.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
@@ -566,7 +566,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         // Write encrypted data to network BIO
-        int written = 0;
+        int written;
         try {
             written = writeEncryptedData(state.networkBIO, src);
         } catch (Exception e) {
@@ -732,8 +732,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public String[] getSupportedCipherSuites() {
-        Set<String> availableCipherSuites = AVAILABLE_CIPHER_SUITES;
-        return availableCipherSuites.toArray(new String[0]);
+        return AVAILABLE_CIPHER_SUITES.toArray(new String[0]);
     }
 
     @Override

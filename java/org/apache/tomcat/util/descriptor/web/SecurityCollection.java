@@ -80,13 +80,13 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
     /**
      * The HTTP methods explicitly covered by this web resource collection.
      */
-    private String methods[] = new String[0];
+    private String[] methods = new String[0];
 
 
     /**
      * The HTTP methods explicitly excluded from this web resource collection.
      */
-    private String omittedMethods[] = new String[0];
+    private String[] omittedMethods = new String[0];
 
     /**
      * The name of this web resource collection.
@@ -97,7 +97,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
     /**
      * The URL patterns protected by this security collection.
      */
-    private String patterns[] = new String[0];
+    private String[] patterns = new String[0];
 
 
     /**
@@ -235,11 +235,9 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
             }
             return false;
         }
-        if (omittedMethods.length > 0) {
-            for (String omittedMethod : omittedMethods) {
-                if (omittedMethod.equals(method)) {
-                    return false;
-                }
+        for (String omittedMethod : omittedMethods) {
+            if (omittedMethod.equals(method)) {
+                return false;
             }
         }
         return true;
@@ -247,7 +245,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * @return the set of HTTP request methods that are part of this web
+     * @return the array of HTTP request methods that are part of this web
      * resource collection, or a zero-length array if no methods have been
      * explicitly included.
      */
@@ -257,7 +255,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * @return the set of HTTP request methods that are explicitly excluded from
+     * @return the array of HTTP request methods that are explicitly excluded from
      * this web resource collection, or a zero-length array if no request
      * methods are excluded.
      */
@@ -283,7 +281,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * @return the set of URL patterns that are part of this web resource
+     * @return the array of URL patterns that are part of this web resource
      * collection.  If none have been specified, a zero-length array is
      * returned.
      */
@@ -312,7 +310,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
         }
         if (n >= 0) {
             int j = 0;
-            String results[] = new String[methods.length - 1];
+            String[] results = new String[methods.length - 1];
             for (int i = 0; i < methods.length; i++) {
                 if (i != n) {
                     results[j++] = methods[i];
@@ -344,7 +342,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
         }
         if (n >= 0) {
             int j = 0;
-            String results[] = new String[omittedMethods.length - 1];
+            String[] results = new String[omittedMethods.length - 1];
             for (int i = 0; i < omittedMethods.length; i++) {
                 if (i != n) {
                     results[j++] = omittedMethods[i];
@@ -376,7 +374,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
         }
         if (n >= 0) {
             int j = 0;
-            String results[] = new String[patterns.length - 1];
+            String[] results = new String[patterns.length - 1];
             for (int i = 0; i < patterns.length; i++) {
                 if (i != n) {
                     results[j++] = patterns[i];

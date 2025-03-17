@@ -80,7 +80,7 @@ public class EjbRef extends AbstractRef {
     public EjbRef(String ejbType, String home, String remote, String link,
             String factory, String factoryLocation) {
         super(home, factory, factoryLocation);
-        StringRefAddr refAddr = null;
+        StringRefAddr refAddr;
         if (ejbType != null) {
             refAddr = new StringRefAddr(TYPE, ejbType);
             add(refAddr);

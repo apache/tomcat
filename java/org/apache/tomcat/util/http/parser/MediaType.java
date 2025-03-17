@@ -37,7 +37,7 @@ public class MediaType {
         this.parameters = parameters;
 
         String cs = parameters.get("charset");
-        if (cs != null && cs.length() > 0 && cs.charAt(0) == '"') {
+        if (cs != null && !cs.isEmpty() && cs.charAt(0) == '"') {
             cs = HttpParser.unquote(cs);
         }
         this.charset = cs;
@@ -74,7 +74,7 @@ public class MediaType {
                     result.append(subtype);
                     for (Map.Entry<String,String> entry : parameters.entrySet()) {
                         String value = entry.getValue();
-                        if (value == null || value.length() == 0) {
+                        if (value == null || value.isEmpty()) {
                             continue;
                         }
                         result.append(';');
@@ -128,7 +128,7 @@ public class MediaType {
 
         // Type (required)
         String type = HttpParser.readToken(input);
-        if (type == null || type.length() == 0) {
+        if (type == null || type.isEmpty()) {
             return null;
         }
 
@@ -138,7 +138,7 @@ public class MediaType {
 
         // Subtype (required)
         String subtype = HttpParser.readToken(input);
-        if (subtype == null || subtype.length() == 0) {
+        if (subtype == null || subtype.isEmpty()) {
             return null;
         }
 

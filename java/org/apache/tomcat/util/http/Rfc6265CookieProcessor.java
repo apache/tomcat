@@ -115,7 +115,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
         header.append(cookie.getName());
         header.append('=');
         String value = cookie.getValue();
-        if (value != null && value.length() > 0) {
+        if (value != null && !value.isEmpty()) {
             validateCookieValue(value);
             header.append(value);
         }
@@ -143,14 +143,14 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
         }
 
         String domain = cookie.getDomain();
-        if (domain != null && domain.length() > 0) {
+        if (domain != null && !domain.isEmpty()) {
             validateDomain(domain);
             header.append("; Domain=");
             header.append(domain);
         }
 
         String path = cookie.getPath();
-        if (path != null && path.length() > 0) {
+        if (path != null && !path.isEmpty()) {
             validatePath(path);
             header.append("; Path=");
             header.append(path);
@@ -239,7 +239,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
 
     private void validateDomain(String domain) {
         int i = 0;
-        int prev = -1;
+        int prev;
         int cur = -1;
         char[] chars = domain.toCharArray();
         while (i < chars.length) {

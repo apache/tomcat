@@ -149,7 +149,7 @@ public class NoDescriptorRegistry extends Registry {
         @Override
         public ObjectInstance createMBean(String className, ObjectName name)
                 throws ReflectionException, InstanceAlreadyExistsException,
-                MBeanRegistrationException, NotCompliantMBeanException, MBeanRegistrationException {
+                MBeanRegistrationException, NotCompliantMBeanException {
             return null;
         }
 
@@ -157,8 +157,7 @@ public class NoDescriptorRegistry extends Registry {
         @Override
         public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName)
                 throws ReflectionException, InstanceAlreadyExistsException,
-                MBeanRegistrationException, NotCompliantMBeanException, InstanceNotFoundException,
-                MBeanRegistrationException {
+                MBeanRegistrationException, NotCompliantMBeanException, InstanceNotFoundException {
             return null;
         }
 
@@ -166,7 +165,7 @@ public class NoDescriptorRegistry extends Registry {
         @Override
         public ObjectInstance createMBean(String className, ObjectName name, Object[] params,
                 String[] signature) throws ReflectionException, InstanceAlreadyExistsException,
-                MBeanRegistrationException, NotCompliantMBeanException, MBeanRegistrationException {
+                MBeanRegistrationException, NotCompliantMBeanException {
             return null;
         }
 
@@ -175,7 +174,7 @@ public class NoDescriptorRegistry extends Registry {
         public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName,
                 Object[] params, String[] signature) throws ReflectionException,
                 InstanceAlreadyExistsException, MBeanRegistrationException,
-                NotCompliantMBeanException, InstanceNotFoundException, MBeanRegistrationException {
+                NotCompliantMBeanException, InstanceNotFoundException {
             return null;
         }
 

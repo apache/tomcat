@@ -261,7 +261,7 @@ public class ContextBindings {
      */
     public static Context getClassLoader() throws NamingException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        Context context = null;
+        Context context;
         do {
             context = clBindings.get(cl);
             if (context != null) {
@@ -278,7 +278,7 @@ public class ContextBindings {
      */
     static String getClassLoaderName() throws NamingException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        Object obj = null;
+        Object obj;
         do {
             obj = clObjectBindings.get(cl);
             if (obj != null) {

@@ -38,8 +38,8 @@ import org.apache.tomcat.util.buf.UriUtil;
 public interface ConfigurationSource {
 
     ConfigurationSource DEFAULT = new ConfigurationSource() {
-        protected final File userDir = new File(System.getProperty("user.dir"));
-        protected final URI userDirUri = userDir.toURI();
+        private final File userDir = new File(System.getProperty("user.dir"));
+        private final URI userDirUri = userDir.toURI();
         @Override
         public Resource getResource(String name) throws IOException {
             if (!UriUtil.isAbsoluteURI(name)) {
@@ -52,7 +52,7 @@ public interface ConfigurationSource {
                     return new Resource(fis, f.toURI());
                 }
             }
-            URI uri = null;
+            URI uri;
             try {
                 uri = userDirUri.resolve(name);
             } catch (IllegalArgumentException e) {

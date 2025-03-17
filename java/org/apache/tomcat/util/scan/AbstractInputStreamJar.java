@@ -137,12 +137,7 @@ public abstract class AbstractInputStreamJar implements Jar {
 
     @Override
     public String getURL(String entry) {
-        StringBuilder result = new StringBuilder("jar:");
-        result.append(getJarFileURL().toExternalForm());
-        result.append("!/");
-        result.append(entry);
-
-        return result.toString();
+        return "jar:" + getJarFileURL().toExternalForm() + "!/" + entry;
     }
 
 

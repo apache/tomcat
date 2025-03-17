@@ -49,7 +49,7 @@ public final class UEncoder {
 
     // Not static - the set may differ ( it's better than adding
     // an extra check for "/", "+", etc
-    private BitSet safeChars = null;
+    private final BitSet safeChars;
     private C2BConverter c2b = null;
     private ByteChunk bb = null;
     private CharChunk cb = null;
@@ -117,7 +117,7 @@ public final class UEncoder {
         return output;
     }
 
-    protected void urlEncode(CharChunk out, ByteChunk bb) throws IOException {
+    private void urlEncode(CharChunk out, ByteChunk bb) throws IOException {
         byte[] bytes = bb.getBuffer();
         for (int j = bb.getStart(); j < bb.getEnd(); j++) {
             out.append('%');
