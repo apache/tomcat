@@ -117,24 +117,15 @@ public class JSONFilter {
     }
 
     private static char getPopularChar(char c) {
-        switch (c) {
-            case '"':
-            case '\\':
-            case '/':
-                return c;
-            case 0x8:
-                return 'b';
-            case 0xc:
-                return 'f';
-            case 0xa:
-                return 'n';
-            case 0xd:
-                return 'r';
-            case 0x9:
-                return 't';
-            default:
-                return 0;
-        }
+        return switch (c) {
+            case '"', '\\', '/' -> c;
+            case 0x8 -> 'b';
+            case 0xc -> 'f';
+            case 0xa -> 'n';
+            case 0xd -> 'r';
+            case 0x9 -> 't';
+            default -> 0;
+        };
     }
 
 }

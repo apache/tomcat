@@ -163,7 +163,7 @@ public class SecureNioChannel extends NioChannel {
             return SelectionKey.OP_WRITE; //we still have data to write
         }
 
-        SSLEngineResult handshake = null;
+        SSLEngineResult handshake;
 
         while (!handshakeComplete) {
             switch (handshakeStatus) {
@@ -398,8 +398,7 @@ public class SecureNioChannel extends NioChannel {
             throw x;
         } catch (Exception cx) {
             closeSilently();
-            IOException x = new IOException(cx);
-            throw x;
+            throw new IOException(cx);
         } finally {
             if (key != null) {
                 try {
@@ -423,7 +422,7 @@ public class SecureNioChannel extends NioChannel {
      * @return the status
      */
     protected SSLEngineResult.HandshakeStatus tasks() {
-        Runnable r = null;
+        Runnable r;
         while ((r = sslEngine.getDelegatedTask()) != null) {
             r.run();
         }
@@ -470,7 +469,7 @@ public class SecureNioChannel extends NioChannel {
             }
         }
         SSLEngineResult result;
-        boolean cont = false;
+        boolean cont;
         //loop while we can perform pure SSLEngine data
         do {
             //prepare the buffer with the incoming data
@@ -804,8 +803,7 @@ public class SecureNioChannel extends NioChannel {
     public int write(ByteBuffer src) throws IOException {
         checkInterruptStatus();
         if (src == this.netOutBuffer) {
-            int written = sc.write(src);
-            return written;
+            return sc.write(src);
         } else {
             // Are we closing or closed?
             if (closing || closed) {
@@ -923,6 +921,6 @@ public class SecureNioChannel extends NioChannel {
     private enum OverflowState {
         NONE,
         PROCESSING,
-        DONE;
+        DONE
     }
 }

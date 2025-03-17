@@ -274,10 +274,7 @@ public class TLSClientHelloExtractor {
         // Next two bytes are major/minor version. We need at least 3.1.
         byte b2 = bb.get();
         byte b3 = bb.get();
-        if (b2 < 3 || b2 == 3 && b3 == 0) {
-            return false;
-        }
-        return true;
+        return b2 >= 3 && (b2 != 3 || b3 != 0);
     }
 
 
@@ -286,7 +283,7 @@ public class TLSClientHelloExtractor {
         // Note: The actual request is not important. This code only checks that
         //       the buffer contains a correctly formatted HTTP request line.
         //       The method, target and protocol are not validated.
-        byte chr = 0;
+        byte chr;
         bb.position(0);
 
         // Skip blank lines
@@ -352,10 +349,7 @@ public class TLSClientHelloExtractor {
 
     private static boolean isClientHello(ByteBuffer bb) {
         // Client hello is handshake type 1
-        if (bb.get() == 1) {
-            return true;
-        }
-        return false;
+        return bb.get() == 1;
     }
 
 
@@ -374,25 +368,14 @@ public class TLSClientHelloExtractor {
 
     private static String readProtocol(ByteBuffer bb) {
         char protocol = bb.getChar();
-        switch (protocol) {
-            case 0x0300: {
-                return Constants.SSL_PROTO_SSLv3;
-            }
-            case 0x0301: {
-                return Constants.SSL_PROTO_TLSv1_0;
-            }
-            case 0x0302: {
-                return Constants.SSL_PROTO_TLSv1_1;
-            }
-            case 0x0303: {
-                return Constants.SSL_PROTO_TLSv1_2;
-            }
-            case 0x0304: {
-                return Constants.SSL_PROTO_TLSv1_3;
-            }
-            default:
-                return "Unknown(0x" + HexUtils.toHexString(protocol) + ")";
-        }
+        return switch (protocol) {
+            case 0x0300 -> Constants.SSL_PROTO_SSLv3;
+            case 0x0301 -> Constants.SSL_PROTO_TLSv1_0;
+            case 0x0302 -> Constants.SSL_PROTO_TLSv1_1;
+            case 0x0303 -> Constants.SSL_PROTO_TLSv1_2;
+            case 0x0304 -> Constants.SSL_PROTO_TLSv1_3;
+            default -> "Unknown(0x" + HexUtils.toHexString(protocol) + ")";
+        };
     }
 
 
@@ -419,7 +402,7 @@ public class TLSClientHelloExtractor {
             bb.get(inputBuffer, 0, len);
             protocolNames.add(new String(inputBuffer, 0, len, StandardCharsets.UTF_8));
             toRead--;
-            toRead -= len;
+            toRead -= (char) len;
         }
     }
 

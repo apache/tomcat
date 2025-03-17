@@ -124,13 +124,10 @@ public class MultipartDef implements Serializable {
             return false;
         }
         if (maxRequestSize == null) {
-            if (other.maxRequestSize != null) {
-                return false;
-            }
-        } else if (!maxRequestSize.equals(other.maxRequestSize)) {
-            return false;
+            return other.maxRequestSize == null;
+        } else {
+            return maxRequestSize.equals(other.maxRequestSize);
         }
-        return true;
     }
 
 }

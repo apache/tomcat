@@ -33,7 +33,7 @@ public class VirtualThreadExecutor extends AbstractExecutorService {
 
     private static final StringManager sm = StringManager.getManager(VirtualThreadExecutor.class);
 
-    private CountDownLatch shutdown = new CountDownLatch(1);
+    private final CountDownLatch shutdown = new CountDownLatch(1);
 
     private final JreCompat jreCompat = JreCompat.getInstance();
 

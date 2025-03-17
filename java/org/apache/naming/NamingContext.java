@@ -191,7 +191,7 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -247,7 +247,7 @@ public class NamingContext implements Context {
     public NamingEnumeration<NameClassPair> list(Name name)
         throws NamingException {
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -280,7 +280,7 @@ public class NamingContext implements Context {
     public NamingEnumeration<Binding> listBindings(Name name)
         throws NamingException {
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -316,7 +316,7 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -398,7 +398,7 @@ public class NamingContext implements Context {
     public NameParser getNameParser(Name name)
         throws NamingException {
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -505,7 +505,7 @@ public class NamingContext implements Context {
         throws NamingException {
 
         // Removing empty parts
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
@@ -604,7 +604,7 @@ public class NamingContext implements Context {
             return;
         }
 
-        while ((!name.isEmpty()) && (name.get(0).length() == 0)) {
+        while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {

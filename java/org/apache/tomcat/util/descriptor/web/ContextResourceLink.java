@@ -111,12 +111,9 @@ public class ContextResourceLink extends ResourceBase {
             return false;
         }
         if (global == null) {
-            if (other.global != null) {
-                return false;
-            }
-        } else if (!global.equals(other.global)) {
-            return false;
+            return other.global == null;
+        } else {
+            return global.equals(other.global);
         }
-        return true;
     }
 }

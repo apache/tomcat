@@ -53,7 +53,7 @@ public class TaskThread extends Thread {
      * instead of letting it go and potentially trigger a break in a debugger.
      */
     private static class WrappingRunnable implements Runnable {
-        private Runnable wrappedRunnable;
+        private final Runnable wrappedRunnable;
         WrappingRunnable(Runnable wrappedRunnable) {
             this.wrappedRunnable = wrappedRunnable;
         }

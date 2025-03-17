@@ -43,8 +43,8 @@ public class UriTemplate {
 
     public UriTemplate(String path) throws DeploymentException {
 
-        if (path == null || path.length() == 0 || !path.startsWith("/") || path.contains("/../") ||
-                path.contains("/./") || path.contains("//")) {
+        if (path == null || !path.startsWith("/") || path.contains("/../") ||
+            path.contains("/./") || path.contains("//")) {
             throw new DeploymentException(sm.getString("uriTemplate.invalidPath", path));
         }
 
@@ -58,7 +58,7 @@ public class UriTemplate {
 
         for (int i = 0; i < segments.length; i++) {
             String segment = segments[i];
-            if (segment.length() == 0) {
+            if (segment.isEmpty()) {
                 if (i == 0 || (i == segments.length - 1 && paramCount == 0)) {
                     // Ignore the first empty segment as the path must always
                     // start with '/'

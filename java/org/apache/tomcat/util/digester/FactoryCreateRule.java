@@ -35,7 +35,7 @@ public class FactoryCreateRule extends Rule {
     // ----------------------------------------------------------- Fields
 
     /** Should exceptions thrown by the factory be ignored? */
-    private boolean ignoreCreateExceptions;
+    private final boolean ignoreCreateExceptions;
     /** Stock to manage */
     private ArrayStack<Boolean> exceptionIgnoredStack;
 
@@ -66,7 +66,7 @@ public class FactoryCreateRule extends Rule {
      * as required based on the attributes specified in the matched XML
      * element.
      */
-    protected ObjectCreationFactory creationFactory = null;
+    protected ObjectCreationFactory creationFactory;
 
 
     // --------------------------------------------------------- Public Methods

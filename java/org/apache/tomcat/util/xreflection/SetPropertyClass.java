@@ -32,8 +32,8 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
 
     private final SetPropertyClass parent;
     private final Class<?> clazz;
-    private Set<SetPropertyClass> children = new TreeSet<>();
-    private Set<ReflectionProperty> properties = new TreeSet<>();
+    private final Set<SetPropertyClass> children = new TreeSet<>();
+    private final Set<ReflectionProperty> properties = new TreeSet<>();
     private final boolean isAbstract;
     private final Method genericSetPropertyMethod;
     private final Method genericGetPropertyMethod;
@@ -187,8 +187,8 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
                 ;
 
             } else {
-                code.append(ReflectionLessCodeGenerator.getIndent(3))
-                    .append("//no set" + IntrospectionUtils.capitalize(property.getPropertyName())+ " method found on this class")
+                code.append(ReflectionLessCodeGenerator.getIndent(3)).append("//no set")
+                    .append(IntrospectionUtils.capitalize(property.getPropertyName())).append(" method found on this class")
                     .append(System.lineSeparator())
                     ;
             }
@@ -380,8 +380,8 @@ final class SetPropertyClass implements Comparable<SetPropertyClass> {
                 ;
 
             } else {
-                code.append(ReflectionLessCodeGenerator.getIndent(3))
-                    .append("//no get" + IntrospectionUtils.capitalize(property.getPropertyName())+ " method found on this class")
+                code.append(ReflectionLessCodeGenerator.getIndent(3)).append("//no get")
+                    .append(IntrospectionUtils.capitalize(property.getPropertyName())).append(" method found on this class")
                     .append(System.lineSeparator())
                 ;
             }

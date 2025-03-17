@@ -80,7 +80,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 try {
                     for (String c: SSL.getCiphers(ssl)) {
                         // Filter out bad input.
-                        if (c == null || c.length() == 0 || availableCipherSuites.contains(c)) {
+                        if (c == null || c.isEmpty() || availableCipherSuites.contains(c)) {
                             continue;
                         }
                         availableCipherSuites.add(OpenSSLCipherConfigurationParser.openSSLToJsse(c));
@@ -136,7 +136,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private final OpenSSLState state;
     private final Cleanable cleanable;
-    private ByteBuffer buf = ByteBuffer.allocateDirect(MAX_ENCRYPTED_PACKET_LENGTH);
+    private final ByteBuffer buf = ByteBuffer.allocateDirect(MAX_ENCRYPTED_PACKET_LENGTH);
 
     private enum Accepted { NOT, IMPLICIT, EXPLICIT }
     private Accepted accepted = Accepted.NOT;
@@ -558,7 +558,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         // Write encrypted data to network BIO
-        int written = 0;
+        int written;
         try {
             written = writeEncryptedData(state.networkBIO, src);
         } catch (Exception e) {
@@ -724,8 +724,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public String[] getSupportedCipherSuites() {
-        Set<String> availableCipherSuites = AVAILABLE_CIPHER_SUITES;
-        return availableCipherSuites.toArray(new String[0]);
+        return AVAILABLE_CIPHER_SUITES.toArray(new String[0]);
     }
 
     @Override
@@ -775,7 +774,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             buf.append(':');
         }
 
-        if (buf.length() == 0) {
+        if (buf.isEmpty()) {
             throw new IllegalArgumentException(sm.getString("engine.emptyCipherSuite"));
         }
         buf.setLength(buf.length() - 1);
@@ -841,16 +840,12 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             if (!IMPLEMENTED_PROTOCOLS_SET.contains(p)) {
                 throw new IllegalArgumentException(sm.getString("engine.unsupportedProtocol", p));
             }
-            if (p.equals(Constants.SSL_PROTO_SSLv2)) {
-                sslv2 = true;
-            } else if (p.equals(Constants.SSL_PROTO_SSLv3)) {
-                sslv3 = true;
-            } else if (p.equals(Constants.SSL_PROTO_TLSv1)) {
-                tlsv1 = true;
-            } else if (p.equals(Constants.SSL_PROTO_TLSv1_1)) {
-                tlsv1_1 = true;
-            } else if (p.equals(Constants.SSL_PROTO_TLSv1_2)) {
-                tlsv1_2 = true;
+            switch (p) {
+                case Constants.SSL_PROTO_SSLv2 -> sslv2 = true;
+                case Constants.SSL_PROTO_SSLv3 -> sslv3 = true;
+                case Constants.SSL_PROTO_TLSv1 -> tlsv1 = true;
+                case Constants.SSL_PROTO_TLSv1_1 -> tlsv1_1 = true;
+                case Constants.SSL_PROTO_TLSv1_2 -> tlsv1_2 = true;
             }
         }
         // Enable all and then disable what we not want

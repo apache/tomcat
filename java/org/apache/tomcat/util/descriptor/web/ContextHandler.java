@@ -132,7 +132,7 @@ public class ContextHandler extends ResourceBase {
             sb.append(", class=");
             sb.append(handlerclass);
         }
-        if (this.soapHeaders != null) {
+        if (!soapHeaders.isEmpty()) {
             sb.append(", soap-headers=");
             sb.append(this.soapHeaders);
         }

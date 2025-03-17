@@ -727,9 +727,9 @@ public class OpenSSLCipherConfigurationParser {
                         // Replace the original list with the profile contents
                         elements = cipherList.toArray(new String[0]);
                     } catch (Throwable t) {
-                        t = ExceptionUtils.unwrapInvocationTargetException(t);
-                        ExceptionUtils.handleThrowable(t);
-                        log.error(sm.getString("opensslCipherConfigurationParser.unknownProfile", elements[0]), t);
+                        Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                        ExceptionUtils.handleThrowable(throwable);
+                        log.error(sm.getString("opensslCipherConfigurationParser.unknownProfile", elements[0]), throwable);
                     }
                 } else {
                     // OpenSSL is not available
@@ -860,7 +860,7 @@ public class OpenSSLCipherConfigurationParser {
             }
             builder.append(separator);
         }
-        return builder.toString().substring(0, builder.length() - 1);
+        return builder.substring(0, builder.length() - 1);
     }
 
     public static void usage() {
@@ -912,7 +912,7 @@ public class OpenSSLCipherConfigurationParser {
         }
         Set<Cipher> ciphers = parse(cipherSpec);
         boolean first = true;
-        if(null != ciphers && 0 < ciphers.size()) {
+        if(!ciphers.isEmpty()) {
             for(Cipher cipher : ciphers)
             {
                 if(first) {

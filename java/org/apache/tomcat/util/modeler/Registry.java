@@ -330,8 +330,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @since 1.1
      */
     public String getType(ObjectName oname, String attName) {
-        String type = null;
-        MBeanInfo info = null;
+        String type;
+        MBeanInfo info;
         try {
             info = getMBeanServer().getMBeanInfo(oname);
         } catch (Exception e) {
@@ -339,7 +339,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             return null;
         }
 
-        MBeanAttributeInfo attInfo[] = info.getAttributes();
+        MBeanAttributeInfo[] attInfo = info.getAttributes();
         for (MBeanAttributeInfo mBeanAttributeInfo : attInfo) {
             if (attName.equals(mBeanAttributeInfo.getName())) {
                 type = mBeanAttributeInfo.getType();
@@ -358,14 +358,14 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * @return the operation info for the specified operation
      */
     public MBeanOperationInfo getMethodInfo(ObjectName oname, String opName) {
-        MBeanInfo info = null;
+        MBeanInfo info;
         try {
             info = getMBeanServer().getMBeanInfo(oname);
         } catch (Exception e) {
             log.info(sm.getString("registry.noMetadata", oname));
             return null;
         }
-        MBeanOperationInfo attInfo[] = info.getOperations();
+        MBeanOperationInfo[] attInfo = info.getOperations();
         for (MBeanOperationInfo mBeanOperationInfo : attInfo) {
             if (opName.equals(mBeanOperationInfo.getName())) {
                 return mBeanOperationInfo;
@@ -386,7 +386,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     public MBeanOperationInfo getMethodInfo(ObjectName oname, String opName, int argCount)
         throws InstanceNotFoundException
     {
-        MBeanInfo info = null;
+        MBeanInfo info;
         try {
             info = getMBeanServer().getMBeanInfo(oname);
         } catch (InstanceNotFoundException infe) {
@@ -395,7 +395,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             log.warn(sm.getString("registry.noMetadata", oname), e);
             return null;
         }
-        MBeanOperationInfo attInfo[] = info.getOperations();
+        MBeanOperationInfo[] attInfo = info.getOperations();
         for (MBeanOperationInfo mBeanOperationInfo : attInfo) {
             if (opName.equals(mBeanOperationInfo.getName())
                     && argCount == mBeanOperationInfo.getSignature().length) {
@@ -432,7 +432,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         if (server == null) {
             synchronized (serverLock) {
                 if (server == null) {
-                    if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
+                    if (!MBeanServerFactory.findMBeanServer(null).isEmpty()) {
                         server = MBeanServerFactory.findMBeanServer(null).get(0);
                         if (log.isDebugEnabled()) {
                             log.debug(sm.getString("registry.existingServer"));
@@ -519,7 +519,6 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
         if (type == null || "java.lang.String".equals(type)) {
             // string is default
-            objValue = value;
         } else if ("javax.management.ObjectName".equals(type) || "ObjectName".equals(type)) {
             try {
                 objValue = new ObjectName(value);
@@ -550,9 +549,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         if (log.isTraceEnabled()) {
             log.trace("load " + source);
         }
-        String location = null;
-        String type = null;
-        Object inputsource = null;
+        String location;
+        String type;
+        Object inputsource;
 
         if (source instanceof URL) {
             URL url = (URL) source;
@@ -587,9 +586,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             sourceType = "MbeansDescriptorsDigesterSource";
         }
         ModelerSource ds = getModelerSource(sourceType);
-        List<ObjectName> mbeans = ds.loadDescriptors(this, type, inputsource);
 
-        return mbeans;
+        return ds.loadDescriptors(this, type, inputsource);
     }
 
 
@@ -692,8 +690,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             classLoader = this.getClass().getClassLoader();
         }
 
-        String className = type;
-        String pkg = className;
+        String pkg = type;
         while (pkg.indexOf('.') > 0) {
             int lastComp = pkg.lastIndexOf('.');
             if (lastComp <= 0) {
@@ -717,8 +714,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         }
 
         Class<?> c = Class.forName(type);
-        ModelerSource ds = (ModelerSource) c.getConstructor().newInstance();
-        return ds;
+        return (ModelerSource) c.getConstructor().newInstance();
     }
 
 

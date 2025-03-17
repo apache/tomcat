@@ -47,7 +47,7 @@ public class ResourceLinkFactory implements ObjectFactory {
      */
     private static Context globalContext = null;
 
-    private static Map<ClassLoader,Map<String,String>> globalResourceRegistrations =
+    private static final Map<ClassLoader,Map<String,String>> globalResourceRegistrations =
             new ConcurrentHashMap<>();
 
     // --------------------------------------------------------- Public Methods
@@ -133,7 +133,7 @@ public class ResourceLinkFactory implements ObjectFactory {
         Reference ref = (Reference) obj;
 
         // Read the global ref addr
-        String globalName = null;
+        String globalName;
         RefAddr refAddr = ref.get(ResourceLinkRef.GLOBALNAME);
         if (refAddr != null) {
             globalName = refAddr.getContent().toString();
@@ -142,8 +142,7 @@ public class ResourceLinkFactory implements ObjectFactory {
             if (!validateGlobalResourceAccess(globalName)) {
                 return null;
             }
-            Object result = null;
-            result = globalContext.lookup(globalName);
+            Object result = globalContext.lookup(globalName);
             // Check the expected type
             String expectedClassName = ref.getClassName();
             if (expectedClassName == null) {

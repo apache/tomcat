@@ -115,12 +115,7 @@ public class JarFileUrlJar implements Jar {
 
     @Override
     public String getURL(String entry) {
-        StringBuilder result = new StringBuilder("jar:");
-        result.append(getJarFileURL().toExternalForm());
-        result.append("!/");
-        result.append(entry);
-
-        return result.toString();
+        return "jar:" + getJarFileURL().toExternalForm() + "!/" +  entry;
     }
 
     @Override
@@ -155,7 +150,7 @@ public class JarFileUrlJar implements Jar {
 
             // Enumerate the entries until one is reached that represents an
             // entry that has not been seen before.
-            String name = null;
+            String name;
             while (true) {
                 if (entries.hasMoreElements()) {
                     entry = entries.nextElement();
@@ -168,7 +163,7 @@ public class JarFileUrlJar implements Jar {
                         }
                         name = name.substring(i + 1);
                     }
-                    if (name.length() == 0 || entryNamesSeen.contains(name)) {
+                    if (name.isEmpty() || entryNamesSeen.contains(name)) {
                         continue;
                     }
 
@@ -176,11 +171,10 @@ public class JarFileUrlJar implements Jar {
 
                     // JarFile.getJarEntry is version aware so use it
                     entry = jarFile.getJarEntry(entry.getName());
-                    break;
                 } else {
                     entry = null;
-                    break;
                 }
+                break;
             }
         } else {
             if (entries.hasMoreElements()) {

@@ -33,7 +33,7 @@ public class ConfigFileLoader {
      * a default source based on the calling directory will be used.
      * @return the configuration source in use
      */
-    public static final ConfigurationSource getSource() {
+    public static ConfigurationSource getSource() {
         if (source == null) {
             return ConfigurationSource.DEFAULT;
         }
@@ -45,7 +45,7 @@ public class ConfigFileLoader {
      * configuration resources.
      * @param source The source
      */
-    public static final void setSource(ConfigurationSource source) {
+    public static void setSource(ConfigurationSource source) {
         if (ConfigFileLoader.source == null) {
             ConfigFileLoader.source = source;
         }

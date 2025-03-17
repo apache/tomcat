@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -87,15 +86,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         final Set<String> availableCipherSuites = new LinkedHashSet<>(128);
         availableCipherSuites.addAll(OpenSSLLibrary.findCiphers("ALL"));
         AVAILABLE_CIPHER_SUITES = Collections.unmodifiableSet(availableCipherSuites);
-        HashSet<String> protocols = new HashSet<>();
-        protocols.add(Constants.SSL_PROTO_SSLv2Hello);
-        protocols.add(Constants.SSL_PROTO_SSLv2);
-        protocols.add(Constants.SSL_PROTO_SSLv3);
-        protocols.add(Constants.SSL_PROTO_TLSv1);
-        protocols.add(Constants.SSL_PROTO_TLSv1_1);
-        protocols.add(Constants.SSL_PROTO_TLSv1_2);
-        protocols.add(Constants.SSL_PROTO_TLSv1_3);
-        IMPLEMENTED_PROTOCOLS_SET = Collections.unmodifiableSet(protocols);
+        IMPLEMENTED_PROTOCOLS_SET = Set.of(Constants.SSL_PROTO_SSLv2Hello, Constants.SSL_PROTO_SSLv2,
+            Constants.SSL_PROTO_SSLv3, Constants.SSL_PROTO_TLSv1, Constants.SSL_PROTO_TLSv1_1,
+            Constants.SSL_PROTO_TLSv1_2, Constants.SSL_PROTO_TLSv1_3);
     }
 
     private static final int MAX_PLAINTEXT_LENGTH = 16 * 1024; // 2^14
@@ -1283,8 +1276,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             MemorySegment /*X509_STORE_CTX*/ x509ctx, Arena localArena) {
         MemorySegment ocspRequest = MemorySegment.NULL;
         MemorySegment ocspResponse = MemorySegment.NULL;
-        MemorySegment id = MemorySegment.NULL;
-        MemorySegment ocspOneReq = MemorySegment.NULL;
+        MemorySegment id;
+        MemorySegment ocspOneReq;
         HttpURLConnection connection = null;
         MemorySegment basicResponse = MemorySegment.NULL;
         MemorySegment certId = MemorySegment.NULL;

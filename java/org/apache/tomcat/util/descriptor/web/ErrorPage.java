@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.descriptor.web;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 import org.apache.tomcat.util.buf.UDecoder;
 
@@ -153,11 +154,7 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
     }
 
     public String getName() {
-        if (exceptionType == null) {
-            return Integer.toString(errorCode);
-        } else {
-            return exceptionType;
-        }
+        return Objects.requireNonNullElseGet(exceptionType, () -> Integer.toString(errorCode));
     }
 
 }

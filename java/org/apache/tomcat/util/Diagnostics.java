@@ -367,10 +367,9 @@ public class Diagnostics {
      *         of the deadlocked threads
      */
     public static String findDeadlock() {
-        ThreadInfo[] tinfos = null;
         long[] ids = threadMXBean.findDeadlockedThreads();
         if (ids != null) {
-            tinfos = threadMXBean.getThreadInfo(threadMXBean.findDeadlockedThreads(),
+            ThreadInfo[] tinfos = threadMXBean.getThreadInfo(threadMXBean.findDeadlockedThreads(),
                                                 true, true);
             if (tinfos != null) {
                 StringBuilder sb =

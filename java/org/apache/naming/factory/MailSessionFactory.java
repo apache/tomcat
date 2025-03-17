@@ -114,7 +114,6 @@ public class MailSessionFactory implements ObjectFactory {
         }
 
         // Create and return the new Session object
-        Session session = Session.getInstance(props, auth);
-        return session;
+        return Session.getInstance(props, auth);
     }
 }

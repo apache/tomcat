@@ -137,7 +137,7 @@ public class RulesBase implements Rules {
 
         // List rulesList = (List) this.cache.get(pattern);
         List<Rule> rulesList = lookup(namespaceURI, pattern);
-        if ((rulesList == null) || (rulesList.size() < 1)) {
+        if ((rulesList == null) || (rulesList.isEmpty())) {
             // Find the longest key, ie more discriminant
             String longKey = "";
             for (String key : this.cache.keySet()) {
@@ -191,7 +191,7 @@ public class RulesBase implements Rules {
         if (list == null) {
             return null;
         }
-        if (namespaceURI == null || namespaceURI.length() == 0) {
+        if (namespaceURI == null || namespaceURI.isEmpty()) {
             return list;
         }
 

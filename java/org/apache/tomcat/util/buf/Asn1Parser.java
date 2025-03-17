@@ -52,7 +52,7 @@ public class Asn1Parser {
      *
      * See https://bz.apache.org/bugzilla/show_bug.cgi?id=67675#c24
      */
-    private Deque<Integer> nestedSequenceEndPositions = new ArrayDeque<>();
+    private final Deque<Integer> nestedSequenceEndPositions = new ArrayDeque<>();
 
 
     public Asn1Parser(byte[] source) {
@@ -76,7 +76,7 @@ public class Asn1Parser {
          * sequences and remove those sequences from the sequence nesting tracking mechanism if they have been
          * completely parsed.
          */
-        while (nestedSequenceEndPositions.size() > 0) {
+        while (!nestedSequenceEndPositions.isEmpty()) {
             if (nestedSequenceEndPositions.peekLast().intValue() <= pos) {
                 nestedSequenceEndPositions.pollLast();
             } else {

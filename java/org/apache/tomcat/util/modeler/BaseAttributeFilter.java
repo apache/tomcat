@@ -63,7 +63,7 @@ public class BaseAttributeFilter implements NotificationFilter {
      * The set of attribute names that are accepted by this filter.  If this
      * list is empty, all attribute names are accepted.
      */
-    private Set<String> names = new HashSet<>();
+    private final Set<String> names = new HashSet<>();
 
 
     // --------------------------------------------------------- Public Methods
@@ -136,7 +136,7 @@ public class BaseAttributeFilter implements NotificationFilter {
             return false;
         }
         synchronized (names) {
-            if (names.size() < 1) {
+            if (names.isEmpty()) {
                 return true;
             } else {
                 return names.contains(acn.getAttributeName());

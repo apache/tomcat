@@ -39,7 +39,7 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
 
     private final CountDownLatch latch = new CountDownLatch(1);
     private final WsSession wsSession;
-    private volatile AtomicReference<SendResult> result = new AtomicReference<>(null);
+    private final AtomicReference<SendResult> result = new AtomicReference<>(null);
 
     FutureToSendHandler(WsSession wsSession) {
         this.wsSession = wsSession;
@@ -90,7 +90,7 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
 
     @Override
     public Void get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        boolean retval = false;
+        boolean retval;
         try {
             wsSession.registerFuture(this);
             retval = latch.await(timeout, unit);
@@ -98,7 +98,7 @@ class FutureToSendHandler implements Future<Void>, SendHandler {
             wsSession.unregisterFuture(this);
 
         }
-        if (retval == false) {
+        if (!retval) {
             throw new TimeoutException(sm.getString("futureToSendHandler.timeout", Long.valueOf(timeout),
                     unit.toString().toLowerCase(Locale.ENGLISH)));
         }

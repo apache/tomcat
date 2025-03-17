@@ -144,7 +144,7 @@ public abstract class SSLUtilBase implements SSLUtil {
 
         List<T> enabled = new ArrayList<>();
 
-        if (implemented.size() == 0) {
+        if (implemented.isEmpty()) {
             // Unable to determine the list of available protocols. This will
             // have been logged previously.
             // Use the configuredProtocols and hope they work. If not, an error
@@ -189,7 +189,7 @@ public abstract class SSLUtilBase implements SSLUtil {
     static KeyStore getStore(String type, String provider, String path,
             String pass, String passFile) throws IOException {
 
-        KeyStore ks = null;
+        KeyStore ks;
         InputStream istream = null;
         try {
             if (provider == null) {
@@ -220,7 +220,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                 // - for JKS or PKCS12 only use null if pass is null
                 //   (because JKS will auto-switch to PKCS12)
                 char[] storePass = null;
-                String passToUse = null;
+                String passToUse;
                 if (passFile != null) {
                     try (BufferedReader reader =
                             new BufferedReader(new InputStreamReader(
@@ -232,7 +232,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                     passToUse = pass;
                 }
 
-                if (passToUse != null && (!"".equals(passToUse) ||
+                if (passToUse != null && (!passToUse.isEmpty() ||
                         "JKS".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type))) {
                     storePass = passToUse.toCharArray();
                 }
@@ -445,7 +445,7 @@ public abstract class SSLUtilBase implements SSLUtil {
     public TrustManager[] getTrustManagers() throws Exception {
 
         String className = sslHostConfig.getTrustManagerClassName();
-        if(className != null && className.length() > 0) {
+        if(className != null && !className.isEmpty()) {
              ClassLoader classLoader = getClass().getClassLoader();
              Class<?> clazz = classLoader.loadClass(className);
              if(!(TrustManager.class.isAssignableFrom(clazz))){
@@ -466,17 +466,16 @@ public abstract class SSLUtilBase implements SSLUtil {
             String crlf = sslHostConfig.getCertificateRevocationListFile();
             boolean revocationEnabled = sslHostConfig.getRevocationEnabled();
 
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
             if ("PKIX".equalsIgnoreCase(algorithm)) {
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
                 CertPathParameters params = getParameters(crlf, trustStore, revocationEnabled);
                 ManagerFactoryParameters mfp = new CertPathTrustManagerParameters(params);
                 tmf.init(mfp);
                 tms = tmf.getTrustManagers();
             } else {
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
                 tmf.init(trustStore);
                 tms = tmf.getTrustManagers();
-                if (crlf != null && crlf.length() > 0) {
+                if (crlf != null && !crlf.isEmpty()) {
                     throw new CRLException(sm.getString("sslUtilBase.noCrlSupport", algorithm));
                 }
                 // Only warn if the attribute has been explicitly configured
@@ -539,7 +538,7 @@ public abstract class SSLUtilBase implements SSLUtil {
 
         PKIXBuilderParameters xparams =
                 new PKIXBuilderParameters(trustStore, new X509CertSelector());
-        if (crlf != null && crlf.length() > 0) {
+        if (crlf != null && !crlf.isEmpty()) {
             Collection<? extends CRL> crls = getCRLs(crlf);
             CertStoreParameters csp = new CollectionCertStoreParameters(crls);
             CertStore store = CertStore.getInstance("Collection", csp);
@@ -564,14 +563,10 @@ public abstract class SSLUtilBase implements SSLUtil {
     protected Collection<? extends CRL> getCRLs(String crlf)
         throws IOException, CRLException, CertificateException {
 
-        Collection<? extends CRL> crls = null;
-        try {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            try (InputStream is = ConfigFileLoader.getSource().getResource(crlf).getInputStream()) {
-                crls = cf.generateCRLs(is);
-            }
-        } catch(IOException | CRLException | CertificateException e) {
-            throw e;
+        Collection<? extends CRL> crls;
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        try (InputStream is = ConfigFileLoader.getSource().getResource(crlf).getInputStream()) {
+            crls = cf.generateCRLs(is);
         }
         return crls;
     }

@@ -101,8 +101,7 @@ public class SendMailFactory implements ObjectFactory
                 ExceptionUtils.handleThrowable(t);
                 // Otherwise ignore
             }
-            MimePartDataSource mds = new MimePartDataSource(message);
-            return mds;
+            return new MimePartDataSource(message);
         } else { // We can't create an instance of the DataSource
             return null;
         }

@@ -62,9 +62,6 @@ public class ResourceFactory extends FactoryBase {
                 factory = (ObjectFactory) Class.forName(
                         javaxMailSessionFactoryClassName).getConstructor().newInstance();
             } catch(Throwable t) {
-                if (t instanceof NamingException) {
-                    throw (NamingException) t;
-                }
                 if (t instanceof VirtualMachineError) {
                     throw (VirtualMachineError) t;
                 }
