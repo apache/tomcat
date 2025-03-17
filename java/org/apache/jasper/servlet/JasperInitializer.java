@@ -44,8 +44,8 @@ public class JasperInitializer implements ServletContainerInitializer {
     private final Log log = LogFactory.getLog(JasperInitializer.class); // must not be static
 
     /*
-     * Preload classes required at runtime by a JSP servlet so that
-     * we don't get a defineClassInPackage security exception.
+     * Preload classes required at runtime by a JSP servlet so that we don't get a defineClassInPackage security
+     * exception.
      */
     static {
         JspFactoryImpl factory = new JspFactoryImpl();
@@ -62,14 +62,12 @@ public class JasperInitializer implements ServletContainerInitializer {
         }
 
         // Setup a simple default Instance Manager
-        if (context.getAttribute(InstanceManager.class.getName())==null) {
+        if (context.getAttribute(InstanceManager.class.getName()) == null) {
             context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
         }
 
-        boolean validate = Boolean.parseBoolean(
-                context.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
-        String blockExternalString = context.getInitParameter(
-                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        boolean validate = Boolean.parseBoolean(context.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
+        String blockExternalString = context.getInitParameter(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
         boolean blockExternal;
         if (blockExternalString == null) {
             blockExternal = true;
@@ -91,12 +89,11 @@ public class JasperInitializer implements ServletContainerInitializer {
         }
 
         context.setAttribute(TldCache.SERVLET_CONTEXT_ATTRIBUTE_NAME,
-                new TldCache(context, scanner.getUriTldResourcePathMap(),
-                        scanner.getTldResourcePathTaglibXmlMap()));
+                new TldCache(context, scanner.getUriTldResourcePathMap(), scanner.getTldResourcePathTaglibXmlMap()));
     }
 
-    protected TldScanner newTldScanner(ServletContext context, boolean namespaceAware,
-            boolean validate, boolean blockExternal) {
+    protected TldScanner newTldScanner(ServletContext context, boolean namespaceAware, boolean validate,
+            boolean blockExternal) {
         return new TldScanner(context, namespaceAware, validate, blockExternal);
     }
 }

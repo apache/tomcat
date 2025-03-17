@@ -26,8 +26,8 @@ import java.security.PermissionCollection;
 import org.apache.jasper.Constants;
 
 /**
- * Class loader for loading servlet class files (corresponding to JSP files)
- * and tag handler class files (corresponding to tag files).
+ * Class loader for loading servlet class files (corresponding to JSP files) and tag handler class files (corresponding
+ * to tag files).
  *
  * @author Anil K. Vijendran
  * @author Harish Prabandham
@@ -37,17 +37,15 @@ public class JasperLoader extends URLClassLoader {
     private final PermissionCollection permissionCollection;
     private final SecurityManager securityManager;
 
-    public JasperLoader(URL[] urls, ClassLoader parent,
-                        PermissionCollection permissionCollection) {
+    public JasperLoader(URL[] urls, ClassLoader parent, PermissionCollection permissionCollection) {
         super(urls, parent);
         this.permissionCollection = permissionCollection;
         this.securityManager = System.getSecurityManager();
     }
 
     /**
-     * Load the class with the specified name.  This method searches for
-     * classes in the same manner as <code>loadClass(String, boolean)</code>
-     * with <code>false</code> as the second argument.
+     * Load the class with the specified name. This method searches for classes in the same manner as
+     * <code>loadClass(String, boolean)</code> with <code>false</code> as the second argument.
      *
      * @param name Name of the class to be loaded
      *
@@ -59,33 +57,26 @@ public class JasperLoader extends URLClassLoader {
     }
 
     /**
-     * Load the class with the specified name, searching using the following
-     * algorithm until it finds and returns the class.  If the class cannot
-     * be found, returns <code>ClassNotFoundException</code>.
+     * Load the class with the specified name, searching using the following algorithm until it finds and returns the
+     * class. If the class cannot be found, returns <code>ClassNotFoundException</code>.
      * <ul>
-     * <li>Call <code>findLoadedClass(String)</code> to check if the
-     *     class has already been loaded.  If it has, the same
-     *     <code>Class</code> object is returned.</li>
-     * <li>If the <code>delegate</code> property is set to <code>true</code>,
-     *     call the <code>loadClass()</code> method of the parent class
-     *     loader, if any.</li>
-     * <li>Call <code>findClass()</code> to find this class in our locally
-     *     defined repositories.</li>
-     * <li>Call the <code>loadClass()</code> method of our parent
-     *     class loader, if any.</li>
+     * <li>Call <code>findLoadedClass(String)</code> to check if the class has already been loaded. If it has, the same
+     * <code>Class</code> object is returned.</li>
+     * <li>If the <code>delegate</code> property is set to <code>true</code>, call the <code>loadClass()</code> method
+     * of the parent class loader, if any.</li>
+     * <li>Call <code>findClass()</code> to find this class in our locally defined repositories.</li>
+     * <li>Call the <code>loadClass()</code> method of our parent class loader, if any.</li>
      * </ul>
-     * If the class was found using the above steps, and the
-     * <code>resolve</code> flag is <code>true</code>, this method will then
-     * call <code>resolveClass(Class)</code> on the resulting Class object.
+     * If the class was found using the above steps, and the <code>resolve</code> flag is <code>true</code>, this method
+     * will then call <code>resolveClass(Class)</code> on the resulting Class object.
      *
-     * @param name Name of the class to be loaded
+     * @param name    Name of the class to be loaded
      * @param resolve If <code>true</code> then resolve the class
      *
      * @exception ClassNotFoundException if the class was not found
      */
     @Override
-    public synchronized Class<?> loadClass(final String name, boolean resolve)
-        throws ClassNotFoundException {
+    public synchronized Class<?> loadClass(final String name, boolean resolve) throws ClassNotFoundException {
 
         Class<?> clazz = null;
 
@@ -104,23 +95,22 @@ public class JasperLoader extends URLClassLoader {
             if (dot >= 0) {
                 try {
                     // Do not call the security manager since by default, we grant that package.
-                    if (!"org.apache.jasper.runtime".equalsIgnoreCase(name.substring(0,dot))){
-                        securityManager.checkPackageAccess(name.substring(0,dot));
+                    if (!"org.apache.jasper.runtime".equalsIgnoreCase(name.substring(0, dot))) {
+                        securityManager.checkPackageAccess(name.substring(0, dot));
                     }
                 } catch (SecurityException se) {
-                    String error = "Security Violation, attempt to use " +
-                        "Restricted Class: " + name;
+                    String error = "Security Violation, attempt to use " + "Restricted Class: " + name;
                     se.printStackTrace();
                     throw new ClassNotFoundException(error);
                 }
             }
         }
 
-        if( !name.startsWith(Constants.JSP_PACKAGE_NAME + '.') ) {
+        if (!name.startsWith(Constants.JSP_PACKAGE_NAME + '.')) {
             // Class is not in org.apache.jsp, therefore, have our
             // parent load it
             clazz = getParent().loadClass(name);
-            if( resolve ) {
+            if (resolve) {
                 resolveClass(clazz);
             }
             return clazz;
@@ -153,13 +143,11 @@ public class JasperLoader extends URLClassLoader {
 
 
     /**
-     * Get the Permissions for a CodeSource.
-     *
-     * Since this ClassLoader is only used for a JSP page in
-     * a web application context, we just return our preset
-     * PermissionCollection for the web app context.
+     * Get the Permissions for a CodeSource. Since this ClassLoader is only used for a JSP page in a web application
+     * context, we just return our preset PermissionCollection for the web app context.
      *
      * @param codeSource Code source where the code was loaded from
+     *
      * @return PermissionCollection for CodeSource
      */
     @Override
