@@ -377,21 +377,21 @@ public class DefaultInstanceManager implements InstanceManager {
                             annotations.add(new AnnotationCacheEntry(fieldName, null, resourceAnnotation.name(),
                                     AnnotationCacheEntryType.FIELD));
                         } else if (EJB_PRESENT && (ejbAnnotation = field.getAnnotation(EJB.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(fieldName, null, ((EJB) ejbAnnotation).name(),
+                            annotations.add(new AnnotationCacheEntry(fieldName, null, ejbAnnotation.name(),
                                     AnnotationCacheEntryType.FIELD));
                         } else if (WS_PRESENT &&
                                 (webServiceRefAnnotation = field.getAnnotation(WebServiceRef.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    ((WebServiceRef) webServiceRefAnnotation).name(), AnnotationCacheEntryType.FIELD));
+                                    webServiceRefAnnotation.name(), AnnotationCacheEntryType.FIELD));
                         } else if (JPA_PRESENT && (persistenceContextAnnotation =
                                 field.getAnnotation(PersistenceContext.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    ((PersistenceContext) persistenceContextAnnotation).name(),
+                                    persistenceContextAnnotation.name(),
                                     AnnotationCacheEntryType.FIELD));
                         } else if (JPA_PRESENT &&
                                 (persistenceUnitAnnotation = field.getAnnotation(PersistenceUnit.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    ((PersistenceUnit) persistenceUnitAnnotation).name(),
+                                    persistenceUnitAnnotation.name(),
                                     AnnotationCacheEntryType.FIELD));
                         }
                     }
