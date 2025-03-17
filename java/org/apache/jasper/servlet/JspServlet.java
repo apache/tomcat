@@ -40,14 +40,10 @@ import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * The JSP engine (a.k.a Jasper).
- *
- * The servlet container is responsible for providing a
- * URLClassLoader for the web application context Jasper
- * is being used in. Jasper will try get the Tomcat
- * ServletContext attribute for its ServletContext class
- * loader, if that fails, it uses the parent class loader.
- * In either case, it must be a URLClassLoader.
+ * The JSP engine (a.k.a Jasper). The servlet container is responsible for providing a URLClassLoader for the web
+ * application context Jasper is being used in. Jasper will try get the Tomcat ServletContext attribute for its
+ * ServletContext class loader, if that fails, it uses the parent class loader. In either case, it must be a
+ * URLClassLoader.
  *
  * @author Anil K. Vijendran
  * @author Harish Prabandham
@@ -120,22 +116,19 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug(Localizer.getMessage("jsp.message.scratch.dir.is",
-                    options.getScratchDir().toString()));
+            log.debug(Localizer.getMessage("jsp.message.scratch.dir.is", options.getScratchDir().toString()));
             log.debug(Localizer.getMessage("jsp.message.dont.modify.servlets"));
         }
     }
 
 
     /**
-     * Returns the number of JSPs for which JspServletWrappers exist, i.e.,
-     * the number of JSPs that have been loaded into the webapp with which
-     * this JspServlet is associated.
+     * Returns the number of JSPs for which JspServletWrappers exist, i.e., the number of JSPs that have been loaded
+     * into the webapp with which this JspServlet is associated.
+     * <p>
+     * This info may be used for monitoring purposes.
      *
-     * <p>This info may be used for monitoring purposes.
-     *
-     * @return The number of JSPs that have been loaded into the webapp with
-     * which this JspServlet is associated
+     * @return The number of JSPs that have been loaded into the webapp with which this JspServlet is associated
      */
     public int getJspCount() {
         return this.rctxt.getJspCount();
@@ -154,11 +147,10 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     /**
      * Gets the number of JSPs that have been reloaded.
+     * <p>
+     * This info may be used for monitoring purposes.
      *
-     * <p>This info may be used for monitoring purposes.
-     *
-     * @return The number of JSPs (in the webapp with which this JspServlet is
-     * associated) that have been reloaded
+     * @return The number of JSPs (in the webapp with which this JspServlet is associated) that have been reloaded
      */
     public int getJspReloadCount() {
         return this.rctxt.getJspReloadCount();
@@ -167,11 +159,11 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     /**
      * Gets the number of JSPs that are in the JSP limiter queue
+     * <p>
+     * This info may be used for monitoring purposes.
      *
-     * <p>This info may be used for monitoring purposes.
-     *
-     * @return The number of JSPs (in the webapp with which this JspServlet is
-     * associated) that are in the JSP limiter queue
+     * @return The number of JSPs (in the webapp with which this JspServlet is associated) that are in the JSP limiter
+     *             queue
      */
     public int getJspQueueLength() {
         return this.rctxt.getJspQueueLength();
@@ -180,11 +172,10 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     /**
      * Gets the number of JSPs that have been unloaded.
+     * <p>
+     * This info may be used for monitoring purposes.
      *
-     * <p>This info may be used for monitoring purposes.
-     *
-     * @return The number of JSPs (in the webapp with which this JspServlet is
-     * associated) that have been unloaded
+     * @return The number of JSPs (in the webapp with which this JspServlet is associated) that have been unloaded
      */
     public int getJspUnloadCount() {
         return this.rctxt.getJspUnloadCount();
@@ -192,17 +183,17 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
 
     /**
-     * <p>Look for a <em>precompilation request</em> as described in
-     * Section 8.4.2 of the JSP 1.2 Specification.  <strong>WARNING</strong> -
-     * we cannot use <code>request.getParameter()</code> for this, because
-     * that will trigger parsing all of the request parameters, and not give
-     * a servlet the opportunity to call
-     * <code>request.setCharacterEncoding()</code> first.</p>
+     * <p>
+     * Look for a <em>precompilation request</em> as described in Section 8.4.2 of the JSP 1.2 Specification.
+     * <strong>WARNING</strong> - we cannot use <code>request.getParameter()</code> for this, because that will trigger
+     * parsing all of the request parameters, and not give a servlet the opportunity to call
+     * <code>request.setCharacterEncoding()</code> first.
+     * </p>
      *
      * @param request The servlet request we are processing
      *
-     * @exception ServletException if an invalid parameter value for the
-     *  <code>jsp_precompile</code> parameter name is specified
+     * @exception ServletException if an invalid parameter value for the <code>jsp_precompile</code> parameter name is
+     *                                 specified
      */
     boolean preCompile(HttpServletRequest request) throws ServletException {
 
@@ -215,16 +206,15 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         if (start < 0) {
             return false;
         }
-        queryString =
-            queryString.substring(start + precompileParameter.length());
+        queryString = queryString.substring(start + precompileParameter.length());
         if (queryString.length() == 0) {
-            return true;             // ?jsp_precompile
+            return true; // ?jsp_precompile
         }
         if (queryString.startsWith("&")) {
-            return true;             // ?jsp_precompile&foo=bar...
+            return true; // ?jsp_precompile&foo=bar...
         }
         if (!queryString.startsWith("=")) {
-            return false;            // part of some other name or value
+            return false; // part of some other name or value
         }
         int limit = queryString.length();
         int ampersand = queryString.indexOf('&');
@@ -233,51 +223,45 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
         }
         String value = queryString.substring(1, limit);
         if (value.equals("true")) {
-            return true;             // ?jsp_precompile=true
+            return true; // ?jsp_precompile=true
         } else if (value.equals("false")) {
             // Spec says if jsp_precompile=false, the request should not
             // be delivered to the JSP page; the easiest way to implement
             // this is to set the flag to true, and precompile the page anyway.
             // This still conforms to the spec, since it says the
             // precompilation request can be ignored.
-            return true;             // ?jsp_precompile=false
+            return true; // ?jsp_precompile=false
         } else {
-            throw new ServletException(Localizer.getMessage("jsp.error.precompilation.parameter",
-                    precompileParameter, value));
+            throw new ServletException(
+                    Localizer.getMessage("jsp.error.precompilation.parameter", precompileParameter, value));
         }
 
     }
 
 
     @Override
-    public void service (HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         // jspFile may be configured as an init-param for this servlet instance
         String jspUri = jspFile;
 
         if (jspUri == null) {
             /*
-             * Check to see if the requested JSP has been the target of a
-             * RequestDispatcher.include()
+             * Check to see if the requested JSP has been the target of a RequestDispatcher.include()
              */
-            jspUri = (String) request.getAttribute(
-                    RequestDispatcher.INCLUDE_SERVLET_PATH);
+            jspUri = (String) request.getAttribute(RequestDispatcher.INCLUDE_SERVLET_PATH);
             if (jspUri != null) {
                 /*
-                 * Requested JSP has been target of
-                 * RequestDispatcher.include(). Its path is assembled from the
-                 * relevant jakarta.servlet.include.* request attributes
+                 * Requested JSP has been target of RequestDispatcher.include(). Its path is assembled from the relevant
+                 * jakarta.servlet.include.* request attributes
                  */
-                String pathInfo = (String) request.getAttribute(
-                        RequestDispatcher.INCLUDE_PATH_INFO);
+                String pathInfo = (String) request.getAttribute(RequestDispatcher.INCLUDE_PATH_INFO);
                 if (pathInfo != null) {
                     jspUri += pathInfo;
                 }
             } else {
                 /*
-                 * Requested JSP has not been the target of a
-                 * RequestDispatcher.include(). Reconstruct its path from the
+                 * Requested JSP has not been the target of a RequestDispatcher.include(). Reconstruct its path from the
                  * request's getServletPath() and getPathInfo()
                  */
                 jspUri = request.getServletPath();
@@ -327,14 +311,12 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
 
     // -------------------------------------------------------- Private Methods
 
-    private void serviceJspFile(HttpServletRequest request,
-                                HttpServletResponse response, String jspUri,
-                                boolean precompile)
-        throws ServletException, IOException {
+    private void serviceJspFile(HttpServletRequest request, HttpServletResponse response, String jspUri,
+            boolean precompile) throws ServletException, IOException {
 
         JspServletWrapper wrapper = rctxt.getWrapper(jspUri);
         if (wrapper == null) {
-            synchronized(this) {
+            synchronized (this) {
                 wrapper = rctxt.getWrapper(jspUri);
                 if (wrapper == null) {
                     // Check if the requested JSP page exists, to avoid
@@ -343,9 +325,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                         handleMissingResource(request, response, jspUri);
                         return;
                     }
-                    wrapper = new JspServletWrapper(config, options, jspUri,
-                                                    rctxt);
-                    rctxt.addWrapper(jspUri,wrapper);
+                    wrapper = new JspServletWrapper(config, options, jspUri, rctxt);
+                    rctxt.addWrapper(jspUri, wrapper);
                 }
             }
         }
@@ -359,14 +340,12 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
     }
 
 
-    private void handleMissingResource(HttpServletRequest request,
-            HttpServletResponse response, String jspUri)
+    private void handleMissingResource(HttpServletRequest request, HttpServletResponse response, String jspUri)
             throws ServletException, IOException {
 
-        String includeRequestUri =
-            (String)request.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI);
+        String includeRequestUri = (String) request.getAttribute(RequestDispatcher.INCLUDE_REQUEST_URI);
 
-        String msg = Localizer.getMessage("jsp.error.file.not.found",jspUri);
+        String msg = Localizer.getMessage("jsp.error.file.not.found", jspUri);
         if (includeRequestUri != null) {
             // This file was included. Throw an exception as
             // a response.sendError() will be ignored

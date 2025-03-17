@@ -59,26 +59,20 @@ public class TldScanner {
     private static final String WEB_INF = "/WEB-INF/";
     private final ServletContext context;
     private final TldParser tldParser;
-    private final Map<String, TldResourcePath> uriTldResourcePathMap = new HashMap<>();
-    private final Map<TldResourcePath, TaglibXml> tldResourcePathTaglibXmlMap = new HashMap<>();
+    private final Map<String,TldResourcePath> uriTldResourcePathMap = new HashMap<>();
+    private final Map<TldResourcePath,TaglibXml> tldResourcePathTaglibXmlMap = new HashMap<>();
     private final List<String> listeners = new ArrayList<>();
 
     /**
      * Initialise with the application's ServletContext.
      *
      * @param context        the application's servletContext
-     * @param namespaceAware should the XML parser used to parse TLD files be
-     *                       configured to be name space aware
-     * @param validation     should the XML parser used to parse TLD files be
-     *                       configured to use validation
-     * @param blockExternal  should the XML parser used to parse TLD files be
-     *                       configured to be block references to external
-     *                       entities
+     * @param namespaceAware should the XML parser used to parse TLD files be configured to be name space aware
+     * @param validation     should the XML parser used to parse TLD files be configured to use validation
+     * @param blockExternal  should the XML parser used to parse TLD files be configured to be block references to
+     *                           external entities
      */
-    public TldScanner(ServletContext context,
-                      boolean namespaceAware,
-                      boolean validation,
-                      boolean blockExternal) {
+    public TldScanner(ServletContext context, boolean namespaceAware, boolean validation, boolean blockExternal) {
         this.context = context;
 
         this.tldParser = new TldParser(namespaceAware, validation, blockExternal);
@@ -109,13 +103,12 @@ public class TldScanner {
      *
      * @return the map of URI to TldResourcePath
      */
-    public Map<String, TldResourcePath> getUriTldResourcePathMap() {
+    public Map<String,TldResourcePath> getUriTldResourcePathMap() {
         return uriTldResourcePathMap;
     }
 
     /**
-     * Returns the map of TldResourcePath to parsed XML files built by this
-     * scanner.
+     * Returns the map of TldResourcePath to parsed XML files built by this scanner.
      *
      * @return the map of TldResourcePath to parsed XML files
      */
@@ -133,11 +126,10 @@ public class TldScanner {
     }
 
     /**
-     * Set the class loader used by the digester to create objects as a result
-     * of this scan. Normally this only needs to be set when using JspC.
+     * Set the class loader used by the digester to create objects as a result of this scan. Normally this only needs to
+     * be set when using JspC.
      *
-     * @param classLoader Class loader to use when creating new objects while
-     *                    parsing TLDs
+     * @param classLoader Class loader to use when creating new objects while parsing TLDs
      */
     public void setClassLoader(ClassLoader classLoader) {
         tldParser.setClassLoader(classLoader);
@@ -151,7 +143,8 @@ public class TldScanner {
 
     /**
      * Scan for TLDs defined in &lt;jsp-config&gt;.
-     * @throws IOException Error reading resources
+     *
+     * @throws IOException  Error reading resources
      * @throws SAXException XML parsing error
      */
     protected void scanJspConfig() throws IOException, SAXException {
@@ -172,16 +165,12 @@ public class TldScanner {
                 resourcePath = WEB_INF + resourcePath;
             }
             if (uriTldResourcePathMap.containsKey(taglibURI)) {
-                log.warn(Localizer.getMessage(MSG + ".webxmlSkip",
-                        resourcePath,
-                        taglibURI));
+                log.warn(Localizer.getMessage(MSG + ".webxmlSkip", resourcePath, taglibURI));
                 continue;
             }
 
             if (log.isTraceEnabled()) {
-                log.trace(Localizer.getMessage(MSG + ".webxmlAdd",
-                        resourcePath,
-                        taglibURI));
+                log.trace(Localizer.getMessage(MSG + ".webxmlAdd", resourcePath, taglibURI));
             }
 
             URL url = context.getResource(resourcePath);
@@ -202,9 +191,7 @@ public class TldScanner {
                     listeners.addAll(tld.getListeners());
                 }
             } else {
-                log.warn(Localizer.getMessage(MSG + ".webxmlFailPathDoesNotExist",
-                        resourcePath,
-                        taglibURI));
+                log.warn(Localizer.getMessage(MSG + ".webxmlFailPathDoesNotExist", resourcePath, taglibURI));
                 continue;
             }
         }
@@ -214,11 +201,11 @@ public class TldScanner {
      * Scan web application resources for TLDs, recursively.
      *
      * @param startPath the directory resource to scan
+     *
      * @throws IOException  if there was a problem scanning for or loading a TLD
      * @throws SAXException if there was a problem parsing a TLD
      */
-    protected void scanResourcePaths(String startPath)
-            throws IOException, SAXException {
+    protected void scanResourcePaths(String startPath) throws IOException, SAXException {
 
         boolean found = false;
         Set<String> dirList = context.getResourcePaths(startPath);
@@ -266,8 +253,7 @@ public class TldScanner {
     }
 
     protected void parseTld(String resourcePath) throws IOException, SAXException {
-        TldResourcePath tldResourcePath =
-                new TldResourcePath(context.getResource(resourcePath), resourcePath);
+        TldResourcePath tldResourcePath = new TldResourcePath(context.getResource(resourcePath), resourcePath);
         parseTld(tldResourcePath);
     }
 
@@ -301,16 +287,13 @@ public class TldScanner {
             boolean found = false;
             URL jarFileUrl = jar.getJarFileURL();
             jar.nextEntry();
-            for (String entryName = jar.getEntryName();
-                entryName != null;
-                jar.nextEntry(), entryName = jar.getEntryName()) {
-                if (!(entryName.startsWith("META-INF/") &&
-                        entryName.endsWith(TLD_EXT))) {
+            for (String entryName = jar.getEntryName(); entryName != null; jar.nextEntry(), entryName =
+                    jar.getEntryName()) {
+                if (!(entryName.startsWith("META-INF/") && entryName.endsWith(TLD_EXT))) {
                     continue;
                 }
                 found = true;
-                TldResourcePath tldResourcePath =
-                        new TldResourcePath(jarFileUrl, webappPath, entryName);
+                TldResourcePath tldResourcePath = new TldResourcePath(jarFileUrl, webappPath, entryName);
                 try {
                     parseTld(tldResourcePath);
                 } catch (SAXException e) {
@@ -324,15 +307,13 @@ public class TldScanner {
             } else {
                 foundJarWithoutTld = true;
                 if (log.isDebugEnabled()) {
-                    log.debug(Localizer.getMessage(
-                            "jsp.tldCache.noTldInJar", jarFileUrl.toString()));
+                    log.debug(Localizer.getMessage("jsp.tldCache.noTldInJar", jarFileUrl.toString()));
                 }
             }
         }
 
         @Override
-        public void scan(File file, final String webappPath, boolean isWebapp)
-                throws IOException {
+        public void scan(File file, final String webappPath, boolean isWebapp) throws IOException {
             File metaInf = new File(file, "META-INF");
             if (!metaInf.isDirectory()) {
                 return;
@@ -341,12 +322,9 @@ public class TldScanner {
             final Path filePath = file.toPath();
             Files.walkFileTree(metaInf.toPath(), new SimpleFileVisitor<Path>() {
                 @Override
-                public FileVisitResult visitFile(Path file,
-                                                 BasicFileAttributes attrs)
-                        throws IOException {
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     Path fileName = file.getFileName();
-                    if (fileName == null || !fileName.toString().toLowerCase(
-                            Locale.ENGLISH).endsWith(TLD_EXT)) {
+                    if (fileName == null || !fileName.toString().toLowerCase(Locale.ENGLISH).endsWith(TLD_EXT)) {
                         return FileVisitResult.CONTINUE;
                     }
 
@@ -355,8 +333,7 @@ public class TldScanner {
                     if (webappPath == null) {
                         resourcePath = null;
                     } else {
-                        String subPath = file.subpath(
-                                filePath.getNameCount(), file.getNameCount()).toString();
+                        String subPath = file.subpath(filePath.getNameCount(), file.getNameCount()).toString();
                         if ('/' != File.separatorChar) {
                             subPath = subPath.replace(File.separatorChar, '/');
                         }
@@ -375,13 +352,11 @@ public class TldScanner {
             });
             if (foundFileWithoutTld) {
                 if (log.isDebugEnabled()) {
-                    log.debug(Localizer.getMessage("jsp.tldCache.tldInDir",
-                            file.getAbsolutePath()));
+                    log.debug(Localizer.getMessage("jsp.tldCache.tldInDir", file.getAbsolutePath()));
                 }
             } else {
                 if (log.isDebugEnabled()) {
-                    log.debug(Localizer.getMessage("jsp.tldCache.noTldInDir",
-                            file.getAbsolutePath()));
+                    log.debug(Localizer.getMessage("jsp.tldCache.noTldInDir", file.getAbsolutePath()));
                 }
             }
         }
