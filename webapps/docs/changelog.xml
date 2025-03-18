@@ -184,6 +184,10 @@
         <bug>69607</bug>: Allow failed initialization of MD5. Based on code
         submitted by Shivam Verma. (remm)
       </fix>
+      <fix>
+        <bug>69614</bug>: HTTP/2 priority frames with an invalid priority field
+        value should be ignored. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
