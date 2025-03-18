@@ -49,27 +49,23 @@ public class TesterOpenSSL {
         } catch (IOException e) {
             versionString = "";
         }
-        if (versionString.startsWith("OpenSSL 3.5.")) {
-            // Note: Gump currently tests 11.x with OpenSSL HEAD which is current 3.4.x
+        if (versionString.startsWith("OpenSSL 3.6.")) {
+            VERSION = 30600;
+        } else if (versionString.startsWith("OpenSSL 3.5.")) {
             VERSION = 30500;
         } else if (versionString.startsWith("OpenSSL 3.4.")) {
             VERSION = 30400;
         } else if (versionString.startsWith("OpenSSL 3.3.")) {
+            // Note: Gump currently tests 10.x with OpenSSL 3.3.x
             VERSION = 30300;
         } else if (versionString.startsWith("OpenSSL 3.2.")) {
             VERSION = 30200;
-        } else if (versionString.startsWith("OpenSSL 3.1.")) {
-            VERSION = 30100;
         } else if (versionString.startsWith("OpenSSL 3.0.")) {
             VERSION = 30000;
-        } else if (versionString.startsWith("OpenSSL 1.1.1")) {
-            // LTS
-            // Supported until at least 2023-09-11
-            // Note: Gump currently tests 9.x and earlier with OpenSSL 1.1.1[x]
-            VERSION = 10101;
-        // Note: Release branches 1.1.0 and earlier are no longer supported by
-        //       the OpenSSL team so these tests don't support them either.
         } else {
+            // Note: 3.1.x is no longer supported by OpenSSL
+            // Note: Release branches 1.1.1 and earlier are no longer supported by
+            //       the OpenSSL team so these tests don't support them either.
             VERSION = -1;
         }
 
