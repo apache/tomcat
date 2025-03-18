@@ -26,7 +26,7 @@ public final class ForEach implements TagPlugin {
     @Override
     public void doTag(TagPluginContext ctxt) {
 
-        String index = null;
+        String index;
 
         boolean hasVarStatus = ctxt.isAttributeSpecified("varStatus");
         if (hasVarStatus) {

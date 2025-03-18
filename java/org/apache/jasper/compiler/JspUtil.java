@@ -50,7 +50,7 @@ public class JspUtil {
     private static final String OPEN_EXPR = "<%=";
     private static final String CLOSE_EXPR = "%>";
 
-    private static final String javaKeywords[] =
+    private static final String[] javaKeywords =
             { "abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue",
                     "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto",
                     "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package",
@@ -159,7 +159,6 @@ public class JspUtil {
                 attrPos = temp.indexOf(validAttribute.name);
                 if (attrPos != -1) {
                     temp.remove(attrPos);
-                    valid = true;
                 } else {
                     valid = false;
                     missingAttribute = validAttribute.name;
@@ -246,7 +245,6 @@ public class JspUtil {
      */
     public static Class<?> toClass(String type, ClassLoader loader) throws ClassNotFoundException {
 
-        Class<?> c = null;
         int i0 = type.indexOf('[');
         int dims = 0;
         if (i0 > 0) {
@@ -259,27 +257,18 @@ public class JspUtil {
             type = type.substring(0, i0);
         }
 
-        if ("boolean".equals(type)) {
-            c = boolean.class;
-        } else if ("char".equals(type)) {
-            c = char.class;
-        } else if ("byte".equals(type)) {
-            c = byte.class;
-        } else if ("short".equals(type)) {
-            c = short.class;
-        } else if ("int".equals(type)) {
-            c = int.class;
-        } else if ("long".equals(type)) {
-            c = long.class;
-        } else if ("float".equals(type)) {
-            c = float.class;
-        } else if ("double".equals(type)) {
-            c = double.class;
-        } else if ("void".equals(type)) {
-            c = void.class;
-        } else {
-            c = loader.loadClass(type);
-        }
+        Class<?> c = switch (type) {
+            case "boolean" -> boolean.class;
+            case "char" -> char.class;
+            case "byte" -> byte.class;
+            case "short" -> short.class;
+            case "int" -> int.class;
+            case "long" -> long.class;
+            case "float" -> float.class;
+            case "double" -> double.class;
+            case "void" -> void.class;
+            default -> loader.loadClass(type);
+        };
 
         if (dims == 0) {
             return c;
@@ -307,7 +296,7 @@ public class JspUtil {
         /*
          * Determine which context object to use.
          */
-        String jspCtxt = null;
+        String jspCtxt;
         if (isTagFile) {
             jspCtxt = "this.getJspContext()";
         } else {
@@ -362,7 +351,7 @@ public class JspUtil {
          */
         if (primitiveConverterMethod != null) {
             call.insert(0, "(");
-            call.append(")." + primitiveConverterMethod + "()");
+            call.append(").").append(primitiveConverterMethod).append("()");
         }
 
         return call.toString();
@@ -372,7 +361,7 @@ public class JspUtil {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToBoolean(" + s + ")";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "false";
             } else {
                 return Boolean.valueOf(s).toString();
@@ -385,7 +374,7 @@ public class JspUtil {
             return "(java.lang.Boolean) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
                     ", java.lang.Boolean.class)";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "java.lang.Boolean.FALSE";
             } else {
                 // Detect format error at translation time
@@ -398,7 +387,7 @@ public class JspUtil {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToByte(" + s + ")";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "(byte) 0";
             } else {
                 return "((byte)" + Byte.valueOf(s).toString() + ")";
@@ -411,7 +400,7 @@ public class JspUtil {
             return "(java.lang.Byte) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
                     ", java.lang.Byte.class)";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "java.lang.Byte.valueOf((byte) 0)";
             } else {
                 // Detect format error at translation time
@@ -424,7 +413,7 @@ public class JspUtil {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToChar(" + s + ")";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "(char) 0";
             } else {
                 char ch = s.charAt(0);
@@ -439,7 +428,7 @@ public class JspUtil {
             return "(java.lang.Character) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
                     ", java.lang.Character.class)";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "java.lang.Character.valueOf((char) 0)";
             } else {
                 char ch = s.charAt(0);
@@ -453,7 +442,7 @@ public class JspUtil {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToDouble(" + s + ")";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "(double) 0";
             } else {
                 return Double.valueOf(s).toString();
@@ -465,7 +454,7 @@ public class JspUtil {
         if (isNamedAttribute) {
             return "(java.lang.Double) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s + ", Double.class)";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "java.lang.Double.valueOf(0)";
             } else {
                 // Detect format error at translation time
@@ -478,7 +467,7 @@ public class JspUtil {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToFloat(" + s + ")";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "(float) 0";
             } else {
                 return Float.valueOf(s).toString() + "f";
@@ -491,7 +480,7 @@ public class JspUtil {
             return "(java.lang.Float) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
                     ", java.lang.Float.class)";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "java.lang.Float.valueOf(0)";
             } else {
                 // Detect format error at translation time
@@ -504,7 +493,7 @@ public class JspUtil {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToInt(" + s + ")";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "0";
             } else {
                 return Integer.valueOf(s).toString();
@@ -517,7 +506,7 @@ public class JspUtil {
             return "(java.lang.Integer) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
                     ", java.lang.Integer.class)";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "java.lang.Integer.valueOf(0)";
             } else {
                 // Detect format error at translation time
@@ -530,7 +519,7 @@ public class JspUtil {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToShort(" + s + ")";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "(short) 0";
             } else {
                 return "((short) " + Short.valueOf(s).toString() + ")";
@@ -543,7 +532,7 @@ public class JspUtil {
             return "(java.lang.Short) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
                     ", java.lang.Short.class)";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "java.lang.Short.valueOf((short) 0)";
             } else {
                 // Detect format error at translation time
@@ -556,7 +545,7 @@ public class JspUtil {
         if (isNamedAttribute) {
             return "org.apache.jasper.runtime.JspRuntimeLibrary.coerceToLong(" + s + ")";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "(long) 0";
             } else {
                 return Long.valueOf(s).toString() + "l";
@@ -569,7 +558,7 @@ public class JspUtil {
             return "(java.lang.Long) org.apache.jasper.runtime.JspRuntimeLibrary.coerce(" + s +
                     ", java.lang.Long.class)";
         } else {
-            if (s == null || s.length() == 0) {
+            if (s == null || s.isEmpty()) {
                 return "java.lang.Long.valueOf(0)";
             } else {
                 // Detect format error at translation time
@@ -581,7 +570,7 @@ public class JspUtil {
     public static BufferedInputStream getInputStream(String fname, Jar jar, JspCompilationContext ctxt)
             throws IOException {
 
-        InputStream in = null;
+        InputStream in;
 
         if (jar != null) {
             String jarEntryName = fname.substring(1);
@@ -680,12 +669,12 @@ public class JspUtil {
      *
      * @return Java package corresponding to the given path
      */
-    public static final String makeJavaPackage(String path) {
-        String classNameComponents[] = path.split("/");
+    public static String makeJavaPackage(String path) {
+        String[] classNameComponents = path.split("/");
         StringBuilder legalClassNames = new StringBuilder();
         for (String classNameComponent : classNameComponents) {
-            if (classNameComponent.length() > 0) {
-                if (legalClassNames.length() > 0) {
+            if (!classNameComponent.isEmpty()) {
+                if (!legalClassNames.isEmpty()) {
                     legalClassNames.append('.');
                 }
                 legalClassNames.append(makeJavaIdentifier(classNameComponent));
@@ -701,7 +690,7 @@ public class JspUtil {
      *
      * @return Legal Java identifier corresponding to the given identifier
      */
-    public static final String makeJavaIdentifier(String identifier) {
+    public static String makeJavaIdentifier(String identifier) {
         return makeJavaIdentifier(identifier, true);
     }
 
@@ -712,7 +701,7 @@ public class JspUtil {
      *
      * @return Legal Java identifier corresponding to the given identifier
      */
-    public static final String makeJavaIdentifierForAttribute(String identifier) {
+    public static String makeJavaIdentifierForAttribute(String identifier) {
         return makeJavaIdentifier(identifier, false);
     }
 
@@ -751,7 +740,7 @@ public class JspUtil {
      *
      * @return the replacement character as a string
      */
-    public static final String mangleChar(char ch) {
+    public static String mangleChar(char ch) {
         char[] result = new char[5];
         result[0] = '_';
         result[1] = Character.forDigit((ch >> 12) & 0xf, 16);
@@ -853,35 +842,18 @@ public class JspUtil {
             if (type.charAt(i) == '[') {
                 dims++;
             } else {
-                switch (type.charAt(i)) {
-                    case 'Z':
-                        t = "boolean";
-                        break;
-                    case 'B':
-                        t = "byte";
-                        break;
-                    case 'C':
-                        t = "char";
-                        break;
-                    case 'D':
-                        t = "double";
-                        break;
-                    case 'F':
-                        t = "float";
-                        break;
-                    case 'I':
-                        t = "int";
-                        break;
-                    case 'J':
-                        t = "long";
-                        break;
-                    case 'S':
-                        t = "short";
-                        break;
-                    case 'L':
-                        t = type.substring(i + 1, type.indexOf(';'));
-                        break;
-                }
+                t = switch (type.charAt(i)) {
+                    case 'Z' -> "boolean";
+                    case 'B' -> "byte";
+                    case 'C' -> "char";
+                    case 'D' -> "double";
+                    case 'F' -> "float";
+                    case 'I' -> "int";
+                    case 'J' -> "long";
+                    case 'S' -> "short";
+                    case 'L' -> type.substring(i + 1, type.indexOf(';'));
+                    default -> null;
+                };
                 break;
             }
         }

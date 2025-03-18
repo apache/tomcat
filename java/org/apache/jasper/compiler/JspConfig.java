@@ -46,7 +46,7 @@ public class JspConfig {
 
     private static final String defaultIsXml = null; // unspecified
     private String defaultIsELIgnored = null; // unspecified
-    private String defaultErrorOnELNotFound = "false";
+    private static final String defaultErrorOnELNotFound = "false";
     private static final String defaultIsScriptingInvalid = null;
     private String defaultDeferedSyntaxAllowedAsLiteral = null;
     private static final String defaultTrimDirectiveWhitespaces = null;
@@ -90,7 +90,7 @@ public class JspConfig {
 
             Collection<String> urlPatterns = jspPropertyGroup.getUrlPatterns();
 
-            if (urlPatterns.size() == 0) {
+            if (urlPatterns.isEmpty()) {
                 continue;
             }
 
@@ -185,10 +185,10 @@ public class JspConfig {
             // Both specifies a *.ext, keep the first one
             return prev;
         }
-        if (prevPath == null && currPath != null) {
+        if (prevPath == null) {
             return curr;
         }
-        if (prevPath != null && currPath == null) {
+        if (currPath == null) {
             return prev;
         }
         if (prevPath.length() >= currPath.length()) {

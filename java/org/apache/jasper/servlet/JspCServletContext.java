@@ -103,13 +103,13 @@ public class JspCServletContext implements ServletContext {
     /**
      * Merged web.xml for the application.
      */
-    private WebXml webXml;
+    private final WebXml webXml;
 
 
     private List<URL> resourceJARs;
 
 
-    private JspConfigDescriptor jspConfigDescriptor;
+    private final JspConfigDescriptor jspConfigDescriptor;
 
 
     /**
@@ -324,7 +324,7 @@ public class JspCServletContext implements ServletContext {
         // Strip leading '/'
         path = path.substring(1);
 
-        URL url = null;
+        URL url;
         try {
             URI uri = new URI(myResourceBaseURL.toExternalForm() + path);
             url = uri.toURL();
@@ -380,7 +380,7 @@ public class JspCServletContext implements ServletContext {
         if (basePath != null) {
             File theBaseDir = new File(basePath);
             if (theBaseDir.isDirectory()) {
-                String theFiles[] = theBaseDir.list();
+                String[] theFiles = theBaseDir.list();
                 if (theFiles != null) {
                     for (String theFile : theFiles) {
                         File testFile = new File(basePath + File.separator + theFile);

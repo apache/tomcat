@@ -192,7 +192,6 @@ public class TldScanner {
                 }
             } else {
                 log.warn(Localizer.getMessage(MSG + ".webxmlFailPathDoesNotExist", resourcePath, taglibURI));
-                continue;
             }
         }
     }
@@ -320,7 +319,7 @@ public class TldScanner {
             }
             foundFileWithoutTld = false;
             final Path filePath = file.toPath();
-            Files.walkFileTree(metaInf.toPath(), new SimpleFileVisitor<Path>() {
+            Files.walkFileTree(metaInf.toPath(), new SimpleFileVisitor<>() {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     Path fileName = file.getFileName();

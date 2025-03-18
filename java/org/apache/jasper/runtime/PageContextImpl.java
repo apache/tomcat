@@ -173,8 +173,7 @@ public class PageContextImpl extends PageContext {
         try {
             ((JspWriterImpl) out).flushBuffer();
         } catch (IOException ex) {
-            IllegalStateException ise = new IllegalStateException(Localizer.getMessage("jsp.error.flush"), ex);
-            throw ise;
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.flush"), ex);
         } finally {
             servlet = null;
             config = null;
@@ -206,25 +205,18 @@ public class PageContextImpl extends PageContext {
             throw new NullPointerException(Localizer.getMessage("jsp.error.attribute.null_name"));
         }
 
-        switch (scope) {
-            case PAGE_SCOPE:
-                return attributes.get(name);
-
-            case REQUEST_SCOPE:
-                return request.getAttribute(name);
-
-            case SESSION_SCOPE:
+        return switch (scope) {
+            case PAGE_SCOPE -> attributes.get(name);
+            case REQUEST_SCOPE -> request.getAttribute(name);
+            case SESSION_SCOPE -> {
                 if (session == null) {
                     throw new IllegalStateException(Localizer.getMessage("jsp.error.page.noSession"));
                 }
-                return session.getAttribute(name);
-
-            case APPLICATION_SCOPE:
-                return context.getAttribute(name);
-
-            default:
-                throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
-        }
+                yield session.getAttribute(name);
+            }
+            case APPLICATION_SCOPE -> context.getAttribute(name);
+            default -> throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
+        };
     }
 
     @Override
@@ -366,25 +358,18 @@ public class PageContextImpl extends PageContext {
 
     @Override
     public Enumeration<String> getAttributeNamesInScope(final int scope) {
-        switch (scope) {
-            case PAGE_SCOPE:
-                return Collections.enumeration(attributes.keySet());
-
-            case REQUEST_SCOPE:
-                return request.getAttributeNames();
-
-            case SESSION_SCOPE:
+        return switch (scope) {
+            case PAGE_SCOPE -> Collections.enumeration(attributes.keySet());
+            case REQUEST_SCOPE -> request.getAttributeNames();
+            case SESSION_SCOPE -> {
                 if (session == null) {
                     throw new IllegalStateException(Localizer.getMessage("jsp.error.page.noSession"));
                 }
-                return session.getAttributeNames();
-
-            case APPLICATION_SCOPE:
-                return context.getAttributeNames();
-
-            default:
-                throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
-        }
+                yield session.getAttributeNames();
+            }
+            case APPLICATION_SCOPE -> context.getAttributeNames();
+            default -> throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
+        };
     }
 
     @Override
@@ -569,7 +554,7 @@ public class PageContextImpl extends PageContext {
             throw new NullPointerException(Localizer.getMessage("jsp.error.page.nullThrowable"));
         }
 
-        if (errorPageURL != null && !errorPageURL.equals("")) {
+        if (errorPageURL != null && !errorPageURL.isEmpty()) {
 
             /*
              * Set request attributes. Do not set the jakarta.servlet.error.exception attribute here (instead, set in
@@ -615,19 +600,17 @@ public class PageContextImpl extends PageContext {
             if (t instanceof ServletException) {
                 throw (ServletException) t;
             }
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            }
-
             Throwable rootCause = null;
             if (t instanceof JspException || t instanceof ELException) {
                 rootCause = t.getCause();
             }
-
             if (rootCause != null) {
                 throw new ServletException(t.getClass().getName() + ": " + t.getMessage(), rootCause);
             }
-
+            // ELException is a runtime exception
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            }
             throw new ServletException(t);
         }
     }
