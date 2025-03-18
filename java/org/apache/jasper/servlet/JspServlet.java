@@ -96,10 +96,10 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 Object[] args = { config, context };
                 options = (Options) ctor.newInstance(args);
             } catch (Throwable e) {
-                e = ExceptionUtils.unwrapInvocationTargetException(e);
-                ExceptionUtils.handleThrowable(e);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(e);
+                ExceptionUtils.handleThrowable(throwable);
                 // Need to localize this.
-                log.warn(Localizer.getMessage("jsp.warning.engineOptionsClass", engineOptionsName), e);
+                log.warn(Localizer.getMessage("jsp.warning.engineOptionsClass", engineOptionsName), throwable);
                 // Use the default Options implementation
                 options = new EmbeddedServletOptions(config, context);
             }

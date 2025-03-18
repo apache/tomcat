@@ -22,7 +22,7 @@ import java.security.PrivilegedAction;
 public class Validation {
 
     // Java keywords, boolean literals & the null literal in alphabetical order
-    private static final String invalidIdentifiers[] = { "abstract", "assert", "boolean", "break", "byte", "case",
+    private static final String[] invalidIdentifiers = { "abstract", "assert", "boolean", "break", "byte", "case",
             "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends",
             "false", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int",
             "interface", "long", "native", "new", "null", "package", "private", "protected", "public", "return",
@@ -64,7 +64,7 @@ public class Validation {
         }
 
         // Should not be the case but check to be sure
-        if (key == null || key.length() == 0) {
+        if (key == null || key.isEmpty()) {
             return false;
         }
 
@@ -88,10 +88,6 @@ public class Validation {
          * The parser checks Character.isJavaIdentifierStart() and Character.isJavaIdentifierPart() so no need to check
          * them again here. However, we do need to check that '#' hasn't been used at the start of the identifier.
          */
-        if (key.charAt(0) == '#') {
-            return false;
-        }
-
-        return true;
+        return key.charAt(0) != '#';
     }
 }

@@ -21,7 +21,6 @@ import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.el.CompositeELResolver;
 import javax.el.ELContext;
 import javax.el.ELContextEvent;
 import javax.el.ELContextListener;
@@ -110,8 +109,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
     private ELResolver createELResolver() {
         this.instantiated = true;
         if (this.resolver == null) {
-            CompositeELResolver r = new JasperELResolver(this.resolvers, expressionFactory.getStreamELResolver());
-            this.resolver = r;
+            this.resolver = new JasperELResolver(this.resolvers, expressionFactory.getStreamELResolver());
         }
         return this.resolver;
     }

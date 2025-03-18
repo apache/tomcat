@@ -373,7 +373,7 @@ public class Util {
             if (isWriterUsed) {
                 return sw.toString();
             } else if (isStreamUsed) {
-                if (this.charEncoding != null && !this.charEncoding.equals("")) {
+                if (this.charEncoding != null && !this.charEncoding.isEmpty()) {
                     return bos.toString(charEncoding);
                 } else {
                     return bos.toString("ISO-8859-1");

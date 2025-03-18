@@ -291,7 +291,7 @@ public class BodyContentImpl extends BodyContent {
     }
 
     @Override
-    public void println(char x[]) throws IOException {
+    public void println(char[] x) throws IOException {
         print(x);
         println();
     }

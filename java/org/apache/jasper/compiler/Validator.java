@@ -715,10 +715,8 @@ class Validator {
                 char c = value.charAt(i);
                 if (c == '#' && (i + 1) < len && value.charAt(i + 1) == '{' && !prevCharIsEscape) {
                     return true;
-                } else if (c == '\\') {
-                    prevCharIsEscape = true;
                 } else {
-                    prevCharIsEscape = false;
+                    prevCharIsEscape = c == '\\';
                 }
                 i++;
             }
@@ -1020,7 +1018,7 @@ class Validator {
                 }
                 for (int j = 0; tldAttrs != null && j < tldAttrs.length; j++) {
                     if (attrs.getLocalName(i).equals(tldAttrs[j].getName()) && (attrs.getURI(i) == null ||
-                            attrs.getURI(i).length() == 0 || attrs.getURI(i).equals(n.getURI()))) {
+                        attrs.getURI(i).isEmpty() || attrs.getURI(i).equals(n.getURI()))) {
 
                         TagAttributeInfo tldAttr = tldAttrs[j];
                         if (tldAttr.canBeRequestTime() || tldAttr.isDeferredMethod() || tldAttr.isDeferredValue()) { // JSP
@@ -1149,7 +1147,7 @@ class Validator {
                      */
                     String attrPrefix = na.getPrefix();
                     if (na.getLocalName().equals(tldAttr.getName()) &&
-                            (attrPrefix == null || attrPrefix.length() == 0 || attrPrefix.equals(n.getPrefix()))) {
+                            (attrPrefix == null || attrPrefix.isEmpty() || attrPrefix.equals(n.getPrefix()))) {
                         jspAttrs[start + i] = new Node.JspAttribute(na, tldAttr, false);
                         NamedAttributeVisitor nav = null;
                         if (na.getBody() != null) {
@@ -1379,7 +1377,7 @@ class Validator {
 
             class FVVisitor extends ELNode.Visitor {
 
-                private Node n;
+                private final Node n;
 
                 FVVisitor(Node n) {
                     this.n = n;
@@ -1498,7 +1496,7 @@ class Validator {
 
             class ValidateFunctionMapper extends FunctionMapper {
 
-                private Map<String,Method> fnmap = new HashMap<>();
+                private final Map<String,Method> fnmap = new HashMap<>();
 
                 @Override
                 public void mapFunction(String prefix, String localName, Method method) {
@@ -1512,7 +1510,7 @@ class Validator {
             }
 
             class MapperELVisitor extends ELNode.Visitor {
-                private ValidateFunctionMapper fmapper;
+                private final ValidateFunctionMapper fmapper;
 
                 MapperELVisitor(ValidateFunctionMapper fmapper) {
                     this.fmapper = fmapper;
@@ -1535,9 +1533,9 @@ class Validator {
                         err.jspError("jsp.error.function.classnotfound", n.getFunctionInfo().getFunctionClass(),
                                 n.getPrefix() + ':' + n.getName(), e.getMessage());
                     }
-                    String paramTypes[] = n.getParameters();
+                    String[] paramTypes = n.getParameters();
                     int size = paramTypes.length;
-                    Class<?> params[] = new Class[size];
+                    Class<?>[] params = new Class[size];
                     int i = 0;
                     try {
                         for (i = 0; i < size; i++) {

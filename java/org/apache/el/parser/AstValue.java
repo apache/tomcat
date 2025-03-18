@@ -200,7 +200,7 @@ public final class AstValue extends SimpleNode {
     public MethodInfo getMethodInfo(EvaluationContext ctx, @SuppressWarnings("rawtypes") Class[] paramTypes)
             throws ELException {
         Target t = getTarget(ctx);
-        Class<?>[] types = null;
+        Class<?>[] types;
         if (isParametersProvided()) {
             Object[] values = ((AstMethodParameters) this.jjtGetChild(this.jjtGetNumChildren() - 1)).getParameters(ctx);
             types = getTypesFromValues(values);
@@ -218,9 +218,9 @@ public final class AstValue extends SimpleNode {
             throws ELException {
 
         Target t = getTarget(ctx);
-        Method m = null;
-        Object[] values = null;
-        Class<?>[] types = null;
+        Method m;
+        Object[] values;
+        Class<?>[] types;
         if (isParametersProvided()) {
             values = ((AstMethodParameters) this.jjtGetChild(this.jjtGetNumChildren() - 1)).getParameters(ctx);
             types = getTypesFromValues(values);
@@ -233,7 +233,7 @@ public final class AstValue extends SimpleNode {
         // Handle varArgs and any coercion required
         values = convertArgs(ctx, values, m);
 
-        Object result = null;
+        Object result;
         try {
             result = m.invoke(t.base, values);
         } catch (IllegalAccessException | IllegalArgumentException e) {
@@ -261,8 +261,8 @@ public final class AstValue extends SimpleNode {
 
         int paramCount = types.length;
 
-        if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount > src.length) ||
-                !m.isVarArgs() && (paramCount > 0 && src == null || src != null && src.length != paramCount)) {
+        if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount > src.length) || !m.isVarArgs() &&
+            (src == null || src.length != paramCount)) {
             String srcCount = null;
             if (src != null) {
                 srcCount = Integer.toString(src.length);
@@ -311,7 +311,7 @@ public final class AstValue extends SimpleNode {
             return null;
         }
 
-        Class<?> result[] = new Class<?>[values.length];
+        Class<?>[] result = new Class<?>[values.length];
         for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
                 result[i] = null;
@@ -347,9 +347,7 @@ public final class AstValue extends SimpleNode {
         // child
         int len = children.length;
         if (len > 2) {
-            if (this.jjtGetChild(len - 1) instanceof AstMethodParameters) {
-                return true;
-            }
+            return this.jjtGetChild(len - 1) instanceof AstMethodParameters;
         }
         return false;
     }

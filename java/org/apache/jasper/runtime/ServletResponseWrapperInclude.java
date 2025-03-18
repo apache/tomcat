@@ -68,6 +68,7 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
         try {
             jspWriter.clearBuffer();
         } catch (IOException ioe) {
+            // Ignore
         }
     }
 }

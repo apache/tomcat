@@ -56,6 +56,7 @@ public class Localizer {
                 errMsg = bundle.getString(errCode);
             }
         } catch (MissingResourceException e) {
+            // Ignore
         }
         return errMsg;
     }

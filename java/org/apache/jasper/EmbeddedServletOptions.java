@@ -45,7 +45,7 @@ public final class EmbeddedServletOptions implements Options {
     // Logger
     private final Log log = LogFactory.getLog(EmbeddedServletOptions.class); // must not be static
 
-    private Properties settings = new Properties();
+    private final Properties settings = new Properties();
 
     /**
      * Is Jasper being used in development mode?
@@ -110,7 +110,7 @@ public final class EmbeddedServletOptions implements Options {
      * I want to see my generated servlets. Which directory are they
      * in?
      */
-    private File scratchDir;
+    private final File scratchDir;
 
     /**
      * Need to have this as is for versions 4 and 5 of IE. Can be set from

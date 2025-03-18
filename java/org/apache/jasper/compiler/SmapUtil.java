@@ -71,6 +71,7 @@ public class SmapUtil {
         try {
             pageNodes.visit(psVisitor);
         } catch (JasperException ex) {
+            // Ignore
         }
         HashMap<String,SmapStratum> map = psVisitor.getMap();
 
@@ -401,7 +402,7 @@ public class SmapUtil {
                         int len = readU2();
                         writeU2(len);
                         byte[] utf8 = readBytes(len);
-                        String str = new String(utf8, "UTF-8");
+                        String str = new String(utf8, StandardCharsets.UTF_8);
                         if (log.isTraceEnabled()) {
                             log.trace(i + " read class attr -- '" + str + "'");
                         }
@@ -432,6 +433,7 @@ public class SmapUtil {
         try {
             nodes.visit(new SmapGenVisitor(s, breakAtLF, innerClassMap));
         } catch (JasperException ex) {
+            // Ignore
         }
     }
 
@@ -609,7 +611,7 @@ public class SmapUtil {
         private void doSmapText(Node n) {
             String text = n.getText();
             int index = 0;
-            int next = 0;
+            int next;
             int lineCount = 1;
             int skippedLines = 0;
             boolean slashStarSeen = false;
@@ -635,7 +637,7 @@ public class SmapUtil {
                                 beginning = false;
                             }
                         }
-                    } else if (line.length() == 0 || line.startsWith("//")) {
+                    } else if (line.isEmpty() || line.startsWith("//")) {
                         skippedLines++;
                     } else {
                         beginning = false;

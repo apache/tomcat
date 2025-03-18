@@ -130,8 +130,8 @@ public class AntCompiler extends Compiler {
         StringBuilder errorReport = new StringBuilder();
 
         StringBuilder info = new StringBuilder();
-        info.append("Compile: javaFileName=" + javaFileName + "\n");
-        info.append("    classpath=" + classpath + "\n");
+        info.append("Compile: javaFileName=").append(javaFileName).append("\n");
+        info.append("    classpath=").append(classpath).append("\n");
 
         // Start capturing the System.err output for this thread
         SystemLogHandler.setThread();
@@ -143,13 +143,13 @@ public class AntCompiler extends Compiler {
         // Initializing classpath
         Path path = new Path(project);
         path.setPath(System.getProperty("java.class.path"));
-        info.append("    cp=" + System.getProperty("java.class.path") + "\n");
+        info.append("    cp=").append(System.getProperty("java.class.path")).append("\n");
         StringTokenizer tokenizer = new StringTokenizer(classpath, File.pathSeparator);
         while (tokenizer.hasMoreElements()) {
             String pathElement = tokenizer.nextToken();
             File repository = new File(pathElement);
             path.setLocation(repository);
-            info.append("    cp=" + repository + "\n");
+            info.append("    cp=").append(repository).append("\n");
         }
 
         if (log.isTraceEnabled()) {
@@ -160,7 +160,7 @@ public class AntCompiler extends Compiler {
         Path srcPath = new Path(project);
         srcPath.setLocation(options.getScratchDir());
 
-        info.append("    work dir=" + options.getScratchDir() + "\n");
+        info.append("    work dir=").append(options.getScratchDir()).append("\n");
 
         // Initialize and set java extensions
         String exts = System.getProperty("java.ext.dirs");
@@ -168,7 +168,7 @@ public class AntCompiler extends Compiler {
             Path extdirs = new Path(project);
             extdirs.setPath(exts);
             javac.setExtdirs(extdirs);
-            info.append("    extension dir=" + exts + "\n");
+            info.append("    extension dir=").append(exts).append("\n");
         }
 
         // Add endorsed directories if any are specified and we're forking
@@ -191,29 +191,29 @@ public class AntCompiler extends Compiler {
         javac.setSrcdir(srcPath);
         javac.setTempdir(options.getScratchDir());
         javac.setFork(ctxt.getOptions().getFork());
-        info.append("    srcDir=" + srcPath + "\n");
+        info.append("    srcDir=").append(srcPath).append("\n");
 
         // Set the Java compiler to use
         if (options.getCompiler() != null) {
             javac.setCompiler(options.getCompiler());
-            info.append("    compiler=" + options.getCompiler() + "\n");
+            info.append("    compiler=").append(options.getCompiler()).append("\n");
         }
 
         if (options.getCompilerTargetVM() != null) {
             javac.setTarget(options.getCompilerTargetVM());
-            info.append("   compilerTargetVM=" + options.getCompilerTargetVM() + "\n");
+            info.append("   compilerTargetVM=").append(options.getCompilerTargetVM()).append("\n");
         }
 
         if (options.getCompilerSourceVM() != null) {
             javac.setSource(options.getCompilerSourceVM());
-            info.append("   compilerSourceVM=" + options.getCompilerSourceVM() + "\n");
+            info.append("   compilerSourceVM=").append(options.getCompilerSourceVM()).append("\n");
         }
 
         // Build includes path
         PatternSet.NameEntry includes = javac.createInclude();
 
         includes.setName(ctxt.getJavaPath());
-        info.append("    include=" + ctxt.getJavaPath() + "\n");
+        info.append("    include=").append(ctxt.getJavaPath()).append("\n");
 
         BuildException be = null;
 

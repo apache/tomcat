@@ -424,8 +424,8 @@ public abstract class Compiler {
 
         if (jsw != null && (ctxt.getOptions().getModificationTestInterval() > 0)) {
 
-            if (jsw.getLastModificationTest() + (ctxt.getOptions().getModificationTestInterval() * 1000) > System
-                    .currentTimeMillis()) {
+            if (jsw.getLastModificationTest() +
+                (ctxt.getOptions().getModificationTestInterval() * 1000L) > System.currentTimeMillis()) {
                 return false;
             }
             jsw.setLastModificationTest(System.currentTimeMillis());
@@ -477,7 +477,7 @@ public abstract class Compiler {
             try {
                 String key = include.getKey();
                 URL includeUrl;
-                long includeLastModified = 0;
+                long includeLastModified;
                 if (key.startsWith("jar:jar:")) {
                     // Assume we constructed this correctly
                     int entryStart = key.lastIndexOf("!/");

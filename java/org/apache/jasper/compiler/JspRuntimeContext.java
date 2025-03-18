@@ -132,7 +132,7 @@ public final class JspRuntimeContext {
         }
 
         /* Init parameter is in seconds, locally we use milliseconds */
-        jspIdleTimeout = options.getJspIdleTimeout() * 1000;
+        jspIdleTimeout = options.getJspIdleTimeout() * 1000L;
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -449,7 +449,7 @@ public final class JspRuntimeContext {
                         // Need to decode the URL, primarily to convert %20
                         // sequences back to spaces
                         String decoded = url.toURI().getPath();
-                        cpath.append(decoded + File.pathSeparator);
+                        cpath.append(decoded).append(File.pathSeparator);
                     } catch (URISyntaxException e) {
                         log.warn(Localizer.getMessage("jsp.warning.classpathUrl"), e);
                     }
@@ -457,7 +457,7 @@ public final class JspRuntimeContext {
             }
         }
 
-        cpath.append(options.getScratchDir() + File.pathSeparator);
+        cpath.append(options.getScratchDir()).append(File.pathSeparator);
 
         String cp = (String) context.getAttribute(Constants.SERVLET_CLASSPATH);
         if (cp == null || cp.equals("")) {

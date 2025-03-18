@@ -51,7 +51,6 @@ public class TagHandlerPool {
                 result = (TagHandlerPool) c.getConstructor().newInstance();
             } catch (Exception e) {
                 LogFactory.getLog(TagHandlerPool.class).info(Localizer.getMessage("jsp.error.tagHandlerPool"), e);
-                result = null;
             }
         }
         if (result == null) {
@@ -69,7 +68,7 @@ public class TagHandlerPool {
             try {
                 maxSize = Integer.parseInt(maxSizeS);
             } catch (Exception ex) {
-                maxSize = -1;
+                // Ignore
             }
         }
         if (maxSize < 0) {

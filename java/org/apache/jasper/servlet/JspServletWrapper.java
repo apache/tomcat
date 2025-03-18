@@ -112,9 +112,9 @@ public class JspServletWrapper {
         this.config = config;
         this.options = options;
         this.jspUri = jspUri;
-        unloadByCount = options.getMaxLoadedJsps() > 0 ? true : false;
-        unloadByIdle = options.getJspIdleTimeout() > 0 ? true : false;
-        unloadAllowed = unloadByCount || unloadByIdle ? true : false;
+        unloadByCount = options.getMaxLoadedJsps() > 0;
+        unloadByIdle = options.getJspIdleTimeout() > 0;
+        unloadAllowed = unloadByCount || unloadByIdle;
         ctxt = new JspCompilationContext(jspUri, options, config.getServletContext(), this, rctxt);
     }
 
@@ -129,9 +129,9 @@ public class JspServletWrapper {
         this.options = options;
         this.jspUri = tagFilePath;
         this.tripCount = 0;
-        unloadByCount = options.getMaxLoadedJsps() > 0 ? true : false;
-        unloadByIdle = options.getJspIdleTimeout() > 0 ? true : false;
-        unloadAllowed = unloadByCount || unloadByIdle ? true : false;
+        unloadByCount = options.getMaxLoadedJsps() > 0;
+        unloadByIdle = options.getJspIdleTimeout() > 0;
+        unloadAllowed = unloadByCount || unloadByIdle;
         ctxt = new JspCompilationContext(jspUri, tagInfo, options, servletContext, this, rctxt, tagJar);
     }
 

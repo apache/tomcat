@@ -49,7 +49,7 @@ public abstract class AstAbstractEmpty extends SimpleNode {
     @Override
     public Object getValue(EvaluationContext ctx) throws ELException {
         Object obj = this.children[0].getValue(ctx);
-        if (obj == null || obj instanceof String && ((String) obj).length() == 0 ||
+        if (obj == null || obj instanceof String && ((String) obj).isEmpty() ||
                 obj instanceof Object[] && ((Object[]) obj).length == 0 ||
                 obj instanceof Collection<?> && ((Collection<?>) obj).isEmpty() ||
                 obj instanceof Map<?,?> && ((Map<?,?>) obj).isEmpty()) {

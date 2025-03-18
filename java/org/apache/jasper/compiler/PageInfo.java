@@ -353,10 +353,10 @@ class PageInfo {
      */
     public String getURI(String prefix) {
 
-        String uri = null;
+        String uri;
 
         Deque<String> stack = xmlPrefixMapper.get(prefix);
-        if (stack == null || stack.size() == 0) {
+        if (stack == null || stack.isEmpty()) {
             uri = jspPrefixMapper.get(prefix);
         } else {
             uri = stack.getFirst();

@@ -44,7 +44,7 @@ class DefaultErrorHandler implements ErrorHandler {
             return;
         }
 
-        Object[] args = null;
+        Object[] args;
         StringBuilder buf = new StringBuilder();
 
         for (JavacErrorDetail detail : details) {

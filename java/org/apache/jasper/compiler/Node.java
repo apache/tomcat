@@ -243,7 +243,7 @@ abstract class Node implements TagConstants {
         int numChildNodes = nodes.size();
         for (int i = 0; i < numChildNodes; i++) {
             NamedAttribute na = (NamedAttribute) nodes.getNode(i);
-            boolean found = false;
+            boolean found;
             int index = name.indexOf(':');
             if (index != -1) {
                 // qualified name
@@ -1674,7 +1674,7 @@ abstract class Node implements TagConstants {
             int n = 0;
             Node p = parent;
             while (p != null) {
-                if ((p instanceof Node.CustomTag) && qName.equals(((Node.CustomTag) p).qName)) {
+                if ((p instanceof Node.CustomTag) && qName.equals(p.qName)) {
                     n++;
                 }
                 p = p.parent;
@@ -1719,9 +1719,9 @@ abstract class Node implements TagConstants {
      * only).
      */
     public static class AttributeGenerator extends Node {
-        private String name; // name of the attribute
+        private final String name; // name of the attribute
 
-        private CustomTag tag; // The tag this attribute belongs to
+        private final CustomTag tag; // The tag this attribute belongs to
 
         AttributeGenerator(Mark start, String name, CustomTag tag) {
             super(start, null);
@@ -1873,6 +1873,7 @@ abstract class Node implements TagConstants {
                 try {
                     getBody().visit(attributeVisitor);
                 } catch (JasperException e) {
+                    // Ignore
                 }
                 text = attributeVisitor.getAttrValue();
             }
@@ -2079,14 +2080,14 @@ abstract class Node implements TagConstants {
          * @return return true if there's TagAttributeInfo meaning we need to assign a ValueExpression
          */
         public boolean isDeferredInput() {
-            return (this.tai != null) ? this.tai.isDeferredValue() : false;
+            return this.tai != null && this.tai.isDeferredValue();
         }
 
         /**
          * @return return true if there's TagAttributeInfo meaning we need to assign a MethodExpression
          */
         public boolean isDeferredMethodInput() {
-            return (this.tai != null) ? this.tai.isDeferredMethod() : false;
+            return this.tai != null && this.tai.isDeferredMethod();
         }
 
         public String getExpectedTypeName() {
@@ -2114,7 +2115,7 @@ abstract class Node implements TagConstants {
                         m = m.trim();
                         m = m.substring(m.indexOf('(') + 1);
                         m = m.substring(0, m.length() - 1);
-                        if (m.trim().length() > 0) {
+                        if (!m.trim().isEmpty()) {
                             String[] p = m.split(",");
                             for (int i = 0; i < p.length; i++) {
                                 p[i] = p[i].trim();
@@ -2250,6 +2251,7 @@ abstract class Node implements TagConstants {
             try {
                 n = list.get(index);
             } catch (ArrayIndexOutOfBoundsException e) {
+                // Ignore
             }
             return n;
         }

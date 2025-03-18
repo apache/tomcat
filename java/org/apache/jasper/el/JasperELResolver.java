@@ -47,7 +47,7 @@ public class JasperELResolver extends CompositeELResolver {
 
     private static final int STANDARD_RESOLVERS_COUNT = 9;
 
-    private AtomicInteger resolversSize = new AtomicInteger(0);
+    private final AtomicInteger resolversSize = new AtomicInteger(0);
     private volatile ELResolver[] resolvers;
     private final int appResolversSize;
 
@@ -96,7 +96,7 @@ public class JasperELResolver extends CompositeELResolver {
         context.setPropertyResolved(false);
 
         int start;
-        Object result = null;
+        Object result;
 
         if (base == null) {
             // call implicit and app resolvers
@@ -132,13 +132,13 @@ public class JasperELResolver extends CompositeELResolver {
     @Override
     public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
         String targetMethod = coerceToString(method);
-        if (targetMethod.length() == 0) {
+        if (targetMethod.isEmpty()) {
             throw new ELException(new NoSuchMethodException());
         }
 
         context.setPropertyResolved(false);
 
-        Object result = null;
+        Object result;
 
         // skip implicit and call app resolvers, stream resolver and static
         // resolver
@@ -233,11 +233,11 @@ public class JasperELResolver extends CompositeELResolver {
             Class<?> beanClass = base.getClass();
             String prop = property.toString();
             Method readMethod = getReadMethod(beanClass, prop);
-            return readMethod == null || !(getWriteMethod(beanClass, prop, readMethod.getReturnType()) != null);
+            return readMethod == null || getWriteMethod(beanClass, prop, readMethod.getReturnType()) == null;
         }
 
         private static Method getReadMethod(Class<?> beanClass, String prop) {
-            Method methods[] = beanClass.getMethods();
+            Method[] methods = beanClass.getMethods();
             String isGetter = "is" + capitalize(prop);
             String getter = "get" + capitalize(prop);
             for (Method method : methods) {
@@ -254,7 +254,7 @@ public class JasperELResolver extends CompositeELResolver {
 
         private static Method getWriteMethod(Class<?> beanClass, String prop, Class<?> valueClass) {
             String setter = "set" + capitalize(prop);
-            Method methods[] = beanClass.getMethods();
+            Method[] methods = beanClass.getMethods();
             for (Method method : methods) {
                 if (method.getParameterCount() == 1 && setter.equals(method.getName()) &&
                         (valueClass == null || valueClass.isAssignableFrom(method.getParameterTypes()[0]))) {
@@ -265,10 +265,10 @@ public class JasperELResolver extends CompositeELResolver {
         }
 
         private static String capitalize(String name) {
-            if (name == null || name.length() == 0) {
+            if (name == null || name.isEmpty()) {
                 return name;
             }
-            char chars[] = name.toCharArray();
+            char[] chars = name.toCharArray();
             chars[0] = Character.toUpperCase(chars[0]);
             return new String(chars);
         }

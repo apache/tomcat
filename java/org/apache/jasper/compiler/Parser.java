@@ -141,8 +141,7 @@ class Parser implements TagConstants {
             parser.addInclude(root, pageInfo.getIncludeCoda());
         }
 
-        Node.Nodes page = new Node.Nodes(root);
-        return page;
+        return new Node.Nodes(root);
     }
 
     /**
@@ -249,15 +248,12 @@ class Parser implements TagConstants {
         char ch = (char) reader.peekChar();
         if (Character.isLetter(ch) || ch == '_' || ch == ':') {
             StringBuilder buf = new StringBuilder();
-            buf.append(ch);
-            reader.nextChar();
-            ch = (char) reader.peekChar();
-            while (Character.isLetter(ch) || Character.isDigit(ch) || ch == '.' || ch == '_' || ch == '-' ||
-                    ch == ':') {
+            do {
                 buf.append(ch);
                 reader.nextChar();
                 ch = (char) reader.peekChar();
-            }
+            } while (Character.isLetter(ch) || Character.isDigit(ch) ||
+                ch == '.' || ch == '_' || ch == '-' || ch == ':');
             return buf.toString();
         }
         return null;
@@ -1207,7 +1203,7 @@ class Parser implements TagConstants {
             bc = tagFileInfo.getTagInfo().getBodyContent();
         }
 
-        Node tagNode = null;
+        Node tagNode;
         if (tagInfo != null) {
             tagNode = new Node.CustomTag(tagName, prefix, shortTagName, uri, attrs, start, parent, tagInfo,
                     tagHandlerClass);
