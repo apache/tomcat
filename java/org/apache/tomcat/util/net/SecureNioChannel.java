@@ -294,7 +294,7 @@ public class SecureNioChannel extends NioChannel {
             break;
         case NON_SECURE:
             netOutBuffer.clear();
-            netOutBuffer.put(TLSClientHelloExtractor.USE_TLS_RESPONSE);
+            netOutBuffer.put(extractor.getUseTlsResponse());
             netOutBuffer.flip();
             flushOutbound();
             throw new IOException(sm.getString("channel.nio.ssl.foundHttp"));
