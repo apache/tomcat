@@ -180,7 +180,7 @@ class ParserController implements TagConstants {
     private Node.Nodes doParse(String inFileName, Node parent, Jar jar)
             throws FileNotFoundException, JasperException, IOException {
 
-        Node.Nodes parsedPage = null;
+        Node.Nodes parsedPage;
         isEncodingSpecifiedInProlog = false;
         isBomPresent = false;
         isDefaultPageEncoding = false;
@@ -347,7 +347,7 @@ class ParserController implements TagConstants {
          * is TRUE and 'isXml' is FALSE). No check for XML prolog, since nothing prevents a page from outputting XML and
          * still using JSP syntax (in this case, the XML prolog is treated as template text).
          */
-        JspReader jspReader = null;
+        JspReader jspReader;
         try {
             jspReader = new JspReader(ctxt, absFileName, sourceEnc, jar, err);
         } catch (FileNotFoundException ex) {
@@ -469,12 +469,11 @@ class ParserController implements TagConstants {
         }
 
         // attrName = contentType
-        String contentType = value;
         String encoding = null;
-        if (contentType != null) {
-            int loc = contentType.indexOf(CHARSET);
+        if (value != null) {
+            int loc = value.indexOf(CHARSET);
             if (loc != -1) {
-                encoding = contentType.substring(loc + CHARSET.length());
+                encoding = value.substring(loc + CHARSET.length());
             }
         }
 
@@ -511,7 +510,7 @@ class ParserController implements TagConstants {
     private boolean hasJspRoot(JspReader reader) {
 
         // <prefix>:root must be the first element
-        Mark start = null;
+        Mark start;
         while ((start = reader.skipUntil("<")) != null) {
             int c = reader.nextChar();
             if (c != '!' && c != '?') {
@@ -546,15 +545,12 @@ class ParserController implements TagConstants {
             index++;
         }
         if (index < root.length() && root.charAt(index) == '=') {
-            index++;
-            while (index < root.length() && Character.isWhitespace(root.charAt(index))) {
+            do {
                 index++;
-            }
+            } while (index < root.length() && Character.isWhitespace(root.charAt(index)));
             if (index < root.length() && (root.charAt(index) == '"' || root.charAt(index) == '\'')) {
                 index++;
-                if (root.regionMatches(index, JSP_URI, 0, JSP_URI.length())) {
-                    return true;
-                }
+                return root.regionMatches(index, JSP_URI, 0, JSP_URI.length());
             }
         }
 

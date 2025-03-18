@@ -211,7 +211,7 @@ abstract class ELNode {
         }
 
         public boolean isEmpty() {
-            return list.size() == 0;
+            return list.isEmpty();
         }
 
         /**

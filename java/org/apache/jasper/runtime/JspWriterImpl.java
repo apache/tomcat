@@ -37,7 +37,7 @@ public class JspWriterImpl extends JspWriter {
 
     private Writer out;
     private ServletResponse response;
-    private char cb[];
+    private char[] cb;
     private int nextChar;
     private boolean flushed = false;
     private boolean closed = false;
@@ -206,14 +206,11 @@ public class JspWriterImpl extends JspWriter {
      * to print a stack trace.
      */
     private static int min(int a, int b) {
-        if (a < b) {
-            return a;
-        }
-        return b;
+        return Math.min(a, b);
     }
 
     @Override
-    public void write(char cbuf[], int off, int len) throws IOException {
+    public void write(char[] cbuf, int off, int len) throws IOException {
         ensureOpen();
 
         if (bufferSize == 0) {
@@ -261,7 +258,7 @@ public class JspWriterImpl extends JspWriter {
     }
 
     @Override
-    public void write(char buf[]) throws IOException {
+    public void write(char[] buf) throws IOException {
         write(buf, 0, buf.length);
     }
 
@@ -329,7 +326,7 @@ public class JspWriterImpl extends JspWriter {
     }
 
     @Override
-    public void print(char s[]) throws IOException {
+    public void print(char[] s) throws IOException {
         write(s);
     }
 
@@ -390,7 +387,7 @@ public class JspWriterImpl extends JspWriter {
     }
 
     @Override
-    public void println(char x[]) throws IOException {
+    public void println(char[] x) throws IOException {
         print(x);
         println();
     }

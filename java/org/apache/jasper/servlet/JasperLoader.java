@@ -78,7 +78,7 @@ public class JasperLoader extends URLClassLoader {
     @Override
     public synchronized Class<?> loadClass(final String name, boolean resolve) throws ClassNotFoundException {
 
-        Class<?> clazz = null;
+        Class<?> clazz;
 
         // (0) Check our previously loaded class cache
         clazz = findLoadedClass(name);

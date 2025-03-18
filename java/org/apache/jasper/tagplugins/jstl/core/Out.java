@@ -33,9 +33,8 @@ public final class Out implements TagPlugin {
 
         //these two data member are to indicate
         //whether the corresponding attribute is specified
-        boolean hasDefault=false, hasEscapeXml=false;
-        hasDefault = ctxt.isAttributeSpecified("default");
-        hasEscapeXml = ctxt.isAttributeSpecified("escapeXml");
+        boolean hasDefault = ctxt.isAttributeSpecified("default");
+        boolean hasEscapeXml = ctxt.isAttributeSpecified("escapeXml");
 
         //strValName, strEscapeXmlName & strDefName are two variables' name
         //standing for value, escapeXml and default attribute

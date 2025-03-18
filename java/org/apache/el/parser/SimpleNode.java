@@ -81,7 +81,7 @@ public abstract class SimpleNode implements Node {
         if (children == null) {
             children = new SimpleNode[i + 1];
         } else if (i >= children.length) {
-            SimpleNode c[] = new SimpleNode[i + 1];
+            SimpleNode[] c = new SimpleNode[i + 1];
             System.arraycopy(children, 0, c, 0, children.length);
             children = c;
         }
@@ -154,7 +154,7 @@ public abstract class SimpleNode implements Node {
     @Override
     public void accept(NodeVisitor visitor) throws Exception {
         visitor.visit(this);
-        if (this.children != null && this.children.length > 0) {
+        if (this.children != null) {
             for (Node child : this.children) {
                 child.accept(visitor);
             }
@@ -210,10 +210,7 @@ public abstract class SimpleNode implements Node {
         } else if (!image.equals(other.image)) {
             return false;
         }
-        if (!Arrays.equals(children, other.children)) {
-            return false;
-        }
-        return true;
+        return Arrays.equals(children, other.children);
     }
 
 

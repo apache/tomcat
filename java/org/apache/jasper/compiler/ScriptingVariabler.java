@@ -86,7 +86,7 @@ class ScriptingVariabler {
 
             List<Object> vec = new ArrayList<>();
 
-            Integer ownRange = null;
+            Integer ownRange;
             Node.CustomTag parent = n.getCustomTagParent();
             if (scope == VariableInfo.AT_BEGIN || scope == VariableInfo.AT_END) {
                 if (parent == null) {

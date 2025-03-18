@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Objects;
 
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.WriteListener;
@@ -174,11 +176,7 @@ public class Util {
      */
     public static String escapeXml(String buffer) {
         String result = escapeXml(buffer.toCharArray(), buffer.length());
-        if (result == null) {
-            return buffer;
-        } else {
-            return result;
-        }
+        return Objects.requireNonNullElse(result, buffer);
     }
 
     @SuppressWarnings("null") // escapedBuffer cannot be null
@@ -345,10 +343,10 @@ public class Util {
             if (isWriterUsed) {
                 return sw.toString();
             } else if (isStreamUsed) {
-                if (this.charEncoding != null && !this.charEncoding.equals("")) {
+                if (this.charEncoding != null && !this.charEncoding.isEmpty()) {
                     return bos.toString(charEncoding);
                 } else {
-                    return bos.toString("ISO-8859-1");
+                    return bos.toString(StandardCharsets.ISO_8859_1);
                 }
             }
             else {

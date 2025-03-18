@@ -141,7 +141,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                     if (path == null) {
                         // JAR not in the web application so add it directly
                         URL jarUrl = jar.getJarFileURL();
-                        long lastMod = -1;
+                        long lastMod;
                         URLConnection urlConn = null;
                         try {
                             urlConn = jarUrl.openConnection();
@@ -393,5 +393,5 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
         return tlv.validate(getPrefixString(), uri, thePage);
     }
 
-    private TagLibraryValidator tagLibraryValidator;
+    private final TagLibraryValidator tagLibraryValidator;
 }

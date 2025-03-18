@@ -215,7 +215,6 @@ public class JspCompilationContext {
         if (jspCompiler != null ) {
             return jspCompiler;
         }
-        jspCompiler = null;
         if (options.getCompilerClassName() != null) {
             jspCompiler = createCompiler(options.getCompilerClassName());
         } else {
@@ -401,7 +400,6 @@ public class JspCompilationContext {
                 log.debug(Localizer.getMessage(
                         "jsp.error.lastModified", getJspFile()), e);
             }
-            result = -1;
         } finally {
             if (uc != null) {
                 try {
@@ -461,7 +459,7 @@ public class JspCompilationContext {
             return packageName;
         } else {
             String dPackageName = getDerivedPackageName();
-            if (dPackageName.length() == 0) {
+            if (dPackageName.isEmpty()) {
                 return basePackageName;
             }
             return basePackageName + '.' + getDerivedPackageName();
@@ -579,7 +577,7 @@ public class JspCompilationContext {
     // ==================== Removal ====================
 
     public void incrementRemoved() {
-        if (removed == false && rctxt != null) {
+        if (!removed && rctxt != null) {
             rctxt.removeWrapper(jspUri);
         }
         removed = true;
@@ -676,7 +674,7 @@ public class JspCompilationContext {
     }
 
     protected void createOutputDir() {
-        String path = null;
+        String path;
         if (isTagFile()) {
             String tagName = tagInfo.getTagClassName();
             path = tagName.replace('.', File.separatorChar);
@@ -699,11 +697,11 @@ public class JspCompilationContext {
         }
     }
 
-    protected static final boolean isPathSeparator(char c) {
+    protected static boolean isPathSeparator(char c) {
         return (c == '/' || c == '\\');
     }
 
-    protected static final String canonicalURI(String s) {
+    protected static String canonicalURI(String s) {
         if (s == null) {
             return null;
         }

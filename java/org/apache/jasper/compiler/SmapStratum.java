@@ -101,14 +101,14 @@ public class SmapStratum {
             StringBuilder out = new StringBuilder();
             out.append(inputStartLine);
             if (lineFileIDSet) {
-                out.append("#" + lineFileID);
+                out.append("#").append(lineFileID);
             }
             if (inputLineCount != 1) {
-                out.append("," + inputLineCount);
+                out.append(",").append(inputLineCount);
             }
-            out.append(":" + outputStartLine);
+            out.append(":").append(outputStartLine);
             if (outputLineIncrement != 1) {
-                out.append("," + outputLineIncrement);
+                out.append(",").append(outputLineIncrement);
             }
             out.append('\n');
             return out.toString();
@@ -281,7 +281,7 @@ public class SmapStratum {
 
         // start the SMAP
         out.append("SMAP\n");
-        out.append(outputFileName + '\n');
+        out.append(outputFileName).append('\n');
         out.append("JSP\n");
 
         // print StratumSection
@@ -292,16 +292,16 @@ public class SmapStratum {
         int bound = fileNameList.size();
         for (int i = 0; i < bound; i++) {
             if (filePathList.get(i) != null) {
-                out.append("+ " + i + " " + fileNameList.get(i) + "\n");
+                out.append("+ ").append(i).append(" ").append(fileNameList.get(i)).append("\n");
                 // Source paths must be relative, not absolute, so we
                 // remove the leading "/", if one exists.
                 String filePath = filePathList.get(i);
                 if (filePath.startsWith("/")) {
                     filePath = filePath.substring(1);
                 }
-                out.append(filePath + "\n");
+                out.append(filePath).append("\n");
             } else {
-                out.append(i + " " + fileNameList.get(i) + "\n");
+                out.append(i).append(" ").append(fileNameList.get(i)).append("\n");
             }
         }
 

@@ -278,9 +278,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
         /*
          * Notice that due to a bug in the underlying SAX parser, the attributes must be enumerated in descending order.
          */
-        boolean isTaglib = false;
         for (int i = attrs.getLength() - 1; i >= 0; i--) {
-            isTaglib = false;
             String attrQName = attrs.getQName(i);
             if (!attrQName.startsWith("xmlns")) {
                 if (nonTaglibAttrs == null) {
@@ -289,6 +287,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
                 nonTaglibAttrs.addAttribute(attrs.getURI(i), attrs.getLocalName(i), attrs.getQName(i), attrs.getType(i),
                         attrs.getValue(i));
             } else {
+                boolean isTaglib;
                 if (attrQName.startsWith("xmlns:jsp")) {
                     isTaglib = true;
                 } else {
@@ -313,7 +312,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
             }
         }
 
-        Node node = null;
+        Node node;
 
         if (tagDependentPending && JSP_URI.equals(uri) && localName.equals(BODY_ACTION)) {
             tagDependentPending = false;
@@ -429,7 +428,8 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
             int column = startMark.getColumnNumber();
 
             CharArrayWriter ttext = new CharArrayWriter();
-            int lastCh = 0, elType = 0;
+            int lastCh = 0;
+            int elType;
             for (int i = 0; i < charBuffer.length(); i++) {
 
                 int ch = charBuffer.charAt(i);
@@ -565,7 +565,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
             tagDependentNesting--;
         }
 
-        if (scriptlessBodyNode != null && current.equals(scriptlessBodyNode)) {
+        if (current.equals(scriptlessBodyNode)) {
             scriptlessBodyNode = null;
         }
 
@@ -719,7 +719,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
     private Node parseStandardAction(String qName, String localName, Attributes nonTaglibAttrs,
             Attributes nonTaglibXmlnsAttrs, Attributes taglibAttrs, Mark start) throws SAXException {
 
-        Node node = null;
+        Node node;
 
         if (localName.equals(ROOT_ACTION)) {
             if (!(current instanceof Node.Root)) {
@@ -858,7 +858,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
 
         String prefix = getPrefix(qName);
 
-        Node.CustomTag ret = null;
+        Node.CustomTag ret;
         if (tagInfo != null) {
             ret = new Node.CustomTag(qName, prefix, localName, uri, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs,
                     start, parent, tagInfo, tagHandlerClass);
@@ -1000,7 +1000,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
     private void checkPrefix(String uri, String qName) {
 
         String prefix = getPrefix(qName);
-        if (prefix.length() > 0) {
+        if (!prefix.isEmpty()) {
             pageInfo.addPrefix(prefix);
             if ("jsp".equals(prefix) && !JSP_URI.equals(uri)) {
                 pageInfo.setIsJspPrefixHijacked(true);

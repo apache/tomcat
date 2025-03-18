@@ -77,15 +77,15 @@ class TagFileProcessor {
                         new JspUtil.ValidAttribute("scope"), new JspUtil.ValidAttribute("declare"),
                         new JspUtil.ValidAttribute("description") };
 
-        private ErrorDispatcher err;
+        private final ErrorDispatcher err;
 
-        private TagLibraryInfo tagLibInfo;
+        private final TagLibraryInfo tagLibInfo;
 
-        private String name = null;
+        private final String name;
 
-        private String path = null;
+        private final String path;
 
-        private String bodycontent = null;
+        private String bodyContent = null;
 
         private String description = null;
 
@@ -99,9 +99,9 @@ class TagFileProcessor {
 
         private String example = null;
 
-        private List<TagAttributeInfo> attributeList;
+        private final List<TagAttributeInfo> attributeList;
 
-        private List<TagVariableInfo> variableList;
+        private final List<TagVariableInfo> variableList;
 
         private static final String ATTR_NAME = "the name attribute of the attribute directive";
 
@@ -113,9 +113,9 @@ class TagFileProcessor {
 
         private static final String TAG_DYNAMIC = "the dynamic-attributes attribute of the tag directive";
 
-        private Map<String,NameEntry> nameTable = new HashMap<>();
+        private final Map<String,NameEntry> nameTable = new HashMap<>();
 
-        private Map<String,NameEntry> nameFromTable = new HashMap<>();
+        private final Map<String,NameEntry> nameFromTable = new HashMap<>();
 
         TagFileDirectiveVisitor(Compiler compiler, TagLibraryInfo tagLibInfo, String name, String path) {
             err = compiler.getErrorDispatcher();
@@ -131,11 +131,11 @@ class TagFileProcessor {
 
             JspUtil.checkAttributes("Tag directive", n, tagDirectiveAttrs, err);
 
-            bodycontent = checkConflict(n, bodycontent, "body-content");
-            if (bodycontent != null && !bodycontent.equalsIgnoreCase(TagInfo.BODY_CONTENT_EMPTY) &&
-                    !bodycontent.equalsIgnoreCase(TagInfo.BODY_CONTENT_TAG_DEPENDENT) &&
-                    !bodycontent.equalsIgnoreCase(TagInfo.BODY_CONTENT_SCRIPTLESS)) {
-                err.jspError(n, "jsp.error.tagdirective.badbodycontent", bodycontent);
+            bodyContent = checkConflict(n, bodyContent, "body-content");
+            if (bodyContent != null && !bodyContent.equalsIgnoreCase(TagInfo.BODY_CONTENT_EMPTY) &&
+                    !bodyContent.equalsIgnoreCase(TagInfo.BODY_CONTENT_TAG_DEPENDENT) &&
+                    !bodyContent.equalsIgnoreCase(TagInfo.BODY_CONTENT_SCRIPTLESS)) {
+                err.jspError(n, "jsp.error.tagdirective.badbodycontent", bodyContent);
             }
             dynamicAttrsMapName = checkConflict(n, dynamicAttrsMapName, "dynamic-attributes");
             if (dynamicAttrsMapName != null) {
@@ -322,8 +322,8 @@ class TagFileProcessor {
                 // XXX Get it from tag file name
             }
 
-            if (bodycontent == null) {
-                bodycontent = TagInfo.BODY_CONTENT_SCRIPTLESS;
+            if (bodyContent == null) {
+                bodyContent = TagInfo.BODY_CONTENT_SCRIPTLESS;
             }
 
             String tagClassName = JspUtil.getTagHandlerClassName(path, packageName, tagLibInfo.getReliableURN(), err);
@@ -331,16 +331,16 @@ class TagFileProcessor {
             TagVariableInfo[] tagVariableInfos = variableList.toArray(new TagVariableInfo[0]);
             TagAttributeInfo[] tagAttributeInfo = attributeList.toArray(new TagAttributeInfo[0]);
 
-            return new JasperTagInfo(name, tagClassName, bodycontent, description, tagLibInfo, null, tagAttributeInfo,
+            return new JasperTagInfo(name, tagClassName, bodyContent, description, tagLibInfo, null, tagAttributeInfo,
                     displayName, smallIcon, largeIcon, tagVariableInfos, dynamicAttrsMapName);
         }
 
         static class NameEntry {
-            private String type;
+            private final String type;
 
-            private Node node;
+            private final Node node;
 
-            private TagAttributeInfo attr;
+            private final TagAttributeInfo attr;
 
             NameEntry(String type, Node node, TagAttributeInfo attr) {
                 this.type = type;
@@ -560,9 +560,9 @@ class TagFileProcessor {
      */
     private class TagFileLoaderVisitor extends Node.Visitor {
 
-        private Compiler compiler;
+        private final Compiler compiler;
 
-        private PageInfo pageInfo;
+        private final PageInfo pageInfo;
 
         TagFileLoaderVisitor(Compiler compiler) {
 

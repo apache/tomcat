@@ -252,7 +252,7 @@ public abstract class ELArithmetic {
 
     private static final Long ZERO = Long.valueOf(0);
 
-    public static final Number add(final Object obj0, final Object obj1) {
+    public static Number add(final Object obj0, final Object obj1) {
         final ELArithmetic delegate = findDelegate(obj0, obj1);
         if (delegate == null) {
             return Long.valueOf(0);
@@ -264,7 +264,7 @@ public abstract class ELArithmetic {
         return delegate.add(num0, num1);
     }
 
-    public static final Number mod(final Object obj0, final Object obj1) {
+    public static Number mod(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
             return Long.valueOf(0);
         }
@@ -286,7 +286,7 @@ public abstract class ELArithmetic {
         return delegate.mod(num0, num1);
     }
 
-    public static final Number subtract(final Object obj0, final Object obj1) {
+    public static Number subtract(final Object obj0, final Object obj1) {
         final ELArithmetic delegate = findDelegate(obj0, obj1);
         if (delegate == null) {
             return Long.valueOf(0);
@@ -298,7 +298,7 @@ public abstract class ELArithmetic {
         return delegate.subtract(num0, num1);
     }
 
-    public static final Number divide(final Object obj0, final Object obj1) {
+    public static Number divide(final Object obj0, final Object obj1) {
         if (obj0 == null && obj1 == null) {
             return ZERO;
         }
@@ -318,7 +318,7 @@ public abstract class ELArithmetic {
         return delegate.divide(num0, num1);
     }
 
-    public static final Number multiply(final Object obj0, final Object obj1) {
+    public static Number multiply(final Object obj0, final Object obj1) {
         final ELArithmetic delegate = findDelegate(obj0, obj1);
         if (delegate == null) {
             return Long.valueOf(0);
@@ -350,11 +350,11 @@ public abstract class ELArithmetic {
         }
     }
 
-    public static final boolean isNumber(final Object obj) {
+    public static boolean isNumber(final Object obj) {
         return (obj != null && isNumberType(obj.getClass()));
     }
 
-    public static final boolean isNumberType(final Class<?> type) {
+    public static boolean isNumberType(final Class<?> type) {
         return type == Long.TYPE || type == Double.TYPE || type == Byte.TYPE || type == Short.TYPE ||
                 type == Integer.TYPE || type == Float.TYPE || Number.class.isAssignableFrom(type);
     }

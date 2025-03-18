@@ -173,8 +173,7 @@ public class PageContextImpl extends PageContext {
         try {
             ((JspWriterImpl) out).flushBuffer();
         } catch (IOException ex) {
-            IllegalStateException ise = new IllegalStateException(Localizer.getMessage("jsp.error.flush"), ex);
-            throw ise;
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.flush"), ex);
         } finally {
             servlet = null;
             config = null;
@@ -586,7 +585,7 @@ public class PageContextImpl extends PageContext {
             throw new NullPointerException(Localizer.getMessage("jsp.error.page.nullThrowable"));
         }
 
-        if (errorPageURL != null && !errorPageURL.equals("")) {
+        if (errorPageURL != null && !errorPageURL.isEmpty()) {
 
             /*
              * Set request attributes. Do not set the jakarta.servlet.error.exception attribute here (instead, set in
@@ -630,20 +629,18 @@ public class PageContextImpl extends PageContext {
             if (t instanceof ServletException) {
                 throw (ServletException) t;
             }
-            if (t instanceof RuntimeException) {
-                throw (RuntimeException) t;
-            }
-
             Throwable rootCause = null;
             if (t instanceof JspException || t instanceof ELException ||
                     t instanceof jakarta.servlet.jsp.el.ELException) {
                 rootCause = t.getCause();
             }
-
             if (rootCause != null) {
                 throw new ServletException(t.getClass().getName() + ": " + t.getMessage(), rootCause);
             }
-
+            // ELException is a runtime exception
+            if (t instanceof RuntimeException) {
+                throw (RuntimeException) t;
+            }
             throw new ServletException(t);
         }
     }
