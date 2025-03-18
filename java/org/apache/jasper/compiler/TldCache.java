@@ -63,7 +63,7 @@ public class TldCache {
         this.uriTldResourcePathMap.putAll(uriTldResourcePathMap);
         for (Entry<TldResourcePath,TaglibXml> entry : tldResourcePathTaglibXmlMap.entrySet()) {
             TldResourcePath tldResourcePath = entry.getKey();
-            long lastModified[] = getLastModified(tldResourcePath);
+            long[] lastModified = getLastModified(tldResourcePath);
             TaglibXmlCacheEntry cacheEntry =
                     new TaglibXmlCacheEntry(entry.getValue(), lastModified[0], lastModified[1]);
             this.tldResourcePathTaglibXmlMap.put(tldResourcePath, cacheEntry);
@@ -91,7 +91,7 @@ public class TldCache {
         if (cacheEntry == null) {
             return null;
         }
-        long lastModified[] = getLastModified(tldResourcePath);
+        long[] lastModified = getLastModified(tldResourcePath);
         if (lastModified[0] != cacheEntry.getWebAppPathLastModified() ||
                 lastModified[1] != cacheEntry.getEntryLastModified()) {
             synchronized (cacheEntry) {

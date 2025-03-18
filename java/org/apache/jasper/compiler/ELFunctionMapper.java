@@ -56,7 +56,7 @@ public class ELFunctionMapper {
 
         // Append the declarations to the root node
         String ds = map.ds.toString();
-        if (ds.length() > 0) {
+        if (!ds.isEmpty()) {
             Node root = page.getRoot();
             @SuppressWarnings("unused")
             Node unused = new Node.Declaration(map.ss.toString(), null, root);
@@ -174,7 +174,7 @@ public class ELFunctionMapper {
             el.visit(fv);
             List<ELNode.Function> functions = fv.funcs;
 
-            if (functions.size() == 0) {
+            if (functions.isEmpty()) {
                 return;
             }
 
@@ -187,13 +187,13 @@ public class ELFunctionMapper {
 
             // Generate declaration for the map statically
             decName = getMapName();
-            ss.append("private static org.apache.jasper.runtime.ProtectedFunctionMapper " + decName + ";\n");
+            ss.append("private static org.apache.jasper.runtime.ProtectedFunctionMapper ").append(decName).append(";\n");
 
-            ds.append("  " + decName + "= ");
+            ds.append("  ").append(decName).append("= ");
             ds.append("org.apache.jasper.runtime.ProtectedFunctionMapper");
 
             // Special case if there is only one function in the map
-            String funcMethod = null;
+            String funcMethod;
             if (functions.size() == 1) {
                 funcMethod = ".getMapForFunction";
             } else {
@@ -208,18 +208,19 @@ public class ELFunctionMapper {
                 if (funcInfo == null) {
                     // Added via Lambda or ImportHandler. EL will expect a
                     // function mapper even if one isn't used so just pass null
-                    ds.append(funcMethod + "(null, null, null, null);\n");
+                    ds.append(funcMethod).append("(null, null, null, null);\n");
                 } else {
-                    ds.append(funcMethod + "(\"" + fnQName + "\", " + getCanonicalName(funcInfo.getFunctionClass()) +
-                            ".class, " + '\"' + f.getMethodName() + "\", " + "new Class[] {");
-                    String params[] = f.getParameters();
+                    ds.append(funcMethod).append("(\"").append(fnQName).append("\", ");
+                    ds.append(getCanonicalName(funcInfo.getFunctionClass())).append(".class, ").append('\"');
+                    ds.append(f.getMethodName()).append("\", ").append("new Class[] {");
+                    String[] params = f.getParameters();
                     for (int k = 0; k < params.length; k++) {
                         if (k != 0) {
                             ds.append(", ");
                         }
                         int iArray = params[k].indexOf('[');
                         if (iArray < 0) {
-                            ds.append(params[k] + ".class");
+                            ds.append(params[k]).append(".class");
                         } else {
                             String baseType = params[k].substring(0, iArray);
                             ds.append("java.lang.reflect.Array.newInstance(");
@@ -236,7 +237,7 @@ public class ELFunctionMapper {
                             if (aCount == 1) {
                                 ds.append("0).getClass()");
                             } else {
-                                ds.append("new int[" + aCount + "]).getClass()");
+                                ds.append("new int[").append(aCount).append("]).getClass()");
                             }
                         }
                     }

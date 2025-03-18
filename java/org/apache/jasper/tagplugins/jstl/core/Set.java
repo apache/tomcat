@@ -25,20 +25,17 @@ public class Set implements TagPlugin {
     @Override
     public void doTag(TagPluginContext ctxt) {
 
-        //the flags to indicate whether the attributes have been specified
-        boolean hasValue = false, hasVar = false, hasScope = false,
-        hasTarget = false;
-
         //the scope name
         String strScope;
         //the id of the scope
         int iScope;
 
+        //the flags to indicate whether the attributes have been specified
         //initialize the flags
-        hasValue = ctxt.isAttributeSpecified("value");
-        hasVar = ctxt.isAttributeSpecified("var");
-        hasScope = ctxt.isAttributeSpecified("scope");
-        hasTarget = ctxt.isAttributeSpecified("target");
+        boolean hasValue = ctxt.isAttributeSpecified("value");
+        boolean hasVar = ctxt.isAttributeSpecified("var");
+        boolean hasScope = ctxt.isAttributeSpecified("scope");
+        boolean hasTarget = ctxt.isAttributeSpecified("target");
 
         //the temp variables name
         String resultName = ctxt.getTemporaryVariableName();

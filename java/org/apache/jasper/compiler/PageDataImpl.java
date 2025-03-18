@@ -124,10 +124,9 @@ class PageDataImpl extends PageData implements TagConstants {
                      * Therefore, create a new prefix (one that is unique across the translation unit) for use by the
                      * 'id' attribute, and bind it to the JSP namespace
                      */
-                    jspIdPrefix += "jsp";
-                    while (pageInfo.containsPrefix(jspIdPrefix)) {
+                    do {
                         jspIdPrefix += "jsp";
-                    }
+                    } while (pageInfo.containsPrefix(jspIdPrefix));
                     rootAttrs.addAttribute("", "", "xmlns:" + jspIdPrefix, "CDATA", JSP_URI);
                 }
 
@@ -434,7 +433,7 @@ class PageDataImpl extends PageData implements TagConstants {
                 } else {
                     appendText(text, false);
                 }
-                buf.append("</" + n.getQName() + ">\n");
+                buf.append("</").append(n.getQName()).append(">\n");
             } else {
                 buf.append("/>\n");
             }
@@ -489,7 +488,7 @@ class PageDataImpl extends PageData implements TagConstants {
                 buf.append("  ").append(attrName).append("=\"");
                 buf.append(JspUtil.getExprInXml(value)).append("\"\n");
             }
-            if (n.getImports().size() > 0) {
+            if (!n.getImports().isEmpty()) {
                 // Concatenate names of imported classes/packages
                 boolean first = true;
                 for (String i : n.getImports()) {

@@ -34,7 +34,7 @@ public final class AstInteger extends SimpleNode {
 
     private volatile Number number;
 
-    protected Number getInteger() {
+    private Number getInteger() {
         // The parser should ensure the format of the string to be parsed
         if (this.number == null) {
             try {

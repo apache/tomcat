@@ -102,8 +102,8 @@ class JspReader {
 
         try {
             CharArrayWriter caw = new CharArrayWriter();
-            char buf[] = new char[1024];
-            for (int i = 0; (i = reader.read(buf)) != -1;) {
+            char[] buf = new char[1024];
+            for (int i; (i = reader.read(buf)) != -1;) {
                 caw.write(buf, 0, i);
             }
             caw.close();
@@ -319,7 +319,7 @@ class JspReader {
             current.update(i + cursor, line, col);
         } else {
             Mark mark = mark();
-            int ch = 0;
+            int ch;
             int i = 0;
             do {
                 ch = nextChar();
@@ -402,7 +402,7 @@ class JspReader {
         Mark ret = mark();
         int limlen = limit.length();
         char firstChar = limit.charAt(0);
-        Boolean result = null;
+        Boolean result;
         Mark restart = null;
 
         skip: while ((result = indexOf(firstChar, ret)) != null) {

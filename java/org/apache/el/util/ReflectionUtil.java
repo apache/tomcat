@@ -445,7 +445,7 @@ public class ReflectionUtil {
             return m;
         }
         Class<?>[] interfaces = type.getInterfaces();
-        Method mp = null;
+        Method mp;
         for (Class<?> iface : interfaces) {
             try {
                 mp = iface.getMethod(m.getName(), m.getParameterTypes());

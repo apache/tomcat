@@ -19,7 +19,6 @@ package org.apache.jasper.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.el.CompositeELResolver;
 import jakarta.el.ELContext;
 import jakarta.el.ELContextEvent;
 import jakarta.el.ELContextListener;
@@ -102,8 +101,7 @@ public class JspApplicationContextImpl implements JspApplicationContext {
     private ELResolver createELResolver() {
         this.instantiated = true;
         if (this.resolver == null) {
-            CompositeELResolver r = new JasperELResolver(this.resolvers, expressionFactory.getStreamELResolver());
-            this.resolver = r;
+            this.resolver = new JasperELResolver(this.resolvers, expressionFactory.getStreamELResolver());
         }
         return this.resolver;
     }
