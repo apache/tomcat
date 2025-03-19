@@ -18,7 +18,6 @@ package org.apache.catalina.ha.tcp;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
@@ -421,15 +420,10 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
         }
         if (isCrossContext) {
             List<DeltaSession> sessions = crossContextSessions.get();
-            if (sessions != null && sessions.size() > 0) {
-                Iterator<DeltaSession> iter = sessions.iterator();
-                for (; iter.hasNext();) {
-                    Session session = iter.next();
+            if (sessions != null) {
+                for (DeltaSession session : sessions) {
                     resetDeltaRequest(session);
-                    if (session instanceof DeltaSession) {
-                        ((DeltaSession) contextSession).setPrimarySession(true);
-                    }
-
+                    session.setPrimarySession(true);
                 }
             }
         }
