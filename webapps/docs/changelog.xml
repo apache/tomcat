@@ -126,6 +126,12 @@
         Fix invocation of the FFM OpenSSL code for setting a SSL engine and
         FIPS mode. (remm)
       </fix>
+      <fix>
+        <bug>69615</bug>: Improve integration with the not found class resources
+        cache for users who are using a custom web application class loader
+        and/or using reflection to dynamically add external repositories to the
+        web application class loader. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
