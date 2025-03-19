@@ -161,6 +161,14 @@
       </scode>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Fix resetting cross context sessions in the
+        <code>ReplicationValve</code>. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
