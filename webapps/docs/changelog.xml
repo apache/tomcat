@@ -128,6 +128,10 @@
         Fix parsing of the <code>time-taken</code> token in the
         <code>ExtendedAccessLogValve</code>. (remm)
       </fix>
+      <fix>
+        Fix invocation of the FFM OpenSSL code for setting a SSL engine and
+        FIPS mode. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
