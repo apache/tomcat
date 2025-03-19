@@ -164,7 +164,6 @@ public class JspConfig {
     /**
      * Select the property group that has more restrictive url-pattern. In case of tie, select the first.
      */
-    @SuppressWarnings("null") // NPE not possible
     private JspPropertyGroup selectProperty(JspPropertyGroup prev, JspPropertyGroup curr) {
         if (prev == null) {
             return curr;
