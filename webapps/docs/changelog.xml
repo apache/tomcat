@@ -134,6 +134,9 @@
         <bug>69614</bug>: HTTP/2 priority frames with an invalid priority field
         value should be ignored. (markt)
       </fix>
+      <fix>
+        Improve handling of unexpected errors during HTTP/2 processing. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
