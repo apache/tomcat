@@ -570,7 +570,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
                     sourceType = "MbeansDescriptorsDigesterSource";
                 }
             }
-            case InputStream _ -> {
+            case InputStream inputStream -> {
                 type = param;
                 inputsource = source;
             }
