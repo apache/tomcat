@@ -97,8 +97,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     @Override
     public void start() throws IOException {
         if (executor == null) {
-            // executor = new ThreadPoolExecutor(minThreads,maxThreads,60,TimeUnit.SECONDS,new
-            // LinkedBlockingQueue<Runnable>());
             String channelName = "";
             if (channel.getName() != null) {
                 channelName = "[" + channel.getName() + "]";
@@ -183,7 +181,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     /**
      * Attempts to bind using the provided port and if that fails attempts to bind to each of the ports from portstart
      * to (portstart + retries -1) until either there are no more ports or the bind is successful. The address to bind
-     * to is obtained via a call to {link {@link #getBind()}.
+     * to is obtained via a call to {@link #getBind()}.
      *
      * @param socket    The socket to bind
      * @param portstart Starting port for bind attempts

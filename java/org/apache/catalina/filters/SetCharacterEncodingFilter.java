@@ -46,7 +46,7 @@ import org.apache.juli.logging.LogFactory;
  * Although this filter can be used unchanged, it is also easy to subclass it and make the <code>selectEncoding()</code>
  * method more intelligent about what encoding to choose, based on characteristics of the incoming request (such as the
  * values of the <code>Accept-Language</code> and <code>User-Agent</code> headers, or a value stashed in the current
- * user's session.
+ * user's session).
  * </p>
  */
 public class SetCharacterEncodingFilter extends FilterBase {

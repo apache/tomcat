@@ -49,7 +49,7 @@ public interface RewriteMap {
      * Optional parameters that can be defined through the {@code RewriteMap} directive in the {@code rewrite.config}
      * file.
      * <p>
-     * This method will be called, if there are more than one parameters defined.
+     * This method will be called, if there is more than one parameter defined.
      *
      * @param params the optional parameters
      */

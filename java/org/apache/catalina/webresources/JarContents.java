@@ -132,7 +132,7 @@ public final class JarContents {
      * Method that identifies whether a given path <b>MIGHT</b> be in this jar. Uses the Bloom filter mechanism.
      *
      * @param path       Requested path. Sometimes starts with "/WEB-INF/classes".
-     * @param webappRoot The value of the webapp location, which can be stripped from the path. Typically is
+     * @param webappRoot The value of the webapp location, which can be stripped from the path. Typically it is
      *                       "/WEB-INF/classes".
      *
      * @return Whether the prefix of the path is known to be in this jar.

@@ -68,7 +68,8 @@ import org.apache.tomcat.util.json.JSONFilter;
  * <li>%{xxx}r: requestAttributes</li>
  * <li>%{xxx}s: sessionAttributes</li>
  * </ul>
- * The attribute list is based on https://github.com/fluent/fluentd/blob/master/lib/fluent/plugin/parser_apache2.rb#L72
+ * The attribute list is based on
+ * <a href="https://github.com/fluent/fluentd/blob/master/lib/fluent/plugin/parser_apache2.rb#L72">parser_apache2.rb</a>
  */
 public class JsonAccessLogValve extends AccessLogValve {
 

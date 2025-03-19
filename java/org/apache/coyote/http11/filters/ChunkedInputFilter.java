@@ -363,8 +363,8 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 }
                 eol = true;
             } else if (chr == Constants.SEMI_COLON && !parsingExtension) {
-                // First semi-colon marks the start of the extension. Further
-                // semi-colons may appear to separate multiple chunk-extensions.
+                // First semicolon marks the start of the extension. Further
+                // semicolons may appear to separate multiple chunk-extensions.
                 // These need to be processed as part of parsing the extensions.
                 parsingExtension = true;
                 extensionSize++;
@@ -426,8 +426,8 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 }
                 eol = true;
             } else if (chr == Constants.SEMI_COLON && !parsingExtension) {
-                // First semi-colon marks the start of the extension. Further
-                // semi-colons may appear to separate multiple chunk-extensions.
+                // First semicolon marks the start of the extension. Further
+                // semicolons may appear to separate multiple chunk-extensions.
                 // These need to be processed as part of parsing the extensions.
                 parsingExtension = true;
                 extensionSize++;

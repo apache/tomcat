@@ -22,7 +22,7 @@ import java.security.Principal;
  * This Realm is intended for use with Authenticator implementations
  * ({@link org.apache.catalina.authenticator.SSLAuthenticator},
  * {@link org.apache.catalina.authenticator.SpnegoAuthenticator}) that authenticate the user as well as obtain the user
- * credentials. An authenticated Principal is always created from the user name presented to without further validation.
+ * credentials. An authenticated Principal is always created from the username presented to without further validation.
  * <p>
  * <strong>Note:</strong> It is unsafe to use this Realm with Authenticator implementations that do not validate the
  * provided credentials.

@@ -48,7 +48,7 @@ public abstract class TimeBucketCounterBase {
     private ScheduledFuture<?> monitorFuture;
     private final ScheduledExecutorService executorService;
     private final long sleeptime;
-    private int bucketDuration;
+    private final int bucketDuration;
 
 
     /**

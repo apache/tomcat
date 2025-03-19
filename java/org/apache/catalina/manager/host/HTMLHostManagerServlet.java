@@ -53,7 +53,7 @@ import org.apache.tomcat.util.security.Escape;
  *
  * @see org.apache.catalina.manager.ManagerServlet
  */
-public final class HTMLHostManagerServlet extends HostManagerServlet {
+public class HTMLHostManagerServlet extends HostManagerServlet {
 
     private static final long serialVersionUID = 1L;
 
@@ -254,7 +254,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         // Message Section
         args = new Object[3];
         args[0] = smClient.getString("htmlHostManagerServlet.messageLabel");
-        if (message == null || message.length() == 0) {
+        if (message == null || message.isEmpty()) {
             args[1] = "OK";
         } else {
             args[1] = Escape.htmlElementContent(message);
@@ -288,13 +288,12 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         // Hosts Row Section
         // Create sorted set of host names.
         Container[] children = engine.findChildren();
-        String hostNames[] = new String[children.length];
+        String[] hostNames = new String[children.length];
         for (int i = 0; i < children.length; i++) {
             hostNames[i] = children[i].getName();
         }
 
-        SortedSet<String> sortedHostNames = new TreeSet<>();
-        sortedHostNames.addAll(Arrays.asList(hostNames));
+        SortedSet<String> sortedHostNames = new TreeSet<>(Arrays.asList(hostNames));
 
         String hostsStart = smClient.getString("htmlHostManagerServlet.hostsStart");
         String hostsStop = smClient.getString("htmlHostManagerServlet.hostsStop");

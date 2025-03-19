@@ -72,7 +72,7 @@ public class Introspection {
      */
     public static boolean isValidLifecycleCallback(Method method) {
         return method.getParameterTypes().length == 0 && !Modifier.isStatic(method.getModifiers()) &&
-            method.getExceptionTypes().length <= 0 && method.getReturnType().getName().equals("void");
+                method.getExceptionTypes().length == 0 && method.getReturnType().getName().equals("void");
     }
 
     /**

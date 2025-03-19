@@ -66,7 +66,7 @@ public class Constants {
 
     /**
      * If the <code>cache</code> property of the authenticator is set, and the current request is part of a session, the
-     * user name used to authenticate this user will be cached under this key to avoid the need for repeated calls to
+     * username used to authenticate this user will be cached under this key to avoid the need for repeated calls to
      * <code>Realm.authenticate()</code>.
      */
     public static final String SESS_USERNAME_NOTE = "org.apache.catalina.session.USERNAME";

@@ -149,7 +149,7 @@ public class WarWatcher {
     protected static class WarInfo {
         protected final File war;
 
-        protected long lastChecked = 0;
+        protected long lastChecked;
 
         protected long lastState = 0;
 

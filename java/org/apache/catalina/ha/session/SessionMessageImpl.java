@@ -61,7 +61,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
      * <B>EVT_SESSION_ACCESSED</B><BR>
      * The parameters: sessionID must be set.<BR>
      * <B>EVT_GET_ALL_SESSIONS</B><BR>
-     * get all sessions from from one of the nodes.<BR>
+     * get all sessions from one of the nodes.<BR>
      * <B>EVT_SESSION_DELTA</B><BR>
      * Send attribute delta (add,update,remove attribute or principal, ...).<BR>
      * <B>EVT_ALL_SESSION_DATA</B><BR>

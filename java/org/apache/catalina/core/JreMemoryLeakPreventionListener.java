@@ -175,7 +175,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     /**
      * The first access to {@link DriverManager} will trigger the loading of all {@link java.sql.Driver}s in the the
      * current class loader. The web application level memory leak protection can take care of this in most cases but
-     * triggering the loading here has fewer side-effects.
+     * triggering the loading here has fewer side effects.
      */
     private boolean driverManagerProtection = true;
 
@@ -205,7 +205,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
     /**
      * List of comma-separated fully qualified class names to load and initialize during the startup of this Listener.
-     * This allows to pre-load classes that are known to provoke classloader leaks if they are loaded during a request
+     * This allows to preload classes that are known to provoke classloader leaks if they are loaded during a request
      * processing.
      */
     private String classesToInitialize = null;

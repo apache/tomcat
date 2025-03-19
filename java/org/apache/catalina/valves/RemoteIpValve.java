@@ -55,7 +55,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * If the incoming <code>request.getRemoteAddr()</code> matches the valve's list of internal or trusted proxies:
  * </p>
  * <ul>
- * <li>Loop on the comma delimited list of IPs and hostnames passed by the preceding load balancer or proxy in the given
+ * <li>Loop on the comma-delimited list of IPs and hostnames passed by the preceding load balancer or proxy in the given
  * request's Http header named <code>$remoteIpHeader</code> (default value <code>x-forwarded-for</code>). Values are
  * processed in right-to-left order.</li>
  * <li>For each ip/host of the list:
@@ -131,7 +131,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * </tr>
  * <tr>
  * <td>protocolHeaderHttpsValue</td>
- * <td>Value of the <code>protocolHeader</code> to indicate that it is an Https request</td>
+ * <td>Value of the <code>protocolHeader</code> to indicate that it is a Https request</td>
  * <td>N/A</td>
  * <td>String like <code>https</code> or <code>ON</code></td>
  * <td><code>https</code></td>
@@ -891,7 +891,7 @@ public class RemoteIpValve extends ValveBase {
 
     /**
      * <p>
-     * Case insensitive value of the protocol header to indicate that the incoming http request uses SSL.
+     * Case-insensitive value of the protocol header to indicate that the incoming http request uses SSL.
      * </p>
      * <p>
      * Default value : <code>https</code>
@@ -914,7 +914,7 @@ public class RemoteIpValve extends ValveBase {
      * Name of the http header that holds the list of trusted proxies that has been traversed by the http request.
      * </p>
      * <p>
-     * The value of this header can be comma delimited.
+     * The value of this header can be comma-delimited.
      * </p>
      * <p>
      * Default value : <code>X-Forwarded-By</code>
@@ -931,7 +931,7 @@ public class RemoteIpValve extends ValveBase {
      * Name of the http header from which the remote ip is extracted.
      * </p>
      * <p>
-     * The value of this header can be comma delimited.
+     * The value of this header can be comma-delimited.
      * </p>
      * <p>
      * Default value : <code>X-Forwarded-For</code>
@@ -944,7 +944,7 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
-     * Should this valve set request attributes for IP address, Hostname, protocol and port used for the request? This
+     * Should this valve set request attributes for IP address, Hostname, protocol and port used for the request? These
      * are typically used in conjunction with the {@link AccessLog} which will otherwise log the original values.
      * Default is <code>true</code>. The attributes set are:
      * <ul>

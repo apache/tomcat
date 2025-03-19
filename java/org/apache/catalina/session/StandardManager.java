@@ -47,7 +47,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 /**
  * Standard implementation of the <b>Manager</b> interface that provides simple session persistence across restarts of
  * this component (such as when the entire server is shut down and restarted, or when a particular web application is
- * reloaded.
+ * reloaded).
  * <p>
  * <b>IMPLEMENTATION NOTE</b>: Correct behavior of session storing and reloading depends upon external calls to the
  * <code>start()</code> and <code>stop()</code> methods of this class at the correct times.

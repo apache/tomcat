@@ -102,7 +102,7 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
      */
     protected String jmxQuery(MBeanServerConnection jmxServerConnection, String qry) {
         String isError = null;
-        Set<ObjectName> names = null;
+        Set<ObjectName> names;
         String resultproperty = getResultproperty();
         try {
             names = jmxServerConnection.queryNames(new ObjectName(qry), null);
@@ -118,7 +118,7 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
 
         if (resultproperty != null) {
             int oindex = 0;
-            String pname = null;
+            String pname;
             for (ObjectName oname : names) {
                 pname = resultproperty + "." + Integer.toString(oindex) + ".";
                 oindex++;
@@ -134,8 +134,8 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
     protected void bindAttributes(MBeanServerConnection jmxServerConnection, String pname, ObjectName oname) {
         try {
             MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
-            MBeanAttributeInfo attrs[] = minfo.getAttributes();
-            Object value = null;
+            MBeanAttributeInfo[] attrs = minfo.getAttributes();
+            Object value;
 
             for (MBeanAttributeInfo attr : attrs) {
                 if (!attr.isReadable()) {

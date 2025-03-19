@@ -223,7 +223,7 @@ public abstract class AbstractReplicatedMap<K, V>
                     "Created Lazy Map with name:" + mapContextName + ", bytes:" + Arrays.toString(this.mapContextName));
         }
 
-        // create an rpc channel and add the map as a listener
+        // create a rpc channel and add the map as a listener
         this.rpcChannel = new RpcChannel(this.mapContextName, channel, this);
         // add this map as a message listener
         this.channel.addChannelListener(this);
@@ -438,7 +438,7 @@ public abstract class AbstractReplicatedMap<K, V>
      * @param complete - if set to true, the object is replicated to its backup if set to false, only objects that
      *                     implement ReplicatedMapEntry and the isDirty() returns true will be replicated
      */
-    public void replicate(Object key, boolean complete) {
+    public void replicate(K key, boolean complete) {
         if (log.isTraceEnabled()) {
             log.trace("Replicate invoked on key:" + key);
         }
@@ -487,7 +487,7 @@ public abstract class AbstractReplicatedMap<K, V>
                         (Serializable) entry.getValue(), null, entry.getPrimary(), entry.getBackupNodes());
             }
             if (msg == null) {
-                // construct a access message
+                // construct an access message
                 msg = new MapMessage(mapContextName, MapMessage.MSG_ACCESS, false, (Serializable) entry.getKey(), null,
                         null, entry.getPrimary(), entry.getBackupNodes());
             }
@@ -863,9 +863,8 @@ public abstract class AbstractReplicatedMap<K, V>
 
     @Override
     public void memberDisappeared(Member member) {
-        boolean removed = false;
         synchronized (mapMembers) {
-            removed = (mapMembers.remove(member) != null);
+            boolean removed = (mapMembers.remove(member) != null);
             if (!removed) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("replicatedMap.member.disappeared.unknown", member));
@@ -941,7 +940,7 @@ public abstract class AbstractReplicatedMap<K, V>
     public int getNextBackupIndex() {
         synchronized (mapMembers) {
             int size = mapMembers.size();
-            if (mapMembers.size() == 0) {
+            if (mapMembers.isEmpty()) {
                 return -1;
             }
             int node = currentNode++;
@@ -1030,7 +1029,7 @@ public abstract class AbstractReplicatedMap<K, V>
             // if the message is not primary, we need to retrieve the latest value
             try {
                 Member[] backup = null;
-                MapMessage msg = null;
+                MapMessage msg;
                 if (entry.isBackup()) {
                     // select a new backup node
                     backup = publishEntryInfo(key, entry.getValue());
@@ -1116,9 +1115,9 @@ public abstract class AbstractReplicatedMap<K, V>
                 System.out.println((++cnt) + ". " + innerMap.get(e.getKey()));
             }
             System.out.println("EndMap]\n\n");
-        } catch (Exception ignore) {
+        } catch (Exception e) {
             if (log.isTraceEnabled()) {
-                log.trace("Error printing map", ignore);
+                log.trace("Error printing map", e);
             }
         }
     }
@@ -1257,11 +1256,9 @@ public abstract class AbstractReplicatedMap<K, V>
         // todo, implement a counter variable instead
         // only count active members in this node
         int counter = 0;
-        Iterator<Map.Entry<K,MapEntry<K,V>>> it = innerMap.entrySet().iterator();
-        while (it != null && it.hasNext()) {
-            Map.Entry<?,?> e = it.next();
+        for (Entry<?, ?> e : innerMap.entrySet()) {
             if (e != null) {
-                MapEntry<K,V> entry = innerMap.get(e.getKey());
+                MapEntry<K, V> entry = innerMap.get(e.getKey());
                 if (entry != null && entry.isActive() && entry.getValue() != null) {
                     counter++;
                 }
@@ -1435,13 +1432,11 @@ public abstract class AbstractReplicatedMap<K, V>
 
         @Override
         public String toString() {
-            StringBuilder buf = new StringBuilder("MapEntry[key:");
-            buf.append(getKey()).append("; ");
-            buf.append("value:").append(getValue()).append("; ");
-            buf.append("primary:").append(isPrimary()).append("; ");
-            buf.append("backup:").append(isBackup()).append("; ");
-            buf.append("proxy:").append(isProxy()).append(";]");
-            return buf.toString();
+            return "MapEntry[key:" + getKey() + "; " +
+                    "value:" + getValue() + "; " +
+                    "primary:" + isPrimary() + "; " +
+                    "backup:" + isBackup() + "; " +
+                    "proxy:" + isProxy() + ";]";
         }
 
     }
@@ -1479,16 +1474,8 @@ public abstract class AbstractReplicatedMap<K, V>
 
         @Override
         public String toString() {
-            StringBuilder buf = new StringBuilder("MapMessage[context=");
-            buf.append(new String(mapId));
-            buf.append("; type=");
-            buf.append(getTypeDesc());
-            buf.append("; key=");
-            buf.append(key);
-            buf.append("; value=");
-            buf.append(value);
-            buf.append(']');
-            return buf.toString();
+            return "MapMessage[context=" + new String(mapId) + "; type=" + getTypeDesc() +
+                    "; key=" + key + "; value=" + value + ']';
         }
 
         public String getTypeDesc() {

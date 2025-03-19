@@ -52,7 +52,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         // and just send one message
         if (okToProcess(msg.getOptions())) {
             super.sendMessage(destination, msg, null);
-            ChannelMessage confirmation = null;
+            ChannelMessage confirmation;
             if (deepclone) {
                 confirmation = (ChannelMessage) msg.deepclone();
             } else {
@@ -150,7 +150,6 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         public boolean expired(long now, long expiration) {
             return (now - timestamp) > expiration;
         }
-
     }
 
 }

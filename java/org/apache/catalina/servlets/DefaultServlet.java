@@ -1238,7 +1238,7 @@ public class DefaultServlet extends HttpServlet {
             skip(is, 2, stripBom);
             return StandardCharsets.UTF_16BE;
         }
-        // Delay the UTF_16LE check if there are more that 2 bytes since it
+        // Delay the UTF_16LE check if there are more than 2 bytes since it
         // overlaps with UTF-32LE.
         if (count == 2 && b0 == 0xFF && b1 == 0xFE) {
             skip(is, 2, stripBom);
@@ -2061,7 +2061,10 @@ public class DefaultServlet extends HttpServlet {
                     } else {
                         reader = new InputStreamReader(is);
                     }
-                    copyRange(reader, new PrintWriter(buffer));
+                    IOException e = copyRange(reader, new PrintWriter(buffer));
+                    if (debug > 10) {
+                        log("readme '" + readmeFile + "' output error: " + e.getMessage());
+                    }
                 } catch (IOException e) {
                     log(sm.getString("defaultServlet.readerCloseFailed"), e);
                 } finally {
@@ -2131,7 +2134,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         /*
-         * Open and read in file in one fell swoop to reduce chance chance of leaving handle open.
+         * Open and read in file in one fell swoop to reduce the chance of leaving handle open.
          */
         if (globalXsltFile != null) {
             File f = validateGlobalXsltFile();
@@ -2927,7 +2930,7 @@ public class DefaultServlet extends HttpServlet {
     /**
      * A class encapsulating the sorting of resources.
      */
-    private static class SortManager {
+    protected static class SortManager {
         /**
          * The default sort.
          */

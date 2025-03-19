@@ -963,7 +963,7 @@ public class ApplicationContext implements ServletContext {
             supportedSessionTrackingModes.add(SessionTrackingMode.COOKIE);
         }
 
-        // SSL not enabled by default as it can only used on its own
+        // SSL not enabled by default as it can only be used on its own
         // Context > Host > Engine > Service
         Connector[] connectors = service.findConnectors();
         // Need at least one SSL enabled connector to use the SSL session ID.
@@ -1004,7 +1004,7 @@ public class ApplicationContext implements ServletContext {
             }
         }
 
-        // Check SSL has not be configured with anything else
+        // Check SSL has not been configured with anything else
         if (sessionTrackingModes.contains(SessionTrackingMode.SSL)) {
             if (sessionTrackingModes.size() > 1) {
                 throw new IllegalArgumentException(

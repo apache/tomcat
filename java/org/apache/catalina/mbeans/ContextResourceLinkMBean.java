@@ -100,7 +100,7 @@ public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceL
             crl.setProperty(name, "" + value);
         }
 
-        // cannot use side-effects. It's removed and added back each time
+        // cannot use side effects. It's removed and added back each time
         // there is a modification in a resource.
         NamingResources nr = crl.getNamingResources();
         nr.removeResourceLink(crl.getName());

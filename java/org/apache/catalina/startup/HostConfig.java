@@ -686,7 +686,8 @@ public class HostConfig implements LifecycleListener {
 
             // default to appBase dir + name
             expandedDocBase = new File(host.getAppBaseFile(), cn.getBaseName());
-            if (context.getDocBase() != null && !context.getDocBase().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
+            if (context != null && context.getDocBase() != null &&
+                    !context.getDocBase().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                 // first assume docBase is absolute
                 expandedDocBase = new File(context.getDocBase());
                 if (!expandedDocBase.isAbsolute()) {
@@ -895,7 +896,7 @@ public class HostConfig implements LifecycleListener {
         // should only be used if the directory is not out of date and
         // unpackWARs is true. Note the code below may apply further limits
         boolean useXml = xml.exists() && unpackWARs && (!warTracker.exists() || warTracker.lastModified() == war.lastModified());
-        // If the xml file exists then expandedDir must exists so no need to
+        // If the xml file exists then expandedDir must exist so no need to
         // test that here
 
         Context context = null;
@@ -1347,8 +1348,8 @@ public class HostConfig implements LifecycleListener {
                     }
                 }
             } else {
-                // There is a chance the the resource was only missing
-                // temporarily eg renamed during a text editor save
+                // There is a chance the resource was only missing
+                // temporarily e.g. renamed during a text editor save
                 if (resource.exists() || !resource.getName().toLowerCase(Locale.ENGLISH).endsWith(".war")) {
                     try {
                         Thread.sleep(500);
@@ -1562,7 +1563,7 @@ public class HostConfig implements LifecycleListener {
         try {
             ObjectName hostON = host.getObjectName();
             oname = new ObjectName(hostON.getDomain() + ":type=Deployer,host=" + host.getName());
-            Registry.getRegistry(null, null).registerComponent(this, oname, this.getClass().getName());
+            Registry.getRegistryNonNull(null, null).registerComponent(this, oname, this.getClass().getName());
         } catch (Exception e) {
             log.warn(sm.getString("hostConfig.jmx.register", oname), e);
         }
@@ -1590,7 +1591,7 @@ public class HostConfig implements LifecycleListener {
 
         if (oname != null) {
             try {
-                Registry.getRegistry(null, null).unregisterComponent(oname);
+                Registry.getRegistryNonNull(null, null).unregisterComponent(oname);
             } catch (Exception e) {
                 log.warn(sm.getString("hostConfig.jmx.unregister", oname), e);
             }
@@ -1887,14 +1888,14 @@ public class HostConfig implements LifecycleListener {
 
 
     /*
-     * The purpose of this class is to provide a way for HostConfig to get a Context to delete an expanded WAR after the
-     * Context stops. This is to resolve this issue described in Bug 57772. The alternative solutions require either
-     * duplicating a lot of the Context.reload() code in HostConfig or adding a new reload(boolean) method to Context
-     * that allows the caller to optionally delete any expanded WAR.
-     *
-     * The LifecycleListener approach offers greater flexibility and enables the behaviour to be changed / extended /
-     * removed in future without changing the Context API.
-     */
+         * The purpose of this class is to provide a way for HostConfig to get a Context to delete an expanded WAR after the
+         * Context stops. This is to resolve this issue described in Bug 57772. The alternative solutions require either
+         * duplicating a lot of the Context.reload() code in HostConfig or adding a new reload(boolean) method to Context
+         * that allows the caller to optionally delete any expanded WAR.
+         *
+         * The LifecycleListener approach offers greater flexibility and enables the behaviour to be changed / extended /
+         * removed in future without changing the Context API.
+         */
     private static class ExpandedDirectoryRemovalListener implements LifecycleListener {
 
         private final File toDelete;

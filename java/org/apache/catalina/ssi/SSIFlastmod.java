@@ -64,7 +64,7 @@ public final class SSIFlastmod implements SSICommand {
     }
 
 
-    protected String formatDate(Date date, String configTimeFmt) {
+    private String formatDate(Date date, String configTimeFmt) {
         Strftime strftime = new Strftime(configTimeFmt, Locale.US);
         return strftime.format(date);
     }

@@ -123,7 +123,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         labels = labels == null ? null : URLEncoder.encode(labels, "UTF-8");
 
         url = String.format("%s://%s:%s/api/%s/namespaces/%s/pods", protocol, masterHost, masterPort, ver, namespace);
-        if (labels != null && labels.length() > 0) {
+        if (labels != null && !labels.isEmpty()) {
             url = url + "?labelSelector=" + labels;
         }
 
@@ -260,7 +260,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 long aliveTime =
                         Duration.between(Instant.parse(creationTimestampObject.toString()), startTime).toMillis();
 
-                MemberImpl member = null;
+                MemberImpl member;
                 try {
                     member = new MemberImpl(podIP, port, aliveTime);
                 } catch (IOException e) {

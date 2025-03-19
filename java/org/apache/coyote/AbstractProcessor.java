@@ -678,7 +678,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     /**
      * {@inheritDoc}
      * <p>
-     * Sub-classes of this base class represent a single request/response pair. The timeout to be processed is,
+     * Subclasses of this base class represent a single request/response pair. The timeout to be processed is,
      * therefore, the Servlet asynchronous processing timeout.
      */
     @Override
@@ -733,7 +733,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * When committing the response, we have to validate the set of headers, as well as setup the response filters.
+     * When committing the response, we have to validate the set of headers, as well as set up the response filters.
      *
      * @throws IOException IO exception during commit
      */

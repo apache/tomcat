@@ -223,7 +223,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
     }
 
     private static class SendResult {
-        private List<NioSender> completeSenders = new ArrayList<>();
+        private final List<NioSender> completeSenders = new ArrayList<>();
         private ChannelException exception = null;
 
         private void complete(NioSender sender) {

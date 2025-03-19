@@ -135,7 +135,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             // HTTP/2 Push or HTTP/1.1 upgrade
             /*
              * Implementation note. The request passed in is always newly created so it is safe to recycle it for re-use
-             * in the Stream.recyle() method. Need to create a matching, new response.
+             * in the Stream.recycle() method. Need to create a matching, new response.
              */
             this.coyoteRequest = coyoteRequest;
             this.coyoteResponse = new Response();
@@ -329,7 +329,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             log.trace(sm.getString("stream.header.debug", getConnectionId(), getIdAsString(), name, value));
         }
 
-        // Header names must be lower case
+        // Header names must be lowercase
         if (!name.toLowerCase(Locale.US).equals(name)) {
             throw new HpackException(sm.getString("stream.header.case", getConnectionId(), getIdAsString(), name));
         }
@@ -1184,8 +1184,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             /*
              * This method should only be called during blocking I/O. All the Servlet API calls that end up here are
              * illegal during non-blocking I/O. Servlet 5.4. However, the wording Servlet specification states that the
-             * behaviour is undefined so we do the best we can which is to perform a flush using blocking I/O or
-             * non-blocking I/O based depending which is currently in use.
+             * behaviour is undefined so we do the best we can, which is to perform a flush using blocking I/O or
+             * non-blocking I/O based depending on which is currently in use.
              */
             flush(getCoyoteResponse().getWriteListener() == null);
         }

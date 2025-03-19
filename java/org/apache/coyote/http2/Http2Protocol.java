@@ -491,7 +491,7 @@ public class Http2Protocol implements UpgradeProtocol {
             ObjectName oname = this.http11Protocol.getONameForUpgrade(getUpgradeProtocolName());
             // This can be null when running the testsuite
             if (oname != null) {
-                Registry.getRegistry(null, null).registerComponent(global, oname, null);
+                Registry.getRegistryNonNull(null, null).registerComponent(global, oname, null);
             }
         } catch (Exception e) {
             log.warn(sm.getString("http2Protocol.jmxRegistration.fail"), e);

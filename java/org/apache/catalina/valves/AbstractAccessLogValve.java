@@ -418,12 +418,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     private static final ThreadLocal<Date> localDate = ThreadLocal.withInitial(Date::new);
 
     /**
-     * Are we doing conditional logging. default null. It is the value of <code>conditionUnless</code> property.
+     * Are we doing conditional logging ? default null. It is the value of <code>conditionUnless</code> property.
      */
     protected String condition = null;
 
     /**
-     * Are we doing conditional logging. default null. It is the value of <code>conditionIf</code> property.
+     * Are we doing conditional logging ? default null. It is the value of <code>conditionIf</code> property.
      */
     protected String conditionIf = null;
 
@@ -703,7 +703,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
     /**
      * This method returns a Date object that is accurate to within one second. If a thread calls this method to get a
-     * Date and it's been less than 1 second since a new Date was created, this method simply gives out the same Date
+     * Date, and it's been less than 1 second since a new Date was created, this method simply gives out the same Date
      * again so that the system doesn't spend time creating Date objects unnecessarily.
      *
      * @param systime The time
@@ -748,7 +748,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
     /**
-     * Marks an AccessLogElement as needing to be have the value cached at the start of the request rather than just
+     * Marks an AccessLogElement as needing to have the value cached at the start of the request rather than just
      * recorded at the end as the source data for the element may not be available at the end of the request. This
      * typically occurs for remote network information, such as ports, IP addresses etc. when the connection is closed
      * unexpectedly. These elements take advantage of these values being cached elsewhere on first request and do not

@@ -265,8 +265,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
     @Override
     public Set<String> getSessionIdsFull() {
         LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>) sessions;
-        Set<String> sessionIds = new HashSet<>(map.keySetFull());
-        return sessionIds;
+        return new HashSet<>(map.keySetFull());
     }
 
 }

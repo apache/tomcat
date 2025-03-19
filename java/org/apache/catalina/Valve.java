@@ -81,7 +81,7 @@ public interface Valve {
      * control to the caller.
      * <li>Examine the properties of the specified Request and Response, wrap either or both of these objects to
      * supplement their functionality, and pass them on.
-     * <li>If the corresponding Response was not generated (and control was not returned, call the next Valve in the
+     * <li>If the corresponding Response was not generated (and control was not returned), call the next Valve in the
      * pipeline (if there is one) by executing <code>getNext().invoke()</code>.
      * <li>Examine, but not modify, the properties of the resulting Response (which was created by a subsequently
      * invoked Valve or Container).

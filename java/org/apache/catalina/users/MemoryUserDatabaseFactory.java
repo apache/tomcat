@@ -54,7 +54,7 @@ public class MemoryUserDatabaseFactory implements ObjectFactory {
     /**
      * <p>
      * Create and return a new <code>MemoryUserDatabase</code> instance that has been configured according to the
-     * properties of the specified <code>Reference</code>. If you instance can be created, return <code>null</code>
+     * properties of the specified <code>Reference</code>. If the instance cannot be created, return <code>null</code>
      * instead.
      * </p>
      *

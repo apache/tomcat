@@ -526,7 +526,7 @@ public class McastService extends MembershipServiceBase implements MessageListen
      *
      * @throws Exception If an error occurs
      */
-    public static void main(String args[]) throws Exception {
+    public static void main(String[] args) throws Exception {
         McastService service = new McastService();
         Properties p = new Properties();
         p.setProperty("mcastPort", "5555");

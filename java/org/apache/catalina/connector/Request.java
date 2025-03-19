@@ -2299,9 +2299,7 @@ public class Request implements HttpServletRequest {
 
             if ((session == null) || !session.isValid()) {
                 // Check for parallel deployment contexts
-                if (getMappingData().contexts == null) {
-                    return false;
-                } else {
+                if (getMappingData().contexts != null) {
                     for (int i = (getMappingData().contexts.length); i > 0; i--) {
                         Context ctxt = getMappingData().contexts[i - 1];
                         try {
@@ -2312,8 +2310,8 @@ public class Request implements HttpServletRequest {
                             // Ignore
                         }
                     }
-                    return false;
                 }
+                return false;
             }
 
             return true;

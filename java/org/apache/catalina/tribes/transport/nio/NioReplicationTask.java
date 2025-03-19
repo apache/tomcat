@@ -199,7 +199,7 @@ public class NioReplicationTask extends AbstractRxTask {
 
         ChannelMessage[] msgs = pkgcnt == 0 ? ChannelData.EMPTY_DATA_ARRAY : reader.execute();
 
-        registerForRead(key, reader);// register to read new data, before we send it off to avoid dead locks
+        registerForRead(key, reader);// register to read new data, before we send it off to avoid deadlocks
 
         for (ChannelMessage msg : msgs) {
             /*

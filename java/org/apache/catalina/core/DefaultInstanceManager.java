@@ -188,7 +188,8 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     /**
-     * Call postConstruct method on the specified instance recursively from deepest superclass to actual class.
+     * Call postConstruct method on the specified instance recursively from the deepest superclass
+     * to actual class.
      *
      * @param instance object to call postconstruct methods on
      * @param clazz    (super) class to examine for postConstruct annotation.
@@ -224,7 +225,8 @@ public class DefaultInstanceManager implements InstanceManager {
 
 
     /**
-     * Call preDestroy method on the specified instance recursively from deepest superclass to actual class.
+     * Call preDestroy method on the specified instance recursively from the deepest superclass
+     * to actual class.
      *
      * @param instance object to call preDestroy methods on
      * @param clazz    (super) class to examine for preDestroy annotation.

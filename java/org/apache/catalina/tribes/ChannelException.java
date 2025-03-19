@@ -91,7 +91,7 @@ public class ChannelException extends Exception {
     @Override
     public String getMessage() {
         StringBuilder buf = new StringBuilder(super.getMessage());
-        if (faultyMembers == null || faultyMembers.size() == 0) {
+        if (faultyMembers == null || faultyMembers.isEmpty()) {
             buf.append("; No faulty members identified.");
         } else {
             buf.append("; Faulty members:");

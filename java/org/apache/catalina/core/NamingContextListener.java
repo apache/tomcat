@@ -299,7 +299,7 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
                 // unregister mbeans.
                 if (!objectNames.isEmpty()) {
                     Collection<ObjectName> names = objectNames.values();
-                    Registry registry = Registry.getRegistry(null, null);
+                    Registry registry = Registry.getRegistryNonNull(null, null);
                     for (ObjectName objectName : names) {
                         registry.unregisterComponent(objectName);
                     }
@@ -998,7 +998,7 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
             try {
                 ObjectName on = createObjectName(resource);
                 actualResource = envCtx.lookup(resource.getName());
-                Registry.getRegistry(null, null).registerComponent(actualResource, on, null);
+                Registry.getRegistryNonNull(null, null).registerComponent(actualResource, on, null);
                 objectNames.put(resource.getName(), on);
             } catch (Exception e) {
                 log.warn(sm.getString("naming.jmxRegistrationFailed", e));
@@ -1189,7 +1189,7 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
 
         ObjectName on = objectNames.get(name);
         if (on != null) {
-            Registry.getRegistry(null, null).unregisterComponent(on);
+            Registry.getRegistryNonNull(null, null).unregisterComponent(on);
         }
 
     }
@@ -1250,7 +1250,7 @@ public class NamingContextListener implements LifecycleListener, ContainerListen
 
 
     /**
-     * Gets look up reference from resource if exist.
+     * Gets look up reference from resource if it exists.
      *
      * @param resourceBase resource base object
      *

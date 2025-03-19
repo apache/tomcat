@@ -72,12 +72,7 @@ public class FileMessage extends ClusterMessageBase {
 
     @Override
     public String getUniqueId() {
-        StringBuilder result = new StringBuilder(getFileName());
-        result.append("#-#");
-        result.append(getMessageNumber());
-        result.append("#-#");
-        result.append(System.currentTimeMillis());
-        return result.toString();
+        return getFileName() + "#-#" + getMessageNumber() + "#-#" + System.currentTimeMillis();
     }
 
 

@@ -534,7 +534,7 @@ public class MemberImpl implements Member, java.io.Externalizable {
         for (int i = 0; data != null && i < data.length; i++) {
             buf.append(String.valueOf(data[i])).append(' ');
             if (i == max) {
-                buf.append("...(" + data.length + ")");
+                buf.append("...(").append(data.length).append(")");
                 break;
             }
         }

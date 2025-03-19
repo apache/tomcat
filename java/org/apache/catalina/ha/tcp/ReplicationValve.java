@@ -100,7 +100,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
     protected LongAdder nrOfCrossContextSendRequests = new LongAdder();
 
     /**
-     * must primary change indicator set
+     * Must set primary change indicator.
      */
     protected boolean primaryIndicator = false;
 
@@ -153,7 +153,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             log.trace(sm.getString("ReplicationValve.filter.loading", filter));
         }
 
-        if (filter == null || filter.length() == 0) {
+        if (filter == null || filter.isEmpty()) {
             this.filter = null;
         } else {
             try {
@@ -294,7 +294,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             createPrimaryIndicator(request);
         }
         Context context = request.getContext();
-        boolean isCrossContext = context != null && context instanceof StandardContext && context.getCrossContext();
+        boolean isCrossContext = context instanceof StandardContext && context.getCrossContext();
         boolean isAsync = request.getAsyncContextInternal() != null;
         try {
             if (isCrossContext) {
@@ -319,7 +319,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
                 }
             }
         } finally {
-            // Array must be remove: Current master request send endAccess at recycle.
+            // Array must be removed: Current master request send endAccess at recycle.
             // Don't register this request session again!
             if (isCrossContext) {
                 if (log.isTraceEnabled()) {
@@ -392,7 +392,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      */
     protected void sendCrossContextSession() {
         List<DeltaSession> sessions = crossContextSessions.get();
-        if (sessions != null && sessions.size() > 0) {
+        if (sessions != null && !sessions.isEmpty()) {
             for (DeltaSession session : sessions) {
                 if (log.isTraceEnabled()) {
                     log.trace(sm.getString("ReplicationValve.crossContext.sendDelta",
@@ -503,13 +503,11 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      */
     protected void sendInvalidSessions(ClusterManager manager) {
         String[] invalidIds = manager.getInvalidatedSessions();
-        if (invalidIds.length > 0) {
-            for (String invalidId : invalidIds) {
-                try {
-                    send(manager, invalidId);
-                } catch (Exception x) {
-                    log.error(sm.getString("ReplicationValve.send.invalid.failure", invalidId), x);
-                }
+        for (String invalidId : invalidIds) {
+            try {
+                send(manager, invalidId);
+            } catch (Exception x) {
+                log.error(sm.getString("ReplicationValve.send.invalid.failure", invalidId), x);
             }
         }
     }
@@ -543,13 +541,13 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
             if (log.isDebugEnabled()) {
                 if ((nrOfRequests.longValue() % 100) == 0) {
                     log.debug(sm.getString("ReplicationValve.stats",
-                            new Object[] { Long.valueOf(totalRequestTime.longValue() / nrOfRequests.longValue()),
-                                    Long.valueOf(totalSendTime.longValue() / nrOfRequests.longValue()),
-                                    Long.valueOf(nrOfRequests.longValue()), Long.valueOf(nrOfSendRequests.longValue()),
-                                    Long.valueOf(nrOfCrossContextSendRequests.longValue()),
-                                    Long.valueOf(nrOfFilterRequests.longValue()),
-                                    Long.valueOf(totalRequestTime.longValue()),
-                                    Long.valueOf(totalSendTime.longValue()) }));
+                            Long.valueOf(totalRequestTime.longValue() / nrOfRequests.longValue()),
+                            Long.valueOf(totalSendTime.longValue() / nrOfRequests.longValue()),
+                            Long.valueOf(nrOfRequests.longValue()), Long.valueOf(nrOfSendRequests.longValue()),
+                            Long.valueOf(nrOfCrossContextSendRequests.longValue()),
+                            Long.valueOf(nrOfFilterRequests.longValue()),
+                            Long.valueOf(totalRequestTime.longValue()),
+                            Long.valueOf(totalSendTime.longValue())));
                 }
             }
         }
@@ -565,7 +563,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
      */
     protected void createPrimaryIndicator(Request request) throws IOException {
         String id = request.getRequestedSessionId();
-        if ((id != null) && (id.length() > 0)) {
+        if ((id != null) && (!id.isEmpty())) {
             Manager manager = request.getContext().getManager();
             Session session = manager.findSession(id);
             if (session instanceof ClusterSession) {

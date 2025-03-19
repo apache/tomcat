@@ -98,7 +98,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
     }
 
     public ClassLoader[] getClassLoaders() {
-        Loader loader = null;
+        Loader loader;
         ClassLoader classLoader = null;
         loader = this.getLoader();
         if (loader != null) {
@@ -192,7 +192,7 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
         public Enumeration<String> getAttributeNames() {
             Set<String> names = new HashSet<>(attributes.keySet());
 
-            return new MultiEnumeration<>(
+            return new MultiEnumeration<String>(
                     new Enumeration[] { super.getAttributeNames(), Collections.enumeration(names) });
         }
     }

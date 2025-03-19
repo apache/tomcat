@@ -171,7 +171,7 @@ public class JMXAccessorCondition extends JMXAccessorConditionBase {
      * @return true if there is no unless condition, or there is a named property but it doesn't exist
      */
     protected boolean testUnlessCondition() {
-        if (unlessCondition == null || "".equals(unlessCondition)) {
+        if (unlessCondition == null || unlessCondition.isEmpty()) {
             return true;
         }
         return getProject().getProperty(unlessCondition) == null;

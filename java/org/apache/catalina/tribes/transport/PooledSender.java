@@ -92,7 +92,7 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
     @Override
     public boolean keepalive() {
         // do nothing, the pool checks on every return
-        return (queue == null) ? false : queue.checkIdleKeepAlive();
+        return queue != null && queue.checkIdleKeepAlive();
     }
 
     @Override
@@ -110,13 +110,13 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
     // ----------------------------------------------------- Inner Class
 
     private static class SenderQueue {
-        private int limit = 25;
+        private int limit;
 
-        PooledSender parent = null;
+        PooledSender parent;
 
-        private List<DataSender> notinuse = null;
+        private final List<DataSender> notinuse;
 
-        private List<DataSender> inuse = null;
+        private final List<DataSender> inuse;
 
         private boolean isOpen = true;
 
@@ -165,15 +165,15 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                     throw new IllegalStateException(sm.getString("pooledSender.closed.queue"));
                 }
                 DataSender sender = null;
-                if (notinuse.size() == 0 && inuse.size() < limit) {
+                if (notinuse.isEmpty() && inuse.size() < limit) {
                     sender = parent.getNewDataSender();
-                } else if (notinuse.size() > 0) {
+                } else if (!notinuse.isEmpty()) {
                     sender = notinuse.remove(0);
                 }
                 if (sender != null) {
                     inuse.add(sender);
                     return sender;
-                } // end if
+                }
                 long delta = System.currentTimeMillis() - start;
                 if (delta > timeout && timeout > 0) {
                     return null;
@@ -181,8 +181,9 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
                     try {
                         wait(Math.max(timeout - delta, 1));
                     } catch (InterruptedException x) {
+                        // Ignore
                     }
-                } // end if
+                }
             }
         }
 
@@ -215,11 +216,11 @@ public abstract class PooledSender extends AbstractSender implements MultiPointS
             for (Object value : unused) {
                 DataSender sender = (DataSender) value;
                 sender.disconnect();
-            } // for
+            }
             for (Object o : used) {
                 DataSender sender = (DataSender) o;
                 sender.disconnect();
-            } // for
+            }
             notinuse.clear();
             inuse.clear();
             notifyAll();

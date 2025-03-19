@@ -58,7 +58,7 @@ public class ExpressionParseTree {
      * Creates a new parse tree for the specified expression.
      *
      * @param expr        The expression string
-     * @param ssiMediator Used to evaluated the expressions
+     * @param ssiMediator Used to evaluate the expressions
      *
      * @throws ParseException a parsing error occurred
      */

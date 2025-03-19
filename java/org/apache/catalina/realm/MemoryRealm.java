@@ -63,7 +63,7 @@ public class MemoryRealm extends RealmBase {
 
 
     /**
-     * The set of valid Principals for this Realm, keyed by user name.
+     * The set of valid Principals for this Realm, keyed by username.
      */
     private final Map<String,GenericPrincipal> principals = new HashMap<>();
 

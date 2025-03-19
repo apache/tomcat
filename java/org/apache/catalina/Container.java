@@ -332,7 +332,7 @@ public interface Container extends Lifecycle {
     /**
      * Add a new child Container to those associated with this Container, if supported. Prior to adding this Container
      * to the set of children, the child's <code>setParent()</code> method must be called, with this Container as an
-     * argument. This method may thrown an <code>IllegalArgumentException</code> if this Container chooses not to be
+     * argument. This method may throw an <code>IllegalArgumentException</code> if this Container chooses not to be
      * attached to the specified Container, in which case it is not added
      *
      * @param child New child Container to be added

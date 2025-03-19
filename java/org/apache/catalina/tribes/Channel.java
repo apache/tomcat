@@ -38,7 +38,7 @@ import org.apache.juli.logging.LogFactory;
  * </ul>
  * The channel has 5 major components:
  * <ul>
- * <li>Data receiver, with a built in thread pool to receive messages from other peers</li>
+ * <li>Data receiver, with a built-in thread pool to receive messages from other peers</li>
  * <li>Data sender, an implementation for sending data using NIO or java.io</li>
  * <li>Membership listener,listens for membership broadcasts</li>
  * <li>Membership broadcaster, broadcasts membership pings.</li>
@@ -144,7 +144,7 @@ public interface Channel {
      * <p>
      * However, there are five default flags that every channel implementation must implement.
      * <p>
-     * SEND_OPTIONS_BYTE_MESSAGE - The message is a pure byte message and no marshaling or unmarshaling will be
+     * SEND_OPTIONS_BYTE_MESSAGE - The message is a pure byte message and no marshaling or unmarshalling will be
      * performed.
      *
      * @see #send(Member[], Serializable , int)
@@ -279,12 +279,12 @@ public interface Channel {
     void start(int svc) throws ChannelException;
 
     /**
-     * Shuts down the channel. This can be called multiple times for individual services to shutdown The svc parameter
-     * can be the logical or value of any constants
+     * Shuts down the channel. This can be called multiple times for individual services to shut down.
+     * The svc parameter can be the logical or value of any constants
      *
      * @param svc one of:
      *                <ul>
-     *                <li>DEFAULT - will shutdown all services</li>
+     *                <li>DEFAULT - will shut down all services</li>
      *                <li>MBR_RX_SEQ - stops the membership receiver</li>
      *                <li>MBR_TX_SEQ - stops the membership broadcaster</li>
      *                <li>SND_TX_SEQ - stops the replication transmitter</li>
@@ -335,7 +335,7 @@ public interface Channel {
      * Sends a heart beat through the interceptor stacks. Use this method to alert interceptors and other components to
      * clean up garbage, timed out messages etc.
      * <p>
-     * If you application has a background thread, then you can save one thread, by configuring your channel to not use
+     * If your application has a background thread, then you can save one thread, by configuring your channel to not use
      * an internal heartbeat thread and invoking this method.
      *
      * @see #setHeartbeat(boolean)
@@ -412,7 +412,7 @@ public interface Channel {
     Member[] getMembers();
 
     /**
-     * Return the member that represents this node. This is also the data that gets broadcasted through the membership
+     * Return the member that represents this node. This is also the data that gets broadcast through the membership
      * broadcaster component
      *
      * @param incAlive - optimization, true if you want it to calculate alive time since the membership service started.

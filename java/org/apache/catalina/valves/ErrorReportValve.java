@@ -94,7 +94,7 @@ public class ErrorReportValve extends ValveBase {
 
         if (response.isCommitted()) {
             if (response.setErrorReported()) {
-                // Error wasn't previously reported but we can't write an error
+                // Error wasn't previously reported, but we can't write an error
                 // page because the response has already been committed.
 
                 // See if IO is allowed

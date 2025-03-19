@@ -24,7 +24,7 @@ public class UndeployMessage implements ClusterMessage {
 
     private Member address;
     private long timestamp;
-    private String uniqueId;
+    private final String uniqueId;
     private final String contextName;
 
     public UndeployMessage(Member address, long timestamp, String uniqueId, String contextName) {
