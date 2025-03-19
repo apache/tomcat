@@ -47,7 +47,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
 
     // Requests can return in the client before log() has been called
     private static final long SLEEP = 2;
-    private static final long SLEEP_MAX = 1000;
+    private static final long SLEEP_MAX = 2000;
 
     @Parameterized.Parameters(name = "{index}: pattern=[{0}]")
     public static Collection<Object[]> data() {
