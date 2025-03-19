@@ -107,12 +107,12 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
     }
 
     @Test
-    public void testExposeHeaderAndRerferenceRateLimitWith4Clients() throws Exception {
+    public void testExposeHeaderAndReferenceRateLimitWith4Clients() throws Exception {
         testRateLimitWith1Clients(true, false);
     }
 
     @Test
-    public void testUnexposeHeaderAndRerferenceRateLimitWith4Clients() throws Exception {
+    public void testUnexposeHeaderAndReferenceRateLimitWith4Clients() throws Exception {
         testRateLimitWith1Clients(false, false);
     }
 
