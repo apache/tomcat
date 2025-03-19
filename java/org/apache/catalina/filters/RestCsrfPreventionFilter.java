@@ -86,7 +86,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
             m -> Objects.nonNull(m) && NON_MODIFYING_METHODS_PATTERN.matcher(m).matches();
 
     private final Set<String> pathsAcceptingParams = new HashSet<>();
-    private String pathsDelimiter = ",";
+    private static final String pathsDelimiter = ",";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {

@@ -56,8 +56,7 @@ public class NamingResourcesSF extends StoreFactoryBase {
     public void storeChildren(PrintWriter aWriter, int indent, Object aElement, StoreDescription elementDesc)
             throws Exception {
 
-        if (aElement instanceof NamingResourcesImpl) {
-            NamingResourcesImpl resources = (NamingResourcesImpl) aElement;
+        if (aElement instanceof NamingResourcesImpl resources) {
             // Store nested <Ejb> elements
             ContextEjb[] ejbs = resources.findEjbs();
             storeElementArray(aWriter, indent, ejbs);

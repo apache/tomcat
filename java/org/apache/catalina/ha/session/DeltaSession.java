@@ -107,7 +107,7 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     }
 
     /*
-     * DeltaRequest instances are created via this protected method to enable sub-classes to over-ride the method to use
+     * DeltaRequest instances are created via this protected method to enable subclasses to over-ride the method to use
      * custom DeltaRequest implementations.
      */
     protected DeltaRequest createRequest(String sessionId, boolean recordAllActions) {
@@ -129,7 +129,7 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     @Override
     public byte[] getDiff() throws IOException {
         SynchronizedStack<DeltaRequest> deltaRequestPool = null;
-        DeltaRequest newDeltaRequest = null;
+        DeltaRequest newDeltaRequest;
 
         if (manager instanceof ClusterManagerBase) {
             deltaRequestPool = ((ClusterManagerBase) manager).getDeltaRequestPool();
@@ -158,8 +158,7 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     public ClassLoader[] getClassLoaders() {
         if (manager instanceof ClusterManagerBase) {
             return ((ClusterManagerBase) manager).getClassLoaders();
-        } else if (manager instanceof ManagerBase) {
-            ManagerBase mb = (ManagerBase) manager;
+        } else if (manager instanceof ManagerBase mb) {
             return ClusterManagerBase.getClassLoaders(mb.getContext());
         }
         return null;
@@ -229,8 +228,7 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
     @Override
     public void setOwner(Object owner) {
-        if (owner instanceof ClusterManager && getManager() == null) {
-            ClusterManager cm = (ClusterManager) owner;
+        if (owner instanceof ClusterManager cm && getManager() == null) {
             this.setManager(cm);
             this.setValid(true);
             this.setPrimarySession(false);
@@ -243,10 +241,7 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
     @Override
     public boolean isAccessReplicate() {
         long replDelta = System.currentTimeMillis() - getLastTimeReplicated();
-        if (maxInactiveInterval >= 0 && replDelta > (maxInactiveInterval * 1000L)) {
-            return true;
-        }
-        return false;
+        return maxInactiveInterval >= 0 && replDelta > (maxInactiveInterval * 1000L);
     }
 
     @Override
@@ -424,8 +419,7 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
             String expiredId = getIdInternal();
 
-            if (notifyCluster && expiredId != null && manager instanceof DeltaManager) {
-                DeltaManager dmanager = (DeltaManager) manager;
+            if (notifyCluster && expiredId != null && manager instanceof DeltaManager dmanager) {
                 CatalinaCluster cluster = dmanager.getCluster();
                 ClusterMessage msg = dmanager.requestCompleted(expiredId, true);
                 if (msg != null) {
@@ -461,11 +455,7 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("DeltaSession[");
-        sb.append(id);
-        sb.append(']');
-        return sb.toString();
+        return "DeltaSession[" + id + ']';
     }
 
     @Override
@@ -831,12 +821,11 @@ public class DeltaSession extends StandardSession implements Externalizable, Clu
         stream.writeObject(notes.get(org.apache.catalina.authenticator.Constants.FORM_REQUEST_NOTE));
 
         // Accumulate the names of serializable and non-serializable attributes
-        String keys[] = keys();
+        String[] keys = keys();
         List<String> saveNames = new ArrayList<>();
         List<Object> saveValues = new ArrayList<>();
         for (String key : keys) {
-            Object value = null;
-            value = attributes.get(key);
+            Object value = attributes.get(key);
             if (value != null && !exclude(key, value) && isAttributeDistributable(key, value)) {
                 saveNames.add(key);
                 saveValues.add(value);

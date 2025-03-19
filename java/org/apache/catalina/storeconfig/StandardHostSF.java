@@ -41,8 +41,7 @@ public class StandardHostSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aHost, StoreDescription parentDesc)
             throws Exception {
-        if (aHost instanceof StandardHost) {
-            StandardHost host = (StandardHost) aHost;
+        if (aHost instanceof StandardHost host) {
             // Store nested <Listener> elements
             LifecycleListener[] listeners = host.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);

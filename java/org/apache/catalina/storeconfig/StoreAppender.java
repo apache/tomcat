@@ -225,8 +225,7 @@ public class StoreAppender {
             }
         }
 
-        if (bean instanceof ResourceBase) {
-            ResourceBase resource = (ResourceBase) bean;
+        if (bean instanceof ResourceBase resource) {
             for (Iterator<String> iter = resource.listProperties(); iter.hasNext();) {
                 String name = iter.next();
                 Object value = resource.getProperty(name);

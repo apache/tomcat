@@ -216,10 +216,6 @@ public class SessionUtils {
                 user = principalArray.get(0);
             }
 
-            if (null != user) {
-                return user;
-            }
-
             return user;
         } catch (IllegalStateException ise) {
             // ignore: invalidated session
@@ -230,8 +226,7 @@ public class SessionUtils {
 
     public static long getUsedTimeForSession(Session in_session) {
         try {
-            long diffMilliSeconds = in_session.getThisAccessedTime() - in_session.getCreationTime();
-            return diffMilliSeconds;
+            return in_session.getThisAccessedTime() - in_session.getCreationTime();
         } catch (IllegalStateException ise) {
             // ignore: invalidated session
             return -1;
@@ -240,9 +235,8 @@ public class SessionUtils {
 
     public static long getTTLForSession(Session in_session) {
         try {
-            long diffMilliSeconds = 1000 * in_session.getMaxInactiveInterval() -
+            return 1000L * in_session.getMaxInactiveInterval() -
                     (System.currentTimeMillis() - in_session.getThisAccessedTime());
-            return diffMilliSeconds;
         } catch (IllegalStateException ise) {
             // ignore: invalidated session
             return -1;
@@ -251,8 +245,7 @@ public class SessionUtils {
 
     public static long getInactiveTimeForSession(Session in_session) {
         try {
-            long diffMilliSeconds = System.currentTimeMillis() - in_session.getThisAccessedTime();
-            return diffMilliSeconds;
+            return System.currentTimeMillis() - in_session.getThisAccessedTime();
         } catch (IllegalStateException ise) {
             // ignore: invalidated session
             return -1;

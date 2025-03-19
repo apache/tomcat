@@ -18,7 +18,6 @@ package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
 
-import org.apache.catalina.tribes.ChannelInterceptor;
 import org.apache.catalina.tribes.group.interceptors.StaticMembershipInterceptor;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -62,8 +61,7 @@ public class InterceptorSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aInterceptor, StoreDescription parentDesc)
             throws Exception {
-        if (aInterceptor instanceof StaticMembershipInterceptor) {
-            ChannelInterceptor interceptor = (ChannelInterceptor) aInterceptor;
+        if (aInterceptor instanceof StaticMembershipInterceptor interceptor) {
             // Store nested <Member> elements
             storeElementArray(aWriter, indent + 2, interceptor.getMembers());
         }

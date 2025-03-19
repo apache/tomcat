@@ -4004,10 +4004,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             tldEvent = new ServletContextEvent(noPluggabilityServletContext);
         }
         for (Object instance : instances) {
-            if (!(instance instanceof ServletContextListener)) {
+            if (!(instance instanceof ServletContextListener listener)) {
                 continue;
             }
-            ServletContextListener listener = (ServletContextListener) instance;
             try {
                 fireContainerEvent("beforeContextInitialized", listener);
                 if (noPluggabilityListeners.contains(listener)) {
@@ -4052,8 +4051,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (listeners[j] == null) {
                     continue;
                 }
-                if (listeners[j] instanceof ServletContextListener) {
-                    ServletContextListener listener = (ServletContextListener) listeners[j];
+                if (listeners[j] instanceof ServletContextListener listener) {
                     try {
                         fireContainerEvent("beforeContextDestroyed", listener);
                         if (noPluggabilityListeners.contains(listener)) {
@@ -4300,8 +4298,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
                 // since the loader just started, the webapp classloader is now
                 // created.
-                if (loader.getClassLoader() instanceof WebappClassLoaderBase) {
-                    WebappClassLoaderBase cl = (WebappClassLoaderBase) loader.getClassLoader();
+                if (loader.getClassLoader() instanceof WebappClassLoaderBase cl) {
                     cl.setClearReferencesRmiTargets(getClearReferencesRmiTargets());
                     cl.setClearReferencesStopThreads(getClearReferencesStopThreads());
                     cl.setClearReferencesStopTimerThreads(getClearReferencesStopTimerThreads());
@@ -5137,10 +5134,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (instance == null) {
                     continue;
                 }
-                if (!(instance instanceof ServletRequestListener)) {
+                if (!(instance instanceof ServletRequestListener listener)) {
                     continue;
                 }
-                ServletRequestListener listener = (ServletRequestListener) instance;
 
                 try {
                     listener.requestInitialized(event);
@@ -5171,10 +5167,9 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 if (instances[j] == null) {
                     continue;
                 }
-                if (!(instances[j] instanceof ServletRequestListener)) {
+                if (!(instances[j] instanceof ServletRequestListener listener)) {
                     continue;
                 }
-                ServletRequestListener listener = (ServletRequestListener) instances[j];
 
                 try {
                     listener.requestDestroyed(event);
@@ -5565,13 +5560,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
 
-    private static class NoPluggabilityServletContext implements ServletContext {
-
-        private final ServletContext sc;
-
-        NoPluggabilityServletContext(ServletContext sc) {
-            this.sc = sc;
-        }
+    private record NoPluggabilityServletContext(ServletContext sc) implements ServletContext {
 
         @Override
         public String getContextPath() {
@@ -5724,7 +5713,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         @Override
-        public Map<String,? extends ServletRegistration> getServletRegistrations() {
+        public Map<String, ? extends ServletRegistration> getServletRegistrations() {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
@@ -5754,7 +5743,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         @Override
-        public Map<String,? extends FilterRegistration> getFilterRegistrations() {
+        public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 

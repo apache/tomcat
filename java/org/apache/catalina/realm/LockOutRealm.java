@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.realm;
 
+import java.io.Serial;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.LinkedHashMap;
@@ -80,6 +81,7 @@ public class LockOutRealm extends CombinedRealm {
          * retained.
          */
         failedUsers = new LinkedHashMap<>(cacheSize, 0.75f, true) {
+            @Serial
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -202,7 +204,7 @@ public class LockOutRealm extends CombinedRealm {
 
     /*
      * Checks to see if the current user is locked. If this is associated with a login attempt, then the last access
-     * time will be recorded and any attempt to authenticated a locked user will log a warning.
+     * time will be recorded and any attempt to authenticate a locked user will log a warning.
      */
     public boolean isLocked(String username) {
         LockRecord lockRecord;

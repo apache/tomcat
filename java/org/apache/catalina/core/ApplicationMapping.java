@@ -80,38 +80,11 @@ public class ApplicationMapping {
         mapping = null;
     }
 
-    private static class MappingImpl implements HttpServletMapping {
-
-        private final String matchValue;
-        private final String pattern;
-        private final MappingMatch mappingType;
-        private final String servletName;
-
-        MappingImpl(String matchValue, String pattern, MappingMatch mappingType, String servletName) {
-            this.matchValue = matchValue;
-            this.pattern = pattern;
-            this.mappingType = mappingType;
-            this.servletName = servletName;
-        }
-
-        @Override
-        public String getMatchValue() {
-            return matchValue;
-        }
-
-        @Override
-        public String getPattern() {
-            return pattern;
-        }
-
+    private record MappingImpl(String matchValue, String pattern, MappingMatch mappingType,
+                               String servletName) implements HttpServletMapping {
         @Override
         public MappingMatch getMappingMatch() {
             return mappingType;
-        }
-
-        @Override
-        public String getServletName() {
-            return servletName;
         }
     }
 }

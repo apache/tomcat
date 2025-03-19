@@ -23,7 +23,7 @@ import java.util.jar.JarInputStream;
 import java.util.zip.ZipEntry;
 
 /**
- * The purpose of this sub-class is to obtain references to the JarEntry objects for META-INF/ and META-INF/MANIFEST.MF
+ * The purpose of this subclass is to obtain references to the JarEntry objects for META-INF/ and META-INF/MANIFEST.MF
  * that are otherwise swallowed by the JarInputStream implementation.
  */
 public class TomcatJarInputStream extends JarInputStream {

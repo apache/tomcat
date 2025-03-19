@@ -39,7 +39,7 @@ public final class ReplicationStream extends ObjectInputStream {
     /**
      * The class loader we will use to resolve classes.
      */
-    private ClassLoader[] classLoaders = null;
+    private ClassLoader[] classLoaders;
 
     /**
      * Construct a new instance of CustomObjectInputStream
@@ -140,16 +140,14 @@ public final class ReplicationStream extends ObjectInputStream {
 
 
     public Class<?> findReplicationClass(String name) throws ClassNotFoundException {
-        Class<?> clazz = Class.forName(name, false, getClass().getClassLoader());
-        return clazz;
+        return Class.forName(name, false, getClass().getClassLoader());
     }
 
     public Class<?> findExternalClass(String name) throws ClassNotFoundException {
         ClassNotFoundException cnfe = null;
         for (ClassLoader classLoader : classLoaders) {
             try {
-                Class<?> clazz = Class.forName(name, false, classLoader);
-                return clazz;
+                return Class.forName(name, false, classLoader);
             } catch (ClassNotFoundException x) {
                 cnfe = x;
             }

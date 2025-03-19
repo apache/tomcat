@@ -1389,10 +1389,9 @@ public class Request implements HttpServletRequest {
         }
 
         for (Object o : listeners) {
-            if (!(o instanceof ServletRequestAttributeListener)) {
+            if (!(o instanceof ServletRequestAttributeListener listener)) {
                 continue;
             }
-            ServletRequestAttributeListener listener = (ServletRequestAttributeListener) o;
             try {
                 if (replaced) {
                     listener.attributeReplaced(event);
@@ -1424,10 +1423,9 @@ public class Request implements HttpServletRequest {
         ServletRequestAttributeEvent event =
                 new ServletRequestAttributeEvent(context.getServletContext(), getRequest(), name, value);
         for (Object o : listeners) {
-            if (!(o instanceof ServletRequestAttributeListener)) {
+            if (!(o instanceof ServletRequestAttributeListener listener)) {
                 continue;
             }
-            ServletRequestAttributeListener listener = (ServletRequestAttributeListener) o;
             try {
                 listener.attributeRemoved(event);
             } catch (Throwable t) {
@@ -2185,9 +2183,7 @@ public class Request implements HttpServletRequest {
 
             if ((session == null) || !session.isValid()) {
                 // Check for parallel deployment contexts
-                if (getMappingData().contexts == null) {
-                    return false;
-                } else {
+                if (getMappingData().contexts != null) {
                     for (int i = (getMappingData().contexts.length); i > 0; i--) {
                         Context ctxt = getMappingData().contexts[i - 1];
                         try {
@@ -2198,8 +2194,8 @@ public class Request implements HttpServletRequest {
                             // Ignore
                         }
                     }
-                    return false;
                 }
+                return false;
             }
 
             return true;

@@ -56,17 +56,17 @@ public interface Member extends Serializable {
     /**
      * Returns the listen port for the ChannelReceiver implementation
      *
-     * @return the listen port for this member, -1 if its not listening on an insecure port
+     * @return the listen port for this member, -1 if it's not listening on an insecure port
      *
      * @see ChannelReceiver
      */
     int getPort();
 
     /**
-     * Returns the secure listen port for the ChannelReceiver implementation. Returns -1 if its not listening to a
+     * Returns the secure listen port for the ChannelReceiver implementation. Returns -1 if it's not listening to a
      * secure port.
      *
-     * @return the listen port for this member, -1 if its not listening on a secure port
+     * @return the listen port for this member, -1 if it's not listening on a secure port
      *
      * @see ChannelReceiver
      */
@@ -75,13 +75,13 @@ public interface Member extends Serializable {
     /**
      * Returns the UDP port that this member is listening to for UDP messages.
      *
-     * @return the listen UDP port for this member, -1 if its not listening on a UDP port
+     * @return the listen UDP port for this member, -1 if it's not listening on a UDP port
      */
     int getUdpPort();
 
 
     /**
-     * Contains information on how long this member has been online. The result is the number of milli seconds this
+     * Contains information on how long this member has been online. The result is the number of milliseconds this
      * member has been broadcasting its membership to the group.
      *
      * @return nr of milliseconds since this member started.

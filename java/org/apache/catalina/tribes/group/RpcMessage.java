@@ -65,15 +65,8 @@ public class RpcMessage implements Externalizable {
 
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder("RpcMessage[");
-        buf.append(super.toString());
-        buf.append("] rpcId=");
-        buf.append(Arrays.toString(rpcId));
-        buf.append("; uuid=");
-        buf.append(Arrays.toString(uuid));
-        buf.append("; msg=");
-        buf.append(message);
-        return buf.toString();
+        return "RpcMessage[" + super.toString() + "] rpcId=" + Arrays.toString(rpcId) + "; uuid=" +
+                Arrays.toString(uuid) + "; msg=" + message;
     }
 
     public static class NoRpcChannelReply extends RpcMessage {

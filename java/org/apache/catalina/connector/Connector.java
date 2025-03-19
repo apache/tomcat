@@ -1031,18 +1031,16 @@ public class Connector extends LifecycleMBeanBase {
         }
 
         if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable() &&
-                protocolHandler instanceof AbstractHttp11Protocol) {
+            protocolHandler instanceof AbstractHttp11Protocol<?> jsseProtocolHandler) {
             // Use FFM and OpenSSL if available
-            AbstractHttp11Protocol<?> jsseProtocolHandler = (AbstractHttp11Protocol<?>) protocolHandler;
             if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
                 // OpenSSL is compatible with the JSSE configuration, so use it if it is available
                 jsseProtocolHandler
                         .setSslImplementationName("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
             }
         } else if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
-                protocolHandler instanceof AbstractHttp11Protocol) {
+            protocolHandler instanceof AbstractHttp11Protocol<?> jsseProtocolHandler) {
             // Use tomcat-native and OpenSSL otherwise, if available
-            AbstractHttp11Protocol<?> jsseProtocolHandler = (AbstractHttp11Protocol<?>) protocolHandler;
             if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
                 // OpenSSL is compatible with the JSSE configuration, so use it if APR is available
                 jsseProtocolHandler.setSslImplementationName(OpenSSLImplementation.class.getName());

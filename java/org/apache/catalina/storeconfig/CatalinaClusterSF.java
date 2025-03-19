@@ -42,10 +42,8 @@ public class CatalinaClusterSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aCluster, StoreDescription parentDesc)
             throws Exception {
-        if (aCluster instanceof CatalinaCluster) {
-            CatalinaCluster cluster = (CatalinaCluster) aCluster;
-            if (cluster instanceof SimpleTcpCluster) {
-                SimpleTcpCluster tcpCluster = (SimpleTcpCluster) cluster;
+        if (aCluster instanceof CatalinaCluster cluster) {
+            if (cluster instanceof SimpleTcpCluster tcpCluster) {
                 // Store nested <Manager> element
                 ClusterManager manager = tcpCluster.getManagerTemplate();
                 if (manager != null) {

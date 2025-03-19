@@ -359,11 +359,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     @Override
     public void registerManager(Manager manager) {
 
-        if (!(manager instanceof ClusterManager)) {
+        if (!(manager instanceof ClusterManager cmanager)) {
             log.warn(sm.getString("simpleTcpCluster.clustermanager.notImplement", manager));
             return;
         }
-        ClusterManager cmanager = (ClusterManager) manager;
         // Notify our interested LifecycleListeners
         fireLifecycleEvent(BEFORE_MANAGERREGISTER_EVENT, manager);
         String clusterName = getManagerName(cmanager.getName(), manager);
@@ -377,8 +376,7 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
 
     @Override
     public void removeManager(Manager manager) {
-        if (manager instanceof ClusterManager) {
-            ClusterManager cmgr = (ClusterManager) manager;
+        if (manager instanceof ClusterManager cmgr) {
             // Notify our interested LifecycleListeners
             fireLifecycleEvent(BEFORE_MANAGERUNREGISTER_EVENT, manager);
             managers.remove(getManagerName(cmgr.getName(), manager));
@@ -479,10 +477,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     }
 
     protected void checkDefaults() {
-        if (clusterListeners.size() == 0 && managerTemplate instanceof DeltaManager) {
+        if (clusterListeners.isEmpty() && managerTemplate instanceof DeltaManager) {
             addClusterListener(new ClusterSessionListener());
         }
-        if (valves.size() == 0) {
+        if (valves.isEmpty()) {
             addValve(new JvmRouteBinderValve());
             addValve(new ReplicationValve());
         }

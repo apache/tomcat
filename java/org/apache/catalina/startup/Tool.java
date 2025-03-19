@@ -218,9 +218,9 @@ public final class Tool {
             paramValues[0] = params;
             method.invoke(null, paramValues);
         } catch (Throwable t) {
-            t = Bootstrap.unwrapInvocationTargetException(t);
-            Bootstrap.handleThrowable(t);
-            log.error("Exception calling main() method", t);
+            Throwable throwable = Bootstrap.unwrapInvocationTargetException(t);
+            Bootstrap.handleThrowable(throwable);
+            log.error("Exception calling main() method", throwable);
             System.exit(1);
         }
 

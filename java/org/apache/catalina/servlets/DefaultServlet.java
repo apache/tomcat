@@ -29,6 +29,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.io.Reader;
+import java.io.Serial;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -131,6 +132,7 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class DefaultServlet extends HttpServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -1148,7 +1150,7 @@ public class DefaultServlet extends HttpServlet {
 
         } else {
 
-            if ((ranges == null) || (ranges.getEntries().isEmpty())) {
+            if (ranges.getEntries().isEmpty()) {
                 return;
             }
 
@@ -1230,7 +1232,7 @@ public class DefaultServlet extends HttpServlet {
             skip(is, 2, stripBom);
             return StandardCharsets.UTF_16BE;
         }
-        // Delay the UTF_16LE check if there are more that 2 bytes since it
+        // Delay the UTF_16LE check if there are more than 2 bytes since it
         // overlaps with UTF-32LE.
         if (count == 2 && b0 == 0xFF && b1 == 0xFE) {
             skip(is, 2, stripBom);
@@ -1803,7 +1805,7 @@ public class DefaultServlet extends HttpServlet {
         sb.append("<thead>\r\n");
         sb.append("<tr>\r\n");
         sb.append("<th align=\"left\"><font size=\"+1\"><strong>");
-        if (sortListings) {
+        if (order != null) {
             sb.append("<a href=\"?C=N;O=");
             sb.append(getOrderChar(order, 'N'));
             sb.append("\">");
@@ -1814,7 +1816,7 @@ public class DefaultServlet extends HttpServlet {
         }
         sb.append("</strong></font></th>\r\n");
         sb.append("<th align=\"center\"><font size=\"+1\"><strong>");
-        if (sortListings) {
+        if (order != null) {
             sb.append("<a href=\"?C=S;O=");
             sb.append(getOrderChar(order, 'S'));
             sb.append("\">");
@@ -1825,7 +1827,7 @@ public class DefaultServlet extends HttpServlet {
         }
         sb.append("</strong></font></th>\r\n");
         sb.append("<th align=\"right\"><font size=\"+1\"><strong>");
-        if (sortListings) {
+        if (order != null) {
             sb.append("<a href=\"?C=M;O=");
             sb.append(getOrderChar(order, 'M'));
             sb.append("\">");
@@ -1971,7 +1973,10 @@ public class DefaultServlet extends HttpServlet {
                     } else {
                         reader = new InputStreamReader(is);
                     }
-                    copyRange(reader, new PrintWriter(buffer));
+                    IOException e = copyRange(reader, new PrintWriter(buffer));
+                    if (debug > 10) {
+                        log("readme '" + readmeFile + "' output error: " + e.getMessage());
+                    }
                 } catch (IOException e) {
                     log(sm.getString("defaultServlet.readerCloseFailed"), e);
                 } finally {
@@ -2033,7 +2038,7 @@ public class DefaultServlet extends HttpServlet {
         }
 
         /*
-         * Open and read in file in one fell swoop to reduce chance chance of leaving handle open.
+         * Open and read in file in one fell swoop to reduce the chance of leaving handle open.
          */
         if (globalXsltFile != null) {
             File f = validateGlobalXsltFile();
@@ -2718,26 +2723,13 @@ public class DefaultServlet extends HttpServlet {
     }
 
 
-    protected static class CompressionFormat implements Serializable {
+    protected record CompressionFormat(String extension, String encoding) implements Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
-        public final String extension;
-        public final String encoding;
-
-        public CompressionFormat(String extension, String encoding) {
-            this.extension = extension;
-            this.encoding = encoding;
-        }
     }
 
 
-    private static class PrecompressedResource {
-        public final WebResource resource;
-        public final CompressionFormat format;
-
-        private PrecompressedResource(WebResource resource, CompressionFormat format) {
-            this.resource = resource;
-            this.format = format;
-        }
+    private record PrecompressedResource(WebResource resource, CompressionFormat format) {
     }
 
 
@@ -2765,7 +2757,7 @@ public class DefaultServlet extends HttpServlet {
     /**
      * A class encapsulating the sorting of resources.
      */
-    private static class SortManager {
+    protected static class SortManager {
         /**
          * The default sort.
          */

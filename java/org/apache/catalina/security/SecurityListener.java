@@ -86,7 +86,7 @@ public class SecurityListener implements LifecycleListener {
     /**
      * Set the list of operating system users not permitted to run Tomcat. By default, only root is prevented from
      * running Tomcat. Calling this method with null or the empty string will clear the list of users and effectively
-     * disables this check. User names will always be checked in a case insensitive manner using the system default
+     * disables this check. Usernames will always be checked in a case-insensitive manner using the system default
      * Locale.
      *
      * @param userNameList A comma separated list of operating system users not permitted to run Tomcat
@@ -108,7 +108,7 @@ public class SecurityListener implements LifecycleListener {
     /**
      * Returns the current list of operating system users not permitted to run Tomcat.
      *
-     * @return A comma separated list of operating system user names.
+     * @return A comma separated list of operating system usernames.
      */
     public String getCheckedOsUsers() {
         return StringUtils.join(checkedOsUsers);

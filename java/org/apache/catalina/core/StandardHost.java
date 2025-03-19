@@ -636,7 +636,7 @@ public class StandardHost extends ContainerBase implements Host {
     @Override
     public void addChild(Container child) {
 
-        if (!(child instanceof Context)) {
+        if (!(child instanceof Context context)) {
             throw new IllegalArgumentException(sm.getString("standardHost.notContext"));
         }
 
@@ -644,7 +644,6 @@ public class StandardHost extends ContainerBase implements Host {
 
         // Avoid NPE for case where Context is defined in server.xml with only a
         // docBase
-        Context context = (Context) child;
         if (context.getPath() == null) {
             ContextName cn = new ContextName(context.getDocBase(), true);
             context.setPath(cn.getPath());
@@ -663,8 +662,7 @@ public class StandardHost extends ContainerBase implements Host {
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
             if (event.getType().equals(AFTER_START_EVENT)) {
-                if (event.getSource() instanceof Context) {
-                    Context context = ((Context) event.getSource());
+                if (event.getSource() instanceof Context context) {
                     childClassLoaders.put(context.getLoader().getClassLoader(),
                             context.getServletContext().getContextPath());
                 }

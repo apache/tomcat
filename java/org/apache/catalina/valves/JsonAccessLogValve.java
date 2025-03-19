@@ -69,7 +69,8 @@ import org.apache.tomcat.util.json.JSONFilter;
  * <li>%{xxx}s: sessionAttributes</li>
  * <li>%{xxx}L: identifier</li>
  * </ul>
- * The attribute list is based on https://github.com/fluent/fluentd/blob/master/lib/fluent/plugin/parser_apache2.rb#L72
+ * The attribute list is based on
+ * <a href="https://github.com/fluent/fluentd/blob/master/lib/fluent/plugin/parser_apache2.rb#L72">parser_apache2.rb</a>
  */
 public class JsonAccessLogValve extends AccessLogValve {
 
@@ -158,13 +159,12 @@ public class JsonAccessLogValve extends AccessLogValve {
         while (lit.hasNext()) {
             AccessLogElement logElement = lit.next();
             // remove all other elements, like StringElements
-            if (!(logElement instanceof JsonWrappedElement)) {
+            if (!(logElement instanceof JsonWrappedElement wrappedLogElement)) {
                 lit.remove();
                 continue;
             }
             // Remove items which should be written as
             // Json objects and add them later in correct order
-            JsonWrappedElement wrappedLogElement = (JsonWrappedElement) logElement;
             AccessLogElement ale = wrappedLogElement.getDelegate();
             if (ale instanceof HeaderElement) {
                 subTypeLists.get(Character.valueOf('i')).add(wrappedLogElement);

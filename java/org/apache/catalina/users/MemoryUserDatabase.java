@@ -139,7 +139,7 @@ public class MemoryUserDatabase implements UserDatabase {
     protected final Map<String,Role> roles = new ConcurrentHashMap<>();
 
     /**
-     * The set of {@link User}s defined in this database, keyed by user name.
+     * The set of {@link User}s defined in this database, keyed by username.
      */
     protected final Map<String,User> users = new ConcurrentHashMap<>();
 
@@ -654,18 +654,8 @@ public class MemoryUserDatabase implements UserDatabase {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("MemoryUserDatabase[id=");
-        sb.append(this.id);
-        sb.append(",pathname=");
-        sb.append(pathname);
-        sb.append(",groupCount=");
-        sb.append(this.groups.size());
-        sb.append(",roleCount=");
-        sb.append(this.roles.size());
-        sb.append(",userCount=");
-        sb.append(this.users.size());
-        sb.append(']');
-        return sb.toString();
+        return "MemoryUserDatabase[id=" + this.id + ",pathname=" + pathname + ",groupCount=" +
+                this.groups.size() + ",roleCount=" + this.roles.size() + ",userCount=" + this.users.size() + ']';
     }
 }
 

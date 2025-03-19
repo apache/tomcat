@@ -164,7 +164,7 @@ public class TcpSender implements Sender {
                 if (contentLength > 0) {
                     char[] buf = new char[512];
                     while (contentLength > 0) {
-                        int thisTime = (contentLength > buf.length) ? buf.length : contentLength;
+                        int thisTime = Math.min(contentLength, buf.length);
                         int n = connectionReaders[i].read(buf, 0, thisTime);
                         if (n <= 0) {
                             log.error(sm.getString("tcpSender.readError"));
@@ -193,6 +193,7 @@ public class TcpSender implements Sender {
                 connectionReaders[i].close();
             }
         } catch (IOException e) {
+            // Ignore
         }
         connectionReaders[i] = null;
         try {
@@ -200,6 +201,7 @@ public class TcpSender implements Sender {
                 connectionWriters[i].close();
             }
         } catch (IOException e) {
+            // Ignore
         }
         connectionWriters[i] = null;
         try {
@@ -207,6 +209,7 @@ public class TcpSender implements Sender {
                 connections[i].close();
             }
         } catch (IOException e) {
+            // Ignore
         }
         connections[i] = null;
     }

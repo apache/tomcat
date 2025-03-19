@@ -103,12 +103,11 @@ public class PropertiesRoleMappingListener implements LifecycleListener {
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
-            if (!(event.getLifecycle() instanceof Context)) {
+            if (!(event.getLifecycle() instanceof Context context)) {
                 log.warn(sm.getString("listener.notContext", event.getLifecycle().getClass().getSimpleName()));
                 return;
             }
             Properties props = new Properties();
-            Context context = (Context) event.getLifecycle();
             try (Resource resource = context.findConfigFileResource(roleMappingFile)) {
                 props.load(resource.getInputStream());
             } catch (IOException e) {

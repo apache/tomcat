@@ -126,8 +126,7 @@ public class DeltaRequest implements Externalizable {
     }
 
     public void setNew(boolean n) {
-        int action = ACTION_SET;
-        addAction(TYPE_ISNEW, action, NAME_ISNEW, Boolean.valueOf(n));
+        addAction(TYPE_ISNEW, ACTION_SET, NAME_ISNEW, Boolean.valueOf(n));
     }
 
     public void setAuthType(String authType) {
@@ -144,8 +143,8 @@ public class DeltaRequest implements Externalizable {
     }
 
     protected void addAction(int type, int action, String name, Object value) {
-        AttributeInfo info = null;
-        if (this.actionPool.size() > 0) {
+        AttributeInfo info;
+        if (!this.actionPool.isEmpty()) {
             try {
                 info = actionPool.removeFirst();
             } catch (Exception x) {
@@ -247,7 +246,7 @@ public class DeltaRequest implements Externalizable {
     }
 
     public void reset() {
-        while (actions.size() > 0) {
+        while (!actions.isEmpty()) {
             try {
                 AttributeInfo info = actions.removeFirst();
                 info.recycle();
@@ -256,7 +255,6 @@ public class DeltaRequest implements Externalizable {
                 log.error(sm.getString("deltaRequest.removeUnable"), x);
             }
         }
-        actions.clear();
     }
 
     public String getSessionId() {
@@ -291,8 +289,8 @@ public class DeltaRequest implements Externalizable {
         recordAllActions = in.readBoolean();
         int cnt = in.readInt();
         for (int i = 0; i < cnt; i++) {
-            AttributeInfo info = null;
-            if (this.actionPool.size() > 0) {
+            AttributeInfo info;
+            if (!this.actionPool.isEmpty()) {
                 try {
                     info = actionPool.removeFirst();
                 } catch (Exception x) {
@@ -392,10 +390,9 @@ public class DeltaRequest implements Externalizable {
 
         @Override
         public boolean equals(Object o) {
-            if (!(o instanceof AttributeInfo)) {
+            if (!(o instanceof AttributeInfo other)) {
                 return false;
             }
-            AttributeInfo other = (AttributeInfo) o;
             return other.getName().equals(this.getName());
         }
 
@@ -433,11 +430,9 @@ public class DeltaRequest implements Externalizable {
 
         @Override
         public String toString() {
-            StringBuilder buf = new StringBuilder("AttributeInfo[type=");
-            buf.append(getType()).append(", action=").append(getAction());
-            buf.append(", name=").append(getName()).append(", value=").append(getValue());
-            buf.append(", addr=").append(super.toString()).append(']');
-            return buf.toString();
+            return "AttributeInfo[type=" + getType() + ", action=" + getAction() +
+                    ", name=" + getName() + ", value=" + getValue() +
+                    ", addr=" + super.toString() + ']';
         }
 
     }

@@ -435,8 +435,8 @@ public final class Mapper {
      */
     private void addWrappers(ContextVersion contextVersion, Collection<WrapperMappingInfo> wrappers) {
         for (WrapperMappingInfo wrapper : wrappers) {
-            addWrapper(contextVersion, wrapper.getMapping(), wrapper.getWrapper(), wrapper.isJspWildCard(),
-                    wrapper.isResourceOnly());
+            addWrapper(contextVersion, wrapper.mapping(), wrapper.wrapper(), wrapper.jspWildCard(),
+                    wrapper.resourceOnly());
         }
     }
 
@@ -478,8 +478,7 @@ public final class Mapper {
                 }
             } else if (path.equals("/")) {
                 // Default wrapper
-                MappedWrapper newWrapper = new MappedWrapper("", wrapper, jspWildCard, resourceOnly);
-                context.defaultWrapper = newWrapper;
+                context.defaultWrapper = new MappedWrapper("", wrapper, jspWildCard, resourceOnly);
             } else {
                 // Exact wrapper
                 final String name;

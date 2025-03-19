@@ -17,6 +17,7 @@
 package org.apache.catalina.realm;
 
 import java.io.ObjectStreamException;
+import java.io.Serial;
 import java.security.Principal;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -273,6 +274,7 @@ public class UserDatabaseRealm extends RealmBase {
 
 
     public static final class UserDatabasePrincipal extends GenericPrincipal {
+        @Serial
         private static final long serialVersionUID = 1L;
         private final transient UserDatabase database;
 
@@ -346,6 +348,7 @@ public class UserDatabaseRealm extends RealmBase {
          *
          * @throws ObjectStreamException Not thrown by this implementation
          */
+        @Serial
         private Object writeReplace() throws ObjectStreamException {
             // Replace with a static principal disconnected from the database
             return new GenericPrincipal(getName(), Arrays.asList(getRoles()));

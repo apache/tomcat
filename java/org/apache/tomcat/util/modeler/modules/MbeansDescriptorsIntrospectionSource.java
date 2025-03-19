@@ -76,7 +76,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
     public void execute() throws Exception {
         if( registry==null ) {
-            registry=Registry.getRegistry(null, null);
+            registry=Registry.getRegistryNonNull(null, null);
         }
         try {
             ManagedBean managed = createManagedBean(registry, null,

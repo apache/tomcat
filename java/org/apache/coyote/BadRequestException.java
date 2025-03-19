@@ -17,12 +17,14 @@
 package org.apache.coyote;
 
 import java.io.IOException;
+import java.io.Serial;
 
 /**
  * Extend IOException to identify it as being caused by a bad request from a remote client.
  */
 public class BadRequestException extends IOException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

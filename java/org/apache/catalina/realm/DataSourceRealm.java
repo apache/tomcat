@@ -206,7 +206,7 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-     * @return the table that holds user data..
+     * @return the table that holds user data
      */
     public String getUserTable() {
         return userTable;
@@ -403,7 +403,7 @@ public class DataSourceRealm extends RealmBase {
 
 
     /**
-     * Return the password associated with the given principal's user name.
+     * Return the password associated with the given principal's username.
      *
      * @param dbConnection The database connection to be used
      * @param username     Username for which password should be retrieved
@@ -447,9 +447,9 @@ public class DataSourceRealm extends RealmBase {
     }
 
     /**
-     * Return the roles associated with the given user name.
+     * Return the roles associated with the given username.
      *
-     * @param username User name for which roles should be retrieved
+     * @param username Username for which roles should be retrieved
      *
      * @return an array list of the role names
      */
@@ -470,10 +470,10 @@ public class DataSourceRealm extends RealmBase {
 
 
     /**
-     * Return the roles associated with the given user name.
+     * Return the roles associated with the given username.
      *
      * @param dbConnection The database connection to be used
-     * @param username     User name for which roles should be retrieved
+     * @param username     Username for which roles should be retrieved
      *
      * @return an array list of the role names
      */

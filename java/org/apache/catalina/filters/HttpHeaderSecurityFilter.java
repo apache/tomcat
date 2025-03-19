@@ -89,9 +89,7 @@ public class HttpHeaderSecurityFilter extends FilterBase {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        if (response instanceof HttpServletResponse) {
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
-
+        if (response instanceof HttpServletResponse httpResponse) {
             if (response.isCommitted()) {
                 throw new ServletException(sm.getString("httpHeaderSecurityFilter.committed"));
             }

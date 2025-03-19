@@ -16,11 +16,14 @@
  */
 package org.apache.coyote.http11;
 
+import java.io.Serial;
+
 /**
  * Exception used to mark the specific error condition of the HTTP headers exceeding the maximum permitted size.
  */
 public class HeadersTooLargeException extends IllegalStateException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public HeadersTooLargeException() {

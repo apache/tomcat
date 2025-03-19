@@ -96,12 +96,11 @@ public class NioSender extends AbstractSender {
                 if (current != null) {
                     key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
                 }
-                return false;
             } else {
                 // wait for the connection to finish
                 key.interestOps(key.interestOps() | SelectionKey.OP_CONNECT);
-                return false;
-            } // end if
+            }
+            return false;
         } else if (key.isWritable()) {
             boolean writecomplete = write();
             if (writecomplete) {
@@ -120,7 +119,7 @@ public class NioSender extends AbstractSender {
             } else {
                 // we are not complete, lets write some more
                 key.interestOps(key.interestOps() | SelectionKey.OP_WRITE);
-            } // end if
+            }
         } else if (key.isReadable()) {
             boolean readcomplete = read();
             if (readcomplete) {
@@ -281,9 +280,6 @@ public class NioSender extends AbstractSender {
                         // Ignore
                     }
                     // error free close, all the way
-                    // try {socket.shutdownOutput();}catch ( Exception x){}
-                    // try {socket.shutdownInput();}catch ( Exception x){}
-                    // try {socket.close();}catch ( Exception x){}
                     try {
                         socketChannel.close();
                     } catch (Exception x) {
@@ -301,9 +297,6 @@ public class NioSender extends AbstractSender {
                         // Ignore
                     }
                     // error free close, all the way
-                    // try {socket.shutdownOutput();}catch ( Exception x){}
-                    // try {socket.shutdownInput();}catch ( Exception x){}
-                    // try {socket.close();}catch ( Exception x){}
                     try {
                         dataChannel.close();
                     } catch (Exception x) {

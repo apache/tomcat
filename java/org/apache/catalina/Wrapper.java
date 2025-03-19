@@ -293,14 +293,14 @@ public interface Wrapper extends Container {
 
 
     /**
-     * @return the multi-part configuration for the associated Servlet. If no multi-part configuration has been defined,
+     * @return the multipart configuration for the associated Servlet. If no multipart configuration has been defined,
      *             then <code>null</code> will be returned.
      */
     MultipartConfigElement getMultipartConfigElement();
 
 
     /**
-     * Set the multi-part configuration for the associated Servlet. To clear the multi-part configuration specify
+     * Set the multipart configuration for the associated Servlet. To clear the multipart configuration specify
      * <code>null</code> as the new value.
      *
      * @param multipartConfig The configuration associated with the Servlet

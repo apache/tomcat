@@ -26,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -213,8 +214,7 @@ public class RewriteValve extends ValveBase {
                     break;
                 }
                 Object result = parse(line);
-                if (result instanceof RewriteRule) {
-                    RewriteRule rule = (RewriteRule) result;
+                if (result instanceof RewriteRule rule) {
                     if (containerLog.isTraceEnabled()) {
                         containerLog.trace("Add rule with pattern " + rule.getPatternString() + " and substitution " +
                                 rule.getSubstitutionString());
@@ -313,7 +313,7 @@ public class RewriteValve extends ValveBase {
                 RewriteRule rule = rules[i];
                 CharSequence test = (rule.isHost()) ? host : urlDecoded;
                 CharSequence newtest = rule.evaluate(test, resolver);
-                if (newtest != null && !test.toString().equals(newtest.toString())) {
+                if (newtest != null && !Objects.equals(test.toString(), newtest.toString())) {
                     if (containerLog.isTraceEnabled()) {
                         containerLog.trace(
                                 "Rewrote " + test + " as " + newtest + " with rule pattern " + rule.getPatternString());

@@ -160,17 +160,17 @@ public interface HttpServletRequest extends ServletRequest {
         return new HttpServletMapping() {
 
             @Override
-            public String getMatchValue() {
+            public String matchValue() {
                 return "";
             }
 
             @Override
-            public String getPattern() {
+            public String pattern() {
                 return "";
             }
 
             @Override
-            public String getServletName() {
+            public String servletName() {
                 return "";
             }
 

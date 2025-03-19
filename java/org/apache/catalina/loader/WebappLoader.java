@@ -161,7 +161,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
 
     /**
-     * @return a non null String if the loader will attempt to use the Jakarta converter. The String is the name of the
+     * @return a non-null String if the loader will attempt to use the Jakarta converter. The String is the name of the
      *             profile used for conversion.
      */
     public String getJakartaConverter() {
@@ -332,12 +332,12 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
             ObjectName cloname =
                     new ObjectName(context.getDomain() + ":type=" + classLoader.getClass().getSimpleName() + ",host=" +
                             context.getParent().getName() + ",context=" + contextName);
-            Registry.getRegistry(null, null).registerComponent(classLoader, cloname, null);
+            Registry.getRegistryNonNull(null, null).registerComponent(classLoader, cloname, null);
 
         } catch (Throwable t) {
-            t = ExceptionUtils.unwrapInvocationTargetException(t);
-            ExceptionUtils.handleThrowable(t);
-            throw new LifecycleException(sm.getString("webappLoader.startError"), t);
+            Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+            ExceptionUtils.handleThrowable(throwable);
+            throw new LifecycleException(sm.getString("webappLoader.startError"), throwable);
         }
 
         setState(LifecycleState.STARTING);
@@ -381,7 +381,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
                 ObjectName cloname =
                         new ObjectName(context.getDomain() + ":type=" + classLoader.getClass().getSimpleName() +
                                 ",host=" + context.getParent().getName() + ",context=" + contextName);
-                Registry.getRegistry(null, null).unregisterComponent(cloname);
+                Registry.getRegistryNonNull(null, null).unregisterComponent(cloname);
             } catch (Exception e) {
                 log.warn(sm.getString("webappLoader.stopError"), e);
             }
@@ -533,7 +533,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
 
     /**
-     * Implemented in a sub-class so EESpecProfile and EESpecProfiles are not loaded unless a profile is configured.
+     * Implemented in a subclass so EESpecProfile and EESpecProfiles are not loaded unless a profile is configured.
      * Otherwise, tomcat-embed-core.jar has a runtime dependency on the migration tool whether it is used or not.
      */
     private static class MigrationUtil {

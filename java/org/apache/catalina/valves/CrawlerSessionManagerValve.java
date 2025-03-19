@@ -17,6 +17,7 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Map;
@@ -274,16 +275,10 @@ public class CrawlerSessionManagerValve extends ValveBase {
         return result.toString();
     }
 
-    private static class CrawlerHttpSessionBindingListener implements HttpSessionBindingListener, Serializable {
+    private record CrawlerHttpSessionBindingListener(Map<String, String> clientIdSessionId,
+                                                     String clientIdentifier) implements HttpSessionBindingListener, Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
-
-        private final transient Map<String,String> clientIdSessionId;
-        private final transient String clientIdentifier;
-
-        private CrawlerHttpSessionBindingListener(Map<String,String> clientIdSessionId, String clientIdentifier) {
-            this.clientIdSessionId = clientIdSessionId;
-            this.clientIdentifier = clientIdentifier;
-        }
 
         @Override
         public void valueUnbound(HttpSessionBindingEvent event) {

@@ -123,9 +123,8 @@ public class WebAnnotationSet {
 
         Container[] children = context.findChildren();
         for (Container child : children) {
-            if (child instanceof Wrapper) {
+            if (child instanceof Wrapper wrapper) {
 
-                Wrapper wrapper = (Wrapper) child;
                 if (wrapper.getServletClass() == null) {
                     continue;
                 }

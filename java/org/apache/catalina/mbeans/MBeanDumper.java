@@ -127,8 +127,7 @@ public class MBeanDumper {
                                 }
                             }
                             valueString = sb.toString();
-                        } else if (TabularData.class.isInstance(value)) {
-                            TabularData tab = TabularData.class.cast(value);
+                        } else if (value instanceof TabularData tab) {
                             StringJoiner joiner = new StringJoiner(CRLF);
                             joiner.add("TabularData[" + tab.getTabularType().getRowType().getTypeName() +
                                     "] of length " + tab.size());
@@ -214,10 +213,9 @@ public class MBeanDumper {
 
     private static String valueToString(Object value) {
         String valueString;
-        if (CompositeData.class.isInstance(value)) {
+        if (value instanceof CompositeData composite) {
             StringBuilder sb = new StringBuilder("{");
             String sep = "";
-            CompositeData composite = CompositeData.class.cast(value);
             Set<String> keys = composite.getCompositeType().keySet();
             for (String key : keys) {
                 sb.append(sep).append(key).append('=').append(composite.get(key));
