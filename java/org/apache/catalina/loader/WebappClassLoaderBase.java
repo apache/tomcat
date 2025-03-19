@@ -2573,6 +2573,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     protected void addURL(URL url) {
         super.addURL(url);
         hasExternalRepositories = true;
+        // Clear the not found resources as they may now be available at the added URL.
+        notFoundClassResources.clear();
     }
 
 
