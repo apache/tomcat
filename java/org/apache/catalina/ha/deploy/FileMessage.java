@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.ha.deploy;
 
+import java.io.Serial;
+
 import org.apache.catalina.ha.ClusterMessageBase;
 import org.apache.catalina.tribes.Member;
 
@@ -25,6 +27,7 @@ import org.apache.catalina.tribes.Member;
  */
 
 public class FileMessage extends ClusterMessageBase {
+    @Serial
     private static final long serialVersionUID = 2L;
 
     private int messageNumber;
@@ -72,12 +75,7 @@ public class FileMessage extends ClusterMessageBase {
 
     @Override
     public String getUniqueId() {
-        StringBuilder result = new StringBuilder(getFileName());
-        result.append("#-#");
-        result.append(getMessageNumber());
-        result.append("#-#");
-        result.append(System.currentTimeMillis());
-        return result.toString();
+        return getFileName() + "#-#" + getMessageNumber() + "#-#" + System.currentTimeMillis();
     }
 
 

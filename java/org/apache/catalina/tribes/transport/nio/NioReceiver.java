@@ -52,7 +52,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
 
     private volatile boolean running = false;
 
-    private AtomicReference<Selector> selector = new AtomicReference<>();
+    private final AtomicReference<Selector> selector = new AtomicReference<>();
     private ServerSocketChannel serverChannel = null;
     private DatagramChannel datagramChannel = null;
 
@@ -160,7 +160,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         if (events.isEmpty()) {
             return;
         }
-        Runnable r = null;
+        Runnable r;
         while ((r = events.pollFirst()) != null) {
             try {
                 if (log.isTraceEnabled()) {
@@ -303,7 +303,7 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 // get an iterator over the set of selected keys
                 Iterator<SelectionKey> it = selector.selectedKeys().iterator();
                 // look at each key in the selected set
-                while (it != null && it.hasNext()) {
+                while (it.hasNext()) {
                     SelectionKey key = it.next();
                     // Is a new connection coming in?
                     if (key.isAcceptable()) {
@@ -397,9 +397,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 key.attach(null);
                 key.cancel();
             }
-        } catch (IOException ignore) {
+        } catch (IOException e) {
             if (log.isWarnEnabled()) {
-                log.warn(sm.getString("nioReceiver.cleanup.fail"), ignore);
+                log.warn(sm.getString("nioReceiver.cleanup.fail"), e);
             }
         } catch (ClosedSelectorException ignore) {
             // Ignore

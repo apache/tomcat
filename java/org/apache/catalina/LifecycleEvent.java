@@ -16,6 +16,7 @@
  */
 package org.apache.catalina;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 /**
@@ -25,6 +26,7 @@ import java.util.EventObject;
  */
 public final class LifecycleEvent extends EventObject {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

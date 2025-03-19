@@ -28,19 +28,19 @@ public interface HttpServletMapping {
     /**
      * @return The value that was matched or the empty String if not known.
      */
-    String getMatchValue();
+    String matchValue();
 
     /**
      * @return The {@code url-pattern} that matched this request or the empty String if not known.
      */
-    String getPattern();
+    String pattern();
 
     /**
      * @return The name of the servlet (as specified in web.xml, {@link WebServlet#name()},
      *             {@link jakarta.servlet.ServletContext#addServlet(String, Class)} or one of the other
      *             <code>addServlet()</code> methods) that the request was mapped to.
      */
-    String getServletName();
+    String servletName();
 
     /**
      * @return The type of match ({@code null} if not known)

@@ -26,7 +26,7 @@ import org.apache.catalina.Valve;
  */
 public interface ClusterValve extends Valve {
     /**
-     * Returns the cluster the cluster deployer is associated with
+     * Returns the cluster the valve is associated with
      *
      * @return CatalinaCluster
      */

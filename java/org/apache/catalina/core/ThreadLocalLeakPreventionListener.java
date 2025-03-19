@@ -118,13 +118,9 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
                     executor = handler.getExecutor();
                 }
 
-                if (executor instanceof ThreadPoolExecutor) {
-                    @SuppressWarnings("resource")
-                    ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
+                if (executor instanceof @SuppressWarnings("resource") ThreadPoolExecutor threadPoolExecutor) {
                     threadPoolExecutor.contextStopping();
-                } else if (executor instanceof StandardThreadExecutor) {
-                    @SuppressWarnings("resource")
-                    StandardThreadExecutor stdThreadExecutor = (StandardThreadExecutor) executor;
+                } else if (executor instanceof @SuppressWarnings("resource") StandardThreadExecutor stdThreadExecutor) {
                     stdThreadExecutor.contextStopping();
                 }
 

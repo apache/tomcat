@@ -17,6 +17,7 @@
 package org.apache.catalina.util;
 
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.HashSet;
 
@@ -34,6 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class ResourceSet<T> extends HashSet<T> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------------- Constructors

@@ -37,8 +37,7 @@ public class StandardServiceSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aService, StoreDescription parentDesc)
             throws Exception {
-        if (aService instanceof StandardService) {
-            StandardService service = (StandardService) aService;
+        if (aService instanceof StandardService service) {
             // Store nested <Listener> elements
             LifecycleListener[] listeners = service.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);

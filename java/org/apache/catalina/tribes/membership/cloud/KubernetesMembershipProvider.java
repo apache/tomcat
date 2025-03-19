@@ -119,11 +119,11 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
 
         String labels = getEnv(CUSTOM_ENV_PREFIX + "LABELS", "KUBERNETES_LABELS");
 
-        namespace = URLEncoder.encode(namespace, "UTF-8");
-        labels = labels == null ? null : URLEncoder.encode(labels, "UTF-8");
+        namespace = URLEncoder.encode(namespace, StandardCharsets.UTF_8);
+        labels = labels == null ? null : URLEncoder.encode(labels, StandardCharsets.UTF_8);
 
         url = String.format("%s://%s:%s/api/%s/namespaces/%s/pods", protocol, masterHost, masterPort, ver, namespace);
-        if (labels != null && labels.length() > 0) {
+        if (labels != null && !labels.isEmpty()) {
             url = url + "?labelSelector=" + labels;
         }
 
@@ -153,7 +153,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         List<MemberImpl> members = new ArrayList<>();
 
         try (InputStream stream = streamProvider.openStream(url, headers, connectionTimeout, readTimeout);
-                InputStreamReader reader = new InputStreamReader(stream, "UTF-8")) {
+                InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             parsePods(reader, members);
         } catch (IOException e) {
             log.error(sm.getString("kubernetesMembershipProvider.streamError"), e);
@@ -260,7 +260,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 long aliveTime =
                         Duration.between(Instant.parse(creationTimestampObject.toString()), startTime).toMillis();
 
-                MemberImpl member = null;
+                MemberImpl member;
                 try {
                     member = new MemberImpl(podIP, port, aliveTime);
                 } catch (IOException e) {

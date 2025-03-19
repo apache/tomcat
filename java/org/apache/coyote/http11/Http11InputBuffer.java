@@ -93,7 +93,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
     /**
      * Underlying input buffer.
      */
-    private InputBuffer inputStreamInputBuffer;
+    private final InputBuffer inputStreamInputBuffer;
 
 
     /**
@@ -115,7 +115,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
 
 
     /**
-     * Parsing state - used for non blocking parsing so that when more data arrives, we can pick up where we left off.
+     * Parsing state - used for non-blocking parsing so that when more data arrives, we can pick up where we left off.
      */
     private byte prevChr = 0;
     private byte chr = 0;

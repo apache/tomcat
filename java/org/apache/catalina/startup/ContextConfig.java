@@ -1936,8 +1936,7 @@ public class ContextConfig implements LifecycleListener {
 
     public String getConfigBasePath() {
         String path = null;
-        if (context.getParent() instanceof Host) {
-            Host host = (Host) context.getParent();
+        if (context.getParent() instanceof Host host) {
             if (host.getXmlBase() != null) {
                 path = host.getXmlBase();
             } else {
@@ -2083,7 +2082,7 @@ public class ContextConfig implements LifecycleListener {
     private class AnnotationScanTask implements Runnable {
         private final WebXml fragment;
         private final boolean handlesTypesOnly;
-        private Map<String,JavaClassCacheEntry> javaClassCache;
+        private final Map<String,JavaClassCacheEntry> javaClassCache;
 
         private AnnotationScanTask(WebXml fragment, boolean handlesTypesOnly,
                 Map<String,JavaClassCacheEntry> javaClassCache) {
@@ -2246,14 +2245,16 @@ public class ContextConfig implements LifecycleListener {
             String className = clazz.getClassName();
             for (AnnotationEntry ae : annotationsEntries) {
                 String type = ae.getAnnotationType();
-                if ("Ljakarta/servlet/annotation/WebServlet;".equals(type)) {
-                    processAnnotationWebServlet(className, ae, fragment);
-                } else if ("Ljakarta/servlet/annotation/WebFilter;".equals(type)) {
-                    processAnnotationWebFilter(className, ae, fragment);
-                } else if ("Ljakarta/servlet/annotation/WebListener;".equals(type)) {
-                    fragment.addListener(className);
-                } else {
-                    // Unknown annotation - ignore
+                switch (type) {
+                    case "Ljakarta/servlet/annotation/WebServlet;" ->
+                            processAnnotationWebServlet(className, ae, fragment);
+                    case "Ljakarta/servlet/annotation/WebFilter;" ->
+                            processAnnotationWebFilter(className, ae, fragment);
+                    case "Ljakarta/servlet/annotation/WebListener;" ->
+                            fragment.addListener(className);
+                    case null, default -> {
+                        // Unknown annotation - ignore
+                    }
                 }
             }
         }
@@ -2586,7 +2587,7 @@ public class ContextConfig implements LifecycleListener {
         boolean urlPatternsSet = false;
         boolean servletNamesSet = false;
         boolean dispatchTypesSet = false;
-        String[] urlPatterns = null;
+        String[] urlPatterns;
 
         for (ElementValuePair evp : evps) {
             String name = evp.getNameString();
@@ -2724,7 +2725,7 @@ public class ContextConfig implements LifecycleListener {
         return result;
     }
 
-    private static class DefaultWebXmlCacheEntry {
+    protected static class DefaultWebXmlCacheEntry {
         private final WebXml webXml;
         private final long globalTimeStamp;
         private final long hostTimeStamp;
@@ -2760,7 +2761,7 @@ public class ContextConfig implements LifecycleListener {
         }
     }
 
-    static class JavaClassCacheEntry {
+    protected static class JavaClassCacheEntry {
         public final String superclassName;
 
         public final String[] interfaceNames;

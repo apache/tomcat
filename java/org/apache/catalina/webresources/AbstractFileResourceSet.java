@@ -124,7 +124,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         // Case sensitivity check
         // The normalized requested path should be an exact match the equivalent
         // canonical path. If it is not, possible reasons include:
-        // - case differences on case insensitive file systems
+        // - case differences on case-insensitive file systems
         // - Windows removing a trailing ' ' or '.' from the file name
         //
         // In all cases, a mismatch here results in the resource not being

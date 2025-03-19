@@ -266,7 +266,7 @@ public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, A
         // threads for each stream. For HTTP/2 the two operations have to be
         // performed atomically else it is possible for the connection thread to
         // read more data in to the buffer after the stream thread checks for
-        // available network data but before it registers for read.
+        // available network data, but before it registers for read.
         if (availableInThisBuffer() > 0) {
             return true;
         }

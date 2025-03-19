@@ -119,7 +119,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
 
         // Set because we don't want duplicates
         // LinkedHashSet to retain the order. It is the order of the
-        // WebResourceSet that matters but it is simpler to retain the order
+        // WebResourceSet that matters, but it is simpler to retain the order
         // over all of the JARs.
         HashSet<String> result = new LinkedHashSet<>();
         for (List<WebResourceSet> list : allResources) {

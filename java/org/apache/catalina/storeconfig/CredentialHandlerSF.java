@@ -62,9 +62,7 @@ public class CredentialHandlerSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aCredentialHandler, StoreDescription parentDesc)
             throws Exception {
-        if (aCredentialHandler instanceof NestedCredentialHandler) {
-            NestedCredentialHandler nestedCredentialHandler = (NestedCredentialHandler) aCredentialHandler;
-
+        if (aCredentialHandler instanceof NestedCredentialHandler nestedCredentialHandler) {
             // Store nested <CredentialHandler> element
             CredentialHandler[] credentialHandlers = nestedCredentialHandler.getCredentialHandlers();
             storeElementArray(aWriter, indent, credentialHandlers);

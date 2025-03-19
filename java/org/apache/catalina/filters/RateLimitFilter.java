@@ -55,7 +55,7 @@ import org.apache.tomcat.util.res.StringManager;
  * </p>
  * <p>
  * It is common to set up different restrictions for different URIs. For example, a login page or authentication script
- * is typically expected to get far less requests than the rest of the application, so you can add a filter definition
+ * is typically expected to get far fewer requests than the rest of the application, so you can add a filter definition
  * that would allow only 5 requests per 15 seconds and map those URIs to it.
  * </p>
  * <p>
@@ -74,7 +74,7 @@ import org.apache.tomcat.util.res.StringManager;
  * the client IP address, so if for example you are using the <a href="#Remote_IP_Filter">Remote IP Filter</a>, then the
  * filter mapping for the Rate Limit Filter must come <em>after</em> the mapping of the Remote IP Filter to ensure that
  * each request has its IP address resolved before the Rate Limit Filter is applied. Failure to do so will count
- * requests from different IPs in the same bucket and will result in a self inflicted DoS attack.
+ * requests from different IPs in the same bucket and will result in a self-inflicted DoS attack.
  * </p>
  */
 public class RateLimitFilter extends FilterBase {

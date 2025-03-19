@@ -52,7 +52,7 @@ public class SenderState {
 
     // ----------------------------------------------------- Instance Variables
 
-    private volatile int state = READY;
+    private volatile int state;
 
     // ----------------------------------------------------- Constructor
 

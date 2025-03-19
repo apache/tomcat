@@ -19,6 +19,7 @@ package org.apache.catalina.authenticator;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Map;
@@ -41,6 +42,7 @@ import org.apache.catalina.Session;
  */
 public class SingleSignOnEntry implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------ Instance Fields
@@ -104,7 +106,7 @@ public class SingleSignOnEntry implements Serializable {
     /**
      * Returns the HTTP Session identifiers associated with this SSO.
      *
-     * @return The identifiers for the HTTP sessions that are current associated with this SSo entry
+     * @return the identifiers for the HTTP sessions that are currently associated with this SSO entry
      */
     public Set<SingleSignOnSessionKey> findSessions() {
         return sessionKeys.keySet();
@@ -148,9 +150,9 @@ public class SingleSignOnEntry implements Serializable {
     }
 
     /**
-     * Gets the user name provided by the user as part of the authentication process.
+     * Gets the username provided by the user as part of the authentication process.
      *
-     * @return The user name that was authenticated as part of the authentication that triggered the creation of the SSO
+     * @return The username that was authenticated as part of the authentication that triggered the creation of the SSO
      *             entry
      */
     public String getUsername() {
@@ -176,6 +178,7 @@ public class SingleSignOnEntry implements Serializable {
     }
 
 
+    @Serial
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
         if (principal instanceof Serializable) {
@@ -186,6 +189,7 @@ public class SingleSignOnEntry implements Serializable {
         }
     }
 
+    @Serial
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         boolean hasPrincipal = in.readBoolean();

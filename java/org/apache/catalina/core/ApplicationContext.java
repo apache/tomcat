@@ -597,10 +597,9 @@ public class ApplicationContext implements ServletContext {
         }
         ServletContextAttributeEvent event = new ServletContextAttributeEvent(context.getServletContext(), name, value);
         for (Object obj : listeners) {
-            if (!(obj instanceof ServletContextAttributeListener)) {
+            if (!(obj instanceof ServletContextAttributeListener listener)) {
                 continue;
             }
-            ServletContextAttributeListener listener = (ServletContextAttributeListener) obj;
             try {
                 context.fireContainerEvent("beforeContextAttributeRemoved", listener);
                 listener.attributeRemoved(event);
@@ -649,10 +648,9 @@ public class ApplicationContext implements ServletContext {
         }
 
         for (Object obj : listeners) {
-            if (!(obj instanceof ServletContextAttributeListener)) {
+            if (!(obj instanceof ServletContextAttributeListener listener)) {
                 continue;
             }
-            ServletContextAttributeListener listener = (ServletContextAttributeListener) obj;
             try {
                 if (replaced) {
                     context.fireContainerEvent("beforeContextAttributeReplaced", listener);
@@ -907,7 +905,7 @@ public class ApplicationContext implements ServletContext {
             supportedSessionTrackingModes.add(SessionTrackingMode.COOKIE);
         }
 
-        // SSL not enabled by default as it can only used on its own
+        // SSL not enabled by default as it can only be used on its own
         // Context > Host > Engine > Service
         Connector[] connectors = service.findConnectors();
         // Need at least one SSL enabled connector to use the SSL session ID.
@@ -948,7 +946,7 @@ public class ApplicationContext implements ServletContext {
             }
         }
 
-        // Check SSL has not be configured with anything else
+        // Check SSL has not been configured with anything else
         if (sessionTrackingModes.contains(SessionTrackingMode.SSL)) {
             if (sessionTrackingModes.size() > 1) {
                 throw new IllegalArgumentException(
@@ -990,13 +988,10 @@ public class ApplicationContext implements ServletContext {
         try {
             if (context.getInstanceManager() != null) {
                 Object obj = context.getInstanceManager().newInstance(className);
-
-                if (!(obj instanceof EventListener)) {
+                if (!(obj instanceof EventListener listener)) {
                     throw new IllegalArgumentException(
                             sm.getString("applicationContext.addListener.iae.wrongType", className));
                 }
-
-                EventListener listener = (EventListener) obj;
                 addListener(listener);
             }
         } catch (InvocationTargetException e) {

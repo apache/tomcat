@@ -736,7 +736,7 @@ public class DeltaManager extends ClusterManagerBase {
      */
     protected Member findSessionMasterMember() {
         Member mbr = null;
-        Member mbrs[] = cluster.getMembers();
+        Member[] mbrs = cluster.getMembers();
         if (mbrs.length != 0) {
             mbr = mbrs[0];
         }
@@ -777,6 +777,7 @@ public class DeltaManager extends ClusterManagerBase {
                     try {
                         Thread.sleep(100);
                     } catch (Exception sleep) {
+                        // Ignore
                     }
                 } while ((!getStateTransferred()) && (!isNoContextManagerReceived()));
                 reqNow = System.currentTimeMillis();
@@ -819,7 +820,7 @@ public class DeltaManager extends ClusterManagerBase {
         if (log.isInfoEnabled()) {
             log.info(sm.getString("deltaManager.expireSessions", getName()));
         }
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
         for (Session value : sessions) {
             DeltaSession session = (DeltaSession) value;
             if (!session.isValid()) {
@@ -841,8 +842,7 @@ public class DeltaManager extends ClusterManagerBase {
 
     @Override
     public void messageDataReceived(ClusterMessage cmsg) {
-        if (cmsg instanceof SessionMessage) {
-            SessionMessage msg = (SessionMessage) cmsg;
+        if (cmsg instanceof SessionMessage msg) {
             switch (msg.getEventType()) {
                 case SessionMessage.EVT_GET_ALL_SESSIONS:
                 case SessionMessage.EVT_SESSION_CREATED:
@@ -883,7 +883,7 @@ public class DeltaManager extends ClusterManagerBase {
      * @return a SessionMessage to be sent,
      */
     public ClusterMessage requestCompleted(String sessionId, boolean expires) {
-        DeltaSession session = null;
+        DeltaSession session;
         SessionMessage msg = null;
         try {
             session = (DeltaSession) findSession(sessionId);
@@ -1004,7 +1004,7 @@ public class DeltaManager extends ClusterManagerBase {
      * Expire all find sessions.
      */
     public void expireAllLocalSessions() {
-        Session sessions[] = findSessions();
+        Session[] sessions = findSessions();
         int expireDirect = 0;
         int expireIndirect = 0;
 
@@ -1014,8 +1014,7 @@ public class DeltaManager extends ClusterManagerBase {
             log.trace("Start expire all sessions " + getName() + " at " + timeNow + " sessioncount " + sessions.length);
         }
         for (Session value : sessions) {
-            if (value instanceof DeltaSession) {
-                DeltaSession session = (DeltaSession) value;
+            if (value instanceof DeltaSession session) {
                 if (session.isPrimarySession()) {
                     if (session.isValid()) {
                         session.expire();
@@ -1166,7 +1165,7 @@ public class DeltaManager extends ClusterManagerBase {
     }
 
     /**
-     * handle receive session is expire at other node ( expire session also here)
+     * handle receive session is expired at other node ( expire session also here)
      *
      * @param msg    Session message
      * @param sender Member which sent the message
@@ -1266,6 +1265,7 @@ public class DeltaManager extends ClusterManagerBase {
                     try {
                         Thread.sleep(getSendAllSessionsWaitTime());
                     } catch (Exception sleep) {
+                        // Ignore
                     }
                 }
             }

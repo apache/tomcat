@@ -214,7 +214,7 @@ public class Arrays {
         return idx;
     }
 
-    public static int hashCode(byte a[]) {
+    public static int hashCode(byte[] a) {
         if (a == null) {
             return 0;
         }

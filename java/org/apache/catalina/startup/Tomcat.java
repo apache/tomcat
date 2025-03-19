@@ -192,7 +192,7 @@ public class Tomcat {
     }
 
     /**
-     * The the hostname of the default host, default is 'localhost'.
+     * The hostname of the default host, default is 'localhost'.
      *
      * @param s The default host name
      */
@@ -462,7 +462,7 @@ public class Tomcat {
     /**
      * Add a user for the in-memory realm. All created apps use this by default, can be replaced using setRealm().
      *
-     * @param user The user name
+     * @param user The username
      * @param pass The password
      */
     public void addUser(String user, String pass) {
@@ -474,7 +474,7 @@ public class Tomcat {
      *
      * @see #addUser(String, String)
      *
-     * @param user The user name
+     * @param user The username
      * @param role The role name
      */
     public void addRole(String user, String role) {
@@ -670,7 +670,7 @@ public class Tomcat {
             Class<?> clazz = Class.forName(getHost().getConfigClass());
             listener = (LifecycleListener) clazz.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
-            // Wrap in IAE since we can't easily change the method signature to
+            // Wrap in IAE since we can't easily change the method signature
             // to throw the specific checked exceptions
             throw new IllegalArgumentException(e);
         }
@@ -876,7 +876,7 @@ public class Tomcat {
 
 
     /**
-     * By default, when calling addWebapp() to create a Context, the settings from from the default web.xml are added to
+     * By default, when calling addWebapp() to create a Context, the settings from the default web.xml are added to
      * the context. Calling this method with a <code>false</code> value prior to calling addWebapp() allows to opt out
      * of the default settings. In that event you will need to add the configurations yourself, either programmatically
      * or by using web.xml deployment descriptors.

@@ -416,26 +416,7 @@ public class ExpiresFilter extends FilterBase {
     /**
      * Duration composed of an {@link #amount} and a {@link #unit}
      */
-    protected static class Duration {
-
-        protected final int amount;
-
-        protected final DurationUnit unit;
-
-        public Duration(int amount, DurationUnit unit) {
-            super();
-            this.amount = amount;
-            this.unit = unit;
-        }
-
-        public int getAmount() {
-            return amount;
-        }
-
-        public DurationUnit getUnit() {
-            return unit;
-        }
-
+    public record Duration(int amount, DurationUnit unit) {
         @Override
         public String toString() {
             return amount + " " + unit;
@@ -445,7 +426,7 @@ public class ExpiresFilter extends FilterBase {
     /**
      * Duration unit
      */
-    protected enum DurationUnit {
+    public enum DurationUnit {
         DAY(Calendar.DAY_OF_YEAR),
         HOUR(Calendar.HOUR),
         MINUTE(Calendar.MINUTE),
@@ -473,32 +454,11 @@ public class ExpiresFilter extends FilterBase {
      * <p>
      * Can be expressed like '{@code access plus 1 month 15 days 2 hours}'.
      * </p>
+     *
+     * @param durations     List of duration elements.
+     * @param startingPoint Starting point of the elapse to set in the response.
      */
-    protected static class ExpiresConfiguration {
-        /**
-         * List of duration elements.
-         */
-        private final List<Duration> durations;
-
-        /**
-         * Starting point of the elapse to set in the response.
-         */
-        private final StartingPoint startingPoint;
-
-        public ExpiresConfiguration(StartingPoint startingPoint, List<Duration> durations) {
-            super();
-            this.startingPoint = startingPoint;
-            this.durations = durations;
-        }
-
-        public List<Duration> getDurations() {
-            return durations;
-        }
-
-        public StartingPoint getStartingPoint() {
-            return startingPoint;
-        }
-
+    public record ExpiresConfiguration(StartingPoint startingPoint, List<Duration> durations) {
         @Override
         public String toString() {
             return "ExpiresConfiguration[startingPoint=" + startingPoint + ", duration=" + durations + "]";
@@ -510,7 +470,7 @@ public class ExpiresFilter extends FilterBase {
      * ({@link StartingPoint#ACCESS_TIME}) or the last time the HTML-page/servlet-response was modified (
      * {@link StartingPoint#LAST_MODIFICATION_TIME}).
      */
-    protected enum StartingPoint {
+   public enum StartingPoint {
         ACCESS_TIME,
         LAST_MODIFICATION_TIME
     }
@@ -1031,7 +991,7 @@ public class ExpiresFilter extends FilterBase {
     private static final String PARAMETER_EXPIRES_EXCLUDED_RESPONSE_STATUS_CODES = "ExpiresExcludedResponseStatusCodes";
 
     /**
-     * Convert a comma delimited list of numbers into an {@code int[]}.
+     * Convert a comma-delimited list of numbers into an {@code int[]}.
      *
      * @param commaDelimitedInts can be {@code null}
      *
@@ -1066,7 +1026,7 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Convert an array of ints into a comma delimited string
+     * Convert an array of ints into a comma-delimited string
      *
      * @param ints The int array
      *
@@ -1165,9 +1125,7 @@ public class ExpiresFilter extends FilterBase {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
-        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-            HttpServletRequest httpRequest = (HttpServletRequest) request;
-            HttpServletResponse httpResponse = (HttpServletResponse) response;
+        if (request instanceof HttpServletRequest httpRequest && response instanceof HttpServletResponse httpResponse) {
 
             if (response.isCommitted()) {
                 if (log.isDebugEnabled()) {
@@ -1306,7 +1264,7 @@ public class ExpiresFilter extends FilterBase {
      */
     protected Date getExpirationDate(ExpiresConfiguration configuration, XHttpServletResponse response) {
         Calendar calendar;
-        switch (configuration.getStartingPoint()) {
+        switch (configuration.startingPoint()) {
             case ACCESS_TIME:
                 calendar = Calendar.getInstance();
                 break;
@@ -1327,10 +1285,10 @@ public class ExpiresFilter extends FilterBase {
                 break;
             default:
                 throw new IllegalStateException(
-                        sm.getString("expiresFilter.unsupportedStartingPoint", configuration.getStartingPoint()));
+                        sm.getString("expiresFilter.unsupportedStartingPoint", configuration.startingPoint()));
         }
-        for (Duration duration : configuration.getDurations()) {
-            calendar.add(duration.getUnit().getCalendardField(), duration.getAmount());
+        for (Duration duration : configuration.durations()) {
+            calendar.add(duration.unit().getCalendardField(), duration.amount());
         }
 
         return calendar.getTime();
@@ -1358,8 +1316,7 @@ public class ExpiresFilter extends FilterBase {
                     ExpiresConfiguration expiresConfiguration = parseExpiresConfiguration(value);
                     this.expiresConfigurationByContentType.put(contentType, expiresConfiguration);
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_DEFAULT)) {
-                    ExpiresConfiguration expiresConfiguration = parseExpiresConfiguration(value);
-                    this.defaultExpiresConfiguration = expiresConfiguration;
+                    this.defaultExpiresConfiguration = parseExpiresConfiguration(value);
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_EXCLUDED_RESPONSE_STATUS_CODES)) {
                     this.excludedResponseStatusCodes = commaDelimitedListToIntArray(value);
                 } else {

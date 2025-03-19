@@ -124,7 +124,7 @@ public class ObjectReader {
      * @see XByteBuffer#doesPackageExist()
      * @see XByteBuffer#extractPackage(boolean)
      *
-     * @return number of received packages/messages
+     * @return array of received packages/messages
      */
     public ChannelMessage[] execute() {
         int pkgCnt = buffer.countPackages();

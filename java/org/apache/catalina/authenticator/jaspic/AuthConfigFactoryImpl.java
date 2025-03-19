@@ -1,18 +1,18 @@
-/**
- *  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.catalina.authenticator.jaspic;
 
@@ -183,7 +183,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
                 RegistrationContextImpl registration = appContextRegistrations.get(getRegistrationID(null, appContext));
                 if (registration != null) {
                     for (RegistrationListenerWrapper wrapper : registration.listeners) {
-                        if (layer.equals(wrapper.getMessageLayer()) && appContext.equals(wrapper.getAppContext())) {
+                        if (layer.equals(wrapper.messageLayer()) && appContext.equals(wrapper.appContext())) {
                             registration.listeners.remove(wrapper);
                             wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
                         }
@@ -196,7 +196,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
                 // Need to check registrations for all layers
                 for (RegistrationContextImpl registration : layerRegistrations.values()) {
                     for (RegistrationListenerWrapper wrapper : registration.listeners) {
-                        if (appContext.equals(wrapper.getAppContext())) {
+                        if (appContext.equals(wrapper.appContext())) {
                             registration.listeners.remove(wrapper);
                             wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
                         }
@@ -207,8 +207,8 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
                 // Need to check default
                 for (RegistrationContextImpl registration : defaultRegistration.values()) {
                     for (RegistrationListenerWrapper wrapper : registration.listeners) {
-                        if (appContext != null && appContext.equals(wrapper.getAppContext()) ||
-                                layer != null && layer.equals(wrapper.getMessageLayer())) {
+                        if (appContext != null && appContext.equals(wrapper.appContext()) ||
+                                layer != null && layer.equals(wrapper.messageLayer())) {
                             registration.listeners.remove(wrapper);
                             wrapper.listener.notify(wrapper.messageLayer, wrapper.appContext);
                         }
@@ -245,7 +245,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             return false;
         } else {
             for (RegistrationListenerWrapper wrapper : registration.listeners) {
-                wrapper.getListener().notify(wrapper.getMessageLayer(), wrapper.getAppContext());
+                wrapper.listener().notify(wrapper.messageLayer(), wrapper.appContext());
             }
             if (registration.isPersistent()) {
                 savePersistentRegistrations();
@@ -324,8 +324,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             throw new IllegalArgumentException(sm.getString("authConfigFactoryImpl.nullContext"));
         }
 
-        if (context instanceof ServletContext) {
-            ServletContext servletContext = (ServletContext) context;
+        if (context instanceof ServletContext servletContext) {
             String appContext = servletContext.getVirtualServerName() + " " + servletContext.getContextPath();
 
             AuthConfigProvider authConfigProvider = new SingleConfigAuthConfigProvider(serverAuthModule, appContext);
@@ -345,8 +344,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
             throw new IllegalArgumentException(sm.getString("authConfigFactoryImpl.nullContext"));
         }
 
-        if (context instanceof ServletContext) {
-            ServletContext servletContext = (ServletContext) context;
+        if (context instanceof ServletContext servletContext) {
             String layer = "HttpServlet";
             String appContextID = servletContext.getVirtualServerName() + " " + servletContext.getContextPath();
 
@@ -506,7 +504,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
         private boolean removeListener(RegistrationListener listener) {
             boolean result = false;
             for (RegistrationListenerWrapper wrapper : listeners) {
-                if (wrapper.getListener().equals(listener)) {
+                if (wrapper.listener().equals(listener)) {
                     listeners.remove(wrapper);
                     result = true;
                 }
@@ -516,47 +514,14 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     }
 
 
-    private static class RegistrationListenerWrapper {
-
-        private final String messageLayer;
-        private final String appContext;
-        private final RegistrationListener listener;
-
-
-        RegistrationListenerWrapper(String messageLayer, String appContext, RegistrationListener listener) {
-            this.messageLayer = messageLayer;
-            this.appContext = appContext;
-            this.listener = listener;
-        }
-
-
-        public String getMessageLayer() {
-            return messageLayer;
-        }
-
-
-        public String getAppContext() {
-            return appContext;
-        }
-
-
-        public RegistrationListener getListener() {
-            return listener;
-        }
+    private record RegistrationListenerWrapper(String messageLayer, String appContext, RegistrationListener listener) {
     }
 
 
-    private static class SingleModuleServerAuthContext implements ServerAuthContext {
-
-        private final ServerAuthModule module;
-
-        SingleModuleServerAuthContext(ServerAuthModule module) {
-            this.module = module;
-        }
-
+    private record SingleModuleServerAuthContext(ServerAuthModule module) implements ServerAuthContext {
         @Override
         public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
-                throws AuthException {
+            throws AuthException {
             return module.validateRequest(messageInfo, clientSubject, serviceSubject);
         }
 

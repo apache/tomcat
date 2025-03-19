@@ -53,25 +53,23 @@ import org.apache.tools.ant.BuildException;
  * </pre>
  *
  * </li>
- * <li>Create new AccessLogger at localhost <code>
+ * <li>Create new AccessLogger at localhost
+ * <pre>
  *   &lt;jmx:invoke
  *           name="Catalina:type=MBeanFactory"
  *           operation="createAccessLoggerValve"
- *           resultproperty="accessLoggerObjectName"
- *       &gt;
+ *           resultproperty="accessLoggerObjectName"&gt;
  *         &lt;arg value="Catalina:type=Host,host=localhost"/&gt;
  *   &lt;/jmx:invoke&gt;
- *
- * </code></li>
- * <li>Remove existing AccessLogger at localhost <code>
+ * </pre></li>
+ * <li>Remove existing AccessLogger at localhost
+ * <pre>
  *   &lt;jmx:invoke
  *           name="Catalina:type=MBeanFactory"
- *           operation="removeValve"
- *       &gt;
+ *           operation="removeValve"&gt;
  *         &lt;arg value="Catalina:type=Valve,name=AccessLogValve,host=localhost"/&gt;
  *   &lt;/jmx:invoke&gt;
- *
- * </code></li>
+ * </pre></li>
  * </ul>
  * <p>
  * First call to a remote MBeanserver save the JMXConnection a referenz <em>jmx.server</em>
@@ -153,8 +151,8 @@ public class JMXAccessorInvokeTask extends JMXAccessorTask {
         if (args == null) {
             result = jmxServerConnection.invoke(new ObjectName(name), operation, null, null);
         } else {
-            Object argsA[] = new Object[args.size()];
-            String sigA[] = new String[args.size()];
+            Object[] argsA = new Object[args.size()];
+            String[] sigA = new String[args.size()];
             for (int i = 0; i < args.size(); i++) {
                 Arg arg = args.get(i);
                 if (arg.getType() == null) {

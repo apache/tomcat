@@ -100,8 +100,6 @@ public class SSIConditional implements SSICommand {
             state.branchTaken = true;
         } else {
             throw new SSIStopProcessingException();
-            // throw new SsiCommandException( "Not a conditional command:" +
-            // cmdName );
         }
         return lastModified;
     }
@@ -115,13 +113,11 @@ public class SSIConditional implements SSICommand {
         String expr = getExpression(names, values);
         if (expr == null) {
             throw new SSIStopProcessingException();
-            // throw new SsiCommandException( "No expression specified." );
         }
         try {
             ExpressionParseTree tree = new ExpressionParseTree(expr, ssiMediator);
             return tree.evaluateTree();
         } catch (ParseException e) {
-            // throw new SsiCommandException( "Error parsing expression." );
             throw new SSIStopProcessingException();
         }
     }

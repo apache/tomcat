@@ -618,8 +618,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         }
 
         sessionIdGenerator.setJvmRoute(getJvmRoute());
-        if (sessionIdGenerator instanceof SessionIdGeneratorBase) {
-            SessionIdGeneratorBase sig = (SessionIdGeneratorBase) sessionIdGenerator;
+        if (sessionIdGenerator instanceof SessionIdGeneratorBase sig) {
             sig.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
             sig.setSecureRandomClass(getSecureRandomClass());
             sig.setSecureRandomProvider(getSecureRandomProvider());
@@ -976,7 +975,7 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         // Calculate average
         for (SessionTiming timing : copy) {
             if (timing != null) {
-                int timeAlive = timing.getDuration();
+                int timeAlive = timing.duration();
                 counter++;
                 // Very careful not to overflow - probably not necessary
                 result = (result * ((counter - 1) / counter)) + (timeAlive / counter);
@@ -1035,8 +1034,8 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         for (SessionTiming timing : sessionTiming) {
             if (timing != null) {
                 counter++;
-                if (timing.getTimestamp() < oldest) {
-                    oldest = timing.getTimestamp();
+                if (timing.timestamp() < oldest) {
+                    oldest = timing.timestamp();
                 }
             }
         }
@@ -1236,27 +1235,23 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
 
     // ----------------------------------------------------------- Inner classes
 
-    protected static final class SessionTiming {
-        private final long timestamp;
-        private final int duration;
-
-        public SessionTiming(long timestamp, int duration) {
-            this.timestamp = timestamp;
-            this.duration = duration;
-        }
+    protected record SessionTiming(long timestamp, int duration) {
 
         /**
          * @return Time stamp associated with this piece of timing information in milliseconds.
          */
-        public long getTimestamp() {
+        @Override
+        public long timestamp() {
             return timestamp;
         }
 
         /**
          * @return Duration associated with this piece of timing information in seconds.
          */
-        public int getDuration() {
+        @Override
+        public int duration() {
             return duration;
         }
+
     }
 }

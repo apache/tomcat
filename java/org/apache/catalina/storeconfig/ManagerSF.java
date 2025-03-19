@@ -35,8 +35,7 @@ public class ManagerSF extends StoreFactoryBase {
     public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
         StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
         if (elementDesc != null) {
-            if (aElement instanceof StandardManager) {
-                StandardManager manager = (StandardManager) aElement;
+            if (aElement instanceof StandardManager manager) {
                 if (!isDefaultManager(manager)) {
                     if (log.isTraceEnabled()) {
                         log.trace(sm.getString("factory.storeTag", elementDesc.getTag(), aElement));
@@ -69,8 +68,7 @@ public class ManagerSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aManager, StoreDescription parentDesc)
             throws Exception {
-        if (aManager instanceof Manager) {
-            Manager manager = (Manager) aManager;
+        if (aManager instanceof Manager manager) {
             // Store nested <SessionIdGenerator> element;
             SessionIdGenerator sessionIdGenerator = manager.getSessionIdGenerator();
             if (sessionIdGenerator != null) {

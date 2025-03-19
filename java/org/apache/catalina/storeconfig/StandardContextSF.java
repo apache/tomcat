@@ -196,8 +196,7 @@ public class StandardContextSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aContext, StoreDescription parentDesc)
             throws Exception {
-        if (aContext instanceof StandardContext) {
-            StandardContext context = (StandardContext) aContext;
+        if (aContext instanceof StandardContext context) {
             // Store nested <Listener> elements
             LifecycleListener[] listeners = context.findLifecycleListeners();
             List<LifecycleListener> listenersArray = new ArrayList<>();

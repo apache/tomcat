@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes;
 
+import java.io.Serial;
 import java.util.ArrayList;
 
 /**
@@ -28,6 +29,7 @@ import java.util.ArrayList;
  * if a message was delivered successfully or not.
  */
 public class ChannelException extends Exception {
+    @Serial
     private static final long serialVersionUID = 1L;
     /**
      * Empty list to avoid reinstantiating lists
@@ -91,7 +93,7 @@ public class ChannelException extends Exception {
     @Override
     public String getMessage() {
         StringBuilder buf = new StringBuilder(super.getMessage());
-        if (faultyMembers == null || faultyMembers.size() == 0) {
+        if (faultyMembers == null || faultyMembers.isEmpty()) {
             buf.append("; No faulty members identified.");
         } else {
             buf.append("; Faulty members:");

@@ -175,8 +175,7 @@ public class NioReplicationTask extends AbstractRxTask {
                     break;
                 }
             }
-        } else if (channel instanceof DatagramChannel) {
-            DatagramChannel dchannel = (DatagramChannel) channel;
+        } else if (channel instanceof DatagramChannel dchannel) {
             saddr = dchannel.receive(buffer);
             buffer.flip(); // make buffer readable
             if (buffer.hasArray()) {
@@ -199,7 +198,7 @@ public class NioReplicationTask extends AbstractRxTask {
 
         ChannelMessage[] msgs = pkgcnt == 0 ? ChannelData.EMPTY_DATA_ARRAY : reader.execute();
 
-        registerForRead(key, reader);// register to read new data, before we send it off to avoid dead locks
+        registerForRead(key, reader);// register to read new data, before we send it off to avoid deadlocks
 
         for (ChannelMessage msg : msgs) {
             /*
@@ -322,8 +321,7 @@ public class NioReplicationTask extends AbstractRxTask {
 
             ByteBuffer buf = ByteBuffer.wrap(command);
             int total = 0;
-            if (channel instanceof DatagramChannel) {
-                DatagramChannel dchannel = (DatagramChannel) channel;
+            if (channel instanceof DatagramChannel dchannel) {
                 // were using a shared channel, document says its thread safe
                 // TODO check optimization, one channel per thread?
                 while (total < command.length) {

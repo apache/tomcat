@@ -2108,7 +2108,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 packageName = name.substring(0, pos);
             }
 
-            Package pkg = null;
+            Package pkg;
 
             if (packageName != null) {
                 pkg = getPackage(packageName);

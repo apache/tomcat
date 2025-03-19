@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -75,8 +75,7 @@ public class SSLHostConfigSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aSSLHostConfig, StoreDescription parentDesc)
             throws Exception {
-        if (aSSLHostConfig instanceof SSLHostConfig) {
-            SSLHostConfig sslHostConfig = (SSLHostConfig) aSSLHostConfig;
+        if (aSSLHostConfig instanceof SSLHostConfig sslHostConfig) {
             // Store nested <SSLHostConfigCertificate> elements
             SSLHostConfigCertificate[] hostConfigsCertificates =
                     sslHostConfig.getCertificates().toArray(new SSLHostConfigCertificate[0]);

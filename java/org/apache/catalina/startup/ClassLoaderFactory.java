@@ -151,14 +151,14 @@ public final class ClassLoaderFactory {
 
         if (repositories != null) {
             for (Repository repository : repositories) {
-                if (repository.getType() == RepositoryType.URL) {
-                    URL url = buildClassLoaderUrl(repository.getLocation());
+                if (repository.type() == RepositoryType.URL) {
+                    URL url = buildClassLoaderUrl(repository.location());
                     if (log.isDebugEnabled()) {
                         log.debug("  Including URL " + url);
                     }
                     set.add(url);
-                } else if (repository.getType() == RepositoryType.DIR) {
-                    File directory = new File(repository.getLocation());
+                } else if (repository.type() == RepositoryType.DIR) {
+                    File directory = new File(repository.location());
                     directory = directory.getCanonicalFile();
                     if (!validateFile(directory, RepositoryType.DIR)) {
                         continue;
@@ -168,8 +168,8 @@ public final class ClassLoaderFactory {
                         log.debug("  Including directory " + url);
                     }
                     set.add(url);
-                } else if (repository.getType() == RepositoryType.JAR) {
-                    File file = new File(repository.getLocation());
+                } else if (repository.type() == RepositoryType.JAR) {
+                    File file = new File(repository.location());
                     file = file.getCanonicalFile();
                     if (!validateFile(file, RepositoryType.JAR)) {
                         continue;
@@ -179,8 +179,8 @@ public final class ClassLoaderFactory {
                         log.debug("  Including jar file " + url);
                     }
                     set.add(url);
-                } else if (repository.getType() == RepositoryType.GLOB) {
-                    File directory = new File(repository.getLocation());
+                } else if (repository.type() == RepositoryType.GLOB) {
+                    File directory = new File(repository.location());
                     directory = directory.getCanonicalFile();
                     if (!validateFile(directory, RepositoryType.GLOB)) {
                         continue;
@@ -290,21 +290,6 @@ public final class ClassLoaderFactory {
         URL
     }
 
-    public static class Repository {
-        private final String location;
-        private final RepositoryType type;
-
-        public Repository(String location, RepositoryType type) {
-            this.location = location;
-            this.type = type;
-        }
-
-        public String getLocation() {
-            return location;
-        }
-
-        public RepositoryType getType() {
-            return type;
-        }
+    public record Repository(String location, RepositoryType type) {
     }
 }

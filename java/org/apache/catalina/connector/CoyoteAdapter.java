@@ -17,6 +17,7 @@
 package org.apache.catalina.connector;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
@@ -137,7 +138,7 @@ public class CoyoteAdapter implements Adapter {
                 }
             } else if (status == SocketEvent.ERROR) {
                 // An I/O error occurred on a non-container thread which means
-                // that the socket needs to be closed so set success to false to
+                // that the socket needs to be closed so set success as false to
                 // trigger a close
                 success = false;
                 Throwable t = (Throwable) req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
@@ -255,7 +256,7 @@ public class CoyoteAdapter implements Adapter {
             if (error.get()) {
                 if (request.isAsyncCompleting() || request.isAsyncDispatching()) {
                     // Connection will be forcibly closed which will prevent completion/dispatch happening at the usual
-                    // point. Trigger post processing here.
+                    // point. Trigger post-processing here.
                     res.action(ActionCode.ASYNC_POST_PROCESS, null);
                 }
                 success = false;
@@ -495,6 +496,7 @@ public class CoyoteAdapter implements Adapter {
 
 
     private static class RecycleRequiredException extends Exception {
+        @Serial
         private static final long serialVersionUID = 1L;
     }
 
@@ -640,7 +642,7 @@ public class CoyoteAdapter implements Adapter {
                     // Character decoding
                     convertURI(decodedURI, request);
                     // URIEncoding values are limited to US-ASCII supersets.
-                    // Therefore it is not necessary to check that the URI remains
+                    // Therefore, it is not necessary to check that the URI remains
                     // normalized after character decoding
                 } else {
                     response.sendError(400, sm.getString("coyoteAdapter.invalidURI"));
@@ -689,7 +691,7 @@ public class CoyoteAdapter implements Adapter {
         }
 
         while (mapRequired) {
-            // This will map the the latest version by default
+            // This will map the latest version by default
             connector.getService().getMapper().map(serverName, decodedURI, version, request.getMappingData());
 
             // If there is no context at this point, either this is a 404
@@ -864,7 +866,7 @@ public class CoyoteAdapter implements Adapter {
                 // result preventing excessive calls to the Realm.
             } else {
                 // The connector isn't configured for authorization. Create a
-                // user without any roles using the supplied user name.
+                // user without any roles using the supplied username.
                 request.setUserPrincipal(new CoyotePrincipal(username));
             }
         }
@@ -1071,7 +1073,7 @@ public class CoyoteAdapter implements Adapter {
 
 
     /**
-     * Character conversion of the a US-ASCII MessageBytes.
+     * Character conversion of the US-ASCII MessageBytes.
      *
      * @param mb The MessageBytes instance containing the bytes that should be converted to chars
      */

@@ -236,7 +236,7 @@ public final class NetMask {
          *
          * But prior to that, a simple test can be done: we deal with IP addresses here, which means IPv4 and IPv6. IPv4
          * addresses are encoded on 4 bytes, IPv6 addresses are encoded on 16 bytes. If the candidate address length is
-         * different than this NetMask's address, we don't have a match.
+         * different from this NetMask's address, we don't have a match.
          */
         if (candidate.length != netaddr.length) {
             return false;
@@ -245,7 +245,7 @@ public final class NetMask {
 
         /*
          * Now do the byte-compare. The constructor has recorded the number of bytes to compare in nrBytes, use that. If
-         * any of the byte we have to compare is different than what we expect, we don't have a match.
+         * any of the byte we have to compare is different from what we expect, we don't have a match.
          *
          * If, on the opposite, after this loop, all bytes have been deemed equal, then the loop variable i will point
          * to the byte right after that -- which we will need...

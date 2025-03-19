@@ -34,8 +34,7 @@ public class JarScannerSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aJarScanner, StoreDescription parentDesc)
             throws Exception {
-        if (aJarScanner instanceof JarScanner) {
-            JarScanner jarScanner = (JarScanner) aJarScanner;
+        if (aJarScanner instanceof JarScanner jarScanner) {
             // Store nested <JarScanFilter> element
             JarScanFilter jarScanFilter = jarScanner.getJarScanFilter();
             if (jarScanFilter != null) {

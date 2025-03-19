@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.util;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,6 +38,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 2L;
 
     private final Map<K,V> delegatedMap;

@@ -48,7 +48,7 @@ public abstract class RateLimiterBase implements RateLimiter {
     private ScheduledThreadPoolExecutor internalExecutorService = null;
 
     /**
-     * If policy name has not been specified, the first call of {@link #getPolicyName()} returns a auto-generated policy
+     * If policy name has not been specified, the first call of {@link #getPolicyName()} returns an auto-generated policy
      * name using the default policy name as prefix and followed by auto-increase index.
      *
      * @return default policy name, as a prefix of auto-generated policy name.

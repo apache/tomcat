@@ -154,23 +154,17 @@ public class SSLAuthenticator extends AuthenticatorBase {
          * and an Engine but test at each stage to be safe.
          */
         Container container = getContainer();
-        if (!(container instanceof Context)) {
+        if (!(container instanceof Context context2)) {
             return;
         }
-        Context context = (Context) container;
-
-        container = context.getParent();
-        if (!(container instanceof Host)) {
+        container = context2.getParent();
+        if (!(container instanceof Host host)) {
             return;
         }
-        Host host = (Host) container;
-
         container = host.getParent();
-        if (!(container instanceof Engine)) {
+        if (!(container instanceof Engine engine)) {
             return;
         }
-        Engine engine = (Engine) container;
-
 
         Connector[] connectors = engine.getService().findConnectors();
 
@@ -179,7 +173,7 @@ public class SSLAuthenticator extends AuthenticatorBase {
             UpgradeProtocol[] upgradeProtocols = connector.findUpgradeProtocols();
             for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
                 if ("h2".equals(upgradeProtocol.getAlpnName())) {
-                    log.warn(sm.getString("sslAuthenticatorValve.http2", context.getName(), host.getName(), connector));
+                    log.warn(sm.getString("sslAuthenticatorValve.http2", context2.getName(), host.getName(), connector));
                     break;
                 }
             }
@@ -195,7 +189,7 @@ public class SSLAuthenticator extends AuthenticatorBase {
                     }
                     for (String enbabledProtocol : enabledProtocols) {
                         if (Constants.SSL_PROTO_TLSv1_3.equals(enbabledProtocol)) {
-                            log.warn(sm.getString("sslAuthenticatorValve.tls13", context.getName(), host.getName(),
+                            log.warn(sm.getString("sslAuthenticatorValve.tls13", context2.getName(), host.getName(),
                                     connector));
                         }
                     }

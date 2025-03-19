@@ -24,7 +24,7 @@ package org.apache.catalina.ssi;
  * @author Dan Sandberg
  * @author Paul Speed
  */
-class SSIConditionalState {
+public class SSIConditionalState {
     /**
      * Set to true if the current conditional has already been completed, i.e.: a branch was taken.
      */

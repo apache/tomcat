@@ -18,6 +18,7 @@ package org.apache.catalina.deploy;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -66,6 +67,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializable, NamingResources {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Log log = LogFactory.getLog(NamingResourcesImpl.class);
@@ -1064,7 +1066,7 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
      *             targets and/or cannot be determined
      */
     private boolean checkResourceType(ResourceBase resource) {
-        if (!(container instanceof Context)) {
+        if (!(container instanceof Context context)) {
             // Only Context's will have injection targets
             return true;
         }
@@ -1073,8 +1075,6 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
             // No injection targets so use the defined type for the resource
             return true;
         }
-
-        Context context = (Context) container;
 
         String typeName = resource.getType();
         Class<?> typeClass = null;

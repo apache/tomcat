@@ -181,7 +181,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                         } else {
                             // Ignore any entry for which we have already found
                             // a later version
-                            if (version > versionedJarEntry.getVersion()) {
+                            if (version > versionedJarEntry.version()) {
                                 // Replace the entry targeted at an earlier
                                 // version
                                 versionedEntries.put(baseName, new VersionedJarEntry(version, entry.getValue()));
@@ -193,7 +193,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
         }
 
         for (Entry<String,VersionedJarEntry> versionedJarEntry : versionedEntries.entrySet()) {
-            archiveEntries.put(versionedJarEntry.getKey(), versionedJarEntry.getValue().getJarEntry());
+            archiveEntries.put(versionedJarEntry.getKey(), versionedJarEntry.getValue().jarEntry());
         }
     }
 
@@ -240,23 +240,6 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
     }
 
 
-    private static final class VersionedJarEntry {
-        private final int version;
-        private final JarEntry jarEntry;
-
-        VersionedJarEntry(int version, JarEntry jarEntry) {
-            this.version = version;
-            this.jarEntry = jarEntry;
-        }
-
-
-        public int getVersion() {
-            return version;
-        }
-
-
-        public JarEntry getJarEntry() {
-            return jarEntry;
-        }
+    private record VersionedJarEntry(int version, JarEntry jarEntry) {
     }
 }

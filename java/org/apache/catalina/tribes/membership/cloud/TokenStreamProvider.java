@@ -27,7 +27,7 @@ import javax.net.ssl.TrustManager;
 public class TokenStreamProvider extends AbstractStreamProvider {
 
     private String token;
-    private SSLSocketFactory factory;
+    private final SSLSocketFactory factory;
 
 
     TokenStreamProvider(String token, String caCertFile) throws Exception {

@@ -42,8 +42,7 @@ public class StandardServerSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aObject, StoreDescription parentDesc)
             throws Exception {
-        if (aObject instanceof StandardServer) {
-            StandardServer server = (StandardServer) aObject;
+        if (aObject instanceof StandardServer server) {
             // Store nested <Listener> elements
             LifecycleListener[] listeners = server.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);

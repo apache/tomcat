@@ -17,6 +17,8 @@
 package org.apache.catalina.ha.session;
 
 
+import java.io.Serial;
+
 import org.apache.catalina.ha.ClusterMessageBase;
 
 /**
@@ -26,6 +28,7 @@ import org.apache.catalina.ha.ClusterMessageBase;
  */
 public class SessionMessageImpl extends ClusterMessageBase implements SessionMessage {
 
+    @Serial
     private static final long serialVersionUID = 2L;
 
 
@@ -61,7 +64,7 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
      * <B>EVT_SESSION_ACCESSED</B><BR>
      * The parameters: sessionID must be set.<BR>
      * <B>EVT_GET_ALL_SESSIONS</B><BR>
-     * get all sessions from from one of the nodes.<BR>
+     * get all sessions from one of the nodes.<BR>
      * <B>EVT_SESSION_DELTA</B><BR>
      * Send attribute delta (add,update,remove attribute or principal, ...).<BR>
      * <B>EVT_ALL_SESSION_DATA</B><BR>
@@ -119,28 +122,18 @@ public class SessionMessageImpl extends ClusterMessageBase implements SessionMes
 
     @Override
     public String getEventTypeString() {
-        switch (mEvtType) {
-            case EVT_SESSION_CREATED:
-                return "SESSION-MODIFIED";
-            case EVT_SESSION_EXPIRED:
-                return "SESSION-EXPIRED";
-            case EVT_SESSION_ACCESSED:
-                return "SESSION-ACCESSED";
-            case EVT_GET_ALL_SESSIONS:
-                return "SESSION-GET-ALL";
-            case EVT_SESSION_DELTA:
-                return "SESSION-DELTA";
-            case EVT_ALL_SESSION_DATA:
-                return "ALL-SESSION-DATA";
-            case EVT_ALL_SESSION_TRANSFERCOMPLETE:
-                return "SESSION-STATE-TRANSFERRED";
-            case EVT_CHANGE_SESSION_ID:
-                return "SESSION-ID-CHANGED";
-            case EVT_ALL_SESSION_NOCONTEXTMANAGER:
-                return "NO-CONTEXT-MANAGER";
-            default:
-                return "UNKNOWN-EVENT-TYPE";
-        }
+        return switch (mEvtType) {
+            case EVT_SESSION_CREATED -> "SESSION-MODIFIED";
+            case EVT_SESSION_EXPIRED -> "SESSION-EXPIRED";
+            case EVT_SESSION_ACCESSED -> "SESSION-ACCESSED";
+            case EVT_GET_ALL_SESSIONS -> "SESSION-GET-ALL";
+            case EVT_SESSION_DELTA -> "SESSION-DELTA";
+            case EVT_ALL_SESSION_DATA -> "ALL-SESSION-DATA";
+            case EVT_ALL_SESSION_TRANSFERCOMPLETE -> "SESSION-STATE-TRANSFERRED";
+            case EVT_CHANGE_SESSION_ID -> "SESSION-ID-CHANGED";
+            case EVT_ALL_SESSION_NOCONTEXTMANAGER -> "NO-CONTEXT-MANAGER";
+            default -> "UNKNOWN-EVENT-TYPE";
+        };
     }
 
     @Override

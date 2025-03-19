@@ -34,8 +34,7 @@ public class SenderSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aSender, StoreDescription parentDesc)
             throws Exception {
-        if (aSender instanceof ReplicationTransmitter) {
-            ReplicationTransmitter transmitter = (ReplicationTransmitter) aSender;
+        if (aSender instanceof ReplicationTransmitter transmitter) {
             // Store nested <Transport> element
             MultiPointSender transport = transmitter.getTransport();
             if (transport != null) {

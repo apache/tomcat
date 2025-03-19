@@ -138,7 +138,7 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
     }
 
     /**
-     * Detect possible the JVMRoute change at cluster backup node..
+     * Detect possible the JVMRoute change at cluster backup node.
      *
      * @param request  tomcat request being processed
      * @param response tomcat response being processed

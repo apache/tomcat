@@ -41,8 +41,7 @@ public class StandardEngineSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aEngine, StoreDescription parentDesc)
             throws Exception {
-        if (aEngine instanceof StandardEngine) {
-            StandardEngine engine = (StandardEngine) aEngine;
+        if (aEngine instanceof StandardEngine engine) {
             // Store nested <Listener> elements
             LifecycleListener[] listeners = engine.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);
