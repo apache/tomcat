@@ -150,7 +150,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
 
         long startWait = System.currentTimeMillis();
         String content = writer.toString();
-        while ("".equals(content) && System.currentTimeMillis() - startWait < SLEEP_MAX) {
+        while (countLogLines(content) == 0 && System.currentTimeMillis() - startWait < SLEEP_MAX) {
             try {
                 Thread.sleep(SLEEP);
             } catch (InterruptedException ex) {
@@ -160,6 +160,18 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         }
 
         processLogContent(content);
+    }
+
+
+    private int countLogLines(String content) {
+        int result = 0;
+        String[] lines = content.split("\\r?\\n");
+        for (String line : lines) {
+            if (!line.startsWith("#") && !line.trim().isEmpty()) {
+                result++;
+            }
+        }
+        return result;
     }
 
 
