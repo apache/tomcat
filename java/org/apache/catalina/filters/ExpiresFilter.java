@@ -445,7 +445,7 @@ public class ExpiresFilter extends FilterBase {
     /**
      * Duration unit
      */
-    protected enum DurationUnit {
+    public enum DurationUnit {
         DAY(Calendar.DAY_OF_YEAR),
         HOUR(Calendar.HOUR),
         MINUTE(Calendar.MINUTE),
@@ -473,6 +473,9 @@ public class ExpiresFilter extends FilterBase {
      * <p>
      * Can be expressed like '{@code access plus 1 month 15 days 2 hours}'.
      * </p>
+     *
+     * @param durations     List of duration elements.
+     * @param startingPoint Starting point of the elapse to set in the response.
      */
     protected static class ExpiresConfiguration {
         /**
@@ -510,7 +513,7 @@ public class ExpiresFilter extends FilterBase {
      * ({@link StartingPoint#ACCESS_TIME}) or the last time the HTML-page/servlet-response was modified (
      * {@link StartingPoint#LAST_MODIFICATION_TIME}).
      */
-    protected enum StartingPoint {
+   public enum StartingPoint {
         ACCESS_TIME,
         LAST_MODIFICATION_TIME
     }
@@ -1031,7 +1034,7 @@ public class ExpiresFilter extends FilterBase {
     private static final String PARAMETER_EXPIRES_EXCLUDED_RESPONSE_STATUS_CODES = "ExpiresExcludedResponseStatusCodes";
 
     /**
-     * Convert a comma delimited list of numbers into an {@code int[]}.
+     * Convert a comma-delimited list of numbers into an {@code int[]}.
      *
      * @param commaDelimitedInts can be {@code null}
      *
@@ -1080,7 +1083,7 @@ public class ExpiresFilter extends FilterBase {
     }
 
     /**
-     * Convert an array of ints into a comma delimited string
+     * Convert an array of ints into a comma-delimited string
      *
      * @param ints The int array
      *
@@ -1372,8 +1375,7 @@ public class ExpiresFilter extends FilterBase {
                     ExpiresConfiguration expiresConfiguration = parseExpiresConfiguration(value);
                     this.expiresConfigurationByContentType.put(contentType, expiresConfiguration);
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_DEFAULT)) {
-                    ExpiresConfiguration expiresConfiguration = parseExpiresConfiguration(value);
-                    this.defaultExpiresConfiguration = expiresConfiguration;
+                    this.defaultExpiresConfiguration = parseExpiresConfiguration(value);
                 } else if (name.equalsIgnoreCase(PARAMETER_EXPIRES_EXCLUDED_RESPONSE_STATUS_CODES)) {
                     this.excludedResponseStatusCodes = commaDelimitedListToIntArray(value);
                 } else {

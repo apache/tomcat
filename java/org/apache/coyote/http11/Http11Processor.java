@@ -623,7 +623,7 @@ public class Http11Processor extends AbstractProcessor {
 
 
     /**
-     * After reading the request headers, we have to setup the request filters.
+     * After reading the request headers, we have to set up the request filters.
      */
     @SuppressWarnings("deprecation")
     private void prepareRequest() throws IOException {

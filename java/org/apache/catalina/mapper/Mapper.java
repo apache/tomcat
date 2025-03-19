@@ -466,8 +466,7 @@ public final class Mapper {
                 }
             } else if (path.equals("/")) {
                 // Default wrapper
-                MappedWrapper newWrapper = new MappedWrapper("", wrapper, jspWildCard, resourceOnly);
-                context.defaultWrapper = newWrapper;
+                context.defaultWrapper = new MappedWrapper("", wrapper, jspWildCard, resourceOnly);
             } else {
                 // Exact wrapper
                 final String name;

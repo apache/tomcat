@@ -202,7 +202,7 @@ public class LockOutRealm extends CombinedRealm {
 
     /*
      * Checks to see if the current user is locked. If this is associated with a login attempt, then the last access
-     * time will be recorded and any attempt to authenticated a locked user will log a warning.
+     * time will be recorded and any attempt to authenticate a locked user will log a warning.
      */
     public boolean isLocked(String username) {
         LockRecord lockRecord;

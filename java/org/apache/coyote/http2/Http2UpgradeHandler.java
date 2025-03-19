@@ -65,7 +65,7 @@ import org.apache.tomcat.util.res.StringManager;
  * For reading, this implementation is blocking within frames and non-blocking between frames. <br>
  * Note:
  * <ul>
- * <li>You will need to nest an &lt;UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /&gt; element
+ * <li>You will need to nest a &lt;UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /&gt; element
  * inside a TLS enabled Connector element in server.xml to enable HTTP/2 support.</li>
  * </ul>
  */
@@ -964,7 +964,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 } else if (windowSize < 1) {
                     /*
                      * The connection window has no capacity. If the stream has not been granted an allocation, and the
-                     * stream was not already added to the backlog due to an partial reservation (see next else if
+                     * stream was not already added to the backlog due to a partial reservation (see next else if
                      * block) add it to the backlog so it can obtain an allocation when capacity is available.
                      */
                     if (stream.getConnectionAllocationMade() == 0 && stream.getConnectionAllocationRequested() == 0) {

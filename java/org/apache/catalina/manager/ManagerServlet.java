@@ -246,7 +246,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         // Retrieve the MBean server
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistryNonNull(null, null).getMBeanServer();
 
     }
 
@@ -507,8 +507,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     } else {
                         SSLHostConfig[] sslHostConfigs = http11Protoocol.findSslHostConfigs();
                         for (SSLHostConfig sslHostConfig : sslHostConfigs) {
-                            // tlsHostName is as provided by the user so use a case insensitive
-                            // comparison as host names are case insensitive.
+                            // tlsHostName is as provided by the user so use a case-insensitive
+                            // comparison as host names are case-insensitive.
                             if (sslHostConfig.getHostName().equalsIgnoreCase(tlsHostName)) {
                                 found = true;
                                 http11Protoocol.reloadSslHostConfig(tlsHostName);

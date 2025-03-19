@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.SortedSet;
@@ -53,7 +54,7 @@ import org.apache.tomcat.util.security.Escape;
  *
  * @see org.apache.catalina.manager.ManagerServlet
  */
-public final class HTMLHostManagerServlet extends HostManagerServlet {
+public class HTMLHostManagerServlet extends HostManagerServlet {
 
     private static final long serialVersionUID = 1L;
 
@@ -254,7 +255,7 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         // Message Section
         args = new Object[3];
         args[0] = smClient.getString("htmlHostManagerServlet.messageLabel");
-        if (message == null || message.length() == 0) {
+        if (message == null || message.isEmpty()) {
             args[1] = "OK";
         } else {
             args[1] = Escape.htmlElementContent(message);
@@ -288,13 +289,12 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
         // Hosts Row Section
         // Create sorted set of host names.
         Container[] children = engine.findChildren();
-        String hostNames[] = new String[children.length];
+        String[] hostNames = new String[children.length];
         for (int i = 0; i < children.length; i++) {
             hostNames[i] = children[i].getName();
         }
 
-        SortedSet<String> sortedHostNames = new TreeSet<>();
-        sortedHostNames.addAll(Arrays.asList(hostNames));
+        SortedSet<String> sortedHostNames = new TreeSet<>(Arrays.asList(hostNames));
 
         String hostsStart = smClient.getString("htmlHostManagerServlet.hostsStart");
         String hostsStop = smClient.getString("htmlHostManagerServlet.hostsStop");
@@ -329,15 +329,15 @@ public final class HTMLHostManagerServlet extends HostManagerServlet {
                 args = new Object[5];
                 if (host.getState().isAvailable()) {
                     args[0] = response.encodeURL(getServletContext().getContextPath() + "/html/stop?name=" +
-                            URLEncoder.encode(hostName, "UTF-8"));
+                            URLEncoder.encode(hostName, StandardCharsets.UTF_8));
                     args[1] = hostsStop;
                 } else {
                     args[0] = response.encodeURL(getServletContext().getContextPath() + "/html/start?name=" +
-                            URLEncoder.encode(hostName, "UTF-8"));
+                            URLEncoder.encode(hostName, StandardCharsets.UTF_8));
                     args[1] = hostsStart;
                 }
                 args[2] = response.encodeURL(getServletContext().getContextPath() + "/html/remove?name=" +
-                        URLEncoder.encode(hostName, "UTF-8"));
+                        URLEncoder.encode(hostName, StandardCharsets.UTF_8));
                 args[3] = hostsRemove;
                 args[4] = hostThis;
                 if (host == this.installedHost) {

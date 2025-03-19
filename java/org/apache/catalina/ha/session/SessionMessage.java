@@ -47,7 +47,7 @@ public interface SessionMessage extends ClusterMessage {
     int EVT_SESSION_EXPIRED = 2;
 
     /**
-     * Event type used when a session has been accessed (ie, last access time has been updated. This is used so that the
+     * Event type used when a session has been accessed (ie, last access time has been updated). This is used so that the
      * replicated sessions will not expire on the network
      */
     int EVT_SESSION_ACCESSED = 3;

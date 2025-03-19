@@ -87,7 +87,7 @@ public class RpcChannel implements ChannelListener {
             return new Response[0];
         }
 
-        // avoid dead lock
+        // avoid deadlock
         int sendOptions = channelOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
 
         RpcCollectorKey key = new RpcCollectorKey(UUIDGenerator.randomUUID(false));

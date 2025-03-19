@@ -138,12 +138,12 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     protected boolean validate = true;
 
     /**
-     * The name of the class to use for retrieving user names from X509 certificates.
+     * The name of the class to use for retrieving usernames from X509 certificates.
      */
     protected String x509UsernameRetrieverClassName;
 
     /**
-     * The object that will extract user names from X509 client certificates.
+     * The object that will extract usernames from X509 client certificates.
      */
     protected X509UsernameRetriever x509UsernameRetriever;
 
@@ -155,7 +155,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     /**
      * When processing users authenticated via the GSS-API, should any &quot;@...&quot; be stripped from the end of the
-     * user name?
+     * username?
      */
     protected boolean stripRealmForGss = true;
 
@@ -268,19 +268,19 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     }
 
     /**
-     * Gets the name of the class that will be used to extract user names from X509 client certificates.
+     * Gets the name of the class that will be used to extract usernames from X509 client certificates.
      *
-     * @return The name of the class that will be used to extract user names from X509 client certificates.
+     * @return The name of the class that will be used to extract usernames from X509 client certificates.
      */
     public String getX509UsernameRetrieverClassName() {
         return x509UsernameRetrieverClassName;
     }
 
     /**
-     * Sets the name of the class that will be used to extract user names from X509 client certificates. The class must
+     * Sets the name of the class that will be used to extract usernames from X509 client certificates. The class must
      * implement X509UsernameRetriever.
      *
-     * @param className The name of the class that will be used to extract user names from X509 client certificates.
+     * @param className The name of the class that will be used to extract usernames from X509 client certificates.
      *
      * @see X509UsernameRetriever
      */
@@ -1123,9 +1123,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
 
     /**
-     * Return the digest associated with given principal's user name.
+     * Return the digest associated with given principal's username.
      *
-     * @param username  The user name
+     * @param username  The username
      * @param realmName The realm name
      *
      * @return the digest for the specified user
@@ -1189,9 +1189,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     /**
      * Get the password for the specified user.
      *
-     * @param username The user name
+     * @param username The username
      *
-     * @return the password associated with the given principal's user name.
+     * @return the password associated with the given principal's username.
      */
     protected abstract String getPassword(String username);
 
@@ -1217,9 +1217,9 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
     /**
      * Get the principal associated with the specified user.
      *
-     * @param username The user name
+     * @param username The username
      *
-     * @return the Principal associated with the given user name.
+     * @return the Principal associated with the given username.
      */
     protected abstract Principal getPrincipal(String username);
 
@@ -1231,7 +1231,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @param gssCredential the GSS credential of the principal
      * @param gssContext    the established GSS context
      *
-     * @return the principal associated with the given user name.
+     * @return the principal associated with the given username.
      */
     protected Principal getPrincipal(GSSName gssName, GSSCredential gssCredential, GSSContext gssContext) {
         return getPrincipal(gssName, gssCredential);
@@ -1244,7 +1244,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
      * @param gssName       The GSS name
      * @param gssCredential the GSS credential of the principal
      *
-     * @return the principal associated with the given user name.
+     * @return the principal associated with the given username.
      */
     protected Principal getPrincipal(GSSName gssName, GSSCredential gssCredential) {
         String name = gssName.toString();

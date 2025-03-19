@@ -201,7 +201,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     protected boolean swallowOutput = false;
 
     // To support jmx attributes
-    protected StandardWrapperValve swValve;
+    StandardWrapperValve swValve;
     protected long loadTime = 0;
     protected int classLoadTime = 0;
 
@@ -721,7 +721,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
             try {
                 jspMonitorON = new ObjectName(oname.toString());
-                Registry.getRegistry(null, null).registerComponent(instance, jspMonitorON, null);
+                Registry.getRegistryNonNull(null, null).registerComponent(instance, jspMonitorON, null);
             } catch (Exception ex) {
                 log.warn(sm.getString("standardWrapper.jspMonitorError", instance));
             }
@@ -767,18 +767,18 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                 // Restore the context ClassLoader
                 throw new ServletException(sm.getString("standardWrapper.notServlet", servletClass), e);
             } catch (Throwable e) {
-                e = ExceptionUtils.unwrapInvocationTargetException(e);
-                ExceptionUtils.handleThrowable(e);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(e);
+                ExceptionUtils.handleThrowable(throwable);
                 unavailable(null);
 
                 // Added extra log statement for Bugzilla 36630:
                 // https://bz.apache.org/bugzilla/show_bug.cgi?id=36630
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("standardWrapper.instantiate", servletClass), e);
+                    log.debug(sm.getString("standardWrapper.instantiate", servletClass), throwable);
                 }
 
                 // Restore the context ClassLoader
-                throw new ServletException(sm.getString("standardWrapper.instantiate", servletClass), e);
+                throw new ServletException(sm.getString("standardWrapper.instantiate", servletClass), throwable);
             }
 
             if (multipartConfigElement == null) {
@@ -967,11 +967,11 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                 }
 
             } catch (Throwable t) {
-                t = ExceptionUtils.unwrapInvocationTargetException(t);
-                ExceptionUtils.handleThrowable(t);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(throwable);
                 fireContainerEvent("unload", this);
                 unloading = false;
-                throw new ServletException(sm.getString("standardWrapper.destroyException", getName()), t);
+                throw new ServletException(sm.getString("standardWrapper.destroyException", getName()), throwable);
             } finally {
                 // Annotation processing
                 if (!((Context) getParent()).getIgnoreAnnotations()) {
@@ -1002,7 +1002,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         instance = null;
 
         if (isJspServlet && jspMonitorON != null) {
-            Registry.getRegistry(null, null).unregisterComponent(jspMonitorON);
+            Registry.getRegistryNonNull(null, null).unregisterComponent(jspMonitorON);
         }
 
         unloading = false;
@@ -1229,11 +1229,11 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         if (this.getObjectName() != null) {
             Notification notification = new Notification("j2ee.state.stopped", this.getObjectName(), sequenceNumber++);
             broadcaster.sendNotification(notification);
-        }
 
-        // Send j2ee.object.deleted notification
-        Notification notification = new Notification("j2ee.object.deleted", this.getObjectName(), sequenceNumber++);
-        broadcaster.sendNotification(notification);
+            // Send j2ee.object.deleted notification
+            notification = new Notification("j2ee.object.deleted", this.getObjectName(), sequenceNumber++);
+            broadcaster.sendNotification(notification);
+        }
 
     }
 

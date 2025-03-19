@@ -1220,7 +1220,7 @@ public class JNDIRealm extends RealmBase {
      *
      * @exception NamingException if a directory server error occurs
      */
-    public Principal authenticate(JNDIConnection connection, String username, String credentials)
+    protected Principal authenticate(JNDIConnection connection, String username, String credentials)
             throws NamingException {
 
         if (username == null || username.isEmpty() || credentials == null || credentials.isEmpty()) {
@@ -2386,10 +2386,10 @@ public class JNDIRealm extends RealmBase {
 
 
     /**
-     * Get the principal associated with the specified user name.
+     * Get the principal associated with the specified username.
      *
      * @param connection    The directory context
-     * @param username      The user name
+     * @param username      The username
      * @param gssCredential The credentials
      *
      * @return the Principal associated with the given certificate.
@@ -2763,7 +2763,7 @@ public class JNDIRealm extends RealmBase {
 
     /**
      * Given a string containing LDAP patterns for user locations (separated by parentheses in a pseudo-LDAP search
-     * string format - "(location1)(location2)", returns an array of those paths. Real LDAP search strings are supported
+     * string format - "(location1)(location2)"), returns an array of those paths. Real LDAP search strings are supported
      * as well (though only the "|" "OR" type).
      *
      * @param userPatternString - a string LDAP search paths surrounded by parentheses

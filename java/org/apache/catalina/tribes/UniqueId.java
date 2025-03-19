@@ -55,15 +55,15 @@ public final class UniqueId implements Serializable {
         if (result) {
             UniqueId uid = (UniqueId) other;
             if (this.id == null && uid.id == null) {
-                result = true;
-            } else if (this.id == null && uid.id != null) {
+                // Nothing to do
+            } else if (this.id == null) {
                 result = false;
-            } else if (this.id != null && uid.id == null) {
+            } else if (uid.id == null) {
                 result = false;
             } else {
                 result = Arrays.equals(this.id, uid.id);
             }
-        } // end if
+        }
         return result;
     }
 

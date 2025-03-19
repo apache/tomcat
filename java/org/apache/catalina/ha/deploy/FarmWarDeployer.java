@@ -146,8 +146,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
             return;
         }
         Engine engine = (Engine) econtainer;
-        String hostname = null;
-        hostname = host.getName();
+        String hostname = host.getName();
         try {
             oname = new ObjectName(engine.getName() + ":type=Deployer,host=" + hostname);
         } catch (Exception e) {
@@ -164,7 +163,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         configBase = host.getConfigBaseFile();
 
         // Retrieve the MBean server
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistryNonNull(null, null).getMBeanServer();
 
         started = true;
         count = 0;
@@ -488,7 +487,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     protected void undeployDir(File dir) {
 
-        String files[] = dir.list();
+        String[] files = dir.list();
         if (files == null) {
             files = new String[0];
         }

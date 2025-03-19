@@ -137,7 +137,7 @@ import org.xml.sax.SAXException;
  *  &lt;/servlet-mapping&gt;
  * </pre>
  *
- * By default access to /WEB-INF and META-INF are not available via WebDAV. To enable access to these URLs, add:
+ * By default, access to /WEB-INF and META-INF are not available via WebDAV. To enable access to these URLs, add:
  *
  * <pre>
  *  &lt;init-param&gt;
@@ -152,7 +152,7 @@ import org.xml.sax.SAXException;
  * http://host:port/context/webdavedit/content
  * <p>
  * The Servlet provides support for arbitrary dead properties on all resources (dead properties are properties whose
- * values are not protected by the server, such as the content length of a resource). By default the Servlet will use
+ * values are not protected by the server, such as the content length of a resource). By default, the Servlet will use
  * non persistent memory storage for them. Persistence can be achieved by implementing the <code>PropertyStore</code>
  * interface and configuring the Servlet to use that store. The <code>propertyStore</code> init-param allows configuring
  * the class name of the store to use, while the parameters in the form of <code>store.xxx</code> will be set on the
@@ -476,7 +476,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         /**
-         * @return the statusCode the statusCode to set as a result of the operation
+         * @return the statusCode to set as a result of the operation
          */
         public int getStatusCode() {
             return this.statusCode;

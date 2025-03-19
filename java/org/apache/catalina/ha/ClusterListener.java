@@ -71,10 +71,7 @@ public abstract class ClusterListener implements ChannelListener {
 
     @Override
     public final boolean accept(Serializable msg, Member member) {
-        if (msg instanceof ClusterMessage) {
-            return true;
-        }
-        return false;
+        return msg instanceof ClusterMessage;
     }
 
 

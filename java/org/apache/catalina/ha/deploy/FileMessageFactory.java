@@ -121,7 +121,7 @@ public class FileMessageFactory {
     /**
      * The time this instance was last modified.
      */
-    protected long lastModified = 0;
+    protected long lastModified;
 
     /**
      * The maximum time (in seconds) this instance will be allowed to exist from lastModifiedTime.
@@ -244,7 +244,7 @@ public class FileMessageFactory {
         // Have received a new message. Update the last modified time (even if the message is being buffered for now).
         lastModified = System.currentTimeMillis();
 
-        FileMessage next = null;
+        FileMessage next;
         synchronized (this) {
             if (!isWriting) {
                 next = msgBuffer.get(Long.valueOf(lastMessageProcessed.get() + 1));

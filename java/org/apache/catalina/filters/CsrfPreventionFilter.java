@@ -477,7 +477,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
 
     /**
-     * Determines whether a nonce should be created. This method is provided primarily for the benefit of sub-classes
+     * Determines whether a nonce should be created. This method is provided primarily for the benefit of subclasses
      * that wish to customise this behaviour.
      *
      * @param request The request that triggered the need to potentially create the nonce.
@@ -491,7 +491,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     /**
      * Create a new {@link NonceCache} and store in the {@link HttpSession}. This method is provided primarily for the
-     * benefit of sub-classes that wish to customise this behaviour.
+     * benefit of subclasses that wish to customise this behaviour.
      *
      * @param request The request that triggered the need to create the nonce cache. Unused by the default
      *                    implementation.
@@ -511,7 +511,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     /**
      * Obtain the {@link NonceCache} associated with the request and/or session. This method is provided primarily for
-     * the benefit of sub-classes that wish to customise this behaviour.
+     * the benefit of subclasses that wish to customise this behaviour.
      *
      * @param request The request that triggered the need to obtain the nonce cache. Unused by the default
      *                    implementation.
@@ -578,7 +578,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         /*
          * Return the specified URL with the nonce added to the query string.
          *
-         * @param url URL to be modified
+         * @param url the URL to be modified
          */
         private String addNonce(String url) {
 

@@ -184,7 +184,7 @@ public class JMXAccessorSetTask extends JMXAccessorTask {
         ObjectName oname = new ObjectName(name);
         String mattrType = null;
         MBeanInfo minfo = jmxServerConnection.getMBeanInfo(oname);
-        MBeanAttributeInfo attrs[] = minfo.getAttributes();
+        MBeanAttributeInfo[] attrs = minfo.getAttributes();
         for (int i = 0; mattrType == null && i < attrs.length; i++) {
             if (attribute.equals(attrs[i].getName())) {
                 mattrType = attrs[i].getType();

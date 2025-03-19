@@ -51,7 +51,7 @@ public interface MembershipService {
      * Starts the membership service. If a membership listeners is added the listener will start to receive membership
      * events.
      *
-     * @param level - level MBR_RX starts listening for members, level MBR_TX starts broad casting the server
+     * @param level - level MBR_RX starts listening for members, level MBR_TX starts broadcasting the server
      *
      * @throws Exception                          if the service fails to start.
      * @throws java.lang.IllegalArgumentException if the level is incorrect.
@@ -63,14 +63,14 @@ public interface MembershipService {
      * Stops the membership service. If a membership listeners is added the listener will start to receive membership
      * events.
      *
-     * @param level - level MBR_RX stops listening for members, level MBR_TX stops broad casting the server
+     * @param level - level MBR_RX stops listening for members, level MBR_TX stops broadcasting the server
      *
      * @throws java.lang.IllegalArgumentException if the level is incorrect.
      */
     void stop(int level);
 
     /**
-     * @return true if the the group contains members
+     * @return true if the group contains members
      */
     boolean hasMembers();
 
@@ -84,7 +84,7 @@ public interface MembershipService {
     Member getMember(Member mbr);
 
     /**
-     * @return a list of all the members in the cluster.
+     * @return an array of all the members in the cluster.
      */
     Member[] getMembers();
 

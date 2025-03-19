@@ -92,7 +92,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
      */
     protected String getNamespace() {
         String namespace = getEnv(CUSTOM_ENV_PREFIX + "NAMESPACE", "KUBERNETES_NAMESPACE");
-        if (namespace == null || namespace.length() == 0) {
+        if (namespace == null || namespace.isEmpty()) {
             log.warn(sm.getString("kubernetesMembershipProvider.noNamespace"));
             namespace = "tomcat";
         }

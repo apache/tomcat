@@ -322,7 +322,7 @@ public class DataSourceUserDatabase extends SparseUserDatabase {
     }
 
     /**
-     * @return the table that holds user data..
+     * @return the table that holds user data
      */
     public String getUserTable() {
         return userTable;

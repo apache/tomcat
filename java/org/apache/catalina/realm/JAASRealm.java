@@ -108,7 +108,7 @@ import org.apache.tomcat.util.file.ConfigurationSource;
  * <blockquote><code>CATALINA_OPTS="-Djava.security.auth.login.config=$CATALINA_HOME/conf/jaas.config"</code></blockquote>
  * </li>
  * <li>As part of the login process, JAASRealm registers its own <code>CallbackHandler</code>, called (unsurprisingly)
- * <code>JAASCallbackHandler</code>. This handler supplies the HTTP requests's username and credentials to the
+ * <code>JAASCallbackHandler</code>. This handler supplies the HTTP requests' username and credentials to the
  * user-supplied <code>LoginModule</code></li>
  * <li>As with other <code>Realm</code> implementations, digested passwords are supported if the
  * <code>&lt;Realm&gt;</code> element in <code>server.xml</code> contains a <code>digest</code> attribute;
@@ -161,7 +161,7 @@ public class JAASRealm extends RealmBase {
     protected volatile boolean jaasConfigurationLoaded = false;
 
     /**
-     * Keeps track if JAAS invocation of login modules was successful or not. By default it is true unless we detect
+     * Keeps track if JAAS invocation of login modules was successful or not. By default, it is true unless we detect
      * JAAS login module can't perform the login. This will be used for realm's {@link #isAvailable()} status so that
      * {@link LockOutRealm} will not lock the user out if JAAS login modules are unavailable to perform the actual
      * login.
@@ -329,7 +329,7 @@ public class JAASRealm extends RealmBase {
     /**
      * Perform the actual JAAS authentication.
      *
-     * @param username        The user name
+     * @param username        The username
      * @param callbackHandler The callback handler
      *
      * @return the associated principal, or <code>null</code> if there is none.
@@ -426,7 +426,7 @@ public class JAASRealm extends RealmBase {
             } catch (Throwable e) {
                 ExceptionUtils.handleThrowable(e);
                 log.error(sm.getString("jaasRealm.unexpectedError"), e);
-                // JAAS throws exception different than LoginException so mark the
+                // JAAS throws exception different from LoginException so mark the
                 // realm as unavailable
                 invocationSuccess = false;
                 return null;
@@ -451,7 +451,7 @@ public class JAASRealm extends RealmBase {
             return principal;
         } catch (Throwable t) {
             log.error(sm.getString("jaasRealm.unexpectedError"), t);
-            // JAAS throws exception different than LoginException so mark the realm as unavailable
+            // JAAS throws exception different from LoginException so mark the realm as unavailable
             invocationSuccess = false;
             return null;
         }
@@ -459,7 +459,7 @@ public class JAASRealm extends RealmBase {
 
 
     /**
-     * @return the password associated with the given principal's user name. This always returns null as the JAASRealm
+     * @return the password associated with the given principal's username. This always returns null as the JAASRealm
      *             has no way of obtaining this information.
      */
     @Override
@@ -485,7 +485,7 @@ public class JAASRealm extends RealmBase {
      * the LoginModules are mapped to roles, but only if their respective classes match one of the "role class" classes.
      * If a user Principal cannot be constructed, return <code>null</code>.
      *
-     * @param username     The associated user name
+     * @param username     The associated username
      * @param subject      The <code>Subject</code> representing the logged-in user
      * @param loginContext Associated with the Principal so {@link LoginContext#logout()} can be called later
      *

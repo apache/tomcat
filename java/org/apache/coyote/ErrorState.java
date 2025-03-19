@@ -66,7 +66,7 @@ public enum ErrorState {
      *
      * @param input The error state to compare to this one
      *
-     * @return The most severe error state from the the provided error state and this one
+     * @return The most severe error state from the provided error state and this one
      */
     public ErrorState getMostSevere(ErrorState input) {
         if (input.severity > this.severity) {

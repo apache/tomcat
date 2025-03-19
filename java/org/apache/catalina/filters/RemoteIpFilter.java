@@ -75,7 +75,7 @@ import org.apache.tomcat.util.res.StringManager;
  * proxies:
  * </p>
  * <ul>
- * <li>Loop on the comma delimited list of IPs and hostnames passed by the preceding load balancer or proxy in the given
+ * <li>Loop on the comma-delimited list of IPs and hostnames passed by the preceding load balancer or proxy in the given
  * request's Http header named <code>$remoteIpHeader</code> (default value <code>x-forwarded-for</code>). Values are
  * processed in right-to-left order.</li>
  * <li>For each ip/host of the list:
@@ -151,7 +151,7 @@ import org.apache.tomcat.util.res.StringManager;
  * </tr>
  * <tr>
  * <td>protocolHeaderHttpsValue</td>
- * <td>Value of the <code>protocolHeader</code> to indicate that it is an Https request</td>
+ * <td>Value of the <code>protocolHeader</code> to indicate that it is a Https request</td>
  * <td>N/A</td>
  * <td>String like <code>https</code> or <code>ON</code></td>
  * <td><code>https</code></td>
@@ -194,7 +194,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * XForwardedFilter configuration:
  * </p>
- * <code>
+ * <pre>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -220,7 +220,7 @@ import org.apache.tomcat.util.res.StringManager;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</code>
+ * &lt;/filter-mapping&gt;</pre>
  * <table border="1">
  * <caption>Request Values</caption>
  * <tr>
@@ -273,7 +273,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * RemoteIpFilter configuration:
  * </p>
- * <code>
+ * <pre>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -299,7 +299,7 @@ import org.apache.tomcat.util.res.StringManager;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</code>
+ * &lt;/filter-mapping&gt;</pre>
  * <table border="1">
  * <caption>Request Values</caption>
  * <tr>
@@ -335,7 +335,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * RemoteIpFilter configuration:
  * </p>
- * <code>
+ * <pre>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -361,7 +361,7 @@ import org.apache.tomcat.util.res.StringManager;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</code>
+ * &lt;/filter-mapping&gt;</pre>
  * <table border="1">
  * <caption>Request Values</caption>
  * <tr>
@@ -398,7 +398,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * RemoteIpFilter configuration:
  * </p>
- * <code>
+ * <pre>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;filter-class&gt;org.apache.catalina.filters.RemoteIpFilter&lt;/filter-class&gt;
@@ -424,7 +424,7 @@ import org.apache.tomcat.util.res.StringManager;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</code>
+ * &lt;/filter-mapping&gt;</pre>
  * <table border="1">
  * <caption>Request Values</caption>
  * <tr>
@@ -1227,7 +1227,7 @@ public class RemoteIpFilter extends GenericFilter {
 
     /**
      * <p>
-     * Case insensitive value of the protocol header to indicate that the incoming http request uses HTTPS.
+     * Case-insensitive value of the protocol header to indicate that the incoming http request uses HTTPS.
      * </p>
      * <p>
      * Default value : <code>https</code>
@@ -1250,7 +1250,7 @@ public class RemoteIpFilter extends GenericFilter {
      * Name of the http header that holds the list of trusted proxies that has been traversed by the http request.
      * </p>
      * <p>
-     * The value of this header can be comma delimited.
+     * The value of this header can be comma-delimited.
      * </p>
      * <p>
      * Default value : <code>X-Forwarded-By</code>
@@ -1267,7 +1267,7 @@ public class RemoteIpFilter extends GenericFilter {
      * Name of the http header from which the remote ip is extracted.
      * </p>
      * <p>
-     * The value of this header can be comma delimited.
+     * The value of this header can be comma-delimited.
      * </p>
      * <p>
      * Default value : <code>X-Forwarded-For</code>
@@ -1280,7 +1280,7 @@ public class RemoteIpFilter extends GenericFilter {
     }
 
     /**
-     * Should this filter set request attributes for IP address, Hostname, protocol and port used for the request? This
+     * Should this filter set request attributes for IP address, Hostname, protocol and port used for the request? These
      * are typically used in conjunction with an {@link AccessLog} which will otherwise log the original values. Default
      * is <code>true</code>. The attributes set are:
      * <ul>

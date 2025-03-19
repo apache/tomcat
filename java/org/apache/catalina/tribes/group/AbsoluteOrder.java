@@ -113,15 +113,7 @@ public class AbsoluteOrder {
         }
 
         protected int compareInts(int b1, int b2) {
-            int result = 0;
-            if (b1 == b2) {
-
-            } else if (b1 < b2) {
-                result = -1;
-            } else {
-                result = 1;
-            }
-            return result;
+            return Integer.compare(b1, b2);
         }
     }
 

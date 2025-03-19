@@ -64,7 +64,7 @@ public class McastServiceImpl extends MembershipProviderBase {
      */
     protected MulticastSocket socket;
     /**
-     * The local member that we intend to broad cast over and over again
+     * The local member that we intend to broadcast over and over again
      */
     protected final MemberImpl member;
     /**
@@ -116,7 +116,7 @@ public class McastServiceImpl extends MembershipProviderBase {
     /**
      * Read timeout on the mcast socket
      */
-    protected int mcastSoTimeout = -1;
+    protected int mcastSoTimeout;
     /**
      * bind address
      */
@@ -347,9 +347,7 @@ public class McastServiceImpl extends MembershipProviderBase {
      * @throws IOException Received failed
      */
     public void receive() throws IOException {
-        boolean checkexpired = true;
         try {
-
             socket.receive(receivePacket);
             if (receivePacket.getLength() > MAX_PACKET_SIZE) {
                 log.error(sm.getString("mcastServiceImpl.packet.tooLong", Integer.toString(receivePacket.getLength())));
@@ -361,16 +359,13 @@ public class McastServiceImpl extends MembershipProviderBase {
                 } else {
                     memberBroadcastsReceived(data);
                 }
-
             }
         } catch (SocketTimeoutException x) {
             // do nothing, this is normal, we don't want to block forever
             // since the receive thread is the same thread
             // that does membership expiration
         }
-        if (checkexpired) {
-            checkExpired();
-        }
+        checkExpired();
     }
 
     private void memberDataReceived(byte[] data) {
@@ -523,7 +518,7 @@ public class McastServiceImpl extends MembershipProviderBase {
     }
 
     public long getServiceStartTime() {
-        return (member != null) ? member.getServiceStartTime() : -1l;
+        return (member != null) ? member.getServiceStartTime() : -1L;
     }
 
     public int getRecoveryCounter() {

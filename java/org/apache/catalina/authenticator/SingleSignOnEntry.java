@@ -104,7 +104,7 @@ public class SingleSignOnEntry implements Serializable {
     /**
      * Returns the HTTP Session identifiers associated with this SSO.
      *
-     * @return The identifiers for the HTTP sessions that are current associated with this SSo entry
+     * @return the identifiers for the HTTP sessions that are currently associated with this SSO entry
      */
     public Set<SingleSignOnSessionKey> findSessions() {
         return sessionKeys.keySet();
@@ -148,9 +148,9 @@ public class SingleSignOnEntry implements Serializable {
     }
 
     /**
-     * Gets the user name provided by the user as part of the authentication process.
+     * Gets the username provided by the user as part of the authentication process.
      *
-     * @return The user name that was authenticated as part of the authentication that triggered the creation of the SSO
+     * @return The username that was authenticated as part of the authentication that triggered the creation of the SSO
      *             entry
      */
     public String getUsername() {

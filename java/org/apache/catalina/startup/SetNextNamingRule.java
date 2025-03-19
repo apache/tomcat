@@ -105,13 +105,7 @@ public class SetNextNamingRule extends Rule {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("SetNextRule[");
-        sb.append("methodName=");
-        sb.append(methodName);
-        sb.append(", paramType=");
-        sb.append(paramType);
-        sb.append(']');
-        return sb.toString();
+        return "SetNextRule[" + "methodName=" + methodName + ", paramType=" + paramType + ']';
     }
 
 

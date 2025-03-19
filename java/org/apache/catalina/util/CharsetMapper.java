@@ -57,7 +57,7 @@ public class CharsetMapper {
 
 
     /**
-     * Construct a new CharsetMapper using the specified properties resource.
+     * Construct a new CharsetMapper using the specified properties' resource.
      *
      * @param name Name of a properties resource to be loaded
      *

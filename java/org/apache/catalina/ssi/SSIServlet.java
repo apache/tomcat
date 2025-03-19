@@ -198,7 +198,7 @@ public class SSIServlet extends HttpServlet {
             if (lastModified > 0) {
                 res.setDateHeader("last-modified", lastModified);
             }
-            if (buffered) {
+            if (stringWriter != null) {
                 printWriter.flush();
                 @SuppressWarnings("null")
                 String text = stringWriter.toString();

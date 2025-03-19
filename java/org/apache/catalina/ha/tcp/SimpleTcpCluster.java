@@ -479,10 +479,10 @@ public class SimpleTcpCluster extends LifecycleMBeanBase
     }
 
     protected void checkDefaults() {
-        if (clusterListeners.size() == 0 && managerTemplate instanceof DeltaManager) {
+        if (clusterListeners.isEmpty() && managerTemplate instanceof DeltaManager) {
             addClusterListener(new ClusterSessionListener());
         }
-        if (valves.size() == 0) {
+        if (valves.isEmpty()) {
             addValve(new JvmRouteBinderValve());
             addValve(new ReplicationValve());
         }

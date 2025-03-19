@@ -40,8 +40,8 @@ public class JdbcLeakPrevention {
         /*
          * DriverManager.getDrivers() has a nasty side-effect of registering drivers that are visible to this class
          * loader but haven't yet been loaded. Therefore, the first call to this method a) gets the list of originally
-         * loaded drivers and b) triggers the unwanted side-effect. The second call gets the complete list of drivers
-         * ensuring that both original drivers and any loaded as a result of the side-effects are all de-registered.
+         * loaded drivers and b) triggers the unwanted side effect. The second call gets the complete list of drivers
+         * ensuring that both original drivers and any loaded as a result of the side effects are all de-registered.
          */
         Set<Driver> originalDrivers = new HashSet<>();
         Enumeration<Driver> drivers = DriverManager.getDrivers();
@@ -56,7 +56,7 @@ public class JdbcLeakPrevention {
                 continue;
             }
             // Only report drivers that were originally registered. Skip any
-            // that were registered as a side-effect of this code.
+            // that were registered as a side effect of this code.
             if (originalDrivers.contains(driver)) {
                 driverNames.add(driver.getClass().getCanonicalName());
             }

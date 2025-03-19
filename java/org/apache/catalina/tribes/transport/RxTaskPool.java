@@ -48,10 +48,6 @@ public class RxTaskPool {
     protected void configureTask(AbstractRxTask task) {
         synchronized (task) {
             task.setTaskPool(this);
-            // task.setName(task.getClass().getName() + "[" + inc() + "]");
-            // task.setDaemon(true);
-            // task.setPriority(Thread.MAX_PRIORITY);
-            // task.start();
         }
     }
 
@@ -64,12 +60,11 @@ public class RxTaskPool {
         AbstractRxTask worker = null;
         synchronized (mutex) {
             while (worker == null && running) {
-                if (idle.size() > 0) {
+                if (!idle.isEmpty()) {
                     try {
                         worker = idle.remove(0);
                     } catch (java.util.NoSuchElementException x) {
                         // this means that there are no available workers
-                        worker = null;
                     }
                 } else if (used.size() < this.maxTasks && creator != null) {
                     worker = creator.createRxTask();
@@ -81,7 +76,7 @@ public class RxTaskPool {
                         Thread.currentThread().interrupt();
                     }
                 }
-            } // while
+            }
             if (worker != null) {
                 used.add(worker);
             }
@@ -104,7 +99,6 @@ public class RxTaskPool {
         if (running) {
             synchronized (mutex) {
                 used.remove(worker);
-                // if ( idle.size() < minThreads && !idle.contains(worker)) idle.add(worker);
                 if (idle.size() < maxTasks && !idle.contains(worker)) {
                     idle.add(worker); // let max be the upper limit
                 } else {

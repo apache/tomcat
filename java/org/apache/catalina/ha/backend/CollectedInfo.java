@@ -28,7 +28,7 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 /*
- * Listener to provider informations to mod_heartbeat.c
+ * Listener to provide information to mod_heartbeat.c
  * *msg_format = "v=%u&ready=%u&busy=%u"; (message to send).
  * send the multicast message using the format...
  * what about the bind(IP. port) only IP makes sense (for the moment).
@@ -55,7 +55,7 @@ public class CollectedInfo {
     public void init(String host, int port) throws Exception {
         int iport = 0;
         String shost = null;
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistryNonNull(null, null).getMBeanServer();
         String onStr = "*:type=ThreadPool,*";
         ObjectName objectName = new ObjectName(onStr);
         Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);

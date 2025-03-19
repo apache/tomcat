@@ -116,7 +116,7 @@ public interface UserDatabase {
 
 
     /**
-     * @return the {@link User} with the specified user name, if any; otherwise return <code>null</code>.
+     * @return the {@link User} with the specified username, if any; otherwise return <code>null</code>.
      *
      * @param username Name of the user to return
      */

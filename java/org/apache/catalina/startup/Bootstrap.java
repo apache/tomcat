@@ -201,7 +201,7 @@ public final class Bootstrap {
      *
      * @return the modified string
      */
-    protected String replace(String str) {
+    private String replace(String str) {
         // Implementation is copied from ClassLoaderLogManager.replace(),
         // but added special processing for catalina.home and catalina.base.
         String result = str;
@@ -494,11 +494,12 @@ public final class Bootstrap {
             }
         } catch (Throwable t) {
             // Unwrap the Exception for clearer error reporting
-            if (t instanceof InvocationTargetException && t.getCause() != null) {
-                t = t.getCause();
+            Throwable throwable = t;
+            if (throwable instanceof InvocationTargetException && throwable.getCause() != null) {
+                throwable = throwable.getCause();
             }
-            handleThrowable(t);
-            log.error("Error running command", t);
+            handleThrowable(throwable);
+            log.error("Error running command", throwable);
             System.exit(1);
         }
     }
@@ -571,7 +572,7 @@ public final class Bootstrap {
     }
 
     // Protected for unit testing
-    protected static String[] getPaths(String value) {
+    static String[] getPaths(String value) {
 
         List<String> result = new ArrayList<>();
         Matcher matcher = PATH_PATTERN.matcher(value);

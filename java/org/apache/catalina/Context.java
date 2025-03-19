@@ -51,8 +51,8 @@ import org.apache.tomcat.util.http.CookieProcessor;
 /**
  * A <b>Context</b> is a Container that represents a servlet context, and therefore an individual web application, in
  * the Catalina servlet engine. It is therefore useful in almost every deployment of Catalina (even if a Connector
- * attached to a web server (such as Apache) uses the web server's facilities to identify the appropriate Wrapper to
- * handle this request. It also provides a convenient mechanism to use Interceptors that see every request processed by
+ * attached to a web server such as Apache uses the web server's facilities to identify the appropriate Wrapper to
+ * handle this request). It also provides a convenient mechanism to use Interceptors that see every request processed by
  * this particular web application.
  * <p>
  * The parent Container attached to a Context is generally a Host, but may be some other implementation, or may be
@@ -318,7 +318,7 @@ public interface Context extends Container, ContextBind {
      * Configures if a / is added to the end of the session cookie path to ensure browsers, particularly IE, don't send
      * a session cookie for context /foo with requests intended for context /foobar.
      *
-     * @param sessionCookiePathUsesTrailingSlash <code>true</code> if the slash is should be added, otherwise
+     * @param sessionCookiePathUsesTrailingSlash <code>true</code> if the slash should be added, otherwise
      *                                               <code>false</code>
      */
     void setSessionCookiePathUsesTrailingSlash(boolean sessionCookiePathUsesTrailingSlash);
@@ -1109,7 +1109,7 @@ public interface Context extends Container, ContextBind {
      * @return <code>true</code> if the specified welcome file is defined for this Context; otherwise return
      *             <code>false</code>.
      *
-     * @param name Welcome file to verify
+     * @param name the welcome file to verify
      */
     boolean findWelcomeFile(String name);
 

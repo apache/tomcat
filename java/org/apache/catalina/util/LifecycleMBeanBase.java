@@ -75,7 +75,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
 
 
     /**
-     * Method implemented by sub-classes to identify the domain in which MBeans should be registered.
+     * Method implemented by subclasses to identify the domain in which MBeans should be registered.
      *
      * @return The name of the domain to use to register MBeans.
      */
@@ -89,7 +89,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
 
 
     /**
-     * Allow sub-classes to specify the key properties component of the {@link ObjectName} that will be used to register
+     * Allow subclasses to specify the key properties component of the {@link ObjectName} that will be used to register
      * this component.
      *
      * @return The string representation of the key properties component of the desired {@link ObjectName}
@@ -98,7 +98,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
 
 
     /**
-     * Utility method to enable sub-classes to easily register additional components that don't implement
+     * Utility method to enable subclasses to easily register additional components that don't implement
      * {@link JmxEnabled} with an MBean server. <br>
      * Note: This method should only be used once {@link #initInternal()} has been called and before
      * {@link #destroyInternal()} has been called.
@@ -119,7 +119,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
 
         try {
             on = new ObjectName(name.toString());
-            Registry.getRegistry(null, null).registerComponent(obj, on, null);
+            Registry.getRegistryNonNull(null, null).registerComponent(obj, on, null);
         } catch (Exception e) {
             log.warn(sm.getString("lifecycleMBeanBase.registerFail", obj, name), e);
         }
@@ -129,7 +129,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
 
 
     /**
-     * Utility method to enable sub-classes to easily unregister additional components that don't implement
+     * Utility method to enable subclasses to easily unregister additional components that don't implement
      * {@link JmxEnabled} with an MBean server. <br>
      * Note: This method should only be used once {@link #initInternal()} has been called and before
      * {@link #destroyInternal()} has been called.
@@ -138,15 +138,13 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
      */
     protected final void unregister(String objectNameKeyProperties) {
         // Construct an object name with the right domain
-        StringBuilder name = new StringBuilder(getDomain());
-        name.append(':');
-        name.append(objectNameKeyProperties);
-        Registry.getRegistry(null, null).unregisterComponent(name.toString());
+        String name = getDomain() + ':' + objectNameKeyProperties;
+        Registry.getRegistryNonNull(null, null).unregisterComponent(name);
     }
 
 
     /**
-     * Utility method to enable sub-classes to easily unregister additional components that don't implement
+     * Utility method to enable subclasses to easily unregister additional components that don't implement
      * {@link JmxEnabled} with an MBean server. <br>
      * Note: This method should only be used once {@link #initInternal()} has been called and before
      * {@link #destroyInternal()} has been called.
@@ -154,7 +152,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
      * @param on The name of the component to unregister
      */
     protected final void unregister(ObjectName on) {
-        Registry.getRegistry(null, null).unregisterComponent(on);
+        Registry.getRegistryNonNull(null, null).unregisterComponent(on);
     }
 
 

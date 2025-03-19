@@ -679,7 +679,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     /**
      * {@inheritDoc}
      * <p>
-     * Sub-classes of this base class represent a single request/response pair. The timeout to be processed is,
+     * Subclasses of this base class represent a single request/response pair. The timeout to be processed is,
      * therefore, the Servlet asynchronous processing timeout.
      */
     @Override
@@ -734,7 +734,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * When committing the response, we have to validate the set of headers, as well as setup the response filters.
+     * When committing the response, we have to validate the set of headers, as well as set up the response filters.
      *
      * @throws IOException IO exception during commit
      */
@@ -1074,9 +1074,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         // Set the socket wrapper so the access log can read the socket related
         // information (e.g. client IP)
         setSocketWrapper(socketWrapper);
-        // Setup the minimal request information
+        // Set up the minimal request information
         request.setStartTimeNanos(System.nanoTime());
-        // Setup the minimal response information
+        // Set up the minimal response information
         response.setStatus(400);
         response.setError();
         getAdapter().log(request, response, 0);

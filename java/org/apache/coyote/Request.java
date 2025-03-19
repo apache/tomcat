@@ -72,7 +72,7 @@ public final class Request {
      * another 3,000,000 years before it gets back to zero).
      *
      * Local testing shows that 5, 10, 50, 500 or 1000 threads can obtain 60,000,000+ IDs a second from a single
-     * AtomicLong. That is about about 17ns per request. It does not appear that the introduction of this counter will
+     * AtomicLong. That is about 17ns per request. It does not appear that the introduction of this counter will
      * cause a bottleneck for request processing.
      */
     private static final AtomicLong requestIdGenerator = new AtomicLong(0);

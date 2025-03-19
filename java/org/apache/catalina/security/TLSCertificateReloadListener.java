@@ -53,7 +53,7 @@ public class TLSCertificateReloadListener implements LifecycleListener {
     private int daysBefore = 14;
 
     // State
-    private Calendar nextCheck = Calendar.getInstance();
+    private final Calendar nextCheck = Calendar.getInstance();
 
 
     /**
@@ -140,7 +140,7 @@ public class TLSCertificateReloadListener implements LifecycleListener {
          */
         calendar.add(Calendar.DAY_OF_MONTH, getDaysBefore());
 
-        // Check all of the certificates
+        // Check all the certificates
         Service[] services = server.findServices();
         for (Service service : services) {
             Connector[] connectors = service.findConnectors();

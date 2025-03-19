@@ -169,7 +169,6 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
     public void execute(String command, InputStream istream, String contentType, long contentLength)
             throws BuildException {
 
-        URLConnection conn = null;
         InputStreamReader reader = null;
         try {
             // Set up authorization with our credentials
@@ -177,8 +176,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
             // Create a connection for this command
             URI uri = new URI(url + command);
-            uri.parseServerAuthority();
-            conn = uri.toURL().openConnection();
+            URLConnection conn = uri.parseServerAuthority().toURL().openConnection();
             HttpURLConnection hconn = (HttpURLConnection) conn;
 
             // Set up standard connection characteristics
@@ -209,13 +207,8 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
 
             // Send the request data (if any)
             if (istream != null) {
-                try (OutputStream ostream = hconn.getOutputStream()) {
+                try (istream; OutputStream ostream = hconn.getOutputStream()) {
                     IOTools.flow(istream, ostream);
-                } finally {
-                    try {
-                        istream.close();
-                    } catch (Exception e) {
-                    }
                 }
             }
 
@@ -271,7 +264,6 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 } catch (IOException ioe) {
                     // Ignore
                 }
-                reader = null;
             }
             if (istream != null) {
                 try {
@@ -294,12 +286,10 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
      * appropriate Authorization when the next request is made (that includes a request body).
      */
     private void preAuthenticate() throws IOException, URISyntaxException {
-        URLConnection conn = null;
 
         // Create a connection for this command
         URI uri = new URI(url);
-        uri.parseServerAuthority();
-        conn = uri.toURL().openConnection();
+        URLConnection conn = uri.parseServerAuthority().toURL().openConnection();
         HttpURLConnection hconn = (HttpURLConnection) conn;
 
         // Set up standard connection characteristics

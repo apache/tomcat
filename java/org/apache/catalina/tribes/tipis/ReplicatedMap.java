@@ -186,10 +186,9 @@ public class ReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
 
     @Override
     public void memberDisappeared(Member member) {
-        boolean removed = false;
         Log log = getLog();
         synchronized (mapMembers) {
-            removed = (mapMembers.remove(member) != null);
+            boolean removed = (mapMembers.remove(member) != null);
             if (!removed) {
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("replicatedMap.member.disappeared.unknown", member));

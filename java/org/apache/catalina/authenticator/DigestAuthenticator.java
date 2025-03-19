@@ -375,7 +375,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         String ipTimeKey = request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
 
-        // Note: The digest used to generate the nonce is independent of the the digest used for authentication.
+        // Note: The digest used to generate the nonce is independent of the digest used for authentication.
         byte[] buffer = ConcurrentMessageDigest.digest(NONCE_DIGEST, ipTimeKey.getBytes(StandardCharsets.ISO_8859_1));
         String nonce = currentTime + ":" + HexUtils.toHexString(buffer);
 
@@ -637,7 +637,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 }
             }
             String serverIpTimeKey = request.getRemoteAddr() + ":" + nonceTime + ":" + key;
-            // Note: The digest used to generate the nonce is independent of the the digest used for authentication/
+            // Note: The digest used to generate the nonce is independent of the digest used for authentication/
             byte[] buffer =
                     ConcurrentMessageDigest.digest(NONCE_DIGEST, serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
             String digestServerIpTimeKey = HexUtils.toHexString(buffer);

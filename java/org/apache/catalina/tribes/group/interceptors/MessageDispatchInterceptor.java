@@ -248,7 +248,7 @@ public class MessageDispatchInterceptor extends ChannelInterceptorBase implement
                 log.error(sm.getString("messageDispatchInterceptor.completeMessage.failed"), ex);
             }
         } catch (Exception x) {
-            ChannelException cx = null;
+            ChannelException cx;
             if (x instanceof ChannelException) {
                 cx = (ChannelException) x;
             } else {

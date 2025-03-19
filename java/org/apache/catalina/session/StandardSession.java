@@ -65,11 +65,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Standard implementation of the <b>Session</b> interface. This object is serializable, so that it can be stored in
  * persistent storage or transferred to a different JVM for distributable session support.
  * <p>
- * <b>IMPLEMENTATION NOTE</b>: An instance of this class represents both the internal (Session) and application level
- * (HttpSession) view of the session. However, because the class itself is not declared public, Java logic outside of
- * the <code>org.apache.catalina.session</code> package cannot cast an HttpSession view of this instance back to a
- * Session view.
- * <p>
  * <b>IMPLEMENTATION NOTE</b>: If you add fields to this class, you must make sure that you carry them over in the
  * read/writeObject methods so that this class is properly serialized.
  *
@@ -1099,7 +1094,7 @@ public class StandardSession implements HttpSession, Session, Serializable {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation simply checks the value for serializability. Sub-classes might use other distribution
+     * This implementation simply checks the value for serializability. Subclasses might use other distribution
      * technology not based on serialization and can override this check.
      */
     @Override

@@ -86,7 +86,7 @@ public final class NonLoginAuthenticator extends AuthenticatorBase {
         }
 
         // No Principal means the user is not already authenticated
-        // and so will not be assigned any roles. It is safe to
+        // and so will not be assigned any roles. It is safe
         // to say the user is now authenticated because access to
         // protected resources will only be allowed with a matching role.
         // i.e. SC_FORBIDDEN (403 status) will be generated later.

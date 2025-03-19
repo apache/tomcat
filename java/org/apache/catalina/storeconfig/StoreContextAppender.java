@@ -163,7 +163,6 @@ public class StoreContextAppender extends StoreAppender {
     @Override
     public Object defaultInstance(Object bean) throws ReflectiveOperationException {
         if (bean instanceof StandardContext) {
-            StandardContext defaultContext = new StandardContext();
             // @formatter:off
             /*
              * if (!((StandardContext) bean).getOverride()) {
@@ -176,7 +175,7 @@ public class StoreContextAppender extends StoreAppender {
              * }
              */
             // @formatter:on
-            return defaultContext;
+            return new StandardContext();
         } else {
             return super.defaultInstance(bean);
         }

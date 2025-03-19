@@ -131,7 +131,7 @@ public interface ProtocolHandler {
 
     /**
      * Close the server socket (to prevent further connections) if the server socket was bound on {@link #start()}
-     * (rather than on {@link #init()} but do not perform any further shutdown.
+     * (rather than on {@link #init()}) but do not perform any further shutdown.
      */
     void closeServerSocketGraceful();
 
