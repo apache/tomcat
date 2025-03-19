@@ -48,6 +48,7 @@ import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.log.UserDataHelper;
@@ -441,6 +442,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("upgradeHandler.ioerror", connectionId), ioe);
             }
+            close();
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("upgradeHandler.throwable", connectionId), t);
+            }
+            // Unexpected errors close the connection.
             close();
         }
 
