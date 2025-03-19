@@ -148,7 +148,7 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
         String ip;
 
         int requests;
-        int sleep;
+        int timePerRequest;
 
         int[] results;
         volatile String[] rlpHeader;
@@ -159,7 +159,7 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
             this.filterChain = filterChain;
             this.ip = ip;
             this.requests = requests;
-            this.sleep = 1000 / rps;
+            this.timePerRequest = 1000 / rps;
             this.results = new int[requests];
             this.rlpHeader = new String[requests];
             this.rlHeader = new String[requests];
@@ -169,6 +169,8 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
 
         @Override
         public void run() {
+            long start = System.nanoTime();
+
             try {
                 for (int i = 0; i < requests; i++) {
                     MockHttpServletRequest request = new MockHttpServletRequest();
@@ -184,7 +186,15 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
                     if (results[i] != 200) {
                         break;
                     }
-                    sleep(sleep);
+                    /*
+                     * Ensure requests are evenly spaced through time irrespective of how long each request takes to
+                     * complete. Do comparisons in milliseconds.
+                     */
+                    long expectedDuration = (i + 1) * timePerRequest;
+                    long duration = (System.nanoTime() - start)/1000000;
+                    if (expectedDuration > duration) {
+                        sleep(expectedDuration - duration);
+                    }
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
