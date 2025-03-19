@@ -43,40 +43,44 @@ public final class AstNegative extends SimpleNode {
     public Object getValue(EvaluationContext ctx) throws ELException {
         Object obj = this.children[0].getValue(ctx);
 
-        if (obj == null) {
-            return Long.valueOf(0);
-        }
-        if (obj instanceof BigDecimal) {
-            return ((BigDecimal) obj).negate();
-        }
-        if (obj instanceof BigInteger) {
-            return ((BigInteger) obj).negate();
-        }
-        if (obj instanceof String) {
-            if (ELSupport.isStringFloat((String) obj)) {
-                return Double.valueOf(-Double.parseDouble((String) obj));
+        switch (obj) {
+            case null -> {
+                return Long.valueOf(0);
             }
-            return Long.valueOf(-Long.parseLong((String) obj));
+            case BigDecimal bigDecimal -> {
+                return bigDecimal.negate();
+            }
+            case BigInteger bigInteger -> {
+                return bigInteger.negate();
+            }
+            case String s -> {
+                if (ELSupport.isStringFloat(s)) {
+                    return Double.valueOf(-Double.parseDouble((String) obj));
+                }
+                return Long.valueOf(-Long.parseLong(s));
+            }
+            case Long l -> {
+                return Long.valueOf(-l.longValue());
+            }
+            case Double v -> {
+                return Double.valueOf(-v.doubleValue());
+            }
+            case Integer i -> {
+                return Integer.valueOf(-i.intValue());
+            }
+            case Float v -> {
+                return Float.valueOf(-v.floatValue());
+            }
+            case Short i -> {
+                return Short.valueOf((short) -i.shortValue());
+            }
+            case Byte b -> {
+                return Byte.valueOf((byte) -b.byteValue());
+            }
+            default -> {
+                Long num = (Long) ELSupport.coerceToNumber(ctx, obj, Long.class);
+                return Long.valueOf(-num.longValue());
+            }
         }
-        if (obj instanceof Long) {
-            return Long.valueOf(-((Long) obj).longValue());
-        }
-        if (obj instanceof Double) {
-            return Double.valueOf(-((Double) obj).doubleValue());
-        }
-        if (obj instanceof Integer) {
-            return Integer.valueOf(-((Integer) obj).intValue());
-        }
-        if (obj instanceof Float) {
-            return Float.valueOf(-((Float) obj).floatValue());
-        }
-        if (obj instanceof Short) {
-            return Short.valueOf((short) -((Short) obj).shortValue());
-        }
-        if (obj instanceof Byte) {
-            return Byte.valueOf((byte) -((Byte) obj).byteValue());
-        }
-        Long num = (Long) ELSupport.coerceToNumber(ctx, obj, Long.class);
-        return Long.valueOf(-num.longValue());
     }
 }

@@ -102,7 +102,7 @@ public class Stream {
     public Stream distinct() {
         Iterator<Object> downStream = new OpIterator() {
 
-            private Set<Object> values = new HashSet<>();
+            private final Set<Object> values = new HashSet<>();
 
             @Override
             protected void findNext() {
@@ -440,8 +440,7 @@ public class Stream {
         Object result = null;
 
         if (iterator.hasNext()) {
-            Object obj = iterator.next();
-            result = obj;
+            result = iterator.next();
         }
 
         while (iterator.hasNext()) {

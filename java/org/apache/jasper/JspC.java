@@ -275,9 +275,9 @@ public class JspC extends Task implements Options {
     protected boolean showSuccess = false;
     protected int argPos;
     protected boolean fullstop = false;
-    protected String args[];
+    protected String[] args;
 
-    public static void main(String arg[]) {
+    public static void main(String[] arg) {
         if (arg.length == 0) {
             System.out.println(Localizer.getMessage("jspc.usage"));
         } else {
@@ -368,11 +368,7 @@ public class JspC extends Task implements Options {
                 }
             } else if (tok.equals(SWITCH_CACHE)) {
                 tok = nextArg();
-                if ("false".equals(tok)) {
-                    caching = false;
-                } else {
-                    caching = true;
-                }
+                caching = !"false".equals(tok);
             } else if (tok.equals(SWITCH_CLASSPATH)) {
                 setClassPath(nextArg());
             } else if (tok.startsWith(SWITCH_DIE)) {
@@ -386,11 +382,7 @@ public class JspC extends Task implements Options {
                 helpNeeded = true;
             } else if (tok.equals(SWITCH_POOLING)) {
                 tok = nextArg();
-                if ("false".equals(tok)) {
-                    poolingEnabled = false;
-                } else {
-                    poolingEnabled = true;
-                }
+                poolingEnabled = !"false".equals(tok);
             } else if (tok.equals(SWITCH_ENCODING)) {
                 setJavaEncoding(nextArg());
             } else if (tok.equals(SWITCH_SOURCE)) {
@@ -1152,10 +1144,9 @@ public class JspC extends Task implements Options {
                                 }
                             }
                         }
-                        current = reader.read();
-                        while (current == '\n' || current == '\r') {
+                        do {
                             current = reader.read();
-                        }
+                        } while (current == '\n' || current == '\r');
                         continue;
                     } else {
                         writer.write(element);
@@ -1170,7 +1161,7 @@ public class JspC extends Task implements Options {
         try (FileInputStream fis = new FileInputStream(webXml2);
                 FileOutputStream fos = new FileOutputStream(webXml)) {
 
-            byte buf[] = new byte[512];
+            byte[] buf = new byte[512];
             while (true) {
                 int n = fis.read(buf);
                 if (n < 0) {
@@ -1250,7 +1241,7 @@ public class JspC extends Task implements Options {
                 ( jspUri, this, context, null, rctxt );
 
             /* Override the defaults */
-            if ((targetClassName != null) && (targetClassName.length() > 0)) {
+            if ((targetClassName != null) && (!targetClassName.isEmpty())) {
                 clctxt.setServletClassName(targetClassName);
                 targetClassName = null;
             }
@@ -1354,10 +1345,10 @@ public class JspC extends Task implements Options {
 
         try {
             if (uriRoot == null) {
-                if (pages.size() == 0) {
+                if (pages.isEmpty()) {
                     throw new JasperException(Localizer.getMessage("jsp.error.jspc.missingTarget"));
                 }
-                String firstJsp = pages.get(0);
+                String firstJsp = pages.getFirst();
                 File firstJspF = new File(firstJsp);
                 if (!firstJspF.exists()) {
                     throw new JasperException(Localizer.getMessage(
@@ -1383,7 +1374,7 @@ public class JspC extends Task implements Options {
             }
 
             // No explicit pages, we'll process all .jsp in the webapp
-            if (pages.size() == 0) {
+            if (pages.isEmpty()) {
                 scanFiles();
             } else {
                 // Ensure pages are all relative to the uriRoot.

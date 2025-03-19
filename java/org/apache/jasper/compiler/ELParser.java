@@ -47,7 +47,7 @@ public class ELParser {
 
     private final boolean isDeferredSyntaxAllowedAsLiteral;
 
-    private static final String reservedWords[] = { "and", "div", "empty", "eq", "false", "ge", "gt", "instanceof",
+    private static final String[] reservedWords = { "and", "div", "empty", "eq", "false", "ge", "gt", "instanceof",
             "le", "lt", "mod", "ne", "not", "null", "or", "true" };
 
     public ELParser(String expression, boolean isDeferredSyntaxAllowedAsLiteral) {
@@ -69,7 +69,7 @@ public class ELParser {
         ELParser parser = new ELParser(expression, isDeferredSyntaxAllowedAsLiteral);
         while (parser.hasNextChar()) {
             String text = parser.skipUntilEL();
-            if (text.length() > 0) {
+            if (!text.isEmpty()) {
                 parser.expr.add(new ELNode.Text(text));
             }
             ELNode.Nodes elexpr = parser.parseEL();
@@ -107,7 +107,7 @@ public class ELParser {
                 buf.append(curToken.toString());
             } else {
                 // Output whatever is in buffer
-                if (buf.length() > 0) {
+                if (!buf.isEmpty()) {
                     ELexpr.add(new ELNode.ELText(buf.toString()));
                     buf.setLength(0);
                 }
@@ -119,7 +119,7 @@ public class ELParser {
         if (curToken != null) {
             buf.append(curToken.getWhiteSpace());
         }
-        if (buf.length() > 0) {
+        if (!buf.isEmpty()) {
             ELexpr.add(new ELNode.ELText(buf.toString()));
         }
 
@@ -234,7 +234,7 @@ public class ELParser {
                     if (output == null) {
                         output = new StringBuilder(len + 20);
                     }
-                    output.append(input.substring(lastAppend, i));
+                    output.append(input, lastAppend, i);
                     lastAppend = i + 1;
                     output.append('\\');
                     output.append(ch);
@@ -244,7 +244,7 @@ public class ELParser {
         if (output == null) {
             return input;
         } else {
-            output.append(input.substring(lastAppend, len));
+            output.append(input, lastAppend, len);
             return output.toString();
         }
     }
@@ -289,7 +289,7 @@ public class ELParser {
                 if (output == null) {
                     output = new StringBuilder(len + 20);
                 }
-                output.append(input.substring(lastAppend, i));
+                output.append(input, lastAppend, i);
                 lastAppend = i + 1;
                 output.append('\\');
                 output.append(ch);
@@ -298,7 +298,7 @@ public class ELParser {
         if (output == null) {
             return input;
         } else {
-            output.append(input.substring(lastAppend, len));
+            output.append(input, lastAppend, len);
             return output.toString();
         }
     }
@@ -471,7 +471,7 @@ public class ELParser {
      */
     private static class Char extends Token {
 
-        private char ch;
+        private final char ch;
 
         Char(String whiteSpace, char ch) {
             super(whiteSpace);
@@ -499,7 +499,7 @@ public class ELParser {
      */
     private static class QuotedString extends Token {
 
-        private String value;
+        private final String value;
 
         QuotedString(String whiteSpace, String v) {
             super(whiteSpace);
