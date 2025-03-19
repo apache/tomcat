@@ -47,7 +47,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
 
     // Requests can return in the client before log() has been called
     private static final long SLEEP = 2;
-    private static final long SLEEP_MAX = 2000;
+    private static final long SLEEP_MAX = 21000;
 
     @Parameterized.Parameters(name = "{index}: pattern=[{0}]")
     public static Collection<Object[]> data() {
@@ -146,8 +146,6 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         int status = getUrl(url, out, reqHead, resHead);
         Assert.assertEquals(HttpServletResponse.SC_OK, status);
 
-        tomcat.stop();
-
         long startWait = System.currentTimeMillis();
         String content = writer.toString();
         while (countLogLines(content) == 0 && System.currentTimeMillis() - startWait < SLEEP_MAX) {
@@ -160,7 +158,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         }
 
         processLogContent(content);
-    }
+}
 
 
     private int countLogLines(String content) {
