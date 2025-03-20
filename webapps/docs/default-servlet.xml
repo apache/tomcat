@@ -214,6 +214,13 @@ Tomcat.</p>
         with a Content-Range header field is a bad request, RFC 9110
         (which obsoletes RFC 7231) now allows partial PUT. [true]
   </property>
+  <property name="allowPostAsGet">
+        Controls whether a direct request (i.e. not a forward or an include) for
+        a static resource using the POST method will be processed as if the GET
+        method had been used. If not allowed, the request will be rejected. The
+        default behaviour of processing the request as if the GET method had
+        been used is unchanged. [true]
+  </property>
 </properties>
 </section>
 
