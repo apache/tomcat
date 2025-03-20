@@ -187,13 +187,13 @@ public class Util {
     /**
      * Performs the following substring replacements
      * (to facilitate output to XML/HTML pages):
-     *
-     *    &amp; -&gt; &amp;amp;
-     *    &lt; -&gt; &amp;lt;
-     *    &gt; -&gt; &amp;gt;
-     *    " -&gt; &amp;#034;
-     *    ' -&gt; &amp;#039;
-     *
+     * <ul>
+     *    <li>{@code &} -&gt; {@code &amp}</li>
+     *    <li>{@code <} -&gt; {@code &lt;}</li>
+     *    <li>{@code >} -&gt; {@code &gt;}</li>
+     *    <li>{@code "} -&gt; {@code &#034;}</li>
+     *    <li>{@code '} -&gt; {@code &#039;}</li>
+     * </ul>
      * See also OutSupport.writeEscapedXml().
      *
      * taken from org.apache.taglibs.standard.tag.common.core.Util
