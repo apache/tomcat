@@ -85,22 +85,6 @@ public class Cookie {
     /**
      * Parse byte array as cookie header.
      *
-     * @param bytes         Source
-     * @param offset        Start point in array
-     * @param len           Number of bytes to read
-     * @param serverCookies Structure to store results
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 11 onwards.
-     */
-    @Deprecated
-    public static void parseCookie(byte[] bytes, int offset, int len, ServerCookies serverCookies) {
-        parseCookie(bytes, offset, len, serverCookies, CookiesWithoutEquals.NAME);
-    }
-
-
-    /**
-     * Parse byte array as cookie header.
-     *
      * @param bytes                Source
      * @param offset               Start point in array
      * @param len                  Number of bytes to read
