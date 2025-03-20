@@ -53,7 +53,7 @@ public class TestApplicationFilterConfig extends TomcatBaseTest {
         tomcat.start();
 
         final MBeanServer mbeanServer =
-                Registry.getRegistryNonNull(null, null).getMBeanServer();
+                Registry.getRegistry(null).getMBeanServer();
 
         // There should be one Servlet MBean registered
         Set<ObjectName> servlets = mbeanServer.queryNames(

@@ -136,14 +136,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * Factory method to create (if necessary) and return our
      * <code>Registry</code> instance.
      *
-     * @param key Unused
      * @param guard Prevent access to the registry by untrusted components
-     *
      * @return the registry
      * @throws IllegalArgumentException if the guard object does not allow access
-     * @since 1.1
      */
-    public static synchronized Registry getRegistryNonNull(Object key, Object guard) {
+    public static synchronized Registry getRegistry(Object guard) {
         if (registry == null) {
             registry = new Registry();
             registry.guard = guard;

@@ -646,14 +646,14 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
             // Component not pre-registered so register it
             oname = createObjectName();
             if (oname != null) {
-                Registry.getRegistryNonNull(null, null).registerComponent(this, oname, null);
+                Registry.getRegistry(null).registerComponent(this, oname, null);
             }
         }
 
         if (this.domain != null) {
             ObjectName rgOname = new ObjectName(domain + ":type=GlobalRequestProcessor,name=" + getName());
             this.rgOname = rgOname;
-            Registry.getRegistryNonNull(null, null).registerComponent(getHandler().getGlobal(), rgOname, null);
+            Registry.getRegistry(null).registerComponent(getHandler().getGlobal(), rgOname, null);
         }
 
         String endpointName = getName();
@@ -764,7 +764,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         } finally {
             if (oname != null) {
                 if (mserver == null) {
-                    Registry.getRegistryNonNull(null, null).unregisterComponent(oname);
+                    Registry.getRegistry(null).unregisterComponent(oname);
                 } else {
                     // Possibly registered with a different MBeanServer
                     try {
@@ -777,7 +777,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
 
             ObjectName rgOname = getGlobalRequestProcessorMBeanName();
             if (rgOname != null) {
-                Registry.getRegistryNonNull(null, null).unregisterComponent(rgOname);
+                Registry.getRegistry(null).unregisterComponent(rgOname);
             }
         }
     }
@@ -1180,7 +1180,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         if (getLog().isTraceEnabled()) {
                             getLog().trace("Register [" + processor + "] as [" + rpName + "]");
                         }
-                        Registry.getRegistryNonNull(null, null).registerComponent(rp, rpName, null);
+                        Registry.getRegistry(null).registerComponent(rp, rpName, null);
                         rp.setRpName(rpName);
                     } catch (Exception e) {
                         getLog().warn(sm.getString("abstractProtocol.processorRegisterError"), e);
@@ -1204,7 +1204,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                         if (getLog().isTraceEnabled()) {
                             getLog().trace("Unregister [" + rpName + "]");
                         }
-                        Registry.getRegistryNonNull(null, null).unregisterComponent(rpName);
+                        Registry.getRegistry(null).unregisterComponent(rpName);
                         rp.setRpName(null);
                     } catch (Exception e) {
                         getLog().warn(sm.getString("abstractProtocol.processorUnregisterError"), e);

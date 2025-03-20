@@ -123,7 +123,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
 
         try {
             on = new ObjectName(name.toString());
-            Registry.getRegistryNonNull(null, null).registerComponent(obj, on, null);
+            Registry.getRegistry(null).registerComponent(obj, on, null);
         } catch (Exception e) {
             log.warn(sm.getString("lifecycleMBeanBase.registerFail", obj, name), e);
         }
@@ -143,7 +143,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
     protected final void unregister(String objectNameKeyProperties) {
         // Construct an object name with the right domain
         String name = getDomain() + ':' + objectNameKeyProperties;
-        Registry.getRegistryNonNull(null, null).unregisterComponent(name);
+        Registry.getRegistry(null).unregisterComponent(name);
     }
 
 
@@ -156,7 +156,7 @@ public abstract class LifecycleMBeanBase extends LifecycleBase implements JmxEna
      * @param on The name of the component to unregister
      */
     protected final void unregister(ObjectName on) {
-        Registry.getRegistryNonNull(null, null).unregisterComponent(on);
+        Registry.getRegistry(null).unregisterComponent(on);
     }
 
 

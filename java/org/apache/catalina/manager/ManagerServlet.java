@@ -245,7 +245,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         // Retrieve the MBean server
-        mBeanServer = Registry.getRegistryNonNull(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
 
     }
 

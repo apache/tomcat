@@ -372,7 +372,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
             ObjectName cloname =
                     new ObjectName(context.getDomain() + ":type=" + classLoader.getClass().getSimpleName() + ",host=" +
                             context.getParent().getName() + ",context=" + contextName);
-            Registry.getRegistryNonNull(null, null).registerComponent(classLoader, cloname, null);
+            Registry.getRegistry(null).registerComponent(classLoader, cloname, null);
 
         } catch (Throwable t) {
             Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
@@ -421,7 +421,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
                 ObjectName cloname =
                         new ObjectName(context.getDomain() + ":type=" + classLoader.getClass().getSimpleName() +
                                 ",host=" + context.getParent().getName() + ",context=" + contextName);
-                Registry.getRegistryNonNull(null, null).unregisterComponent(cloname);
+                Registry.getRegistry(null).unregisterComponent(cloname);
             } catch (Exception e) {
                 log.warn(sm.getString("webappLoader.stopError"), e);
             }
