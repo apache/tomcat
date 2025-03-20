@@ -38,7 +38,7 @@ import org.apache.jasper.JasperException;
  * @author Kin-man Chung
  */
 
-class PageInfo {
+public class PageInfo {
 
     private final List<String> imports;
     private final Map<String,Long> dependants;

@@ -713,7 +713,7 @@ public final class EmbeddedServletOptions implements Options {
         // web-application.
         tldCache = TldCache.getInstance(context);
 
-        // Setup the jsp config info for this web app.
+        // Set up the jsp config info for this web app.
         jspConfig = new JspConfig(context);
 
         // Create a Tag plugin instance

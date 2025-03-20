@@ -45,8 +45,8 @@ import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * The JSP engine (a.k.a Jasper). The servlet container is responsible for providing a URLClassLoader for the web
- * application context Jasper is being used in. Jasper will try get the Tomcat ServletContext attribute for its
+ * The Jasper JSP engine. The servlet container is responsible for providing a URLClassLoader for the web
+ * application context Jasper is being used in. Jasper will try to get the Tomcat ServletContext attribute for its
  * ServletContext class loader, if that fails, it uses the parent class loader. In either case, it must be a
  * URLClassLoader.
  *

@@ -81,7 +81,7 @@ public interface TagPluginContext {
     String getConstantAttribute(String attribute);
 
     /**
-     * Generate codes to evaluate value of a attribute in the custom tag The codes is a Java expression. NOTE: Currently
+     * Generate codes to evaluate value of an attribute in the custom tag The codes is a Java expression. NOTE: Currently
      * cannot handle attributes that are fragments.
      *
      * @param attribute The specified attribute
@@ -101,10 +101,10 @@ public interface TagPluginContext {
 
     /**
      * Get the PluginContext for the parent of this custom tag. NOTE: The operations available for PluginContext so
-     * obtained is limited to getPluginAttribute and setPluginAttribute, and queries (e.g. isScriptless(). There should
+     * obtained is limited to getPluginAttribute and setPluginAttribute, and queries (e.g. isScriptless()). There should
      * be no calls to generate*().
      *
-     * @return The pluginContext for the parent node. null if the parent is not a custom tag, or if the pluginContext if
+     * @return The pluginContext for the parent node. null if the parent is not a custom tag, or if the pluginContext is
      *             not available (because useTagPlugin is false, e.g).
      */
     TagPluginContext getParentContext();

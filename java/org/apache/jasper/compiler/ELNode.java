@@ -31,7 +31,7 @@ import org.apache.jasper.JasperException;
  * @author Kin-man Chung
  */
 
-abstract class ELNode {
+public abstract class ELNode {
 
     public abstract void accept(Visitor v) throws JasperException;
 

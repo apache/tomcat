@@ -27,8 +27,8 @@ import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 
 /**
- * Write text to a character-output stream, buffering characters so as to provide for the efficient writing of single
- * characters, arrays, and strings. Provide support for discarding for the output that has been buffered. This needs
+ * Write text to a character-output stream, buffering characters to provide efficient writing of single
+ * characters, arrays, and strings. Provide support for discarding the output that has been buffered. This needs
  * revisiting when the buffering problems in the JSP spec are fixed -akv
  *
  * @author Anil K. Vijendran
@@ -202,7 +202,7 @@ public class JspWriterImpl extends JspWriter {
     }
 
     /**
-     * Our own little min method, to avoid loading java.lang.Math if we've run out of file descriptors and we're trying
+     * Our own little min method, to avoid loading java.lang.Math if we've run out of file descriptors, and we're trying
      * to print a stack trace.
      */
     private static int min(int a, int b) {

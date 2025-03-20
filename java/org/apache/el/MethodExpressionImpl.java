@@ -52,7 +52,7 @@ import org.apache.el.util.ReflectionUtil;
  * provides the <code>base</code> object on which the method appears. If the <code>base</code> object is null, a
  * <code>NullPointerException</code> must be thrown. At the last resolution, the final <code>property</code> is then
  * coerced to a <code>String</code>, which provides the name of the method to be found. A method matching the name and
- * expected parameters provided at parse time is found and it is either queried or invoked (depending on the method
+ * expected parameters provided at parse time is found, and it is either queried or invoked (depending on the method
  * called on this <code>MethodExpression</code>).
  * </p>
  * <p>

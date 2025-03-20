@@ -2659,7 +2659,7 @@ class Generator {
                 // JspFragment, because a fragment is always scriptless.
                 // Thus, there is no need to save/ restore/ sync them.
                 // Note, that JspContextWrapper.syncFoo() methods will take
-                // care of saving/ restoring/ sync'ing of JspContext attributes.
+                // care of saving/ restoring/ syncing of JspContext attributes.
                 return;
             }
 
@@ -2731,7 +2731,7 @@ class Generator {
                 // JspFragment, because a fragment is always scriptless.
                 // Thus, there is no need to save/ restore/ sync them.
                 // Note, that JspContextWrapper.syncFoo() methods will take
-                // care of saving/ restoring/ sync'ing of JspContext attributes.
+                // care of saving/ restoring/ syncing of JspContext attributes.
                 return;
             }
 
@@ -2797,7 +2797,7 @@ class Generator {
                 // JspFragment, because a fragment is always scriptless.
                 // Thus, there is no need to save/ restore/ sync them.
                 // Note, that JspContextWrapper.syncFoo() methods will take
-                // care of saving/ restoring/ sync'ing of JspContext attributes.
+                // care of saving/ restoring/ syncing of JspContext attributes.
                 return;
             }
 
@@ -3191,7 +3191,7 @@ class Generator {
             fragmentHelperClass.closeFragment(fragment, methodNesting);
             // XXX - Need to change pageContext to jspContext if
             // we're not in a place where pageContext is defined (e.g.
-            // in a fragment or in a tag file.
+            // in a fragment or in a tag file).
             out.print("new " + fragmentHelperClass.getClassName() + "( " + fragment.getId() + ", _jspx_page_context, " +
                     tagHandlerVar + ", " + pushBodyCountVar + ")");
         }
@@ -3933,7 +3933,7 @@ class Generator {
         /*
          * For a CustomTag, the codes that are generated at the beginning of the tag may not be in the same buffer as
          * those for the body of the tag. Two fields are used here to keep this straight. For codes that do not
-         * corresponds to any JSP lines, they should be null.
+         * correspond to any JSP lines, they should be null.
          */
         private final Node node;
 

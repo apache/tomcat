@@ -63,7 +63,7 @@ public class Set implements TagPlugin {
         // get the iScope according to the strScope
         iScope = Util.getScope(strScope);
 
-        String jspCtxt = null;
+        String jspCtxt;
         if (ctxt.isTagFile()) {
             jspCtxt = "this.getJspContext()";
         } else {

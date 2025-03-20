@@ -42,7 +42,7 @@ public final class When implements TagPlugin {
         ctxt.generateBody();
 
         // We don't generate the closing "}" for the "if" here because there
-        // may be whitespaces in between <c:when>'s. Instead we delay
+        // may be whitespaces in between <c:when>'s. Instead, we delay
         // generating it until the next <c:when> or <c:otherwise> or
         // <c:choose>
     }

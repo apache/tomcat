@@ -30,8 +30,8 @@ import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 
 /**
- * Write text to a character-output stream, buffering characters so as to provide for the efficient writing of single
- * characters, arrays, and strings. Provide support for discarding for the output that has been buffered.
+ * Write text to a character-output stream, buffering characters to provide efficient writing of single
+ * characters, arrays, and strings. Provide support for discarding the output that has been buffered.
  *
  * @author Rajiv Mordani
  * @author Jan Luehe
@@ -365,7 +365,7 @@ public class BodyContentImpl extends BodyContent {
     public void writeOut(Writer out) throws IOException {
         if (writer == null) {
             out.write(cb, 0, nextChar);
-            // Flush not called as the writer passed could be a BodyContent and
+            // Flush not called as the writer passed could be a BodyContent, and
             // it doesn't allow to flush.
         }
     }

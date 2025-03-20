@@ -1176,10 +1176,10 @@ class Validator {
         /**
          * Preprocess attributes that can be expressions. Expression delimiters are stripped.
          * <p>
-         * If value is null, checks if there are any NamedAttribute subelements in the tree node, and if so, constructs
+         * If value is null, checks if there are any NamedAttribute sub elements in the tree node, and if so, constructs
          * a JspAttribute out of a child NamedAttribute node.
          *
-         * @param el EL expression, if already parsed by the caller (so that we can skip re-parsing it)
+         * @param el EL expression, if already parsed by the caller (so that we can skip reparsing it)
          */
         private Node.JspAttribute getJspAttribute(TagAttributeInfo tai, String qName, String uri, String localName,
                 String value, Node n, ELNode.Nodes el, boolean dynamic) throws JasperException {

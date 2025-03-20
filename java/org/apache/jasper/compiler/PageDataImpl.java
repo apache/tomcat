@@ -77,7 +77,7 @@ class PageDataImpl extends PageData implements TagConstants {
     }
 
     /*
-     * First-pass Visitor for JspRoot nodes (representing jsp:root elements) and TablibDirective nodes, ignoring any
+     * First-pass Visitor for JspRoot nodes (representing jsp:root elements) and TaglibDirective nodes, ignoring any
      * other nodes.
      *
      * The purpose of this Visitor is to collect the attributes of the top-level jsp:root and those of the jsp:root

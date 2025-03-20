@@ -33,7 +33,7 @@ public class Param implements TagPlugin {
         String encName = ctxt.getTemporaryVariableName();
         String index = ctxt.getTemporaryVariableName();
 
-        // if the param tag has no parents, throw a exception
+        // if the param tag has no parents, throw an exception
         TagPluginContext parent = ctxt.getParentContext();
         if (parent == null) {
             ctxt.generateJavaSource(

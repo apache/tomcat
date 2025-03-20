@@ -362,7 +362,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
      *
      * The SAX does not call this method with all of the template text, but may invoke this method with chunks of it.
      * This is a problem when we try to determine if the text contains only whitespaces, or when we are looking for an
-     * EL expression string. Therefore it is necessary to buffer and concatenate the chunks and process the concatenated
+     * EL expression string. Therefore, it is necessary to buffer and concatenate the chunks and process the concatenated
      * text later (at beginTag and endTag)
      *
      * @param buf The characters
@@ -533,12 +533,12 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
                     continue;
                 }
                 // Ignore any whitespace (including spaces, carriage returns,
-                // line feeds, and tabs, that appear at the beginning and at
+                // line feeds, and tabs) that appear at the beginning and at
                 // the end of the body of the <jsp:attribute> action, if the
                 // action's 'trim' attribute is set to TRUE (default).
                 // In addition, any textual nodes in the <jsp:attribute> that
-                // have only white space are dropped from the document, with
-                // the exception of leading and trailing white-space-only
+                // have only white space are dropped from the document,
+                // except for leading and trailing white-space-only
                 // textual nodes in a <jsp:attribute> whose 'trim' attribute
                 // is set to FALSE, which must be kept verbatim.
                 if (i == 0) {

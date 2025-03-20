@@ -185,8 +185,8 @@ public class ELSupport {
     }
 
     /*
-     * Going to have to have some casts /raw types somewhere so doing it here keeps them all in one place. There might
-     * be a neater / better solution but I couldn't find it.
+     * Going to have some casts /raw types somewhere so doing it here keeps them all in one place. There might
+     * be a neater / better solution, but I couldn't find it.
      */
     @SuppressWarnings("unchecked")
     public static Enum<?> coerceToEnum(final ELContext ctx, final Object obj,

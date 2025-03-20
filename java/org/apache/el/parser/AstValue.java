@@ -97,7 +97,8 @@ public final class AstValue extends SimpleNode {
                 i += 2;
 
                 if (property == null) {
-                    throw new PropertyNotFoundException(MessageFactory.get("error.unreachable.property", property));
+                    throw new PropertyNotFoundException(
+                            MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
                 }
             } else if (i + 1 < propCount) {
                 // Object with property not at end of expression
@@ -113,11 +114,13 @@ public final class AstValue extends SimpleNode {
                 i++;
 
                 if (property == null) {
-                    throw new PropertyNotFoundException(MessageFactory.get("error.unreachable.property", property));
+                    throw new PropertyNotFoundException(
+                            MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
                 }
             }
             if (base == null) {
-                throw new PropertyNotFoundException(MessageFactory.get("error.unreachable.property", property));
+                throw new PropertyNotFoundException(
+                        MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
             }
         }
 
