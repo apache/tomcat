@@ -163,7 +163,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         configBase = host.getConfigBaseFile();
 
         // Retrieve the MBean server
-        mBeanServer = Registry.getRegistryNonNull(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
 
         started = true;
         count = 0;
