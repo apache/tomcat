@@ -22,4 +22,26 @@ import org.apache.catalina.tribes.Member;
  * @author Peter Rossbach
  */
 public record SendMessageData(Object message, Member destination, Exception exception) {
+
+    /**
+     * @return the destination.
+     */
+    public Member getDestination() {
+        return destination;
+    }
+
+    /**
+     * @return the exception.
+     */
+    public Exception getException() {
+        return exception;
+    }
+
+    /**
+     * @return the message.
+     */
+    public Object getMessage() {
+        return message;
+    }
+
 }
