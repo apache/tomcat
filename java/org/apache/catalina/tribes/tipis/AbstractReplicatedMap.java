@@ -172,7 +172,7 @@ public abstract class AbstractReplicatedMap<K, V>
      * @param terminate          - Flag for whether to terminate this map that failed to start.
      */
     public AbstractReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName,
-            int initialCapacity, float loadFactor, int channelSendOptions, ClassLoader[] cls, boolean terminate) {
+                                 int initialCapacity, float loadFactor, int channelSendOptions, ClassLoader[] cls, boolean terminate) {
         innerMap = new ConcurrentHashMap<>(initialCapacity, loadFactor, 15);
         init(owner, channel, mapContextName, timeout, channelSendOptions, cls, terminate);
 
@@ -206,7 +206,7 @@ public abstract class AbstractReplicatedMap<K, V>
      * @param terminate          - Flag for whether to terminate this map that failed to start.
      */
     protected void init(MapOwner owner, Channel channel, String mapContextName, long timeout, int channelSendOptions,
-            ClassLoader[] cls, boolean terminate) {
+                        ClassLoader[] cls, boolean terminate) {
         long start = System.currentTimeMillis();
         if (log.isInfoEnabled()) {
             log.info(sm.getString("abstractReplicatedMap.init.start", mapContextName));
@@ -227,12 +227,10 @@ public abstract class AbstractReplicatedMap<K, V>
 
         // create a rpc channel and add the map as a listener
         this.rpcChannel = new RpcChannel(this.mapContextName, channel, this);
-        if (this.channel != null) {
-            // add this map as a message listener
-            this.channel.addChannelListener(this);
-            // listen for membership notifications
-            this.channel.addMembershipListener(this);
-        }
+        // add this map as a message listener
+        this.channel.addChannelListener(this);
+        // listen for membership notifications
+        this.channel.addMembershipListener(this);
 
         try {
             // broadcast our map, this just notifies other members of our existence
@@ -571,8 +569,7 @@ public abstract class AbstractReplicatedMap<K, V>
 
         // backup request
         if (mapmsg.getMsgType() == MapMessage.MSG_RETRIEVE_BACKUP) {
-            @SuppressWarnings("unchecked")
-            MapEntry<K,V> entry = innerMap.get((K) mapmsg.getKey());
+            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
             if (entry == null || (!entry.isSerializable())) {
                 return null;
             }
@@ -674,7 +671,7 @@ public abstract class AbstractReplicatedMap<K, V>
         }
 
         if (mapmsg.getMsgType() == MapMessage.MSG_PROXY) {
-            MapEntry<K,V> entry = innerMap.get((K) mapmsg.getKey());
+            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
             if (entry == null) {
                 entry = new MapEntry<>((K) mapmsg.getKey(), (V) mapmsg.getValue());
                 MapEntry<K,V> old = innerMap.putIfAbsent(entry.getKey(), entry);
@@ -690,11 +687,11 @@ public abstract class AbstractReplicatedMap<K, V>
         }
 
         if (mapmsg.getMsgType() == MapMessage.MSG_REMOVE) {
-            innerMap.remove((K) mapmsg.getKey());
+            innerMap.remove(mapmsg.getKey());
         }
 
         if (mapmsg.getMsgType() == MapMessage.MSG_BACKUP || mapmsg.getMsgType() == MapMessage.MSG_COPY) {
-            MapEntry<K,V> entry = innerMap.get((K) mapmsg.getKey());
+            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
             if (entry == null) {
                 entry = new MapEntry<>((K) mapmsg.getKey(), (V) mapmsg.getValue());
                 entry.setBackup(mapmsg.getMsgType() == MapMessage.MSG_BACKUP);
@@ -746,7 +743,7 @@ public abstract class AbstractReplicatedMap<K, V>
         } // end if
 
         if (mapmsg.getMsgType() == MapMessage.MSG_ACCESS) {
-            MapEntry<K,V> entry = innerMap.get((K) mapmsg.getKey());
+            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
             if (entry != null) {
                 entry.setBackupNodes(mapmsg.getBackupNodes());
                 entry.setPrimary(mapmsg.getPrimary());
@@ -757,7 +754,7 @@ public abstract class AbstractReplicatedMap<K, V>
         }
 
         if (mapmsg.getMsgType() == MapMessage.MSG_NOTIFY_MAPMEMBER) {
-            MapEntry<K,V> entry = innerMap.get((K) mapmsg.getKey());
+            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
             if (entry != null) {
                 entry.setBackupNodes(mapmsg.getBackupNodes());
                 entry.setPrimary(mapmsg.getPrimary());
@@ -996,8 +993,7 @@ public abstract class AbstractReplicatedMap<K, V>
     }
 
     public V remove(Object key, boolean notify) {
-        @SuppressWarnings("unchecked")
-        MapEntry<K,V> entry = innerMap.remove((K) key);
+        MapEntry<K,V> entry = innerMap.remove(key);
 
         try {
             if (getMapMembers().length > 0 && notify) {
@@ -1011,9 +1007,7 @@ public abstract class AbstractReplicatedMap<K, V>
         return entry != null ? entry.getValue() : null;
     }
 
-    public MapEntry<K,V> getInternal(Object keyObject) {
-        @SuppressWarnings("unchecked")
-        K key = (K) keyObject;
+    public MapEntry<K,V> getInternal(Object key) {
         return innerMap.get(key);
     }
 
@@ -1256,7 +1250,7 @@ public abstract class AbstractReplicatedMap<K, V>
         // todo, implement a counter variable instead
         // only count active members in this node
         int counter = 0;
-        for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
+        for (Entry<K,?> e : innerMap.entrySet()) {
             if (e != null) {
                 MapEntry<K, V> entry = innerMap.get(e.getKey());
                 if (entry != null && entry.isActive() && entry.getValue() != null) {
@@ -1499,7 +1493,7 @@ public abstract class AbstractReplicatedMap<K, V>
         }
 
         public MapMessage(byte[] mapId, int msgtype, boolean diff, Serializable key, Serializable value,
-                byte[] diffvalue, Member primary, Member[] nodes) {
+                          byte[] diffvalue, Member primary, Member[] nodes) {
             this.mapId = mapId;
             this.msgtype = msgtype;
             this.diff = diff;
