@@ -23,6 +23,12 @@ import org.apache.tomcat.InstanceManager;
 
 /**
  * Token used during the upgrade process.
+ *
+ * @param httpUpgradeHandler The handler for the HTTP upgrade
+ * @param contextBind        The object to use to bind/unbind the current thread to/from the web application class
+ *                               loader
+ * @param instanceManager    The instance manager to use to create new Servlets, Filters, Listeners etc
+ * @param protocol           The desired protocol to upgrade to
  */
 public record UpgradeToken(HttpUpgradeHandler httpUpgradeHandler, ContextBind contextBind,
                            InstanceManager instanceManager, String protocol) {

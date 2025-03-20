@@ -20,6 +20,11 @@ import org.apache.catalina.Wrapper;
 
 /**
  * Encapsulates information used to register a Wrapper mapping.
+ *
+ * @param mapping       The URL pattern)
+ * @param wrapper       The wrapper for the Servlet
+ * @param jspWildCard   Is this a mapping for JSP files?
+ * @param resourceOnly  Is this a resource only mapping?
  */
 public record WrapperMappingInfo(String mapping, Wrapper wrapper, boolean jspWildCard,
                                  boolean resourceOnly) {

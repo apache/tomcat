@@ -415,6 +415,9 @@ public class ExpiresFilter extends FilterBase {
 
     /**
      * Duration composed of an {@link #amount} and a {@link #unit}
+     *
+     * @param amount Magnitude of duration
+     * @param unit   Unit of duration
      */
     public record Duration(int amount, DurationUnit unit) {
         public int getAmount() {
