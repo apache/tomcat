@@ -425,6 +425,9 @@ public class DefaultServlet extends HttpServlet {
             useStrongETags = Boolean.parseBoolean(getServletConfig().getInitParameter("useStrongETags"));
         }
 
+        if (getServletConfig().getInitParameter("allowPostAsGet") != null) {
+            allowPostAsGet = Boolean.parseBoolean(getServletConfig().getInitParameter("allowPostAsGet"));
+        }
     }
 
     private CompressionFormat[] parseCompressionFormats(String precompressed, String gzip) {
