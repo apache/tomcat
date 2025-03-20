@@ -17,6 +17,7 @@
 package org.apache.jasper.runtime;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -35,6 +36,7 @@ import org.apache.jasper.compiler.Localizer;
  */
 public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected HttpJspBase() {

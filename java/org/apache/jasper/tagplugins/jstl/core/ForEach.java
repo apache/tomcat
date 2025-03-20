@@ -71,7 +71,7 @@ public final class ForEach implements TagPlugin {
     }
 
     /**
-     * Generate codes for Collections The pseudo code is:
+     * Generate codes for Collections The pseudocode is:
      */
     private void doCollection(TagPluginContext ctxt) {
 

@@ -290,7 +290,7 @@ public class ReflectionUtil {
             }
         }
         if (multiple) {
-            if (bestMatch.getExactCount() == paramCount - 1) {
+            if (bestMatch.exactCount() == paramCount - 1) {
                 // Only one parameter is not an exact match - try using the
                 // super class
                 match = resolveAmbiguousMethod(candidates.keySet(), paramTypes);
@@ -425,8 +425,7 @@ public class ReflectionUtil {
      * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     private static boolean isCoercibleFrom(EvaluationContext ctx, Object src, Class<?> target) {
-        // TODO: This isn't pretty but it works. Significant refactoring would
-        // be required to avoid the exception.
+        // TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the exception.
         try {
             ELSupport.coerceToType(ctx, src, target);
         } catch (ELException e) {
@@ -495,68 +494,29 @@ public class ReflectionUtil {
     /*
      * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
-    private static class MatchResult implements Comparable<MatchResult> {
-
-        private final boolean varArgs;
-        private final int exactCount;
-        private final int assignableCount;
-        private final int coercibleCount;
-        private final int varArgsCount;
-        private final boolean bridge;
-
-        MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
-                boolean bridge) {
-            this.varArgs = varArgs;
-            this.exactCount = exactCount;
-            this.assignableCount = assignableCount;
-            this.coercibleCount = coercibleCount;
-            this.varArgsCount = varArgsCount;
-            this.bridge = bridge;
-        }
-
-        public boolean isVarArgs() {
-            return varArgs;
-        }
-
-        public int getExactCount() {
-            return exactCount;
-        }
-
-        public int getAssignableCount() {
-            return assignableCount;
-        }
-
-        public int getCoercible() {
-            return coercibleCount;
-        }
-
-        public int getVarArgsCount() {
-            return varArgsCount;
-        }
-
-        public boolean isBridge() {
-            return bridge;
-        }
+    private record MatchResult(boolean varArgs, int exactCount, int assignableCount,
+                               int coercibleCount, int varArgsCount,
+                               boolean bridge) implements Comparable<MatchResult> {
 
         @Override
         public int compareTo(MatchResult o) {
             // Non-varArgs always beats varArgs
-            int cmp = Boolean.compare(o.isVarArgs(), this.isVarArgs());
+            int cmp = Boolean.compare(o.varArgs(), this.varArgs());
             if (cmp == 0) {
-                cmp = Integer.compare(this.getExactCount(), o.getExactCount());
+                cmp = Integer.compare(this.exactCount(), o.exactCount());
                 if (cmp == 0) {
-                    cmp = Integer.compare(this.getAssignableCount(), o.getAssignableCount());
+                    cmp = Integer.compare(this.assignableCount(), o.assignableCount());
                     if (cmp == 0) {
-                        cmp = Integer.compare(this.getCoercible(), o.getCoercible());
+                        cmp = Integer.compare(this.coercibleCount(), o.coercibleCount());
                         if (cmp == 0) {
                             // Fewer var args matches are better
-                            cmp = Integer.compare(o.getVarArgsCount(), this.getVarArgsCount());
+                            cmp = Integer.compare(o.varArgsCount(), this.varArgsCount());
                             if (cmp == 0) {
                                 // The nature of bridge methods is such that it actually
                                 // doesn't matter which one we pick as long as we pick
                                 // one. That said, pick the 'right' one (the non-bridge
                                 // one) anyway.
-                                cmp = Boolean.compare(o.isBridge(), this.isBridge());
+                                cmp = Boolean.compare(o.bridge(), this.bridge());
                             }
                         }
                     }
@@ -568,24 +528,24 @@ public class ReflectionUtil {
         @Override
         public boolean equals(Object o) {
             return o == this || (null != o && this.getClass().equals(o.getClass()) &&
-                    ((MatchResult) o).getExactCount() == this.getExactCount() &&
-                    ((MatchResult) o).getAssignableCount() == this.getAssignableCount() &&
-                    ((MatchResult) o).getCoercible() == this.getCoercible() &&
-                    ((MatchResult) o).getVarArgsCount() == this.getVarArgsCount() &&
-                    ((MatchResult) o).isVarArgs() == this.isVarArgs() &&
-                    ((MatchResult) o).isBridge() == this.isBridge());
+                    ((MatchResult) o).exactCount() == this.exactCount() &&
+                    ((MatchResult) o).assignableCount() == this.assignableCount() &&
+                    ((MatchResult) o).coercibleCount() == this.coercibleCount() &&
+                    ((MatchResult) o).varArgsCount() == this.varArgsCount() &&
+                    ((MatchResult) o).varArgs() == this.varArgs() &&
+                    ((MatchResult) o).bridge() == this.bridge());
         }
 
         @Override
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + assignableCount;
-            result = prime * result + (bridge ? 1231 : 1237);
-            result = prime * result + coercibleCount;
-            result = prime * result + exactCount;
-            result = prime * result + (varArgs ? 1231 : 1237);
-            result = prime * result + varArgsCount;
+            result = prime * result + assignableCount();
+            result = prime * result + (bridge() ? 1231 : 1237);
+            result = prime * result + coercibleCount();
+            result = prime * result + exactCount();
+            result = prime * result + (varArgs() ? 1231 : 1237);
+            result = prime * result + varArgsCount();
             return result;
         }
     }

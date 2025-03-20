@@ -59,7 +59,7 @@ public class JasperInitializer implements ServletContainerInitializer {
             log.debug(Localizer.getMessage(MSG + ".onStartup", context.getServletContextName()));
         }
 
-        // Setup a simple default Instance Manager
+        // Set up a simple default Instance Manager
         if (context.getAttribute(InstanceManager.class.getName()) == null) {
             context.setAttribute(InstanceManager.class.getName(), new SimpleInstanceManager());
         }

@@ -26,7 +26,7 @@ import org.apache.jasper.JspCompilationContext;
  *
  * @author Anil K. Vijendran
  */
-final class Mark {
+public final class Mark {
 
     // position within current stream
     int cursor, line, col;
@@ -125,8 +125,7 @@ final class Mark {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof Mark) {
-            Mark m = (Mark) other;
+        if (other instanceof Mark m) {
             return this.cursor == m.cursor && this.line == m.line && this.col == m.col;
         }
         return false;

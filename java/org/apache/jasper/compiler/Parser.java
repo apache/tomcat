@@ -562,7 +562,7 @@ class Parser implements TagConstants {
     }
 
     /*
-     * Parses a attribute directive with the following syntax: AttributeDirective ::= ( S Attribute)*
+     * Parses an attribute directive with the following syntax: AttributeDirective ::= ( S Attribute)*
      */
     private void parseAttributeDirective(Node parent) throws JasperException {
         Attributes attrs = parseAttributes();
@@ -955,8 +955,7 @@ class Parser implements TagConstants {
         boolean result = false;
 
         if (reader.matchesOptionalSpacesFollowedBy("<jsp:attribute")) {
-            // May be an EmptyBody, depending on whether
-            // There's a "<jsp:body" before the ETag
+            // It may be an EmptyBody, depending on whether there's a "<jsp:body" before the ETag
 
             // First, parse <jsp:attribute> elements:
             parseNamedAttributes(parent);
@@ -1121,7 +1120,7 @@ class Parser implements TagConstants {
         // 'CustomActionJSPContent', or 'CustomActionScriptlessContent'.
         // depending on body-content in TLD.
 
-        // Looking for a body, it still can be empty; but if there is a
+        // Looking for a body, it still can be empty; but if there is
         // a tag body, its syntax would be dependent on the type of
         // body content declared in the TLD.
         String bc;

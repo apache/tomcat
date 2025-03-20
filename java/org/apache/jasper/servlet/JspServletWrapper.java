@@ -49,8 +49,8 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.Jar;
 
 /**
- * The JSP engine (a.k.a Jasper). The servlet container is responsible for providing a URLClassLoader for the web
- * application context Jasper is being used in. Jasper will try get the Tomcat ServletContext attribute for its
+ * The Jasper JSP engine. The servlet container is responsible for providing a URLClassLoader for the web
+ * application context Jasper is being used in. Jasper will try to get the Tomcat ServletContext attribute for its
  * ServletContext class loader, if that fails, it uses the parent class loader. In either case, it must be a
  * URLClassLoader.
  *
@@ -81,8 +81,8 @@ public class JspServletWrapper {
     private final ServletConfig config;
     private final Options options;
     /*
-     * The servlet / tag file needs a compilation check on first access. Use a separate flag (rather then theServlet ==
-     * null / tagHandlerClass == null as it avoids the potentially expensive isOutDated() calls in ctxt.compile() if
+     * The servlet / tag file needs a compilation check on first access. Use a separate flag (rather than theServlet ==
+     * null / tagHandlerClass == null) as it avoids the potentially expensive isOutDated() calls in ctxt.compile() if
      * there are multiple concurrent requests for the servlet / tag before the class has been loaded.
      */
     private volatile boolean mustCompile = true;
@@ -273,7 +273,7 @@ public class JspServletWrapper {
 
     /**
      * Compile and load a prototype for the Tag file. This is needed when compiling tag files with circular
-     * dependencies. A prototype (skeleton) with no dependencies on other other tag files is generated and compiled.
+     * dependencies. A prototype (skeleton) with no dependencies on other tag files is generated and compiled.
      *
      * @return the loaded class
      *
@@ -513,8 +513,7 @@ public class JspServletWrapper {
      * Attempts to construct a JasperException that contains helpful information about what went wrong. Uses the JSP
      * compiler system to translate the line number in the generated servlet that originated the exception to a line
      * number in the JSP. Then constructs an exception containing that information, and a snippet of the JSP to help
-     * debugging. Please see https://bz.apache.org/bugzilla/show_bug.cgi?id=37062 and http://www.tfenne.com/jasper/ for
-     * more details.
+     * debugging. Please see <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=37062">BZ 37062</a> for more details.
      * </p>
      *
      * @param ex the exception that was the cause of the problem.
@@ -549,7 +548,7 @@ public class JspServletWrapper {
 
             if (smap == null) {
                 // If we couldn't find a frame in the stack trace corresponding
-                // to the generated servlet class or we don't have a copy of the
+                // to the generated servlet class, or we don't have a copy of the
                 // smap to hand, we can't really add anything
                 return new JasperException(ex);
             }
@@ -560,16 +559,16 @@ public class JspServletWrapper {
 
             // If the line number is less than one we couldn't find out
             // where in the JSP things went wrong
-            if (source.getLineNumber() < 1) {
+            if (source.lineNumber() < 1) {
                 throw new JasperException(ex);
             }
 
             JavacErrorDetail detail = new JavacErrorDetail(jspFrame.getMethodName(), javaLineNumber,
-                    source.getFileName(), source.getLineNumber(), null, ctxt);
+                    source.fileName(), source.lineNumber(), null, ctxt);
 
             if (options.getDisplaySourceFragment()) {
                 return new JasperException(
-                        Localizer.getMessage("jsp.exception", detail.getJspFileName(), "" + source.getLineNumber()) +
+                        Localizer.getMessage("jsp.exception", detail.getJspFileName(), "" + source.lineNumber()) +
                                 System.lineSeparator() + System.lineSeparator() + detail.getJspExtract() +
                                 System.lineSeparator() + System.lineSeparator() + "Stacktrace:",
                         ex);
@@ -577,7 +576,7 @@ public class JspServletWrapper {
             }
 
             return new JasperException(
-                    Localizer.getMessage("jsp.exception", detail.getJspFileName(), "" + source.getLineNumber()), ex);
+                    Localizer.getMessage("jsp.exception", detail.getJspFileName(), "" + source.lineNumber()), ex);
         } catch (Exception je) {
             // If anything goes wrong, just revert to the original behaviour
             if (ex instanceof JasperException) {
