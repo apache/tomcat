@@ -473,9 +473,6 @@ public class ExpiresFilter extends FilterBase {
      * <p>
      * Can be expressed like '{@code access plus 1 month 15 days 2 hours}'.
      * </p>
-     *
-     * @param durations     List of duration elements.
-     * @param startingPoint Starting point of the elapse to set in the response.
      */
     protected static class ExpiresConfiguration {
         /**

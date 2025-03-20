@@ -2217,11 +2217,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    /*
-     * The use of getPackage() is appropriate given that the code is checking if the package is sealed. Therefore,
-     * parent class loaders need to be checked.
-     */
-    @SuppressWarnings("deprecation")
     private Class<?> findClassInternal(String name, String path) {
         ResourceEntry entry = resourceEntries.get(path);
         WebResource resource = null;

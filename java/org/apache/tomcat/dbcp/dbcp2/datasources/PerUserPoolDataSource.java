@@ -665,7 +665,6 @@ public class PerUserPoolDataSource extends InstanceKeyDataSource {
      * @throws IOException            Any of the usual Input/Output related exceptions.
      * @throws ClassNotFoundException A class of a serialized object cannot be found.
      */
-    @SuppressWarnings("resource")
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         this.managers = readObjectImpl().managers;
