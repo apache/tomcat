@@ -149,6 +149,13 @@
         always return <code>null</code> if the provided name starts with
         <code>/</code>. (markt)
       </fix>
+      <update>
+        Update the default value for the <code>allowPostAsGet</code>
+        initialisation parameter of the Default servlet from <code>true</code>
+        to <code>false</code>. This means a direct request (i.e. not a forward
+        or an include) for a static resource using the POST method will be
+        rejected by default. (markt)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Return 400 if the amount of content sent for a partial PUT is
