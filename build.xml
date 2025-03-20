@@ -1915,6 +1915,9 @@
   <target name="test" description="Runs the JUnit test cases"
           depends="test-nio,test-nio2,test-apr,coverage-report,test-status" />
 
+  <target name="test-clean" description="Runs the JUnit test cases"
+          depends="clean-classes,test-nio,test-nio2,coverage-report,test-status" />
+
   <target name="test-only" description="Runs the JUnit test cases, without compilation"
           depends="test-only-nio,test-only-nio2,test-only-apr,test-status" />
 
@@ -3524,6 +3527,11 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
     <delete file="webapps/docs/jdbc-pool.xml"/>
   </target>
 
+
+  <target name="clean-classes">
+    <delete dir="${tomcat.classes}" />
+    <delete dir="${test.classes}" />
+  </target>
 
   <!-- ================ Download and dependency building =================== -->
 
