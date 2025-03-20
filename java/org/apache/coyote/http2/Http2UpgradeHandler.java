@@ -1917,6 +1917,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     protected record PingRecord(int sequence, long sentNanoTime) {
+        public int getSequence() {
+            return sequence;
+        }
+
+        public long getSentNanoTime() {
+            return sentNanoTime;
+        }
     }
 
 

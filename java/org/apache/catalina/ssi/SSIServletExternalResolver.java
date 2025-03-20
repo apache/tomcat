@@ -503,5 +503,12 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     }
 
     protected record ServletContextAndPath(ServletContext servletContext, String path) {
+        public ServletContext getServletContext() {
+            return servletContext;
+        }
+
+        public String getPath() {
+            return path;
+        }
     }
 }
