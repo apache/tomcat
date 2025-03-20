@@ -35,9 +35,9 @@ import org.apache.jasper.compiler.TldCache;
 public interface Options {
 
     /**
-     * Returns true if Jasper issues a compilation error instead of a runtime
-     * Instantiation error if the class attribute specified in useBean action
-     * is invalid.
+     * Returns true if Jasper issues a compilation error instead of a runtime Instantiation error if the class attribute
+     * specified in useBean action is invalid.
+     *
      * @return <code>true</code> to get an error
      */
     boolean getErrorOnUseBeanInvalidClassAttribute();
@@ -48,8 +48,7 @@ public interface Options {
     boolean getKeepGenerated();
 
     /**
-     * @return <code>true</code> if tag handler pooling is enabled,
-     *  <code>false</code> otherwise.
+     * @return <code>true</code> if tag handler pooling is enabled, <code>false</code> otherwise.
      */
     boolean isPoolingEnabled();
 
@@ -59,8 +58,7 @@ public interface Options {
     boolean getMappedFile();
 
     /**
-     * @return <code>true</code> if debug information in included
-     *  in compiled classes.
+     * @return <code>true</code> if debug information in included in compiled classes.
      */
     boolean getClassDebugInfo();
 
@@ -70,53 +68,48 @@ public interface Options {
     int getCheckInterval();
 
     /**
-     * Main development flag, which enables detailed error reports with
-     *  sources, as well automatic recompilation of JSPs and tag files.
-     *  This setting should usually be <code>false</code> when running
-     *  in production.
+     * Main development flag, which enables detailed error reports with sources, as well automatic recompilation of JSPs
+     * and tag files. This setting should usually be <code>false</code> when running in production.
+     *
      * @return <code>true</code> if Jasper is in development mode
      */
     boolean getDevelopment();
 
     /**
-     * @return <code>true</code> to include a source fragment in exception
-     *  messages.
+     * @return <code>true</code> to include a source fragment in exception messages.
      */
     boolean getDisplaySourceFragment();
 
     /**
-     * @return <code>true</code> to suppress generation of SMAP info for
-     *  JSR45 debugging.
+     * @return <code>true</code> to suppress generation of SMAP info for JSR45 debugging.
      */
     boolean isSmapSuppressed();
 
     /**
      * This setting is ignored if suppressSmap() is <code>true</code>.
-     * @return <code>true</code> to write SMAP info for JSR45 debugging to a
-     * file.
+     *
+     * @return <code>true</code> to write SMAP info for JSR45 debugging to a file.
      */
     boolean isSmapDumped();
 
     /**
-     * @return {@link TrimSpacesOption#TRUE} to remove template text that
-     *         consists only of whitespace from the output completely,
-     *         {@link TrimSpacesOption#SINGLE} to replace such template text
-     *         with a single space, {@link TrimSpacesOption#FALSE} to leave
-     *         such template text unchanged or {@link TrimSpacesOption#EXTENDED}
-     *         to remove template text that consists only of whitespace and to
-     *         replace any sequence of whitespace and new lines within template
-     *         text with a single new line.
+     * @return {@link TrimSpacesOption#TRUE} to remove template text that consists only of whitespace from the output
+     *             completely, {@link TrimSpacesOption#SINGLE} to replace such template text with a single space,
+     *             {@link TrimSpacesOption#FALSE} to leave such template text unchanged or
+     *             {@link TrimSpacesOption#EXTENDED} to remove template text that consists only of whitespace and to
+     *             replace any sequence of whitespace and new lines within template text with a single new line.
      */
     TrimSpacesOption getTrimSpaces();
 
     /**
-     * Gets the class-id value that is sent to Internet Explorer when using
-     * &lt;jsp:plugin&gt; tags.
+     * Gets the class-id value that is sent to Internet Explorer when using &lt;jsp:plugin&gt; tags.
+     *
      * @return Class-id value
      *
      * @deprecated Will be removed in Tomcat 10.1.x
      */
-    @Deprecated String getIeClassId();
+    @Deprecated
+    String getIeClassId();
 
     /**
      * @return the work folder
@@ -130,13 +123,11 @@ public interface Options {
 
     /**
      * Compiler to use.
-     *
      * <p>
-     * If <code>null</code> (the default), the java compiler from Eclipse JDT
-     * project, bundled with Tomcat, will be used. Otherwise, the
-     * <code>javac</code> task from Apache Ant will be used to call an external
-     * java compiler and the value of this option will be passed to it. See
-     * Apache Ant documentation for the possible values.
+     * If <code>null</code> (the default), the java compiler from Eclipse JDT project, bundled with Tomcat, will be
+     * used. Otherwise, the <code>javac</code> task from Apache Ant will be used to call an external java compiler and
+     * the value of this option will be passed to it. See Apache Ant documentation for the possible values.
+     *
      * @return the compiler name
      */
     String getCompiler();
@@ -157,14 +148,11 @@ public interface Options {
     String getCompilerClassName();
 
     /**
-     * The cache that maps URIs, resource paths and parsed TLD files for the
-     * various tag libraries 'exposed' by the web application.
-     * A tag library is 'exposed' either explicitly in
-     * web.xml or implicitly via the uri tag in the TLD
-     * of a taglib deployed in a jar file (WEB-INF/lib).
+     * The cache that maps URIs, resource paths and parsed TLD files for the various tag libraries 'exposed' by the web
+     * application. A tag library is 'exposed' either explicitly in web.xml or implicitly via the uri tag in the TLD of
+     * a taglib deployed in a jar file (WEB-INF/lib).
      *
-     * @return the instance of the TldCache
-     *  for the web-application.
+     * @return the instance of the TldCache for the web-application.
      */
     TldCache getTldCache();
 
@@ -175,10 +163,9 @@ public interface Options {
 
     /**
      * The boolean flag to tell Ant whether to fork JSP page compilations.
-     *
      * <p>
-     * Is used only when Jasper uses an external java compiler (wrapped through
-     * a <code>javac</code> Apache Ant task).
+     * Is used only when Jasper uses an external java compiler (wrapped through a <code>javac</code> Apache Ant task).
+     *
      * @return <code>true</code> to fork a process during compilation
      */
     boolean getFork();
@@ -201,8 +188,7 @@ public interface Options {
     /**
      * Indicates whether text strings are to be generated as char arrays.
      *
-     * @return <code>true</code> if text strings are to be generated as char
-     *         arrays, <code>false</code> otherwise
+     * @return <code>true</code> if text strings are to be generated as char arrays, <code>false</code> otherwise
      */
     boolean genStringAsCharArray();
 
@@ -218,54 +204,51 @@ public interface Options {
     boolean getRecompileOnFail();
 
     /**
-     * @return <code>true</code> is caching is enabled
-     *  (used for precompilation).
+     * @return <code>true</code> is caching is enabled (used for precompilation).
      */
     boolean isCaching();
 
     /**
-     * The web-application wide cache for the TagLibraryInfo tag library
-     * descriptors, used if {@link #isCaching()} returns <code>true</code>.
-     *
+     * The web-application wide cache for the TagLibraryInfo tag library descriptors, used if {@link #isCaching()}
+     * returns <code>true</code>.
      * <p>
-     * Using this cache avoids the cost of repeating the parsing of a tag
-     * library descriptor XML file (performed by TagLibraryInfoImpl.parseTLD).
+     * Using this cache avoids the cost of repeating the parsing of a tag library descriptor XML file (performed by
+     * TagLibraryInfoImpl.parseTLD).
      * </p>
      *
      * @return the Map(String uri, TagLibraryInfo tld) instance.
      */
-    Map<String, TagLibraryInfo> getCache();
+    Map<String,TagLibraryInfo> getCache();
 
     /**
-     * The maximum number of loaded jsps per web-application. If there are more
-     * jsps loaded, they will be unloaded. If unset or less than 0, no jsps
-     * are unloaded.
+     * The maximum number of loaded jsps per web-application. If there are more jsps loaded, they will be unloaded. If
+     * unset or less than 0, no jsps are unloaded.
+     *
      * @return The JSP count
      */
     int getMaxLoadedJsps();
 
     /**
-     * @return the idle time in seconds after which a JSP is unloaded.
-     * If unset or less or equal than 0, no jsps are unloaded.
+     * @return the idle time in seconds after which a JSP is unloaded. If unset or less or equal than 0, no jsps are
+     *             unloaded.
      */
     int getJspIdleTimeout();
 
     /**
-     * @return {@code true} if the quote escaping required by section JSP.1.6 of
-     *         the JSP specification should be applied to scriplet expression.
+     * @return {@code true} if the quote escaping required by section JSP.1.6 of the JSP specification should be applied
+     *             to scriplet expression.
      */
     boolean getStrictQuoteEscaping();
 
     /**
-     * @return {@code true} if EL expressions used within attributes should have
-     *         the quoting rules in JSP.1.6 applied to the expression.
+     * @return {@code true} if EL expressions used within attributes should have the quoting rules in JSP.1.6 applied to
+     *             the expression.
      */
     boolean getQuoteAttributeEL();
 
     /**
-     * Should the container include the time the file was generated in the
-     * comments at the start of a Java file generated from a JSP or tag.
-     * Defaults to {@code true}.
+     * Should the container include the time the file was generated in the comments at the start of a Java file
+     * generated from a JSP or tag. Defaults to {@code true}.
      *
      * @return {@code true} to include the timestamp, otherwise don't include it
      */

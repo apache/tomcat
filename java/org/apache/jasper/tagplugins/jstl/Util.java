@@ -36,22 +36,18 @@ import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 
 /**
- * Util contains some often used consts, static methods and embedded class
- * to support the JSTL tag plugin.
+ * Util contains some often used consts, static methods and embedded class to support the JSTL tag plugin.
  */
 
 public class Util {
 
-    private static final String VALID_SCHEME_CHAR =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+.-";
+    private static final String VALID_SCHEME_CHAR = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+.-";
 
-    public static final String DEFAULT_ENCODING =
-        "ISO-8859-1";
+    public static final String DEFAULT_ENCODING = "ISO-8859-1";
 
     private static final int HIGHEST_SPECIAL = '>';
 
-    private static final char[][] specialCharactersRepresentation =
-            new char[HIGHEST_SPECIAL + 1][];
+    private static final char[][] specialCharactersRepresentation = new char[HIGHEST_SPECIAL + 1][];
 
     static {
         specialCharactersRepresentation['&'] = "&amp;".toCharArray();
@@ -62,26 +58,22 @@ public class Util {
     }
 
     /**
-     * Converts the given string description of a scope to the corresponding
-     * PageContext constant.
-     *
-     * The validity of the given scope has already been checked by the
-     * appropriate TLV.
+     * Converts the given string description of a scope to the corresponding PageContext constant. The validity of the
+     * given scope has already been checked by the appropriate TLV.
      *
      * @param scope String description of scope
      *
-     * @return PageContext constant corresponding to given scope description
-     *
-     * taken from org.apache.taglibs.standard.tag.common.core.Util
+     * @return PageContext constant corresponding to given scope description taken from
+     *             org.apache.taglibs.standard.tag.common.core.Util
      */
-    public static int getScope(String scope){
+    public static int getScope(String scope) {
         int ret = PageContext.PAGE_SCOPE;
 
-        if("request".equalsIgnoreCase(scope)){
+        if ("request".equalsIgnoreCase(scope)) {
             ret = PageContext.REQUEST_SCOPE;
-        }else if("session".equalsIgnoreCase(scope)){
+        } else if ("session".equalsIgnoreCase(scope)) {
             ret = PageContext.SESSION_SCOPE;
-        }else if("application".equalsIgnoreCase(scope)){
+        } else if ("application".equalsIgnoreCase(scope)) {
             ret = PageContext.APPLICATION_SCOPE;
         }
 
@@ -89,24 +81,25 @@ public class Util {
     }
 
     /**
-     * Returns <code>true</code> if our current URL is absolute,
-     * <code>false</code> otherwise.
-     * taken from org.apache.taglibs.standard.tag.common.core.ImportSupport
+     * Returns <code>true</code> if our current URL is absolute, <code>false</code> otherwise. taken from
+     * org.apache.taglibs.standard.tag.common.core.ImportSupport
+     *
      * @param url The URL
+     *
      * @return <code>true</code> if the URL is absolute
      */
-    public static boolean isAbsoluteUrl(String url){
-        if(url == null){
+    public static boolean isAbsoluteUrl(String url) {
+        if (url == null) {
             return false;
         }
 
         int colonPos = url.indexOf(':');
-        if(colonPos == -1){
+        if (colonPos == -1) {
             return false;
         }
 
-        for(int i=0;i<colonPos;i++){
-            if(VALID_SCHEME_CHAR.indexOf(url.charAt(i)) == -1){
+        for (int i = 0; i < colonPos; i++) {
+            if (VALID_SCHEME_CHAR.indexOf(url.charAt(i)) == -1) {
                 return false;
             }
         }
@@ -115,11 +108,12 @@ public class Util {
     }
 
     /**
-     * Get the value associated with a content-type attribute.
-     * Syntax defined in RFC 2045, section 5.1.
-     * taken from org.apache.taglibs.standard.tag.common.core.Util
+     * Get the value associated with a content-type attribute. Syntax defined in RFC 2045, section 5.1. taken from
+     * org.apache.taglibs.standard.tag.common.core.Util
+     *
      * @param input The attribute string
-     * @param name The attribute name
+     * @param name  The attribute name
+     *
      * @return the attribute value
      */
     public static String getContentTypeAttribute(String input, String name) {
@@ -158,13 +152,12 @@ public class Util {
     }
 
     /**
-     * Strips a servlet session ID from <code>url</code>.  The session ID
-     * is encoded as a URL "path parameter" beginning with "jsessionid=".
-     * We thus remove anything we find between ";jsessionid=" (inclusive)
-     * and either EOS or a subsequent ';' (exclusive).
+     * Strips a servlet session ID from <code>url</code>. The session ID is encoded as a URL "path parameter" beginning
+     * with "jsessionid=". We thus remove anything we find between ";jsessionid=" (inclusive) and either EOS or a
+     * subsequent ';' (exclusive). taken from org.apache.taglibs.standard.tag.common.core.ImportSupport
      *
-     * taken from org.apache.taglibs.standard.tag.common.core.ImportSupport
      * @param url The URL
+     *
      * @return the URL without a user submitted session id parameter
      */
     public static String stripSession(String url) {
@@ -185,19 +178,18 @@ public class Util {
 
 
     /**
-     * Performs the following substring replacements
-     * (to facilitate output to XML/HTML pages):
+     * Performs the following substring replacements (to facilitate output to XML/HTML pages):
      * <ul>
-     *    <li>{@code &} -&gt; {@code &amp}</li>
-     *    <li>{@code <} -&gt; {@code &lt;}</li>
-     *    <li>{@code >} -&gt; {@code &gt;}</li>
-     *    <li>{@code "} -&gt; {@code &#034;}</li>
-     *    <li>{@code '} -&gt; {@code &#039;}</li>
+     * <li>{@code &} -&gt; {@code &amp}</li>
+     * <li>{@code <} -&gt; {@code &lt;}</li>
+     * <li>{@code >} -&gt; {@code &gt;}</li>
+     * <li>{@code "} -&gt; {@code &#034;}</li>
+     * <li>{@code '} -&gt; {@code &#039;}</li>
      * </ul>
-     * See also OutSupport.writeEscapedXml().
+     * See also OutSupport.writeEscapedXml(). taken from org.apache.taglibs.standard.tag.common.core.Util
      *
-     * taken from org.apache.taglibs.standard.tag.common.core.Util
      * @param buffer Data to escape
+     *
      * @return escaped data
      */
     public static String escapeXml(String buffer) {
@@ -225,7 +217,7 @@ public class Util {
                     }
                     // add unescaped portion
                     if (start < i) {
-                        escapedBuffer.append(arrayBuffer,start,i-start);
+                        escapedBuffer.append(arrayBuffer, start, i - start);
                     }
                     start = i + 1;
                     // add escaped xml
@@ -239,31 +231,30 @@ public class Util {
         }
         // add rest of unescaped portion
         if (start < length) {
-            escapedBuffer.append(arrayBuffer,start,length-start);
+            escapedBuffer.append(arrayBuffer, start, length - start);
         }
         return escapedBuffer.toString();
     }
 
     /**
-     * Utility methods
-     * taken from org.apache.taglibs.standard.tag.common.core.UrlSupport
-     * @param url The URL
-     * @param context The context
+     * Utility methods taken from org.apache.taglibs.standard.tag.common.core.UrlSupport
+     *
+     * @param url         The URL
+     * @param context     The context
      * @param pageContext The page context
+     *
      * @return the absolute URL
+     *
      * @throws JspException If the URL doesn't start with '/'
      */
-    public static String resolveUrl(
-            String url, String context, PageContext pageContext)
-    throws JspException {
+    public static String resolveUrl(String url, String context, PageContext pageContext) throws JspException {
         // don't touch absolute URLs
         if (isAbsoluteUrl(url)) {
             return url;
         }
 
         // normalize relative URLs against a context root
-        HttpServletRequest request =
-            (HttpServletRequest) pageContext.getRequest();
+        HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
         if (context == null) {
             if (url.startsWith("/")) {
                 return request.getContextPath() + url;
@@ -286,10 +277,10 @@ public class Util {
     }
 
     /**
-     * Wraps responses to allow us to retrieve results as Strings. Mainly taken
-     * from org.apache.taglibs.standard.tag.common.core.importSupport.
+     * Wraps responses to allow us to retrieve results as Strings. Mainly taken from
+     * org.apache.taglibs.standard.tag.common.core.importSupport.
      */
-    public static class ImportResponseWrapper extends HttpServletResponseWrapper{
+    public static class ImportResponseWrapper extends HttpServletResponseWrapper {
 
         private final StringWriter sw = new StringWriter();
         private final ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -310,7 +301,6 @@ public class Util {
                 // Non-blocking IO not supported
                 throw new UnsupportedOperationException();
             }
-
 
 
         };
@@ -361,11 +351,11 @@ public class Util {
             return status;
         }
 
-        public String getCharEncoding(){
+        public String getCharEncoding() {
             return this.charEncoding;
         }
 
-        public void setCharEncoding(String ce){
+        public void setCharEncoding(String ce) {
             this.charEncoding = ce;
         }
 
@@ -378,8 +368,7 @@ public class Util {
                 } else {
                     return bos.toString("ISO-8859-1");
                 }
-            }
-            else {
+            } else {
                 return ""; // target didn't write anything
             }
         }

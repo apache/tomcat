@@ -71,8 +71,7 @@ public final class ForEach implements TagPlugin {
     }
 
     /**
-     * Generate codes for Collections
-     * The pseudo code is:
+     * Generate codes for Collections The pseudo code is:
      */
     private void doCollection(TagPluginContext ctxt) {
 
@@ -84,7 +83,7 @@ public final class ForEach implements TagPlugin {
         ctxt.generateAttribute("items");
         ctxt.generateJavaSource(";");
 
-        String indexV=null, beginV=null, endV=null, stepV=null;
+        String indexV = null, beginV = null, endV = null, stepV = null;
         if (hasBegin) {
             beginV = ctxt.getTemporaryVariableName();
             ctxt.generateJavaSource("int " + beginV + " = ");
@@ -161,9 +160,8 @@ public final class ForEach implements TagPlugin {
 
         if (hasBegin) {
             String tV = ctxt.getTemporaryVariableName();
-            ctxt.generateJavaSource("for (int " + tV + "=" + beginV + ";" +
-                    tV + ">0 && " + iterV + ".hasNext(); " +
-                    tV + "--)");
+            ctxt.generateJavaSource(
+                    "for (int " + tV + "=" + beginV + ";" + tV + ">0 && " + iterV + ".hasNext(); " + tV + "--)");
             ctxt.generateJavaSource(iterV + ".next();");
         }
 
@@ -178,9 +176,8 @@ public final class ForEach implements TagPlugin {
 
         if (hasStep) {
             String tV = ctxt.getTemporaryVariableName();
-            ctxt.generateJavaSource("for (int " + tV + "=" + stepV + "-1;" +
-                    tV + ">0 && " + iterV + ".hasNext(); " +
-                    tV + "--)");
+            ctxt.generateJavaSource(
+                    "for (int " + tV + "=" + stepV + "-1;" + tV + ">0 && " + iterV + ".hasNext(); " + tV + "--)");
             ctxt.generateJavaSource(iterV + ".next();");
         }
         if (hasEnd) {
@@ -190,8 +187,7 @@ public final class ForEach implements TagPlugin {
                 ctxt.generateJavaSource(indexV + "++;");
             }
             if (hasBegin) {
-                ctxt.generateJavaSource("if(" + beginV + "+" + indexV +
-                        ">"+ endV + ")");
+                ctxt.generateJavaSource("if(" + beginV + "+" + indexV + ">" + endV + ")");
             } else {
                 ctxt.generateJavaSource("if(" + indexV + ">" + endV + ")");
             }
