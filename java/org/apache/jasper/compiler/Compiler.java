@@ -108,9 +108,10 @@ public abstract class Compiler {
      */
     protected Map<String,SmapStratum> generateJava() throws Exception {
 
-        long t1, t2, t3, t4;
-
-        t1 = t2 = t3 = t4 = 0;
+        long t1 = 0;
+        long t2 = 0;
+        long t3 = 0;
+        long t4;
 
         if (log.isDebugEnabled()) {
             t1 = System.currentTimeMillis();
@@ -244,9 +245,9 @@ public abstract class Compiler {
                 Generator.generate(writer, this, pageNodes);
             }
 
-            // The writer is only used during the compile, dereference
+            // The writer is only used during compile, dereference
             // it in the JspCompilationContext when done to allow it
-            // to be GC'd and save memory.
+            // to be GCed and save memory.
             ctxt.setWriter(null);
 
             if (log.isTraceEnabled()) {
@@ -276,7 +277,7 @@ public abstract class Compiler {
             ctxt.getRuntimeContext().getSmaps().putAll(smaps);
         }
 
-        // If any proto type .java and .class files was generated,
+        // If any prototype .java and .class files was generated,
         // the prototype .java may have been replaced by the current
         // compilation (if the tag file is self referencing), but the
         // .class file need to be removed, to make sure that javac would
@@ -288,7 +289,7 @@ public abstract class Compiler {
 
     private ServletWriter setupContextWriter(String javaFileName) throws FileNotFoundException, JasperException {
         ServletWriter writer;
-        // Setup the ServletWriter
+        // Set up the ServletWriter
         String javaEncoding = ctxt.getOptions().getJavaEncoding();
         OutputStreamWriter osw = null;
 
@@ -332,7 +333,7 @@ public abstract class Compiler {
     }
 
     /**
-     * Compile the jsp file from the current engine context. As an side- effect, tag files that are referenced by this
+     * Compile the jsp file from the current engine context. As a side effect, tag files that are referenced by this
      * page are also compiled.
      *
      * @param compileClass If true, generate both .java and .class file If false, generate only .java file
@@ -346,7 +347,7 @@ public abstract class Compiler {
     }
 
     /**
-     * Compile the jsp file from the current engine context. As an side- effect, tag files that are referenced by this
+     * Compile the jsp file from the current engine context. As a side effect, tag files that are referenced by this
      * page are also compiled.
      *
      * @param compileClass If true, generate both .java and .class file If false, generate only .java file
@@ -389,7 +390,7 @@ public abstract class Compiler {
             }
             // Make sure these object which are only used during the
             // generation and compilation of the JSP page get
-            // dereferenced so that they can be GC'd and reduce the
+            // dereferenced so that they can be GCed and reduce the
             // memory footprint.
             tfp = null;
             errDispatcher = null;
@@ -416,7 +417,7 @@ public abstract class Compiler {
     /**
      * Determine if a compilation is necessary by checking the time stamp of the JSP page with that of the corresponding
      * .class or .java file. If the page has dependencies, the check is also extended to its dependents, and so on. This
-     * method can by overridden by a subclasses of Compiler.
+     * method can be overridden by a subclasses of Compiler.
      *
      * @param checkClass If true, check against .class file, if false, check against .java file.
      *

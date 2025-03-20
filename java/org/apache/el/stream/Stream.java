@@ -460,14 +460,7 @@ public class Stream {
     }
 
 
-    private static class LambdaExpressionComparator implements Comparator<Object> {
-
-        private final LambdaExpression le;
-
-        LambdaExpressionComparator(LambdaExpression le) {
-            this.le = le;
-        }
-
+    private record LambdaExpressionComparator(LambdaExpression le) implements Comparator<Object> {
         @Override
         public int compare(Object o1, Object o2) {
             return ELSupport.coerceToNumber(null, le.invoke(o1, o2), Integer.class).intValue();

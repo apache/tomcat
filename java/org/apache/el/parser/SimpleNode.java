@@ -176,10 +176,9 @@ public abstract class SimpleNode implements Node {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof SimpleNode)) {
+        if (!(obj instanceof SimpleNode other)) {
             return false;
         }
-        SimpleNode other = (SimpleNode) obj;
         if (id != other.id) {
             return false;
         }

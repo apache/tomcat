@@ -166,9 +166,7 @@ public final class ExpressionBuilder implements NodeVisitor {
 
     @Override
     public void visit(Node node) throws ELException {
-        if (node instanceof AstFunction) {
-
-            AstFunction funcNode = (AstFunction) node;
+        if (node instanceof AstFunction funcNode) {
 
             Method m = null;
 

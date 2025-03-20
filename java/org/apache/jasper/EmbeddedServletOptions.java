@@ -876,11 +876,11 @@ public final class EmbeddedServletOptions implements Options {
             }
         }
 
-        // Setup the global Tag Libraries location cache for this
+        // Set up the global Tag Libraries location cache for this
         // web-application.
         tldCache = TldCache.getInstance(context);
 
-        // Setup the jsp config info for this web app.
+        // Set up the jsp config info for this web app.
         jspConfig = new JspConfig(context);
 
         // Create a Tag plugin instance

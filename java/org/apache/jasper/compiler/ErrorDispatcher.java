@@ -250,7 +250,7 @@ public class ErrorDispatcher {
                     file = where.getFile();
                 }
             } else {
-                // Get the context-relative resource path, so as to not disclose any local file system details
+                // Get the context-relative resource path, to avoid disclosing any local file system details
                 file = where.getFile();
             }
             line = where.getLineNumber();
