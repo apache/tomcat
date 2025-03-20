@@ -262,6 +262,13 @@ public class DefaultServlet extends HttpServlet {
      */
     private boolean useStrongETags = false;
 
+    /**
+     * Will direct ({@link DispatcherType#REQUEST} or {@link DispatcherType#ASYNC}) requests using the POST method be
+     * processed as GET requests. If not allowed, direct requests using the POST method will be rejected with a 405
+     * (method not allowed).
+     */
+    private boolean allowPostAsGet = true;
+
 
     // --------------------------------------------------------- Public Methods
 
@@ -551,7 +558,11 @@ public class DefaultServlet extends HttpServlet {
         StringBuilder allow = new StringBuilder();
 
         // Start with methods that are always allowed
-        allow.append("OPTIONS, GET, HEAD, POST");
+        allow.append("OPTIONS, GET, HEAD");
+
+        if (allowPostAsGet) {
+            allow.append(", POST");
+        }
 
         // PUT and DELETE depend on readonly
         if (!isReadOnly()) {
@@ -576,7 +587,32 @@ public class DefaultServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-        doGet(request, response);
+        if (allowPostAsGet) {
+            doGet(request, response);
+        } else {
+            // Use a switch without a default to ensure all possibilities are explicitly handled
+            switch (request.getDispatcherType()) {
+                case ASYNC:
+                case REQUEST: {
+                    // Direct POST requests may not be processed as GET
+                    sendNotAllowed(request, response);
+                    break;
+                }
+                case ERROR:
+                case FORWARD:
+                case INCLUDE: {
+                    /*
+                     * Forward and Include are processed as GET as it is possible that a POST to a servlet may use a
+                     * forward or an include as part of generating the response.
+                     *
+                     * Error should have already been converted to GET but convert here anyway as that is better than
+                     * failing the request.
+                     */
+                    doGet(request, response);
+                    break;
+                }
+            }
+        }
     }
 
 
