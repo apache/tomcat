@@ -205,7 +205,7 @@ public final class ForEach implements TagPlugin {
      * Generate iterators for data types supported in items
      */
     private void generateIterators(TagPluginContext ctxt) {
-
+        //@formatter:off
         // Object[]
         ctxt.generateDeclaration("ObjectArrayIterator",
                 "private Iterator toIterator(final Object[] a){\n" +
@@ -344,6 +344,6 @@ public final class ForEach implements TagPlugin {
                 "  });\n" +
                 "}"
         );
-
+        //@formatter:on
     }
 }
