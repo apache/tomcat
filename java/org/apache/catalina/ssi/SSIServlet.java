@@ -202,7 +202,6 @@ public class SSIServlet extends HttpServlet {
             }
             if (stringWriter != null) {
                 printWriter.flush();
-                @SuppressWarnings("null")
                 String text = stringWriter.toString();
                 res.getWriter().write(text);
             }
