@@ -94,27 +94,27 @@
     <module name="JavadocMissingLeadingAsterisk"/>
     <module name="JavadocMissingWhitespaceAfterAsterisk"/>
     <module name="JavadocStyle">
-        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1500 errors -->
-        <property name="checkFirstSentence" value="false"/>
         <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1400 errors -->
+        <property name="checkFirstSentence" value="false"/>
+        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1300 errors -->
         <property name="checkEmptyJavadoc" value="false"/>
         <!-- Does not handle HTML tags in {@code ...} correctly -->
         <property name="checkHtml" value="false"/>
     </module>
-    <!-- ~9000 errors
+    <!-- ~10000 errors
     <module name="MissingJavadocMethod"/>
     -->
-    <!-- ~1500 errors
+    <!-- ~1600 errors
     <module name="MissingJavadocType"/>
     -->
     <module name="NonEmptyAtclauseDescription"/>
-    <!-- ~1400 errors
+    <!-- ~500 errors
     <module name="RequireEmptyLineBeforeBlockTagGroup"/>
     -->
     <module name="SingleLineJavadoc"/>
 
     <!-- Miscellaneous -->
-    <!-- ~3300 errors
+    <!-- ~1700 errors
     <module name="Indentation">
         <property name="lineWrappingIndentation" value="8"/>
     </module>
@@ -128,7 +128,7 @@
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
-    <!--  ~ 1000 errors
+    <!--  ~ 600 errors
     <module name="OperatorWrap">
       <property name="option" value="eol"/>
     </module>
