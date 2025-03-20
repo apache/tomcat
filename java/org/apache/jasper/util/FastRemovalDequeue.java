@@ -21,24 +21,24 @@ package org.apache.jasper.util;
  * entries. This is achieved by using a doubly linked list and wrapping any object
  * added to the collection with an Entry type, that is returned to the consumer.
  * When removing an object from the list, the consumer provides this Entry object.
- *
+ * <p>
  * The Entry type is nearly opaque to the consumer of the queue. The only public
  * member is the getter for any object displaced when adding a new object to the
  * queue. This can be used to destroy that object.
- *
+ * <p>
  * The Entry object contains the links pointing to the neighbours in the doubly
  * linked list, so that removal of an Entry does not need to search for it but
  * instead can be done in constant time.
- *
+ * <p>
  * The implementation is fully thread-safe.
- *
+ * <p>
  * Invalidation of Entry objects during removal from the list is done
  * by setting their "valid" field to false. All public methods which take Entry
  * objects as arguments are NOP if the entry is no longer valid.
- *
+ * <p>
  * A typical use of the FastRemovalDequeue is a list of entries in sorted order,
  * where the sort position of an object will only switch to first or last.
- *
+ * <p>
  * Whenever the sort position needs to change, the consumer can remove the object
  * and reinsert it in front or at the end in constant time.
  * So keeping the list sorted is very cheap.
