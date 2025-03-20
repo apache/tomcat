@@ -1,0 +1,185 @@
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!--
+    Licensed to the Apache Software Foundation (ASF) under one or more
+    contributor license agreements.  See the NOTICE file distributed with
+    this work for additional information regarding copyright ownership.
+    The ASF licenses this file to You under the Apache License, Version 2.0
+    (the "License"); you may not use this file except in compliance with
+    the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+    -->
+    <!DOCTYPE document [
+    <!ENTITY project SYSTEM "file:///usr/share/tomcat/project.xml">
+    ]>
+    <document url="global_attributes.html">
+    <body>
+    <table class="detail-table">
+    <tr>
+    <th>Attribute</th>
+    <th>Description</th>
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.deploy.alt_dd"</td>
+    <td>The servlet context attribute under which we store the alternate deployment 
+    descriptor for this web application</td>
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.ASYNC_SUPPORTED"</td>
+    <td />
+    </tr>
+    <tr>
+    <td>"catalina.base"</td>
+    <td>Name of the system property containing the tomcat instance installation 
+    path</td>
+    </tr>
+    <tr>
+    <td>"catalina.home"</td>
+    <td>Name of the system property containing the tomcat product installation 
+    path</td>
+    </tr>
+    <tr>
+    <td>"jakarta.servlet.request.X509Certificate"</td>
+    <td>The request attribute under which we store the array of X509Certificate 
+    objects representing the certificate chain presented by our client, if any.</td>
+    </tr>
+    <tr>
+    <td>"jakarta.servlet.request.cipher_suite"</td>
+    <td>The request attribute under which we store the name of the cipher suite 
+    being used on an SSL connection (as an object of type String).</td>
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.jsp_classpath"</td>
+    <td>The servlet context attribute under which we store the class path for our 
+    application class loader (as an object of type String), delimited with the 
+    appropriate path delimiter for this platform.</td>
+    </tr>
+    <tr>
+    <td>"application/x-www-form-urlencoded"</td>
+    <td />
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.CredentialHandler"</td>
+    <td>ServletContext attribute under which we store the context Realm's 
+    CredentialHandler (if both the Realm and the CredentialHandler exist).</td>
+    </tr>
+    <tr>
+    <td>"Catalina"</td>
+    <td>Default domain for MBeans if none can be determined</td>
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.core.DISPATCHER_REQUEST_PATH"</td>
+    <td>Request dispatcher path.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.core.DISPATCHER_TYPE"</td>
+    <td>Request dispatcher state.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.realm.GSS_CREDENTIAL"</td>
+    <td />
+    </tr>
+    <tr>
+    <td>"org.apache.jasper.XML_BLOCK_EXTERNAL"</td>
+    <td>ServletContext init-param that determines if the JSP engine will block 
+    external entities from being used in *.tld, *.jspx, *.tagx and tagplugin.xml 
+    files.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.jasper.XML_VALIDATE_TLD"</td>
+    <td>ServletContext init-param that determines if the JSP engine should validate 
+    *.tld files when parsing them.</td>
+    </tr>
+    <tr>
+    <td>"jakarta.servlet.request.key_size"</td>
+    <td>The request attribute under which we store the key size being used for this 
+    SSL connection (as an object of type Integer).</td>
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.NAMED"</td>
+    <td>The request attribute under which we store the servlet name on a named 
+    dispatcher request.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.tomcat.remoteAddr"</td>
+    <td>The request attribute set by the RemoteIpFilter, RemoteIpValve (and may be 
+    set by other similar components) that identifies for the connector the remote IP
+    address claimed to be associated with this request when a request is received 
+    via one or more proxies.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.filters.RemoteIpFilter.secure"</td>
+    <td>The request attribute that is set to the value of Boolean.TRUE if 
+    RemoteIpFilter determines that this request was submitted via a secure 
+    channel.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.tomcat.request.forwarded"</td>
+    <td>The request attribute that is set to the value of Boolean.TRUE by the 
+    RemoteIpFilter, RemoteIpValve (and other similar components) that identifies a 
+    request which been forwarded via one or more proxies.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.resources"</td>
+    <td>The WebResourceRoot which is associated with the context.</td>
+    </tr>
+    <tr>
+    <td>"jakarta.servlet.request.secure_protocol"</td>
+    <td>The request attribute under which we store the name of the security protocol
+    (e.g. TLSv1.3) being used on a secured connection (as an object of type 
+    String).</td>
+    </tr>
+    <tr>
+    <td>"org.apache.tomcat.sendfile.end"</td>
+    <td>The request attribute that can be used by a servlet to pass to the connector
+    the end offset (not including) of the part of a file that is to be served by 
+    sendfile.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.tomcat.sendfile.start"</td>
+    <td>The request attribute that can be used by a servlet to pass to the connector
+    the start offset of the part of a file that is to be served by sendfile.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.tomcat.sendfile.filename"</td>
+    <td>The request attribute that can be used by a servlet to pass to the connector
+    the name of the file that is to be served by sendfile.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.tomcat.sendfile.support"</td>
+    <td>The request attribute that is set to the value of Boolean.TRUE if connector 
+    processing this request supports use of sendfile.</td>
+    </tr>
+    <tr>
+    <td>"jakarta.servlet.request.ssl_session_id"</td>
+    <td>The request attribute under which we store the session id being used for 
+    this SSL connection (as an object of type String).</td>
+    </tr>
+    <tr>
+    <td>"jakarta.servlet.request.ssl_session_mgr"</td>
+    <td>The request attribute key for the session manager.</td>
+    </tr>
+    <tr>
+    <td>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</td>
+    <td>The flag which controls strict servlet specification compliance. Setting 
+    this flag to true will change the defaults for other settings.</td>
+    </tr>
+    <tr>
+    <td>"javax.security.auth.subject"</td>
+    <td>The subject under which the AccessControlContext is running.</td>
+    </tr>
+    <tr>
+    <td>"org.apache.catalina.webappVersion"</td>
+    <td>Name of the ServletContext attribute under which we store the web 
+    application version string (the text that appears after ## when parallel 
+    deployment is used).</td>
+    </tr>
+    </table>
+    </body>
+    </document>
