@@ -176,7 +176,7 @@
   treated as an earlier version than <code>foo##011.war</code>.
   </p>
   <p>To get the current webapp version number in a servlet you should 
-  use org.apache.catalina.webappVersion attribute, like this:
+  use org.apache.catalina.webappVersion <a href="global_attributes.html">attribute</a>, like this:
   <code>String webappVersion =
   (String)request.getServletContext().getAttribute("org.apache.catalina.webappVersion"); 
   </code> 
