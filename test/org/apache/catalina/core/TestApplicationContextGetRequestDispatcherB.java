@@ -530,9 +530,9 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
             Assert.assertEquals(expectedQueryString, req.getQueryString());
             HttpServletMapping mapping = req.getHttpServletMapping();
             Assert.assertEquals(expectedMappingMatch, mapping.getMappingMatch());
-            Assert.assertEquals(expectedMappingPattern, mapping.pattern());
-            Assert.assertEquals(expectedMappingMatchValue, mapping.matchValue());
-            Assert.assertEquals(expectedMappingServletName, mapping.servletName());
+            Assert.assertEquals(expectedMappingPattern, mapping.getPattern());
+            Assert.assertEquals(expectedMappingMatchValue, mapping.getMatchValue());
+            Assert.assertEquals(expectedMappingServletName, mapping.getServletName());
 
             for (DispatcherType type : DispatcherType.values()) {
                 if (type == dispatcherType) {
@@ -554,11 +554,11 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
                     Assert.assertEquals(expectedDispatcherMappingMatch,
                             dispatcherMapping.getMappingMatch());
                     Assert.assertEquals(expectedDispatcherMappingPattern,
-                            dispatcherMapping.pattern());
+                            dispatcherMapping.getPattern());
                     Assert.assertEquals(expectedDispatcherMappingMatchValue,
-                            dispatcherMapping.matchValue());
+                            dispatcherMapping.getMatchValue());
                     Assert.assertEquals(expectedDispatcherMappingServletName,
-                            dispatcherMapping.servletName());
+                            dispatcherMapping.getServletName());
                 } else if (type == DispatcherType.ERROR || type == DispatcherType.REQUEST) {
                     // Skip - not tested
                 } else {

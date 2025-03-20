@@ -82,6 +82,22 @@ public class ApplicationMapping {
 
     private record MappingImpl(String matchValue, String pattern, MappingMatch mappingType,
                                String servletName) implements HttpServletMapping {
+
+        @Override
+        public String getMatchValue() {
+            return matchValue;
+        }
+
+        @Override
+        public String getPattern() {
+            return pattern;
+        }
+
+        @Override
+        public String getServletName() {
+            return servletName;
+        }
+
         @Override
         public MappingMatch getMappingMatch() {
             return mappingType;
