@@ -26,4 +26,21 @@ import org.apache.tomcat.InstanceManager;
  */
 public record UpgradeToken(HttpUpgradeHandler httpUpgradeHandler, ContextBind contextBind,
                            InstanceManager instanceManager, String protocol) {
+
+    public ContextBind getContextBind() {
+        return contextBind;
+    }
+
+    public HttpUpgradeHandler getHttpUpgradeHandler() {
+        return httpUpgradeHandler;
+    }
+
+    public InstanceManager getInstanceManager() {
+        return instanceManager;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
 }

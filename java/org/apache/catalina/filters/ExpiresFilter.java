@@ -417,6 +417,14 @@ public class ExpiresFilter extends FilterBase {
      * Duration composed of an {@link #amount} and a {@link #unit}
      */
     public record Duration(int amount, DurationUnit unit) {
+        public int getAmount() {
+            return amount;
+        }
+
+        public DurationUnit getUnit() {
+            return unit;
+        }
+
         @Override
         public String toString() {
             return amount + " " + unit;
@@ -459,6 +467,15 @@ public class ExpiresFilter extends FilterBase {
      * @param startingPoint Starting point of the elapse to set in the response.
      */
     public record ExpiresConfiguration(StartingPoint startingPoint, List<Duration> durations) {
+
+        public List<Duration> getDurations() {
+            return durations;
+        }
+
+        public StartingPoint getStartingPoint() {
+            return startingPoint;
+        }
+
         @Override
         public String toString() {
             return "ExpiresConfiguration[startingPoint=" + startingPoint + ", duration=" + durations + "]";
