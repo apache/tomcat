@@ -1240,16 +1240,14 @@ public abstract class ManagerBase extends LifecycleMBeanBase implements Manager 
         /**
          * @return Time stamp associated with this piece of timing information in milliseconds.
          */
-        @Override
-        public long timestamp() {
+        public long getTimestamp() {
             return timestamp;
         }
 
         /**
          * @return Duration associated with this piece of timing information in seconds.
          */
-        @Override
-        public int duration() {
+        public int getDuration() {
             return duration;
         }
 
