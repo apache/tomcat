@@ -113,29 +113,6 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
-     * @return start
-     * @deprecated Unused. This method will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public int getOffset() {
-        return start;
-    }
-
-    /**
-     * Set start.
-     * @param off the new start
-     * @deprecated Unused. This method will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public void setOffset(int off) {
-        if (end < off) {
-            end = off;
-        }
-        start = off;
-    }
-
-
-    /**
      * @return the length of the data in the buffer
      */
     public int getLength() {

@@ -2362,12 +2362,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     }
 
 
-    @Override
-    public boolean hasLoggingConfig() {
-        return findResource("logging.properties") != null;
-    }
-
-
     private static class CombinedEnumeration implements Enumeration<URL> {
 
         private final Enumeration<URL>[] sources;

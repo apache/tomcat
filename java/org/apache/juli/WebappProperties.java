@@ -45,16 +45,4 @@ public interface WebappProperties {
      * @return The name to use for the Service where the Host is deployed or null if none is available.
      */
     String getServiceName();
-
-    /**
-     * Enables JULI to determine if the web application includes a local configuration without JULI having to look for
-     * the file which it may not have permission to do when running under a SecurityManager.
-     *
-     * @return {@code true} if the web application includes a logging configuration at the standard location of
-     *             /WEB-INF/classes/logging.properties.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
-     */
-    @Deprecated
-    boolean hasLoggingConfig();
 }

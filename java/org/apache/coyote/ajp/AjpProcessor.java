@@ -632,7 +632,6 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * After reading the request headers, we have to setup the request filters.
      */
-    @SuppressWarnings("deprecation")
     private void prepareRequest() {
 
         // Translate the HTTP method code to a String.
@@ -741,7 +740,6 @@ public class AjpProcessor extends AbstractProcessor {
                         }
                     } else if (n.equals(Constants.SC_A_SSL_PROTOCOL)) {
                         request.setAttribute(SSLSupport.SECURE_PROTOCOL_KEY, v);
-                        request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, v);
                     } else if (n.equals("JK_LB_ACTIVATION")) {
                         request.setAttribute(n, v);
                     } else if (jakartaAttributeMapping.containsKey(n)) {

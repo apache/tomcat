@@ -853,7 +853,6 @@ public class Request implements HttpServletRequest {
 
     // ------------------------------------------------- ServletRequest Methods
 
-    @SuppressWarnings("deprecation")
     @Override
     public Object getAttribute(String name) {
         // Special attributes
@@ -881,7 +880,6 @@ public class Request implements HttpServletRequest {
             attr = coyoteRequest.getAttribute(Globals.SECURE_PROTOCOL_ATTR);
             if (attr != null) {
                 attributes.put(Globals.SECURE_PROTOCOL_ATTR, attr);
-                attributes.put(SSLSupport.PROTOCOL_VERSION_KEY, attr);
             }
             attr = coyoteRequest.getAttribute(Globals.CIPHER_SUITE_ATTR);
             if (attr != null) {

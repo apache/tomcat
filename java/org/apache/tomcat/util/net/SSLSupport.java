@@ -62,16 +62,6 @@ public interface SSLSupport {
             "jakarta.servlet.request.ssl_session_mgr";
 
     /**
-     * The request attribute key under which the String indicating the protocol
-     * that created the SSL socket is recorded - e.g. TLSv1 or TLSv1.2 etc.
-     *
-     * @deprecated Replaced by {@link #SECURE_PROTOCOL_KEY}. This constant will be removed in Tomcat 12.
-     */
-    @Deprecated
-    String PROTOCOL_VERSION_KEY =
-            "org.apache.tomcat.util.net.secure_protocol_version";
-
-    /**
      * The request attribute key under which the String indicating the ciphers
      * requested by the client are recorded.
      */

@@ -18,8 +18,6 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -389,58 +387,6 @@ public final class Request {
 
 
     // -------------------- encoding/type --------------------
-
-    /**
-     * Get the character encoding used for this request.
-     *
-     * @return The value set via {@link #setCharset(Charset)} or if no call has been made to that method try to obtain
-     *             if from the content type.
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public String getCharacterEncoding() {
-        if (charsetHolder.getName() == null) {
-            charsetHolder = CharsetHolder.getInstance(getCharsetFromContentType(getContentType()));
-        }
-
-        return charsetHolder.getName();
-    }
-
-
-    /**
-     * Get the character encoding used for this request.
-     *
-     * @return The value set via {@link #setCharset(Charset)} or if no call has been made to that method try to obtain
-     *             if from the content type.
-     *
-     * @throws UnsupportedEncodingException If the user agent has specified an invalid character encoding
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public Charset getCharset() throws UnsupportedEncodingException {
-        if (charsetHolder.getName() == null) {
-            // Populates charsetHolder
-            getCharacterEncoding();
-        }
-
-        return charsetHolder.getValidatedCharset();
-    }
-
-
-    /**
-     * Unused.
-     *
-     * @param charset The Charset to use for the request
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public void setCharset(Charset charset) {
-        charsetHolder = CharsetHolder.getInstance(charset);
-    }
-
 
     public CharsetHolder getCharsetHolder() {
         if (charsetHolder.getName() == null) {
