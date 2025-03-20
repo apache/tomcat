@@ -267,7 +267,7 @@ public class DefaultServlet extends HttpServlet {
      * processed as GET requests. If not allowed, direct requests using the POST method will be rejected with a 405
      * (method not allowed).
      */
-    private boolean allowPostAsGet = true;
+    private boolean allowPostAsGet = false;
 
 
     // --------------------------------------------------------- Public Methods
@@ -404,6 +404,9 @@ public class DefaultServlet extends HttpServlet {
             useStrongETags = Boolean.parseBoolean(getServletConfig().getInitParameter("useStrongETags"));
         }
 
+        if (getServletConfig().getInitParameter("allowPostAsGet") != null) {
+            allowPostAsGet = Boolean.parseBoolean(getServletConfig().getInitParameter("allowPostAsGet"));
+        }
     }
 
     private CompressionFormat[] parseCompressionFormats(String precompressed, String gzip) {

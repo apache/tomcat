@@ -84,6 +84,7 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
         Wrapper w = Tomcat.addServlet(ctx, "servlet", createServlet());
         w.addInitParameter("listings", Boolean.toString(listings));
         w.addInitParameter("readonly", Boolean.toString(readonly));
+        w.addInitParameter("allowPostAsGet", "true");
 
         ctx.addServletMappingDecoded("/*", "servlet");
 

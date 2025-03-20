@@ -215,8 +215,7 @@ Tomcat.</p>
         Controls whether a direct request (i.e. not a forward or an include) for
         a static resource using the POST method will be processed as if the GET
         method had been used. If not allowed, the request will be rejected. The
-        default behaviour of processing the request as if the GET method had
-        been used is unchanged. [true]
+        default behaviour is to reject such requests. [false]
   </property>
 </properties>
 </section>
