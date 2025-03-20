@@ -4971,7 +4971,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
      */
     protected ClassLoader bindThread() {
 
-        ClassLoader oldContextClassLoader = bind(false, null);
+        ClassLoader oldContextClassLoader = bind(null);
 
         if (isUseNaming()) {
             try {
@@ -4997,13 +4997,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             ContextBindings.unbindThread(this, getNamingToken());
         }
 
-        unbind(false, oldContextClassLoader);
-    }
-
-
-    @Override
-    public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
-        return bind(originalClassLoader);
+        unbind(oldContextClassLoader);
     }
 
 
@@ -5039,12 +5033,6 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         return originalClassLoader;
-    }
-
-
-    @Override
-    public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
-        unbind(originalClassLoader);
     }
 
 
