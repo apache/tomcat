@@ -17,6 +17,7 @@
 package org.apache.catalina.filters;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -319,10 +320,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             throws IOException, ServletException {
         ServletResponse wResponse = null;
 
-        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
-
-            HttpServletRequest req = (HttpServletRequest) request;
-            HttpServletResponse res = (HttpServletResponse) response;
+        if (request instanceof HttpServletRequest req && response instanceof HttpServletResponse res) {
 
             HttpSession session = req.getSession(false);
 
@@ -477,7 +475,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
 
     /**
-     * Determines whether a nonce should be created. This method is provided primarily for the benefit of sub-classes
+     * Determines whether a nonce should be created. This method is provided primarily for the benefit of subclasses
      * that wish to customise this behaviour.
      *
      * @param request The request that triggered the need to potentially create the nonce.
@@ -491,7 +489,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     /**
      * Create a new {@link NonceCache} and store in the {@link HttpSession}. This method is provided primarily for the
-     * benefit of sub-classes that wish to customise this behaviour.
+     * benefit of subclasses that wish to customise this behaviour.
      *
      * @param request The request that triggered the need to create the nonce cache. Unused by the default
      *                    implementation.
@@ -511,7 +509,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
     /**
      * Obtain the {@link NonceCache} associated with the request and/or session. This method is provided primarily for
-     * the benefit of sub-classes that wish to customise this behaviour.
+     * the benefit of subclasses that wish to customise this behaviour.
      *
      * @param request The request that triggered the need to obtain the nonce cache. Unused by the default
      *                    implementation.
@@ -578,7 +576,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
         /*
          * Return the specified URL with the nonce added to the query string.
          *
-         * @param url URL to be modified
+         * @param url the URL to be modified
          */
         private String addNonce(String url) {
 
@@ -630,6 +628,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
      */
     protected static class LruCache<T> implements NonceCache<T> {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         // Although the internal implementation uses a Map, this cache
@@ -638,6 +637,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         public LruCache(final int cacheSize) {
             cache = new LinkedHashMap<>() {
+                @Serial
                 private static final long serialVersionUID = 1L;
 
                 @Override

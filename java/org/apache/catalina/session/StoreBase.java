@@ -197,8 +197,7 @@ public abstract class StoreBase extends LifecycleBase implements Store {
         CustomObjectInputStream ois;
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
 
-        if (manager instanceof ManagerBase) {
-            ManagerBase managerBase = (ManagerBase) manager;
+        if (manager instanceof ManagerBase managerBase) {
             ois = new CustomObjectInputStream(bis, classLoader, manager.getContext().getLogger(),
                     managerBase.getSessionAttributeValueClassNamePattern(),
                     managerBase.getWarnOnSessionAttributeFilterFailure());

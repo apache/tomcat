@@ -82,11 +82,10 @@ public class ContextNamingInfoListener implements LifecycleListener {
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
-            if (!(event.getLifecycle() instanceof Context)) {
+            if (!(event.getLifecycle() instanceof Context context)) {
                 log.warn(sm.getString("listener.notContext", event.getLifecycle().getClass().getSimpleName()));
                 return;
             }
-            Context context = (Context) event.getLifecycle();
             String path = context.getPath();
             String encodedPath = context.getEncodedPath();
             String name = context.getName();

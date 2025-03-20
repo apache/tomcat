@@ -17,6 +17,8 @@
 package org.apache.catalina;
 
 
+import java.io.Serial;
+
 /**
  * General purpose exception that is thrown to indicate a lifecycle related problem. Such exceptions should generally be
  * considered fatal to the operation of the application containing this component.
@@ -25,6 +27,7 @@ package org.apache.catalina;
  */
 public final class LifecycleException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------ Constructors

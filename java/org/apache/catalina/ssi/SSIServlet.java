@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
@@ -42,6 +43,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author David Becker
  */
 public class SSIServlet extends HttpServlet {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /** Debug level for this servlet. */
@@ -198,9 +200,8 @@ public class SSIServlet extends HttpServlet {
             if (lastModified > 0) {
                 res.setDateHeader("last-modified", lastModified);
             }
-            if (buffered) {
+            if (stringWriter != null) {
                 printWriter.flush();
-                @SuppressWarnings("null")
                 String text = stringWriter.toString();
                 res.getWriter().write(text);
             }

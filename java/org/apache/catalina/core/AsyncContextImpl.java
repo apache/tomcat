@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -152,8 +153,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
         String path;
         String cpath;
         ServletRequest servletRequest = getRequest();
-        if (servletRequest instanceof HttpServletRequest) {
-            HttpServletRequest sr = (HttpServletRequest) servletRequest;
+        if (servletRequest instanceof HttpServletRequest sr) {
             path = sr.getRequestURI();
             cpath = sr.getContextPath();
         } else {
@@ -193,10 +193,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
                 request.setAttribute(ASYNC_QUERY_STRING, request.getQueryString());
             }
             final RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(path);
-            if (!(requestDispatcher instanceof AsyncDispatcher)) {
+            if (!(requestDispatcher instanceof AsyncDispatcher applicationDispatcher)) {
                 throw new UnsupportedOperationException(sm.getString("asyncContextImpl.noAsyncDispatcher"));
             }
-            final AsyncDispatcher applicationDispatcher = (AsyncDispatcher) requestDispatcher;
             final ServletRequest servletRequest = getRequest();
             final ServletResponse servletResponse = getResponse();
             this.dispatch = new AsyncRunnable(request, applicationDispatcher, servletRequest, servletResponse);
@@ -536,6 +535,7 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
     private static class DebugException extends Exception {
+        @Serial
         private static final long serialVersionUID = 1L;
     }
 
@@ -575,20 +575,9 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
 
-    private static class AsyncRunnable implements Runnable {
-
-        private final AsyncDispatcher applicationDispatcher;
-        private final Request request;
-        private final ServletRequest servletRequest;
-        private final ServletResponse servletResponse;
-
-        AsyncRunnable(Request request, AsyncDispatcher applicationDispatcher, ServletRequest servletRequest,
-                ServletResponse servletResponse) {
-            this.request = request;
-            this.applicationDispatcher = applicationDispatcher;
-            this.servletRequest = servletRequest;
-            this.servletResponse = servletResponse;
-        }
+    private record AsyncRunnable(Request request, AsyncDispatcher applicationDispatcher,
+                                 ServletRequest servletRequest,
+                                 ServletResponse servletResponse) implements Runnable {
 
         @Override
         public void run() {

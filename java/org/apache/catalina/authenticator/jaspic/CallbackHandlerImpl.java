@@ -66,31 +66,30 @@ public class CallbackHandlerImpl implements CallbackHandler, Contained {
              * and that the Subject is used to maintain state.
              */
             for (Callback callback : callbacks) {
-                if (callback instanceof CallerPrincipalCallback) {
-                    CallerPrincipalCallback cpc = (CallerPrincipalCallback) callback;
-                    name = cpc.getName();
-                    if (cpc.getPrincipal() != null) {
-                        principal = cpc.getPrincipal();
+                switch (callback) {
+                    case CallerPrincipalCallback cpc -> {
+                        name = cpc.getName();
+                        if (cpc.getPrincipal() != null) {
+                            principal = cpc.getPrincipal();
+                        }
+                        subject = cpc.getSubject();
                     }
-                    subject = cpc.getSubject();
-                } else if (callback instanceof GroupPrincipalCallback) {
-                    GroupPrincipalCallback gpc = (GroupPrincipalCallback) callback;
-                    groups = gpc.getGroups();
-                } else if (callback instanceof PasswordValidationCallback) {
-                    if (container == null) {
-                        log.warn(sm.getString("callbackHandlerImpl.containerMissing", callback.getClass().getName()));
-                    } else if (container.getRealm() == null) {
-                        log.warn(sm.getString("callbackHandlerImpl.realmMissing", callback.getClass().getName(),
+                    case GroupPrincipalCallback gpc -> groups = gpc.getGroups();
+                    case PasswordValidationCallback pvc -> {
+                        if (container == null) {
+                            log.warn(sm.getString("callbackHandlerImpl.containerMissing", callback.getClass().getName()));
+                        } else if (container.getRealm() == null) {
+                            log.warn(sm.getString("callbackHandlerImpl.realmMissing", callback.getClass().getName(),
                                 container.getName()));
-                    } else {
-                        PasswordValidationCallback pvc = (PasswordValidationCallback) callback;
-                        principal =
+                        } else {
+                            principal =
                                 container.getRealm().authenticate(pvc.getUsername(), String.valueOf(pvc.getPassword()));
-                        pvc.setResult(principal != null);
-                        subject = pvc.getSubject();
+                            pvc.setResult(principal != null);
+                            subject = pvc.getSubject();
+                        }
                     }
-                } else {
-                    log.error(sm.getString("callbackHandlerImpl.jaspicCallbackMissing", callback.getClass().getName()));
+                    default ->
+                        log.error(sm.getString("callbackHandlerImpl.jaspicCallbackMissing", callback.getClass().getName()));
                 }
             }
 

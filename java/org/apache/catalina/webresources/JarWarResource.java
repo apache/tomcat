@@ -54,10 +54,9 @@ public class JarWarResource extends AbstractArchiveResource {
             InputStream isInWar = warFile.getInputStream(jarFileInWar);
 
             jarIs = new JarInputStream(isInWar);
-            entry = jarIs.getNextJarEntry();
-            while (entry != null && !entry.getName().equals(getResource().getName())) {
+            do {
                 entry = jarIs.getNextJarEntry();
-            }
+            } while (entry != null && !entry.getName().equals(getResource().getName()));
 
             if (entry == null) {
                 return null;

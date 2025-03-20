@@ -60,10 +60,9 @@ public class LoaderSF extends StoreFactoryBase {
      */
     protected boolean isDefaultLoader(Loader loader) {
 
-        if (!(loader instanceof WebappLoader)) {
+        if (!(loader instanceof WebappLoader wloader)) {
             return false;
         }
-        WebappLoader wloader = (WebappLoader) loader;
         return (!wloader.getDelegate()) &&
             wloader.getLoaderClass().equals("org.apache.catalina.loader.WebappClassLoader");
     }

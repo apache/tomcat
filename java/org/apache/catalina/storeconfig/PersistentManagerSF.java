@@ -35,8 +35,7 @@ public class PersistentManagerSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aManager, StoreDescription parentDesc)
             throws Exception {
-        if (aManager instanceof PersistentManager) {
-            PersistentManager manager = (PersistentManager) aManager;
+        if (aManager instanceof PersistentManager manager) {
 
             // Store nested <Store> element
             Store store = manager.getStore();

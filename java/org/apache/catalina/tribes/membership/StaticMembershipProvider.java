@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.membership;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -233,10 +234,9 @@ public class StaticMembershipProvider extends MembershipProviderBase
 
     @Override
     public Serializable replyRequest(Serializable msg, final Member sender) {
-        if (!(msg instanceof MemberMessage)) {
+        if (!(msg instanceof MemberMessage memMsg)) {
             return null;
         }
-        MemberMessage memMsg = (MemberMessage) msg;
         if (memMsg.getMsgtype() == MemberMessage.MSG_START) {
             messageReceived(memMsg, sender);
             memMsg.setMember(service.getLocalMember(true));
@@ -256,10 +256,9 @@ public class StaticMembershipProvider extends MembershipProviderBase
 
     @Override
     public void leftOver(Serializable msg, Member sender) {
-        if (!(msg instanceof MemberMessage)) {
+        if (!(msg instanceof MemberMessage memMsg)) {
             return;
         }
-        MemberMessage memMsg = (MemberMessage) msg;
         if (memMsg.getMsgtype() == MemberMessage.MSG_START) {
             messageReceived(memMsg, sender);
         } else if (memMsg.getMsgtype() == MemberMessage.MSG_PING) {
@@ -342,6 +341,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
     // member message to send to and from other memberships
     // ------------------------------------------------------------------------------
     public static class MemberMessage implements Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
         public static final int MSG_START = 1;
         public static final int MSG_STOP = 2;
@@ -374,28 +374,17 @@ public class StaticMembershipProvider extends MembershipProviderBase
 
         @Override
         public String toString() {
-            StringBuilder buf = new StringBuilder("MemberMessage[");
-            buf.append("name=");
-            buf.append(new String(membershipId));
-            buf.append("; type=");
-            buf.append(getTypeDesc());
-            buf.append("; member=");
-            buf.append(member);
-            buf.append(']');
-            return buf.toString();
+            return "MemberMessage[" + "name=" + new String(membershipId) + "; type=" +
+                    getTypeDesc() + "; member=" + member + ']';
         }
 
         protected String getTypeDesc() {
-            switch (msgtype) {
-                case MSG_START:
-                    return "MSG_START";
-                case MSG_STOP:
-                    return "MSG_STOP";
-                case MSG_PING:
-                    return "MSG_PING";
-                default:
-                    return "UNKNOWN";
-            }
+            return switch (msgtype) {
+                case MSG_START -> "MSG_START";
+                case MSG_STOP -> "MSG_STOP";
+                case MSG_PING -> "MSG_PING";
+                default -> "UNKNOWN";
+            };
         }
     }
 
@@ -407,6 +396,7 @@ public class StaticMembershipProvider extends MembershipProviderBase
                     sleep(pingInterval);
                     ping();
                 } catch (InterruptedException ix) {
+                    // Ignore
                 } catch (Exception x) {
                     log.warn(sm.getString("staticMembershipProvider.pingThread.failed"), x);
                 }

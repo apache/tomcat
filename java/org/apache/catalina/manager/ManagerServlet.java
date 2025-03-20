@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -151,6 +152,7 @@ import org.apache.tomcat.util.security.Escape;
  */
 public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------- Instance Variables
@@ -246,7 +248,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
 
         // Retrieve the MBean server
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
 
     }
 
@@ -499,16 +501,15 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         for (Connector connector : connectors) {
             if (Boolean.TRUE.equals(connector.getProperty("SSLEnabled"))) {
                 ProtocolHandler protocol = connector.getProtocolHandler();
-                if (protocol instanceof AbstractHttp11Protocol<?>) {
-                    AbstractHttp11Protocol<?> http11Protoocol = (AbstractHttp11Protocol<?>) protocol;
+                if (protocol instanceof AbstractHttp11Protocol<?> http11Protoocol) {
                     if (tlsHostName == null || tlsHostName.isEmpty()) {
                         found = true;
                         http11Protoocol.reloadSslHostConfigs();
                     } else {
                         SSLHostConfig[] sslHostConfigs = http11Protoocol.findSslHostConfigs();
                         for (SSLHostConfig sslHostConfig : sslHostConfigs) {
-                            // tlsHostName is as provided by the user so use a case insensitive
-                            // comparison as host names are case insensitive.
+                            // tlsHostName is as provided by the user so use a case-insensitive
+                            // comparison as host names are case-insensitive.
                             if (sslHostConfig.getHostName().equalsIgnoreCase(tlsHostName)) {
                                 found = true;
                                 http11Protoocol.reloadSslHostConfig(tlsHostName);

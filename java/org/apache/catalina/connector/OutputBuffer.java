@@ -317,7 +317,7 @@ public class OutputBuffer extends Writer {
             try {
                 coyoteResponse.doWrite(buf);
             } catch (CloseNowException e) {
-                // Catch this sub-class as it requires specific handling.
+                // Catch this subclass as it requires specific handling.
                 // Examples where this exception is thrown:
                 // - HTTP/2 stream timeout
                 // Prevent further output for this response

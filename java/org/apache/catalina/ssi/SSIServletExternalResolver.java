@@ -301,14 +301,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             } else if (nameParts[1].equals("PROTOCOL")) {
                 retVal = req.getProtocol();
             } else if (nameParts[1].equals("SOFTWARE")) {
-                StringBuilder rv = new StringBuilder(context.getServerInfo());
-                rv.append(' ');
-                rv.append(System.getProperty("java.vm.name"));
-                rv.append('/');
-                rv.append(System.getProperty("java.vm.version"));
-                rv.append(' ');
-                rv.append(System.getProperty("os.name"));
-                retVal = rv.toString();
+                retVal = context.getServerInfo() + ' ' + System.getProperty("java.vm.name") +
+                        '/' + System.getProperty("java.vm.version") + ' ' + System.getProperty("os.name");
             }
         } else if (name.equalsIgnoreCase("UNIQUE_ID")) {
             retVal = req.getRequestedSessionId();
@@ -430,8 +424,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
 
     protected URLConnection getURLConnection(String originalPath, boolean virtual) throws IOException {
         ServletContextAndPath csAndP = getServletContextAndPath(originalPath, virtual);
-        ServletContext context = csAndP.getServletContext();
-        String path = csAndP.getPath();
+        ServletContext context = csAndP.servletContext();
+        String path = csAndP.path();
         URL url = context.getResource(path);
         if (url == null) {
             throw new IOException(sm.getString("ssiServletExternalResolver.noResource", path));
@@ -474,8 +468,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
     public String getFileText(String originalPath, boolean virtual) throws IOException {
         try {
             ServletContextAndPath csAndP = getServletContextAndPath(originalPath, virtual);
-            ServletContext context = csAndP.getServletContext();
-            String path = csAndP.getPath();
+            ServletContext context = csAndP.servletContext();
+            String path = csAndP.path();
             RequestDispatcher rd = context.getRequestDispatcher(path);
             if (rd == null) {
                 throw new IOException(sm.getString("ssiServletExternalResolver.requestDispatcherError", path));
@@ -508,21 +502,10 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         }
     }
 
-    protected static class ServletContextAndPath {
-        protected final ServletContext servletContext;
-        protected final String path;
-
-
-        public ServletContextAndPath(ServletContext servletContext, String path) {
-            this.servletContext = servletContext;
-            this.path = path;
-        }
-
-
+    protected record ServletContextAndPath(ServletContext servletContext, String path) {
         public ServletContext getServletContext() {
             return servletContext;
         }
-
 
         public String getPath() {
             return path;

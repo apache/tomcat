@@ -18,6 +18,7 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
@@ -51,6 +52,7 @@ import org.apache.juli.logging.LogFactory;
  */
 public class RequestDumperFilter extends GenericFilter {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String NON_HTTP_REQ_MSG = "Not available. Non-http request.";
@@ -253,6 +255,7 @@ public class RequestDumperFilter extends GenericFilter {
      * Log objects are not Serializable but this Filter is because it extends GenericFilter. Tomcat won't serialize a
      * Filter but in case something else does...
      */
+    @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         log = LogFactory.getLog(RequestDumperFilter.class);

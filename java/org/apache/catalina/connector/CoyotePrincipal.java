@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.connector;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Principal;
 
@@ -27,6 +28,7 @@ import java.security.Principal;
  */
 public class CoyotePrincipal implements Principal, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

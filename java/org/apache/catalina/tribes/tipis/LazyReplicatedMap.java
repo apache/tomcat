@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.tipis;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.apache.catalina.tribes.Channel;
@@ -65,6 +66,7 @@ import org.apache.juli.logging.LogFactory;
  * @param <V> The type of Value
  */
 public class LazyReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
+    @Serial
     private static final long serialVersionUID = 1L;
     // Lazy init to support serialization
     private transient volatile Log log;
@@ -180,7 +182,7 @@ public class LazyReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
             if (next == null) {
                 continue;
             }
-            MapMessage msg = null;
+            MapMessage msg;
             try {
                 Member[] tmpBackup = wrap(next);
                 // publish the backup data to one node
@@ -203,7 +205,7 @@ public class LazyReplicatedMap<K, V> extends AbstractReplicatedMap<K,V> {
             try {
                 // publish the data out to all nodes
                 Member[] proxies = excludeFromSet(backup, getMapMembers());
-                if (success && proxies.length > 0) {
+                if (proxies.length > 0) {
                     msg = new MapMessage(getMapContextName(), MapMessage.MSG_PROXY, false, (Serializable) key, null,
                             null, channel.getLocalMember(false), backup);
                     if (log.isTraceEnabled()) {

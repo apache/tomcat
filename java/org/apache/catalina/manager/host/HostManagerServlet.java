@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -82,6 +83,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class HostManagerServlet extends HttpServlet implements ContainerServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------- Instance Variables
@@ -270,7 +272,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         }
 
         // Set our properties from the initialization parameters
-        String value = null;
+        String value;
         try {
             value = getServletConfig().getInitParameter("debug");
             debug = Integer.parseInt(value);
@@ -307,7 +309,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         }
 
         // Validate the requested host name
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             writer.println(smClient.getString("hostManagerServlet.invalidHostName", name));
             return;
         }
@@ -319,10 +321,10 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         }
 
         // Validate and create appBase
-        File appBaseFile = null;
-        File file = null;
+        File appBaseFile;
+        File file;
         String applicationBase = appBase;
-        if (applicationBase == null || applicationBase.length() == 0) {
+        if (applicationBase == null || applicationBase.isEmpty()) {
             applicationBase = name;
         }
         file = new File(applicationBase);
@@ -413,7 +415,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         }
 
         // Validate the requested host name
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             writer.println(smClient.getString("hostManagerServlet.invalidHostName", name));
             return;
         }
@@ -491,7 +493,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         }
 
         // Validate the requested host name
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             writer.println(smClient.getString("hostManagerServlet.invalidHostName", name));
             return;
         }
@@ -542,7 +544,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         }
 
         // Validate the requested host name
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             writer.println(smClient.getString("hostManagerServlet.invalidHostName", name));
             return;
         }

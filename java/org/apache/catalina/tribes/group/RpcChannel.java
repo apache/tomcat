@@ -87,7 +87,7 @@ public class RpcChannel implements ChannelListener {
             return new Response[0];
         }
 
-        // avoid dead lock
+        // avoid deadlock
         int sendOptions = channelOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK;
 
         RpcCollectorKey key = new RpcCollectorKey(UUIDGenerator.randomUUID(false));
@@ -194,8 +194,7 @@ public class RpcChannel implements ChannelListener {
 
     @Override
     public boolean accept(Serializable msg, Member sender) {
-        if (msg instanceof RpcMessage) {
-            RpcMessage rmsg = (RpcMessage) msg;
+        if (msg instanceof RpcMessage rmsg) {
             return Arrays.equals(rmsg.rpcId, rpcId);
         } else {
             return false;
@@ -258,17 +257,15 @@ public class RpcChannel implements ChannelListener {
             if (destcnt <= 0) {
                 return true;
             }
-            switch (options) {
-                case ALL_REPLY:
-                    return destcnt == responses.size();
-                case MAJORITY_REPLY:
+            return switch (options) {
+                case ALL_REPLY -> destcnt == responses.size();
+                case MAJORITY_REPLY -> {
                     float perc = ((float) responses.size()) / ((float) destcnt);
-                    return perc >= 0.50f;
-                case FIRST_REPLY:
-                    return responses.size() > 0;
-                default:
-                    return false;
-            }
+                    yield perc >= 0.50f;
+                }
+                case FIRST_REPLY -> !responses.isEmpty();
+                default -> false;
+            };
         }
 
         @Override
@@ -278,8 +275,7 @@ public class RpcChannel implements ChannelListener {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof RpcCollector) {
-                RpcCollector r = (RpcCollector) o;
+            if (o instanceof RpcCollector r) {
                 return r.key.equals(this.key);
             } else {
                 return false;
@@ -305,8 +301,7 @@ public class RpcChannel implements ChannelListener {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof RpcCollectorKey) {
-                RpcCollectorKey r = (RpcCollectorKey) o;
+            if (o instanceof RpcCollectorKey r) {
                 return Arrays.equals(id, r.id);
             } else {
                 return false;

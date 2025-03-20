@@ -134,9 +134,8 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
                 clusterReceiver.start();
                 // synchronize, big time FIXME
                 Member localMember = getChannel().getLocalMember(false);
-                if (localMember instanceof StaticMember) {
+                if (localMember instanceof StaticMember staticMember) {
                     // static member
-                    StaticMember staticMember = (StaticMember) localMember;
                     staticMember.setHost(getClusterReceiver().getHost());
                     staticMember.setPort(getClusterReceiver().getPort());
                     staticMember.setSecurePort(getClusterReceiver().getSecurePort());

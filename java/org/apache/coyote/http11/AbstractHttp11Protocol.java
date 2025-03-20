@@ -98,7 +98,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         // be de-registered.
         ObjectName rgOname = getGlobalRequestProcessorMBeanName();
         if (rgOname != null) {
-            Registry registry = Registry.getRegistry(null, null);
+            Registry registry = Registry.getRegistry(null);
             ObjectName query = new ObjectName(rgOname.getCanonicalName() + ",Upgrade=*");
             Set<ObjectInstance> upgrades = registry.getMBeanServer().queryMBeans(query, null);
             for (ObjectInstance upgrade : upgrades) {
@@ -616,7 +616,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                     ObjectName oname = getONameForUpgrade(upgradeProtocol);
                     if (oname != null) {
                         try {
-                            Registry.getRegistry(null, null).registerComponent(result, oname, null);
+                            Registry.getRegistry(null).registerComponent(result, oname, null);
                         } catch (Exception e) {
                             getLog().warn(sm.getString("abstractHttp11Protocol.upgradeJmxRegistrationFail"), e);
                             result = null;
@@ -769,11 +769,11 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     protected Processor createUpgradeProcessor(SocketWrapperBase<?> socket, UpgradeToken upgradeToken) {
-        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
+        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.httpUpgradeHandler();
         if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
-            return new UpgradeProcessorInternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.getProtocol()));
+            return new UpgradeProcessorInternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.protocol()));
         } else {
-            return new UpgradeProcessorExternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.getProtocol()));
+            return new UpgradeProcessorExternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.protocol()));
         }
     }
 }

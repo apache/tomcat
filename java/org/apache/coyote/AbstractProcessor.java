@@ -671,7 +671,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
     /**
      * {@inheritDoc}
      * <p>
-     * Sub-classes of this base class represent a single request/response pair. The timeout to be processed is,
+     * Subclasses of this base class represent a single request/response pair. The timeout to be processed is,
      * therefore, the Servlet asynchronous processing timeout.
      */
     @Override
@@ -726,7 +726,7 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
 
 
     /**
-     * When committing the response, we have to validate the set of headers, as well as setup the response filters.
+     * When committing the response, we have to validate the set of headers, as well as set up the response filters.
      *
      * @throws IOException IO exception during commit
      */
@@ -818,14 +818,12 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
      * Populate the TLS related request attributes from the {@link SSLSupport} instance associated with this processor.
      * Protocols that populate TLS attributes from a different source (e.g. AJP) should override this method.
      */
-    @SuppressWarnings("deprecation")
     protected void populateSslRequestAttributes() {
         try {
             if (sslSupport != null) {
                 Object sslO = sslSupport.getProtocol();
                 if (sslO != null) {
                     request.setAttribute(SSLSupport.SECURE_PROTOCOL_KEY, sslO);
-                    request.setAttribute(SSLSupport.PROTOCOL_VERSION_KEY, sslO);
                 }
                 sslO = sslSupport.getCipherSuite();
                 if (sslO != null) {
@@ -1044,9 +1042,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         // Set the socket wrapper so the access log can read the socket related
         // information (e.g. client IP)
         setSocketWrapper(socketWrapper);
-        // Setup the minimal request information
+        // Set up the minimal request information
         request.setStartTimeNanos(System.nanoTime());
-        // Setup the minimal response information
+        // Set up the minimal response information
         response.setStatus(400);
         response.setError();
         getAdapter().log(request, response, 0);

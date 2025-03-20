@@ -57,9 +57,9 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                                 Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                         openSSLLibraryClass.getMethod("init").invoke(null);
                     } catch (Throwable t) {
-                        t = ExceptionUtils.unwrapInvocationTargetException(t);
-                        ExceptionUtils.handleThrowable(t);
-                        log.error(sm.getString("openssllistener.sslInit"), t);
+                        Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                        ExceptionUtils.handleThrowable(throwable);
+                        log.error(sm.getString("openssllistener.sslInit"), throwable);
                     }
                 }
             }
@@ -97,9 +97,9 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                             Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                     openSSLLibraryClass.getMethod("init").invoke(null);
                 } catch (Throwable t) {
-                    t = ExceptionUtils.unwrapInvocationTargetException(t);
-                    ExceptionUtils.handleThrowable(t);
-                    log.error(sm.getString("openssllistener.sslInit"), t);
+                    Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                    ExceptionUtils.handleThrowable(throwable);
+                    log.error(sm.getString("openssllistener.sslInit"), throwable);
                     initError = true;
                 }
                 // Failure to initialize FIPS mode is fatal
@@ -123,8 +123,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                             Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                     openSSLLibraryClass.getMethod("destroy").invoke(null);
                 } catch (Throwable t) {
-                    t = ExceptionUtils.unwrapInvocationTargetException(t);
-                    ExceptionUtils.handleThrowable(t);
+                    Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                    ExceptionUtils.handleThrowable(throwable);
                     log.info(sm.getString("openssllistener.destroy"));
                 }
             }
@@ -139,8 +139,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                         Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 return (String) openSSLLibraryClass.getMethod("getSSLEngine").invoke(null);
             } catch (Throwable t) {
-                t = ExceptionUtils.unwrapInvocationTargetException(t);
-                ExceptionUtils.handleThrowable(t);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(throwable);
             }
         }
         return null;
@@ -151,10 +151,10 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
             try {
                 Class<?> openSSLLibraryClass =
                         Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
-                openSSLLibraryClass.getMethod("setSSLEngine").invoke(null, SSLEngine);
+                openSSLLibraryClass.getMethod("setSSLEngine", String.class).invoke(null, SSLEngine);
             } catch (Throwable t) {
-                t = ExceptionUtils.unwrapInvocationTargetException(t);
-                ExceptionUtils.handleThrowable(t);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(throwable);
             }
         }
     }
@@ -166,8 +166,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                         Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 return (String) openSSLLibraryClass.getMethod("getSSLRandomSeed").invoke(null);
             } catch (Throwable t) {
-                t = ExceptionUtils.unwrapInvocationTargetException(t);
-                ExceptionUtils.handleThrowable(t);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(throwable);
             }
         }
         return null;
@@ -178,10 +178,10 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
             try {
                 Class<?> openSSLLibraryClass =
                         Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
-                openSSLLibraryClass.getMethod("setSSLRandomSeed").invoke(null, SSLRandomSeed);
+                openSSLLibraryClass.getMethod("setSSLRandomSeed", String.class).invoke(null, SSLRandomSeed);
             } catch (Throwable t) {
-                t = ExceptionUtils.unwrapInvocationTargetException(t);
-                ExceptionUtils.handleThrowable(t);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(throwable);
             }
         }
     }
@@ -193,8 +193,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                         Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 return (String) openSSLLibraryClass.getMethod("getFIPSMode").invoke(null);
             } catch (Throwable t) {
-                t = ExceptionUtils.unwrapInvocationTargetException(t);
-                ExceptionUtils.handleThrowable(t);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(throwable);
             }
         }
         return null;
@@ -205,10 +205,10 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
             try {
                 Class<?> openSSLLibraryClass =
                         Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
-                openSSLLibraryClass.getMethod("setFIPSMode").invoke(null, FIPSMode);
+                openSSLLibraryClass.getMethod("setFIPSMode", String.class).invoke(null, FIPSMode);
             } catch (Throwable t) {
-                t = ExceptionUtils.unwrapInvocationTargetException(t);
-                ExceptionUtils.handleThrowable(t);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(throwable);
             }
         }
     }
@@ -220,8 +220,8 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                         Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                 return ((Boolean) openSSLLibraryClass.getMethod("isFIPSModeActive").invoke(null)).booleanValue();
             } catch (Throwable t) {
-                t = ExceptionUtils.unwrapInvocationTargetException(t);
-                ExceptionUtils.handleThrowable(t);
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
+                ExceptionUtils.handleThrowable(throwable);
             }
         }
         return false;

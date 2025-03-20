@@ -217,7 +217,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
             onError(e);
         }
         ready = Boolean.TRUE;
-        ClassLoader oldCL = processor.getUpgradeToken().getContextBind().bind(null);
+        ClassLoader oldCL = processor.getUpgradeToken().contextBind().bind(null);
         try {
             if (!eof) {
                 listener.onDataAvailable();
@@ -229,7 +229,7 @@ public class UpgradeServletInputStream extends ServletInputStream {
             ExceptionUtils.handleThrowable(t);
             onError(t);
         } finally {
-            processor.getUpgradeToken().getContextBind().unbind(oldCL);
+            processor.getUpgradeToken().contextBind().unbind(oldCL);
         }
     }
 
@@ -238,14 +238,14 @@ public class UpgradeServletInputStream extends ServletInputStream {
         if (listener == null) {
             return;
         }
-        ClassLoader oldCL = processor.getUpgradeToken().getContextBind().bind(null);
+        ClassLoader oldCL = processor.getUpgradeToken().contextBind().bind(null);
         try {
             listener.onError(t);
         } catch (Throwable t2) {
             ExceptionUtils.handleThrowable(t2);
             log.warn(sm.getString("upgrade.sis.onErrorFail"), t2);
         } finally {
-            processor.getUpgradeToken().getContextBind().unbind(oldCL);
+            processor.getUpgradeToken().contextBind().unbind(oldCL);
         }
         try {
             close();

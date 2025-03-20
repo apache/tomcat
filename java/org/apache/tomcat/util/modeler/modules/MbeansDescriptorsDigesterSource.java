@@ -44,7 +44,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
         Digester digester = new Digester();
         digester.setNamespaceAware(false);
         digester.setValidating(false);
-        URL url = Registry.getRegistry(null, null).getClass().getResource
+        URL url = Registry.getRegistry(null).getClass().getResource
             ("/org/apache/tomcat/util/modeler/mbeans-descriptors.dtd");
         if (url != null) {
             digester.register
@@ -151,7 +151,7 @@ public class MbeansDescriptorsDigesterSource extends ModelerSource
 
     public void execute() throws Exception {
         if (registry == null) {
-            registry = Registry.getRegistry(null, null);
+            registry = Registry.getRegistry(null);
         }
 
         InputStream stream = (InputStream) source;

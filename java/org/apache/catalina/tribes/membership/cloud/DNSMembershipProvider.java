@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -124,7 +125,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("cloudMembershipProvider.start", dnsServiceName));
         }
-        dnsServiceName = URLEncoder.encode(dnsServiceName, "UTF-8");
+        dnsServiceName = URLEncoder.encode(dnsServiceName, StandardCharsets.UTF_8);
 
         // Fetch initial members
         heartbeat();
@@ -161,7 +162,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
                     continue;
                 }
                 long aliveTime = -1;
-                MemberImpl member = null;
+                MemberImpl member;
                 try {
                     member = new MemberImpl(ip, port, aliveTime);
                 } catch (IOException e) {

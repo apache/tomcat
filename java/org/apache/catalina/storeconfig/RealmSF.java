@@ -61,8 +61,7 @@ public class RealmSF extends StoreFactoryBase {
     @Override
     public void storeChildren(PrintWriter aWriter, int indent, Object aRealm, StoreDescription parentDesc)
             throws Exception {
-        if (aRealm instanceof CombinedRealm) {
-            CombinedRealm combinedRealm = (CombinedRealm) aRealm;
+        if (aRealm instanceof CombinedRealm combinedRealm) {
 
             // Store nested <Realm> element
             Realm[] realms = combinedRealm.getNestedRealms();

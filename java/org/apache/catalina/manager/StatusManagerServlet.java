@@ -18,6 +18,7 @@ package org.apache.catalina.manager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class StatusManagerServlet extends HttpServlet implements NotificationListener {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------- Instance Variables
@@ -88,7 +90,7 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
     public void init() throws ServletException {
 
         // Retrieve the MBean server
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
 
         try {
 

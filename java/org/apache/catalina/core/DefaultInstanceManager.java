@@ -185,7 +185,8 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     /**
-     * Call postConstruct method on the specified instance recursively from deepest superclass to actual class.
+     * Call postConstruct method on the specified instance recursively from the deepest superclass
+     * to actual class.
      *
      * @param instance object to call postconstruct methods on
      * @param clazz    (super) class to examine for postConstruct annotation.
@@ -209,7 +210,7 @@ public class DefaultInstanceManager implements InstanceManager {
         // method is invoked
         AnnotationCacheEntry[] annotations = annotationCache.get(clazz);
         for (AnnotationCacheEntry entry : annotations) {
-            if (entry.getType() == AnnotationCacheEntryType.POST_CONSTRUCT) {
+            if (entry.type() == AnnotationCacheEntryType.POST_CONSTRUCT) {
                 // This will always return a new Method instance
                 // Making this instance accessible does not affect other instances
                 Method postConstruct = getMethod(clazz, entry);
@@ -222,7 +223,8 @@ public class DefaultInstanceManager implements InstanceManager {
 
 
     /**
-     * Call preDestroy method on the specified instance recursively from deepest superclass to actual class.
+     * Call preDestroy method on the specified instance recursively from the deepest superclass
+     * to actual class.
      *
      * @param instance object to call preDestroy methods on
      * @param clazz    (super) class to examine for preDestroy annotation.
@@ -245,7 +247,7 @@ public class DefaultInstanceManager implements InstanceManager {
             return;
         }
         for (AnnotationCacheEntry entry : annotations) {
-            if (entry.getType() == AnnotationCacheEntryType.PRE_DESTROY) {
+            if (entry.type() == AnnotationCacheEntryType.PRE_DESTROY) {
                 // This will always return a new Method instance
                 // Making this instance accessible does not affect other instances
                 Method preDestroy = getMethod(clazz, entry);
@@ -437,10 +439,10 @@ public class DefaultInstanceManager implements InstanceManager {
         while (clazz != null) {
             AnnotationCacheEntry[] annotations = annotationCache.get(clazz);
             for (AnnotationCacheEntry entry : annotations) {
-                if (entry.getType() == AnnotationCacheEntryType.SETTER) {
-                    lookupMethodResource(context, instance, getMethod(clazz, entry), entry.getName(), clazz);
-                } else if (entry.getType() == AnnotationCacheEntryType.FIELD) {
-                    lookupFieldResource(context, instance, getField(clazz, entry), entry.getName(), clazz);
+                if (entry.type() == AnnotationCacheEntryType.SETTER) {
+                    lookupMethodResource(context, instance, getMethod(clazz, entry), entry.name(), clazz);
+                } else if (entry.type() == AnnotationCacheEntryType.FIELD) {
+                    lookupFieldResource(context, instance, getField(clazz, entry), entry.name(), clazz);
                 }
             }
             clazz = clazz.getSuperclass();
@@ -599,7 +601,7 @@ public class DefaultInstanceManager implements InstanceManager {
     private static Method getMethod(final Class<?> clazz, final AnnotationCacheEntry entry) {
         Method result = null;
         try {
-            result = clazz.getDeclaredMethod(entry.getAccessibleObjectName(), entry.getParamTypes());
+            result = clazz.getDeclaredMethod(entry.accessibleObjectName(), entry.paramTypes());
         } catch (NoSuchMethodException e) {
             // Should never happen. On that basis don't log it.
         }
@@ -609,7 +611,7 @@ public class DefaultInstanceManager implements InstanceManager {
     private static Field getField(final Class<?> clazz, final AnnotationCacheEntry entry) {
         Field result = null;
         try {
-            result = clazz.getDeclaredField(entry.getAccessibleObjectName());
+            result = clazz.getDeclaredField(entry.accessibleObjectName());
         } catch (NoSuchFieldException e) {
             // Should never happen. On that basis don't log it.
         }
@@ -648,35 +650,8 @@ public class DefaultInstanceManager implements InstanceManager {
         return result;
     }
 
-    private static final class AnnotationCacheEntry {
-        private final String accessibleObjectName;
-        private final Class<?>[] paramTypes;
-        private final String name;
-        private final AnnotationCacheEntryType type;
-
-        AnnotationCacheEntry(String accessibleObjectName, Class<?>[] paramTypes, String name,
-                AnnotationCacheEntryType type) {
-            this.accessibleObjectName = accessibleObjectName;
-            this.paramTypes = paramTypes;
-            this.name = name;
-            this.type = type;
-        }
-
-        public String getAccessibleObjectName() {
-            return accessibleObjectName;
-        }
-
-        public Class<?>[] getParamTypes() {
-            return paramTypes;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public AnnotationCacheEntryType getType() {
-            return type;
-        }
+    private record AnnotationCacheEntry(String accessibleObjectName, Class<?>[] paramTypes,
+                                        String name, AnnotationCacheEntryType type) {
     }
 
 

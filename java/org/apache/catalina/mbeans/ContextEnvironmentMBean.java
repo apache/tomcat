@@ -42,7 +42,7 @@ public class ContextEnvironmentMBean extends BaseCatalinaMBean<ContextEnvironmen
 
         ContextEnvironment ce = doGetManagedResource();
 
-        // cannot use side-effects. It's removed and added back each time
+        // cannot use side effects. It's removed and added back each time
         // there is a modification in a resource.
         NamingResources nr = ce.getNamingResources();
         nr.removeEnvironment(ce.getName());

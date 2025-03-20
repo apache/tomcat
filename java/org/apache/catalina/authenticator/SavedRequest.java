@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.authenticator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +41,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
  */
 public final class SavedRequest implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

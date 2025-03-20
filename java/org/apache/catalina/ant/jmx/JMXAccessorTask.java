@@ -308,7 +308,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     public void execute() throws BuildException {
         if (testIfCondition() && testUnlessCondition()) {
             try {
-                String error = null;
+                String error;
 
                 MBeanServerConnection jmxServerConnection = getJMXConnection();
                 error = jmxExecute(jmxServerConnection);
@@ -370,7 +370,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return true if there is no if condition, or the named property exists
      */
     protected boolean testIfCondition() {
-        if (ifCondition == null || "".equals(ifCondition)) {
+        if (ifCondition == null || ifCondition.isEmpty()) {
             return true;
         }
         return getProperty(ifCondition) != null;
@@ -382,7 +382,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
      * @return true if there is no unless condition, or there is a named property but it doesn't exist
      */
     protected boolean testUnlessCondition() {
-        if (unlessCondition == null || "".equals(unlessCondition)) {
+        if (unlessCondition == null || unlessCondition.isEmpty()) {
             return true;
         }
         return getProperty(unlessCondition) == null;
@@ -409,7 +409,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
     public static MBeanServerConnection accessJMXConnection(Project project, String url, String host, String port,
             String username, String password, String refId) throws MalformedURLException, IOException {
         MBeanServerConnection jmxServerConnection = null;
-        boolean isRef = project != null && refId != null && refId.length() > 0;
+        boolean isRef = project != null && refId != null && !refId.isEmpty();
         if (isRef) {
             Object pref = project.getReference(refId);
             try {
@@ -442,7 +442,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
 
         MBeanServerConnection jmxServerConnection = null;
         if (isUseRef()) {
-            Object pref = null;
+            Object pref;
             if (getProject() != null) {
                 pref = getProject().getReference(getRef());
                 if (pref != null) {
@@ -595,8 +595,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
         if (propertyPrefix == null) {
             propertyPrefix = "";
         }
-        if (result instanceof CompositeDataSupport) {
-            CompositeDataSupport data = (CompositeDataSupport) result;
+        if (result instanceof CompositeDataSupport data) {
             CompositeType compositeType = data.getCompositeType();
             Set<String> keys = compositeType.keySet();
             for (String key : keys) {
@@ -608,8 +607,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
                     createProperty(propertyPrefix + "." + key, value);
                 }
             }
-        } else if (result instanceof TabularDataSupport) {
-            TabularDataSupport data = (TabularDataSupport) result;
+        } else if (result instanceof TabularDataSupport data) {
             for (Object key : data.keySet()) {
                 for (Object key1 : ((List<?>) key)) {
                     CompositeData valuedata = data.get(new Object[] { key1 });
@@ -639,7 +637,7 @@ public class JMXAccessorTask extends BaseRedirectorHelperTask {
             if (delim != null) {
                 StringTokenizer tokenizer = new StringTokenizer(result.toString(), delim);
                 int size = 0;
-                for (; tokenizer.hasMoreTokens();) {
+                while (tokenizer.hasMoreTokens()) {
                     String token = tokenizer.nextToken();
                     if (setProperty(propertyPrefix + "." + size, token)) {
                         size++;

@@ -23,21 +23,15 @@ import org.apache.tomcat.InstanceManager;
 
 /**
  * Token used during the upgrade process.
+ *
+ * @param httpUpgradeHandler The handler for the HTTP upgrade
+ * @param contextBind        The object to use to bind/unbind the current thread to/from the web application class
+ *                               loader
+ * @param instanceManager    The instance manager to use to create new Servlets, Filters, Listeners etc
+ * @param protocol           The desired protocol to upgrade to
  */
-public final class UpgradeToken {
-
-    private final ContextBind contextBind;
-    private final HttpUpgradeHandler httpUpgradeHandler;
-    private final InstanceManager instanceManager;
-    private final String protocol;
-
-    public UpgradeToken(HttpUpgradeHandler httpUpgradeHandler, ContextBind contextBind, InstanceManager instanceManager,
-            String protocol) {
-        this.contextBind = contextBind;
-        this.httpUpgradeHandler = httpUpgradeHandler;
-        this.instanceManager = instanceManager;
-        this.protocol = protocol;
-    }
+public record UpgradeToken(HttpUpgradeHandler httpUpgradeHandler, ContextBind contextBind,
+                           InstanceManager instanceManager, String protocol) {
 
     public ContextBind getContextBind() {
         return contextBind;
@@ -54,4 +48,5 @@ public final class UpgradeToken {
     public String getProtocol() {
         return protocol;
     }
+
 }

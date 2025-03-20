@@ -65,7 +65,7 @@ import org.apache.tomcat.util.res.StringManager;
  * For reading, this implementation is blocking within frames and non-blocking between frames. <br>
  * Note:
  * <ul>
- * <li>You will need to nest an &lt;UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /&gt; element
+ * <li>You will need to nest a &lt;UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol" /&gt; element
  * inside a TLS enabled Connector element in server.xml to enable HTTP/2 support.</li>
  * </ul>
  */
@@ -944,7 +944,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 } else if (windowSize < 1) {
                     /*
                      * The connection window has no capacity. If the stream has not been granted an allocation, and the
-                     * stream was not already added to the backlog due to an partial reservation (see next else if
+                     * stream was not already added to the backlog due to a partial reservation (see next else if
                      * block) add it to the backlog so it can obtain an allocation when capacity is available.
                      */
                     if (stream.getConnectionAllocationMade() == 0 && stream.getConnectionAllocationRequested() == 0) {
@@ -1585,10 +1585,9 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     public void headersEnd(int streamId, boolean endOfStream) throws Http2Exception {
         AbstractNonZeroStream abstractNonZeroStream =
                 getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
-        if (abstractNonZeroStream instanceof Stream) {
+        if (abstractNonZeroStream instanceof Stream stream) {
             boolean processStream = false;
             setMaxProcessedStream(streamId);
-            Stream stream = (Stream) abstractNonZeroStream;
             if (stream.isActive()) {
                 if (stream.receivedEndOfHeaders()) {
                     if (localSettings.getMaxConcurrentStreams() < activeRemoteStreamCount.get()) {
@@ -1626,8 +1625,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     public void receivedEndOfStream(int streamId) throws ConnectionException {
         AbstractNonZeroStream abstractNonZeroStream =
                 getAbstractNonZeroStream(streamId, connectionState.get().isNewStreamAllowed());
-        if (abstractNonZeroStream instanceof Stream) {
-            Stream stream = (Stream) abstractNonZeroStream;
+        if (abstractNonZeroStream instanceof Stream stream) {
             receivedEndOfStream(stream);
         }
     }
@@ -1657,8 +1655,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         increaseOverheadCount(FrameType.RST, getProtocol().getOverheadResetFactor());
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         abstractNonZeroStream.checkState(FrameType.RST);
-        if (abstractNonZeroStream instanceof Stream) {
-            Stream stream = (Stream) abstractNonZeroStream;
+        if (abstractNonZeroStream instanceof Stream stream) {
             boolean active = stream.isActive();
             stream.receiveReset(errorCode);
             if (active) {
@@ -1790,8 +1787,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     public void priorityUpdate(int prioritizedStreamID, Priority p) throws Http2Exception {
         increaseOverheadCount(FrameType.PRIORITY_UPDATE);
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(prioritizedStreamID, true);
-        if (abstractNonZeroStream instanceof Stream) {
-            Stream stream = (Stream) abstractNonZeroStream;
+        if (abstractNonZeroStream instanceof Stream stream) {
             stream.setUrgency(p.getUrgency());
             stream.setIncremental(p.getIncremental());
         }
@@ -1883,13 +1879,13 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 // Extract the sequence from the payload
                 int receivedSequence = ByteUtil.get31Bits(payload, 4);
                 PingRecord pingRecord = inflightPings.poll();
-                while (pingRecord != null && pingRecord.getSequence() < receivedSequence) {
+                while (pingRecord != null && pingRecord.sequence() < receivedSequence) {
                     pingRecord = inflightPings.poll();
                 }
                 if (pingRecord == null) {
                     // Unexpected ACK. Log it.
                 } else {
-                    long roundTripTime = System.nanoTime() - pingRecord.getSentNanoTime();
+                    long roundTripTime = System.nanoTime() - pingRecord.sentNanoTime();
                     roundTripTimes.add(Long.valueOf(roundTripTime));
                     while (roundTripTimes.size() > 3) {
                         // Ignore the returned value as we just want to reduce
@@ -1920,16 +1916,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
     }
 
 
-    protected static class PingRecord {
-
-        private final int sequence;
-        private final long sentNanoTime;
-
-        public PingRecord(int sequence, long sentNanoTime) {
-            this.sequence = sequence;
-            this.sentNanoTime = sentNanoTime;
-        }
-
+    protected record PingRecord(int sequence, long sentNanoTime) {
         public int getSequence() {
             return sequence;
         }

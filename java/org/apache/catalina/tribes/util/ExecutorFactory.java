@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.tribes.util;
 
+import java.io.Serial;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -75,8 +76,7 @@ public class ExecutorFactory {
             try {
                 super.execute(command);
             } catch (RejectedExecutionException rx) {
-                if (super.getQueue() instanceof TaskQueue) {
-                    TaskQueue queue = (TaskQueue) super.getQueue();
+                if (super.getQueue() instanceof TaskQueue queue) {
                     if (!queue.force(command)) {
                         throw new RejectedExecutionException(sm.getString("executorFactory.queue.full"));
                     }
@@ -87,6 +87,7 @@ public class ExecutorFactory {
 
     // ---------------------------------------------- TaskQueue Inner Class
     private static class TaskQueue extends LinkedBlockingQueue<Runnable> {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         transient ThreadPoolExecutor parent = null;

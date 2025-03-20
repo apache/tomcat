@@ -949,7 +949,7 @@ public class Catalina {
 
     // --------------------------------------- CatalinaShutdownHook Inner Class
 
-    // XXX Should be moved to embedded !
+
     /**
      * Shutdown hook which will perform a clean shutdown of Catalina if needed.
      */

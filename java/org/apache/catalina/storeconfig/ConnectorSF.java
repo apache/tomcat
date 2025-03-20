@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -32,8 +32,7 @@ public class ConnectorSF extends StoreFactoryBase {
     public void storeChildren(PrintWriter aWriter, int indent, Object aConnector, StoreDescription parentDesc)
             throws Exception {
 
-        if (aConnector instanceof Connector) {
-            Connector connector = (Connector) aConnector;
+        if (aConnector instanceof Connector connector) {
             // Store nested <Listener> elements
             LifecycleListener[] listeners = connector.findLifecycleListeners();
             storeElementArray(aWriter, indent, listeners);

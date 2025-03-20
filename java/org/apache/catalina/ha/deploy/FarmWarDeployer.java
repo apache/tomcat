@@ -142,13 +142,11 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
 
         // Check to correct engine and host setup
         Container econtainer = host.getParent();
-        if (!(econtainer instanceof Engine)) {
+        if (!(econtainer instanceof Engine engine)) {
             log.error(sm.getString("farmWarDeployer.hostParentEngine", host.getName()));
             return;
         }
-        Engine engine = (Engine) econtainer;
-        String hostname = null;
-        hostname = host.getName();
+        String hostname = host.getName();
         try {
             oname = new ObjectName(engine.getName() + ":type=Deployer,host=" + hostname);
         } catch (Exception e) {
@@ -165,7 +163,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
         configBase = host.getConfigBaseFile();
 
         // Retrieve the MBean server
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
 
         started = true;
         count = 0;
@@ -206,8 +204,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
     @Override
     public void messageReceived(ClusterMessage msg) {
         try {
-            if (msg instanceof FileMessage) {
-                FileMessage fmsg = (FileMessage) msg;
+            if (msg instanceof FileMessage fmsg) {
                 if (log.isTraceEnabled()) {
                     log.trace(sm.getString("farmWarDeployer.msgRxDeploy", fmsg.getContextName(), fmsg.getFileName()));
                 }
@@ -490,7 +487,7 @@ public class FarmWarDeployer extends ClusterListener implements ClusterDeployer,
      */
     protected void undeployDir(File dir) {
 
-        String files[] = dir.list();
+        String[] files = dir.list();
         if (files == null) {
             files = new String[0];
         }

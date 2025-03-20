@@ -511,7 +511,7 @@ public class MBeanUtils {
      */
     public static synchronized Registry createRegistry() {
         if (registry == null) {
-            registry = Registry.getRegistry(null, null);
+            registry = Registry.getRegistry(null);
             ClassLoader cl = MBeanUtils.class.getClassLoader();
 
             registry.loadDescriptors("org.apache.catalina.mbeans", cl);
@@ -542,7 +542,7 @@ public class MBeanUtils {
      */
     public static synchronized MBeanServer createServer() {
         if (mserver == null) {
-            mserver = Registry.getRegistry(null, null).getMBeanServer();
+            mserver = Registry.getRegistry(null).getMBeanServer();
         }
         return mserver;
     }

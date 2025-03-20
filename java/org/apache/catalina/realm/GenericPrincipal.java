@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.realm;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Arrays;
@@ -38,6 +39,7 @@ import org.ietf.jgss.GSSCredential;
  */
 public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 
@@ -244,31 +246,30 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
     // ----------------------------------------------------------- Serialization
 
+    @Serial
     private Object writeReplace() {
         return new SerializablePrincipal(name, roles, userPrincipal, attributes);
     }
 
-    private static class SerializablePrincipal implements Serializable {
-        private static final long serialVersionUID = 1L;
+    private record SerializablePrincipal(String name, String[] roles, Principal principal,
+                                         Map<String, Object> attributes) implements Serializable {
+            @Serial
+            private static final long serialVersionUID = 1L;
 
-        private final String name;
-        private final String[] roles;
-        private final Principal principal;
-        private final Map<String,Object> attributes;
-
-        SerializablePrincipal(String name, String[] roles, Principal principal, Map<String,Object> attributes) {
-            this.name = name;
-            this.roles = roles;
-            if (principal instanceof Serializable) {
-                this.principal = principal;
-            } else {
-                this.principal = null;
+            private SerializablePrincipal(String name, String[] roles, Principal principal, Map<String, Object> attributes) {
+                this.name = name;
+                this.roles = roles;
+                if (principal instanceof Serializable) {
+                    this.principal = principal;
+                } else {
+                    this.principal = null;
+                }
+                this.attributes = attributes;
             }
-            this.attributes = attributes;
-        }
 
-        private Object readResolve() {
-            return new GenericPrincipal(name, Arrays.asList(roles), principal, null, null, attributes);
+            @Serial
+            private Object readResolve() {
+                return new GenericPrincipal(name, Arrays.asList(roles), principal, null, null, attributes);
+            }
         }
-    }
 }

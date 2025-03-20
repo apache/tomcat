@@ -17,9 +17,7 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -179,16 +177,13 @@ public class FilterValve extends ValveBase implements FilterConfig {
 
             // I don't feel like writing a whole trivial class just for this one thing.
             application = (ServletContext) Proxy.newProxyInstance(getClass().getClassLoader(),
-                    new Class<?>[] { ServletContext.class }, new InvocationHandler() {
-                        @Override
-                        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                            if ("getAttribute".equals(method.getName()) && null != args && 1 == args.length &&
-                                    ScheduledThreadPoolExecutor.class.getName().equals(args[0])) {
-                                return executor;
-                            } else {
-                                throw new UnsupportedOperationException(
-                                        sm.getString("filterValve.proxyServletContext"));
-                            }
+                    new Class<?>[] { ServletContext.class }, (proxy, method, args) -> {
+                        if ("getAttribute".equals(method.getName()) && null != args && 1 == args.length &&
+                                ScheduledThreadPoolExecutor.class.getName().equals(args[0])) {
+                            return executor;
+                        } else {
+                            throw new UnsupportedOperationException(
+                                    sm.getString("filterValve.proxyServletContext"));
                         }
                     });
         }

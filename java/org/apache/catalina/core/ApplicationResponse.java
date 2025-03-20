@@ -66,7 +66,7 @@ class ApplicationResponse extends ServletResponseWrapper {
 
 
     /**
-     * Disallow <code>reset()</code> calls on a included response.
+     * Disallow <code>reset()</code> calls on an included response.
      *
      * @exception IllegalStateException if the response has already been committed
      */

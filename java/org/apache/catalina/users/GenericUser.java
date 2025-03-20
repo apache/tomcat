@@ -191,14 +191,13 @@ public class GenericUser<UD extends UserDatabase> extends AbstractUser {
     @Override
     public void setUsername(String username) {
         database.modifiedUser(this);
-        // Note: changing the user name is a problem ...
+        // Note: changing the username is a problem ...
         super.setUsername(username);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof GenericUser) {
-            GenericUser<?> user = (GenericUser<?>) obj;
+        if (obj instanceof GenericUser<?> user) {
             return user.database == database && username.equals(user.getUsername());
         }
         return super.equals(obj);

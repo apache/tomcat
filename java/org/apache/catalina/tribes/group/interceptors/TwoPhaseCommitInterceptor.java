@@ -52,7 +52,7 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         // and just send one message
         if (okToProcess(msg.getOptions())) {
             super.sendMessage(destination, msg, null);
-            ChannelMessage confirmation = null;
+            ChannelMessage confirmation;
             if (deepclone) {
                 confirmation = (ChannelMessage) msg.deepclone();
             } else {
@@ -136,21 +136,10 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
         }
     }
 
-    public static class MapEntry {
-        public final ChannelMessage msg;
-        public final UniqueId id;
-        public final long timestamp;
-
-        public MapEntry(ChannelMessage msg, UniqueId id, long timestamp) {
-            this.msg = msg;
-            this.id = id;
-            this.timestamp = timestamp;
-        }
-
+    public record MapEntry(ChannelMessage msg, UniqueId id, long timestamp) {
         public boolean expired(long now, long expiration) {
             return (now - timestamp) > expiration;
         }
-
     }
 
 }

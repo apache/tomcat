@@ -24,7 +24,7 @@ import java.io.ObjectOutput;
 /**
  * A byte message is not serialized and deserialized by the channel instead it is sent as a byte array.
  * <p>
- * By default Tribes uses java serialization when it receives an object to be sent over the wire. Java serialization is
+ * By default, Tribes uses java serialization when it receives an object to be sent over the wire. Java serialization is
  * not the most efficient of serializing data, and Tribes might not even have access to the correct class loaders to
  * deserialize the object properly.
  * <p>

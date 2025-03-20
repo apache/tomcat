@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Serial;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.file.Files;
@@ -203,6 +204,7 @@ public final class CGIServlet extends HttpServlet {
 
     /* some vars below copied from Craig R. McClanahan's InvokerServlet */
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Set<String> DEFAULT_SUPER_METHODS = new HashSet<>();
@@ -240,7 +242,7 @@ public final class CGIServlet extends HttpServlet {
     private String parameterEncoding = System.getProperty("file.encoding", "UTF-8");
 
     /* The HTTP methods this Servlet will pass to the CGI script */
-    private Set<String> cgiMethods = new HashSet<>();
+    private final Set<String> cgiMethods = new HashSet<>();
     private boolean cgiMethodsAll = false;
 
 
@@ -270,7 +272,7 @@ public final class CGIServlet extends HttpServlet {
     private boolean enableCmdLineArguments = false;
 
     /**
-     * Limits the encoded form of individual command line arguments. By default values are limited to those allowed by
+     * Limits the encoded form of individual command line arguments. By default, values are limited to those allowed by
      * the RFC. See https://tools.ietf.org/html/rfc3875#section-4.4 Uses \Q...\E to avoid individual quoting.
      */
     private Pattern cmdLineArgumentsEncodedPattern = Pattern.compile("[\\w\\Q%;/?:@&,$-.!~*'()\\E]+");
@@ -938,7 +940,7 @@ public final class CGIServlet extends HttpServlet {
              * (see method findCGI, where the real work is done)
              *
              */
-            if (pathInfo == null || (pathInfo.substring(sCGIFullName.length()).length() <= 0)) {
+            if (pathInfo == null || (pathInfo.substring(sCGIFullName.length()).isEmpty())) {
                 sPathInfoCGI = "";
             } else {
                 sPathInfoCGI = pathInfo.substring(sCGIFullName.length());
@@ -960,7 +962,7 @@ public final class CGIServlet extends HttpServlet {
              * path_translated = servletContext.getRealPath("/trans1/trans2")
              *
              * That is, PATH_TRANSLATED = webAppRootDir + sPathInfoCGI
-             * (unless sPathInfoCGI is null or blank, then the CGI
+             * (unless sPathInfoCGI is null or blank), then the CGI
              * specification dictates that the PATH_TRANSLATED metavariable
              * SHOULD NOT be defined.
              *
@@ -1405,9 +1407,9 @@ public final class CGIServlet extends HttpServlet {
          * <LI><u>Allowed characters in pathInfo</u>: This implementation does not allow ASCII NUL nor any character
          * which cannot be URL-encoded according to internet standards;
          * <LI><u>Allowed characters in path segments</u>: This implementation does not allow non-terminal NULL segments
-         * in the the path -- IOExceptions may be thrown;
+         * in the path -- IOExceptions may be thrown;
          * <LI><u>"<code>.</code>" and "<code>..</code>" path segments</u>: This implementation does not allow
-         * "<code>.</code>" and "<code>..</code>" in the the path, and such characters will result in an IOException
+         * "<code>.</code>" and "<code>..</code>" in the path, and such characters will result in an IOException
          * being thrown (this should never happen since Tomcat normalises the requestURI before determining the
          * contextPath, servletPath and pathInfo);
          * <LI><u>Implementation limitations</u>: This implementation does not impose any limitations except as

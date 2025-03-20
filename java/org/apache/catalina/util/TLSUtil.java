@@ -30,21 +30,12 @@ public class TLSUtil {
      *
      * @return {@code true} if the attribute is used to pass TLS configuration information, otherwise {@code false}
      */
-    @SuppressWarnings("deprecation")
     public static boolean isTLSRequestAttribute(String name) {
-        switch (name) {
-            case Globals.CERTIFICATES_ATTR:
-            case Globals.SECURE_PROTOCOL_ATTR:
-            case Globals.CIPHER_SUITE_ATTR:
-            case Globals.KEY_SIZE_ATTR:
-            case Globals.SSL_SESSION_ID_ATTR:
-            case Globals.SSL_SESSION_MGR_ATTR:
-            case SSLSupport.PROTOCOL_VERSION_KEY:
-            case SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY:
-            case SSLSupport.REQUESTED_CIPHERS_KEY:
-                return true;
-            default:
-                return false;
-        }
+        return switch (name) {
+            case Globals.CERTIFICATES_ATTR, Globals.SECURE_PROTOCOL_ATTR, Globals.CIPHER_SUITE_ATTR,
+                 Globals.KEY_SIZE_ATTR, Globals.SSL_SESSION_ID_ATTR, Globals.SSL_SESSION_MGR_ATTR,
+                 SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY, SSLSupport.REQUESTED_CIPHERS_KEY -> true;
+            default -> false;
+        };
     }
 }

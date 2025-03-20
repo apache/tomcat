@@ -16,12 +16,15 @@
  */
 package org.apache.catalina.session;
 
+import java.io.Serial;
+
 /**
  * An exception that indicates the maximum number of active sessions has been reached and the server is refusing to
  * create any new sessions.
  */
 public class TooManyActiveSessionsException extends IllegalStateException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

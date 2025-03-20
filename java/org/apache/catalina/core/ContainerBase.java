@@ -1157,13 +1157,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     // ---------------------------- Inner classes used with start/stop Executor
 
-    private static class StartChild implements Callable<Void> {
-
-        private final Container child;
-
-        StartChild(Container child) {
-            this.child = child;
-        }
+    private record StartChild(Container child) implements Callable<Void> {
 
         @Override
         public Void call() throws LifecycleException {
@@ -1172,13 +1166,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         }
     }
 
-    private static class StopChild implements Callable<Void> {
-
-        private final Container child;
-
-        StopChild(Container child) {
-            this.child = child;
-        }
+    private record StopChild(Container child) implements Callable<Void> {
 
         @Override
         public Void call() throws LifecycleException {

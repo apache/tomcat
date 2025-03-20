@@ -299,7 +299,7 @@ public class SingleSignOn extends ValveBase {
      * Process a session destroyed event by removing references to that session from the caches and - if the session
      * destruction is the result of a logout - destroy the associated SSO session.
      *
-     * @param ssoId   The ID of the SSO session which which the destroyed session was associated
+     * @param ssoId   The id of the SSO session with which the destroyed session was associated
      * @param session The session that has been destroyed
      */
     public void sessionDestroyed(String ssoId, Session session) {
@@ -556,7 +556,7 @@ public class SingleSignOn extends ValveBase {
         // Remove the inactive session from SingleSignOnEntry
         entry.removeSession(session);
 
-        // If there are not sessions left in the SingleSignOnEntry,
+        // If there are no sessions left in the SingleSignOnEntry,
         // deregister the entry.
         if (entry.findSessions().isEmpty()) {
             deregister(ssoId);

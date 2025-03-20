@@ -100,8 +100,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
     // =========================================================================
     @Override
     public void objectMadePrimary(Object key, Object value) {
-        if (value instanceof DeltaSession) {
-            DeltaSession session = (DeltaSession) value;
+        if (value instanceof DeltaSession session) {
             synchronized (session) {
                 session.access();
                 session.setPrimarySession(true);
@@ -178,8 +177,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
 
         setState(LifecycleState.STOPPING);
 
-        if (sessions instanceof LazyReplicatedMap) {
-            LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>) sessions;
+        if (sessions instanceof LazyReplicatedMap<String, Session> map) {
             map.breakdown();
         }
 
@@ -265,8 +263,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
     @Override
     public Set<String> getSessionIdsFull() {
         LazyReplicatedMap<String,Session> map = (LazyReplicatedMap<String,Session>) sessions;
-        Set<String> sessionIds = new HashSet<>(map.keySetFull());
-        return sessionIds;
+        return new HashSet<>(map.keySetFull());
     }
 
 }

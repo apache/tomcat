@@ -180,36 +180,38 @@ public class JAASCallbackHandler implements CallbackHandler {
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 
         for (Callback callback : callbacks) {
-
-            if (callback instanceof NameCallback) {
-                if (realm.getContainer().getLogger().isTraceEnabled()) {
-                    realm.getContainer().getLogger().trace(sm.getString("jaasCallback.username", username));
+            switch (callback) {
+                case NameCallback nameCallback -> {
+                    if (realm.getContainer().getLogger().isTraceEnabled()) {
+                        realm.getContainer().getLogger().trace(sm.getString("jaasCallback.username", username));
+                    }
+                    nameCallback.setName(username);
                 }
-                ((NameCallback) callback).setName(username);
-            } else if (callback instanceof PasswordCallback) {
-                final char[] passwordcontents;
-                if (password != null) {
-                    passwordcontents = password.toCharArray();
-                } else {
-                    passwordcontents = new char[0];
+                case PasswordCallback passwordCallback -> {
+                    final char[] passwordcontents;
+                    if (password != null) {
+                        passwordcontents = password.toCharArray();
+                    } else {
+                        passwordcontents = new char[0];
+                    }
+                    passwordCallback.setPassword(passwordcontents);
                 }
-                ((PasswordCallback) callback).setPassword(passwordcontents);
-            } else if (callback instanceof TextInputCallback) {
-                TextInputCallback cb = ((TextInputCallback) callback);
-                switch (cb.getPrompt()) {
-                    case "nonce" -> cb.setText(nonce);
-                    case "nc" -> cb.setText(nc);
-                    case "cnonce" -> cb.setText(cnonce);
-                    case "qop" -> cb.setText(qop);
-                    case "realmName" -> cb.setText(realmName);
-                    case "digestA2" -> cb.setText(digestA2);
-                    case "authMethod" -> cb.setText(authMethod);
-                    case "algorithm" -> cb.setText(algorithm);
-                    case "catalinaBase" -> cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
-                    default -> throw new UnsupportedCallbackException(callback);
+                case TextInputCallback cb -> {
+                    switch (cb.getPrompt()) {
+                        case "nonce" -> cb.setText(nonce);
+                        case "nc" -> cb.setText(nc);
+                        case "cnonce" -> cb.setText(cnonce);
+                        case "qop" -> cb.setText(qop);
+                        case "realmName" -> cb.setText(realmName);
+                        case "digestA2" -> cb.setText(digestA2);
+                        case "authMethod" -> cb.setText(authMethod);
+                        case "algorithm" -> cb.setText(algorithm);
+                        case "catalinaBase" ->
+                                cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
+                        default -> throw new UnsupportedCallbackException(callback);
+                    }
                 }
-            } else {
-                throw new UnsupportedCallbackException(callback);
+                case null, default -> throw new UnsupportedCallbackException(callback);
             }
         }
     }

@@ -2108,7 +2108,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 packageName = name.substring(0, pos);
             }
 
-            Package pkg = null;
+            Package pkg;
 
             if (packageName != null) {
                 pkg = getPackage(packageName);
@@ -2324,6 +2324,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
     protected void addURL(URL url) {
         super.addURL(url);
         hasExternalRepositories = true;
+        // Clear the not found resources as they may now be available at the added URL.
+        notFoundClassResources.clear();
     }
 
 
@@ -2357,12 +2359,6 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
         }
         return null;
-    }
-
-
-    @Override
-    public boolean hasLoggingConfig() {
-        return findResource("logging.properties") != null;
     }
 
 

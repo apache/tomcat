@@ -18,6 +18,7 @@ package org.apache.catalina.manager;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.util.Set;
 
 import javax.management.Attribute;
@@ -48,6 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class JMXProxyServlet extends HttpServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // Constant for "no parameters" when invoking a JMX operation
@@ -69,8 +71,8 @@ public class JMXProxyServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         // Retrieve the MBean server
-        registry = Registry.getRegistry(null, null);
-        mBeanServer = Registry.getRegistry(null, null).getMBeanServer();
+        registry = Registry.getRegistry(null);
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
     }
 
 

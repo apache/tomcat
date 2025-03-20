@@ -25,7 +25,7 @@ import javax.management.ObjectName;
  * Structure holding the Request and Response objects. It also holds statistical information about request processing
  * and provide management information about the requests being processed. Each thread uses a Request/Response pair that
  * is recycled on each request. This object provides a place to collect global low-level statistics - without having to
- * deal with synchronization ( since each thread will have it's own RequestProcessorMX ).
+ * deal with synchronization ( since each thread will have its own RequestProcessorMX ).
  *
  * @author Costin Manolache
  */
@@ -101,7 +101,7 @@ public class RequestInfo {
     /**
      * Obtain the remote address for this connection as reported by an intermediate proxy (if any).
      *
-     * @return The remote address for the this connection
+     * @return The remote address for this connection
      */
     public String getRemoteAddrForwarded() {
         String remoteAddrProxy = (String) req.getAttribute(Constants.REMOTE_ADDR_ATTRIBUTE);

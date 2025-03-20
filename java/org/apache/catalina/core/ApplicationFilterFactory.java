@@ -63,8 +63,7 @@ public final class ApplicationFilterFactory {
 
         // Create and initialize a filter chain object
         ApplicationFilterChain filterChain;
-        if (request instanceof Request) {
-            Request req = (Request) request;
+        if (request instanceof Request req) {
             filterChain = (ApplicationFilterChain) req.getFilterChain();
             if (filterChain == null) {
                 filterChain = new ApplicationFilterChain();

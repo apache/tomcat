@@ -488,53 +488,6 @@ public final class Response {
     }
 
 
-    /**
-     * Overrides the character encoding used in the body of the response. This method must be called prior to writing
-     * output using getWriter().
-     *
-     * @param characterEncoding The name of character encoding.
-     *
-     * @throws UnsupportedEncodingException If the specified name is not recognised
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public void setCharacterEncoding(String characterEncoding) throws UnsupportedEncodingException {
-        if (isCommitted()) {
-            return;
-        }
-
-        charsetHolder = CharsetHolder.getInstance(characterEncoding);
-        charsetHolder.validate();
-    }
-
-
-    /**
-     * Returns the current character set.
-     *
-     * @return The current character set
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public Charset getCharset() {
-        return charsetHolder.getCharset();
-    }
-
-
-    /**
-     * Returns the name of the current encoding.
-     *
-     * @return The name of the current encoding
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12.
-     */
-    @Deprecated
-    public String getCharacterEncoding() {
-        return charsetHolder.getName();
-    }
-
-
     public CharsetHolder getCharsetHolder() {
         return charsetHolder;
     }

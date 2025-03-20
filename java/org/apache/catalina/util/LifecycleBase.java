@@ -56,7 +56,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Will a {@link LifecycleException} thrown by a sub-class during {@link #initInternal()}, {@link #startInternal()},
+     * Will a {@link LifecycleException} thrown by a subclass during {@link #initInternal()}, {@link #startInternal()},
      * {@link #stopInternal()} or {@link #destroyInternal()} be re-thrown for the caller to handle or will it be logged
      * instead?
      *
@@ -68,7 +68,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Configure if a {@link LifecycleException} thrown by a sub-class during {@link #initInternal()},
+     * Configure if a {@link LifecycleException} thrown by a subclass during {@link #initInternal()},
      * {@link #startInternal()}, {@link #stopInternal()} or {@link #destroyInternal()} will be re-thrown for the caller
      * to handle or if it will be logged instead.
      *
@@ -98,7 +98,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Allow sub classes to fire {@link Lifecycle} events.
+     * Allow subclasses to fire {@link Lifecycle} events.
      *
      * @param type Event type
      * @param data Data associated with event.
@@ -128,7 +128,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Sub-classes implement this method to perform any instance initialisation required.
+     * Subclasses implement this method to perform any instance initialisation required.
      *
      * @throws LifecycleException If the initialisation fails
      */
@@ -167,7 +167,7 @@ public abstract class LifecycleBase implements Lifecycle {
                 // FAILED state so call stop() to complete the clean-up.
                 stop();
             } else if (!state.equals(LifecycleState.STARTING)) {
-                // Shouldn't be necessary but acts as a check that sub-classes are
+                // Shouldn't be necessary but acts as a check that subclasses are
                 // doing what they are supposed to.
                 invalidTransition(AFTER_START_EVENT);
             } else {
@@ -182,9 +182,9 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Sub-classes must ensure that the state is changed to {@link LifecycleState#STARTING} during the execution of this
+     * Subclasses must ensure that the state is changed to {@link LifecycleState#STARTING} during the execution of this
      * method. Changing state will trigger the {@link Lifecycle#START_EVENT} event. If a component fails to start it may
-     * either throw a {@link LifecycleException} which will cause it's parent to fail to start or it can place itself in
+     * either throw a {@link LifecycleException} which will cause it's parent to fail to start, or it can place itself in
      * the error state in which case {@link #stop()} will be called on the failed component but the parent component
      * will continue to start normally.
      *
@@ -234,7 +234,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
             stopInternal();
 
-            // Shouldn't be necessary but acts as a check that sub-classes are
+            // Shouldn't be necessary but acts as a check that subclasses are
             // doing what they are supposed to.
             if (!state.equals(LifecycleState.STOPPING) && !state.equals(LifecycleState.FAILED)) {
                 invalidTransition(AFTER_STOP_EVENT);
@@ -254,7 +254,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Sub-classes must ensure that the state is changed to {@link LifecycleState#STOPPING} during the execution of this
+     * Subclasses must ensure that the state is changed to {@link LifecycleState#STOPPING} during the execution of this
      * method. Changing state will trigger the {@link Lifecycle#STOP_EVENT} event.
      *
      * @throws LifecycleException Stop error occurred
@@ -304,7 +304,7 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Sub-classes implement this method to perform any instance destruction required.
+     * Subclasses implement this method to perform any instance destruction required.
      *
      * @throws LifecycleException If the destruction fails
      */
@@ -324,9 +324,9 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Provides a mechanism for sub-classes to update the component state. Calling this method will automatically fire
+     * Provides a mechanism for subclasses to update the component state. Calling this method will automatically fire
      * any associated {@link Lifecycle} event. It will also check that any attempted state transition is valid for a
-     * sub-class.
+     * subclass.
      *
      * @param state The new state for this component
      *
@@ -338,9 +338,9 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     /**
-     * Provides a mechanism for sub-classes to update the component state. Calling this method will automatically fire
+     * Provides a mechanism for subclasses to update the component state. Calling this method will automatically fire
      * any associated {@link Lifecycle} event. It will also check that any attempted state transition is valid for a
-     * sub-class.
+     * subclass.
      *
      * @param state The new state for this component
      * @param data  The data to pass to the associated {@link Lifecycle} event

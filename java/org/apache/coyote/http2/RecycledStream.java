@@ -55,7 +55,7 @@ class RecycledStream extends AbstractNonZeroStream {
     /**
      * {@inheritDoc}
      * <p>
-     * This implementation will return an zero length ByteBuffer to trigger a flow control error if more DATA frame
+     * This implementation will return a zero length ByteBuffer to trigger a flow control error if more DATA frame
      * payload than the remaining flow control window is received for this recycled stream.
      */
     @Override

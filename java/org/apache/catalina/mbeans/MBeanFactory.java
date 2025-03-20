@@ -203,7 +203,7 @@ public class MBeanFactory {
      * @param dataSourceName the datasource name
      * @param roleNameCol    the column name for the role names
      * @param userCredCol    the column name for the user credentials
-     * @param userNameCol    the column name for the user names
+     * @param userNameCol    the column name for the usernames
      * @param userRoleTable  the table name for the roles table
      * @param userTable      the table name for the users
      *
