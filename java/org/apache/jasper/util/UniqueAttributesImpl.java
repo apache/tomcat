@@ -24,8 +24,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 /**
- * Wraps the default attributes implementation and ensures that each attribute
- * has a unique qname as required by the JSP specification.
+ * Wraps the default attributes implementation and ensures that each attribute has a unique qname as required by the JSP
+ * specification.
  */
 public class UniqueAttributesImpl extends AttributesImpl {
 
@@ -60,8 +60,7 @@ public class UniqueAttributesImpl extends AttributesImpl {
     }
 
     @Override
-    public void addAttribute(String uri, String localName, String qName,
-            String type, String value) {
+    public void addAttribute(String uri, String localName, String qName, String type, String value) {
         if (qNames.add(qName)) {
             super.addAttribute(uri, localName, qName, type, value);
         } else {
@@ -70,8 +69,7 @@ public class UniqueAttributesImpl extends AttributesImpl {
     }
 
     @Override
-    public void setAttribute(int index, String uri, String localName,
-            String qName, String type, String value) {
+    public void setAttribute(int index, String uri, String localName, String qName, String type, String value) {
         qNames.remove(super.getQName(index));
         if (qNames.add(qName)) {
             super.setAttribute(index, uri, localName, qName, type, value);
@@ -114,7 +112,6 @@ public class UniqueAttributesImpl extends AttributesImpl {
         }
 
         // Ordinary tag attributes can't be repeated, even with identical values
-        throw new IllegalArgumentException(
-                    Localizer.getMessage("jsp.error.duplicateqname", qName));
+        throw new IllegalArgumentException(Localizer.getMessage("jsp.error.duplicateqname", qName));
     }
 }
