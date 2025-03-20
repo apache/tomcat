@@ -297,7 +297,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 // unregister mbeans.
                 if (!objectNames.isEmpty()) {
                     Collection<ObjectName> names = objectNames.values();
-                    Registry registry = Registry.getRegistryNonNull(null, null);
+                    Registry registry = Registry.getRegistry(null);
                     for (ObjectName objectName : names) {
                         registry.unregisterComponent(objectName);
                     }
@@ -979,7 +979,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             try {
                 ObjectName on = createObjectName(resource);
                 actualResource = envCtx.lookup(resource.getName());
-                Registry.getRegistryNonNull(null, null).registerComponent(actualResource, on, null);
+                Registry.getRegistry(null).registerComponent(actualResource, on, null);
                 objectNames.put(resource.getName(), on);
             } catch (Exception e) {
                 log.warn(sm.getString("naming.jmxRegistrationFailed", e));
@@ -1170,7 +1170,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
 
         ObjectName on = objectNames.get(name);
         if (on != null) {
-            Registry.getRegistryNonNull(null, null).unregisterComponent(on);
+            Registry.getRegistry(null).unregisterComponent(on);
         }
 
     }

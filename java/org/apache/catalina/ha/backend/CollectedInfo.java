@@ -55,7 +55,7 @@ public class CollectedInfo {
     public void init(String host, int port) throws Exception {
         int iport = 0;
         String shost = null;
-        mBeanServer = Registry.getRegistryNonNull(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
         String onStr = "*:type=ThreadPool,*";
         ObjectName objectName = new ObjectName(onStr);
         Set<ObjectInstance> set = mBeanServer.queryMBeans(objectName, null);

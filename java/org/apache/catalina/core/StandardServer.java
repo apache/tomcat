@@ -797,7 +797,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         try {
             // Note: Hard-coded domain used since this object is per Server/JVM
             ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
-            MBeanServer server = Registry.getRegistryNonNull(null, null).getMBeanServer();
+            MBeanServer server = Registry.getRegistry(null).getMBeanServer();
             if (server.isRegistered(sname)) {
                 server.invoke(sname, "storeConfig", null, null);
             } else {
@@ -824,7 +824,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         try {
             // Note: Hard-coded domain used since this object is per Server/JVM
             ObjectName sname = new ObjectName("Catalina:type=StoreConfig");
-            MBeanServer server = Registry.getRegistryNonNull(null, null).getMBeanServer();
+            MBeanServer server = Registry.getRegistry(null).getMBeanServer();
             if (server.isRegistered(sname)) {
                 server.invoke(sname, "store", new Object[] { context }, new String[] { "java.lang.String" });
             } else {

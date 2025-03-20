@@ -88,7 +88,7 @@ public class StatusManagerServlet extends HttpServlet implements NotificationLis
     public void init() throws ServletException {
 
         // Retrieve the MBean server
-        mBeanServer = Registry.getRegistryNonNull(null, null).getMBeanServer();
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
 
         try {
 

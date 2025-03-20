@@ -721,7 +721,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
 
             try {
                 jspMonitorON = new ObjectName(oname.toString());
-                Registry.getRegistryNonNull(null, null).registerComponent(instance, jspMonitorON, null);
+                Registry.getRegistry(null).registerComponent(instance, jspMonitorON, null);
             } catch (Exception ex) {
                 log.warn(sm.getString("standardWrapper.jspMonitorError", instance));
             }
@@ -1002,7 +1002,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
         instance = null;
 
         if (isJspServlet && jspMonitorON != null) {
-            Registry.getRegistryNonNull(null, null).unregisterComponent(jspMonitorON);
+            Registry.getRegistry(null).unregisterComponent(jspMonitorON);
         }
 
         unloading = false;
