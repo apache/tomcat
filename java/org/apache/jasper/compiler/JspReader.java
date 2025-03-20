@@ -30,7 +30,7 @@ import org.apache.tomcat.Jar;
 
 /**
  * JspReader is an input buffer for the JSP parser. It should allow unlimited lookahead and pushback. It also has a
- * bunch of parsing utility methods for understanding htmlesque thingies.
+ * bunch of parsing utility methods for understanding html style content.
  *
  * @author Anil K. Vijendran
  * @author Anselm Baird-Smith
@@ -599,7 +599,7 @@ class JspReader {
 
     /**
      * Parse utils - Is current character a token delimiter ? Delimiters are currently defined to be =, &gt;, &lt;, ",
-     * and ' or any any space character as defined by <code>isSpace</code>.
+     * and ' or any space character as defined by <code>isSpace</code>.
      *
      * @return A boolean.
      */

@@ -46,7 +46,7 @@ import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
  * @author Kin-man Chung
  */
 
-class TagFileProcessor {
+public class TagFileProcessor {
 
     private List<Compiler> tempVector;
 
@@ -625,7 +625,7 @@ class TagFileProcessor {
     /**
      * Removed the java and class files for the tag prototype generated from the current compilation.
      *
-     * @param classFileName If non-null, remove only the class file with with this name.
+     * @param classFileName If non-null, remove only the class file with this name.
      */
     public void removeProtoTypeFiles(String classFileName) {
         for (Compiler c : tempVector) {

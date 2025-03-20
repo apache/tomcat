@@ -427,8 +427,7 @@ public class ReflectionUtil {
      * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
     private static boolean isCoercibleFrom(EvaluationContext ctx, Object src, Class<?> target) {
-        // TODO: This isn't pretty but it works. Significant refactoring would
-        // be required to avoid the exception.
+        // TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the exception.
         try {
             ELSupport.coerceToType(ctx, src, target);
         } catch (ELException e) {

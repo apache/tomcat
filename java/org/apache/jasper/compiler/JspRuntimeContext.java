@@ -338,7 +338,7 @@ public final class JspRuntimeContext {
 
 
     /**
-     * Method used by background thread to check the JSP dependencies registered with this class for JSP's.
+     * Method used by background thread to check the JSP dependencies registered with this class for JSPs.
      */
     public void checkCompile() {
 
@@ -387,7 +387,7 @@ public final class JspRuntimeContext {
             try {
                 if (jsw.isTagFile()) {
                     // Although this is a public method, all other paths to this
-                    // method use this sync and it is required to prevent race
+                    // method use this sync, and it is required to prevent race
                     // conditions during the reload.
                     synchronized (this) {
                         jsw.loadTagFile();
@@ -558,7 +558,7 @@ public final class JspRuntimeContext {
 
 
     /**
-     * Method used by background thread to check if any JSP's should be unloaded.
+     * Method used by background thread to check if any JSPs should be unloaded.
      */
     public void checkUnload() {
 

@@ -43,7 +43,7 @@ import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 
 /**
- * A place holder for various things that are used through out the JSP engine. This is a per-request/per-context data
+ * A placeholder for various things that are used throughout the JSP engine. This is a per-request/per-context data
  * structure. Some of the instance variables are set at different points. Most of the path-related stuff is here -
  * mangling names, versions, dirs, loading resources and dealing with uris.
  *
@@ -188,7 +188,7 @@ public class JspCompilationContext {
 
     /**
      * The output directory to generate code into. The output directory is make up of the scratch directory, which is
-     * provide in Options, plus the directory derived from the package name.
+     * provided in Options, plus the directory derived from the package name.
      *
      * @return the output directory in which the generated sources are placed
      */

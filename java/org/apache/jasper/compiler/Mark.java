@@ -26,7 +26,7 @@ import org.apache.jasper.JspCompilationContext;
  *
  * @author Anil K. Vijendran
  */
-final class Mark {
+public final class Mark {
 
     // position within current stream
     int cursor, line, col;

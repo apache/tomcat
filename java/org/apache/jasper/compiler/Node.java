@@ -49,7 +49,7 @@ import org.xml.sax.Attributes;
  * @author Mark Roth
  */
 
-abstract class Node implements TagConstants {
+public abstract class Node implements TagConstants {
 
     private static final VariableInfo[] ZERO_VARIABLE_INFO = {};
 
@@ -346,7 +346,7 @@ abstract class Node implements TagConstants {
     }
 
     /**
-     * Selects and invokes a method in the visitor class based on the node type. This is abstract and should be overrode
+     * Selects and invokes a method in the visitor class based on the node type. This is abstract and should be overridden
      * by the extending classes.
      *
      * @param v The visitor class
@@ -2280,7 +2280,7 @@ abstract class Node implements TagConstants {
 
         /**
          * This method provides a place to put actions that are common to all nodes. Override this in the child visitor
-         * class if need to.
+         * class if needed.
          *
          * @param n The node to visit
          */

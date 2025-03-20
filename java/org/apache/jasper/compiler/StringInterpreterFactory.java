@@ -153,7 +153,7 @@ public class StringInterpreterFactory {
 
 
         /**
-         * Intended to be used by sub-classes that don't need/want to re-implement the logic in
+         * Intended to be used by subclasses that don't need/want to re-implement the logic in
          * {@link #convertString(Class, String, String, Class, boolean)}.
          *
          * @param c                unused
