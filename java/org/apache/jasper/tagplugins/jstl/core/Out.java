@@ -31,35 +31,33 @@ public final class Out implements TagPlugin {
     @Override
     public void doTag(TagPluginContext ctxt) {
 
-        //these two data member are to indicate
-        //whether the corresponding attribute is specified
+        // these two data member are to indicate
+        // whether the corresponding attribute is specified
         boolean hasDefault = ctxt.isAttributeSpecified("default");
         boolean hasEscapeXml = ctxt.isAttributeSpecified("escapeXml");
 
-        //strValName, strEscapeXmlName & strDefName are two variables' name
-        //standing for value, escapeXml and default attribute
+        // strValName, strEscapeXmlName & strDefName are two variables' name
+        // standing for value, escapeXml and default attribute
         String strObjectName = ctxt.getTemporaryVariableName();
         String strValName = ctxt.getTemporaryVariableName();
         String strDefName = ctxt.getTemporaryVariableName();
         String strEscapeXmlName = ctxt.getTemporaryVariableName();
         String strSkipBodyName = ctxt.getTemporaryVariableName();
 
-        //according to the tag file, the value attribute is mandatory.
+        // according to the tag file, the value attribute is mandatory.
         ctxt.generateImport("java.io.Reader");
         ctxt.generateJavaSource("Object " + strObjectName + "=");
         ctxt.generateAttribute("value");
         ctxt.generateJavaSource(";");
         ctxt.generateJavaSource("String " + strValName + "=null;");
-        ctxt.generateJavaSource("if(!(" + strObjectName +
-                " instanceof Reader) && "+ strObjectName + " != null){");
-        ctxt.generateJavaSource(
-                strValName + " = " + strObjectName + ".toString();");
+        ctxt.generateJavaSource("if(!(" + strObjectName + " instanceof Reader) && " + strObjectName + " != null){");
+        ctxt.generateJavaSource(strValName + " = " + strObjectName + ".toString();");
         ctxt.generateJavaSource("}");
 
-        //initiate the strDefName with null.
-        //if the default has been specified, then assign the value to it;
+        // initiate the strDefName with null.
+        // if the default has been specified, then assign the value to it;
         ctxt.generateJavaSource("String " + strDefName + " = null;");
-        if(hasDefault){
+        if (hasDefault) {
             ctxt.generateJavaSource("if(");
             ctxt.generateAttribute("default");
             ctxt.generateJavaSource(" != null){");
@@ -69,28 +67,26 @@ public final class Out implements TagPlugin {
             ctxt.generateJavaSource("}");
         }
 
-        //initiate the strEscapeXmlName with true;
-        //if the escapeXml is specified, assign the value to it;
+        // initiate the strEscapeXmlName with true;
+        // if the escapeXml is specified, assign the value to it;
         ctxt.generateJavaSource("boolean " + strEscapeXmlName + " = true;");
-        if(hasEscapeXml){
+        if (hasEscapeXml) {
             ctxt.generateJavaSource(strEscapeXmlName + " = ");
             ctxt.generateAttribute("escapeXml");
             ctxt.generateJavaSource(";");
         }
 
-        //main part.
+        // main part.
         ctxt.generateJavaSource(
-                "boolean " + strSkipBodyName + " = " +
-                "org.apache.jasper.tagplugins.jstl.core.Out.output(out, " +
-                strObjectName + ", " + strValName + ", " + strDefName + ", " +
-                strEscapeXmlName + ");");
+                "boolean " + strSkipBodyName + " = " + "org.apache.jasper.tagplugins.jstl.core.Out.output(out, " +
+                        strObjectName + ", " + strValName + ", " + strDefName + ", " + strEscapeXmlName + ");");
         ctxt.generateJavaSource("if(!" + strSkipBodyName + ") {");
         ctxt.generateBody();
         ctxt.generateJavaSource("}");
     }
 
-    public static boolean output(JspWriter out, Object input, String value,
-            String defaultValue, boolean escapeXml) throws IOException {
+    public static boolean output(JspWriter out, Object input, String value, String defaultValue, boolean escapeXml)
+            throws IOException {
         if (input instanceof Reader) {
             char[] buffer = new char[8096];
             int read = 0;
@@ -113,7 +109,7 @@ public final class Out implements TagPlugin {
         } else {
             String v = value != null ? value : defaultValue;
             if (v != null) {
-                if(escapeXml){
+                if (escapeXml) {
                     v = Util.escapeXml(v);
                 }
                 out.write(v);

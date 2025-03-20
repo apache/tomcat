@@ -25,42 +25,42 @@ public class Set implements TagPlugin {
     @Override
     public void doTag(TagPluginContext ctxt) {
 
-        //the scope name
+        // the scope name
         String strScope;
-        //the id of the scope
+        // the id of the scope
         int iScope;
 
-        //the flags to indicate whether the attributes have been specified
-        //initialize the flags
+        // the flags to indicate whether the attributes have been specified
+        // initialize the flags
         boolean hasValue = ctxt.isAttributeSpecified("value");
         boolean hasVar = ctxt.isAttributeSpecified("var");
         boolean hasScope = ctxt.isAttributeSpecified("scope");
         boolean hasTarget = ctxt.isAttributeSpecified("target");
 
-        //the temp variables name
+        // the temp variables name
         String resultName = ctxt.getTemporaryVariableName();
         String targetName = ctxt.getTemporaryVariableName();
         String propertyName = ctxt.getTemporaryVariableName();
 
-        //initialize the "result" which will be assigned to the var or target.property
+        // initialize the "result" which will be assigned to the var or target.property
         ctxt.generateJavaSource("Object " + resultName + " = null;");
-        if(hasValue){
+        if (hasValue) {
             ctxt.generateJavaSource(resultName + " = ");
             ctxt.generateAttribute("value");
             ctxt.generateJavaSource(";");
-        }else{
+        } else {
             ctxt.dontUseTagPlugin();
             return;
         }
 
-        //initialize the strScope
-        if(hasScope){
+        // initialize the strScope
+        if (hasScope) {
             strScope = ctxt.getConstantAttribute("scope");
-        }else{
+        } else {
             strScope = "page";
         }
 
-        //get the iScope according to the strScope
+        // get the iScope according to the strScope
         iScope = Util.getScope(strScope);
 
         String jspCtxt = null;
@@ -69,29 +69,30 @@ public class Set implements TagPlugin {
         } else {
             jspCtxt = "_jspx_page_context";
         }
-        //if the attribute var has been specified then assign the result to the var;
-        if(hasVar){
+        // if the attribute var has been specified then assign the result to the var;
+        if (hasVar) {
             String strVar = ctxt.getConstantAttribute("var");
             ctxt.generateJavaSource("if(null != " + resultName + "){");
-            ctxt.generateJavaSource("    " + jspCtxt + ".setAttribute(\"" + strVar + "\"," + resultName + "," + iScope + ");");
+            ctxt.generateJavaSource(
+                    "    " + jspCtxt + ".setAttribute(\"" + strVar + "\"," + resultName + "," + iScope + ");");
             ctxt.generateJavaSource("} else {");
-            if(hasScope){
+            if (hasScope) {
                 ctxt.generateJavaSource("    " + jspCtxt + ".removeAttribute(\"" + strVar + "\"," + iScope + ");");
-            }else{
+            } else {
                 ctxt.generateJavaSource("    " + jspCtxt + ".removeAttribute(\"" + strVar + "\");");
             }
             ctxt.generateJavaSource("}");
 
-            //else assign the result to the target.property
-        }else if(hasTarget){
+            // else assign the result to the target.property
+        } else if (hasTarget) {
 
-            //generate the temp variable name
+            // generate the temp variable name
             String pdName = ctxt.getTemporaryVariableName();
             String successFlagName = ctxt.getTemporaryVariableName();
             String index = ctxt.getTemporaryVariableName();
             String methodName = ctxt.getTemporaryVariableName();
 
-            //initialize the property
+            // initialize the property
             ctxt.generateJavaSource("String " + propertyName + " = null;");
             ctxt.generateJavaSource("if(");
             ctxt.generateAttribute("property");
@@ -101,57 +102,69 @@ public class Set implements TagPlugin {
             ctxt.generateJavaSource(").toString();");
             ctxt.generateJavaSource("}");
 
-            //initialize the target
+            // initialize the target
             ctxt.generateJavaSource("Object " + targetName + " = ");
             ctxt.generateAttribute("target");
             ctxt.generateJavaSource(";");
 
-            //the target is ok
+            // the target is ok
             ctxt.generateJavaSource("if(" + targetName + " != null){");
 
-            //if the target is a map, then put the result into the map with the key property
+            // if the target is a map, then put the result into the map with the key property
             ctxt.generateJavaSource("    if(" + targetName + " instanceof java.util.Map){");
             ctxt.generateJavaSource("        if(null != " + resultName + "){");
-            ctxt.generateJavaSource("            ((java.util.Map) " + targetName + ").put(" + propertyName + "," + resultName + ");");
+            ctxt.generateJavaSource(
+                    "            ((java.util.Map) " + targetName + ").put(" + propertyName + "," + resultName + ");");
             ctxt.generateJavaSource("        }else{");
             ctxt.generateJavaSource("            ((java.util.Map) " + targetName + ").remove(" + propertyName + ");");
             ctxt.generateJavaSource("        }");
 
-            //else assign the result to the target.property
+            // else assign the result to the target.property
             ctxt.generateJavaSource("    }else{");
             ctxt.generateJavaSource("        try{");
 
-            //get all the property of the target
-            ctxt.generateJavaSource("            java.beans.PropertyDescriptor " + pdName + "[] = java.beans.Introspector.getBeanInfo(" + targetName + ".getClass()).getPropertyDescriptors();");
+            // get all the property of the target
+            ctxt.generateJavaSource("            java.beans.PropertyDescriptor " + pdName +
+                    "[] = java.beans.Introspector.getBeanInfo(" + targetName +
+                    ".getClass()).getPropertyDescriptors();");
 
-            //the success flag is to imply whether the assign is successful
+            // the success flag is to imply whether the assign is successful
             ctxt.generateJavaSource("            boolean " + successFlagName + " = false;");
 
-            //find the right property
-            ctxt.generateJavaSource("            for(int " + index + "=0;" + index + "<" + pdName + ".length;" + index + "++){");
-            ctxt.generateJavaSource("                if(" + pdName + "[" + index + "].getName().equals(" + propertyName + ")){");
+            // find the right property
+            ctxt.generateJavaSource(
+                    "            for(int " + index + "=0;" + index + "<" + pdName + ".length;" + index + "++){");
+            ctxt.generateJavaSource(
+                    "                if(" + pdName + "[" + index + "].getName().equals(" + propertyName + ")){");
 
-            //get the "set" method;
-            ctxt.generateJavaSource("                    java.lang.reflect.Method " + methodName + " = " + pdName + "[" + index + "].getWriteMethod();");
+            // get the "set" method;
+            ctxt.generateJavaSource("                    java.lang.reflect.Method " + methodName + " = " + pdName +
+                    "[" + index + "].getWriteMethod();");
             ctxt.generateJavaSource("                    if(null == " + methodName + "){");
-            ctxt.generateJavaSource("                        throw new JspException(\"No setter method in &lt;set&gt; for property \"+" + propertyName + ");");
+            ctxt.generateJavaSource(
+                    "                        throw new JspException(\"No setter method in &lt;set&gt; for property \"+" +
+                            propertyName + ");");
             ctxt.generateJavaSource("                    }");
 
-            //invoke the method through the reflection
+            // invoke the method through the reflection
             ctxt.generateJavaSource("                    if(" + resultName + " != null){");
-            ctxt.generateJavaSource("                        " + methodName + ".invoke(" + targetName + ", new Object[]{org.apache.el.lang.ELSupport.coerceToType(" + jspCtxt + ".getELContext(), " + resultName + ", " + methodName + ".getParameterTypes()[0])});");
+            ctxt.generateJavaSource("                        " + methodName + ".invoke(" + targetName +
+                    ", new Object[]{org.apache.el.lang.ELSupport.coerceToType(" + jspCtxt + ".getELContext(), " +
+                    resultName + ", " + methodName + ".getParameterTypes()[0])});");
             ctxt.generateJavaSource("                    }else{");
-            ctxt.generateJavaSource("                        " + methodName + ".invoke(" + targetName + ", new Object[]{null});");
+            ctxt.generateJavaSource(
+                    "                        " + methodName + ".invoke(" + targetName + ", new Object[]{null});");
             ctxt.generateJavaSource("                    }");
             ctxt.generateJavaSource("                    " + successFlagName + " = true;");
             ctxt.generateJavaSource("                }");
             ctxt.generateJavaSource("            }");
             ctxt.generateJavaSource("            if(!" + successFlagName + "){");
-            ctxt.generateJavaSource("                throw new JspException(\"Invalid property in &lt;set&gt;:\"+" + propertyName + ");");
+            ctxt.generateJavaSource("                throw new JspException(\"Invalid property in &lt;set&gt;:\"+" +
+                    propertyName + ");");
             ctxt.generateJavaSource("            }");
             ctxt.generateJavaSource("        }");
 
-            //catch the el exception and throw it as a JspException
+            // catch the el exception and throw it as a JspException
             ctxt.generateJavaSource("        catch (IllegalAccessException ex) {");
             ctxt.generateJavaSource("            throw new JspException(ex);");
             ctxt.generateJavaSource("        } catch (java.beans.IntrospectionException ex) {");
