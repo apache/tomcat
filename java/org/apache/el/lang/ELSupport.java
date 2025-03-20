@@ -457,22 +457,23 @@ public class ELSupport {
             }
         }
 
-        return switch (obj) {
-            case null -> "";
-            case String s -> s;
-            case Enum<?> anEnum -> anEnum.name();
-            default -> {
-                try {
-                    yield obj.toString();
-                } catch (ELException e) {
-                    // Unlikely but you never know
-                    throw e;
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
-                    throw new ELException(t);
-                }
+        if (obj == null) {
+            return "";
+        } else if (obj instanceof String) {
+            return (String) obj;
+        } else if (obj instanceof Enum<?>) {
+            return ((Enum<?>) obj).name();
+        } else {
+            try {
+                return obj.toString();
+            } catch (ELException e) {
+                // Unlikely but you never know
+                throw e;
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                throw new ELException(t);
             }
-        };
+        }
     }
 
     public static <T> T coerceToType(final ELContext ctx, final Object obj, final Class<T> type)
