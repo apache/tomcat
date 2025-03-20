@@ -73,9 +73,8 @@ public final class EmbeddedServletOptions implements Options {
     private boolean isPoolingEnabled = true;
 
     /**
-     * Do you want support for "mapped" files? This will generate
-     * servlet that has a print statement per line of the JSP file.
-     * This seems like a really nice feature to have for debugging.
+     * Do you want support for "mapped" files? This will generate servlet that has a print statement per line of the JSP
+     * file. This seems like a really nice feature to have for debugging.
      */
     private boolean mappedFile = true;
 
@@ -107,8 +106,7 @@ public final class EmbeddedServletOptions implements Options {
     private boolean errorOnUseBeanInvalidClassAttribute = true;
 
     /**
-     * I want to see my generated servlets. Which directory are they
-     * in?
+     * I want to see my generated servlets. Which directory are they in?
      */
     private final File scratchDir;
 
@@ -153,8 +151,7 @@ public final class EmbeddedServletOptions implements Options {
     private TagPluginManager tagPluginManager = null;
 
     /**
-     * Java platform encoding to generate the JSP
-     * page servlet.
+     * Java platform encoding to generate the JSP page servlet.
      */
     private String javaEncoding = "UTF-8";
 
@@ -174,33 +171,29 @@ public final class EmbeddedServletOptions implements Options {
     private boolean xpoweredBy;
 
     /**
-     * Should we include a source fragment in exception messages, which could be displayed
-     * to the developer ?
+     * Should we include a source fragment in exception messages, which could be displayed to the developer ?
      */
     private boolean displaySourceFragment = true;
 
 
     /**
-     * The maximum number of loaded jsps per web-application. If there are more
-     * jsps loaded, they will be unloaded.
+     * The maximum number of loaded jsps per web-application. If there are more jsps loaded, they will be unloaded.
      */
     private int maxLoadedJsps = -1;
 
     /**
-     * The idle time in seconds after which a JSP is unloaded.
-     * If unset or less or equal than 0, no jsps are unloaded.
+     * The idle time in seconds after which a JSP is unloaded. If unset or less or equal than 0, no jsps are unloaded.
      */
     private int jspIdleTimeout = -1;
 
     /**
-     * Should JSP.1.6 be applied strictly to attributes defined using scriptlet
-     * expressions?
+     * Should JSP.1.6 be applied strictly to attributes defined using scriptlet expressions?
      */
     private boolean strictQuoteEscaping = true;
 
     /**
-     * When EL is used in JSP attribute values, should the rules for quoting of
-     * attributes described in JSP.1.6 be applied to the expression?
+     * When EL is used in JSP attribute values, should the rules for quoting of attributes described in JSP.1.6 be
+     * applied to the expression?
      */
     private boolean quoteAttributeEL = true;
 
@@ -230,13 +223,13 @@ public final class EmbeddedServletOptions implements Options {
 
     private boolean useInstanceManagerForTags = false;
 
-    public String getProperty(String name ) {
-        return settings.getProperty( name );
+    public String getProperty(String name) {
+        return settings.getProperty(name);
     }
 
-    public void setProperty(String name, String value ) {
-        if (name != null && value != null){
-            settings.setProperty( name, value );
+    public void setProperty(String name, String value) {
+        if (name != null && value != null) {
+            settings.setProperty(name, value);
         }
     }
 
@@ -388,7 +381,7 @@ public final class EmbeddedServletOptions implements Options {
     }
 
     @Override
-    public Map<String, TagLibraryInfo> getCache() {
+    public Map<String,TagLibraryInfo> getCache() {
         return null;
     }
 
@@ -478,18 +471,18 @@ public final class EmbeddedServletOptions implements Options {
     }
 
     /**
-     * Create an EmbeddedServletOptions object using data available from
-     * ServletConfig and ServletContext.
-     * @param config The Servlet config
+     * Create an EmbeddedServletOptions object using data available from ServletConfig and ServletContext.
+     *
+     * @param config  The Servlet config
      * @param context The Servlet context
      */
     public EmbeddedServletOptions(ServletConfig config, ServletContext context) {
 
-        Enumeration<String> enumeration=config.getInitParameterNames();
-        while( enumeration.hasMoreElements() ) {
-            String k=enumeration.nextElement();
-            String v=config.getInitParameter( k );
-            setProperty( k, v);
+        Enumeration<String> enumeration = config.getInitParameterNames();
+        while (enumeration.hasMoreElements()) {
+            String k = enumeration.nextElement();
+            String v = config.getInitParameter(k);
+            setProperty(k, v);
         }
 
         String keepgen = config.getInitParameter("keepgenerated");
@@ -519,8 +512,7 @@ public final class EmbeddedServletOptions implements Options {
 
         this.isPoolingEnabled = true;
         String poolingEnabledParam = config.getInitParameter("enablePooling");
-        if (poolingEnabledParam != null
-                && !poolingEnabledParam.equalsIgnoreCase("true")) {
+        if (poolingEnabledParam != null && !poolingEnabledParam.equalsIgnoreCase("true")) {
             if (poolingEnabledParam.equalsIgnoreCase("false")) {
                 this.isPoolingEnabled = false;
             } else {
@@ -546,9 +538,9 @@ public final class EmbeddedServletOptions implements Options {
         String debugInfo = config.getInitParameter("classdebuginfo");
         if (debugInfo != null) {
             if (debugInfo.equalsIgnoreCase("true")) {
-                this.classDebugInfo  = true;
+                this.classDebugInfo = true;
             } else if (debugInfo.equalsIgnoreCase("false")) {
-                this.classDebugInfo  = false;
+                this.classDebugInfo = false;
             } else {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage("jsp.warning.classDebugInfo"));
@@ -560,7 +552,7 @@ public final class EmbeddedServletOptions implements Options {
         if (checkInterval != null) {
             try {
                 this.checkInterval = Integer.parseInt(checkInterval);
-            } catch(NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage("jsp.warning.checkInterval"));
                 }
@@ -571,7 +563,7 @@ public final class EmbeddedServletOptions implements Options {
         if (modificationTestInterval != null) {
             try {
                 this.modificationTestInterval = Integer.parseInt(modificationTestInterval);
-            } catch(NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 if (log.isWarnEnabled()) {
                     log.warn(Localizer.getMessage("jsp.warning.modificationTestInterval"));
                 }
@@ -674,21 +666,19 @@ public final class EmbeddedServletOptions implements Options {
             return;
         }
 
-        if (!(scratchDir.exists() && scratchDir.canRead() &&
-                scratchDir.canWrite() && scratchDir.isDirectory())) {
-            log.fatal(Localizer.getMessage("jsp.error.bad.scratch.dir",
-                    scratchDir.getAbsolutePath()));
+        if (!(scratchDir.exists() && scratchDir.canRead() && scratchDir.canWrite() && scratchDir.isDirectory())) {
+            log.fatal(Localizer.getMessage("jsp.error.bad.scratch.dir", scratchDir.getAbsolutePath()));
         }
 
         this.compiler = config.getInitParameter("compiler");
 
         String compilerTargetVM = config.getInitParameter("compilerTargetVM");
-        if(compilerTargetVM != null) {
+        if (compilerTargetVM != null) {
             this.compilerTargetVM = compilerTargetVM;
         }
 
         String compilerSourceVM = config.getInitParameter("compilerSourceVM");
-        if(compilerSourceVM != null) {
+        if (compilerSourceVM != null) {
             this.compilerSourceVM = compilerSourceVM;
         }
 
@@ -745,9 +735,9 @@ public final class EmbeddedServletOptions implements Options {
         if (maxLoadedJsps != null) {
             try {
                 this.maxLoadedJsps = Integer.parseInt(maxLoadedJsps);
-            } catch(NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 if (log.isWarnEnabled()) {
-                    log.warn(Localizer.getMessage("jsp.warning.maxLoadedJsps", ""+this.maxLoadedJsps));
+                    log.warn(Localizer.getMessage("jsp.warning.maxLoadedJsps", "" + this.maxLoadedJsps));
                 }
             }
         }
@@ -756,9 +746,9 @@ public final class EmbeddedServletOptions implements Options {
         if (jspIdleTimeout != null) {
             try {
                 this.jspIdleTimeout = Integer.parseInt(jspIdleTimeout);
-            } catch(NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 if (log.isWarnEnabled()) {
-                    log.warn(Localizer.getMessage("jsp.warning.jspIdleTimeout", ""+this.jspIdleTimeout));
+                    log.warn(Localizer.getMessage("jsp.warning.jspIdleTimeout", "" + this.jspIdleTimeout));
                 }
             }
         }
