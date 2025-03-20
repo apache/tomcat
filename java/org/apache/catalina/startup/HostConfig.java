@@ -1566,7 +1566,7 @@ public class HostConfig implements LifecycleListener {
         try {
             ObjectName hostON = host.getObjectName();
             oname = new ObjectName(hostON.getDomain() + ":type=Deployer,host=" + host.getName());
-            Registry.getRegistryNonNull(null, null).registerComponent(this, oname, this.getClass().getName());
+            Registry.getRegistry(null).registerComponent(this, oname, this.getClass().getName());
         } catch (Exception e) {
             log.warn(sm.getString("hostConfig.jmx.register", oname), e);
         }
@@ -1594,7 +1594,7 @@ public class HostConfig implements LifecycleListener {
 
         if (oname != null) {
             try {
-                Registry.getRegistryNonNull(null, null).unregisterComponent(oname);
+                Registry.getRegistry(null).unregisterComponent(oname);
             } catch (Exception e) {
                 log.warn(sm.getString("hostConfig.jmx.unregister", oname), e);
             }

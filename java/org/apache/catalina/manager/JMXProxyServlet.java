@@ -71,8 +71,8 @@ public class JMXProxyServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         // Retrieve the MBean server
-        registry = Registry.getRegistryNonNull(null, null);
-        mBeanServer = Registry.getRegistryNonNull(null, null).getMBeanServer();
+        registry = Registry.getRegistry(null);
+        mBeanServer = Registry.getRegistry(null).getMBeanServer();
     }
 
 

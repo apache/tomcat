@@ -98,7 +98,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         // be de-registered.
         ObjectName rgOname = getGlobalRequestProcessorMBeanName();
         if (rgOname != null) {
-            Registry registry = Registry.getRegistryNonNull(null, null);
+            Registry registry = Registry.getRegistry(null);
             ObjectName query = new ObjectName(rgOname.getCanonicalName() + ",Upgrade=*");
             Set<ObjectInstance> upgrades = registry.getMBeanServer().queryMBeans(query, null);
             for (ObjectInstance upgrade : upgrades) {
@@ -616,7 +616,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                     ObjectName oname = getONameForUpgrade(upgradeProtocol);
                     if (oname != null) {
                         try {
-                            Registry.getRegistryNonNull(null, null).registerComponent(result, oname, null);
+                            Registry.getRegistry(null).registerComponent(result, oname, null);
                         } catch (Exception e) {
                             getLog().warn(sm.getString("abstractHttp11Protocol.upgradeJmxRegistrationFail"), e);
                             result = null;
