@@ -227,10 +227,12 @@ public abstract class AbstractReplicatedMap<K, V>
 
         // create a rpc channel and add the map as a listener
         this.rpcChannel = new RpcChannel(this.mapContextName, channel, this);
-        // add this map as a message listener
-        this.channel.addChannelListener(this);
-        // listen for membership notifications
-        this.channel.addMembershipListener(this);
+        if (this.channel != null) {
+            // add this map as a message listener
+            this.channel.addChannelListener(this);
+            // listen for membership notifications
+            this.channel.addMembershipListener(this);
+        }
 
         try {
             // broadcast our map, this just notifies other members of our existence
@@ -569,7 +571,8 @@ public abstract class AbstractReplicatedMap<K, V>
 
         // backup request
         if (mapmsg.getMsgType() == MapMessage.MSG_RETRIEVE_BACKUP) {
-            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
+            @SuppressWarnings("unchecked")
+            MapEntry<K,V> entry = innerMap.get((K) mapmsg.getKey());
             if (entry == null || (!entry.isSerializable())) {
                 return null;
             }
@@ -671,7 +674,7 @@ public abstract class AbstractReplicatedMap<K, V>
         }
 
         if (mapmsg.getMsgType() == MapMessage.MSG_PROXY) {
-            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
+            MapEntry<K,V> entry = innerMap.get((K) mapmsg.getKey());
             if (entry == null) {
                 entry = new MapEntry<>((K) mapmsg.getKey(), (V) mapmsg.getValue());
                 MapEntry<K,V> old = innerMap.putIfAbsent(entry.getKey(), entry);
@@ -687,11 +690,11 @@ public abstract class AbstractReplicatedMap<K, V>
         }
 
         if (mapmsg.getMsgType() == MapMessage.MSG_REMOVE) {
-            innerMap.remove(mapmsg.getKey());
+            innerMap.remove((K) mapmsg.getKey());
         }
 
         if (mapmsg.getMsgType() == MapMessage.MSG_BACKUP || mapmsg.getMsgType() == MapMessage.MSG_COPY) {
-            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
+            MapEntry<K,V> entry = innerMap.get((K) mapmsg.getKey());
             if (entry == null) {
                 entry = new MapEntry<>((K) mapmsg.getKey(), (V) mapmsg.getValue());
                 entry.setBackup(mapmsg.getMsgType() == MapMessage.MSG_BACKUP);
@@ -743,7 +746,7 @@ public abstract class AbstractReplicatedMap<K, V>
         } // end if
 
         if (mapmsg.getMsgType() == MapMessage.MSG_ACCESS) {
-            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
+            MapEntry<K,V> entry = innerMap.get((K) mapmsg.getKey());
             if (entry != null) {
                 entry.setBackupNodes(mapmsg.getBackupNodes());
                 entry.setPrimary(mapmsg.getPrimary());
@@ -754,7 +757,7 @@ public abstract class AbstractReplicatedMap<K, V>
         }
 
         if (mapmsg.getMsgType() == MapMessage.MSG_NOTIFY_MAPMEMBER) {
-            MapEntry<K,V> entry = innerMap.get(mapmsg.getKey());
+            MapEntry<K,V> entry = innerMap.get((K) mapmsg.getKey());
             if (entry != null) {
                 entry.setBackupNodes(mapmsg.getBackupNodes());
                 entry.setPrimary(mapmsg.getPrimary());
@@ -993,7 +996,8 @@ public abstract class AbstractReplicatedMap<K, V>
     }
 
     public V remove(Object key, boolean notify) {
-        MapEntry<K,V> entry = innerMap.remove(key);
+        @SuppressWarnings("unchecked")
+        MapEntry<K,V> entry = innerMap.remove((K) key);
 
         try {
             if (getMapMembers().length > 0 && notify) {
@@ -1007,7 +1011,9 @@ public abstract class AbstractReplicatedMap<K, V>
         return entry != null ? entry.getValue() : null;
     }
 
-    public MapEntry<K,V> getInternal(Object key) {
+    public MapEntry<K,V> getInternal(Object keyObject) {
+        @SuppressWarnings("unchecked")
+        K key = (K) keyObject;
         return innerMap.get(key);
     }
 
@@ -1106,7 +1112,7 @@ public abstract class AbstractReplicatedMap<K, V>
             int cnt = 0;
 
             while (i.hasNext()) {
-                Map.Entry<?,?> e = i.next();
+                Map.Entry<K,?> e = i.next();
                 System.out.println((++cnt) + ". " + innerMap.get(e.getKey()));
             }
             System.out.println("EndMap]\n\n");
@@ -1220,8 +1226,7 @@ public abstract class AbstractReplicatedMap<K, V>
     public Set<Map.Entry<K,V>> entrySet() {
         LinkedHashSet<Map.Entry<K,V>> set = new LinkedHashSet<>(innerMap.size());
         for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
-            Object key = e.getKey();
-            MapEntry<K,V> entry = innerMap.get(key);
+            MapEntry<K,V> entry = innerMap.get(e.getKey());
             if (entry != null && entry.isActive()) {
                 set.add(entry);
             }
@@ -1251,7 +1256,7 @@ public abstract class AbstractReplicatedMap<K, V>
         // todo, implement a counter variable instead
         // only count active members in this node
         int counter = 0;
-        for (Entry<?, ?> e : innerMap.entrySet()) {
+        for (Entry<K,MapEntry<K,V>> e : innerMap.entrySet()) {
             if (e != null) {
                 MapEntry<K, V> entry = innerMap.get(e.getKey());
                 if (entry != null && entry.isActive() && entry.getValue() != null) {
