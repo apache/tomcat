@@ -156,6 +156,10 @@
       <fix>
         Improve handling of unexpected errors during HTTP/2 processing. (markt)
       </fix>
+      <fix>
+        Add missing code to process an OpenSSL profile, such as
+        <code>PROFILE=SYSTEM</code>, using FFM. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
