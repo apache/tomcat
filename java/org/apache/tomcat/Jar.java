@@ -57,7 +57,7 @@ public interface Jar extends AutoCloseable {
      * @param name  Entry to obtain the modification time for
      *
      * @return The time (in the same format as
-     *         {@link System#currentTimeMillis()} that the resource was last
+     *         {@link System#currentTimeMillis()}) that the resource was last
      *         modified. Returns -1 if the entry does not exist
      *
      * @throws IOException if an I/O error occurs while processing the JAR file

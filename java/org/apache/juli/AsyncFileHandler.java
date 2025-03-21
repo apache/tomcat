@@ -119,17 +119,13 @@ public class AsyncFileHandler extends FileHandler {
         // fill source entries, before we hand the record over to another
         // thread with another class loader
         record.getSourceMethodName();
-        loggerService.execute(new Runnable() {
-
-            @Override
-            public void run() {
-                /*
-                 * During Tomcat shutdown, the Handlers are closed before the executor queue is flushed therefore the
-                 * closed flag is ignored if the executor is shutting down.
-                 */
-                if (!closed || loggerService.isTerminating()) {
-                    publishInternal(record);
-                }
+        loggerService.execute(() -> {
+            /*
+             * During Tomcat shutdown, the Handlers are closed before the executor queue is flushed therefore the
+             * closed flag is ignored if the executor is shutting down.
+             */
+            if (!closed || loggerService.isTerminating()) {
+                publishInternal(record);
             }
         });
     }
@@ -186,7 +182,7 @@ public class AsyncFileHandler extends FileHandler {
                     Runtime.getRuntime().removeShutdownHook(dummyHook);
                 } catch (IllegalStateException ise) {
                     // JVM is shutting down.
-                    // Allow up to 10s for for the queue to be emptied
+                    // Allow up to 10s for the queue to be emptied
                     shutdown();
                     try {
                         awaitTermination(10, TimeUnit.SECONDS);

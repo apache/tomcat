@@ -23,7 +23,7 @@ import java.util.TreeSet;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 
-final class SetPropertyClass implements Comparable<SetPropertyClass> {
+public final class SetPropertyClass implements Comparable<SetPropertyClass> {
 
     static final String OBJECT_VAR_NAME = "o";
     static final String NAME_VAR_NAME = "name";

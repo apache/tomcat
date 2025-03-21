@@ -38,7 +38,7 @@ import org.apache.tomcat.util.security.PermissionCheck;
  * <p><strong>Usage example:</strong></p>
  *
  * Configure the certificate with a service binding.
- *
+ * <p>
  * When the service binding is constructed as follows:
  *
  * <pre>

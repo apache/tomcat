@@ -41,7 +41,7 @@ public abstract class SSLImplementation {
      * class name.
      *
      * @param className The class name of the required implementation or null to
-     *                  use the default (currently {@link JSSEImplementation}.
+     *                  use the default (currently {@link JSSEImplementation}).
      *
      * @return An instance of the required implementation
      *

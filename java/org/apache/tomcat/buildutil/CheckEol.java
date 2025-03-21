@@ -123,7 +123,7 @@ public class CheckEol extends Task {
             log("Done line ends check in " + count + " file(s), "
                     + errors.size() + " error(s) found.");
         }
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             String message = "The following files have wrong line ends: "
                     + errors;
             // We need to explicitly write the message to the log, because

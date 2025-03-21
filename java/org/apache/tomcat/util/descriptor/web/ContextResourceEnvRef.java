@@ -20,7 +20,7 @@ package org.apache.tomcat.util.descriptor.web;
 
 /**
  * Representation of an application resource reference, as represented in
- * an <code>&lt;res-env-refy&gt;</code> element in the deployment descriptor.
+ * an <code>&lt;res-env-ref&gt;</code> element in the deployment descriptor.
  *
  * @author Craig R. McClanahan
  * @author Peter Rossbach (pero@apache.org)

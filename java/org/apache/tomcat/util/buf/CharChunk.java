@@ -108,7 +108,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
-     * Sets the buffer to the specified subarray of characters.
+     * Sets the buffer to the specified sub array of characters.
      *
      * @param c   the characters
      * @param off the start offset of the characters

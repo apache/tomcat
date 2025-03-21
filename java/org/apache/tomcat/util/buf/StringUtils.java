@@ -102,13 +102,10 @@ public final class StringUtils {
 
     /**
      * Splits a comma-separated string into an array of String values.
-     *
      * Whitespace around the commas is removed.
-     *
      * Null or empty values will return a zero-element array.
      *
      * @param s The string to split by commas.
-     *
      * @return An array of String values.
      */
     public static String[] splitCommaSeparated(String s) {

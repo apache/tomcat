@@ -192,7 +192,7 @@ public final class IntrospectionUtils {
                                 params)).booleanValue();
                     }catch (IllegalArgumentException biae) {
                         //the boolean method had the wrong
-                        //parameter types. lets try the other
+                        //parameter types. let's try the other
                         if (setPropertyMethodVoid!=null) {
                             setPropertyMethodVoid.invoke(o, params);
                             return true;
@@ -570,7 +570,6 @@ public final class IntrospectionUtils {
      * the specified type. The class <code>clazz</code>, all its superclasses,
      * interfaces and those superinterfaces are tested for a match against
      * the type name <code>type</code>.
-     *
      * This is similar to <code>instanceof</code> or {@link Class#isAssignableFrom}
      * except that the target type will not be resolved into a Class
      * object, which provides some security and memory benefits.

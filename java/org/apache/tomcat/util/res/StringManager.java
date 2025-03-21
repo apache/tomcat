@@ -220,7 +220,7 @@ public class StringManager {
         if (map == null) {
             /*
              * Don't want the HashMap size to exceed LOCALE_CACHE_SIZE. Expansion occurs when size() exceeds capacity.
-             * Therefore keep size at or below capacity. removeEldestEntry() executes after insertion therefore the test
+             * Therefore, keep size at or below capacity. removeEldestEntry() executes after insertion therefore the test
              * for removal needs to use one less than the maximum desired size. Note this is an LRU cache.
              */
             map = new LinkedHashMap<>(LOCALE_CACHE_SIZE, 0.75f, true) {

@@ -384,7 +384,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         boolean doWrite = false;
         synchronized (messagePartLock) {
             if (Constants.OPCODE_CLOSE == mp.getOpCode() && getBatchingAllowed()) {
-                // Should not happen. To late to send batched messages now since
+                // Should not happen. Too late to send batched messages now since
                 // the session has been closed. Complain loudly.
                 log.warn(sm.getString("wsRemoteEndpoint.flushOnCloseFailed"));
             }
@@ -573,7 +573,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     /**
      * If a transformation needs to split a {@link MessagePart} into multiple {@link MessagePart}s, it uses this handler
-     * as the end handler for each of the additional {@link MessagePart}s. This handler notifies this this class that
+     * as the end handler for each of the additional {@link MessagePart}s. This handler notifies this class that
      * the {@link MessagePart} has been processed and that the next {@link MessagePart} in the queue should be started.
      * The final {@link MessagePart} will use the {@link EndMessageHandler} provided with the original
      * {@link MessagePart}.
@@ -786,7 +786,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             b = 0;
         }
 
-        // Next write the mask && length length
+        // Next write the mask && length
         if (payload.remaining() < 126) {
             headerBuffer.put((byte) (payload.remaining() | b));
         } else if (payload.remaining() < 65536) {

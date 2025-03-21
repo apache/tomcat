@@ -168,7 +168,7 @@ import org.apache.tomcat.util.res.StringManager;
  * Direct handoffs generally require unbounded maximumPoolSizes to
  * avoid rejection of new submitted tasks. This in turn admits the
  * possibility of unbounded thread growth when commands continue to
- * arrive on average faster than they can be processed.
+ * arrive faster on average than they can be processed.
  *
  * <li><em> Unbounded queues.</em> Using an unbounded queue (for
  * example a {@link java.util.concurrent.LinkedBlockingQueue}
@@ -181,8 +181,8 @@ import org.apache.tomcat.util.res.StringManager;
  * affect each others execution; for example, in a web page server.
  * While this style of queuing can be useful in smoothing out
  * transient bursts of requests, it admits the possibility of
- * unbounded work queue growth when commands continue to arrive on
- * average faster than they can be processed.
+ * unbounded work queue growth when commands continue to arrive faster
+ * on average than they can be processed.
  *
  * <li><em>Bounded queues.</em> A bounded queue (for example, an
  * {@link java.util.concurrent.ArrayBlockingQueue})
@@ -461,7 +461,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * to be generally preferable to use a lock. Among the reasons is
      * that this serializes interruptIdleWorkers, which avoids
      * unnecessary interrupt storms, especially during shutdown.
-     * Otherwise exiting threads would concurrently interrupt those
+     * Otherwise, exiting threads would concurrently interrupt those
      * that have not yet interrupted. It also simplifies some of the
      * associated statistics bookkeeping of largestPoolSize etc. We
      * also hold mainLock on shutdown and shutdownNow, for the sake of
@@ -548,7 +548,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     /**
      * Timeout in nanoseconds for idle threads waiting for work.
      * Threads use this timeout when there are more than corePoolSize
-     * present or if allowCoreThreadTimeOut. Otherwise they wait
+     * present or if allowCoreThreadTimeOut. Otherwise, they wait
      * forever for new work.
      */
     private volatile long keepAliveTime;
@@ -2281,7 +2281,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * request and then retries {@code execute}, unless the executor
      * is shut down, in which case the task is discarded. This policy is
      * rarely useful in cases where other threads may be waiting for
-     * tasks to terminate, or failures must be recorded. Instead consider
+     * tasks to terminate, or failures must be recorded. Instead, consider
      * using a handler of the form:
      * <pre> {@code
      * new RejectedExecutionHandler() {

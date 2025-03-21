@@ -78,7 +78,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
      * <p>
      * The close message is a special case. It needs to be blocking else implementing the clean-up that follows the
      * sending of the close message gets a lot more complicated. On the server, this creates additional complications as
-     * a dead-lock may occur in the following scenario:
+     * a deadlock may occur in the following scenario:
      * <ol>
      * <li>Application thread writes message using non-blocking</li>
      * <li>Write does not complete (write logic holds message pending lock)</li>
@@ -88,9 +88,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
      * <li>Container holds socket lock and is blocked waiting for message pending lock</li>
      * <li>Poller fires write possible event for socket</li>
      * <li>Container tries to process write possible event but is blocked waiting for socket lock</li>
-     * <li>Processing of the WebSocket connection is dead-locked until the original message write times out</li>
+     * <li>Processing of the WebSocket connection is deadlocked until the original message write times out</li>
      * </ol>
-     * The purpose of this method is to break the above dead-lock. It does this by returning control of the processor to
+     * The purpose of this method is to break the above deadlock. It does this by returning control of the processor to
      * the socket wrapper and releasing the socket lock while waiting for the pending message write to complete.
      * Normally, that would be a terrible idea as it creates the possibility that the processor is returned to the pool
      * more than once under various error conditions. In this instance it is safe because these are upgrade processors

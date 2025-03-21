@@ -127,7 +127,7 @@ public class FactoryCreateRule extends Rule {
     public void end(String namespace, String name) throws Exception {
 
         // check if object was created
-        // this only happens if an exception was thrown and we're ignoring them
+        // this only happens if an exception was thrown, and we're ignoring them
         if (
                 ignoreCreateExceptions &&
                 exceptionIgnoredStack != null &&

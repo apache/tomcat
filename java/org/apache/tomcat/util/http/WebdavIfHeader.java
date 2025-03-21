@@ -68,12 +68,12 @@ import org.apache.tomcat.util.res.StringManager;
  * must not match the concrete token or etag.
  * <p>
  * Example: The <em>ifList</em> <code>(&lt;token&gt; [etag])</code> only matches
- * if the concret token has the value <code>token</code> and the conrete etag
+ * if the concrete token has the value <code>token</code> and the concrete etag
  * has the value <code>etag</code>. On the other hand, the <em>ifList</em>
  * <code>(Not &lt;notoken&gt;)</code> matches any token which is not
  * <code>notoken</code> (in this case the concrete value of the etag is
  * not taken into consideration).
- *
+ * <p>
  * This class was contributed by Apache Jackrabbit
  *
  * @author Felix Meschberger
@@ -112,7 +112,7 @@ public class WebdavIfHeader {
     private String uriPrefix;
 
     /**
-     * Create a Untagged <code>IfHeader</code> if the given lock tokens.
+     * Create an Untagged <code>IfHeader</code> if the given lock tokens.
      *
      * @param tokens the tokens
      *
@@ -321,7 +321,7 @@ public class WebdavIfHeader {
             throws IOException  {
         IfHeaderList list = new IfHeaderList();
         while (true) {
-            // read next non white space
+            // read next non whitespace
             reader.mark(1);
             int c = readWhiteSpace(reader);
             if (c < 0) {
@@ -593,7 +593,7 @@ public class WebdavIfHeader {
         }
 
         /**
-         * Matches the entry's value to the the token or etag. Depending on the
+         * Matches the entry's value to the token or etag. Depending on the
          * concrete implementation, only one of the parameters may be evaluated
          * while the other may be ignored.
          * <p>
@@ -850,7 +850,7 @@ public class WebdavIfHeader {
         /**
          * Matches a list of {@link IfList}s against the token and etag. If any of
          * the {@link IfList}s matches, the method returns <code>true</code>.
-         * On the other hand <code>false</code> is only returned if non of the
+         * On the other hand <code>false</code> is only returned if none of the
          * {@link IfList}s match.
          *
          * @param resource The resource to match, which is ignored by this

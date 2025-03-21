@@ -55,7 +55,7 @@ import org.xml.sax.Attributes;
  * not configurable. </p>
  *
  * <p>Note also that if a CallMethodRule is expecting exactly one parameter
- * and that parameter is not available (eg CallParamRule is used with an
+ * and that parameter is not available (e.g. CallParamRule is used with an
  * attribute name but the attribute does not exist) then the method will
  * not be invoked. If a CallMethodRule is expecting more than one parameter,
  * then it is always invoked, regardless of whether the parameters were
@@ -335,16 +335,9 @@ public class CallMethodRule extends Rule {
         }
 
         if (target == null) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("[CallMethodRule]{");
-            sb.append(digester.match);
-            sb.append("} Call target is null (");
-            sb.append("targetOffset=");
-            sb.append(targetOffset);
-            sb.append(",stackdepth=");
-            sb.append(digester.getCount());
-            sb.append(')');
-            throw new org.xml.sax.SAXException(sb.toString());
+            String sb = "[CallMethodRule]{" + digester.match + "} Call target is null (" +
+                    "targetOffset=" + targetOffset + ",stackdepth=" + digester.getCount() + ')';
+            throw new org.xml.sax.SAXException(sb);
         }
 
         // Invoke the required method on the top object

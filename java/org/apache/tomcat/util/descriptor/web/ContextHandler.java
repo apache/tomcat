@@ -53,9 +53,9 @@ public class ContextHandler extends ResourceBase {
     /**
      * A list of QName specifying the SOAP Headers the handler will work on.
      * -namespace and localpart values must be found inside the WSDL.
-     *
+     * <p>
      * A service-qname is composed by a namespaceURI and a localpart.
-     *
+     * <p>
      * soapHeader[0] : namespaceURI
      * soapHeader[1] : localpart
      */
@@ -159,12 +159,9 @@ public class ContextHandler extends ResourceBase {
         int result = super.hashCode();
         result = prime * result +
                 ((handlerclass == null) ? 0 : handlerclass.hashCode());
-        result = prime * result +
-                ((portNames == null) ? 0 : portNames.hashCode());
-        result = prime * result +
-                ((soapHeaders == null) ? 0 : soapHeaders.hashCode());
-        result = prime * result +
-                ((soapRoles == null) ? 0 : soapRoles.hashCode());
+        result = prime * result + portNames.hashCode();
+        result = prime * result + soapHeaders.hashCode();
+        result = prime * result + soapRoles.hashCode();
         return result;
     }
 
@@ -188,27 +185,12 @@ public class ContextHandler extends ResourceBase {
         } else if (!handlerclass.equals(other.handlerclass)) {
             return false;
         }
-        if (portNames == null) {
-            if (other.portNames != null) {
-                return false;
-            }
-        } else if (!portNames.equals(other.portNames)) {
+        if (!portNames.equals(other.portNames)) {
             return false;
         }
-        if (soapHeaders == null) {
-            if (other.soapHeaders != null) {
-                return false;
-            }
-        } else if (!soapHeaders.equals(other.soapHeaders)) {
+        if (!soapHeaders.equals(other.soapHeaders)) {
             return false;
         }
-        if (soapRoles == null) {
-            if (other.soapRoles != null) {
-                return false;
-            }
-        } else if (!soapRoles.equals(other.soapRoles)) {
-            return false;
-        }
-        return true;
+        return soapRoles.equals(other.soapRoles);
     }
 }

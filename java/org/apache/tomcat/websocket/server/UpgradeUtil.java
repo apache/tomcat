@@ -119,7 +119,7 @@ public class UpgradeUtil {
         while (extHeaders.hasMoreElements()) {
             Util.parseExtensionHeader(extensionsRequested, extHeaders.nextElement());
         }
-        // Negotiation phase 1. By default this simply filters out the
+        // Negotiation phase 1. By default, this simply filters out the
         // extensions that the server does not support but applications could
         // use a custom configurator to do more than this.
         List<Extension> installedExtensions;

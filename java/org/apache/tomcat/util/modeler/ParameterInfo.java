@@ -19,7 +19,6 @@ package org.apache.tomcat.util.modeler;
 
 import javax.management.MBeanParameterInfo;
 
-
 /**
  * <p>Internal configuration information for a <code>Parameter</code>
  * descriptor.</p>

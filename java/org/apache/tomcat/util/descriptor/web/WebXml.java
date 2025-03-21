@@ -54,9 +54,9 @@ import org.apache.tomcat.util.security.Escape;
  * Representation of common elements of web.xml and web-fragment.xml. Provides
  * a repository for parsed data before the elements are merged.
  * Validation is spread between multiple classes:
- * The digester checks for structural correctness (eg single login-config)
- * This class checks for invalid duplicates (eg filter/servlet names)
- * StandardContext will check validity of values (eg URL formats etc)
+ * The digester checks for structural correctness (e.g. single login-config)
+ * This class checks for invalid duplicates (e.g. filter/servlet names)
+ * StandardContext will check validity of values (e.g. URL formats etc)
  */
 public class WebXml extends XmlEncodingBase implements DocumentProperties.Charset {
 
@@ -1474,7 +1474,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             displayName = temp.getDisplayName();
         }
 
-        // Note: Not permitted in fragments but we also use fragments for
+        // Note: Not permitted in fragments, but we also use fragments for
         //       per-Host and global defaults so they may appear there
         if (!denyUncoveredHttpMethods) {
             for (WebXml fragment : fragments) {
@@ -2166,7 +2166,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                             sm.getString("webXml.duplicateFragment", fragment.getName(), duplicates));
                 }
             }
-            // Stage 1. Make all dependencies bi-directional - this makes the
+            // Stage 1. Make all dependencies bidirectional - this makes the
             //          next stage simpler.
             for (WebXml fragment : fragments.values()) {
                 Iterator<String> before =

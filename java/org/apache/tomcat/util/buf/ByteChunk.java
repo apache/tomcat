@@ -49,7 +49,7 @@ import java.nio.charset.StandardCharsets;
  * ( for example a multipart message may have parts with different
  *  encoding )
  * <p>
- * For HTTP it is not very clear how the encoding of RequestURI
+ * For HTTP, it is not very clear how the encoding of RequestURI
  * and mime values can be determined, but it is a great advantage
  * to be able to parse the request without converting to string.
  *
@@ -175,7 +175,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Sets the buffer to the specified subarray of bytes.
+     * Sets the buffer to the specified sub array of bytes.
      *
      * @param b   the ascii bytes
      * @param off the start offset of the bytes
@@ -728,7 +728,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Returns true if the buffer starts with the specified string when tested in a case sensitive manner.
+     * Returns true if the buffer starts with the specified string when tested in a case-sensitive manner.
      * <p>
      * NOTE: This only works for characters in the range 0-127.
      *
@@ -754,7 +754,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Returns true if the buffer starts with the specified string when tested in a case insensitive manner.
+     * Returns true if the buffer starts with the specified string when tested in a case-insensitive manner.
      * <p>
      * NOTE: This only works for characters in the range 0-127.
      *
@@ -851,7 +851,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Returns the first instance of any of the given bytes in the byte array between the specified start and end.
+     * Returns the first instance of the given bytes in the byte array between the specified start and end.
      *
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array

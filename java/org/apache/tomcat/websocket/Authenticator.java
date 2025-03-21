@@ -38,9 +38,9 @@ public abstract class Authenticator {
      *
      * @param requestUri         The request URI
      * @param authenticateHeader The server authentication header received
-     * @param userName           The user name
+     * @param userName           The username
      * @param userPassword       The user password
-     * @param userRealm          The realm for which the provided user name and password are valid. {@code null} to
+     * @param userRealm          The realm for which the provided username and password are valid. {@code null} to
      *                               indicate all realms.
      *
      * @return The generated authorization header value

@@ -60,9 +60,9 @@ public class ExceptionUtils {
 
 
     /**
-     * NO-OP method provided to enable simple pre-loading of this class. Since
+     * NO-OP method provided to enable simple preloading of this class. Since
      * the class is used extensively in error handling, it is prudent to
-     * pre-load it to avoid any failure to load this class masking the true
+     * preload it to avoid any failure to load this class masking the true
      * problem during error handling.
      */
     public static void preload() {

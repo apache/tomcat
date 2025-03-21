@@ -232,7 +232,6 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     /**
      * Write plain text data to the OpenSSL internal BIO
-     *
      * Calling this function with src.remaining == 0 is undefined.
      * @throws SSLException if the OpenSSL error check fails
      */
@@ -1030,7 +1029,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
              *
              * Obtaining client certificates after the connection has been
              * established requires additional checks. We need to trigger
-             * additional reads until the certificates have been read but we
+             * additional reads until the certificates have been read, but we
              * don't know how many reads we will need as it depends on both
              * client and network behaviour.
              *

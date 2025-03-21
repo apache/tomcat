@@ -140,7 +140,7 @@ public class Util {
     static byte[] generateMask() {
         // SecureRandom is not thread-safe so need to make sure only one thread
         // uses it at a time. In theory, the pool could grow to the same size
-        // as the number of request processing threads. In reality it will be
+        // as the number of request processing threads. In reality, it will be
         // a lot smaller.
 
         // Get a SecureRandom from the pool

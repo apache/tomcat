@@ -194,8 +194,8 @@ public class Utils {
                 Writer w = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
             String[] keys = translation.keySet().toArray(new String[0]);
             Arrays.sort(keys);
-            for (Object key : keys) {
-                w.write(key + "=" + formatValueExport(translation.getProperty((String) key)) + "\n");
+            for (String key : keys) {
+                w.write(key + "=" + formatValueExport(translation.getProperty(key)) + "\n");
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();

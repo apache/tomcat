@@ -973,7 +973,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
              *
              * Obtaining client certificates after the connection has been
              * established requires additional checks. We need to trigger
-             * additional reads until the certificates have been read but we
+             * additional reads until the certificates have been read, but we
              * don't know how many reads we will need as it depends on both
              * client and network behaviour.
              *
@@ -1082,7 +1082,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 case OPTIONAL -> SSL_VERIFY_PEER();
             };
             // Note: Since a callback is always set by the context, the callback here could in theory
-            // be set to NULL (at the time of creation of the SSL, the SSL_CTX will have a non null callback)
+            // be set to NULL (at the time of creation of the SSL, the SSL_CTX will have a non-null callback)
             SSL_set_verify(state.ssl, value, SSL_set_verify$callback.allocate(new VerifyCallback(), engineArena));
             clientAuth = mode;
         }

@@ -26,10 +26,10 @@ import java.util.Locale;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This class is used to represent a subarray of bytes in an HTTP message. It represents all request/response elements.
+ * This class is used to represent a sub array of bytes in an HTTP message. It represents all request/response elements.
  * The byte/char conversions are delayed and cached. Everything is recyclable.
  * <p>
- * The object can represent a byte[], a char[], or a (sub) String. All operations can be made in case sensitive mode or
+ * The object can represent a byte[], a char[], or a (sub) String. All operations can be made in case-sensitive mode or
  * not.
  *
  * @author dac@eng.sun.com
@@ -47,15 +47,15 @@ public final class MessageBytes implements Cloneable, Serializable {
 
     public static final int T_NULL = 0;
     /**
-     * getType() is T_STR if the the object used to create the MessageBytes was a String.
+     * getType() is T_STR if the object used to create the MessageBytes was a String.
      */
     public static final int T_STR = 1;
     /**
-     * getType() is T_BYTES if the the object used to create the MessageBytes was a byte[].
+     * getType() is T_BYTES if the object used to create the MessageBytes was a byte[].
      */
     public static final int T_BYTES = 2;
     /**
-     * getType() is T_CHARS if the the object used to create the MessageBytes was a char[].
+     * getType() is T_CHARS if the object used to create the MessageBytes was a char[].
      */
     public static final int T_CHARS = 3;
 
@@ -112,7 +112,7 @@ public final class MessageBytes implements Cloneable, Serializable {
 
 
     /**
-     * Sets the content to the specified subarray of bytes.
+     * Sets the content to the specified sub array of bytes.
      *
      * @param b   the bytes
      * @param off the start offset of the bytes

@@ -60,7 +60,7 @@ public class Txt2Html
 
     /**
      * Line terminator to be used for separating lines of the generated
-     * HTML page, to be independent from "line.separator" system property.
+     * HTML page, to be independent of the "line.separator" system property.
      */
     private static final String LINE_SEPARATOR = "\r\n";
 

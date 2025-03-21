@@ -33,7 +33,6 @@ import java.sql.Timestamp;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -231,7 +230,7 @@ public class FileHandler extends Handler {
                 }
             }
 
-            String result = null;
+            String result;
             try {
                 result = getFormatter().format(record);
             } catch (Exception e) {
@@ -364,7 +363,7 @@ public class FileHandler extends Handler {
 
         // Get encoding for the logging file
         String encoding = getProperty(className + ".encoding", null);
-        if (encoding != null && encoding.length() > 0) {
+        if (encoding != null && !encoding.isEmpty()) {
             try {
                 setEncoding(encoding);
             } catch (UnsupportedEncodingException ex) {
@@ -488,7 +487,7 @@ public class FileHandler extends Handler {
     }
 
     private DirectoryStream<Path> streamFilesForDelete() throws IOException {
-        LocalDate maxDaysOffset = LocalDate.now().minus(maxDays.intValue(), ChronoUnit.DAYS);
+        LocalDate maxDaysOffset = LocalDate.now().minusDays(maxDays.intValue());
         return Files.newDirectoryStream(getDirectoryAsPath(), path -> {
             boolean result = false;
             String date = obtainDateFromPath(path);

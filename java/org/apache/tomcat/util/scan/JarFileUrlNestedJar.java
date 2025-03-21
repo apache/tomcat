@@ -25,7 +25,7 @@ import java.util.jar.JarFile;
 /**
  * Implementation of {@link org.apache.tomcat.Jar} that is optimised for file
  * based JAR URLs that refer to a JAR file nested inside a WAR
- * (e.g URLs of the form jar:file: ... .war!/ ... .jar).
+ * (e.g. URLs of the form jar:file: ... .war!/ ... .jar).
  */
 public class JarFileUrlNestedJar extends AbstractInputStreamJar {
 

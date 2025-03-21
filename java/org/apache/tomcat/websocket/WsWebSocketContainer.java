@@ -853,7 +853,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             log.warn(sm.getString("wsWebSocketContainer.invalidHeader", line));
             return;
         }
-        // Header names are case insensitive so always use lower case
+        // Header names are case-insensitive so always use lower case
         String headerName = line.substring(0, index).trim().toLowerCase(Locale.ENGLISH);
         // Multi-value headers are stored as a single header and the client is
         // expected to handle splitting into individual values

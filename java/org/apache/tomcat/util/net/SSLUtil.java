@@ -70,7 +70,7 @@ public interface SSLUtil {
     /**
      * Optional interface that can be implemented by
      * {@link javax.net.ssl.SSLEngine}s to indicate that they support ALPN and
-     * can provided the protocol agreed with the client.
+     * can provide the protocol agreed with the client.
      */
     interface ProtocolInfo {
         /**

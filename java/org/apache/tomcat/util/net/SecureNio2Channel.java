@@ -207,7 +207,7 @@ public class SecureNio2Channel extends Nio2Channel  {
     }
 
     /**
-     * Performs SSL handshake, non blocking, but performs NEED_TASK on the same
+     * Performs SSL handshake, non-blocking, but performs NEED_TASK on the same
      * thread. Hence, you should never call this method using your Acceptor
      * thread, as you would slow down your system significantly.
      * <p>
@@ -603,7 +603,7 @@ public class SecureNio2Channel extends Nio2Channel  {
      *   if ( isOpen() ) close(true); //forces a close if you timed out
      * </code></pre>
      * @throws IOException if an I/O error occurs
-     * @throws IOException if there is data on the outgoing network buffer and we are unable to flush it
+     * @throws IOException if there is data on the outgoing network buffer, and we are unable to flush it
      */
     @Override
     public void close() throws IOException {

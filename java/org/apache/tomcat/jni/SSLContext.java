@@ -139,7 +139,7 @@ public final class SSLContext {
      * This directive sets the optional all-in-one file where you can assemble the
      * certificates of Certification Authorities (CA) which form the certificate
      * chain of the server certificate. This starts with the issuing CA certificate
-     * of of the server certificate and can range up to the root CA certificate.
+     * of the server certificate and can range up to the root CA certificate.
      * Such a file is simply the concatenation of the various PEM-encoded CA
      * Certificate files, usually in certificate chain order.
      * <br>
