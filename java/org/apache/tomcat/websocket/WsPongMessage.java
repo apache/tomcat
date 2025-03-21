@@ -26,4 +26,9 @@ public record WsPongMessage(ByteBuffer applicationData) implements PongMessage {
         applicationData.get(dst);
         this.applicationData = ByteBuffer.wrap(dst);
     }
+
+    @Override
+    public ByteBuffer getApplicationData() {
+        return applicationData;
+    }
 }
