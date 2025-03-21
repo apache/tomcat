@@ -28,5 +28,5 @@ public interface PongMessage {
      *
      * @return The payload of the Pong message.
      */
-    ByteBuffer applicationData();
+    ByteBuffer getApplicationData();
 }
