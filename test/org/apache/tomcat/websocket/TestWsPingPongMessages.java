@@ -70,7 +70,7 @@ public class TestWsPingPongMessages extends WebSocketBaseTest {
 
         boolean latchResult = handler.getLatch().await(10, TimeUnit.SECONDS);
         Assert.assertTrue(latchResult);
-        Assert.assertArrayEquals(applicationData.array(), (handler.getMessages().peek()).getApplicationData().array());
+        Assert.assertArrayEquals(applicationData.array(), (handler.getMessages().peek()).applicationData().array());
     }
 
     public static class PongMessageHandler extends TesterMessageCountClient.BasicHandler<PongMessage> {

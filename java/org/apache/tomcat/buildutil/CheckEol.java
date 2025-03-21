@@ -123,7 +123,7 @@ public class CheckEol extends Task {
             log("Done line ends check in " + count + " file(s), "
                     + errors.size() + " error(s) found.");
         }
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             String message = "The following files have wrong line ends: "
                     + errors;
             // We need to explicitly write the message to the log, because
@@ -138,17 +138,7 @@ public class CheckEol extends Task {
         LF, CRLF
     }
 
-    private static class CheckFailure {
-        private final File file;
-        private final int line;
-        private final String value;
-
-        CheckFailure(File file, int line, String value) {
-            this.file = file;
-            this.line = line;
-            this.value = value;
-        }
-
+    private record CheckFailure(File file, int line, String value) {
         @Override
         public String toString() {
             return System.lineSeparator() + file + ": uses " + value + " on line " + line;

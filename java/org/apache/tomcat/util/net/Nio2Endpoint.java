@@ -282,7 +282,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
             }
             threadGroup = null;
         }
-        // Mostly to cleanup references
+        // Mostly to clean up references
         super.shutdownExecutor();
     }
 
@@ -617,7 +617,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
                     if (log.isTraceEnabled()) {
                         log.trace("Socket: [" + Nio2SocketWrapper.this + "], Interest: [" + readInterest + "]");
                     }
-                    boolean notify = false;
+                    boolean notify;
                     synchronized (readCompletionHandler) {
                         readNotify = false;
                         if (nBytes.intValue() < 0) {
@@ -863,10 +863,10 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
                 synchronized (readCompletionHandler) {
                     readNotify = false;
                 }
-                // This may be sufficient to complete the request and we
+                // This may be sufficient to complete the request, and we
                 // don't want to trigger another read since if there is no
                 // more data to read and this request takes a while to
-                // process the read will timeout triggering an error.
+                // process the read will time out triggering an error.
                 readPending.release();
                 return nRead;
             }
@@ -927,10 +927,10 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
                 synchronized (readCompletionHandler) {
                     readNotify = false;
                 }
-                // This may be sufficient to complete the request and we
+                // This may be sufficient to complete the request, and we
                 // don't want to trigger another read since if there is no
                 // more data to read and this request takes a while to
-                // process the read will timeout triggering an error.
+                // process the read will time out triggering an error.
                 readPending.release();
                 return nRead;
             }
@@ -1179,10 +1179,10 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
         @Override
         protected void writeNonBlocking(byte[] buf, int off, int len) throws IOException {
             // Note: Possible alternate behavior:
-            // If there's non blocking abuse (like a test writing 1MB in a single
-            // "non blocking" write), then block until the previous write is
+            // If there's non-blocking abuse (like a test writing 1MB in a single
+            // "non-blocking" write), then block until the previous write is
             // done rather than continue buffering
-            // Also allows doing autoblocking
+            // Also allows doing auto blocking
             // Could be "smart" with coordination with the main CoyoteOutputStream to
             // indicate the end of a write
             // Uses: if (writePending.tryAcquire(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS))
@@ -1230,10 +1230,10 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
         @Override
         protected void writeNonBlockingInternal(ByteBuffer from) throws IOException {
             // Note: Possible alternate behavior:
-            // If there's non blocking abuse (like a test writing 1MB in a single
-            // "non blocking" write), then block until the previous write is
+            // If there's non-blocking abuse (like a test writing 1MB in a single
+            // "non-blocking" write), then block until the previous write is
             // done rather than continue buffering
-            // Also allows doing autoblocking
+            // Also allows doing auto blocking
             // Could be "smart" with coordination with the main CoyoteOutputStream to
             // indicate the end of a write
             // Uses: if (writePending.tryAcquire(socketWrapper.getTimeout(), TimeUnit.MILLISECONDS))
@@ -1296,8 +1296,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
         protected void flushBlocking() throws IOException {
             checkError();
 
-            // Before doing a blocking flush, make sure that any pending non
-            // blocking write has completed.
+            // Before doing a blocking flush, make sure that any pending non-blocking write has completed.
             try {
                 if (writePending.tryAcquire(toTimeout(getWriteTimeout()), TimeUnit.MILLISECONDS)) {
                     writePending.release();
@@ -1591,8 +1590,7 @@ public class Nio2Endpoint extends AbstractNetworkChannelEndpoint<Nio2Channel,Asy
 
         @Override
         public SSLSupport getSslSupport() {
-            if (getSocket() instanceof SecureNio2Channel) {
-                SecureNio2Channel ch = (SecureNio2Channel) getSocket();
+            if (getSocket() instanceof SecureNio2Channel ch) {
                 return ch.getSSLSupport();
             }
             return null;

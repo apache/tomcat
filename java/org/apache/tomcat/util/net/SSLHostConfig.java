@@ -19,6 +19,7 @@ package org.apache.tomcat.util.net;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.KeyStore;
 import java.security.UnrecoverableKeyException;
@@ -46,13 +47,14 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SSLHostConfig implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Log log = LogFactory.getLog(SSLHostConfig.class);
     private static final StringManager sm = StringManager.getManager(SSLHostConfig.class);
 
-    // Must be lower case. SSL host names are always stored using lower case as
-    // they are case insensitive but are used by case sensitive code such as
+    // Must be lowercase. SSL host names are always stored using lower case as
+    // they are case-insensitive but are used by case-sensitive code such as
     // keys in Maps.
     protected static final String DEFAULT_SSL_HOST_NAME = "_default_";
     protected static final Set<String> SSL_PROTO_ALL_SET = new HashSet<>();
@@ -360,8 +362,8 @@ public class SSLHostConfig implements Serializable {
         // necessary.
         if (ciphersList != null && !ciphersList.contains(":")) {
             StringBuilder sb = new StringBuilder();
-            // Not obviously in OpenSSL format. May be a single OpenSSL or JSSE
-            // cipher name. May be a comma separated list of cipher names
+            // Not obviously in OpenSSL format. Might be a single OpenSSL or JSSE
+            // cipher name. Might be a comma separated list of cipher names
             String[] ciphers = ciphersList.split(",");
             for (String cipher : ciphers) {
                 String trimmed = cipher.trim();

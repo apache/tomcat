@@ -64,7 +64,7 @@ public class TLSClientHelloExtractor {
     /**
      * Creates the instance of the parser and processes the provided buffer. The
      * buffer position and limit will be modified during the execution of this
-     * method but they will be returned to the original values before the method
+     * method, but they will be returned to the original values before the method
      * exits.
      *
      * @param netInBuffer The buffer containing the TLS data to process

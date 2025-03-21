@@ -478,7 +478,7 @@ public class StringCache {
      * Find an entry given its name in the cache and return the associated String.
      *
      * @param name                      The name to find
-     * @param malformedInputAction      Action to take if an malformed input is encountered
+     * @param malformedInputAction      Action to take if a malformed input is encountered
      * @param unmappableCharacterAction Action to take if an unmappable character is encountered
      *
      * @return the corresponding value

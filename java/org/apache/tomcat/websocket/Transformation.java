@@ -86,7 +86,7 @@ public interface Transformation {
      *
      * @param messageParts The list of messages to be transformed
      *
-     * @return The list of messages after this any any subsequent transformations have been applied. The size of the
+     * @return The list of messages after this and any subsequent transformations have been applied. The size of the
      *             returned list may be bigger or smaller than the size of the input list
      *
      * @throws IOException If an error occurs during the transformation of the message parts

@@ -130,7 +130,7 @@ public class Util {
     static byte[] generateMask() {
         // SecureRandom is not thread-safe so need to make sure only one thread
         // uses it at a time. In theory, the pool could grow to the same size
-        // as the number of request processing threads. In reality it will be
+        // as the number of request processing threads. In reality, it will be
         // a lot smaller.
 
         // Get a SecureRandom from the pool
@@ -180,8 +180,7 @@ public class Util {
         Type[] interfaces = clazz.getGenericInterfaces();
         for (Type iface : interfaces) {
             // Only need to check interfaces that use generics
-            if (iface instanceof ParameterizedType) {
-                ParameterizedType pi = (ParameterizedType) iface;
+            if (iface instanceof ParameterizedType pi) {
                 // Look for the interface of interest
                 if (pi.getRawType() instanceof Class) {
                     if (type.isAssignableFrom((Class<?>) pi.getRawType())) {
@@ -249,24 +248,26 @@ public class Util {
      * definition of the class
      */
     private static TypeResult getTypeParameter(Class<?> clazz, Type argType) {
-        if (argType instanceof Class<?>) {
-            return new TypeResult((Class<?>) argType, -1, 0);
-        } else if (argType instanceof ParameterizedType) {
-            return new TypeResult((Class<?>) ((ParameterizedType) argType).getRawType(), -1, 0);
-        } else if (argType instanceof GenericArrayType) {
-            Type arrayElementType = ((GenericArrayType) argType).getGenericComponentType();
-            TypeResult result = getTypeParameter(clazz, arrayElementType);
-            result.incrementDimension(1);
-            return result;
-        } else {
-            TypeVariable<?>[] tvs = clazz.getTypeParameters();
-            for (int i = 0; i < tvs.length; i++) {
-                if (tvs[i].equals(argType)) {
-                    return new TypeResult(null, i, 0);
-                }
+        return switch (argType) {
+            case Class<?> aClass -> new TypeResult(aClass, -1, 0);
+            case ParameterizedType parameterizedType ->
+                new TypeResult((Class<?>) parameterizedType.getRawType(), -1, 0);
+            case GenericArrayType genericArrayType -> {
+                Type arrayElementType = genericArrayType.getGenericComponentType();
+                TypeResult result = getTypeParameter(clazz, arrayElementType);
+                result.incrementDimension(1);
+                yield result;
             }
-            throw new IllegalStateException();
-        }
+            case null, default -> {
+                TypeVariable<?>[] tvs = clazz.getTypeParameters();
+                for (int i = 0; i < tvs.length; i++) {
+                    if (tvs[i].equals(argType)) {
+                        yield new TypeResult(null, i, 0);
+                    }
+                }
+                throw new IllegalStateException();
+            }
+        };
     }
 
 
@@ -547,24 +548,24 @@ public class Util {
         public DecoderMatch(Class<?> target, List<DecoderEntry> decoderEntries) {
             this.target = target;
             for (DecoderEntry decoderEntry : decoderEntries) {
-                if (decoderEntry.getClazz().isAssignableFrom(target)) {
-                    if (Binary.class.isAssignableFrom(decoderEntry.getDecoderClazz())) {
-                        binaryDecoders.add(decoderEntry.getDecoderClazz());
+                if (decoderEntry.clazz().isAssignableFrom(target)) {
+                    if (Binary.class.isAssignableFrom(decoderEntry.decoderClazz())) {
+                        binaryDecoders.add(decoderEntry.decoderClazz());
                         // willDecode() method means this decoder may or may not
                         // decode a message so need to carry on checking for
                         // other matches
-                    } else if (BinaryStream.class.isAssignableFrom(decoderEntry.getDecoderClazz())) {
-                        binaryDecoders.add(decoderEntry.getDecoderClazz());
+                    } else if (BinaryStream.class.isAssignableFrom(decoderEntry.decoderClazz())) {
+                        binaryDecoders.add(decoderEntry.decoderClazz());
                         // Stream decoders have to process the message so no
                         // more decoders can be matched
                         break;
-                    } else if (Text.class.isAssignableFrom(decoderEntry.getDecoderClazz())) {
-                        textDecoders.add(decoderEntry.getDecoderClazz());
+                    } else if (Text.class.isAssignableFrom(decoderEntry.decoderClazz())) {
+                        textDecoders.add(decoderEntry.decoderClazz());
                         // willDecode() method means this decoder may or may not
                         // decode a message so need to carry on checking for
                         // other matches
-                    } else if (TextStream.class.isAssignableFrom(decoderEntry.getDecoderClazz())) {
-                        textDecoders.add(decoderEntry.getDecoderClazz());
+                    } else if (TextStream.class.isAssignableFrom(decoderEntry.decoderClazz())) {
+                        textDecoders.add(decoderEntry.decoderClazz());
                         // Stream decoders have to process the message so no
                         // more decoders can be matched
                         break;

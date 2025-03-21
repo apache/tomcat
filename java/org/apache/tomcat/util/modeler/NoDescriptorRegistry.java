@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.modeler;
 
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -401,6 +402,7 @@ public class NoDescriptorRegistry extends Registry {
 
     private static class PassthroughMBean extends ManagedBean {
 
+        @Serial
         private static final long serialVersionUID = 1L;
     }
 }

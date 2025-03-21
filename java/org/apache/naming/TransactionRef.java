@@ -16,6 +16,8 @@
  */
 package org.apache.naming;
 
+import java.io.Serial;
+
 /**
  * Represents a reference address to a transaction.
  *
@@ -23,6 +25,7 @@ package org.apache.naming;
  */
 public class TransactionRef extends AbstractRef {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

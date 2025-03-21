@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.websocket;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -123,13 +121,8 @@ public class Constants {
     public static final String WS_AUTHENTICATION_PROXY_PASSWORD = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_PASSWORD";
     public static final String WS_AUTHENTICATION_PROXY_REALM = "org.apache.tomcat.websocket.WS_AUTHENTICATION_PROXY_REALM";
 
-    public static final List<Extension> INSTALLED_EXTENSIONS;
-
-    static {
-        List<Extension> installed = new ArrayList<>(1);
-        installed.add(new WsExtension("permessage-deflate"));
-        INSTALLED_EXTENSIONS = Collections.unmodifiableList(installed);
-    }
+    public static final List<Extension> INSTALLED_EXTENSIONS =
+            List.of(new WsExtension("permessage-deflate"));
 
     private Constants() {
         // Hide default constructor

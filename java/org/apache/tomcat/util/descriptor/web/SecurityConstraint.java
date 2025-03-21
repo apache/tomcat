@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class SecurityConstraint extends XmlEncodingBase implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public static final String ROLE_ALL_ROLES = "*";

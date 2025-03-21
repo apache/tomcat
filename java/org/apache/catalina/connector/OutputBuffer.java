@@ -449,7 +449,7 @@ public class OutputBuffer extends Writer {
             }
             if (from.remaining() > 0) {
                 flushByteBuffer();
-            } else if (conv.isUndeflow() && bb.limit() > bb.capacity() - 4) {
+            } else if (conv.isUnderflow() && bb.limit() > bb.capacity() - 4) {
                 // Handle an edge case. There are no more chars to write at the
                 // moment but there is a leftover character in the converter
                 // which must be part of a surrogate pair. The byte buffer does

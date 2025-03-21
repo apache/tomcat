@@ -521,8 +521,8 @@ public class NamingContext implements Context {
         }
 
         if (name.size() > 1) {
-            // If the size of the name is greater that 1, then we go through a
-            // number of subcontexts.
+            // If the size of the name is greater than 1, then we go through a
+            // number of sub contexts.
             if (entry.type != NamingEntry.CONTEXT) {
                 throw new NamingException
                     (sm.getString("namingContext.contextExpected"));

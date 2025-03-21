@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.modeler;
 
 
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,6 +36,7 @@ import javax.management.NotificationFilter;
  */
 public class BaseAttributeFilter implements NotificationFilter {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------------- Constructors
@@ -127,11 +129,9 @@ public class BaseAttributeFilter implements NotificationFilter {
         if (notification == null) {
             return false;
         }
-        if (!(notification instanceof AttributeChangeNotification)) {
+        if (!(notification instanceof AttributeChangeNotification acn)) {
             return false;
         }
-        AttributeChangeNotification acn =
-            (AttributeChangeNotification) notification;
         if (!AttributeChangeNotification.ATTRIBUTE_CHANGE.equals(acn.getType())) {
             return false;
         }

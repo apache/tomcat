@@ -209,7 +209,6 @@ public class NioChannel implements ByteChannel, ScatteringByteChannel, Gathering
     /**
      * This method should be used to check the interrupt status before
      * attempting a write.
-     *
      * If a thread has been interrupted and the interrupt has not been cleared
      * then an attempt to write to the socket will fail. When this happens the
      * socket is removed from the poller without the socket being selected. This

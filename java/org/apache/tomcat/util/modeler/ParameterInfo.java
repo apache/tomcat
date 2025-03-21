@@ -17,8 +17,9 @@
 package org.apache.tomcat.util.modeler;
 
 
-import javax.management.MBeanParameterInfo;
+import java.io.Serial;
 
+import javax.management.MBeanParameterInfo;
 
 /**
  * <p>Internal configuration information for a <code>Parameter</code>
@@ -27,6 +28,7 @@ import javax.management.MBeanParameterInfo;
  * @author Craig R. McClanahan
  */
 public class ParameterInfo extends FeatureInfo {
+    @Serial
     private static final long serialVersionUID = 2222796006787664020L;
     // ----------------------------------------------------------- Constructors
 

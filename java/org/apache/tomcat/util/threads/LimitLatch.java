@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.threads;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.AbstractQueuedSynchronizer;
@@ -35,6 +36,7 @@ public class LimitLatch {
     private static final StringManager sm = StringManager.getManager(LimitLatch.class);
 
     private class Sync extends AbstractQueuedSynchronizer {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         Sync() {

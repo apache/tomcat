@@ -41,7 +41,7 @@ public class BackportTranslations extends BackportBase {
     protected void execute() throws IOException {
         for (String language : targetTranslations.keySet()) {
             // Skip source
-            if (language.length() == 0) {
+            if (language.isEmpty()) {
                 continue;
             }
 

@@ -20,6 +20,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.CharConversionException;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.Serial;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -36,6 +37,7 @@ public final class UDecoder {
     private static final StringManager sm = StringManager.getManager(UDecoder.class);
 
     private static class DecodeException extends CharConversionException {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         DecodeException(String s) {
@@ -167,7 +169,7 @@ public final class UDecoder {
                     }
                 } else if (res == '%') {
                     /*
-                     * If encoded '/' or '\' is going to be left encoded then so must encoded '%' else the subsequent
+                     * If encoded '/' or '\' is going to be left encoded then so must be encoded '%' else the subsequent
                      * %nn decoding will either fail or corrupt the output.
                      */
                     if (encodedSolidusHandling.equals(EncodedSolidusHandling.PASS_THROUGH) ||
@@ -245,7 +247,7 @@ public final class UDecoder {
          * sets and some use a variable length.
          */
 
-        // This isn't perfect but it is a reasonable guess for the size of the
+        // This isn't perfect, but it is a reasonable guess for the size of the
         // array required
         ByteArrayOutputStream baos = new ByteArrayOutputStream(str.length() * 2);
 

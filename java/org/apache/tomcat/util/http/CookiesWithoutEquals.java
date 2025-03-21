@@ -30,7 +30,7 @@ public enum CookiesWithoutEquals {
      * The historical intention (from the user agent perspective) of using a name-value-pair without an equals sign has
      * been to indicate a cookie with a name but no value. Tomcat has done the opposite. The current RFC6265bis text
      * treats a name-value-pair without an equals sign as a cookie with a value but no name. Supporting this will
-     * require changes to the Servlet specifcation.
+     * require changes to the Servlet specification.
      */
 
 

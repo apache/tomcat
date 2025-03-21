@@ -189,7 +189,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
         /*
          * If a CLOSE frame has been received then wsFrame will be closed but need to keep the connection open until the
-         * CLOSE frame has been sent. Hence use the wsSession.isClosed() rather than wsFrame.isOpen() here.
+         * CLOSE frame has been sent. Hence, use the wsSession.isClosed() rather than wsFrame.isOpen() here.
          */
         if (wsSession.isClosed()) {
             return SocketState.CLOSED;
@@ -242,7 +242,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
         /*
          * Any call to this method is a result of a problem reading from the client. At this point that state of the
          * connection is unknown. First attempt to clear the handler for any in-flight message write (that probably
-         * failed). If using NIO2 is is possible that the original error occurred on a write but this method was called
+         * failed). If using NIO2 it is possible that the original error occurred on a write but this method was called
          * during a read. The in-progress write will block the sending of the close frame unless the handler is cleared
          * (effectively signalling the write failed).
          */

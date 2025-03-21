@@ -17,6 +17,8 @@
 package org.apache.tomcat.util.descriptor.web;
 
 
+import java.io.Serial;
+
 /**
  * <p>Representation of a message destination reference for a web application,
  * as represented in a <code>&lt;message-destination-ref&gt;</code> element
@@ -27,6 +29,7 @@ package org.apache.tomcat.util.descriptor.web;
  */
 public class MessageDestinationRef extends ResourceBase {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties

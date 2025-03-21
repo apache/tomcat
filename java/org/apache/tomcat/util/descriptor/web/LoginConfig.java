@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.apache.tomcat.util.buf.UDecoder;
@@ -30,6 +31,7 @@ import org.apache.tomcat.util.buf.UDecoder;
 public class LoginConfig extends XmlEncodingBase implements Serializable {
 
 
+    @Serial
     private static final long serialVersionUID = 2L;
 
 
@@ -93,9 +95,6 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
     }
 
     public void setErrorPage(String errorPage) {
-        //        if ((errorPage == null) || !errorPage.startsWith("/"))
-        //            throw new IllegalArgumentException
-        //                ("Error Page resource path must start with a '/'");
         this.errorPage = UDecoder.URLDecode(errorPage, getCharset());
     }
 
@@ -110,9 +109,6 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
     }
 
     public void setLoginPage(String loginPage) {
-        //        if ((loginPage == null) || !loginPage.startsWith("/"))
-        //            throw new IllegalArgumentException
-        //                ("Login Page resource path must start with a '/'");
         this.loginPage = UDecoder.URLDecode(loginPage, getCharset());
     }
 
@@ -187,10 +183,9 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof LoginConfig)) {
+        if (!(obj instanceof LoginConfig other)) {
             return false;
         }
-        LoginConfig other = (LoginConfig) obj;
         if (authMethod == null) {
             if (other.authMethod != null) {
                 return false;

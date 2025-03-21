@@ -25,7 +25,6 @@ import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
-import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
 import org.apache.naming.ResourceLinkRef;
@@ -125,12 +124,11 @@ public class ResourceLinkFactory implements ObjectFactory {
     public Object getObjectInstance(Object obj, Name name, Context nameCtx,
             Hashtable<?,?> environment) throws NamingException {
 
-        if (!(obj instanceof ResourceLinkRef)) {
+        if (!(obj instanceof ResourceLinkRef ref)) {
             return null;
         }
 
         // Can we process this request?
-        Reference ref = (Reference) obj;
 
         // Read the global ref addr
         String globalName;

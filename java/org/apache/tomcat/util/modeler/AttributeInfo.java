@@ -16,8 +16,9 @@
  */
 package org.apache.tomcat.util.modeler;
 
-import javax.management.MBeanAttributeInfo;
+import java.io.Serial;
 
+import javax.management.MBeanAttributeInfo;
 
 /**
  * <p>Internal configuration information for an <code>Attribute</code>
@@ -26,6 +27,7 @@ import javax.management.MBeanAttributeInfo;
  * @author Craig R. McClanahan
  */
 public class AttributeInfo extends FeatureInfo {
+    @Serial
     private static final long serialVersionUID = -2511626862303972143L;
 
     // ----------------------------------------------------- Instance Variables

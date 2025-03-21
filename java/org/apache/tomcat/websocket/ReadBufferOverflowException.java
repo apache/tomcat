@@ -17,9 +17,11 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
+import java.io.Serial;
 
 public class ReadBufferOverflowException extends IOException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final int minBufferSize;

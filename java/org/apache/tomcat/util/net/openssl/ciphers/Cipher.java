@@ -512,7 +512,7 @@ public enum Cipher {
             new String[] {"SSL_DH_anon_WITH_3DES_EDE_CBC_SHA"},
             null
     ),
-    /* Fortezza ciphersuite from SSL 3.0 spec
+    /* Fortezza cipher suite from SSL 3.0 spec
      * Neither OpenSSL nor Java implement these ciphers and the IDs used
      * overlap partially with the IDs used by the Kerberos ciphers
     // Cipher 1C
@@ -844,7 +844,7 @@ public enum Cipher {
             null,
             null
     ),
-    /* New AES ciphersuites */
+    /* New AES cipher suites */
     // Cipher 2F
     TLS_RSA_WITH_AES_128_CBC_SHA(
             0x002f,
@@ -1049,7 +1049,7 @@ public enum Cipher {
             null,
             null
     ),
-    /* TLS v1.2 ciphersuites */
+    /* TLS v1.2 cipher suites */
     // Cipher 3B
     TLS_RSA_WITH_NULL_SHA256(
             0x003B,
@@ -1152,7 +1152,7 @@ public enum Cipher {
             null,
             null
     ),
-    /* Camellia ciphersuites from RFC4132 (
+    /* Camellia cipher suites from RFC4132 (
             128-bit portion) */
     // Cipher 41
     TLS_RSA_WITH_CAMELLIA_128_CBC_SHA(
@@ -1379,7 +1379,7 @@ public enum Cipher {
             null
     ),
 
-    /* TLS v1.2 ciphersuites */
+    /* TLS v1.2 cipher suites */
     // Cipher 67
     TLS_DHE_RSA_WITH_AES_128_CBC_SHA256(
             0x0067,
@@ -1499,7 +1499,7 @@ public enum Cipher {
             null,
             null
     ),
-    /* GOST Ciphersuites. Unsupported by Java. OpenSSL lists them with IDs
+    /* GOST cipher suites. Unsupported by Java. OpenSSL lists them with IDs
      * 0x3000080 to 0x3000083
      * The ciphers are not listed in the IANA registry. */
     /*
@@ -1567,7 +1567,7 @@ public enum Cipher {
             null,
             null
     ),*/
-    /* Camellia ciphersuites from RFC4132 (
+    /* Camellia cipher suites from RFC4132 (
             256-bit portion) */
     // Cipher 84
     TLS_RSA_WITH_CAMELLIA_256_CBC_SHA(
@@ -1875,7 +1875,7 @@ public enum Cipher {
             null,
             null
     ),
-    /* SEED ciphersuites from RFC4162 */
+    /* SEED cipher suites from RFC4162 */
     // Cipher 96
     TLS_RSA_WITH_SEED_CBC_SHA(
             0x0096,
@@ -1978,7 +1978,7 @@ public enum Cipher {
             null,
             null
     ),
-    /* GCM ciphersuites from RFC5288 */
+    /* GCM cipher suites from RFC5288 */
     // Cipher 9C
     TLS_RSA_WITH_AES_128_GCM_SHA256(
             0x009C,
@@ -2790,7 +2790,7 @@ public enum Cipher {
      * No other ciphers defined until 0xC001 below
      */
 
-    /* ECC ciphersuites from draft-ietf-tls-ecc-01.txt (
+    /* ECC cipher suites from draft-ietf-tls-ecc-01.txt (
             Mar 15, 2001) */
     // Cipher C001
     TLS_ECDH_ECDSA_WITH_NULL_SHA(
@@ -3217,7 +3217,7 @@ public enum Cipher {
             null,
             null
     ),
-    /* SRP ciphersuite from RFC 5054 */
+    /* SRP cipher suite from RFC 5054 */
     // Cipher C01A
     TLS_SRP_SHA_WITH_3DES_EDE_CBC_SHA(
             0xC01A,
@@ -3371,7 +3371,7 @@ public enum Cipher {
             null,
             null
     ),
-    /* HMAC based TLS v1.2 ciphersuites from RFC5289 */
+    /* HMAC based TLS v1.2 cipher suites from RFC5289 */
     // Cipher C023
     TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256(
             0xC023,
@@ -3508,7 +3508,7 @@ public enum Cipher {
             null,
             null
     ),
-    /* GCM based TLS v1.2 ciphersuites from RFC5289 */
+    /* GCM based TLS v1.2 cipher suites from RFC5289 */
     // Cipher C02B
     TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256(
             0xC02B,
@@ -4353,7 +4353,7 @@ public enum Cipher {
             null,
             null
     ),
-    // CCM ciphersuites from RFC6655
+    // CCM cipher suites from RFC6655
     // Cipher C09C
     TLS_RSA_WITH_AES_128_CCM(
             0xC09C,
@@ -4626,7 +4626,7 @@ public enum Cipher {
             null,
             null
     ),
-    // CCM ciphersuites from RFC7251
+    // CCM cipher suites from RFC7251
     // Cipher C0AC
     TLS_ECDHE_ECDSA_WITH_AES_128_CCM(
             0xC0AC,

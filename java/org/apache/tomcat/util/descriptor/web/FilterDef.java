@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,6 +34,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class FilterDef implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final StringManager sm =
@@ -198,13 +200,7 @@ public class FilterDef implements Serializable {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("FilterDef[");
-        sb.append("filterName=");
-        sb.append(this.filterName);
-        sb.append(", filterClass=");
-        sb.append(this.filterClass);
-        sb.append(']');
-        return sb.toString();
+        return "FilterDef[" + "filterName=" + this.filterName + ", filterClass=" + this.filterClass + ']';
     }
 
 

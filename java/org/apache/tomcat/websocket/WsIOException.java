@@ -17,6 +17,7 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import jakarta.websocket.CloseReason;
 
@@ -26,6 +27,7 @@ import jakarta.websocket.CloseReason;
  */
 public class WsIOException extends IOException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final CloseReason closeReason;

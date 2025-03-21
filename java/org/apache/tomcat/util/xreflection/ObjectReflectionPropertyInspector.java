@@ -162,6 +162,7 @@ public final class ObjectReflectionPropertyInspector {
                     return method;
                 }
             } catch (NoSuchMethodException e) {
+                // Ignore
             }
         }
         try {
@@ -170,6 +171,7 @@ public final class ObjectReflectionPropertyInspector {
                 return method;
             }
         } catch (NoSuchMethodException e) {
+            // Ignore
         }
 
         return null;
@@ -182,6 +184,7 @@ public final class ObjectReflectionPropertyInspector {
                 return method;
             }
         } catch (NoSuchMethodException e) {
+            // Ignore
         }
         try {
             Method method = declaringClass.getMethod("setProperty", String.class, String.class);
@@ -189,6 +192,7 @@ public final class ObjectReflectionPropertyInspector {
                 return method;
             }
         } catch (NoSuchMethodException e) {
+            // Ignore
         }
         return null;
     }
