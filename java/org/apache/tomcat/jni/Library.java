@@ -72,7 +72,7 @@ public final class Library {
                             throw t;
                         }
                     }
-                    if (err.length() > 0) {
+                    if (!err.isEmpty()) {
                         err.append(", ");
                     }
                     err.append(t.getMessage());

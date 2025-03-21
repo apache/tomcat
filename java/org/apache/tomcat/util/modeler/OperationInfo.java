@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.modeler;
 
+import java.io.Serial;
 import java.util.Locale;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -32,6 +33,7 @@ import javax.management.MBeanParameterInfo;
  */
 public class OperationInfo extends FeatureInfo {
 
+    @Serial
     private static final long serialVersionUID = 4418342922072614875L;
 
     // ----------------------------------------------------------- Constructors

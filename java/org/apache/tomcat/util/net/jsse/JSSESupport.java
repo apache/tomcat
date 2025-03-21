@@ -37,7 +37,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * JSSESupport.
- *
  * Concrete implementation class for JSSE Support classes.
  *
  * @author EKR

@@ -44,11 +44,9 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Registry for modeler MBeans.
- *
  * This is the main entry point into modeler. It provides methods to create and
  * manipulate model mbeans and simplify their use.
- *
- * This class is itself an mbean.
+ * This class is itself a mbean.
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
@@ -180,25 +178,19 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     /**
      * Register a bean by creating a modeler mbean and adding it to the
      * MBeanServer.
-     *
      * If metadata is not loaded, we'll look up and read a file named
      * "mbeans-descriptors.ser" or "mbeans-descriptors.xml" in the same package
      * or parent.
-     *
-     * If the bean is an instance of DynamicMBean. it's metadata will be
-     * converted to a model mbean and we'll wrap it - so modeler services will
-     * be supported
-     *
+     * If the bean is an instance of DynamicMBean. its metadata will be
+     * converted to a model mbean, and we'll wrap it so modeler services are
+     * supported.
      * If the metadata is still not found, introspection will be used to extract
      * it automatically.
-     *
-     * If an mbean is already registered under this name, it'll be first
+     * If a mbean is already registered under this name, it'll be first
      * unregistered.
-     *
      * If the component implements MBeanRegistration, the methods will be
      * called. If the method has a method "setRegistry" that takes a
      * RegistryMBean as parameter, it'll be called with the current registry.
-     *
      *
      * @param bean Object to be registered
      * @param oname Name used for registration
@@ -233,7 +225,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Invoke a operation on a list of mbeans. Can be used to implement
+     * Invoke an operation on a list of mbeans. Can be used to implement
      * lifecycle operations.
      *
      * @param mbeans list of ObjectName on which we'll invoke the operations

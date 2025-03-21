@@ -211,8 +211,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         for (Proxy proxy : proxies) {
             if (proxy.type().equals(Proxy.Type.HTTP)) {
                 sa = proxy.address();
-                if (sa instanceof InetSocketAddress) {
-                    InetSocketAddress inet = (InetSocketAddress) sa;
+                if (sa instanceof InetSocketAddress inet) {
                     if (inet.isUnresolved()) {
                         sa = new InetSocketAddress(inet.getHostName(), inet.getPort());
                     }
@@ -289,9 +288,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 if (httpResponse.status == Constants.PROXY_AUTHENTICATION_REQUIRED) {
                     return processAuthenticationChallenge(clientEndpointHolder, clientEndpointConfiguration, path,
                             redirectSet, userProperties, request, httpResponse, AuthenticationType.PROXY);
-                } else if (httpResponse.getStatus() != 200) {
+                } else if (httpResponse.status() != 200) {
                     throw new DeploymentException(sm.getString("wsWebSocketContainer.proxyConnectFail", selectedProxy,
-                            Integer.toString(httpResponse.getStatus())));
+                            Integer.toString(httpResponse.status())));
                 }
             }
 
@@ -335,7 +334,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
             if (httpResponse.status != 101) {
                 if (isRedirectStatus(httpResponse.status)) {
-                    List<String> locationHeader = httpResponse.getHandshakeResponse().getHeaders()
+                    List<String> locationHeader = httpResponse.handshakeResponse().getHeaders()
                             .get(Constants.LOCATION_HEADER_NAME);
 
                     if (locationHeader == null || locationHeader.isEmpty() || locationHeader.get(0) == null ||
@@ -376,7 +375,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                             sm.getString("wsWebSocketContainer.invalidStatus", Integer.toString(httpResponse.status)));
                 }
             }
-            HandshakeResponse handshakeResponse = httpResponse.getHandshakeResponse();
+            HandshakeResponse handshakeResponse = httpResponse.handshakeResponse();
             clientEndpointConfiguration.getConfigurator().afterResponse(handshakeResponse);
 
             // Sub-protocol
@@ -471,7 +470,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                     Integer.valueOf(httpResponse.status), authenticationType.getAuthorizationHeaderName()));
         }
 
-        List<String> authenticateHeaders = httpResponse.getHandshakeResponse().getHeaders()
+        List<String> authenticateHeaders = httpResponse.handshakeResponse().getHeaders()
                 .get(authenticationType.getAuthenticateHeaderName());
 
         if (authenticateHeaders == null || authenticateHeaders.isEmpty() || authenticateHeaders.get(0) == null ||
@@ -847,7 +846,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             log.warn(sm.getString("wsWebSocketContainer.invalidHeader", line));
             return;
         }
-        // Header names are case insensitive so always use lower case
+        // Header names are case-insensitive so always use lower case
         String headerName = line.substring(0, index).trim().toLowerCase(Locale.ENGLISH);
         // Multi-value headers are stored as a single header and the client is
         // expected to handle splitting into individual values
@@ -1047,23 +1046,6 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     }
 
 
-    private static class HttpResponse {
-        private final int status;
-        private final HandshakeResponse handshakeResponse;
-
-        HttpResponse(int status, HandshakeResponse handshakeResponse) {
-            this.status = status;
-            this.handshakeResponse = handshakeResponse;
-        }
-
-
-        public int getStatus() {
-            return status;
-        }
-
-
-        public HandshakeResponse getHandshakeResponse() {
-            return handshakeResponse;
-        }
+    private record HttpResponse(int status, HandshakeResponse handshakeResponse) {
     }
 }

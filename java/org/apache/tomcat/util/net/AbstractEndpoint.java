@@ -66,8 +66,8 @@ import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 
 /**
  * @param <S> The type used by the socket wrapper associated with this endpoint.
- *            May be the same as U.
- * @param <U> The type of the underlying socket used by this endpoint. May be
+ *            Might be the same as U.
+ * @param <U> The type of the underlying socket used by this endpoint. Might be
  *            the same as S.
  *
  * @author Mladen Turk
@@ -311,7 +311,7 @@ public abstract class AbstractEndpoint<S,U> {
             // Do not release any SSLContexts associated with a replaced
             // SSLHostConfig. They may still be in used by existing connections
             // and releasing them would break the connection at best. Let GC
-            // handle the clean up.
+            // handle the cleanup.
         } else {
             SSLHostConfig duplicate = sslHostConfigs.putIfAbsent(key, sslHostConfig);
             if (duplicate != null) {
@@ -334,9 +334,9 @@ public abstract class AbstractEndpoint<S,U> {
         if (hostName == null) {
             return null;
         }
-        // Host names are case insensitive but stored/processed in lower case
+        // Host names are case-insensitive but stored/processed in lower case
         // internally because they are used as keys in a ConcurrentMap where
-        // keys are compared in a case sensitive manner.
+        // keys are compared in a case-sensitive manner.
         String hostNameLower = hostName.toLowerCase(Locale.ENGLISH);
         if (hostNameLower.equals(getDefaultSSLHostConfigName())) {
             throw new IllegalArgumentException(
@@ -355,9 +355,9 @@ public abstract class AbstractEndpoint<S,U> {
      *                 reloaded. This must match a current SSL host
      */
     public void reloadSslHostConfig(String hostName) {
-        // Host names are case insensitive but stored/processed in lower case
+        // Host names are case-insensitive but stored/processed in lower case
         // internally because they are used as keys in a ConcurrentMap where
-        // keys are compared in a case sensitive manner.
+        // keys are compared in a case-sensitive manner.
         // This method can be called via various paths so convert the supplied
         // host name to lower case here to ensure the conversion occurs whatever
         // the call path.
@@ -1117,9 +1117,9 @@ public abstract class AbstractEndpoint<S,U> {
 
 
     /**
-     * Attributes provide a way for configuration to be passed to sub-components
+     * Attributes provide a way for configuration to be passed to subcomponents
      * without the {@link org.apache.coyote.ProtocolHandler} being aware of the
-     * properties available on those sub-components.
+     * properties available on those subcomponents.
      */
     protected HashMap<String, Object> attributes = new HashMap<>();
 
@@ -1127,7 +1127,7 @@ public abstract class AbstractEndpoint<S,U> {
      * Generic property setter called when a property for which a specific
      * setter already exists within the
      * {@link org.apache.coyote.ProtocolHandler} needs to be made available to
-     * sub-components. The specific setter will call this method to populate the
+     * subcomponents. The specific setter will call this method to populate the
      * attributes.
      *
      * @param name  Name of property to set
@@ -1140,7 +1140,7 @@ public abstract class AbstractEndpoint<S,U> {
         attributes.put(name, value);
     }
     /**
-     * Used by sub-components to retrieve configuration information.
+     * Used by subcomponents to retrieve configuration information.
      *
      * @param key The name of the property for which the value should be
      *            retrieved
@@ -1254,10 +1254,8 @@ public abstract class AbstractEndpoint<S,U> {
         Executor executor = this.executor;
         if (executor != null && internalExecutor) {
             this.executor = null;
-            if (executor instanceof ThreadPoolExecutor) {
+            if (executor instanceof @SuppressWarnings("resource")ThreadPoolExecutor tpe) {
                 //this is our internal one, so we need to shut it down
-                @SuppressWarnings("resource")
-                ThreadPoolExecutor tpe = (ThreadPoolExecutor) executor;
                 tpe.shutdownNow();
                 long timeout = getExecutorTerminationTimeoutMillis();
                 if (timeout > 0) {
@@ -1303,7 +1301,7 @@ public abstract class AbstractEndpoint<S,U> {
             try (java.net.Socket s = new java.net.Socket()) {
                 // Never going to read from this socket so the timeout doesn't matter. Use the unlock timeout.
                 s.setSoTimeout(getSocketProperties().getUnlockTimeout());
-                // Newer MacOS versions (e.g. Ventura 13.2) appear to linger for ~1s on close when linger is disabled.
+                // Newer macOS versions (e.g. Ventura 13.2) appear to linger for ~1s on close when linger is disabled.
                 // That causes delays when running the unit tests. Explicitly enabling linger but with a timeout of
                 // zero seconds seems to fix the issue.
                 s.setSoLinger(true, 0);
@@ -1686,7 +1684,7 @@ public abstract class AbstractEndpoint<S,U> {
             // Signal to any multiplexed protocols (HTTP/2) that they may wish
             // to stop accepting new streams
             getHandler().pause();
-            // Update the bindState. This has the side-effect of disabling
+            // Update the bindState. This has the side effect of disabling
             // keep-alive for any in-progress connections
             bindState = BindState.SOCKET_CLOSED_ON_STOP;
             try {

@@ -17,6 +17,7 @@
 package org.apache.juli;
 
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.management.ManagementFactory;
@@ -221,7 +222,7 @@ public class OneLineFormatter extends Formatter {
             return result;
         }
 
-        // Double checked locking OK as threadMxBean is volatile
+        // Double-checked locking OK as threadMxBean is volatile
         if (threadMxBean == null) {
             synchronized (threadMxBeanLock) {
                 if (threadMxBean == null) {
@@ -246,6 +247,7 @@ public class OneLineFormatter extends Formatter {
      */
     private static class ThreadNameCache extends LinkedHashMap<Long, String> {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         private final int cacheSize;

@@ -157,7 +157,7 @@ parse.</p>
           the XML document against a Document Type Definition (DTD) that is
           specified in its <code>DOCTYPE</code> declaration.  The default
           value of <code>false</code> requests a parse that only detects
-          "well formed" XML documents, rather than "valid" ones.</td>
+          "well-formed" XML documents, rather than "valid" ones.</td>
     </tr>
   </table>
 </blockquote>
@@ -266,7 +266,7 @@ encountered in the XML document, no matter how many times it occurs.  Note that
 nested <code>&lt;a&gt;</code> elements will <strong>not</strong> match this
 pattern -- we will describe means to support this kind of matching later.</p>
 
-<p>The next step up in matching pattern complexity is "a/b".  This pattern will
+<p>The next step-up in matching pattern complexity is "a/b".  This pattern will
 be matched when a <code>&lt;b&gt;</code> element is found nested inside a
 top-level <code>&lt;a&gt;</code> element.  Again, this match can occur as many
 times as desired, depending on the content of the XML document being parsed.
@@ -300,7 +300,7 @@ within the document.</p>
 <p>It is quite possible that, when a particular XML element is being parsed,
 the pattern for more than one registered processing rule will be matched
  either because you registered more than one processing rule with the same
-matching pattern, or because one more more exact pattern matches and wildcard
+matching pattern, or because one more exact pattern matches and wildcard
 pattern matches are satisfied by the same element.</p>
 
 <p>When this occurs, the corresponding processing rules will all be fired in order.
@@ -529,7 +529,7 @@ Struts controller servlet itself needed a robust, flexible, easy to extend
 mechanism for processing the contents of the <code>struts-config.xml</code>
 configuration that describes nearly every aspect of a Struts-based application.
 Because of this, the controller servlet contains a comprehensive, real world,
-example of how the Digester can be employed for this type of a use case.
+example of how the Digester can be employed for this type of use case.
 See the <code>initDigester()</code> method of class
 <code>org.apache.struts.action.ActionServlet</code> for the code that creates
 and configures the Digester to be used, and the <code>initMapping()</code>
@@ -839,7 +839,7 @@ following as part of your Digester initialization:</p>
 implementation which does not build on the default pattern matching rules.
 It uses a pluggable <a href="RegexMatcher.html">RegexMatcher</a> implementation to test
 if a path matches the pattern for a Rule. All matching rules are returned
-(note that this behaviour differs from longest matching rule of the default
+(note that this behaviour differs from the longest matching rule of the default
  pattern matching rules). See the Java Docs for more details.
 </p>
 <p>
@@ -1001,7 +1001,7 @@ with other <code>Rule</code> implementations.
     <li><code>PUBLIC <em>public-identifier</em> <em>system-identifier</em></code></li>
 </ol>
 <p>
-The <code><em>system-identifier</em></code> is an URI from which the resource can be obtained
+The <code><em>system-identifier</em></code> is a URI from which the resource can be obtained
 (either directly or indirectly). Many valid URIs may identify the same resource.
 The <code><em>public-identifier</em></code> is an additional free identifier which may be used
 (by the parser) to locate the resource.

@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.buf;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.apache.tomcat.util.res.StringManager;
@@ -25,6 +26,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public abstract class AbstractChunk implements Cloneable, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     protected static final StringManager sm = StringManager.getManager(AbstractChunk.class);
 

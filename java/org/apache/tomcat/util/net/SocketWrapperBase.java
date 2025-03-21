@@ -52,7 +52,7 @@ public abstract class SocketWrapperBase<E> {
      * before it gets back to zero).
      *
      * Local testing shows that 5 threads can obtain 60,000,000+ IDs a second
-     * from a single AtomicLong. That is about about 17ns per request. It does
+     * from a single AtomicLong. That is about 17ns per request. It does
      * not appear that the introduction of this counter will cause a bottleneck
      * for connection processing.
      */
@@ -474,7 +474,7 @@ public abstract class SocketWrapperBase<E> {
         /*
          * While the implementations for blocking and non-blocking writes are
          * very similar they have been split into separate methods:
-         * - To allow sub-classes to override them individually. NIO2, for
+         * - To allow subclasses to override them individually. NIO2, for
          *   example, overrides the non-blocking write but not the blocking
          *   write.
          * - To enable a marginally more efficient implemented for blocking
@@ -521,7 +521,7 @@ public abstract class SocketWrapperBase<E> {
         /*
          * While the implementations for blocking and non-blocking writes are
          * very similar they have been split into separate methods:
-         * - To allow sub-classes to override them individually. NIO2, for
+         * - To allow subclasses to override them individually. NIO2, for
          *   example, overrides the non-blocking write but not the blocking
          *   write.
          * - To enable a marginally more efficient implemented for blocking
@@ -624,7 +624,7 @@ public abstract class SocketWrapperBase<E> {
                     thisTime = transfer(buf, off, len, socketBufferHandler.getWriteBuffer());
                 } else {
                     // Didn't write any data in the last non-blocking write.
-                    // Therefore the write buffer will still be full. Nothing
+                    // Therefore, the write buffer will still be full. Nothing
                     // else to do here. Exit the loop.
                     break;
                 }
@@ -854,7 +854,7 @@ public abstract class SocketWrapperBase<E> {
          */
         PENDING,
         /**
-         * Operation was pending and non blocking.
+         * Operation was pending and non-blocking.
          */
         NOT_DONE,
         /**

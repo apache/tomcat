@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -24,12 +25,13 @@ import java.util.Map;
 
 /**
  * Representation of an application resource reference, as represented in
- * an <code>&lt;res-env-refy&gt;</code> element in the deployment descriptor.
+ * an <code>&lt;res-env-ref&gt;</code> element in the deployment descriptor.
  *
  * @author Craig R. McClanahan
  */
 public class ContextTransaction implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties

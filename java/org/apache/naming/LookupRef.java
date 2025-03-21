@@ -16,6 +16,8 @@
  */
 package org.apache.naming;
 
+import java.io.Serial;
+
 import javax.naming.RefAddr;
 import javax.naming.StringRefAddr;
 
@@ -24,6 +26,7 @@ import javax.naming.StringRefAddr;
  */
 public class LookupRef extends AbstractRef {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

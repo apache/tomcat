@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.modeler;
 
 
+import java.io.Serial;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,6 +49,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class ManagedBean implements java.io.Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private static final StringManager sm = StringManager.getManager(ManagedBean.class);
 

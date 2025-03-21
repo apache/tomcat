@@ -33,8 +33,8 @@ import static java.lang.foreign.ValueLayout.*;
 public class openssl_h {
 
     /*
-     * On Mac OS SymbolLookup.libraryLookup() appears to ignore java.library.path which means the LibreSSL
-     * library will be found which will then fail. Therefore, skip that lookup on Mac OS.
+     * On macOS SymbolLookup.libraryLookup() appears to ignore java.library.path which means the LibreSSL
+     * library will be found which will then fail. Therefore, skip that lookup on macOS.
      * On other platforms this can also be used to give more flexibility when testing.
      */
     public static final boolean USE_SYSTEM_LOAD_LIBRARY = Boolean.getBoolean("org.apache.tomcat.util.openssl.USE_SYSTEM_LOAD_LIBRARY");

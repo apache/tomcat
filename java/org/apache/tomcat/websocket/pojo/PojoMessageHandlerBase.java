@@ -125,7 +125,7 @@ public abstract class PojoMessageHandlerBase<T> implements WrappedMessageHandler
         ExceptionUtils.handleThrowable(t);
         // Log at debug level since this is an application issue and the application should be handling this.
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("pojoMessageHandlerBase.onMessafeFail", pojo.getClass().getName(), session.getId()),
+            log.debug(sm.getString("pojoMessageHandlerBase.onMessageFail", pojo.getClass().getName(), session.getId()),
                     t);
         }
         // Notify the application of the issue so it can handle it.

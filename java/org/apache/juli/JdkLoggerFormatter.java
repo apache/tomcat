@@ -63,9 +63,7 @@ public class JdkLoggerFormatter extends Formatter {
         buf.append(time);
 
         // pad to 8 to make it more readable
-        for (int i = 0; i < 8 - buf.length(); i++) {
-            buf.append(' ');
-        }
+        buf.append(" ".repeat(Math.max(0, 8 - buf.length())));
 
         // Append a readable representation of the log level.
         switch (level) {
@@ -95,9 +93,7 @@ public class JdkLoggerFormatter extends Formatter {
         buf.append(' ');
 
         // pad to 20 chars
-        for (int i = 0; i < 8 - buf.length(); i++) {
-            buf.append(' ');
-        }
+        buf.append(" ".repeat(Math.max(0, 8 - buf.length())));
 
         // Append the message
         buf.append(message);
@@ -110,7 +106,7 @@ public class JdkLoggerFormatter extends Formatter {
             java.io.PrintWriter pw = new java.io.PrintWriter(sw);
             t.printStackTrace(pw);
             pw.close();
-            buf.append(sw.toString());
+            buf.append(sw);
         }
 
         buf.append(System.lineSeparator());

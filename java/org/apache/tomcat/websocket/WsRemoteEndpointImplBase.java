@@ -387,7 +387,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
         boolean doWrite = false;
         synchronized (messagePartLock) {
             if (Constants.OPCODE_CLOSE == mp.getOpCode() && getBatchingAllowed()) {
-                // Should not happen. To late to send batched messages now since
+                // Should not happen. Too late to send batched messages now since
                 // the session has been closed. Complain loudly.
                 log.warn(sm.getString("wsRemoteEndpoint.flushOnCloseFailed"));
             }
@@ -556,17 +556,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     /**
      * Wraps the user provided handler so that the end point is notified when the message is complete.
      */
-    private static class EndMessageHandler implements SendHandler {
-
-        private final WsRemoteEndpointImplBase endpoint;
-        private final SendHandler handler;
-
-        EndMessageHandler(WsRemoteEndpointImplBase endpoint, SendHandler handler) {
-            this.endpoint = endpoint;
-            this.handler = handler;
-        }
-
-
+    private record EndMessageHandler(WsRemoteEndpointImplBase endpoint,
+                                     SendHandler handler) implements SendHandler {
         @Override
         public void onResult(SendResult result) {
             endpoint.endMessage(handler, result);
@@ -576,20 +567,13 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     /**
      * If a transformation needs to split a {@link MessagePart} into multiple {@link MessagePart}s, it uses this handler
-     * as the end handler for each of the additional {@link MessagePart}s. This handler notifies this this class that
+     * as the end handler for each of the additional {@link MessagePart}s. This handler notifies this class that
      * the {@link MessagePart} has been processed and that the next {@link MessagePart} in the queue should be started.
      * The final {@link MessagePart} will use the {@link EndMessageHandler} provided with the original
      * {@link MessagePart}.
      */
-    private static class IntermediateMessageHandler implements SendHandler {
-
-        private final WsRemoteEndpointImplBase endpoint;
-
-        IntermediateMessageHandler(WsRemoteEndpointImplBase endpoint) {
-            this.endpoint = endpoint;
-        }
-
-
+    private record IntermediateMessageHandler(
+            WsRemoteEndpointImplBase endpoint) implements SendHandler {
         @Override
         public void onResult(SendResult result) {
             endpoint.endMessage(null, result);
@@ -727,8 +711,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     private Encoder findEncoder(Object obj) {
         for (EncoderEntry entry : encoderEntries) {
-            if (entry.getClazz().isAssignableFrom(obj.getClass())) {
-                return entry.getEncoder();
+            if (entry.clazz().isAssignableFrom(obj.getClass())) {
+                return entry.encoder();
             }
         }
         return null;
@@ -738,7 +722,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     public final void close() {
         InstanceManager instanceManager = wsSession.getInstanceManager();
         for (EncoderEntry entry : encoderEntries) {
-            entry.getEncoder().destroy();
+            entry.encoder().destroy();
             if (instanceManager != null) {
                 try {
                     instanceManager.destroyInstance(entry);
@@ -789,7 +773,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             b = 0;
         }
 
-        // Next write the mask && length length
+        // Next write the mask && length
         if (payload.remaining() < 126) {
             headerBuffer.put((byte) (payload.remaining() | b));
         } else if (payload.remaining() < 65536) {
@@ -971,15 +955,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     /**
      * Ensures that the output buffer is cleared after it has been flushed.
      */
-    private static class OutputBufferFlushSendHandler implements SendHandler {
-
-        private final ByteBuffer outputBuffer;
-        private final SendHandler handler;
-
-        OutputBufferFlushSendHandler(ByteBuffer outputBuffer, SendHandler handler) {
-            this.outputBuffer = outputBuffer;
-            this.handler = handler;
-        }
+    private record OutputBufferFlushSendHandler(ByteBuffer outputBuffer,
+                                                SendHandler handler) implements SendHandler {
 
         @Override
         public void onResult(SendResult result) {
@@ -1159,23 +1136,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    private static class EncoderEntry {
-
-        private final Class<?> clazz;
-        private final Encoder encoder;
-
-        EncoderEntry(Class<?> clazz, Encoder encoder) {
-            this.clazz = clazz;
-            this.encoder = encoder;
-        }
-
-        public Class<?> getClazz() {
-            return clazz;
-        }
-
-        public Encoder getEncoder() {
-            return encoder;
-        }
+    private record EncoderEntry(Class<?> clazz, Encoder encoder) {
     }
 
 
@@ -1256,16 +1217,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    private static class StateUpdateSendHandler implements SendHandler {
-
-        private final SendHandler handler;
-        private final StateMachine stateMachine;
-
-        StateUpdateSendHandler(SendHandler handler, StateMachine stateMachine) {
-            this.handler = handler;
-            this.stateMachine = stateMachine;
-        }
-
+    private record StateUpdateSendHandler(SendHandler handler,
+                                          StateMachine stateMachine) implements SendHandler {
         @Override
         public void onResult(SendResult result) {
             if (result.isOK()) {

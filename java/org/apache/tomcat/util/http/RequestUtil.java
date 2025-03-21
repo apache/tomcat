@@ -135,7 +135,7 @@ public class RequestUtil {
         // At this point target doesn't include a port.
         if (target.length() == origin.length()) {
             // origin and target can only be equal if both are using default
-            // ports. Therefore only append the port to the target if a
+            // ports. Therefore, only append the port to the target if a
             // non-default port is used.
             if (("http".equals(scheme) || "ws".equals(scheme)) && port != 80 ||
                     ("https".equals(scheme) || "wss".equals(scheme)) && port != 443) {

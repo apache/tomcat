@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
     // ------------------------------------------------------------- Properties
 
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

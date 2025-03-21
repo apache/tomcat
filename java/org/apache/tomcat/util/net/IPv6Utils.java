@@ -92,7 +92,7 @@ public class IPv6Utils {
         int zeroGroupIndex = -1;
         int zeroGroupLength = 0;
 
-        // maximum length zero group, if there is more then one, then first one
+        // maximum length zero group, if there is more than one, then first one
         int maxZeroGroupIndex = -1;
         int maxZeroGroupLength = 0;
 

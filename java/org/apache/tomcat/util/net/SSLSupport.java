@@ -119,17 +119,14 @@ public interface SSLSupport {
     }
 
     /**
-     * Get the keysize.
-     *
+     * Get the key size.
      * What we're supposed to put here is ill-defined by the
      * Servlet spec (S 4.7 again). There are at least 4 potential
      * values that might go here:
-     *
      * (a) The size of the encryption key
      * (b) The size of the MAC key
      * (c) The size of the key-exchange key
      * (d) The size of the signature key used by the server
-     *
      * Unfortunately, all of these values are nonsensical.
      *
      * @return The effective key size for the current cipher suite

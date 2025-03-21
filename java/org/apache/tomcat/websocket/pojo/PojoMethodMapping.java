@@ -98,8 +98,8 @@ public class PojoMethodMapping {
                 if (method.isSynthetic()) {
                     // Skip all synthetic methods.
                     // They may have copies of annotations from methods we are
-                    // interested in and they will use the wrong parameter type
-                    // (they always use Object) so we can't used them here.
+                    // interested in, and they will use the wrong parameter type
+                    // (they always use Object) so we can't use them here.
                     continue;
                 }
                 if (method.getAnnotation(OnOpen.class) != null) {
@@ -159,7 +159,7 @@ public class PojoMethodMapping {
             }
             currentClazz = currentClazz.getSuperclass();
         }
-        // If the methods are not on clazzPojo and they are overridden
+        // If the methods are not on clazzPojo, and they are overridden
         // by a non annotated method in clazzPojo, they should be ignored
         if (open != null && open.getDeclaringClass() != clazzPojo) {
             if (isOverridenWithoutAnnotation(clazzPojoMethods, open, OnOpen.class)) {

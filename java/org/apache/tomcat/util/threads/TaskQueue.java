@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.threads;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionException;
@@ -32,6 +33,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class TaskQueue extends LinkedBlockingQueue<Runnable> {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     protected static final StringManager sm = StringManager.getManager(TaskQueue.class);
 

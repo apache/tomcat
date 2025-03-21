@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -30,6 +31,7 @@ import org.apache.tomcat.util.buf.MessageBytes;
  */
 public class ServerCookie implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // RFC 6265

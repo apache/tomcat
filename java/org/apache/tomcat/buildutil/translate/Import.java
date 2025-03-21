@@ -57,7 +57,7 @@ public class Import {
             String key = (String) objKey;
             String value = props.getProperty(key);
             // Skip untranslated values
-            if (value.trim().length() == 0) {
+            if (value.trim().isEmpty()) {
                 continue;
             }
             CompositeKey cKey = new CompositeKey(key);

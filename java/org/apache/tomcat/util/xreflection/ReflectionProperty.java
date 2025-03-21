@@ -19,20 +19,8 @@ package org.apache.tomcat.util.xreflection;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 
-final class ReflectionProperty implements Comparable<ReflectionProperty> {
-    private final String clazz;
-    private final String propertyName;
-    private final Class<?> propertyType;
-    private final Method setMethod;
-    private final Method getMethod;
-
-    ReflectionProperty(String clazz, String propertyName, Class<?> propertyType, Method setMethod, Method getMethod) {
-        this.clazz = clazz;
-        this.propertyName = propertyName;
-        this.propertyType = propertyType;
-        this.setMethod = setMethod;
-        this.getMethod = getMethod;
-    }
+record ReflectionProperty(String clazz, String propertyName, Class<?> propertyType, Method setMethod, Method getMethod)
+        implements Comparable<ReflectionProperty> {
 
     public String getPropertyName() {
         return propertyName;

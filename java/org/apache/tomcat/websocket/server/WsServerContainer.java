@@ -152,8 +152,8 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
                 if (oldMatch != null) {
                     // Note: This depends on Endpoint instances being added
                     // before POJOs in WsSci#onStartup()
-                    if (oldMatch.isFromAnnotatedPojo() && !newMatch.isFromAnnotatedPojo() &&
-                            oldMatch.getConfig().getEndpointClass() == newMatch.getConfig().getEndpointClass()) {
+                    if (oldMatch.fromAnnotatedPojo() && !newMatch.fromAnnotatedPojo() &&
+                            oldMatch.config().getEndpointClass() == newMatch.config().getEndpointClass()) {
                         // The WebSocket spec says to ignore the new match in this case
                         templateMatches.put(path, oldMatch);
                     } else {
@@ -169,14 +169,14 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
                 if (oldMatch != null) {
                     // Note: This depends on Endpoint instances being added
                     // before POJOs in WsSci#onStartup()
-                    if (oldMatch.isFromAnnotatedPojo() && !newMatch.isFromAnnotatedPojo() &&
-                            oldMatch.getConfig().getEndpointClass() == newMatch.getConfig().getEndpointClass()) {
+                    if (oldMatch.fromAnnotatedPojo() && !newMatch.fromAnnotatedPojo() &&
+                            oldMatch.config().getEndpointClass() == newMatch.config().getEndpointClass()) {
                         // The WebSocket spec says to ignore the new match in this case
                         configExactMatchMap.put(path, oldMatch);
                     } else {
                         // Duplicate path mappings
                         throw new DeploymentException(sm.getString("serverContainer.duplicatePaths", path,
-                                oldMatch.getConfig().getEndpointClass(), sec.getEndpointClass()));
+                                oldMatch.config().getEndpointClass(), sec.getEndpointClass()));
                     }
                 }
             }
@@ -275,7 +275,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
         // Check an exact match. Simple case as there are no templates.
         ExactPathMatch match = configExactMatchMap.get(path);
         if (match != null) {
-            return new WsMappingResult(match.getConfig(), Collections.emptyMap());
+            return new WsMappingResult(match.config(), Collections.emptyMap());
         }
 
         // No exact match. Need to look for template matches.
@@ -302,9 +302,9 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
         ServerEndpointConfig sec = null;
         Map<String, String> pathParams = null;
         for (TemplatePathMatch templateMatch : templateMatches.values()) {
-            pathParams = templateMatch.getUriTemplate().match(pathUriTemplate);
+            pathParams = templateMatch.uriTemplate().match(pathUriTemplate);
             if (pathParams != null) {
-                sec = templateMatch.getConfig();
+                sec = templateMatch.config();
                 break;
             }
         }
@@ -414,51 +414,11 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
     }
 
 
-    private static class TemplatePathMatch {
-        private final ServerEndpointConfig config;
-        private final UriTemplate uriTemplate;
-        private final boolean fromAnnotatedPojo;
-
-        TemplatePathMatch(ServerEndpointConfig config, UriTemplate uriTemplate, boolean fromAnnotatedPojo) {
-            this.config = config;
-            this.uriTemplate = uriTemplate;
-            this.fromAnnotatedPojo = fromAnnotatedPojo;
-        }
-
-
-        public ServerEndpointConfig getConfig() {
-            return config;
-        }
-
-
-        public UriTemplate getUriTemplate() {
-            return uriTemplate;
-        }
-
-
-        public boolean isFromAnnotatedPojo() {
-            return fromAnnotatedPojo;
-        }
+    private record TemplatePathMatch(ServerEndpointConfig config, UriTemplate uriTemplate,
+                                     boolean fromAnnotatedPojo) {
     }
 
 
-    private static class ExactPathMatch {
-        private final ServerEndpointConfig config;
-        private final boolean fromAnnotatedPojo;
-
-        ExactPathMatch(ServerEndpointConfig config, boolean fromAnnotatedPojo) {
-            this.config = config;
-            this.fromAnnotatedPojo = fromAnnotatedPojo;
-        }
-
-
-        public ServerEndpointConfig getConfig() {
-            return config;
-        }
-
-
-        public boolean isFromAnnotatedPojo() {
-            return fromAnnotatedPojo;
-        }
+    private record ExactPathMatch(ServerEndpointConfig config, boolean fromAnnotatedPojo) {
     }
 }

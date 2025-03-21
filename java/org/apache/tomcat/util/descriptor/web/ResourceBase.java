@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,12 +26,13 @@ import java.util.Map;
 
 
 /**
- * Representation of an Context element
+ * Representation of a Context element
  *
  * @author Peter Rossbach (pero@apache.org)
  */
 public class ResourceBase implements Serializable, Injectable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

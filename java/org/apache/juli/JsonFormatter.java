@@ -125,7 +125,7 @@ public class JsonFormatter extends OneLineFormatter {
      * Escaping is based on the definition of JSON found in
      * <a href="https://www.rfc-editor.org/rfc/rfc8259.html">RFC 8259</a>.
      */
-    public class JSONFilter {
+    public static class JSONFilter {
 
         /**
          * Escape the given string.
@@ -189,24 +189,15 @@ public class JsonFormatter extends OneLineFormatter {
         }
 
         private static char getPopularChar(char c) {
-            switch (c) {
-                case '"':
-                case '\\':
-                case '/':
-                    return c;
-                case 0x8:
-                    return 'b';
-                case 0xc:
-                    return 'f';
-                case 0xa:
-                    return 'n';
-                case 0xd:
-                    return 'r';
-                case 0x9:
-                    return 't';
-                default:
-                    return 0;
-            }
+            return switch (c) {
+                case '"', '\\', '/' -> c;
+                case 0x8 -> 'b';
+                case 0xc -> 'f';
+                case 0xa -> 'n';
+                case 0xd -> 'r';
+                case 0x9 -> 't';
+                default -> 0;
+            };
         }
 
     }

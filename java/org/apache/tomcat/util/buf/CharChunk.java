@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.buf;
 
 import java.io.IOException;
+import java.io.Serial;
 
 /**
  * Utilities to manipulate char chunks. While String is the easiest way to manipulate chars ( search, substrings, etc),
@@ -29,6 +30,7 @@ import java.io.IOException;
  */
 public final class CharChunk extends AbstractChunk implements CharSequence {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -108,7 +110,7 @@ public final class CharChunk extends AbstractChunk implements CharSequence {
 
 
     /**
-     * Sets the buffer to the specified subarray of characters.
+     * Sets the buffer to the specified sub array of characters.
      *
      * @param c   the characters
      * @param off the start offset of the characters

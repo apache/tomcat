@@ -43,7 +43,7 @@ import java.util.logging.Logger;
  */
 public class ClassLoaderLogManager extends LogManager {
 
-    private static ThreadLocal<Boolean> addingLocalRootLogger = ThreadLocal.withInitial(() -> Boolean.FALSE);
+    private static final ThreadLocal<Boolean> addingLocalRootLogger = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     public static final String DEBUG_PROPERTY = ClassLoaderLogManager.class.getName() + ".debug";
 
@@ -470,19 +470,14 @@ public class ClassLoaderLogManager extends LogManager {
 
         ClassLoaderLogInfo info = classLoaderLoggers.get(classLoader);
 
-        try {
+        try (is) {
             info.props.load(is);
         } catch (IOException e) {
             // Report error
             System.err.println("Configuration error");
             e.printStackTrace();
-        } finally {
-            try {
-                is.close();
-            } catch (IOException ioe) {
-                // Ignore
-            }
         }
+        // Ignore
 
         // Create handlers for the root logger of this classloader
         String rootHandlers = info.props.getProperty(".handlers");
@@ -494,7 +489,7 @@ public class ClassLoaderLogManager extends LogManager {
                 String handlerName = (tok.nextToken().trim());
                 String handlerClassName = handlerName;
                 String prefix = "";
-                if (handlerClassName.length() <= 0) {
+                if (handlerClassName.isEmpty()) {
                     continue;
                 }
                 // Parse and remove a prefix (prefix start with a digit, such as
@@ -553,7 +548,7 @@ public class ClassLoaderLogManager extends LogManager {
 
                 String replacement = replaceWebApplicationProperties(propName);
                 if (replacement == null) {
-                    replacement = propName.length() > 0 ? System.getProperty(propName) : null;
+                    replacement = !propName.isEmpty() ? System.getProperty(propName) : null;
                 }
                 if (replacement != null) {
                     builder.append(replacement);
@@ -592,7 +587,7 @@ public class ClassLoaderLogManager extends LogManager {
      * Obtain the class loader to use to lookup loggers, obtain configuration etc. The search order is:
      * <ol>
      * <li>Thread.currentThread().getContextClassLoader()</li>
-     * <li>The class laoder of this class</li>
+     * <li>The classloader of this class</li>
      * </ol>
      *
      * @return The class loader to use to lookup loggers, obtain configuration etc.

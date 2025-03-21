@@ -20,7 +20,7 @@ import java.nio.ByteBuffer;
 
 import jakarta.websocket.SendHandler;
 
-class MessagePart {
+public class MessagePart {
     private final boolean fin;
     private final int rsv;
     private final byte opCode;
@@ -40,31 +40,25 @@ class MessagePart {
         this.blockingWriteTimeoutExpiry = blockingWriteTimeoutExpiry;
     }
 
-
     public boolean isFin() {
         return fin;
     }
-
 
     public int getRsv() {
         return rsv;
     }
 
-
     public byte getOpCode() {
         return opCode;
     }
-
 
     public ByteBuffer getPayload() {
         return payload;
     }
 
-
     public SendHandler getIntermediateHandler() {
         return intermediateHandler;
     }
-
 
     public SendHandler getEndHandler() {
         return endHandler;

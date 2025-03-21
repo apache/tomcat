@@ -19,6 +19,7 @@ package org.apache.tomcat.util.buf;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -49,7 +50,7 @@ import java.nio.charset.StandardCharsets;
  * ( for example a multipart message may have parts with different
  *  encoding )
  * <p>
- * For HTTP it is not very clear how the encoding of RequestURI
+ * For HTTP, it is not very clear how the encoding of RequestURI
  * and mime values can be determined, but it is a great advantage
  * to be able to parse the request without converting to string.
  *
@@ -60,6 +61,7 @@ import java.nio.charset.StandardCharsets;
  */
 public final class ByteChunk extends AbstractChunk {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -135,12 +137,14 @@ public final class ByteChunk extends AbstractChunk {
     }
 
 
+    @Serial
     private void writeObject(ObjectOutputStream oos) throws IOException {
         oos.defaultWriteObject();
         oos.writeUTF(getCharset().name());
     }
 
 
+    @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         this.charset = Charset.forName(ois.readUTF());
@@ -175,7 +179,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Sets the buffer to the specified subarray of bytes.
+     * Sets the buffer to the specified sub array of bytes.
      *
      * @param b   the ascii bytes
      * @param off the start offset of the bytes
@@ -710,7 +714,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Returns true if the buffer starts with the specified string when tested in a case sensitive manner.
+     * Returns true if the buffer starts with the specified string when tested in a case-sensitive manner.
      * <p>
      * NOTE: This only works for characters in the range 0-127.
      *
@@ -736,7 +740,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Returns true if the buffer starts with the specified string when tested in a case insensitive manner.
+     * Returns true if the buffer starts with the specified string when tested in a case-insensitive manner.
      * <p>
      * NOTE: This only works for characters in the range 0-127.
      *
@@ -833,7 +837,7 @@ public final class ByteChunk extends AbstractChunk {
 
 
     /**
-     * Returns the first instance of any of the given bytes in the byte array between the specified start and end.
+     * Returns the first instance of the given bytes in the byte array between the specified start and end.
      *
      * @param bytes The byte array to search
      * @param start The point to start searching from in the byte array
@@ -874,6 +878,7 @@ public final class ByteChunk extends AbstractChunk {
 
     public static class BufferOverflowException extends IOException {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         public BufferOverflowException(String message) {

@@ -114,7 +114,7 @@ public final class HexUtils {
             int upperNibble = getDec(inputChars[2 * i]);
             int lowerNibble = getDec(inputChars[2 * i + 1]);
             if (upperNibble < 0 || lowerNibble < 0) {
-                // Non hex character
+                // Non-hex character
                 throw new IllegalArgumentException(sm.getString("hexUtils.fromHex.nonHex"));
             }
             result[i] = (byte) ((upperNibble << 4) + lowerNibble);

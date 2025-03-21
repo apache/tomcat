@@ -322,26 +322,26 @@ public class WsSession implements Session {
         Set<MessageHandlerResult> mhResults = Util.getMessageHandlers(target, listener, endpointConfig, this);
 
         for (MessageHandlerResult mhResult : mhResults) {
-            switch (mhResult.getType()) {
+            switch (mhResult.type()) {
                 case TEXT: {
                     if (textMessageHandler != null) {
                         throw new IllegalStateException(sm.getString("wsSession.duplicateHandlerText"));
                     }
-                    textMessageHandler = mhResult.getHandler();
+                    textMessageHandler = mhResult.handler();
                     break;
                 }
                 case BINARY: {
                     if (binaryMessageHandler != null) {
                         throw new IllegalStateException(sm.getString("wsSession.duplicateHandlerBinary"));
                     }
-                    binaryMessageHandler = mhResult.getHandler();
+                    binaryMessageHandler = mhResult.handler();
                     break;
                 }
                 case PONG: {
                     if (pongMessageHandler != null) {
                         throw new IllegalStateException(sm.getString("wsSession.duplicateHandlerPong"));
                     }
-                    MessageHandler handler = mhResult.getHandler();
+                    MessageHandler handler = mhResult.handler();
                     if (handler instanceof MessageHandler.Whole<?>) {
                         pongMessageHandler = (MessageHandler.Whole<PongMessage>) handler;
                     } else {
@@ -352,7 +352,7 @@ public class WsSession implements Session {
                 }
                 default: {
                     throw new IllegalArgumentException(
-                            sm.getString("wsSession.unknownHandlerType", listener, mhResult.getType()));
+                            sm.getString("wsSession.unknownHandlerType", listener, mhResult.type()));
                 }
             }
         }
@@ -633,8 +633,8 @@ public class WsSession implements Session {
             closeConnection();
         } else if (state.compareAndSet(State.OUTPUT_CLOSING, State.CLOSING)) {
             /*
-             * The local endpoint sent a close message the the same time as the remote endpoint. The local close is
-             * still being processed. Update the state so the the local close process will also close the network
+             * The local endpoint sent a close message at the same time as the remote endpoint. The local close is
+             * still being processed. Update the state so the local close process will also close the network
              * connection once it has finished sending a close message.
              */
         } else if (state.compareAndSet(State.OUTPUT_CLOSED, State.CLOSED)) {
@@ -787,7 +787,7 @@ public class WsSession implements Session {
             closeConnection();
             // Failure to send a close message is not unexpected in the case of
             // an abnormal closure (usually triggered by a failure to read/write
-            // from/to the client. In this case do not trigger the endpoint's
+            // from/to the client). In this case do not trigger the endpoint's
             // error handling
             if (closeCode != CloseCodes.CLOSED_ABNORMALLY) {
                 localEndpoint.onError(this, e);
@@ -816,7 +816,7 @@ public class WsSession implements Session {
         // Once the close code has been added there are a maximum of 123 bytes
         // left for the reason phrase. If it is truncated then care needs to be
         // taken to ensure the bytes are not truncated in the middle of a
-        // multi-byte UTF-8 character.
+        // multibyte UTF-8 character.
         byte[] reasonBytes = reason.getBytes(StandardCharsets.UTF_8);
 
         if (reasonBytes.length <= 123) {
@@ -844,11 +844,11 @@ public class WsSession implements Session {
      *
      * @param f2sh The handler
      */
-    protected void registerFuture(FutureToSendHandler f2sh) {
+    void registerFuture(FutureToSendHandler f2sh) {
         // Ideally, this code should sync on stateLock so that the correct
         // action is taken based on the current state of the connection.
         // However, a sync on stateLock can't be used here as it will create the
-        // possibility of a dead-lock. See BZ 61183.
+        // possibility of a deadlock. See BZ 61183.
         // Therefore, a slightly less efficient approach is used.
 
         // Always register the future.
@@ -895,7 +895,7 @@ public class WsSession implements Session {
      *
      * @param f2sh The handler
      */
-    protected void unregisterFuture(FutureToSendHandler f2sh) {
+    void unregisterFuture(FutureToSendHandler f2sh) {
         futures.remove(f2sh);
     }
 

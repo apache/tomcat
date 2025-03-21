@@ -16,6 +16,7 @@
  */
 package org.apache.naming;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -28,6 +29,7 @@ import javax.naming.StringRefAddr;
  */
 public class ServiceRef extends AbstractRef {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 
