@@ -27,7 +27,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * This helper class may be used to do sophisticated redirection of
  * System.out and System.err on a per Thread basis.
- *
  * A stack is implemented per Thread so that nested startCapture
  * and stopCapture can be used.
  *

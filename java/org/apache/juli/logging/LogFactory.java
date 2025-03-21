@@ -28,27 +28,25 @@ import aQute.bnd.annotation.spi.ServiceConsumer;
  * discovery mechanism with a default of using JDK based logging. An
  * implementation that uses the full Commons Logging discovery mechanism is
  * available as part of the Tomcat extras download.
- *
+ * <p>
  * Why? It is an attempt to strike a balance between simpler code (no discovery)
  * and providing flexibility - particularly for those projects that embed Tomcat
  * or some of Tomcat's components - is an alternative logging
  * implementation is desired.
- *
+ * <p>
  * Note that this implementation is not just a wrapper around JDK logging (like
  * the original commons-logging impl). It adds 2 features - a simpler
  * configuration  (which is in fact a subset of log4j.properties) and a
  * formatter that is less ugly.
- *
+ * <p>
  * The removal of 'abstract' preserves binary backward compatibility. It is
  * possible to preserve the abstract - and introduce another (hardcoded) factory
  * - but I see no benefit.
- *
+ * <p>
  * Since this class is not intended to be extended - all protected methods are
  * removed. This can be changed - but again, there is little value in keeping
  * dead code. Just take a quick look at the removed code ( and it's complexity).
- *
- * --------------
- *
+ * <p>
  * Original comment:
  * <p>Factory for creating {@link Log} instances, with discovery and
  * configuration features similar to that employed by standard Java APIs
@@ -78,7 +76,7 @@ public class LogFactory {
          * Work-around known a JRE bug.
          * https://bugs.openjdk.java.net/browse/JDK-8194653
          *
-         * Pre-load the default file system. No performance impact as we need to
+         * Preload the default file system. No performance impact as we need to
          * load the default file system anyway. Just do it earlier to avoid the
          * potential deadlock.
          *
@@ -242,7 +240,7 @@ public class LogFactory {
     public static void release(ClassLoader classLoader) {
         // JULI's log manager looks at the current classLoader so there is no
         // need to use the passed in classLoader, the default implementation
-        // does not so calling reset in that case will break things
+        // does not so call reset in that case will break things
         if (!LogManager.getLogManager().getClass().getName().equals(
                 "java.util.logging.LogManager")) {
             LogManager.getLogManager().reset();

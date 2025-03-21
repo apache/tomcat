@@ -110,7 +110,7 @@ public class JdkLoggerFormatter extends Formatter {
             java.io.PrintWriter pw = new java.io.PrintWriter(sw);
             t.printStackTrace(pw);
             pw.close();
-            buf.append(sw.toString());
+            buf.append(sw);
         }
 
         buf.append(System.lineSeparator());

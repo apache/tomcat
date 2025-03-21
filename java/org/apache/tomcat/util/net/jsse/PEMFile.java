@@ -107,12 +107,10 @@ public class PEMFile {
     }
 
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
-        StringBuilder result = new StringBuilder();
-        result.append(Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY);
-        result.append(System.lineSeparator());
-        result.append(Base64.getMimeEncoder().encodeToString(certificate.getEncoded()));
-        result.append(Part.END_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY);
-        return result.toString();
+        return Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY +
+                System.lineSeparator() +
+                Base64.getMimeEncoder().encodeToString(certificate.getEncoded()) +
+                Part.END_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY;
     }
 
     private final List<X509Certificate> certificates = new ArrayList<>();
@@ -409,7 +407,7 @@ public class PEMFile {
                     p.parseTagSequence();
                     p.parseLength();
                     String prf;
-                    // This tag is optional. If present the nested sequence level will be 6 else if will be 4.
+                    // This tag is optional. If present the nested sequence level will be 6 else it will be 4.
                     if (p.getNestedSequenceLevel() == 6) {
                         byte[] oidPRF = p.parseOIDAsBytes();
                         prf = OID_TO_PRF.get(HexUtils.toHexString(oidPRF));

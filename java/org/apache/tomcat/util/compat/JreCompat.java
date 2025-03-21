@@ -46,7 +46,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This is the base implementation class for JRE compatibility and provides an implementation based on Java 8.
- * Sub-classes may extend this class and provide alternative implementations for later JRE versions
+ * Subclasses may extend this class and provide alternative implementations for later JRE versions
  */
 public class JreCompat {
 

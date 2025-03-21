@@ -46,7 +46,7 @@ public interface CookieProcessor {
 
     /**
      * Generate the {@code Set-Cookie} HTTP header value for the given Cookie. This method receives as parameter the
-     * servlet request so that it can make decisions based on request properties. One such use-case is decide if the
+     * servlet request so that it can make decisions based on request properties. One such use-case is deciding if the
      * SameSite attribute should be added to the cookie based on the User-Agent or other request header because there
      * are browser versions incompatible with the SameSite attribute. This is described by
      * <a href="https://www.chromium.org/updates/same-site/incompatible-clients">the Chromium project</a>.

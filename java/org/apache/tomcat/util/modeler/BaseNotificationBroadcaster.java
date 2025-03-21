@@ -49,7 +49,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      * The set of registered <code>BaseNotificationBroadcasterEntry</code>
      * entries.
      */
-    protected final ArrayList<BaseNotificationBroadcasterEntry> entries =
+    final ArrayList<BaseNotificationBroadcasterEntry> entries =
             new ArrayList<>();
 
 
@@ -62,7 +62,7 @@ public class BaseNotificationBroadcaster implements NotificationBroadcaster {
      * @param listener Listener that will receive event notifications
      * @param filter Filter object used to filter event notifications
      *  actually delivered, or <code>null</code> for no filtering
-     * @param handback Handback object to be sent along with event
+     * @param handback object to be sent along with event
      *  notifications
      *
      * @exception IllegalArgumentException if the listener parameter is null

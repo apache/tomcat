@@ -21,9 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import javax.naming.NamingException;
 
 /**
- * SimpleInstanceManager
- *
- * Implement the org.apache.tomcat.InstanceManager interface.
+ * SimpleInstanceManager implements the org.apache.tomcat.InstanceManager interface.
  */
 public class SimpleInstanceManager implements InstanceManager {
 

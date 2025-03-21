@@ -29,7 +29,7 @@ import org.apache.naming.StringManager;
 
 /**
  * Abstract base class that provides common functionality required by
- * sub-classes. This class exists primarily to reduce code duplication.
+ * subclasses. This class exists primarily to reduce code duplication.
  */
 public abstract class FactoryBase implements ObjectFactory {
 

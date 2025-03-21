@@ -198,13 +198,7 @@ public class FilterDef implements Serializable {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("FilterDef[");
-        sb.append("filterName=");
-        sb.append(this.filterName);
-        sb.append(", filterClass=");
-        sb.append(this.filterClass);
-        sb.append(']');
-        return sb.toString();
+        return "FilterDef[" + "filterName=" + this.filterName + ", filterClass=" + this.filterClass + ']';
     }
 
 

@@ -228,7 +228,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * The EntityResolver used by the SAX parser. By default it use this class
+     * The EntityResolver used by the SAX parser. By default, it uses this class
      */
     protected EntityResolver entityResolver;
 
@@ -308,7 +308,7 @@ public class Digester extends DefaultHandler2 {
 
     /**
      * The "root" element of the stack (in other words, the last object
-     * that was popped.
+     * that was popped).
      */
     protected Object root = null;
 
@@ -676,7 +676,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Set the public id of the current file being parse.
+     * Set the public id of the current file being parsed.
      * @param publicId the DTD/Schema public's id.
      */
     public void setPublicId(String publicId) {
@@ -765,7 +765,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * @return the boolean as to whether the context classloader should be used.
+     * @return a boolean to indicate if the context classloader should be used.
      */
     public boolean getUseContextClassLoader() {
         return useContextClassLoader;
@@ -777,7 +777,7 @@ public class Digester extends DefaultHandler2 {
      * calling <code>Thread.currentThread().getContextClassLoader()</code>)
      * to resolve/load classes that are defined in various rules.  If not
      * using Context ClassLoader, then the class-loading defaults to
-     * using the calling-class' ClassLoader.
+     * using the calling class' ClassLoader.
      *
      * @param use determines whether to use Context ClassLoader.
      */
@@ -870,7 +870,6 @@ public class Digester extends DefaultHandler2 {
 
     /**
      * Return the XMLReader to be used for parsing the input document.
-     *
      * FIX ME: there is a bug in JAXP/XERCES that prevent the use of a
      * parser that contains a schema with a DTD.
      * @return the XML reader
@@ -1619,7 +1618,7 @@ public class Digester extends DefaultHandler2 {
 
 
     /**
-     * Add an "call method" rule for a method which accepts no arguments.
+     * Add a "call method" rule for a method which accepts no arguments.
      *
      * @param pattern Element matching pattern
      * @param methodName Method name to be called
@@ -1632,7 +1631,7 @@ public class Digester extends DefaultHandler2 {
     }
 
     /**
-     * Add an "call method" rule for the specified parameters.
+     * Add a "call method" rule for the specified parameters.
      *
      * @param pattern Element matching pattern
      * @param methodName Method name to be called
@@ -1755,7 +1754,7 @@ public class Digester extends DefaultHandler2 {
      * Clear the current contents of the object stack.
      * <p>
      * Calling this method <i>might</i> allow another document of the same type
-     * to be correctly parsed. However this method was not intended for this
+     * to be correctly parsed. However, this method was not intended for this
      * purpose. In general, a separate Digester object should be created for
      * each document to be parsed.
      */

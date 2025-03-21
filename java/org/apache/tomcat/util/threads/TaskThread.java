@@ -67,7 +67,6 @@ public class TaskThread extends Thread {
                 log.debug(sm.getString("taskThread.exiting"), exc);
             }
         }
-
     }
 
 }

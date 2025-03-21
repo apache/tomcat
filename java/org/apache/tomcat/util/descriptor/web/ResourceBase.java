@@ -25,7 +25,7 @@ import java.util.Map;
 
 
 /**
- * Representation of an Context element
+ * Representation of a Context element
  *
  * @author Peter Rossbach (pero@apache.org)
  */

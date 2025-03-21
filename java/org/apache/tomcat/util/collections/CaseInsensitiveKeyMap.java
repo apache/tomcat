@@ -65,7 +65,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
      * {@inheritDoc}
      * <p>
      * <b>Use this method with caution</b>. If the input Map contains duplicate
-     * keys when the keys are compared in a case insensitive manner then some
+     * keys when the keys are compared in a case-insensitive manner then some
      * values will be lost when inserting via this method.
      */
     @Override
@@ -126,8 +126,8 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
         }
 
         @Override
-        public Entry<String,V> next() {
-            Entry<Key,V> entry = iterator.next();
+        public Entry<String, V> next() {
+            Entry<Key, V> entry = iterator.next();
             return new EntryImpl<>(entry.getKey().getKey(), entry.getValue());
         }
 

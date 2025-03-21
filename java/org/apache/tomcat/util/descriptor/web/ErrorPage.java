@@ -121,12 +121,7 @@ public class ErrorPage extends XmlEncodingBase implements Serializable {
      * @param location The new location
      */
     public void setLocation(String location) {
-
-        //        if ((location == null) || !location.startsWith("/"))
-        //            throw new IllegalArgumentException
-        //                ("Error Page Location must start with a '/'");
         this.location = UDecoder.URLDecode(location, getCharset());
-
     }
 
 

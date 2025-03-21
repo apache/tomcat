@@ -550,7 +550,7 @@ public class ClassLoaderLogManager extends LogManager {
                 String handlerName = (tok.nextToken().trim());
                 String handlerClassName = handlerName;
                 String prefix = "";
-                if (handlerClassName.length() <= 0) {
+                if (handlerClassName.isEmpty()) {
                     continue;
                 }
                 // Parse and remove a prefix (prefix start with a digit, such as
@@ -623,7 +623,7 @@ public class ClassLoaderLogManager extends LogManager {
 
                 String replacement = replaceWebApplicationProperties(propName);
                 if (replacement == null) {
-                    replacement = propName.length() > 0 ? System.getProperty(propName) : null;
+                    replacement = !propName.isEmpty() ? System.getProperty(propName) : null;
                 }
                 if (replacement != null) {
                     builder.append(replacement);
@@ -662,7 +662,7 @@ public class ClassLoaderLogManager extends LogManager {
      * Obtain the class loader to use to lookup loggers, obtain configuration etc. The search order is:
      * <ol>
      * <li>Thread.currentThread().getContextClassLoader()</li>
-     * <li>The class laoder of this class</li>
+     * <li>The classloader of this class</li>
      * </ol>
      *
      * @return The class loader to use to lookup loggers, obtain configuration etc.

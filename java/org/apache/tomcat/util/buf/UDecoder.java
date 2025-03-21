@@ -189,7 +189,7 @@ public final class UDecoder {
                     }
                 } else if (res == '%') {
                     /*
-                     * If encoded '/' or '\' is going to be left encoded then so must encoded '%' else the subsequent
+                     * If encoded '/' or '\' is going to be left encoded then so must be encoded '%' else the subsequent
                      * %nn decoding will either fail or corrupt the output.
                      */
                     if (encodedSolidusHandling.equals(EncodedSolidusHandling.PASS_THROUGH) ||
@@ -462,7 +462,7 @@ public final class UDecoder {
          * sets and some use a variable length.
          */
 
-        // This isn't perfect but it is a reasonable guess for the size of the
+        // This isn't perfect, but it is a reasonable guess for the size of the
         // array required
         ByteArrayOutputStream baos = new ByteArrayOutputStream(str.length() * 2);
 

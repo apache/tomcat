@@ -20,7 +20,7 @@ import java.io.Serializable;
 
 
 /**
- * Representation of a the multipart configuration for a servlet.
+ * Representation of the multipart configuration for a servlet.
  */
 public class MultipartDef implements Serializable {
 

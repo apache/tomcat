@@ -1056,15 +1056,9 @@ final class CallMethodMultiRule extends CallMethodRule {
         }
 
         if (target == null) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("[CallMethodRule]{");
-            sb.append("} Call target is null (");
-            sb.append("targetOffset=");
-            sb.append(targetOffset);
-            sb.append(",stackdepth=");
-            sb.append(digester.getCount());
-            sb.append(')');
-            throw new org.xml.sax.SAXException(sb.toString());
+            String sb = "[CallMethodRule]{" + "} Call target is null (" + "targetOffset="
+                    + targetOffset + ",stackdepth=" + digester.getCount() + ')';
+            throw new org.xml.sax.SAXException(sb);
         }
 
         if (multiParams == null) {

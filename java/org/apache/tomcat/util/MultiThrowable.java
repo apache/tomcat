@@ -31,7 +31,7 @@ public class MultiThrowable extends Throwable {
 
     private static final long serialVersionUID = 1L;
 
-    private List<Throwable> throwables = new ArrayList<>();
+    private final List<Throwable> throwables = new ArrayList<>();
 
     /**
      * Add a throwable to the list of wrapped throwables.

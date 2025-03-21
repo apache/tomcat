@@ -41,7 +41,7 @@ public abstract class SendfileDataBase {
 
     /**
      * The number of bytes remaining to be written from the file (from the
-     * current {@link #pos}. This is initialised to the end point - the start
+     * current {@link #pos}). This is initialised to the end point - the start
      * point and then updated as the file is written.
      */
     public long length;

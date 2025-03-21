@@ -18,7 +18,6 @@ package org.apache.tomcat.util.modeler;
 
 import javax.management.MBeanAttributeInfo;
 
-
 /**
  * <p>Internal configuration information for an <code>Attribute</code>
  * descriptor.</p>

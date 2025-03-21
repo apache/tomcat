@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.threads;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.RejectedExecutionException;
@@ -40,7 +41,7 @@ public class InlineExecutorService extends AbstractExecutorService {
     @Override
     public List<Runnable> shutdownNow() {
         shutdown();
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
