@@ -53,10 +53,9 @@ public class TaglibDescriptorImpl implements TaglibDescriptor {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof TaglibDescriptorImpl)) {
+        if (!(obj instanceof TaglibDescriptorImpl other)) {
             return false;
         }
-        TaglibDescriptorImpl other = (TaglibDescriptorImpl) obj;
         if (location == null) {
             if (other.location != null) {
                 return false;

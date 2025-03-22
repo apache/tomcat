@@ -118,7 +118,7 @@ public class Asn1Parser {
             }
         }
         /*
-         * If this is the first length parsed after a sequence has been added to the sequence nesting tracking mechansim
+         * If this is the first length parsed after a sequence has been added to the sequence nesting tracking mechanism
          * it must be the length of the sequence so update the entry to record the end position of the sequence. Note
          * that position recorded is actually the start of the first element after the sequence ends.
          */

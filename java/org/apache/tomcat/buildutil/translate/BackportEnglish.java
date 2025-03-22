@@ -29,7 +29,7 @@ import java.util.Set;
  */
 public class BackportEnglish extends BackportBase {
 
-    private static Set<String> keysToExclude = new HashSet<>();
+    private static final Set<String> keysToExclude = new HashSet<>();
 
 
     public static void main(String... args) throws IOException {

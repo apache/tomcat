@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.collections;
 
+import java.io.Serial;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -95,6 +96,7 @@ public class ConcurrentLruCache<T> {
 
 
     private static class LimitedLinkedHashMap<K,V> extends LinkedHashMap<K,V> {
+        @Serial
         private static final long serialVersionUID = 1L;
 
         private final int limit;

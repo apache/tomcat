@@ -35,7 +35,7 @@ import org.xml.sax.SAXException;
 
 /**
  * This class caches parsed instances of TLD files to remove the need for the same TLD to be parsed for each JSP that
- * references it. It does not protect against multiple threads processing the same, new TLD but it does ensure that each
+ * references it. It does not protect against multiple threads processing the same new TLD, but it does ensure that each
  * all threads will use the same TLD object after parsing.
  */
 public class TldCache {

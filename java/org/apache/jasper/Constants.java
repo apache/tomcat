@@ -16,8 +16,6 @@
  */
 package org.apache.jasper;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -35,10 +33,8 @@ public class Constants {
     /**
      * These classes/packages are automatically imported by the generated code.
      */
-    private static final String[] PRIVATE_STANDARD_IMPORTS =
-            { "jakarta.servlet.*", "jakarta.servlet.http.*", "jakarta.servlet.jsp.*" };
     public static final List<String> STANDARD_IMPORTS =
-            Collections.unmodifiableList(Arrays.asList(PRIVATE_STANDARD_IMPORTS));
+            List.of("jakarta.servlet.*", "jakarta.servlet.http.*", "jakarta.servlet.jsp.*");
 
     /**
      * Default size of the JSP buffer.

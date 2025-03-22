@@ -107,7 +107,7 @@ public class JasperELResolver extends CompositeELResolver {
             // call implicit and app resolvers
             int index = 1 /* implicit */ + appResolversSize;
             for (int i = 0; i < index; i++) {
-                result = resolvers[i].getValue(context, base, property);
+                result = resolvers[i].getValue(context, null, property);
                 if (context.isPropertyResolved()) {
                     return result;
                 }

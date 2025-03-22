@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
@@ -30,6 +31,7 @@ import java.io.Serializable;
  */
 public class ApplicationParameter implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties

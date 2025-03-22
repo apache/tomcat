@@ -94,7 +94,8 @@ public final class AstValue extends SimpleNode {
                 i += 2;
 
                 if (property == null) {
-                    throw new PropertyNotFoundException(MessageFactory.get("error.unreachable.property", property));
+                    throw new PropertyNotFoundException(
+                            MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
                 }
             } else if (i + 1 < propCount) {
                 // Object with property not at end of expression
@@ -110,11 +111,13 @@ public final class AstValue extends SimpleNode {
                 i++;
 
                 if (property == null) {
-                    throw new PropertyNotFoundException(MessageFactory.get("error.unreachable.property", property));
+                    throw new PropertyNotFoundException(
+                            MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
                 }
             }
             if (base == null) {
-                throw new PropertyNotFoundException(MessageFactory.get("error.unreachable.property", property));
+                throw new PropertyNotFoundException(
+                        MessageFactory.get("error.unreachable.property", this.children[i].getImage()));
             }
         }
 
@@ -133,8 +136,7 @@ public final class AstValue extends SimpleNode {
         ELResolver resolver = ctx.getELResolver();
         while (base != null && i < propCount) {
             suffix = this.children[i].getValue(ctx);
-            if (i + 1 < propCount && (this.children[i + 1] instanceof AstMethodParameters)) {
-                AstMethodParameters mps = (AstMethodParameters) this.children[i + 1];
+            if (i + 1 < propCount && (this.children[i + 1] instanceof AstMethodParameters mps)) {
                 if (base instanceof Optional && "orElseGet".equals(suffix) && mps.jjtGetNumChildren() == 1) {
                     Node paramFoOptional = mps.jjtGetChild(0);
                     if (!(paramFoOptional instanceof AstLambdaExpression ||

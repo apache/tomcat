@@ -20,7 +20,7 @@ public class HeaderUtil {
 
     /**
      * Converts an HTTP header line in byte form to a printable String. Bytes corresponding to visible ASCII characters
-     * will converted to those characters. All other bytes (0x00 to 0x1F, 0x7F to OxFF) will be represented in 0xNN
+     * will be converted to those characters. All other bytes (0x00 to 0x1F, 0x7F to OxFF) will be represented in 0xNN
      * form.
      *
      * @param bytes  Contains an HTTP header line

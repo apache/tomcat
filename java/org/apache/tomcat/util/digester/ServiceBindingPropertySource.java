@@ -35,7 +35,7 @@ import org.apache.tomcat.util.IntrospectionUtils;
  * <p><strong>Usage example:</strong></p>
  *
  * Configure the certificate with a service binding.
- *
+ * <p>
  * When the service binding is constructed as follows:
  *
  * <pre>

@@ -18,6 +18,7 @@ package org.apache.tomcat.util.net;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.KeyStore;
 import java.util.Arrays;
@@ -34,6 +35,7 @@ import org.apache.tomcat.util.res.StringManager;
 
 public class SSLHostConfigCertificate implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final Log log = LogFactory.getLog(SSLHostConfigCertificate.class);

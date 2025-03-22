@@ -31,7 +31,7 @@ import org.apache.juli.logging.Log;
  * <li>INFO_ALL: Log all problems at INFO log level.</li>
  * </ul>
  * By default, INFO_THEN_DEBUG is used with a suppression time of 24 hours.
- *
+ * <p>
  * NOTE: This class is not completely thread-safe. When using INFO_THEN_DEBUG it
  * is possible that several INFO messages will be logged before dropping to
  * DEBUG.

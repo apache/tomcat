@@ -40,7 +40,7 @@ import org.xml.sax.Attributes;
  * @author Pierre Delisle
  * @author Jan Luehe
  */
-class ParserController implements TagConstants {
+public class ParserController implements TagConstants {
 
     private static final String CHARSET = "charset=";
     private static final String TAGS_IN_JAR_LOCATION = "/META-INF/tags/";
@@ -197,7 +197,7 @@ class ParserController implements TagConstants {
             /*
              * An included file is being parsed that was included from the standard location for tag files in JAR but
              * tries to escape that location to either somewhere in the JAR not under the standard location or outside
-             * of the JAR. Neither of these are permitted.
+             * the JAR. Neither of these are permitted.
              */
             err.jspError("jsp.error.invalid.includeInTagFileJar", inFileName, jar.getJarFileURL().toString());
         }

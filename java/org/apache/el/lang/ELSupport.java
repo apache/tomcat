@@ -177,8 +177,8 @@ public class ELSupport {
     }
 
     /*
-     * Going to have to have some casts /raw types somewhere so doing it here keeps them all in one place. There might
-     * be a neater / better solution but I couldn't find it.
+     * Going to have some casts /raw types somewhere so doing it here keeps them all in one place. There might
+     * be a neater / better solution, but I couldn't find it.
      */
     @SuppressWarnings("unchecked")
     public static Enum<?> coerceToEnum(final ELContext ctx, final Object obj,
@@ -457,23 +457,22 @@ public class ELSupport {
             }
         }
 
-        if (obj == null) {
-            return "";
-        } else if (obj instanceof String) {
-            return (String) obj;
-        } else if (obj instanceof Enum<?>) {
-            return ((Enum<?>) obj).name();
-        } else {
-            try {
-                return obj.toString();
-            } catch (ELException e) {
-                // Unlikely but you never know
-                throw e;
-            } catch (Throwable t) {
-                ExceptionUtils.handleThrowable(t);
-                throw new ELException(t);
+        return switch (obj) {
+            case null -> "";
+            case String s -> s;
+            case Enum<?> anEnum -> anEnum.name();
+            default -> {
+                try {
+                    yield obj.toString();
+                } catch (ELException e) {
+                    // Unlikely but you never know
+                    throw e;
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    throw new ELException(t);
+                }
             }
-        }
+        };
     }
 
     public static <T> T coerceToType(final ELContext ctx, final Object obj, final Class<T> type)
@@ -533,8 +532,7 @@ public class ELSupport {
         if (obj == null) {
             return null;
         }
-        if (obj instanceof String) {
-            String str = (String) obj;
+        if (obj instanceof String str) {
             PropertyEditor editor = PropertyEditorManager.findEditor(type);
             if (editor == null) {
                 if (str.isEmpty()) {
@@ -693,19 +691,23 @@ public class ELSupport {
      */
     private static boolean overridesObjectMethod(Method method) {
         // There are three methods that can be overridden
-        if ("equals".equals(method.getName())) {
-            if (method.getReturnType().equals(boolean.class)) {
-                if (method.getParameterCount() == 1) {
-                    return method.getParameterTypes()[0].equals(Object.class);
+        switch (method.getName()) {
+            case "equals" -> {
+                if (method.getReturnType().equals(boolean.class)) {
+                    if (method.getParameterCount() == 1) {
+                        return method.getParameterTypes()[0].equals(Object.class);
+                    }
                 }
             }
-        } else if ("hashCode".equals(method.getName())) {
-            if (method.getReturnType().equals(int.class)) {
-                return method.getParameterCount() == 0;
+            case "hashCode" -> {
+                if (method.getReturnType().equals(int.class)) {
+                    return method.getParameterCount() == 0;
+                }
             }
-        } else if ("toString".equals(method.getName())) {
-            if (method.getReturnType().equals(String.class)) {
-                return method.getParameterCount() == 0;
+            case "toString" -> {
+                if (method.getReturnType().equals(String.class)) {
+                    return method.getParameterCount() == 0;
+                }
             }
         }
 
@@ -714,6 +716,6 @@ public class ELSupport {
 
 
     private ELSupport() {
-        // Uility class - hide default constructor;
+        // Utility class - hide default constructor;
     }
 }

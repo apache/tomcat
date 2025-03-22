@@ -20,6 +20,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -35,6 +36,7 @@ import org.apache.el.util.ReflectionUtil;
  */
 public class FunctionMapperImpl extends FunctionMapper implements Externalizable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected ConcurrentMap<String,Function> functions = new ConcurrentHashMap<>();

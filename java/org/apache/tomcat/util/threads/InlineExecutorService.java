@@ -40,7 +40,7 @@ public class InlineExecutorService extends AbstractExecutorService {
     @Override
     public List<Runnable> shutdownNow() {
         shutdown();
-        return null;
+        return List.of();
     }
 
     @Override

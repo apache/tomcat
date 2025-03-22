@@ -18,7 +18,7 @@ package org.apache.tomcat.util.net;
 
 /**
  * Defines events that occur per socket that require further processing by the
- * container. Usually these events are triggered by the socket implementation
+ * container. Usually these events are triggered by the socket implementation,
  * but they may be triggered by the container.
  */
 public enum SocketEvent {
@@ -41,7 +41,7 @@ public enum SocketEvent {
 
     /**
      * A timeout has occurred and the connection needs to be closed cleanly.
-     * Currently this is only used by the Servlet 3.0 async processing.
+     * Currently, this is only used by the Servlet 3.0 async processing.
      */
     TIMEOUT,
 

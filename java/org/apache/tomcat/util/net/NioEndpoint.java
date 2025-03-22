@@ -757,7 +757,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                         hasEvents = events();
                         if (wakeupCounter.getAndSet(-1) > 0) {
                             // If we are here, means we have other stuff to do
-                            // Do a non blocking select
+                            // Do a non-blocking select
                             keyCount = selector.selectNow();
                         } else {
                             keyCount = selector.select(selectorTimeout);
@@ -875,7 +875,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                 }
 
                 if (sd.fchannel == null) {
-                    // Setup the file channel
+                    // Set up the file channel
                     File f = new File(sd.fileName);
                     @SuppressWarnings("resource") // Closed when channel is closed
                     FileInputStream fis = new FileInputStream(f);
@@ -1146,7 +1146,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                 /*
                  * Since more bytes may have arrived since the buffer was last
                  * filled, it is an option at this point to perform a
-                 * non-blocking read. However correctly handling the case if
+                 * non-blocking read. However, correctly handling the case if
                  * that read returns end of stream adds complexity. Therefore,
                  * at the moment, the preference is for simplicity.
                  */
@@ -1175,7 +1175,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                 /*
                  * Since more bytes may have arrived since the buffer was last
                  * filled, it is an option at this point to perform a
-                 * non-blocking read. However correctly handling the case if
+                 * non-blocking read. However, correctly handling the case if
                  * that read returns end of stream adds complexity. Therefore,
                  * at the moment, the preference is for simplicity.
                  */
@@ -1383,7 +1383,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                     }
                     synchronized (writeLock) {
                         n = getSocket().write(buffer);
-                        // n == 0 could be an incomplete write but it could also
+                        // n == 0 could be an incomplete write, but it could also
                         // indicate that a previous incomplete write of the
                         // outbound buffer (for TLS) has now completed. Only
                         // block if there is still data to write.
@@ -1531,8 +1531,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
 
         @Override
         public SSLSupport getSslSupport() {
-            if (getSocket() instanceof SecureNioChannel) {
-                SecureNioChannel ch = (SecureNioChannel) getSocket();
+            if (getSocket() instanceof SecureNioChannel ch) {
                 return ch.getSSLSupport();
             }
             return null;

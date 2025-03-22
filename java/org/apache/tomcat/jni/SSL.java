@@ -379,9 +379,9 @@ public final class SSL {
 
     /**
      * Wire up internal and network BIOs for the given SSL instance.
-     *
+     * <p>
      * <b>Warning: you must explicitly free this resource by calling freeBIO</b>
-     *
+     * <p>
      * While the SSL's internal/application data BIO will be freed when freeSSL is called on
      * the provided SSL instance, you must call freeBIO on the returned network BIO.
      *
@@ -478,14 +478,14 @@ public final class SSL {
     public static native String getAlpnSelected(long ssl);
 
     /**
-     * Get the peer certificate chain or {@code null} if non was send.
+     * Get the peer certificate chain or {@code null} if none was sent.
      * @param ssl the SSL instance (SSL *)
      * @return the certificate chain bytes
      */
     public static native byte[][] getPeerCertChain(long ssl);
 
     /**
-     * Get the peer certificate or {@code null} if non was send.
+     * Get the peer certificate or {@code null} if none was sent.
      * @param ssl the SSL instance (SSL *)
      * @return the certificate bytes
      */
@@ -532,7 +532,7 @@ public final class SSL {
      * certificates are accepted only, the default depth of 1 means the client
      * certificate can be self-signed or has to be signed by a CA which is directly
      * known to the server (i.e. the CA's certificate is under
-     * {@code setCACertificatePath}, etc.
+     * {@code setCACertificatePath}, etc).
      *
      * @param ssl the SSL instance (SSL *)
      * @param level Type of Client Certificate verification.

@@ -50,8 +50,7 @@ public abstract class WsFrameBase {
     private final Transformation transformation;
 
     // Attributes for control messages
-    // Control messages can appear in the middle of other messages so need
-    // separate attributes
+    // They can appear in the middle of other messages so need separate attributes
     private final ByteBuffer controlBufferBinary = ByteBuffer.allocate(125);
     private final CharBuffer controlBufferText = CharBuffer.allocate(125);
 
@@ -860,7 +859,7 @@ public abstract class WsFrameBase {
     }
 
     /**
-     * This method will be invoked when the read operation is resumed. As the suspend of the read operation can be
+     * This method will be invoked when the read operation is resumed. Since suspend of the read operation can be
      * invoked at any time, when implementing this method one should consider that there might still be data remaining
      * into the internal buffers that needs to be processed before reading again from the socket.
      */

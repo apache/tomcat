@@ -111,15 +111,15 @@ public class UriTemplate {
         for (Segment candidateSegment : candidate.getSegments()) {
             Segment targetSegment = targetSegments.next();
 
-            if (targetSegment.getParameterIndex() == -1) {
+            if (targetSegment.parameterIndex() == -1) {
                 // Not a parameter - values must match
-                if (!targetSegment.getValue().equals(candidateSegment.getValue())) {
+                if (!targetSegment.value().equals(candidateSegment.value())) {
                     // Not a match. Stop here
                     return null;
                 }
             } else {
                 // Parameter
-                result.put(targetSegment.getValue(), candidateSegment.getValue());
+                result.put(targetSegment.value(), candidateSegment.value());
             }
         }
 
@@ -147,23 +147,6 @@ public class UriTemplate {
     }
 
 
-    private static class Segment {
-        private final int parameterIndex;
-        private final String value;
-
-        Segment(int parameterIndex, String value) {
-            this.parameterIndex = parameterIndex;
-            this.value = value;
-        }
-
-
-        public int getParameterIndex() {
-            return parameterIndex;
-        }
-
-
-        public String getValue() {
-            return value;
-        }
+    private record Segment(int parameterIndex, String value) {
     }
 }

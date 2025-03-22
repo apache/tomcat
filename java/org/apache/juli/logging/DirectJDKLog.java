@@ -151,16 +151,11 @@ class DirectJDKLog implements Log {
         log(Level.SEVERE, String.valueOf(message), t);
     }
 
-    // from commons logging. This would be my number one reason why java.util.logging
-    // is bad - design by committee can be really bad ! The impact on performance of
-    // using java.util.logging - and the ugliness if you need to wrap it - is far
-    // worse than the unfriendly and uncommon default format for logs.
-
     private void log(Level level, String msg, Throwable ex) {
         if (logger.isLoggable(level)) {
             // Hack (?) to get the stack trace.
             Throwable dummyException=new Throwable();
-            StackTraceElement locations[]=dummyException.getStackTrace();
+            StackTraceElement[] locations = dummyException.getStackTrace();
             // Caller will be the third element
             String cname = "unknown";
             String method = "unknown";

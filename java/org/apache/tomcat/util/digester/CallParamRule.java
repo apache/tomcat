@@ -126,12 +126,10 @@ public class CallParamRule extends Rule {
             param = digester.peek(stackIndex);
 
             if (digester.log.isTraceEnabled()) {
-
-                StringBuilder sb = new StringBuilder("[CallParamRule]{");
-                sb.append(digester.match);
-                sb.append("} Save from stack; from stack? ").append(true);
-                sb.append("; object=").append(param);
-                digester.log.trace(sb.toString());
+                String sb = "[CallParamRule]{" + digester.match +
+                        "} Save from stack; from stack? " + true +
+                        "; object=" + param;
+                digester.log.trace(sb);
             }
         }
 
@@ -191,15 +189,8 @@ public class CallParamRule extends Rule {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("CallParamRule[");
-        sb.append("paramIndex=");
-        sb.append(paramIndex);
-        sb.append(", attributeName=");
-        sb.append(attributeName);
-        sb.append(", from stack=");
-        sb.append(fromStack);
-        sb.append(']');
-        return sb.toString();
+        return "CallParamRule[" + "paramIndex=" + paramIndex + ", attributeName=" + attributeName +
+                ", from stack=" + fromStack + ']';
     }
 
 

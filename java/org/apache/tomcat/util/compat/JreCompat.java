@@ -18,7 +18,7 @@ package org.apache.tomcat.util.compat;
 
 /**
  * This is the base implementation class for JRE compatibility and provides an implementation based on Java 21.
- * Sub-classes may extend this class and provide alternative implementations for later JRE versions
+ * Subclasses may extend this class and provide alternative implementations for later JRE versions
  */
 public class JreCompat {
 

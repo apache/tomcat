@@ -107,8 +107,7 @@ class Collector {
             hasScriptingVars = false;
 
             // Scan attribute list for expressions
-            if (n instanceof Node.CustomTag) {
-                Node.CustomTag ct = (Node.CustomTag) n;
+            if (n instanceof Node.CustomTag ct) {
                 Node.JspAttribute[] attrs = ct.getJspAttributes();
                 for (int i = 0; attrs != null && i < attrs.length; i++) {
                     if (attrs[i].isExpression()) {
@@ -120,8 +119,7 @@ class Collector {
 
             visitBody(n);
 
-            if ((n instanceof Node.CustomTag) && !hasScriptingVars) {
-                Node.CustomTag ct = (Node.CustomTag) n;
+            if ((n instanceof Node.CustomTag ct) && !hasScriptingVars) {
                 hasScriptingVars = ct.getVariableInfos().length > 0 || ct.getTagVariableInfos().length > 0;
             }
 

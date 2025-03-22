@@ -17,6 +17,8 @@
 package org.apache.juli.logging;
 
 
+import java.io.Serial;
+
 /**
  * <p>An exception that is thrown only if a suitable <code>LogFactory</code>
  * or <code>Log</code> instance cannot be created by the corresponding
@@ -27,6 +29,7 @@ package org.apache.juli.logging;
 public class LogConfigurationException extends RuntimeException {
 
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

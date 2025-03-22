@@ -114,7 +114,7 @@ public class Cookie {
                 skipLWS(bb);
                 value = readCookieValueRfc6265(bb);
                 if (value == null) {
-                    // Invalid cookie value. Skip to the next semi-colon
+                    // Invalid cookie value. Skip to the next semicolon
                     skipUntilSemiColon(bb);
                     logInvalidHeader(start, bb);
                     continue;
@@ -126,7 +126,7 @@ public class Cookie {
             if (skipResult == SkipResult.FOUND) {
                 // NO-OP
             } else if (skipResult == SkipResult.NOT_FOUND) {
-                // Invalid cookie. Ignore it and skip to the next semi-colon
+                // Invalid cookie. Ignore it and skip to the next semicolon
                 skipUntilSemiColon(bb);
                 logInvalidHeader(start, bb);
                 continue;

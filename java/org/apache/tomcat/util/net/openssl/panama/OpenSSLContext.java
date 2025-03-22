@@ -449,7 +449,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
     /**
-     * Setup the SSL_CTX.
+     * Set up the SSL_CTX.
      *
      * @param kms Must contain a KeyManager of the type
      *            {@code OpenSSLKeyManager}
@@ -1270,7 +1270,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         List<Type> candidateTypes = new ArrayList<>();
         if (Type.UNDEFINED.equals(type)) {
-            // Try all types to find an suitable alias
+            // Try all types to find a suitable alias
             candidateTypes.addAll(Arrays.asList(Type.values()));
             candidateTypes.remove(Type.UNDEFINED);
         } else {

@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.descriptor.web;
 
 
+import java.io.Serial;
 
 /**
  * Representation of an application environment entry, as represented in
@@ -26,6 +27,7 @@ package org.apache.tomcat.util.descriptor.web;
  */
 public class ContextEnvironment extends ResourceBase {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

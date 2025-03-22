@@ -25,7 +25,6 @@ import javax.naming.InitialContext;
 import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
-import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
 import org.apache.juli.logging.Log;
@@ -60,8 +59,7 @@ public class LookupFactory implements ObjectFactory {
         String lookupName = null;
         Object result = null;
 
-        if (obj instanceof LookupRef) {
-            Reference ref = (Reference) obj;
+        if (obj instanceof LookupRef ref) {
             ObjectFactory factory = null;
             RefAddr lookupNameRefAddr = ref.get(LookupRef.LOOKUP_NAME);
             if (lookupNameRefAddr != null) {

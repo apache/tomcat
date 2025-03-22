@@ -129,9 +129,9 @@ public class TestWsServerContainer extends WebSocketBaseTest {
         sc.addEndpoint(configB);
         sc.addEndpoint(configC);
 
-        Assert.assertEquals(configB, sc.findMapping("/a/b/c").getConfig());
-        Assert.assertEquals(configA, sc.findMapping("/a/d/c").getConfig());
-        Assert.assertEquals(configC, sc.findMapping("/a/x/y").getConfig());
+        Assert.assertEquals(configB, sc.findMapping("/a/b/c").config());
+        Assert.assertEquals(configA, sc.findMapping("/a/d/c").config());
+        Assert.assertEquals(configC, sc.findMapping("/a/x/y").config());
     }
 
 
@@ -145,7 +145,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
         sc.addEndpoint(configA);
         sc.addEndpoint(configB);
 
-        Assert.assertEquals(configB, sc.findMapping("/b/d").getConfig());
+        Assert.assertEquals(configB, sc.findMapping("/b/d").config());
     }
 
     @Test
@@ -235,8 +235,8 @@ public class TestWsServerContainer extends WebSocketBaseTest {
         sc.addEndpoint(configA);
         sc.addEndpoint(configB);
 
-        Assert.assertEquals(configA, sc.findMapping("/a/x/y").getConfig());
-        Assert.assertEquals(configB, sc.findMapping("/a/b/y").getConfig());
+        Assert.assertEquals(configA, sc.findMapping("/a/x/y").config());
+        Assert.assertEquals(configB, sc.findMapping("/a/b/y").config());
     }
 
 
@@ -266,7 +266,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
         sc.addEndpoint(Pojo.class, true);
         sc.addEndpoint(configA);
 
-        Assert.assertNotEquals(configA, sc.findMapping("/foo").getConfig());
+        Assert.assertNotEquals(configA, sc.findMapping("/foo").config());
     }
 
 
@@ -361,7 +361,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
         sc.addEndpoint(PojoTemplate.class, true);
         sc.addEndpoint(configA);
 
-        Assert.assertNotEquals(configA, sc.findMapping("/foo/{a}").getConfig());
+        Assert.assertNotEquals(configA, sc.findMapping("/foo/{a}").config());
     }
 
 

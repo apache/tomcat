@@ -30,7 +30,7 @@ public class SmapStratum {
     /**
      * Represents a single LineSection in an SMAP, associated with a particular stratum.
      */
-    static class LineInfo {
+    public static class LineInfo {
         private int inputStartLine = -1;
         private int outputStartLine = -1;
         private int lineFileID = 0;

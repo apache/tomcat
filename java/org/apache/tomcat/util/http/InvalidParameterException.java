@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.http;
 
+import java.io.Serial;
+
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
@@ -26,6 +28,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class InvalidParameterException extends IllegalStateException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final int errorCode;

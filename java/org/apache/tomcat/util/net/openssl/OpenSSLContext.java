@@ -622,20 +622,12 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
-    private static class OpenSSLState implements Runnable {
-
-        final long aprPool;
-        // OpenSSLConfCmd context
-        final long cctx;
-        // SSL context
-        final long ctx;
-
-        private OpenSSLState(long aprPool, long cctx, long ctx) {
-            this.aprPool = aprPool;
-            this.cctx = cctx;
-            this.ctx = ctx;
-        }
-
+    /**
+     * @param aprPool the APR pool
+     * @param cctx OpenSSLConfCmd context
+     * @param ctx  SSL context
+     */
+    private record OpenSSLState(long aprPool, long cctx, long ctx) implements Runnable {
         @Override
         public void run() {
             if (ctx != 0) {

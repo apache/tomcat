@@ -74,8 +74,8 @@ import org.apache.tomcat.util.res.StringManager;
  * supports the minimal requirements of the interface contract.</p>
  *
  * <p>This can be used directly to wrap an existing java bean, or inside
- * an mlet or anywhere an MBean would be used.
- *
+ * a mlet or anywhere an MBean would be used.
+ * <p>
  * Limitations:
  * <ul>
  * <li>Only managed resources of type <code>objectReference</code> are
@@ -473,7 +473,6 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration,
     /**
      * Set the instance handle of the object against which we will execute
      * all methods in this ModelMBean management interface.
-     *
      * The caller can provide the mbean instance or the object name to
      * the resource, if needed.
      *

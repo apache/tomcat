@@ -52,11 +52,7 @@ public class TaskThread extends Thread {
      * Wraps a {@link Runnable} to swallow any {@link StopPooledThreadException}
      * instead of letting it go and potentially trigger a break in a debugger.
      */
-    private static class WrappingRunnable implements Runnable {
-        private final Runnable wrappedRunnable;
-        WrappingRunnable(Runnable wrappedRunnable) {
-            this.wrappedRunnable = wrappedRunnable;
-        }
+    private record WrappingRunnable(Runnable wrappedRunnable) implements Runnable {
         @Override
         public void run() {
             try {
@@ -67,7 +63,6 @@ public class TaskThread extends Thread {
                 log.debug(sm.getString("taskThread.exiting"), exc);
             }
         }
-
     }
 
 }

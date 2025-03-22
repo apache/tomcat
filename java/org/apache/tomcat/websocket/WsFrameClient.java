@@ -71,7 +71,7 @@ public class WsFrameClient extends WsFrameBase {
                             // There is still data available in the response buffer
                             // Return here so that the response buffer will not be
                             // cleared and there will be no data read from the
-                            // socket. Thus when the read operation is resumed first
+                            // socket. Thus, when the read operation is resumed first
                             // the data left in the response buffer will be consumed
                             // and then a new socket read will be performed
                             return;
