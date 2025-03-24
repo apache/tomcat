@@ -32,11 +32,10 @@ public class StaticFieldELResolver extends ELResolver {
     public Object getValue(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
 
-        if (base instanceof ELClass && property instanceof String) {
+        if (base instanceof ELClass && property instanceof String name) {
             context.setPropertyResolved(base, property);
 
             Class<?> clazz = ((ELClass) base).getKlass();
-            String name = (String) property;
             Exception exception = null;
             try {
                 Field field = clazz.getField(name);
@@ -62,9 +61,8 @@ public class StaticFieldELResolver extends ELResolver {
     public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
 
-        if (base instanceof ELClass && property instanceof String) {
+        if (base instanceof ELClass && property instanceof String name) {
             Class<?> clazz = ((ELClass) base).getKlass();
-            String name = (String) property;
 
             throw new PropertyNotWritableException(
                     Util.message(context, "staticFieldELResolver.notWritable", name, clazz.getName()));
@@ -76,11 +74,10 @@ public class StaticFieldELResolver extends ELResolver {
     public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
         Objects.requireNonNull(context);
 
-        if (base instanceof ELClass && method instanceof String) {
+        if (base instanceof ELClass && method instanceof String methodName) {
             context.setPropertyResolved(base, method);
 
             Class<?> clazz = ((ELClass) base).getKlass();
-            String methodName = (String) method;
 
             if ("<init>".equals(methodName)) {
                 Constructor<?> match = Util.findConstructor(context, clazz, paramTypes, params);
@@ -88,8 +85,7 @@ public class StaticFieldELResolver extends ELResolver {
                 Object[] parameters =
                         Util.buildParameters(context, match.getParameterTypes(), match.isVarArgs(), params);
 
-                Object result = null;
-
+                Object result;
                 try {
                     result = match.newInstance(parameters);
                 } catch (InvocationTargetException e) {
@@ -113,7 +109,7 @@ public class StaticFieldELResolver extends ELResolver {
                 Object[] parameters =
                         Util.buildParameters(context, match.getParameterTypes(), match.isVarArgs(), params);
 
-                Object result = null;
+                Object result;
                 try {
                     result = match.invoke(null, parameters);
                 } catch (IllegalArgumentException | IllegalAccessException e) {
@@ -133,11 +129,10 @@ public class StaticFieldELResolver extends ELResolver {
     public Class<?> getType(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
 
-        if (base instanceof ELClass && property instanceof String) {
+        if (base instanceof ELClass && property instanceof String name) {
             context.setPropertyResolved(base, property);
 
             Class<?> clazz = ((ELClass) base).getKlass();
-            String name = (String) property;
             Exception exception = null;
             try {
                 Field field = clazz.getField(name);

@@ -122,12 +122,9 @@ public class MethodReference {
             return false;
         }
         if (methodInfo == null) {
-            if (other.methodInfo != null) {
-                return false;
-            }
-        } else if (!methodInfo.equals(other.methodInfo)) {
-            return false;
+            return other.methodInfo == null;
+        } else {
+            return methodInfo.equals(other.methodInfo);
         }
-        return true;
     }
 }

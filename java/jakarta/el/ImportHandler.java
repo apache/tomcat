@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -279,10 +280,10 @@ public class ImportHandler {
 
     }
 
-    private Map<String,Set<String>> packageNames = new ConcurrentHashMap<>();
-    private Map<String,String> classNames = new ConcurrentHashMap<>();
-    private Map<String,Class<?>> clazzes = new ConcurrentHashMap<>();
-    private Map<String,Class<?>> statics = new ConcurrentHashMap<>();
+    private final Map<String,Set<String>> packageNames = new ConcurrentHashMap<>();
+    private final Map<String,String> classNames = new ConcurrentHashMap<>();
+    private final Map<String,Class<?>> clazzes = new ConcurrentHashMap<>();
+    private final Map<String,Class<?>> statics = new ConcurrentHashMap<>();
 
 
     public ImportHandler() {
@@ -369,11 +370,7 @@ public class ImportHandler {
         // b) java.lang.Package.getPackage(name) is not reliable (BZ 57574),
         // c) such check is not required by specification.
         Set<String> preloaded = standardPackages.get(name);
-        if (preloaded == null) {
-            packageNames.put(name, Collections.emptySet());
-        } else {
-            packageNames.put(name, preloaded);
-        }
+        packageNames.put(name, Objects.requireNonNullElse(preloaded, Collections.emptySet()));
     }
 
 
@@ -425,13 +422,9 @@ public class ImportHandler {
                 result = clazz;
             }
         }
-        if (result == null) {
-            // Cache NotFound results to save repeated calls to findClass()
-            // which is relatively slow
-            clazzes.put(name, NotFound.class);
-        } else {
-            clazzes.put(name, result);
-        }
+        // Cache NotFound results to save repeated calls to findClass()
+        // which is relatively slow
+        clazzes.put(name, Objects.requireNonNullElse(result, NotFound.class));
 
         return result;
     }

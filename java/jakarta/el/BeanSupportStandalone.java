@@ -84,7 +84,7 @@ class BeanSupportStandalone extends BeanSupport {
 
 
     private static String getPropertyName(String input) {
-        if (input.length() == 0) {
+        if (input.isEmpty()) {
             return null;
         }
         if (!Character.isUpperCase(input.charAt(0))) {
@@ -104,7 +104,7 @@ class BeanSupportStandalone extends BeanSupport {
         private boolean usesIs;
         private Method readMethod;
         private Method writeMethod;
-        private List<Method> writeMethods = new ArrayList<>();
+        private final List<Method> writeMethods = new ArrayList<>();
 
         String getName() {
             return name;
@@ -146,7 +146,7 @@ class BeanSupportStandalone extends BeanSupport {
                     if (writeMethods.size() > 1) {
                         writeMethods.sort(WRITE_METHOD_COMPARATOR);
                     }
-                    type = writeMethods.get(0).getParameterTypes()[0];
+                    type = writeMethods.getFirst().getParameterTypes()[0];
                 }
                 for (Method candidate : writeMethods) {
                     if (type.isAssignableFrom(candidate.getParameterTypes()[0])) {
@@ -179,17 +179,15 @@ class BeanSupportStandalone extends BeanSupport {
         }
 
         private void populateFromInterfaces(Class<?> aClass) {
-            Class<?> interfaces[] = aClass.getInterfaces();
-            if (interfaces.length > 0) {
-                for (Class<?> ifs : interfaces) {
-                    PropertyDescriptor[] pds = getPropertyDescriptors(type);
-                    for (PropertyDescriptor pd : pds) {
-                        if (!this.properties.containsKey(pd.getName())) {
-                            this.properties.put(pd.getName(), new BeanPropertyStandalone(this.type, pd));
-                        }
+            Class<?>[] interfaces = aClass.getInterfaces();
+            for (Class<?> ifs : interfaces) {
+                PropertyDescriptor[] pds = getPropertyDescriptors(type);
+                for (PropertyDescriptor pd : pds) {
+                    if (!this.properties.containsKey(pd.getName())) {
+                        this.properties.put(pd.getName(), new BeanPropertyStandalone(this.type, pd));
                     }
-                    populateFromInterfaces(ifs);
                 }
+                populateFromInterfaces(ifs);
             }
             Class<?> superclass = aClass.getSuperclass();
             if (superclass != null) {

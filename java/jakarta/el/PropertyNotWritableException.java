@@ -16,8 +16,11 @@
  */
 package jakarta.el;
 
+import java.io.Serial;
+
 public class PropertyNotWritableException extends ELException {
 
+    @Serial
     private static final long serialVersionUID = 827987155471214717L;
 
     public PropertyNotWritableException() {

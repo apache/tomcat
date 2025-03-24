@@ -41,9 +41,8 @@ public class ListELResolver extends ELResolver {
     public Class<?> getType(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
 
-        if (base instanceof List<?>) {
+        if (base instanceof List<?> list) {
             context.setPropertyResolved(base, property);
-            List<?> list = (List<?>) base;
             int idx = coerce(property);
             if (idx < 0 || idx >= list.size()) {
                 throw new PropertyNotFoundException(new ArrayIndexOutOfBoundsException(idx).getMessage());
@@ -66,9 +65,8 @@ public class ListELResolver extends ELResolver {
     public Object getValue(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
 
-        if (base instanceof List<?>) {
+        if (base instanceof List<?> list) {
             context.setPropertyResolved(base, property);
-            List<?> list = (List<?>) base;
             int idx = coerce(property);
             if (idx < 0 || idx >= list.size()) {
                 return null;
@@ -108,9 +106,8 @@ public class ListELResolver extends ELResolver {
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
 
-        if (base instanceof List<?>) {
+        if (base instanceof List<?> list) {
             context.setPropertyResolved(base, property);
-            List<?> list = (List<?>) base;
             try {
                 int idx = coerce(property);
                 if (idx < 0 || idx >= list.size()) {

@@ -420,7 +420,7 @@ class Util {
             return EMPTY_CLASS_ARRAY;
         }
 
-        Class<?> result[] = new Class<?>[values.length];
+        Class<?>[] result = new Class<?>[values.length];
         for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
                 result[i] = null;
@@ -441,7 +441,7 @@ class Util {
             return m;
         }
         Class<?>[] interfaces = type.getInterfaces();
-        Method mp = null;
+        Method mp;
         for (Class<?> iface : interfaces) {
             try {
                 mp = iface.getMethod(m.getName(), m.getParameterTypes());
@@ -631,24 +631,8 @@ class Util {
     /*
      * This class duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
-    private static class MatchResult implements Comparable<MatchResult> {
-
-        private final boolean varArgs;
-        private final int exactCount;
-        private final int assignableCount;
-        private final int coercibleCount;
-        private final int varArgsCount;
-        private final boolean bridge;
-
-        MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
-                boolean bridge) {
-            this.varArgs = varArgs;
-            this.exactCount = exactCount;
-            this.assignableCount = assignableCount;
-            this.coercibleCount = coercibleCount;
-            this.varArgsCount = varArgsCount;
-            this.bridge = bridge;
-        }
+    private record MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
+                               boolean bridge) implements Comparable<MatchResult> {
 
         public boolean isVarArgs() {
             return varArgs;
@@ -716,12 +700,12 @@ class Util {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + assignableCount;
-            result = prime * result + (bridge ? 1231 : 1237);
-            result = prime * result + coercibleCount;
-            result = prime * result + exactCount;
-            result = prime * result + (varArgs ? 1231 : 1237);
-            result = prime * result + varArgsCount;
+            result = prime * result + getAssignableCount();
+            result = prime * result + (isBridge() ? 1231 : 1237);
+            result = prime * result + getCoercibleCount();
+            result = prime * result + getExactCount();
+            result = prime * result + (isVarArgs() ? 1231 : 1237);
+            result = prime * result + getVarArgsCount();
             return result;
         }
     }

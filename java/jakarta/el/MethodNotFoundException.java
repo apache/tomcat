@@ -16,8 +16,11 @@
  */
 package jakarta.el;
 
+import java.io.Serial;
+
 public class MethodNotFoundException extends ELException {
 
+    @Serial
     private static final long serialVersionUID = -3631968116081480328L;
 
     public MethodNotFoundException() {

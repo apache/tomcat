@@ -16,6 +16,7 @@
  */
 package jakarta.el;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -23,6 +24,7 @@ import java.io.Serializable;
  */
 public abstract class Expression implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -6663767980471823812L;
 
     public abstract String getExpressionString();
