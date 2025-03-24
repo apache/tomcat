@@ -16,11 +16,14 @@
  */
 package jakarta.servlet;
 
+import java.io.Serial;
+
 /**
  * Defines a general exception a servlet can throw when it encounters difficulty.
  */
 public class ServletException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

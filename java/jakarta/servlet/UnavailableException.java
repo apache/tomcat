@@ -16,6 +16,8 @@
  */
 package jakarta.servlet;
 
+import java.io.Serial;
+
 /**
  * Defines an exception that a servlet or filter throws to indicate that it is permanently or temporarily unavailable.
  * <p>
@@ -34,6 +36,7 @@ package jakarta.servlet;
  */
 public class UnavailableException extends ServletException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

@@ -165,17 +165,15 @@ public class TagAttributeInfo {
      */
     @Override
     public String toString() {
-        StringBuilder b = new StringBuilder(64);
-        b.append("name = " + name + " ");
-        b.append("type = " + type + " ");
-        b.append("reqTime = " + reqTime + " ");
-        b.append("required = " + required + " ");
-        b.append("fragment = " + fragment + " ");
-        b.append("deferredValue = " + deferredValue + " ");
-        b.append("expectedTypeName = " + expectedTypeName + " ");
-        b.append("deferredMethod = " + deferredMethod + " ");
-        b.append("methodSignature = " + methodSignature);
-        return b.toString();
+        return "name = " + name + " " +
+                "type = " + type + " " +
+                "reqTime = " + reqTime + " " +
+                "required = " + required + " " +
+                "fragment = " + fragment + " " +
+                "deferredValue = " + deferredValue + " " +
+                "expectedTypeName = " + expectedTypeName + " " +
+                "deferredMethod = " + deferredMethod + " " +
+                "methodSignature = " + methodSignature;
     }
 
     /*

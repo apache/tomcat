@@ -16,8 +16,6 @@
  */
 package jakarta.servlet.jsp.tagext;
 
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -70,7 +68,7 @@ public abstract class TagLibraryValidator {
      * @param map A Map describing the init parameters
      */
     public void setInitParameters(Map<String,Object> map) {
-        initParameters = Collections.unmodifiableMap(new HashMap<>(map));
+        initParameters = Map.copyOf(map);
     }
 
 

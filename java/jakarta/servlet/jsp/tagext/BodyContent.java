@@ -44,7 +44,7 @@ import jakarta.servlet.jsp.JspWriter;
 public abstract class BodyContent extends JspWriter {
 
     /**
-     * Protected constructor. Unbounded buffer, no autoflushing.
+     * Protected constructor. Unbounded buffer, no auto flushing.
      *
      * @param e the enclosing JspWriter
      */

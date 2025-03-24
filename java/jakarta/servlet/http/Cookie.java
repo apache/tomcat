@@ -16,6 +16,7 @@
  */
 package jakarta.servlet.http;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.BitSet;
@@ -56,6 +57,7 @@ public class Cookie implements Cloneable, Serializable {
 
     private static final String EMPTY_STRING = "";
 
+    @Serial
     private static final long serialVersionUID = 2L;
 
     /**
@@ -414,7 +416,7 @@ public class Cookie implements Cloneable, Serializable {
             if (value == null) {
                 return;
             } else {
-                // Case insensitive keys but retain case used
+                // Case-insensitive keys but retain case used
                 attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             }
         }
@@ -500,13 +502,10 @@ public class Cookie implements Cloneable, Serializable {
             return false;
         }
         if (value == null) {
-            if (other.value != null) {
-                return false;
-            }
-        } else if (!value.equals(other.value)) {
-            return false;
+            return other.value == null;
+        } else {
+            return value.equals(other.value);
         }
-        return true;
     }
 }
 
@@ -527,7 +526,7 @@ class CookieNameValidator {
     }
 
     void validate(String name) {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException(lStrings.getString("err.cookie_name_blank"));
         }
         if (!isToken(name)) {

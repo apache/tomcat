@@ -118,7 +118,7 @@ public interface HttpServletResponse extends ServletResponse {
      * <p>
      * This method has no effect if called from an include.
      *
-     * @param location the redirect location URL (may be absolute or relative)
+     * @param location the redirect location URL (can be absolute or relative)
      *
      * @exception IOException              If an input or output exception occurs
      * @exception IllegalArgumentException If a relative URL is given and cannot be converted into an absolute URL
@@ -137,7 +137,7 @@ public interface HttpServletResponse extends ServletResponse {
      * <p>
      * This method has no effect if called from an include.
      *
-     * @param location    the redirect location URL (may be absolute or relative)
+     * @param location    the redirect location URL (can be absolute or relative)
      * @param clearBuffer if {@code true}, clear the buffer and replace it with the data set by this method otherwise
      *                        retain the existing buffer
      *
@@ -160,7 +160,7 @@ public interface HttpServletResponse extends ServletResponse {
      * <p>
      * This method has no effect if called from an include.
      *
-     * @param location the redirect location URL (may be absolute or relative)
+     * @param location the redirect location URL (can be absolute or relative)
      * @param sc       the status code to use for the redirect
      *
      * @exception IOException              If an input or output exception occurs
@@ -199,7 +199,7 @@ public interface HttpServletResponse extends ServletResponse {
      * If the response has already been committed, this method throws an IllegalStateException. After using this method,
      * the response should be considered to be committed and should not be written to.
      *
-     * @param location    the redirect location URL (may be absolute or relative)
+     * @param location    the redirect location URL (can be absolute or relative)
      * @param sc          the status code to use for the redirect
      * @param clearBuffer if {@code true}, clear the buffer and replace it with the data set by this method otherwise
      *                        retain the existing buffer
@@ -253,8 +253,8 @@ public interface HttpServletResponse extends ServletResponse {
      * header before setting its value.
      *
      * @param name  the name of the header
-     * @param value the header value If it contains octet string, it should be encoded according to RFC 2047
-     *                  (http://www.ietf.org/rfc/rfc2047.txt)
+     * @param value the header value If it contains octet string, it should be encoded according to
+     *                  <a href="http://www.ietf.org/rfc/rfc2047.txt">RFC 2047</a>
      *
      * @see #containsHeader
      * @see #addHeader
@@ -266,8 +266,8 @@ public interface HttpServletResponse extends ServletResponse {
      * values.
      *
      * @param name  the name of the header
-     * @param value the additional header value If it contains octet string, it should be encoded according to RFC 2047
-     *                  (http://www.ietf.org/rfc/rfc2047.txt)
+     * @param value the additional header value If it contains octet string, it should be encoded according to
+     *                  <a href="http://www.ietf.org/rfc/rfc2047.txt">RFC 2047</a>
      *
      * @see #setHeader
      */

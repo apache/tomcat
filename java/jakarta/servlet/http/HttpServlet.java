@@ -19,6 +19,7 @@ package jakarta.servlet.http;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
@@ -43,7 +44,7 @@ import jakarta.servlet.WriteListener;
 
 
 /**
- * Provides an abstract class to be subclassed to create an HTTP servlet suitable for a Web site. A subclass of
+ * Provides an abstract class to be subclassed to create an HTTP servlet suitable for a website. A subclass of
  * <code>HttpServlet</code> must override at least one method, usually one of these:
  * <ul>
  * <li><code>doGet</code>, if the servlet supports HTTP GET requests
@@ -68,6 +69,7 @@ import jakarta.servlet.WriteListener;
  */
 public abstract class HttpServlet extends GenericServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String METHOD_DELETE = "DELETE";
@@ -362,7 +364,7 @@ public abstract class HttpServlet extends GenericServlet {
         String protocol = req.getProtocol();
         // Note: Tomcat reports "" for HTTP/0.9 although some implementations
         // may report HTTP/0.9
-        if (protocol.length() == 0 || protocol.endsWith("0.9") || protocol.endsWith("1.0")) {
+        if (protocol.isEmpty() || protocol.endsWith("0.9") || protocol.endsWith("1.0")) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
         } else {
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
@@ -505,7 +507,7 @@ public abstract class HttpServlet extends GenericServlet {
 
         // Tomcat specific hack to see if TRACE is allowed
         if (TomcatHack.getAllowTrace(req)) {
-            if (allow.length() == 0) {
+            if (allow.isEmpty()) {
                 allow = METHOD_TRACE;
             } else {
                 allow = allow + ", " + METHOD_TRACE;
@@ -574,11 +576,11 @@ public abstract class HttpServlet extends GenericServlet {
      * <li>proxy-authorization</li>
      * </ul>
      * <p>
-     * Note that HTTP header names are case insensitive.
+     * Note that HTTP header names are case-insensitive.
      *
      * @param headerName the name of the HTTP request header to test
      *
-     * @return (@code true} if the HTTP request header is considered sensitive and should be excluded from the response
+     * @return {@code true} if the HTTP request header is considered sensitive and should be excluded from the response
      *             to a {@code TRACE} request, otherwise {@code false}
      *
      * @since Servlet 6.1
@@ -611,66 +613,58 @@ public abstract class HttpServlet extends GenericServlet {
 
         String method = req.getMethod();
 
-        if (method.equals(METHOD_GET)) {
-            long lastModified = getLastModified(req);
-            if (lastModified == -1) {
-                // servlet doesn't support if-modified-since, no reason
-                // to go through further expensive logic
-                doGet(req, resp);
-            } else {
-                long ifModifiedSince;
-                try {
-                    ifModifiedSince = req.getDateHeader(HEADER_IFMODSINCE);
-                } catch (IllegalArgumentException iae) {
-                    // Invalid date header - proceed as if none was set
-                    ifModifiedSince = -1;
-                }
-                if (ifModifiedSince < (lastModified / 1000 * 1000)) {
-                    // If the servlet mod time is later, call doGet()
-                    // Round down to the nearest second for a proper compare
-                    // A ifModifiedSince of -1 will always be less
-                    maybeSetLastModified(resp, lastModified);
+        switch (method) {
+            case METHOD_GET -> {
+                long lastModified = getLastModified(req);
+                if (lastModified == -1) {
+                    // servlet doesn't support if-modified-since, no reason
+                    // to go through further expensive logic
                     doGet(req, resp);
                 } else {
-                    resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                    long ifModifiedSince;
+                    try {
+                        ifModifiedSince = req.getDateHeader(HEADER_IFMODSINCE);
+                    } catch (IllegalArgumentException iae) {
+                        // Invalid date header - proceed as if none was set
+                        ifModifiedSince = -1;
+                    }
+                    if (ifModifiedSince < (lastModified / 1000 * 1000)) {
+                        // If the servlet mod time is later, call doGet()
+                        // Round down to the nearest second for a proper compare
+                        // A ifModifiedSince of -1 will always be less
+                        maybeSetLastModified(resp, lastModified);
+                        doGet(req, resp);
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                    }
                 }
+
             }
+            case METHOD_HEAD -> {
+                long lastModified = getLastModified(req);
+                maybeSetLastModified(resp, lastModified);
+                doHead(req, resp);
 
-        } else if (method.equals(METHOD_HEAD)) {
-            long lastModified = getLastModified(req);
-            maybeSetLastModified(resp, lastModified);
-            doHead(req, resp);
+            }
+            case METHOD_POST -> doPost(req, resp);
+            case METHOD_PUT -> doPut(req, resp);
+            case METHOD_DELETE -> doDelete(req, resp);
+            case METHOD_OPTIONS -> doOptions(req, resp);
+            case METHOD_TRACE -> doTrace(req, resp);
+            case METHOD_PATCH -> doPatch(req, resp);
+            default -> {
+                //
+                // Note that this means NO servlet supports whatever
+                // method was requested, anywhere on this server.
+                //
 
-        } else if (method.equals(METHOD_POST)) {
-            doPost(req, resp);
+                String errMsg = lStrings.getString("http.method_not_implemented");
+                Object[] errArgs = new Object[1];
+                errArgs[0] = method;
+                errMsg = MessageFormat.format(errMsg, errArgs);
 
-        } else if (method.equals(METHOD_PUT)) {
-            doPut(req, resp);
-
-        } else if (method.equals(METHOD_DELETE)) {
-            doDelete(req, resp);
-
-        } else if (method.equals(METHOD_OPTIONS)) {
-            doOptions(req, resp);
-
-        } else if (method.equals(METHOD_TRACE)) {
-            doTrace(req, resp);
-
-        } else if (method.equals(METHOD_PATCH)) {
-            doPatch(req, resp);
-
-        } else {
-            //
-            // Note that this means NO servlet supports whatever
-            // method was requested, anywhere on this server.
-            //
-
-            String errMsg = lStrings.getString("http.method_not_implemented");
-            Object[] errArgs = new Object[1];
-            errArgs[0] = method;
-            errMsg = MessageFormat.format(errMsg, errArgs);
-
-            resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, errMsg);
+                resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, errMsg);
+            }
         }
     }
 
@@ -878,7 +872,7 @@ public abstract class HttpServlet extends GenericServlet {
         }
 
         @Override
-        public void write(byte buf[], int offset, int len) throws IOException {
+        public void write(byte[] buf, int offset, int len) throws IOException {
             if (buf == null) {
                 throw new NullPointerException(lStrings.getString("err.io.nullArray"));
             }
@@ -1099,14 +1093,7 @@ public abstract class HttpServlet extends GenericServlet {
     /*
      * Calls NoBodyResponse.setContentLength() once the async request is complete.
      */
-    private static class NoBodyAsyncContextListener implements AsyncListener {
-
-        private final NoBodyResponse noBodyResponse;
-
-        NoBodyAsyncContextListener(NoBodyResponse noBodyResponse) {
-            this.noBodyResponse = noBodyResponse;
-        }
-
+    private record NoBodyAsyncContextListener(NoBodyResponse noBodyResponse) implements AsyncListener {
         @Override
         public void onComplete(AsyncEvent event) throws IOException {
             noBodyResponse.setContentLength();

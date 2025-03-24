@@ -72,7 +72,7 @@ public interface ServletContext {
      * Returns a <code>ServletContext</code> object that corresponds to a specified URL on the server.
      * <p>
      * This method allows servlets to gain access to the context for various parts of the server, and as needed obtain
-     * {@link RequestDispatcher} objects from the context. The given path must be begin with "/", is interpreted
+     * {@link RequestDispatcher} objects from the context. The given path must begin with "/", is interpreted
      * relative to the server's document root and is matched against the context roots of other web applications hosted
      * on this container.
      * <p>
@@ -270,7 +270,7 @@ public interface ServletContext {
     /**
      * Returns a <code>String</code> containing the real path for a given virtual path. For example, the path
      * "/index.html" returns the absolute file path on the server's filesystem would be served by a request for
-     * "http://host/contextPath/index.html", where contextPath is the context path of this ServletContext..
+     * "http://host/contextPath/index.html", where contextPath is the context path of this ServletContext.
      * <p>
      * The real path returned will be in a form appropriate to the computer and operating system on which the servlet
      * container is running, including the proper path separators. This method returns <code>null</code> if the servlet
@@ -301,7 +301,7 @@ public interface ServletContext {
      * <code>null</code> if the parameter does not exist.
      * <p>
      * This method can make available configuration information useful to an entire "web application". For example, it
-     * can provide a web site administrator's email address or the name of a system that holds critical data.
+     * can provide a website administrator's email address or the name of a system that holds critical data.
      *
      * @param name a <code>String</code> containing the name of the parameter whose value is requested
      *
@@ -496,10 +496,10 @@ public interface ServletContext {
     ServletRegistration.Dynamic addJspFile(String jspName, String jspFile);
 
     /**
-     * Create an Servlet instance using the given class. The instance is just created. No initialisation occurs.
+     * Create a Servlet instance using the given class. The instance is just created. No initialisation occurs.
      *
      * @param <T> The type for the given class
-     * @param c   The the class for which an instance should be created
+     * @param c   The class for which an instance should be created
      *
      * @return The created Servlet instance.
      *
@@ -626,7 +626,7 @@ public interface ServletContext {
      * Create a Filter instance using the given class. The instance is just created. No initialisation occurs.
      *
      * @param <T> The type for the given class
-     * @param c   The the class for which an instance should be created
+     * @param c   The class for which an instance should be created
      *
      * @return The created Filter instance.
      *

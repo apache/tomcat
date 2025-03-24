@@ -66,7 +66,7 @@ public interface ServletResponse {
      * <code>getWriter</code> has been called or after the response has been committed have no effect on the character
      * encoding. If no character encoding has been specified, <code>ISO-8859-1</code> is returned.
      * <p>
-     * See RFC 2047 (http://www.ietf.org/rfc/rfc2047.txt) for more information about character encoding and MIME.
+     * See <a href="http://www.ietf.org/rfc/rfc2047.txt">RFC 2047</a> for more information about character encoding and MIME.
      *
      * @return a <code>String</code> specifying the name of the character encoding, for example, <code>UTF-8</code>
      */
@@ -143,8 +143,8 @@ public interface ServletResponse {
      * via HTTP headers if the servlet does not specify a content type; however, it is still used to encode text written
      * via the servlet response's writer.
      *
-     * @param charset a String specifying only the character set defined by IANA Character Sets
-     *                    (http://www.iana.org/assignments/character-sets)
+     * @param charset a String specifying only the character set defined by
+     *                    <a href="http://www.iana.org/assignments/character-sets">IANA Character Sets</a>
      *
      * @see #setContentType #setLocale
      * @see #setCharacterEncoding(Charset)

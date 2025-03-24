@@ -63,7 +63,7 @@ import jakarta.servlet.jsp.JspException;
  * <p>
  * <B>Empty and Non-Empty Action</B>
  * <p>
- * If the TagLibraryDescriptor file indicates that the action must always have an empty element body, by an
+ * If the TagLibraryDescriptor file indicates that the action must always have an empty element body, by a
  * &lt;body-content&gt; entry of "empty", then the doStartTag() method must return SKIP_BODY. Otherwise, the
  * doStartTag() method may return SKIP_BODY, EVAL_BODY_INCLUDE, or EVAL_BODY_BUFFERED.
  * <p>
@@ -96,7 +96,7 @@ public interface BodyTag extends IterationTag {
      * or for non-empty tags whose doStartTag() method returns SKIP_BODY or EVAL_BODY_INCLUDE.
      * <p>
      * When setBodyContent is invoked, the value of the implicit object out has already been changed in the pageContext
-     * object. The BodyContent object passed will have not data on it but may have been reused (and cleared) from some
+     * object. The BodyContent object passed will have no data on it but may have been reused (and cleared) from some
      * previous invocation.
      * <p>
      * The BodyContent object is available and with the appropriate content until after the invocation of the doEndTag

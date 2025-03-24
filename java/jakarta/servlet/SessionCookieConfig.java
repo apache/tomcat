@@ -162,7 +162,7 @@ public interface SessionCookieConfig {
     void setAttribute(String name, String value);
 
     /**
-     * Obtain the value for a sesison cookie given attribute. Values returned from this method must be consistent with
+     * Obtain the value for a session cookie given attribute. Values returned from this method must be consistent with
      * the values set and returned by the attribute specific getters and setters in this class.
      *
      * @param name Name of attribute to return

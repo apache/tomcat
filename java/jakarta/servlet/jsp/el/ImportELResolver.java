@@ -76,7 +76,7 @@ public class ImportELResolver extends ELResolver {
                 ImportHandler importHandler = context.getImportHandler();
                 if (importHandler != null) {
                     String key = property.toString();
-                    Class<?> clazz = null;
+                    Class<?> clazz;
                     if (resolveClass) {
                         clazz = importHandler.resolveClass(key);
                         if (clazz != null) {
