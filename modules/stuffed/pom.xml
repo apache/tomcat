@@ -21,6 +21,12 @@
   http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>34</version>
+    </parent>
+
     <groupId>org.apache.tomcat</groupId>
     <artifactId>tomcat-stuffed</artifactId>
     <version>1.0</version>
@@ -76,7 +82,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
                 <configuration>
                     <release>21</release>
                 </configuration>
@@ -84,7 +89,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.5.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
