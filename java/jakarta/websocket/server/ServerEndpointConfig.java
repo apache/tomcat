@@ -90,7 +90,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
 
 
         public Builder encoders(List<Class<? extends Encoder>> encoders) {
-            if (encoders == null || encoders.size() == 0) {
+            if (encoders == null || encoders.isEmpty()) {
                 this.encoders = Collections.emptyList();
             } else {
                 this.encoders = Collections.unmodifiableList(encoders);
@@ -100,7 +100,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
 
 
         public Builder decoders(List<Class<? extends Decoder>> decoders) {
-            if (decoders == null || decoders.size() == 0) {
+            if (decoders == null || decoders.isEmpty()) {
                 this.decoders = Collections.emptyList();
             } else {
                 this.decoders = Collections.unmodifiableList(decoders);
@@ -110,7 +110,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
 
 
         public Builder subprotocols(List<String> subprotocols) {
-            if (subprotocols == null || subprotocols.size() == 0) {
+            if (subprotocols == null || subprotocols.isEmpty()) {
                 this.subprotocols = Collections.emptyList();
             } else {
                 this.subprotocols = Collections.unmodifiableList(subprotocols);
@@ -120,7 +120,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
 
 
         public Builder extensions(List<Extension> extensions) {
-            if (extensions == null || extensions.size() == 0) {
+            if (extensions == null || extensions.isEmpty()) {
                 this.extensions = Collections.emptyList();
             } else {
                 this.extensions = Collections.unmodifiableList(extensions);

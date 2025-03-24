@@ -16,11 +16,14 @@
  */
 package jakarta.websocket;
 
+import java.io.Serial;
+
 public class EncodeException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private Object object;
+    private final Object object;
 
     public EncodeException(Object object, String message) {
         super(message);

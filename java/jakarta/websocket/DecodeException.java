@@ -16,10 +16,12 @@
  */
 package jakarta.websocket;
 
+import java.io.Serial;
 import java.nio.ByteBuffer;
 
 public class DecodeException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private ByteBuffer bb;
