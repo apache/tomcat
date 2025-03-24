@@ -146,7 +146,7 @@ class BeanSupportStandalone extends BeanSupport {
                     if (writeMethods.size() > 1) {
                         writeMethods.sort(WRITE_METHOD_COMPARATOR);
                     }
-                    type = writeMethods.getFirst().getParameterTypes()[0];
+                    type = writeMethods.get(0).getParameterTypes()[0];
                 }
                 for (Method candidate : writeMethods) {
                     if (type.isAssignableFrom(candidate.getParameterTypes()[0])) {
