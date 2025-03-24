@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>33</version>
+        <version>34</version>
     </parent>
 
     <groupId>org.apache.tomcat</groupId>
@@ -29,7 +29,7 @@
     <name>Apache CXF for Apache Tomcat CDI</name>
     <description>Apache CXF packaged for Apache Tomcat CDI</description>
     <!-- This is the Apache CXF version -->
-    <version>3.6.5</version>
+    <version>3.6.6</version>
     <packaging>jar</packaging>
 
     <properties>
