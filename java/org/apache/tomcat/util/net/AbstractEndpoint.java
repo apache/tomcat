@@ -1248,7 +1248,7 @@ public abstract class AbstractEndpoint<S,U> {
         Executor executor = this.executor;
         if (executor != null && internalExecutor) {
             this.executor = null;
-            if (executor instanceof @SuppressWarnings("resource")ThreadPoolExecutor tpe) {
+            if (executor instanceof ThreadPoolExecutor tpe) {
                 //this is our internal one, so we need to shut it down
                 tpe.shutdownNow();
                 long timeout = getExecutorTerminationTimeoutMillis();

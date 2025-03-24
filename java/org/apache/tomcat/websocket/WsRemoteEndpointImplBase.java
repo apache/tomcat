@@ -581,7 +581,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked", "rawtypes", "null" })
     public void sendObject(Object obj) throws IOException, EncodeException {
         if (obj == null) {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullData"));
@@ -607,7 +607,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 String msg = text1.encode(obj);
                 sendString(msg);
             }
-            case Encoder.TextStream textStream -> {
+            case @SuppressWarnings("unused") Encoder.TextStream textStream -> {
                 try (Writer w = getSendWriter()) {
                     ((Encoder.TextStream) encoder).encode(obj, w);
                 }
@@ -616,7 +616,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                 ByteBuffer msg = binary.encode(obj);
                 sendBytes(msg);
             }
-            case Encoder.BinaryStream binaryStream -> {
+            case @SuppressWarnings("unused") Encoder.BinaryStream binaryStream -> {
                 try (OutputStream os = getSendStream()) {
                     ((Encoder.BinaryStream) encoder).encode(obj, os);
                 }
@@ -634,7 +634,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked", "rawtypes", "null" })
     public void sendObjectByCompletion(Object obj, SendHandler completion) {
 
         if (obj == null) {
@@ -666,7 +666,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                     String msg = text1.encode(obj);
                     sendStringByCompletion(msg, completion);
                 }
-                case Encoder.TextStream textStream -> {
+                case @SuppressWarnings("unused") Encoder.TextStream textStream -> {
                     try (Writer w = getSendWriter()) {
                         ((Encoder.TextStream) encoder).encode(obj, w);
                     }
@@ -676,7 +676,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
                     ByteBuffer msg = binary.encode(obj);
                     sendBytesByCompletion(msg, completion);
                 }
-                case Encoder.BinaryStream binaryStream -> {
+                case @SuppressWarnings("unused") Encoder.BinaryStream binaryStream -> {
                     try (OutputStream os = getSendStream()) {
                         ((Encoder.BinaryStream) encoder).encode(obj, os);
                     }
