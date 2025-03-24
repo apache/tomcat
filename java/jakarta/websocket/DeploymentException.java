@@ -16,8 +16,11 @@
  */
 package jakarta.websocket;
 
+import java.io.Serial;
+
 public class DeploymentException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public DeploymentException(String message) {

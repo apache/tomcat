@@ -1,4 +1,4 @@
-/**
+/*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -28,7 +28,7 @@ public interface ClientAuth {
      *
      * @return An AuthStatus instance that represents the result of the authentication
      *
-     * @throws AuthException If the a failure occurred in a manner that prevented the failure from being communicated
+     * @throws AuthException If a failure occurred in a manner that prevented the failure from being communicated
      *                           via messageInfo
      */
     AuthStatus secureRequest(MessageInfo messageInfo, Subject clientSubject) throws AuthException;
@@ -42,7 +42,7 @@ public interface ClientAuth {
      *
      * @return An AuthStatus instance that represents the result of the validation
      *
-     * @throws AuthException If the a failure occurred in a manner that prevented the failure from being communicated
+     * @throws AuthException If a failure occurred in a manner that prevented the failure from being communicated
      *                           via messageInfo
      */
     default AuthStatus validateResponse(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
@@ -57,7 +57,7 @@ public interface ClientAuth {
      * @param messageInfo The associated request and response
      * @param subject     The subject to clean
      *
-     * @throws AuthException If the a failure occurred
+     * @throws AuthException If a failure occurred
      */
     default void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
         // NO-OP

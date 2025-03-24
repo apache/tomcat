@@ -1,4 +1,4 @@
-/**
+/*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -22,7 +22,7 @@ import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 
 /**
- * Callback that enables an authentication module to supply a user name and password (to a runtime?) and determine if
+ * Callback that enables an authentication module to supply a username and password (to a runtime?) and determine if
  * the result of validation.
  */
 public class PasswordValidationCallback implements Callback {
