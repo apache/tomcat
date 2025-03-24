@@ -100,12 +100,12 @@ public class ELProcessor {
 
         MethodSignature sig = new MethodSignature(context, methodName, className);
 
-        if (function.length() == 0) {
+        if (function.isEmpty()) {
             function = sig.getName();
         }
 
         // Only returns public methods. Module access is checked below.
-        Method methods[] = clazz.getMethods();
+        Method[] methods = clazz.getMethods();
 
         for (Method method : methods) {
             if (!Modifier.isStatic(method.getModifiers())) {
@@ -130,28 +130,26 @@ public class ELProcessor {
                 } else {
                     Class<?>[] types = method.getParameterTypes();
                     String[] typeNames = sig.getParamTypeNames();
-                    if (types.length == typeNames.length) {
-                        boolean match = true;
-                        for (int i = 0; i < types.length; i++) {
-                            if (i == types.length - 1 && method.isVarArgs()) {
-                                String typeName = typeNames[i];
-                                if (typeName.endsWith("...")) {
-                                    typeName = typeName.substring(0, typeName.length() - 3);
-                                    if (!typeName.equals(types[i].getName())) {
-                                        match = false;
-                                    }
-                                } else {
+                    boolean match = true;
+                    for (int i = 0; i < types.length; i++) {
+                        if (i == types.length - 1 && method.isVarArgs()) {
+                            String typeName = typeNames[i];
+                            if (typeName.endsWith("...")) {
+                                typeName = typeName.substring(0, typeName.length() - 3);
+                                if (!typeName.equals(types[i].getName())) {
                                     match = false;
                                 }
-                            } else if (!types[i].getName().equals(typeNames[i])) {
+                            } else {
                                 match = false;
-                                break;
                             }
+                        } else if (!types[i].getName().equals(typeNames[i])) {
+                            match = false;
+                            break;
                         }
-                        if (match) {
-                            manager.mapFunction(prefix, function, method);
-                            return;
-                        }
+                    }
+                    if (match) {
+                        manager.mapFunction(prefix, function, method);
+                        return;
                     }
                 }
             }
@@ -236,7 +234,7 @@ public class ELProcessor {
                 }
                 // Trim '(' and ')'
                 paramString = paramString.substring(1, paramString.length() - 1).trim();
-                if (paramString.length() == 0) {
+                if (paramString.isEmpty()) {
                     parameterTypeNames = EMPTY_STRING_ARRAY;
                 } else {
                     parameterTypeNames = paramString.split(",");
@@ -263,33 +261,17 @@ public class ELProcessor {
                         if (isPrimitive && dimension > 0) {
                             // When in an array, class name changes for primitive
                             switch (parameterTypeName) {
-                                case "boolean":
-                                    parameterTypeName = "Z";
-                                    break;
-                                case "byte":
-                                    parameterTypeName = "B";
-                                    break;
-                                case "char":
-                                    parameterTypeName = "C";
-                                    break;
-                                case "double":
-                                    parameterTypeName = "D";
-                                    break;
-                                case "float":
-                                    parameterTypeName = "F";
-                                    break;
-                                case "int":
-                                    parameterTypeName = "I";
-                                    break;
-                                case "long":
-                                    parameterTypeName = "J";
-                                    break;
-                                case "short":
-                                    parameterTypeName = "S";
-                                    break;
-                                default:
+                                case "boolean" -> parameterTypeName = "Z";
+                                case "byte" -> parameterTypeName = "B";
+                                case "char" -> parameterTypeName = "C";
+                                case "double" -> parameterTypeName = "D";
+                                case "float" -> parameterTypeName = "F";
+                                case "int" -> parameterTypeName = "I";
+                                case "long" -> parameterTypeName = "J";
+                                case "short" -> parameterTypeName = "S";
+                                default -> {
                                     // Should never happen
-                                    break;
+                                }
                             }
                         } else if (!isPrimitive && !parameterTypeName.contains(".")) {
                             Class<?> clazz = importHandler.resolveClass(parameterTypeName);
@@ -303,9 +285,7 @@ public class ELProcessor {
                         if (dimension > 0) {
                             // Convert to array form of class name
                             StringBuilder sb = new StringBuilder();
-                            for (int j = 0; j < dimension; j++) {
-                                sb.append('[');
-                            }
+                            sb.append("[".repeat(dimension));
                             if (!isPrimitive) {
                                 sb.append('L');
                             }

@@ -66,12 +66,11 @@ public abstract class ExpressionFactory {
      * Create a new {@link ExpressionFactory} passing in the provided {@link Properties}. Search order is the same as
      * {@link #newInstance()}.
      *
-     * @param properties the properties to be passed to the new instance (may be null)
+     * @param properties the properties to be passed to the new instance (might be null)
      *
      * @return the new ExpressionFactory
      */
     public static ExpressionFactory newInstance(Properties properties) {
-        ExpressionFactory result = null;
 
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
@@ -124,6 +123,8 @@ public abstract class ExpressionFactory {
                 throw new ELException(Util.message(null, "expressionFactory.cannotFind", className), e);
             }
         }
+
+        ExpressionFactory result;
 
         try {
             Constructor<?> constructor = null;
@@ -289,10 +290,8 @@ public abstract class ExpressionFactory {
      * @return Class name. There is default, so it is never {@code null}.
      */
     private static String discoverClassName(ClassLoader tccl) {
-        String className = null;
-
         // First services API
-        className = getClassNameServices(tccl);
+        String className = getClassNameServices(tccl);
         if (className == null) {
             // Second el.properties file
             className = getClassNameJreDir();
@@ -332,7 +331,7 @@ public abstract class ExpressionFactory {
                 Properties props = new Properties();
                 props.load(is);
                 String value = props.getProperty(PROPERTY_NAME);
-                if (value != null && value.trim().length() > 0) {
+                if (value != null && !value.trim().isEmpty()) {
                     return value.trim();
                 }
             } catch (FileNotFoundException e) {
@@ -346,7 +345,7 @@ public abstract class ExpressionFactory {
 
     private static String getClassNameSysProp() {
         String value = System.getProperty(PROPERTY_NAME);
-        if (value != null && value.trim().length() > 0) {
+        if (value != null && !value.trim().isEmpty()) {
             return value.trim();
         }
         return null;

@@ -39,7 +39,7 @@ public abstract class ELResolver {
     public abstract Object getValue(ELContext context, Object base, Object property);
 
     /**
-     * Invokes a method on the the given object.
+     * Invokes a method on the given object.
      *
      * @param context    The EL context for this evaluation
      * @param base       The base object on which the method is to be found
@@ -113,7 +113,7 @@ public abstract class ELResolver {
      * @param context The context in which the examination takes place
      * @param base    The object to examine
      *
-     * @return {code null} if the most common type cannot be determine, otherwise the most common type
+     * @return {code null} if the most common type cannot be determined, otherwise the most common type
      */
     public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
 

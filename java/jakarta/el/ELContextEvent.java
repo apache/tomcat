@@ -16,10 +16,12 @@
  */
 package jakarta.el;
 
+import java.io.Serial;
 import java.util.EventObject;
 
 public class ELContextEvent extends EventObject {
 
+    @Serial
     private static final long serialVersionUID = 1255131906285426769L;
 
     /**

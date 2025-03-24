@@ -77,12 +77,9 @@ public class MethodInfo {
             return false;
         }
         if (returnType == null) {
-            if (other.returnType != null) {
-                return false;
-            }
-        } else if (!returnType.equals(other.returnType)) {
-            return false;
+            return other.returnType == null;
+        } else {
+            return returnType.equals(other.returnType);
         }
-        return true;
     }
 }
