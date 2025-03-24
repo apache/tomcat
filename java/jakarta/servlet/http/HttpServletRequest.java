@@ -77,8 +77,8 @@ public interface HttpServletRequest extends ServletRequest {
      * <code>Date</code> object. Use this method with headers that contain dates, such as
      * <code>If-Modified-Since</code>.
      * <p>
-     * The date is returned as the number of milliseconds since January 1, 1970 GMT. The header name is case
-     * insensitive.
+     * The date is returned as the number of milliseconds since January 1, 1970 GMT. The header name
+     * is case-insensitive.
      * <p>
      * If the request did not have a header of the specified name, this method returns -1. If the header can't be
      * converted to a date, the method throws an <code>IllegalArgumentException</code>.
@@ -95,7 +95,7 @@ public interface HttpServletRequest extends ServletRequest {
     /**
      * Returns the value of the specified request header as a <code>String</code>. If the request did not include a
      * header of the specified name, this method returns <code>null</code>. If there are multiple headers with the same
-     * name, this method returns the first head in the request. The header name is case insensitive. You can use this
+     * name, this method returns the first head in the request. The header name is case-insensitive. You can use this
      * method with any request header.
      *
      * @param name a <code>String</code> specifying the header name
@@ -113,7 +113,7 @@ public interface HttpServletRequest extends ServletRequest {
      * different value rather than sending the header as a comma separated list.
      * <p>
      * If the request did not include any headers of the specified name, this method returns an empty
-     * <code>Enumeration</code>. The header name is case insensitive. You can use this method with any request header.
+     * <code>Enumeration</code>. The header name is case-insensitive. You can use this method with any request header.
      *
      * @param name a <code>String</code> specifying the header name
      *
@@ -140,7 +140,7 @@ public interface HttpServletRequest extends ServletRequest {
      * of the specified name, this method returns -1. If the header cannot be converted to an integer, this method
      * throws a <code>NumberFormatException</code>.
      * <p>
-     * The header name is case insensitive.
+     * The header name is case-insensitive.
      *
      * @param name a <code>String</code> specifying the name of a request header
      *
@@ -256,7 +256,7 @@ public interface HttpServletRequest extends ServletRequest {
 
     /**
      * Returns the login of the user making this request, if the user has been authenticated, or <code>null</code> if
-     * the user has not been authenticated. Whether the user name is sent with each subsequent request depends on the
+     * the user has not been authenticated. Whether the username is sent with each subsequent request depends on the
      * browser and type of authentication. Same as the value of the CGI variable REMOTE_USER.
      *
      * @return a <code>String</code> specifying the login of the user making this request, or <code>null</code> if the
@@ -446,14 +446,14 @@ public interface HttpServletRequest extends ServletRequest {
     boolean authenticate(HttpServletResponse response) throws IOException, ServletException;
 
     /**
-     * Authenticate the provided user name and password and then associated the authenticated user with the request.
+     * Authenticate the provided username and password and then associated the authenticated user with the request.
      *
-     * @param username The user name to authenticate
+     * @param username The username to authenticate
      * @param password The password to use to authenticate the user
      *
      * @throws ServletException If any of {@link #getRemoteUser()}, {@link #getUserPrincipal()} or
      *                              {@link #getAuthType()} are non-null, if the configured authenticator does not
-     *                              support user name and password authentication or if the authentication fails
+     *                              support username and password authentication or if the authentication fails
      *
      * @since Servlet 3.0
      */

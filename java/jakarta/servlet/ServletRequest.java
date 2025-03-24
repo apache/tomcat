@@ -30,7 +30,7 @@ import java.util.Map;
  * <p>
  * A <code>ServletRequest</code> object provides data including parameter name and values, attributes, and an input
  * stream. Interfaces that extend <code>ServletRequest</code> can provide additional protocol-specific data (for
- * example, HTTP data is provided by {@link jakarta.servlet.http.HttpServletRequest}.
+ * example, HTTP data is provided by {@link jakarta.servlet.http.HttpServletRequest}).
  *
  * @see jakarta.servlet.http.HttpServletRequest
  */

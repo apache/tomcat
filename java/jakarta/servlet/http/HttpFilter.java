@@ -17,6 +17,7 @@
 package jakarta.servlet.http;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.GenericFilter;
@@ -30,6 +31,7 @@ import jakarta.servlet.ServletResponse;
  */
 public abstract class HttpFilter extends GenericFilter {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

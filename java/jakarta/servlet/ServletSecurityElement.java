@@ -27,7 +27,7 @@ import jakarta.servlet.annotation.HttpMethodConstraint;
 import jakarta.servlet.annotation.ServletSecurity;
 
 /**
- * The programmatic equivalent of {@link jakarta.servlet.annotation.ServletSecurity} used to configre security
+ * The programmatic equivalent of {@link jakarta.servlet.annotation.ServletSecurity} used to configure security
  * constraints for a Servlet.
  *
  * @since Servlet 3.0
@@ -110,8 +110,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
      * @return The security constraints for specific methods
      */
     public Collection<HttpMethodConstraintElement> getHttpMethodConstraints() {
-        Collection<HttpMethodConstraintElement> result = new HashSet<>(methodConstraints.values());
-        return result;
+        return new HashSet<>(methodConstraints.values());
     }
 
     /**
@@ -120,8 +119,7 @@ public class ServletSecurityElement extends HttpConstraintElement {
      * @return The names of the HTTP methods
      */
     public Collection<String> getMethodNames() {
-        Collection<String> result = new HashSet<>(methodConstraints.keySet());
-        return result;
+        return new HashSet<>(methodConstraints.keySet());
     }
 
     private void addHttpMethodConstraints(Collection<HttpMethodConstraintElement> httpMethodConstraints) {

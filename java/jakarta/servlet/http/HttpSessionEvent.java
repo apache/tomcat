@@ -16,12 +16,15 @@
  */
 package jakarta.servlet.http;
 
+import java.io.Serial;
+
 /**
  * This is the class representing event notifications for changes to sessions within a web application.
  *
  * @since Servlet 2.3
  */
 public class HttpSessionEvent extends java.util.EventObject {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

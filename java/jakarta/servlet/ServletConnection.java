@@ -73,7 +73,7 @@ public interface ServletConnection {
     String getProtocolConnectionId();
 
     /**
-     * Determine whether or not the incoming network connection to the server used encryption or not. Note that where a
+     * Determine whether the incoming network connection to the server used encryption or not. Note that where a
      * reverse proxy is used, the application may have a different view as to whether encryption is being used due to
      * the use of headers like {@code X-Forwarded-Proto}.
      *

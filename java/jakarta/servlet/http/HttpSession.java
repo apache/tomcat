@@ -22,7 +22,7 @@ import java.util.function.Consumer;
 import jakarta.servlet.ServletContext;
 
 /**
- * Provides a way to identify a user across more than one page request or visit to a Web site and to store information
+ * Provides a way to identify a user across more than one page request or visit to a website and to store information
  * about that user.
  * <p>
  * The servlet container uses this interface to create a session between an HTTP client and an HTTP server. The session
@@ -55,7 +55,7 @@ import jakarta.servlet.ServletContext;
  * <p>
  * This object is <b>only</b> valid within the scope of the HTTP request from which it was obtained. Once the processing
  * of that request returns to the container, this object must not be used. If there is a requirement to access the
- * session outside of the scope of an HTTP request then this must be done via {@code #getAccessor()}.
+ * session outside the scope of an HTTP request then this must be done via {@code #getAccessor()}.
  *
  * @see HttpSessionBindingListener
  */
@@ -106,7 +106,7 @@ public interface HttpSession {
 
     /**
      * Specifies the time, in seconds, between client requests before the servlet container will invalidate this
-     * session. A zero or negative time indicates that the session should never timeout.
+     * session. A zero or negative time indicates that the session should never time out.
      *
      * @param interval An integer specifying the number of seconds
      */
@@ -116,7 +116,7 @@ public interface HttpSession {
      * Returns the maximum time interval, in seconds, that the servlet container will keep this session open between
      * client accesses. After this interval, the servlet container will invalidate the session. The maximum time
      * interval can be set with the <code>setMaxInactiveInterval</code> method. A zero or negative time indicates that
-     * the session should never timeout.
+     * the session should never time out.
      *
      * @return an integer specifying the number of seconds this session remains open between client requests
      *

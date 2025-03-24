@@ -69,7 +69,7 @@ public interface Part {
     long getSize();
 
     /**
-     * A convenience method to write an uploaded part to disk. The client code is not concerned with whether or not the
+     * A convenience method to write an uploaded part to disk. The client code is not concerned with whether the
      * part is stored in memory, or on disk in a temporary location. They just want to write the uploaded part to a
      * file. This method is not guaranteed to succeed if called more than once for the same part. This allows a
      * particular implementation to use, for example, file renaming, where possible, rather than copying all of the
@@ -97,7 +97,7 @@ public interface Part {
 
     /**
      * Obtains the value of the specified part header as a String. If there are multiple headers with the same name,
-     * this method returns the first header in the part. The header name is case insensitive.
+     * this method returns the first header in the part. The header name is case-insensitive.
      *
      * @param name Header name
      *
@@ -108,7 +108,7 @@ public interface Part {
     /**
      * Obtain all the values of the specified part header.
      *
-     * @param name The name of the header of interest. The header name is case insensitive.
+     * @param name The name of the header of interest. The header name is case-insensitive.
      *
      * @return All the values of the specified part header. If the part did not include any headers of the specified
      *             name, this method returns an empty Collection.

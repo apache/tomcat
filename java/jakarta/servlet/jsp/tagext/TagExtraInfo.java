@@ -35,7 +35,7 @@ package jakarta.servlet.jsp.tagext;
  * being translated. The call should happen before any invocation on validate() and before any invocation on
  * getVariableInfo().
  * <p>
- * <b>NOTE:</b> It is a (translation time) error for a tag definition in a TLD with one or more variable subelements to
+ * <b>NOTE:</b> It is a (translation time) error for a tag definition in a TLD with one or more variable sub elements to
  * have an associated TagExtraInfo implementation that returns a VariableInfo array with one or more elements from a
  * call to getVariableInfo().
  */

@@ -53,7 +53,7 @@ import jakarta.servlet.jsp.tagext.BodyContent;
  * <li>a mechanism to manage session usage by the page
  * <li>a mechanism to expose page directive attributes to the scripting environment
  * <li>mechanisms to forward or include the current request to other active components in the application
- * <li>a mechanism to handle errorpage exception processing
+ * <li>a mechanism to handle error page exception processing
  * </ul>
  * <p>
  * <B>Methods Intended for Container Generated Code</B>
@@ -118,7 +118,7 @@ public abstract class PageContext extends JspContext {
     public static final String PAGE = "jakarta.servlet.jsp.jspPage";
 
     /**
-     * Name used to store this PageContext in it's own name table.
+     * Name used to store this PageContext in its own name table.
      */
 
     public static final String PAGECONTEXT = "jakarta.servlet.jsp.jspPageContext";
@@ -199,7 +199,7 @@ public abstract class PageContext extends JspContext {
      * the PageContext for potential reuse by a later invocation of initialize(). This method is typically called from
      * JspFactory.releasePageContext().
      * <p>
-     * Subclasses shall envelope this method.
+     * Subclasses shall override this method.
      * <p>
      * This method should not be used by page or tag library authors.
      */
@@ -242,7 +242,7 @@ public abstract class PageContext extends JspContext {
     /**
      * The current value of the exception object (an Exception).
      *
-     * @return any exception passed to this as an errorpage
+     * @return any exception passed to this as an error page
      */
 
     public abstract Exception getException();
@@ -301,7 +301,7 @@ public abstract class PageContext extends JspContext {
      * to the ServletResponse output stream.
      * </p>
      * <p>
-     * The current JspWriter "out" for this JSP is flushed as a side-effect of this call, prior to processing the
+     * The current JspWriter "out" for this JSP is flushed as a side effect of this call, prior to processing the
      * include.
      * </p>
      * <p>
@@ -328,7 +328,7 @@ public abstract class PageContext extends JspContext {
      * to the current JspWriter returned by a call to getOut().
      * </p>
      * <p>
-     * If flush is true, The current JspWriter "out" for this JSP is flushed as a side-effect of this call, prior to
+     * If flush is true, The current JspWriter "out" for this JSP is flushed as a side effect of this call, prior to
      * processing the include. Otherwise, the JspWriter "out" is not flushed.
      * </p>
      * <p>

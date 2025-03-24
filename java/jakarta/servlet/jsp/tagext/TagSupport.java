@@ -16,6 +16,7 @@
  */
 package jakarta.servlet.jsp.tagext;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -37,6 +38,7 @@ import jakarta.servlet.jsp.PageContext;
  */
 public class TagSupport implements IterationTag, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -44,8 +46,8 @@ public class TagSupport implements IterationTag, Serializable {
      * method from the Tag interface. This method is used for coordination among cooperating tags.
      * <p>
      * The current version of the specification only provides one formal way of indicating the observable type of a tag
-     * handler: its tag handler implementation class, described in the tag-class subelement of the tag element. This is
-     * extended in an informal manner by allowing the tag library author to indicate in the description subelement an
+     * handler: its tag handler implementation class, described in the tag-class sub element of the tag element. This is
+     * extended in an informal manner by allowing the tag library author to indicate in the description sub element an
      * observable type. The type should be a subtype of the tag handler implementation class or void. This additional
      * constraint can be exploited by a specialized container that knows about that specific tag library, as in the case
      * of the JSP standard tag library.
@@ -59,7 +61,7 @@ public class TagSupport implements IterationTag, Serializable {
      *
      * @return the nearest ancestor that implements the interface or is an instance of the class specified
      */
-    public static final Tag findAncestorWithClass(Tag from, Class<?> klass) {
+    public static Tag findAncestorWithClass(Tag from, Class<?> klass) {
         boolean isInterface = false;
 
         if (from == null || klass == null ||
@@ -74,7 +76,7 @@ public class TagSupport implements IterationTag, Serializable {
                 return null;
             }
 
-            if ((isInterface && klass.isInstance(tag)) || ((Class<?>) klass).isAssignableFrom(tag.getClass())) {
+            if ((isInterface && klass.isInstance(tag)) || klass.isAssignableFrom(tag.getClass())) {
                 return tag;
             }
             from = tag;
@@ -218,7 +220,7 @@ public class TagSupport implements IterationTag, Serializable {
     }
 
     /**
-     * Get a the value associated with a key.
+     * Get the value associated with a key.
      *
      * @param k The string key.
      *

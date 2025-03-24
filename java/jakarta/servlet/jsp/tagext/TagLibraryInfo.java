@@ -126,7 +126,7 @@ public abstract class TagLibraryInfo {
      * @return the TagInfo for the tag with the specified short name, or null if no such tag is found
      */
     public TagInfo getTag(String shortname) {
-        TagInfo tags[] = getTags();
+        TagInfo[] tags = getTags();
 
         if (tags == null || tags.length == 0 || shortname == null) {
             return null;
@@ -150,7 +150,7 @@ public abstract class TagLibraryInfo {
      * @since JSP 2.0
      */
     public TagFileInfo getTagFile(String shortname) {
-        TagFileInfo tagFiles[] = getTagFiles();
+        TagFileInfo[] tagFiles = getTagFiles();
 
         if (tagFiles == null || tagFiles.length == 0) {
             return null;

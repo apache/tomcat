@@ -31,7 +31,7 @@ public interface ServletRegistration extends Registration {
      * any of the specified URL patterns are already mapped to a different Servlet, no updates will be performed. If
      * this method is called multiple times, each successive call adds to the effects of the former. The returned set is
      * not backed by the ServletRegistration object, so changes in the returned set are not reflected in the
-     * ServletRegistration object, and vice-versa.
+     * ServletRegistration object, and vice versa.
      *
      * @param urlPatterns The URL patterns that this Servlet should be mapped to
      *
@@ -82,7 +82,7 @@ public interface ServletRegistration extends Registration {
         Set<String> setServletSecurity(ServletSecurityElement constraint);
 
         /**
-         * Set the multi-part configuration for the associated Servlet. To clear the multi-part configuration specify
+         * Set the multipart configuration for the associated Servlet. To clear the multipart configuration specify
          * <code>null</code> as the new value.
          *
          * @param multipartConfig The configuration to associate with the Servlet

@@ -16,6 +16,8 @@
  */
 package jakarta.servlet.http;
 
+import java.io.Serial;
+
 /**
  * Events of this type are either sent to an object that implements {@link HttpSessionBindingListener} when it is bound
  * or unbound from a session, or to an {@link HttpSessionAttributeListener} that has been configured in the deployment
@@ -30,6 +32,7 @@ package jakarta.servlet.http;
  */
 public class HttpSessionBindingEvent extends HttpSessionEvent {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

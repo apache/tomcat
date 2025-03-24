@@ -70,7 +70,7 @@ import jakarta.servlet.jsp.PageContext;
  * <B>Empty and Non-Empty Action</B>
  * </p>
  * <p>
- * If the TagLibraryDescriptor file indicates that the action must always have an empty action, by an
+ * If the TagLibraryDescriptor file indicates that the action must always have an empty action, by a
  * &lt;body-content&gt; entry of "empty", then the doStartTag() method must return SKIP_BODY.
  * </p>
  * <p>
@@ -148,7 +148,7 @@ public interface Tag extends JspTag {
      * The current version of the specification only provides one formal way of indicating the observable type of a tag
      * handler: its tag handler implementation class, described in the tag-class sub-element of the tag element. This is
      * extended in an informal manner by allowing the tag library author to indicate in the description sub-element an
-     * observable type. The type should be a sub-type of the tag handler implementation class or void. This additional
+     * observable type. The type should be a subtype of the tag handler implementation class or void. This additional
      * constraint can be exploited by a specialized container that knows about that specific tag library, as in the case
      * of the JSP standard tag library.
      *

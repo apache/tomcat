@@ -16,12 +16,15 @@
  */
 package jakarta.servlet.jsp;
 
+import java.io.Serial;
+
 /**
  * Exception to be used by a Tag Handler to indicate some unrecoverable error. This error is to be caught by the top
  * level of the JSP page and will result in an error page.
  */
 public class JspTagException extends JspException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**

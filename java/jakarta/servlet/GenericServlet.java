@@ -17,6 +17,7 @@
 package jakarta.servlet;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.util.Enumeration;
 
 /**
@@ -36,6 +37,7 @@ import java.util.Enumeration;
  */
 public abstract class GenericServlet implements Servlet, ServletConfig, java.io.Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private transient ServletConfig config;

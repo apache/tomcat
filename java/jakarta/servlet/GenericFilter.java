@@ -16,6 +16,7 @@
  */
 package jakarta.servlet;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Enumeration;
 
@@ -30,6 +31,7 @@ import java.util.Enumeration;
  */
 public abstract class GenericFilter implements Filter, FilterConfig, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -74,7 +76,7 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
 
 
     /**
-     * Convenience method for sub-classes to save them having to call <code>super.init(config)</code>. This is a NO-OP
+     * Convenience method for subclasses to save them having to call <code>super.init(config)</code>. This is a NO-OP
      * by default.
      *
      * @throws ServletException If an exception occurs that interrupts the Filter's normal operation
