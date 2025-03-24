@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>30</version>
+        <version>34</version>
     </parent>
 
     <groupId>org.apache.tomcat</groupId>
@@ -29,7 +29,7 @@
     <name>Apache Tomcat CDI 4 support</name>
     <description>Apache Tomcat CDI 4 support using Apache OpenWebBeans</description>
     <!-- This is the Apache OpenWebBeans version -->
-    <version>4.0.2</version>
+    <version>4.0.3</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -37,7 +37,7 @@
         <jakarta-interceptor.version>2.1.0</jakarta-interceptor.version>
         <jakarta-enterprise-cdi.version>4.0.1</jakarta-enterprise-cdi.version>
         <jakarta-annotation-api.version>2.1.1</jakarta-annotation-api.version>
-        <tomcat.version>10.1.26</tomcat.version>
+        <tomcat.version>10.1.39</tomcat.version>
     </properties>
 
     <dependencies>
