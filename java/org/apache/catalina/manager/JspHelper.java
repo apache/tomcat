@@ -28,7 +28,7 @@ import org.apache.tomcat.util.security.Escape;
 
 
 /**
- * Helper JavaBean for JSPs, because JSTL 1.1/EL 2.0 is too dumb to to what I need (call methods with parameters), or I
+ * Helper JavaBean for JSPs, because JSTL 1.1/EL 2.0 is too dumb to do what I need (call methods with parameters), or I
  * am too dumb to use it correctly. :)
  *
  * @author C&eacute;drik LIME
@@ -66,11 +66,11 @@ public class JspHelper {
     }
 
     /**
-     * Try to get user name from the session, if possible.
+     * Try to get username from the session, if possible.
      *
      * @param in_session The Servlet session
      *
-     * @return the user name
+     * @return the username
      */
     public static String guessDisplayUserFromSession(Session in_session) {
         Object user = SessionUtils.guessUserFromSession(in_session);

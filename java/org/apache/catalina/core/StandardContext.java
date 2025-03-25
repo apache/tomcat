@@ -239,7 +239,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
 
     /**
-     * The broadcaster that sends j2ee notifications.
+     * The broadcaster that sends EE notifications.
      */
     private final NotificationBroadcasterSupport broadcaster;
 
@@ -1354,7 +1354,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     /**
      * {@inheritDoc} Note that this implementation is not thread safe. If two threads call this method concurrently, the
-     * result may be either set of listeners or a the union of both.
+     * result may be either set of listeners or the union of both.
      */
     @Override
     public void setApplicationEventListeners(Object[] listeners) {
@@ -4308,7 +4308,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     cl.setNotFoundClassResourceCacheSize(getNotFoundClassResourceCacheSize());
                 }
 
-                // By calling unbindThread and bindThread in a row, we setup the
+                // By calling unbindThread and bindThread in a row, we set up the
                 // current Thread CCL to be the webapp classloader
                 unbindThread(oldCCL);
                 oldCCL = bindThread();
@@ -4635,7 +4635,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         // Once the state is set to STOPPING, the Context will report itself as
-        // not available and any in progress async requests will timeout
+        // not available and any in progress async requests will time out
         setState(LifecycleState.STOPPING);
 
         // Binding thread
@@ -4743,7 +4743,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * Destroy needs to clean up the context completely. The problem is that undoing all the config in start() and
      * restoring a 'fresh' state is impossible. After stop()/destroy()/init()/start() we should have the same state as
-     * if a fresh start was done - i.e read modified web.xml, etc. This can only be done by completely removing the
+     * if a fresh start was done - i.e. read modified web.xml, etc. This can only be done by completely removing the
      * context object and remapping a new one, or by cleaning up everything.
      */
     @Override

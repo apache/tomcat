@@ -16,6 +16,8 @@
  */
 package org.apache.catalina.connector;
 
+import java.io.Serial;
+
 import org.apache.coyote.BadRequestException;
 
 /**
@@ -25,6 +27,7 @@ import org.apache.coyote.BadRequestException;
  */
 public final class ClientAbortException extends BadRequestException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

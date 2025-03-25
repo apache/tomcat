@@ -187,8 +187,8 @@ public class SSLAuthenticator extends AuthenticatorBase {
                         // Possibly boundOnInit is used, so use the less accurate protocols
                         enabledProtocols = sslHostConfig.getProtocols().toArray(new String[0]);
                     }
-                    for (String enbabledProtocol : enabledProtocols) {
-                        if (Constants.SSL_PROTO_TLSv1_3.equals(enbabledProtocol)) {
+                    for (String enabledProtocol : enabledProtocols) {
+                        if (Constants.SSL_PROTO_TLSv1_3.equals(enabledProtocol)) {
                             log.warn(sm.getString("sslAuthenticatorValve.tls13", context2.getName(), host.getName(),
                                     connector));
                         }

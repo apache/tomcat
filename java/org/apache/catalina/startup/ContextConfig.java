@@ -799,7 +799,7 @@ public class ContextConfig implements LifecycleListener {
         }
 
         // At this point we need to determine if we have a WAR file in the
-        // appBase that needs to be expanded. Therefore we consider the absolute
+        // appBase that needs to be expanded. Therefore, we consider the absolute
         // docBase NOT the canonical docBase. This is because some users symlink
         // WAR files into the appBase and we want this to work correctly.
         boolean docBaseAbsoluteInAppBase = docBaseAbsolute.startsWith(appBase.getPath() + File.separatorChar);
@@ -915,7 +915,7 @@ public class ContextConfig implements LifecycleListener {
 
 
     /**
-     * Process a "init" event for this Context.
+     * Process an "init" event for this Context.
      */
     protected synchronized void init() {
         // Called from StandardContext.init()
@@ -2468,7 +2468,7 @@ public class ContextConfig implements LifecycleListener {
             }
         }
         if (servletName == null) {
-            // classname is default servletName as annotation has no name!
+            // class name is default servletName as annotation has no name!
             servletName = className;
         }
         ServletDef servletDef = fragment.getServlets().get(servletName);
@@ -2568,7 +2568,7 @@ public class ContextConfig implements LifecycleListener {
             }
         }
         if (filterName == null) {
-            // classname is default filterName as annotation has no name!
+            // class name is default filterName as annotation has no name!
             filterName = className;
         }
         FilterDef filterDef = fragment.getFilters().get(filterName);

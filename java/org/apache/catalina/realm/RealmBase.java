@@ -1244,7 +1244,7 @@ public abstract class RealmBase extends LifecycleMBeanBase implements Realm {
 
     /**
      * Return the Server object that is the ultimate parent for the container with which this Realm is associated. If
-     * the server cannot be found (eg because the container hierarchy is not complete), <code>null</code> is returned.
+     * the server cannot be found (e.g. because the container hierarchy is not complete), <code>null</code> is returned.
      *
      * @return the Server associated with the realm
      */

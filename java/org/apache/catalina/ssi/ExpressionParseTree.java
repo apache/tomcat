@@ -180,7 +180,7 @@ public class ExpressionParseTree {
                     break;
                 case ExpressionTokenizer.TOKEN_NOT_EQ:
                     pushOpp(new NotNode());
-                    // Sneak the regular node in. The NOT will
+                    // Sneak the regular node in. They will NOT
                     // be resolved when the next opp comes along.
                     oppStack.addFirst(new EqualNode());
                     break;
