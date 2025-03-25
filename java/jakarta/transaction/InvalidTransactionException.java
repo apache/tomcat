@@ -16,8 +16,11 @@
  */
 package jakarta.transaction;
 
+import java.io.Serial;
+
 public class InvalidTransactionException extends java.rmi.RemoteException {
 
+    @Serial
     private static final long serialVersionUID = 3597320220337691496L;
 
     public InvalidTransactionException() {
