@@ -92,7 +92,7 @@ public class TimeBucketCounter extends TimeBucketCounterBase {
      *
      * @return the actual bucket duration in seconds
      *
-     * @see FastTimeBucketCounter#determineShiftBitsOfDuration(int)
+     * @see TimeBucketCounter#determineShiftBitsOfDuration(int)
      */
     private static int getActualDuration(int duration) {
         return (int) (1L << determineShiftBitsOfDuration(duration)) / 1000;

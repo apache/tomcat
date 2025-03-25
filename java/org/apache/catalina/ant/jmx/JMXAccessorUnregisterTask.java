@@ -74,12 +74,11 @@ public class JMXAccessorUnregisterTask extends JMXAccessorTask {
      * @throws Exception An error occurred
      */
     protected String jmxUuregister(MBeanServerConnection jmxServerConnection, String name) throws Exception {
-        String error = null;
         if (isEcho()) {
             handleOutput("Unregister MBean " + name);
         }
         jmxServerConnection.unregisterMBean(new ObjectName(name));
-        return error;
+        return null;
     }
 
 }

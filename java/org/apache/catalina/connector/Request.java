@@ -900,7 +900,7 @@ public class Request implements HttpServletRequest {
      * {@inheritDoc}
      * <p>
      * The attribute names returned will only be those for the attributes set via {@link #setAttribute(String, Object)}.
-     * Tomcat internal attributes will not be included although they are accessible via {@link #getAttribute(String)}.
+     * Tomcat internal attributes will not be included even though they are accessible via {@link #getAttribute(String)}.
      * The Tomcat internal attributes include:
      * <ul>
      * <li>{@link Globals#DISPATCHER_TYPE_ATTR}</li>
@@ -1931,8 +1931,8 @@ public class Request implements HttpServletRequest {
         int pos = 0;
         if (!getContext().getAllowMultipleLeadingForwardSlashInPath()) {
             // Ensure that the returned value only starts with a single '/'.
-            // This prevents the value being misinterpreted as a protocol-
-            // relative URI if used with sendRedirect().
+            // This prevents the value being misinterpreted as a protocol-relative
+            // URI if used with sendRedirect().
             do {
                 pos++;
             } while (pos < uri.length() && uri.charAt(pos) == '/');
@@ -2715,7 +2715,7 @@ public class Request implements HttpServletRequest {
         } else if (("/".equals(context.getSessionCookiePath()) && isRequestedSessionIdFromCookie())) {
             /*
              * This is the common(ish) use case: using the same session ID with multiple web applications on the same
-             * host. Typically this is used by Portlet implementations. It only works if sessions are tracked via
+             * host. Typically, this is used by Portlet implementations. It only works if sessions are tracked via
              * cookies. The cookie must have a path of "/" else it won't be provided for requests to all web
              * applications.
              *

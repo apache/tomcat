@@ -53,7 +53,7 @@ public class ServiceMBean extends BaseCatalinaMBean<Service> {
     /**
      * Adds a named executor to the service
      *
-     * @param type Classname of the Executor to be added
+     * @param type Class name of the Executor to be added
      *
      * @throws MBeanException error creating the executor
      */
