@@ -121,7 +121,7 @@ public class FileMessageFactory {
 
     /**
      * Private constructor, either instantiates a factory to read or write. <BR>
-     * When openForWrite==true, then a the file, f, will be created and an output stream is opened to write to it. <BR>
+     * When openForWrite==true, then the file f will be created and an output stream is opened to write to it. <BR>
      * When openForWrite==false, an input stream is opened, the file has to exist.
      *
      * @param f            File - the file to be read/written

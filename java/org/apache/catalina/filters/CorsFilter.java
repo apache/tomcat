@@ -18,6 +18,7 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -75,6 +76,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class CorsFilter extends GenericFilter {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private static final StringManager sm = StringManager.getManager(CorsFilter.class);
 
@@ -127,13 +129,9 @@ public class CorsFilter extends GenericFilter {
     @Override
     public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse,
             final FilterChain filterChain) throws IOException, ServletException {
-        if (!(servletRequest instanceof HttpServletRequest) || !(servletResponse instanceof HttpServletResponse)) {
+        if (!(servletRequest instanceof HttpServletRequest request) || !(servletResponse instanceof HttpServletResponse response)) {
             throw new ServletException(sm.getString("corsFilter.onlyHttp"));
         }
-
-        // Safe to downcast at this point.
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         // Determines the CORS request type.
         CorsFilter.CORSRequestType requestType = checkRequestType(request);
@@ -407,7 +405,7 @@ public class CorsFilter extends GenericFilter {
 
         if ("OPTIONS".equals(method)) {
             // For an OPTIONS request, the response will vary based on the
-            // value or absence of the following headers. Hence they need be be
+            // value or absence of the following headers. Hence, they need to be
             // included in the Vary header.
             ResponseUtil.addVaryFieldName(response, REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
             ResponseUtil.addVaryFieldName(response, REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
@@ -767,6 +765,7 @@ public class CorsFilter extends GenericFilter {
      * Log objects are not Serializable but this Filter is because it extends GenericFilter. Tomcat won't serialize a
      * Filter but in case something else does...
      */
+    @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         log = LogFactory.getLog(CorsFilter.class);

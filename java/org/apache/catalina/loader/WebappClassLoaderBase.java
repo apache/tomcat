@@ -1591,7 +1591,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         // when the executor was shut down or the thread was interrupted but
         // that depends on the thread correctly handling the interrupt. Check
         // each thread and if any are still running give all threads up to a
-        // total of 2 seconds to shutdown.
+        // total of 2 seconds to shut down.
         int count = 0;
         for (Thread t : threadsToStop) {
             while (t.isAlive() && count < 100) {

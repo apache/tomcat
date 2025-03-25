@@ -30,7 +30,7 @@ public final class Constants {
     public static final String CSRF_NONCE_SESSION_ATTR_NAME = "org.apache.catalina.filters.CSRF_NONCE";
 
     /**
-     * The request attribute key under which the current requests's CSRF nonce can be found.
+     * The request attribute key under which the current request's CSRF nonce can be found.
      */
     public static final String CSRF_NONCE_REQUEST_ATTR_NAME = "org.apache.catalina.filters.CSRF_REQUEST_NONCE";
 

@@ -182,10 +182,10 @@ public abstract class StoreBase extends LifecycleBase implements Store {
     // --------------------------------------------------------- Protected Methods
 
     /**
-     * Create the object input stream to use to read a session from the store. Sub-classes <b>must</b> have set the
+     * Create the object input stream to use to read a session from the store. Subclasses <b>must</b> have set the
      * thread context class loader before calling this method.
      *
-     * @param is The input stream provided by the sub-class that will provide the data for a session
+     * @param is The input stream provided by the subclass that will provide the data for a session
      *
      * @return An appropriately configured ObjectInputStream from which the session can be read.
      *

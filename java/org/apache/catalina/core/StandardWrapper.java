@@ -100,7 +100,7 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
     protected long available = 0L;
 
     /**
-     * The broadcaster that sends j2ee notifications.
+     * The broadcaster that sends EE notifications.
      */
     protected final NotificationBroadcasterSupport broadcaster;
 

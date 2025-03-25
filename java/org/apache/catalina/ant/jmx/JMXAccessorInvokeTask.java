@@ -29,7 +29,7 @@ import org.apache.tools.ant.BuildException;
 /**
  * Access <em>JMX</em> JSR 160 MBeans Server.
  * <ul>
- * <li>open more then one JSR 160 rmi connection</li>
+ * <li>open more than one JSR 160 rmi connection</li>
  * <li>Get/Set Mbeans attributes</li>
  * <li>Call Mbean Operation with arguments</li>
  * <li>Argument values can be converted from string to int,long,float,double,boolean,ObjectName or InetAddress</li>
