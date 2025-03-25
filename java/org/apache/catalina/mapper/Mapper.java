@@ -846,7 +846,7 @@ public final class Mapper {
                 if (buf[pathEnd - 1] == '/') {
                     /*
                      * Path ending in '/' was mapped to JSP servlet based on wildcard match (e.g., as specified in
-                     * url-pattern of a jsp-property-group. Force the context's welcome files, which are interpreted as
+                     * url-pattern of a jsp-property-group). Force the context's welcome files, which are interpreted as
                      * JSP files (since they match the url-pattern), to be considered. See Bugzilla 27664.
                      */
                     mappingData.wrapper = null;
@@ -922,7 +922,7 @@ public final class Mapper {
         }
 
         /*
-         * welcome file processing - take 2 Now that we have looked for welcome files with a physical backing, now look
+         * Welcome file processing - take 2. Now that we have looked for welcome files with a physical backing, now look
          * for an extension mapping listed but may not have a physical backing to it. This is for the case of index.jsf,
          * index.do, etc. A watered down version of rule 4
          */

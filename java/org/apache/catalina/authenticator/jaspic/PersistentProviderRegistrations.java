@@ -244,7 +244,7 @@ public final class PersistentProviderRegistrations {
         /**
          * Used by IntrospectionUtils via reflection.
          *
-         * @param name  - the name of of the property to set on this object
+         * @param name  - the name of the property to set on this object
          * @param value - the value to set
          *
          * @see #addProperty(String, String)

@@ -2790,21 +2790,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         @Override
         public String toString() {
-
-            StringBuilder result = new StringBuilder("Type:");
-            result.append(type);
-            result.append("\nScope:");
-            result.append(scope);
-            result.append("\nDepth:");
-            result.append(depth);
-            result.append("\nOwner:");
-            result.append(owner);
-            result.append("\nExpiration:");
-            result.append(FastHttpDateFormat.formatDate(expiresAt));
-            result.append("\nToken:");
-            result.append(token);
-            result.append("\n");
-            return result.toString();
+            return "Type:" + type + "\nScope:" + scope + "\nDepth:" + String.valueOf(depth) + "\nOwner:" + owner +
+                    "\nExpiration:" + FastHttpDateFormat.formatDate(expiresAt) + "\nToken:" + token + "\n";
         }
 
 

@@ -101,7 +101,6 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
      * @return null (no error message to report other than exception)
      */
     protected String jmxQuery(MBeanServerConnection jmxServerConnection, String qry) {
-        String isError = null;
         Set<ObjectName> names;
         String resultproperty = getResultproperty();
         try {
@@ -128,7 +127,7 @@ public class JMXAccessorQueryTask extends JMXAccessorTask {
                 }
             }
         }
-        return isError;
+        return null;
     }
 
     protected void bindAttributes(MBeanServerConnection jmxServerConnection, String pname, ObjectName oname) {

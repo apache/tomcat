@@ -606,7 +606,7 @@ public class StandardHost extends ContainerBase implements Host {
 
 
     /**
-     * Used to ensure the regardless of {@link Context} implementation, a record is kept of the class loader used every
+     * Used to ensure that regardless of {@link Context} implementation, a record is kept of the class loader used every
      * time a context starts.
      */
     private class MemoryLeakTrackingListener implements LifecycleListener {

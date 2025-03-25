@@ -1147,7 +1147,7 @@ public class JNDIRealm extends RealmBase {
 
             try {
 
-                // Occasionally the directory context will timeout. Try one more
+                // Occasionally the directory context will time out. Try one more
                 // time before giving up.
 
                 // Authenticate the specified username if possible
@@ -1156,7 +1156,7 @@ public class JNDIRealm extends RealmBase {
             } catch (NullPointerException | NamingException e) {
                 /*
                  * BZ 61313 NamingException may or may not indicate an error that is recoverable via fail over.
-                 * Therefore a decision needs to be made whether to fail over or not. Generally, attempting to fail over
+                 * Therefore, a decision needs to be made whether to fail over or not. Generally, attempting to fail over
                  * when it is not appropriate is better than not failing over when it is appropriate so the code always
                  * attempts to fail over for NamingExceptions.
                  */
@@ -1262,9 +1262,9 @@ public class JNDIRealm extends RealmBase {
                             // Log the problem for posterity
                             containerLog.warn(sm.getString("jndiRealm.exception"), ine);
                             // ignore; this is probably due to a name not fitting
-                            // the search path format exactly, as in a fully-
-                            // qualified name being munged into a search path
-                            // that already contains cn= or vice-versa
+                            // the search path format exactly, as in a fully-qualified
+                            // name being munged into a search path
+                            // that already contains cn= or vice versa
                         }
                     }
                 }
@@ -1743,7 +1743,7 @@ public class JNDIRealm extends RealmBase {
     /**
      * Check whether the given User can be authenticated with the given credentials. If the <code>userPassword</code>
      * configuration attribute is specified, the credentials previously retrieved from the directory are compared
-     * explicitly with those presented by the user. Otherwise the presented credentials are checked by binding to the
+     * explicitly with those presented by the user. Otherwise, the presented credentials are checked by binding to the
      * directory as the user.
      *
      * @param context     The directory context
@@ -2267,7 +2267,7 @@ public class JNDIRealm extends RealmBase {
             // Ensure that we have a directory context available
             connection = get();
 
-            // Occasionally the directory context will timeout. Try one more
+            // Occasionally the directory context will time out. Try one more
             // time before giving up.
             try {
                 user = getUser(connection, username, null);
@@ -2339,7 +2339,7 @@ public class JNDIRealm extends RealmBase {
             // Ensure that we have a directory context available
             connection = get();
 
-            // Occasionally the directory context will timeout. Try one more
+            // Occasionally the directory context will time out. Try one more
             // time before giving up.
             try {
 

@@ -409,7 +409,7 @@ public class CorsFilter extends GenericFilter {
 
         if ("OPTIONS".equals(method)) {
             // For an OPTIONS request, the response will vary based on the
-            // value or absence of the following headers. Hence they need be be
+            // value or absence of the following headers. Hence, they need to be
             // included in the Vary header.
             ResponseUtil.addVaryFieldName(response, REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
             ResponseUtil.addVaryFieldName(response, REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);

@@ -46,11 +46,11 @@ import org.apache.tools.ant.BuildException;
  *   &lt;/jmxCreate/&gt;
  * </pre>
  * <p>
- * <b>WARNING</b>Not all Tomcat MBeans can create remotely and autoregister by its parents! Please, use the MBeanFactory
+ * <b>WARNING</b>Not all Tomcat MBeans can create remotely and auto register by its parents! Please, use the MBeanFactory
  * operation to generate valves and realms.
  * </p>
  * <p>
- * First call to a remote MBeanserver save the JMXConnection a reference <em>jmx.server</em>
+ * First call to a remote MBean server save the JMXConnection a reference <em>jmx.server</em>
  * </p>
  * These tasks require Ant 1.6 or later interface.
  *
@@ -137,8 +137,8 @@ public class JMXAccessorCreateTask extends JMXAccessorTask {
      * @throws Exception Error creating MBean
      */
     protected void jmxCreate(MBeanServerConnection jmxServerConnection, String name) throws Exception {
-        Object argsA[] = null;
-        String sigA[] = null;
+        Object[] argsA = null;
+        String[] sigA = null;
         if (args != null) {
             argsA = new Object[args.size()];
             sigA = new String[args.size()];

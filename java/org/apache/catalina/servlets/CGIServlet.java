@@ -1415,7 +1415,7 @@ public final class CGIServlet extends HttpServlet {
          *
          * @exception IOException if problems during reading/writing occur
          *
-         * @see java.lang.Runtime#exec(String command, String[] envp, File dir)
+         * @see java.lang.Runtime#exec(String[] command, String[] envp, File dir)
          */
         protected void run() throws IOException {
 
