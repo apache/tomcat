@@ -16,8 +16,11 @@
  */
 package jakarta.transaction;
 
+import java.io.Serial;
+
 public class SystemException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 8615483418828223571L;
 
     public int errorCode;
