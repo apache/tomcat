@@ -141,6 +141,12 @@
         processing the request as if the GET method had been used is unchanged.
         (markt)
       </add>
+      <fix>
+        <bug>69623</bug>: Correct a long standing regression that meant that
+        calls to <code>ClassLoader.getResource().getContent()</code> failed when
+        made from within a web application with resource caching enabled.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
