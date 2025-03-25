@@ -32,7 +32,6 @@ import java.security.cert.Certificate;
 import java.text.Collator;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.Objects;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -596,7 +595,7 @@ public class CachedResource implements WebResource {
         @Override
         public String getContentType() {
             // "content/unknown" is the value used by sun.net.www.URLConnection. It is used here for consistency.
-            return Objects.requireNonNullElse(getResource().getMimeType(), "content/unknown");
+            return (getResource().getMimeType() != null) ? getResource().getMimeType() : "content/unknown";
         }
     }
 
