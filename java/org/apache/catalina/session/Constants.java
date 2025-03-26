@@ -18,7 +18,6 @@ package org.apache.catalina.session;
 
 import java.util.Set;
 
-import org.apache.catalina.Globals;
 import org.apache.catalina.valves.CrawlerSessionManagerValve;
 
 /**
@@ -26,14 +25,11 @@ import org.apache.catalina.valves.CrawlerSessionManagerValve;
  *
  * @author Craig R. McClanahan
  */
-
 public class Constants {
 
     /**
      * Set of session attribute names used internally by Tomcat that should always be removed from the session before it
      * is persisted, replicated or equivalent.
      */
-    public static final Set<String> excludedAttributeNames =
-            Set.of(Globals.SUBJECT_ATTR, CrawlerSessionManagerValve.class.getName());
-
+    public static final Set<String> excludedAttributeNames = Set.of(CrawlerSessionManagerValve.class.getName());
 }
