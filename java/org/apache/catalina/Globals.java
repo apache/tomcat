@@ -149,7 +149,10 @@ public final class Globals {
 
     /**
      * The subject under which the AccessControlContext is running.
+     *
+     * @deprecated Will be removed from Tomcat 11 onwards.
      */
+    @Deprecated
     public static final String SUBJECT_ATTR = "javax.security.auth.subject";
 
 
