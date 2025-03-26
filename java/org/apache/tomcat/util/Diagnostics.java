@@ -273,7 +273,7 @@ public class Diagnostics {
      * @return the formatted thread dump header
      */
     private static String getThreadDumpHeader(ThreadInfo ti) {
-        StringBuilder sb = new StringBuilder("\"" + ti.getThreadName() + "\"");
+        StringBuilder sb = new StringBuilder("\"").append(ti.getThreadName()).append("\"");
         sb.append(" Id=").append(ti.getThreadId());
         sb.append(" cpu=").append(threadMXBean.getThreadCpuTime(ti.getThreadId())).append(" ns");
         sb.append(" usr=").append(threadMXBean.getThreadUserTime(ti.getThreadId())).append(" ns");
@@ -287,7 +287,7 @@ public class Diagnostics {
             sb.append(" (running in native)");
         }
         sb.append(CRLF);
-        sb.append(INDENT3 + "java.lang.Thread.State: ").append(ti.getThreadState());
+        sb.append(INDENT3).append("java.lang.Thread.State: ").append(ti.getThreadState());
         sb.append(CRLF);
         return sb.toString();
     }
