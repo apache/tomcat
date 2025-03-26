@@ -33,6 +33,7 @@ public class Constants {
      * Set of session attribute names used internally by Tomcat that should always be removed from the session before it
      * is persisted, replicated or equivalent.
      */
+    @SuppressWarnings("deprecation")
     public static final Set<String> excludedAttributeNames =
             Set.of(Globals.SUBJECT_ATTR, CrawlerSessionManagerValve.class.getName());
 

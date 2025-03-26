@@ -1791,6 +1791,7 @@ public class Request implements HttpServletRequest {
      *
      * @param principal The user Principal
      */
+    @SuppressWarnings("deprecation")
     public void setUserPrincipal(final Principal principal) {
         if (Globals.IS_SECURITY_ENABLED && principal != null) {
             if (subject == null) {
