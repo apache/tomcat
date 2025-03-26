@@ -47,11 +47,6 @@ public class RewriteRule {
             positive = false;
             patternString = patternString.substring(1);
         }
-        int flags = Pattern.DOTALL;
-        if (isNocase()) {
-            flags |= Pattern.CASE_INSENSITIVE;
-        }
-        Pattern.compile(patternString, flags);
         // Parse conditions
         for (RewriteCond condition : conditions) {
             condition.parse(maps);
