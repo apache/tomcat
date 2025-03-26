@@ -200,6 +200,11 @@
         Documentation. Add a link to the Log4j documentation that describes how
         to use Log4j rather than JULI for Tomcat's internal logging. (markt)
       </add>
+      <add>
+        Documentation. Document the runtime attributes available to web
+        applications via the Request or the ServletContext. Based on pull
+        request <pr>832</pr> by usmazat. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">

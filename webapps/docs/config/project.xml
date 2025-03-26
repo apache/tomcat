@@ -89,6 +89,7 @@
     </menu>
 
     <menu name="Other">
+        <item name="Runtime attributes"    href="runtime-attributes.html"/>
         <item name="System properties"     href="systemprops.html"/>
         <item name="JASPIC"                href="jaspic.html"/>
     </menu>
