@@ -184,6 +184,11 @@
         Replace custom URL encoding provided by the JSP runtime library with
         calls to <code>java.net.URLEncoder.encode()</code>. (markt)
       </scode>
+      <add>
+        Add compiler using the <code>Java Compiler</code> API, supporting
+        exploded web applications. The <code>compilerClassName</code> to use is
+        <code>org.apache.jasper.compiler.JavaCompiler</code>. (remm)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">

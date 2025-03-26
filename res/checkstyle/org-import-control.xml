@@ -105,6 +105,7 @@
   <subpackage name="jasper">
     <allow pkg="javax.el"/>
     <allow pkg="javax.servlet"/>
+    <allow pkg="javax.tools"/>
     <allow pkg="org.apache.el"/>
     <allow pkg="org.apache.jasper"/>
     <allow pkg="org.apache.juli"/>
