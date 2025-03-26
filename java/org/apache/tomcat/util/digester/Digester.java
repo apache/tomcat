@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -2037,7 +2038,7 @@ public class Digester extends DefaultHandler2 {
             return bodyText; // return unchanged data
         }
 
-        if (out == in) {
+        if (Objects.equals(out, in)) {
             // No substitutions required. Don't waste memory creating
             // a new buffer
             return bodyText;

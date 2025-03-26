@@ -19,6 +19,7 @@ package org.apache.catalina.realm;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Objects;
 import java.util.Random;
 
 import org.apache.catalina.CredentialHandler;
@@ -288,7 +289,7 @@ public abstract class DigestCredentialHandlerBase implements CredentialHandler {
      * @return <code>true</code> if the strings are equal to each other, <code>false</code> otherwise.
      */
     public static boolean equals(final String s1, final String s2, final boolean ignoreCase) {
-        if (s1 == s2) {
+        if (Objects.equals(s1, s2)) {
             return true;
         }
         if (s1 == null || s2 == null) {

@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLEngine;
@@ -503,7 +504,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             }
             // Check if the ciphers have been changed from the defaults
-            if (maxTlsVersion >= TLS1_3_VERSION() && (sslHostConfig.getCiphers() != SSLHostConfig.DEFAULT_TLS_CIPHERS)) {
+            if (maxTlsVersion >= TLS1_3_VERSION() && (!Objects.equals(sslHostConfig.getCiphers(), SSLHostConfig.DEFAULT_TLS_CIPHERS))) {
                 if (SSL_CTX_set_ciphersuites(state.sslCtx,
                         localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
                     log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
