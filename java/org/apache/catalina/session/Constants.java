@@ -29,6 +29,7 @@ import org.apache.catalina.valves.CrawlerSessionManagerValve;
  * @author Craig R. McClanahan
  */
 
+@SuppressWarnings("deprecation")
 public class Constants {
 
     /**

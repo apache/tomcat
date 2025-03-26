@@ -213,6 +213,7 @@ public final class SecurityUtil {
      *
      * @throws Exception an execution error occurred
      */
+    @SuppressWarnings("deprecation")
     private static void execute(final Method method, final Object targetObject, final Object[] targetArguments,
             Principal principal) throws Exception {
 
