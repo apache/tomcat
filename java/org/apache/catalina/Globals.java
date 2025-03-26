@@ -145,17 +145,6 @@ public final class Globals {
     public static final String SSL_SESSION_MGR_ATTR = "jakarta.servlet.request.ssl_session_mgr";
 
 
-    // ------------------------------------------------- Session attribute names
-
-    /**
-     * The subject under which the AccessControlContext is running.
-     *
-     * @deprecated Will be removed from Tomcat 11 onwards.
-     */
-    @Deprecated
-    public static final String SUBJECT_ATTR = "javax.security.auth.subject";
-
-
     // ------------------------------------------ ServletContext attribute names
 
     /**
