@@ -273,7 +273,8 @@ public class Diagnostics {
      * @return the formatted thread dump header
      */
     private static String getThreadDumpHeader(ThreadInfo ti) {
-        StringBuilder sb = new StringBuilder("\"" + ti.getThreadName() + "\"");
+        StringBuilder sb = new StringBuilder();
+        sb.append("\"").append(ti.getThreadName()).append("\"");
         sb.append(" Id=").append(ti.getThreadId());
         sb.append(" cpu=").append(threadMXBean.getThreadCpuTime(ti.getThreadId())).append(" ns");
         sb.append(" usr=").append(threadMXBean.getThreadUserTime(ti.getThreadId())).append(" ns");
@@ -362,11 +363,7 @@ public class Diagnostics {
             ThreadInfo[] tinfos = threadMXBean.getThreadInfo(threadMXBean.findDeadlockedThreads(),
                                                 true, true);
             if (tinfos != null) {
-                StringBuilder sb =
-                    new StringBuilder(sm.getString("diagnostics.deadlockFound"));
-                sb.append(CRLF);
-                sb.append(getThreadDump(tinfos));
-                return sb.toString();
+                return sm.getString("diagnostics.deadlockFound") + CRLF + getThreadDump(tinfos);
             }
         }
         return "";
