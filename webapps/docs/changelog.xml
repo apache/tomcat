@@ -177,27 +177,6 @@
       </add>
     </changelog>
   </subsection>
-  <subsection name="Other">
-    <changelog>
-      <update>
-        Update to NSIS 3.11. (markt)
-      </update>
-    </changelog>
-  </subsection>
-</section>
-<section name="Tomcat 10.1.39 (schultz)" rtext="2025-03-07">
-</section>
-<section name="Tomcat 10.1.38 (schultz)" rtext="not released">
-  <subsection name="Catalina">
-    <changelog>
-      <fix>
-        <bug>69602</bug>: Fix regression in releases from 12-2024 that were too
-        strict and rejected weak etags in the <code>If-Range</code> header with
-        a 400 response. Instead will consider it as a failed match since strong
-        etags are required for <code>If-Range</code>. (remm)
-      </fix>
-    </changelog>
-  </subsection>
   <subsection name="Jasper">
     <changelog>
       <scode>
@@ -244,6 +223,23 @@
       <update>
         Revert JSign to 6.0 to avoid a file locking issue. (markt)
       </update>
+      <update>
+        Update to NSIS 3.11. (markt)
+      </update>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 10.1.39 (schultz)" rtext="2025-03-07">
+</section>
+<section name="Tomcat 10.1.38 (schultz)" rtext="not released">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>69602</bug>: Fix regression in releases from 12-2024 that were too
+        strict and rejected weak etags in the <code>If-Range</code> header with
+        a 400 response. Instead will consider it as a failed match since strong
+        etags are required for <code>If-Range</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
