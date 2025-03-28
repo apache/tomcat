@@ -2131,7 +2131,7 @@ public abstract class Node implements TagConstants {
         /**
          * Only makes sense if namedAttribute is false.
          *
-         * @return the value for the attribute, or the expression string (stripped of "<%=", "%>", "%=", or "%" but
+         * @return the value for the attribute, or the expression string (stripped of "&lt;%=", "%>", "%=", or "%" but
          *             containing "${" and "}" for EL expressions)
          */
         public String getValue() {
