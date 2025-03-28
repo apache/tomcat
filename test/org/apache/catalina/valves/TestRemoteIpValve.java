@@ -1195,6 +1195,26 @@ public class TestRemoteIpValve {
         doTestPattern(internalProxiesPattern, "100.127.255.255", true);
         doTestPattern(internalProxiesPattern, "100.128.0.0", false);
         doTestPattern(internalProxiesPattern, "100.130.0.0", false);
+        // Bug 69600 - IPv6 RFC 4193 Unique Local IPv6 Unicast Addresses
+        doTestPattern(internalProxiesPattern, "fe79:ffff:ffff:ffff:ffff:ffff:ffff:ffff", false);
+        doTestPattern(internalProxiesPattern, "fe80:0000:0000:0000:0000:0000:0000:0000", true);
+        doTestPattern(internalProxiesPattern, "fe80::", true);
+        doTestPattern(internalProxiesPattern, "fe80:0000:0000:0000:0000:0000:0000:0001", true);
+        doTestPattern(internalProxiesPattern, "fe80::1", true);
+        doTestPattern(internalProxiesPattern, "fe80:1234:5678:9abc:def0:1234:5678:9abc", true);
+        doTestPattern(internalProxiesPattern, "febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff", true);
+        doTestPattern(internalProxiesPattern, "fec0:0000:0000:0000:0000:0000:0000:0000", false);
+        doTestPattern(internalProxiesPattern, "fec0::", false);
+        // Bug 69600 - IPv6 RFC 4291 Link Local IPv6 Unicast Addresses
+        doTestPattern(internalProxiesPattern, "fbff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", false);
+        doTestPattern(internalProxiesPattern, "fc00:0000:0000:0000:0000:0000:0000:0000", true);
+        doTestPattern(internalProxiesPattern, "fc00::", true);
+        doTestPattern(internalProxiesPattern, "fc00:0000:0000:0000:0000:0000:0000:0001", true);
+        doTestPattern(internalProxiesPattern, "fc00::1", true);
+        doTestPattern(internalProxiesPattern, "fc00:1234:5678:9abc:def0:1234:5678:9abc", true);
+        doTestPattern(internalProxiesPattern, "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", true);
+        doTestPattern(internalProxiesPattern, "fe00:0000:0000:0000:0000:0000:0000:0000", false);
+        doTestPattern(internalProxiesPattern, "fe00::", false);
     }
 
     private void doTestPattern(Pattern pattern, String input, boolean expectedMatch) {
