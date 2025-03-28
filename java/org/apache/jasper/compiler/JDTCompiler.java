@@ -339,6 +339,11 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 // Java 8.
                 // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_Source, "24");
+            } else if (opt.equals("25")) {
+                // Constant not available in latest ECJ version shipped with
+                // Tomcat. May be supported in a snapshot build.
+                // This is checked against the actual version below.
+                settings.put(CompilerOptions.OPTION_Source, "25");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.sourceVM", opt));
                 settings.put(CompilerOptions.OPTION_Source, CompilerOptions.VERSION_1_8);
@@ -445,6 +450,12 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                 // This is checked against the actual version below.
                 settings.put(CompilerOptions.OPTION_TargetPlatform, "24");
                 settings.put(CompilerOptions.OPTION_Compliance, "24");
+            } else if (opt.equals("25")) {
+                // Constant not available in latest ECJ version shipped with
+                // Tomcat. May be supported in a snapshot build.
+                // This is checked against the actual version below.
+                settings.put(CompilerOptions.OPTION_TargetPlatform, "25");
+                settings.put(CompilerOptions.OPTION_Compliance, "25");
             } else {
                 log.warn(Localizer.getMessage("jsp.warning.unknown.targetVM", opt));
                 settings.put(CompilerOptions.OPTION_TargetPlatform, CompilerOptions.VERSION_1_8);
