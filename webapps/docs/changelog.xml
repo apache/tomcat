@@ -294,6 +294,9 @@
       <update>
         Revert JSign to 6.0 to avoid a file locking issue. (markt)
       </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.35. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
