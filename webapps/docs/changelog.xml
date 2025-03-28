@@ -229,6 +229,9 @@
       <update>
         Update to ByteBuddy 1.17.4. (markt)
       </update>
+      <update>
+        Update to Checkstyle 10.21.4. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
