@@ -177,6 +177,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update to NSIS 3.11. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.102 (remm)" rtext="2025-03-06">
   <subsection name="Catalina">
