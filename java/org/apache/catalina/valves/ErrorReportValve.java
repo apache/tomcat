@@ -360,7 +360,7 @@ public class ErrorReportValve extends ValveBase {
         int pos = elements.length;
         for (int i = elements.length - 1; i >= 0; i--) {
             if ((elements[i].getClassName().startsWith("org.apache.catalina.core.ApplicationFilterChain")) &&
-                    (elements[i].getMethodName().equals("internalDoFilter"))) {
+                    (elements[i].getMethodName().equals("doFilter"))) {
                 pos = i;
                 break;
             }

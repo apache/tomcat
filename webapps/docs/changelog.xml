@@ -211,6 +211,10 @@
         <code>JsonErrorReportValve</code> equivalent to the one from
         <code>ErrorReportValve</code>. (remm)
       </fix>
+      <fix>
+        Fix stack trace trimming in <code>ErrorReportValve</code> after removal
+        of the security manager support. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
