@@ -74,9 +74,12 @@ public class JsonErrorReportValve extends ErrorReportValve {
         if (message == null && throwable != null) {
             message = throwable.getMessage();
         }
+        if (message == null) {
+            message = "";
+        }
         String description = smClient.getString("http." + statusCode + ".desc");
         if (description == null) {
-            if (message == null || message.isEmpty()) {
+            if (message.isEmpty()) {
                 return;
             } else {
                 description = smClient.getString("errorReportValve.noDescription");
