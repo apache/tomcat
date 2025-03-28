@@ -147,6 +147,11 @@
         made from within a web application with resource caching enabled.
         (markt)
       </fix>
+      <fix>
+        <bug>69600</bug>: Add IPv6 local addresses (RFC 4193 and RFC 4291) to
+        the default internal proxies for the RemoteIpFilter and RemoteIpValve.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
