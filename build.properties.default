@@ -138,15 +138,15 @@ base-maven.loc=https://repo.maven.apache.org/maven2
 # ----- Eclipse JDT, version 4.7 or later -----#
 # See https://cwiki.apache.org/confluence/display/TOMCAT/Managing+Tomcat%27s+Dependency+on+the+Eclipse+JDT+Core+Batch+Compiler
 #
-# Checksum is from "SHA512 Checksums for 4.34" link at
-# https://download.eclipse.org/eclipse/downloads/drops4/R-4.34-202411201800/
-# https://download.eclipse.org/eclipse/downloads/drops4/R-4.34-202411201800/checksum/eclipse-4.34-SUMSSHA512
+# Checksum is from "SHA512 Checksums for 4.35" link at
+# https://download.eclipse.org/eclipse/downloads/drops4/R-4.35-202502280140/
+# https://download.eclipse.org/eclipse/downloads/drops4/R-4.35-202502280140/checksum/eclipse-4.35-SUMSSHA512
 #
-jdt.version=4.34
-jdt.release=R-4.34-202411201800
+jdt.version=4.35
+jdt.release=R-4.35-202502280140
 jdt.checksum.enabled=true
 jdt.checksum.algorithm=SHA-512
-jdt.checksum.value=096c8063097f4aae0ce678200884c70e92773f748a852a20c92d808425ef8fe8d7bd57a5b4ce868a3ec1c71abeaaf92a92871e62e53041d48fc7e86483ecd8ee
+jdt.checksum.value=f79cadd22cc0b2c9ce8d7cd168280b98835caa24dd6b8c14aab06ce67fe2048c161c6f4b38df686783e64aeb4953cbb0886fea6e3abffad99aa62f1aa80e6d40
 jdt.home=${base.path}/ecj-${jdt.version}
 jdt.jar=${jdt.home}/ecj-${jdt.version}.jar
 # The download will be moved to the archive area eventually. We are taking care of that in advance.
