@@ -156,6 +156,11 @@
         <bug>69634</bug>: Avoid NPE on <code>JsonErrorReportValve</code>.
         (remm)
       </fix>
+      <fix>
+        Add missing <code>throwable</code> stack trace to
+        <code>JsonErrorReportValve</code> equivalent to the one from
+        <code>ErrorReportValve</code>. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
