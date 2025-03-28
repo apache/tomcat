@@ -226,6 +226,9 @@
       <update>
         Update to NSIS 3.11. (markt)
       </update>
+      <update>
+        Update to ByteBuddy 1.17.4. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
