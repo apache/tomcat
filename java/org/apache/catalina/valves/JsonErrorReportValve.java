@@ -83,6 +83,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("{\n  \"type\": \"").append(JSONFilter.escape(type)).append("\",\n");
+        sb.append("  \"status\": ").append(statusCode).append(",\n");
         sb.append("  \"message\": \"").append(JSONFilter.escape(message)).append("\",\n");
         sb.append("  \"description\": \"").append(JSONFilter.escape(description));
 
