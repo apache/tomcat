@@ -50,6 +50,8 @@ import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
+import org.eclipse.jdt.internal.compiler.lookup.LookupEnvironment;
+import org.eclipse.jdt.internal.compiler.lookup.ModuleBinding;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 
 /**
@@ -139,6 +141,16 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             @Override
             public boolean ignoreOptionalProblems() {
                 return false;
+            }
+
+            @Override
+            public ModuleBinding module(LookupEnvironment environment) {
+                return environment.getModule(ModuleBinding.UNNAMED);
+            }
+
+            @Override
+            public char[] getModuleName() {
+                return ModuleBinding.UNNAMED;
             }
         }
 
