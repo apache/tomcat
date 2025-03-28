@@ -202,6 +202,13 @@
         exploded web applications. The <code>compilerClassName</code> to use is
         <code>org.apache.jasper.compiler.JavaCompiler</code>. (remm)
       </add>
+      <add>
+        Add support for specifying Java 25 (with the value <code>25</code>) as
+        the compiler source and/or compiler target for JSP compilation. If used
+        with an Eclipse JDT compiler version that does not support these values,
+        a warning will be logged and the default will used.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
