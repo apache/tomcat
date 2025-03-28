@@ -158,6 +158,10 @@
         made from within a web application with resource caching enabled.
         (markt)
       </fix>
+      <fix>
+        <bug>69634</bug>: Avoid NPE on <code>JsonErrorReportValve</code>.
+        (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
