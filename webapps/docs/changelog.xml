@@ -168,6 +168,10 @@
       <fix>
         Improve handling of unexpected errors during HTTP/2 processing. (markt)
       </fix>
+      <add>
+        Simplify the process of using a custom SSLContext for an HTTPS enabled
+        connector. Based on pull request <pr>805</pr> by Hakky54. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
