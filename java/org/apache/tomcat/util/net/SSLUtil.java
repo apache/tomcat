@@ -21,6 +21,8 @@ import java.util.List;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
 
 /**
  * Provides a common interface for {@link SSLImplementation}s to create the
@@ -28,6 +30,22 @@ import javax.net.ssl.TrustManager;
  * JSSE API.
  */
 public interface SSLUtil {
+
+    /**
+     * Creates an instance of Tomcat's {@code SSLContext} from the provided inputs. Typically used when the user wants
+     * to provide a pre-configured {@code javax.net.ssl.SSLContext} instance. There is no need to call
+     * {@link SSLContext#init(KeyManager[], TrustManager[], java.security.SecureRandom)} on the returned value.
+     *
+     * @param sslContext   The JSSE SSL context
+     * @param keyManager   The JSSE key manager
+     * @param trustManager The JSSE trust manager
+     *
+     * @return An instance of Tomcat's {@code SSLContext} formed from the provided inputs.
+     */
+    static SSLContext createSSLContext(javax.net.ssl.SSLContext sslContext, X509KeyManager keyManager,
+            X509TrustManager trustManager) {
+        return new SSLContextWrapper(sslContext, keyManager, trustManager);
+    }
 
     SSLContext createSSLContext(List<String> negotiableProtocols) throws Exception;
 

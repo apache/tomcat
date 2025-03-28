@@ -166,6 +166,10 @@
         Add missing code to process an OpenSSL profile, such as
         <code>PROFILE=SYSTEM</code>, using FFM. (remm)
       </fix>
+      <add>
+        Simplify the process of using a custom SSLContext for an HTTPS enabled
+        connector. Based on pull request <pr>805</pr> by Hakky54. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
