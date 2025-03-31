@@ -552,7 +552,7 @@ public class RewriteValve extends ValveBase {
                         // This is decoded and normalized
                         chunk.append(request.getServletContext().getContextPath());
                     }
-                    chunk.append(URLDecoder.decode(urlStringRewriteEncoded, uriCharset));
+                    chunk.append(URLDecoder.decode(urlStringRewriteEncoded, uriCharset.name()));
                     // Set the new Query if there is one
                     if (queryStringRewriteEncoded != null) {
                         request.getCoyoteRequest().queryString().setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
