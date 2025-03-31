@@ -202,4 +202,19 @@ public class TestWebappClassLoader extends TomcatBaseTest {
         URL u2 = cl.getResource("jaspic-test-01.xml");
         Assert.assertNotNull(u2);
     }
+
+
+    @Test
+    public void testResourceNameEmptyString() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        getProgrammaticRootContext();
+        tomcat.start();
+
+        // Add an external resource to the web application
+        WebappClassLoaderBase cl =
+                (WebappClassLoaderBase) ((Context) tomcat.getHost().findChildren()[0]).getLoader().getClassLoader();
+
+        URL u1 = cl.getResource("");
+        Assert.assertNotNull(u1);
+    }
 }
