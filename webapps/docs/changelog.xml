@@ -341,6 +341,12 @@
       <update>
         Update to JSign to 7.1. (markt)
       </update>
+      <update>
+        Improvements to French translations. (remm)
+      </update>
+      <update>
+        Improvements to Japanese translations provided by tak7iji. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
