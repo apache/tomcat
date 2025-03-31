@@ -265,6 +265,9 @@
       <update>
         Update to JSign to 7.1. (markt)
       </update>
+      <update>
+        Improvements to French translations. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
