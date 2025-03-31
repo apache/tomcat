@@ -220,6 +220,10 @@
         RewriteValve and document how <code>%nn</code> URL encoding may be used
         with rewrite rules. (markt)
       </fix>
+      <fix>
+        Fix a potential NPE when calling
+        <code>WebappClassLoaderBase.findResource(null)</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

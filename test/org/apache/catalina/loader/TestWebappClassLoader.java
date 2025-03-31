@@ -187,4 +187,27 @@ public class TestWebappClassLoader extends TomcatBaseTest {
         URL u2 = cl.getResource("/org/apache/tomcat/Bug58096.java");
         Assert.assertNull(u2);
     }
+
+
+    @Test
+    public void testFindResourceNull() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        WebappClassLoaderBase cl = (WebappClassLoaderBase) ((Context) tomcat.getHost().findChildren()[0]).getLoader().getClassLoader();
+
+        URL u1 = cl.findResource(null);
+        Assert.assertNull(u1);
+    }
+
+
+    @Test
+    public void testFindResourceEmptyString() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        Context c = (Context) tomcat.getHost().findChildren()[0];
+        WebappClassLoaderBase cl = (WebappClassLoaderBase) c.getLoader().getClassLoader();
+
+        URL u1 = cl.findResource("");
+        Assert.assertNotNull(u1);
+    }
 }

@@ -712,7 +712,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         URL url = null;
 
-        if (name.startsWith("/")) {
+        if (name == null || name.startsWith("/")) {
             return null;
         }
 
@@ -768,7 +768,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
 
         LinkedHashSet<URL> result = new LinkedHashSet<>();
 
-        if (name.startsWith("/")) {
+        if (name == null || name.startsWith("/")) {
             return null;
         }
 
