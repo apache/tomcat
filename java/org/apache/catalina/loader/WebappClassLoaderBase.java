@@ -911,7 +911,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
             }
 
             // Skip caching results for invalid names (it might mask lookups for valid ones)
-            if (url == null && name.charAt(0) != '/') {
+            if (url == null && !name.isEmpty() && name.charAt(0) != '/') {
                 notFoundClassResources.add(path);
             }
         }
@@ -1123,7 +1123,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 return stream;
             }
             // Skip caching results for invalid names (it might mask lookups for valid ones)
-            if (name.charAt(0) != '/') {
+            if (!name.isEmpty() && name.charAt(0) != '/') {
                 notFoundClassResources.add(path);
             }
         }

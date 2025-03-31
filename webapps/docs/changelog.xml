@@ -166,6 +166,10 @@
         RewriteValve and document how <code>%nn</code> URL encoding may be used
         with rewrite rules. (markt)
       </fix>
+      <fix>
+        Fix a potential exception when calling
+        <code>WebappClassLoaderBase.getResource("")</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
