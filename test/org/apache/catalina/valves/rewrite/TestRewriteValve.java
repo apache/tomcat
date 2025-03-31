@@ -1011,7 +1011,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         String body = res.toString();
         Assert.assertTrue(body, body.contains("REQUEST-URI: /target/" + expectedSegment));
         Assert.assertTrue(body, body.contains("PATH-INFO: /" +
-                URLDecoder.decode(expectedSegment, StandardCharsets.UTF_8)));
+                URLDecoder.decode(expectedSegment, "UTF-8")));
         Assert.assertTrue(body, body.contains("REQUEST-QUERY-STRING: " + expectedQueryString));
     }
 }
