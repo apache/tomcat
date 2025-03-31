@@ -157,7 +157,7 @@ public class SimpleTagSupport implements SimpleTag {
      *
      * @return the nearest ancestor that implements the interface or is an instance of the class specified
      */
-    public static JspTag findAncestorWithClass(JspTag from, Class<?> klass) {
+    public static final JspTag findAncestorWithClass(JspTag from, Class<?> klass) {
         boolean isInterface = false;
 
         if (from == null || klass == null ||
