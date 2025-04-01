@@ -128,7 +128,7 @@
       attribute will be applied after decoding.
       </p>
       <p>If <code>passthrough</code> is used then it is the application's
-      resposibility to perform any further <code>%nn</code> decoding required.
+      responsibility to perform any further <code>%nn</code> decoding required.
       Any <code>%25</code> sequences (encoded <code>%</code>) in the request
       path with also be processed with the <code>%25</code> sequence unchanged
       to avoid potential corruption and/or decoding failure when the path is
@@ -146,7 +146,7 @@
       sequence will be processed with the <code>%2f</code> sequence unchanged.
       </p>
       <p>If <code>passthrough</code> is used then it is the application's
-      resposibility to perform any further <code>%nn</code> decoding required.
+      responsibility to perform any further <code>%nn</code> decoding required.
       Any <code>%25</code> sequences (encoded <code>%</code>) in the request
       path with also be processed with the <code>%25</code> sequence unchanged
       to avoid potential corruption and/or decoding failure when the path is
