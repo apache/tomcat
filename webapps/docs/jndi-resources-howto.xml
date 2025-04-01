@@ -427,7 +427,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <h5>1. Database schema</h5>
 
-    <p>The database shema for the user database is flexible. It can be the same
+    <p>The database schema for the user database is flexible. It can be the same
     as the schema used for the <code>DataSourceRealm</code>, with only a table
     for users (user name, password), and another one listing the roles
     associated with each user. To support the full <code>UserDatabase</code>
@@ -739,7 +739,7 @@ Transport.send(message);]]></source>
     $CATALINA_HOME/lib location only.
     </p>
 
-    <h5>5.  Install a compatible implementaion</h5>
+    <h5>5.  Install a compatible implementation</h5>
 
     <p>Select and <a href="https://jakarta.ee/specifications/mail/2.1/">
     download a compatible implementation</a>.</p>

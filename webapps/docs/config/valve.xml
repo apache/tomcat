@@ -1451,7 +1451,7 @@
         it appears to be a CORS preflight request; it is mapped to a web
         application that has the <a href="filter.html#CORS_Filter">CORS
         Filter</a> enabled; and the request matches the URLPatterns for the CORS
-        fitler mapper.
+        filter mapper.
         <code>always</code> means that all requests that appear to be CORS
         preflight requests will bypass authentication. If not set, the default
         value is <code>never</code>.</p>
@@ -1619,7 +1619,7 @@
         it appears to be a CORS preflight request; it is mapped to a web
         application that has the <a href="filter.html#CORS_Filter">CORS
         Filter</a> enabled; and the request matches the URLPatterns for the CORS
-        fitler mapper.
+        filter mapper.
         <code>always</code> means that all requests that appear to be CORS
         preflight requests will bypass authentication. If not set, the default
         value is <code>never</code>.</p>
@@ -1802,7 +1802,7 @@
         it appears to be a CORS preflight request; it is mapped to a web
         application that has the <a href="filter.html#CORS_Filter">CORS
         Filter</a> enabled; and the request matches the URLPatterns for the CORS
-        fitler mapper.
+        filter mapper.
         <code>always</code> means that all requests that appear to be CORS
         preflight requests will bypass authentication. If not set, the default
         value is <code>never</code>.</p>
@@ -1951,7 +1951,7 @@
         it appears to be a CORS preflight request; it is mapped to a web
         application that has the <a href="filter.html#CORS_Filter">CORS
         Filter</a> enabled; and the request matches the URLPatterns for the CORS
-        fitler mapper.
+        filter mapper.
         <code>always</code> means that all requests that appear to be CORS
         preflight requests will bypass authentication. If not set, the default
         value is <code>never</code>.</p>
@@ -2067,7 +2067,7 @@
         it appears to be a CORS preflight request and the web application the
         request maps to has the <a href="filter.html#CORS_Filter">CORS
         Filter</a> enabled; and the request matches the URLPatterns for the CORS
-        fitler mapper.
+        filter mapper.
         means that all requests that appear to be CORS preflight requests will
         bypass authentication. If not set, the default value is
         <code>never</code>.</p>
