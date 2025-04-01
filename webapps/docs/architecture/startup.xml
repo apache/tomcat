@@ -56,7 +56,7 @@ waits in the await() method for a shutdown signal. Once a shutdown signal is
 received, the Server object is stopped and then destroyed. The JVM then exits.
 </p>
 <p>
-<a href="startup/2_catalina_init.png">Diagram 2</a> shows how Tomcat initalizes
+<a href="startup/2_catalina_init.png">Diagram 2</a> shows how Tomcat initializes
 the objects created by the Digester in the previous step and when additional key
 objects are created. A Server may have several Services although it typically
 only has one. Each Service may have multiple Connectors. A Connector instance is

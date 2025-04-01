@@ -426,7 +426,7 @@
         <code>passthrough</code>, any <code>%5c</code> sequence in the path used
         to obtain a <code>RequestDispatcher</code> will remain unchanged.</p>
         <p>If <code>passthrough</code> is used then it is the application's
-        resposibility to perform any further <code>%nn</code> decoding required.
+        responsibility to perform any further <code>%nn</code> decoding required.
         Any <code>%25</code> sequences (encoded <code>%</code>) in the path will
         also be processed with the <code>%25</code> sequence unchanged
         to avoid potential corruption and/or decoding failure when the path is
@@ -445,7 +445,7 @@
         sequence in the path used to obtain a <code>RequestDispatcher</code>
         will remain unchanged.</p>
         <p>If <code>passthrough</code> is used then it is the application's
-        resposibility to perform any further <code>%nn</code> decoding required.
+        responsibility to perform any further <code>%nn</code> decoding required.
         Any <code>%25</code> sequences (encoded <code>%</code>) in the path will
         also be processed with the <code>%25</code> sequence unchanged
         to avoid potential corruption and/or decoding failure when the path is
@@ -492,7 +492,7 @@
         <p>If enabled, requests for a web application context root will be
         redirected (adding a trailing slash) if necessary by the Mapper rather
         than the default Servlet. This is more efficient but there are security
-        side effects. First, the existance of a web application or a directory
+        side effects. First, the existence of a web application or a directory
         may be confirmed even though the user does not have access to that
         directory. Secondly, any Valves and/or Filters - including those
         providing security functionality - will not have an opportunity to
@@ -504,7 +504,7 @@
         <p>If enabled, requests for a web application directory will be
         redirected (adding a trailing slash) if necessary by the Mapper rather
         than the default Servlet. This is more efficient but there are security
-        side effects. First, the existance of a web application or a directory
+        side effects. First, the existence of a web application or a directory
         may be confirmed even though the user does not have access to that
         directory. Secondly, any Valves and/or Filters - including those
         providing security functionality - will not have an opportunity to
