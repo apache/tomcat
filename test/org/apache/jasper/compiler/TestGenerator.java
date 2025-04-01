@@ -323,7 +323,7 @@ public class TestGenerator extends TomcatBaseTest {
             }
         }
         if (!removeBlankLines && blankLineCount == 0) {
-            Assert.fail("TrimSpaceOptions.EXTENDED not configured but balnk lines have been removed");
+            Assert.fail("TrimSpaceOptions.EXTENDED not configured but blank lines have been removed");
         } else if (removeBlankLines && blankLineCount > 0) {
             Assert.fail("TrimSpaceOptions.EXTENDED does not allow the line to be just a new line character");
         }
