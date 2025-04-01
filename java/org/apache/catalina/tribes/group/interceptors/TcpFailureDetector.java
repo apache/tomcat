@@ -111,7 +111,7 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
         if (process) {
             super.messageReceived(msg);
         } else if (log.isDebugEnabled()) {
-            log.debug(sm.getString("tcpFailureDetector.recievedPacket", msg));
+            log.debug(sm.getString("tcpFailureDetector.receivedPacket", msg));
         }
     }// messageReceived
 
