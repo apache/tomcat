@@ -455,7 +455,7 @@ public interface RewriteMap {
     <p>Note: You can use more than one parameter. These have to be separated by spaces. Parameters
     can be quoted with &quot;. This enables space characters inside parameters.</p>
 
-    <p>That map instance will be given the the lookup value that is configured in the corresponding <code>RewriteRule</code> by
+    <p>That map instance will be given the lookup value that is configured in the corresponding <code>RewriteRule</code> by
     calling <code>lookup(String)</code>. Your implementation is free to return <code>null</code> to indicate,
     that the given default should be used, or to return a replacement value.</p>
 

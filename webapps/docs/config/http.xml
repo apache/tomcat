@@ -1457,7 +1457,7 @@
       certificate. The default is the value of the
       <code>javax.net.ssl.trustStoreProvider</code> system property. If
       that property is null and a single certificate has been configured for
-      this TLS virtual host then default will be the the value of
+      this TLS virtual host then default will be the value of
       <code>keystoreProvider</code> of the single certificate. If none of these
       identify a default, the list of registered providers is traversed in
       preference order and the first provider that supports the
