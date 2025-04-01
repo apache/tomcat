@@ -158,7 +158,7 @@ public class CharsetCache {
             // Added from OpenJDK 21 ea18
             "gb18030-2022"
             // If you add and entry to this list, ensure you run
-            // TestCharsetUtil#testIsAcsiiSupersetAll()
+            // TestCharsetUtil#testIsAsciiSupersetAll()
     };
 
     private static final Charset DUMMY_CHARSET = new DummyCharset("Dummy", null);

@@ -51,7 +51,7 @@ public class TestCharsetUtil {
      * Only need to run this when we detect a new Charset.
      */
     //@Test
-    public void testIsAcsiiSupersetAll() {
+    public void testIsAsciiSupersetAll() {
         for (Charset charset : Charset.availableCharsets().values()) {
             System.out.println("Testing: " + charset.name());
 
