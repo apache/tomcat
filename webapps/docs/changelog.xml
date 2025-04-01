@@ -286,7 +286,7 @@
         Add support for specifying Java 25 (with the value <code>25</code>) as
         the compiler source and/or compiler target for JSP compilation. If used
         with an Eclipse JDT compiler version that does not support these values,
-        a warning will be logged and the default will used.
+        a warning will be logged and the default will be used.
         (markt)
       </add>
     </changelog>
