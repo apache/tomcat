@@ -191,10 +191,10 @@
         the pathname of a directory that may contain Java EE web applications to
         be converted to Jakarta EE before deployment. Java EE applications
         packaged as WAR files or directories placed in this directory will be
-        converted to Jakarta EE using the Apache Tomcart Migration Tool for
+        converted to Jakarta EE using the Apache Tomcat Migration Tool for
         Jakarta EE. The conversion will be performed using default settings. The
         resulting WAR or directory will be placed in the <code>appBase</code>
-        confiugured for this virtual host.</p>
+        configured for this virtual host.</p>
         <p>If the default settings are not appropriate for the migration of an
         application, the full range of migration options may be accessed by
         performing the migration manually. The <code>migrate.[sh|bat]</code>
