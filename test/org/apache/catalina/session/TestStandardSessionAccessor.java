@@ -97,9 +97,9 @@ public class TestStandardSessionAccessor extends TomcatBaseTest {
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             HttpSession httpSession = req.getSession();
-            Accessor acessor = httpSession.getAccessor();
+            Accessor accessor = httpSession.getAccessor();
 
-            Thread t = new Thread(new AccessorRunnable(acessor, latch));
+            Thread t = new Thread(new AccessorRunnable(accessor, latch));
             t.start();
         }
     }
