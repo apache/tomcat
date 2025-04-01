@@ -102,7 +102,7 @@ client are taking place over a secure connection (because your application
 needs to be able to ask about this), but it does not participate in the
 encryption or decryption itself.</p>
 
-<p>Tomcat is able to use any of the the cryptographic protocols that are
+<p>Tomcat is able to use any of the cryptographic protocols that are
 provided by the underlying environment. Java itself provides cryptographic
 capabilities through <a href="https://docs.oracle.com/javase/9/security/java-cryptography-architecture-jca-reference-guide.htm">JCE/JCA</a>
 and encrypted communications capabilities through <a href="https://docs.oracle.com/javase/9/security/java-secure-socket-extension-jsse-reference-guide.htm">JSSE</a>.

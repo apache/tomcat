@@ -52,7 +52,7 @@
   <xsl:param    name="sitedir"             select="''"/>
   <xsl:param    name="filename"            select="'-'"/>
 
-  <!-- Defined variables (non-overrideable) -->
+  <!-- Defined variables (non-overridable) -->
   <xsl:variable name="project-xml-filename"><xsl:value-of select="$subdir"/>project.xml</xsl:variable>
   <xsl:variable name="project"
                 select="document($project-xml-filename)/project"/>
