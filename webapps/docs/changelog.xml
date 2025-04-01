@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.5 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.6 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -157,73 +157,6 @@
         rejected by default. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Return 400 if the amount of content sent for a partial PUT is
-        inconsistent with the range that was specified. (remm)
-      </fix>
-      <add>
-        Add a new <code>RateLimiter</code> implementation,
-        <code>org.apache.catalina.util.ExactRateLimiter</code>, that can be used
-        with <code>org.apache.catalina.filters.RateLimitFilter</code> to provide
-        rate limit based on the exact values configured. Based on pull request
-        <pr>794</pr> by Chenjp. (markt)
-      </add>
-      <fix>
-        Fix parsing of the <code>time-taken</code> token in the
-        <code>ExtendedAccessLogValve</code>. (remm)
-      </fix>
-      <fix>
-        Fix invocation of the FFM OpenSSL code for setting a SSL engine and
-        FIPS mode. (remm)
-      </fix>
-      <fix>
-        <bug>69600</bug>: Add IPv6 local addresses (RFC 4193 and RFC 4291) to
-        the default internal proxies for the RemoteIpFilter and RemoteIpValve.
-        (markt)
-      </fix>
-      <fix>
-        <bug>69615</bug>: Improve integration with the not found class resources
-        cache for users who are using a custom web application class loader
-        and/or using reflection to dynamically add external repositories to the
-        web application class loader. (markt)
-      </fix>
-      <add>
-        Add a new initialisation parameter to the Default servlet -
-        <code>allowPostAsGet</code> - which controls whether a direct request
-        (i.e. not a forward or an include) for a static resource using the POST
-        method will be processed as if the GET method had been used. If not
-        allowed, the request will be rejected. The default behaviour of
-        processing the request as if the GET method had been used is unchanged.
-        (markt)
-      </add>
-      <fix>
-        <bug>69623</bug>: Correct a long standing regression that meant that
-        calls to <code>ClassLoader.getResource().getContent()</code> failed when
-        made from within a web application with resource caching enabled.
-        (markt)
-      </fix>
-      <fix>
-        <bug>69634</bug>: Avoid NPE on <code>JsonErrorReportValve</code>.
-        (remm)
-      </fix>
-      <fix>
-        Add missing <code>throwable</code> stack trace to
-        <code>JsonErrorReportValve</code> equivalent to the one from
-        <code>ErrorReportValve</code>. (remm)
-      </fix>
-      <fix>
-        Fix stack trace trimming in <code>ErrorReportValve</code> after removal
-        of the security manager support. (remm)
-      </fix>
-      <fix>
-        Improve the handling of <code>%nn</code> URL encoding in the
-        RewriteValve and document how <code>%nn</code> URL encoding may be used
-        with rewrite rules. (markt)
-      </fix>
-      <fix>
-        Fix a potential NPE when calling
-        <code>WebappClassLoaderBase.findResource(null)</code>. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -239,21 +172,6 @@
         (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69607</bug>: Allow failed initialization of MD5. Based on code
-        submitted by Shivam Verma. (remm)
-      </fix>
-      <fix>
-        <bug>69614</bug>: HTTP/2 priority frames with an invalid priority field
-        value should be ignored. (markt)
-      </fix>
-      <fix>
-        Improve handling of unexpected errors during HTTP/2 processing. (markt)
-      </fix>
-      <add>
-        Simplify the process of using a custom SSLContext for an HTTPS enabled
-        connector. Based on pull request <pr>805</pr> by Hakky54. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -273,45 +191,16 @@
         21 being the minimum Java version required for Tomcat 12. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <scode>
-        Replace custom URL encoding provided by the JSP runtime library with
-        calls to <code>java.net.URLEncoder.encode()</code>. (markt)
-      </scode>
-      <add>
-        Add compiler using the <code>Java Compiler</code> API, supporting
-        exploded web applications. The <code>compilerClassName</code> to use is
-        <code>org.apache.jasper.compiler.JavaCompiler</code>. (remm)
-      </add>
-      <add>
-        Add support for specifying Java 25 (with the value <code>25</code>) as
-        the compiler source and/or compiler target for JSP compilation. If used
-        with an Eclipse JDT compiler version that does not support these values,
-        a warning will be logged and the default will be used.
-        (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Fix resetting cross context sessions in the
-        <code>ReplicationValve</code>. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        Documentation. Add a link to the Log4j documentation that describes how
-        to use Log4j rather than JULI for Tomcat's internal logging. (markt)
-      </add>
-      <add>
-        Documentation. Document the runtime attributes available to web
-        applications via the Request or the ServletContext. Based on pull
-        request <pr>832</pr> by usmazat. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -320,30 +209,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Revert JSign to 6.0 to avoid a file locking issue. (markt)
-      </update>
-      <update>
-        Update to the Eclipse JDT compiler 4.35. (markt)
-      </update>
-      <update>
-        Update to NSIS 3.11. (markt)
-      </update>
-      <update>
-        Update to ByteBuddy 1.17.4. (markt)
-      </update>
-      <update>
-        Update to Checkstyle 10.21.4. (markt)
-      </update>
-      <update>
-        Update to SpotBugs to 4.9.3. (markt)
-      </update>
-      <update>
-        Improvements to French translations. (remm)
-      </update>
-      <update>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
