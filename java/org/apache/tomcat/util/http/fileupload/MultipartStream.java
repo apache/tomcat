@@ -186,13 +186,13 @@ public class MultipartStream {
     protected static final byte[] HEADER_SEPARATOR = {CR, LF, CR, LF};
 
     /**
-     * A byte sequence that that follows a delimiter that will be
+     * A byte sequence that follows a delimiter that will be
      * followed by an encapsulation ({@code CRLF}).
      */
     protected static final byte[] FIELD_SEPARATOR = {CR, LF};
 
     /**
-     * A byte sequence that that follows a delimiter of the last
+     * A byte sequence that follows a delimiter of the last
      * encapsulation in the stream ({@code --}).
      */
     protected static final byte[] STREAM_TERMINATOR = {DASH, DASH};
