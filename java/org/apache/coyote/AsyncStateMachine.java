@@ -353,7 +353,7 @@ class AsyncStateMachine {
             return true;
         } else if (state == AsyncState.COMPLETING || state == AsyncState.DISPATCHING ||
                 state == AsyncState.DISPATCHED) {
-            // NOOP - App called complete() or dispatch() between the the
+            // NOOP - App called complete() or dispatch() between the
             // timeout firing and execution reaching this point
             return false;
         } else {

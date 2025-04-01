@@ -36,7 +36,7 @@ public class ConstantPool {
      * Reads constants from given input stream.
      *
      * @param input Input stream
-     * @throws IOException if an I/O error occurs reading the the InputStream
+     * @throws IOException if an I/O error occurs reading the InputStream
      * @throws  ClassFormatException If the .class file is not valid
      */
     ConstantPool(final DataInput input) throws IOException, ClassFormatException {

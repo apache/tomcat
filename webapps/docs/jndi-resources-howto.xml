@@ -330,7 +330,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <p>If the bean property is of type <code>String</code>, the BeanFactory
     will call the property setter using the provided property value. If the
-    bean property type is a primitive or a primitive wrapper, the the
+    bean property type is a primitive or a primitive wrapper, the
     BeanFactory will convert the value to the appropriate primitive or
     primitive wrapper and then use that value when calling the setter. Some
     beans have properties with types that cannot automatically be converted
