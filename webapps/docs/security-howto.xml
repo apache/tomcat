@@ -408,7 +408,7 @@
       <p>When <strong>mapperContextRootRedirectEnabled</strong> and/or
       <strong>mapperDirectoryRedirectEnabled</strong> are enabled, request
       processing will be more efficient but there are security side effects.
-      First, the existance of a web application or a directory may be confirmed
+      First, the existence of a web application or a directory may be confirmed
       even though the user does not have access to that directory. Secondly, any
       Valves and/or Filters - including those providing security functionality -
       will not have an opportunity to process the request.</p>

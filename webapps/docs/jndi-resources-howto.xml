@@ -428,7 +428,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <h5>1. Database schema</h5>
 
-    <p>The database shema for the user database is flexible. It can be the same
+    <p>The database schema for the user database is flexible. It can be the same
     as the schema used for the <code>DataSourceRealm</code>, with only a table
     for users (user name, password), and another one listing the roles
     associated with each user. To support the full <code>UserDatabase</code>

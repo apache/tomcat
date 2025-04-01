@@ -143,7 +143,7 @@ loaders as it is initialized:</p>
     <li><em>catalina-storeconfig.jar</em> &#8212; Optional. Generation of XML
         configuration files from current state.</li>
     <li><em>catalina-tribes.jar</em> &#8212; Optional. Group communication
-        package used by the high availabaility package.</li>
+        package used by the high availability package.</li>
     <li><em>ecj-*.jar</em> &#8212; Optional. Eclipse JDT Java compiler used to
         compile JSPs to Servlets.</li>
     <li><em>el-api.jar</em> &#8212; Optional. EL 3.0 API.</li>
