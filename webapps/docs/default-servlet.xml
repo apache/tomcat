@@ -209,7 +209,7 @@ Tomcat.</p>
   </property>
   <property name="directoryRedirectStatusCode">
         When a directory redirect (trailing slash missing) is made, use this as
-        the the HTTP response code. [302]
+        the HTTP response code. [302]
   </property>
   <property name="allowPostAsGet">
         Controls whether a direct request (i.e. not a forward or an include) for
