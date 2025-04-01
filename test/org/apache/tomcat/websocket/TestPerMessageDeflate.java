@@ -65,7 +65,7 @@ public class TestPerMessageDeflate {
      * https://bz.apache.org/bugzilla/show_bug.cgi?id=65317
      */
     @Test
-    public void testMessagePartThatFillsBufffer() throws IOException {
+    public void testMessagePartThatFillsBuffer() throws IOException {
 
         // Set up the extension using defaults
         List<Parameter> parameters = Collections.emptyList();
