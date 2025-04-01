@@ -16,7 +16,7 @@
 ================================================================================
 
 A number of the test files in this directory specify conflicting encoding
-in the BOM and and in the XML prolog. The rules for determining the actual
+in the BOM and in the XML prolog. The rules for determining the actual
 encoding used in the file are as follows:
 
 1. If there is a BOM, use the encoding defined by the BOM.

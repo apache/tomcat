@@ -235,7 +235,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     @Test
-    public void testNonBlockingReadChunkedSplitBeforeExtensionDelimter() throws Exception {
+    public void testNonBlockingReadChunkedSplitBeforeExtensionDelimiter() throws Exception {
         String[] requestBody = new String[] {
                 "14",
                 ";a=b" + SimpleHttpClient.CRLF +
@@ -248,7 +248,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     @Test
-    public void testNonBlockingReadChunkedSplitAfterExtensionDelimter() throws Exception {
+    public void testNonBlockingReadChunkedSplitAfterExtensionDelimiter() throws Exception {
         String[] requestBody = new String[] {
                 "14;",
                 "a=b" + SimpleHttpClient.CRLF +
@@ -419,7 +419,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     @Test
-    public void testNonBlockingReadChunkedSplitAfterTrailerDelimter() throws Exception {
+    public void testNonBlockingReadChunkedSplitAfterTrailerDelimiter() throws Exception {
         String[] requestBody = new String[] {
                 "14" + SimpleHttpClient.CRLF +
                 "012345678901FINISHED" + SimpleHttpClient.CRLF +
