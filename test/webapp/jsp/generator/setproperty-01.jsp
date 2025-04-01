@@ -16,7 +16,7 @@
 --%>
 <jsp:useBean id="bean" class="org.apache.jasper.runtime.TesterBean" />
 <html>
-  <head><title>jsp:setProeprty test cases</title></head>
+  <head><title>jsp:setProperty test cases</title></head>
   <body>
     <jsp:setProperty name="bean" property="*"/>
     <jsp:setProperty name="bean" property="objectValue"/>
