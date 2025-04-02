@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Set <code>sun.io.useCanonCaches</code> in <code>service.bat</code>
+        Based on pull request <pr>841</pr> by Paul Lodge. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.40 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
