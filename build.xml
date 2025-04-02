@@ -2437,7 +2437,7 @@ Apache Tomcat ${version} native binaries for Win64 AMD64/EMT64 platform.
       <link href="../elapi"/>
       <link href="../websocketapi"/>
       <link href="../jaspicapi"/>
-      <link href="https://docs.oracle.com/javase/8/docs/api/"/>
+      <link href="https://docs.oracle.com/en/java/javase/11/docs/api/"/>
       <link href="https://javaee.github.io/javaee-spec/javadocs/"/>
       <packageset dir="${tomcat.dist}/src/java/">
         <include name="org/**"/>
