@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.41 (schultz)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Fix use of <code>SSS</code> in <code>SimpleDateFormat</code>
+        pattern for <code>AccessLogValve</code>. (rjung)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.40 (schultz)" rtext="release in progress">
   <subsection name="Catalina">

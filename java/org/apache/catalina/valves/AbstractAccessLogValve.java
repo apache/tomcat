@@ -1122,7 +1122,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                     frac = timestamp % 1000;
                     StringBuilder tripleMsec = new StringBuilder(4);
                     if (frac < 100) {
-                        buf.append('0');
+                        tripleMsec.append('0');
                         if (frac < 10) {
                             tripleMsec.append('0');
                         }
