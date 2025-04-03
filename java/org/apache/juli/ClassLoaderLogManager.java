@@ -95,7 +95,7 @@ public class ClassLoaderLogManager extends LogManager {
      * Map containing the classloader information, keyed per classloader. A weak hashmap is used to ensure no
      * classloader reference is leaked from application redeployment.
      */
-    protected final Map<ClassLoader, ClassLoaderLogInfo> classLoaderLoggers = new WeakHashMap<>(); // Guarded by this
+    protected final Map<ClassLoader,ClassLoaderLogInfo> classLoaderLoggers = new WeakHashMap<>(); // Guarded by this
 
 
     /**
@@ -681,7 +681,7 @@ public class ClassLoaderLogManager extends LogManager {
     protected static final class LogNode {
         Logger logger;
 
-        final Map<String, LogNode> children = new HashMap<>();
+        final Map<String,LogNode> children = new HashMap<>();
 
         final LogNode parent;
 
@@ -747,8 +747,8 @@ public class ClassLoaderLogManager extends LogManager {
 
     protected static final class ClassLoaderLogInfo {
         final LogNode rootNode;
-        final Map<String, Logger> loggers = new ConcurrentHashMap<>();
-        final Map<String, Handler> handlers = new HashMap<>();
+        final Map<String,Logger> loggers = new ConcurrentHashMap<>();
+        final Map<String,Handler> handlers = new HashMap<>();
         final Properties props = new Properties();
 
         ClassLoaderLogInfo(final LogNode rootNode) {

@@ -55,8 +55,8 @@ public class AsyncFileHandler extends FileHandler {
     public static final int MAX_RECORDS = Integer
             .parseInt(System.getProperty("org.apache.juli.AsyncMaxRecordCount", Integer.toString(DEFAULT_MAX_RECORDS)));
 
-    private static final LoggerExecutorService LOGGER_SERVICE = new LoggerExecutorService(OVERFLOW_DROP_TYPE,
-            MAX_RECORDS);
+    private static final LoggerExecutorService LOGGER_SERVICE =
+            new LoggerExecutorService(OVERFLOW_DROP_TYPE, MAX_RECORDS);
 
     private final Object closeLock = new Object();
     protected volatile boolean closed = false;
@@ -121,8 +121,8 @@ public class AsyncFileHandler extends FileHandler {
         record.getSourceMethodName();
         loggerService.execute(() -> {
             /*
-             * During Tomcat shutdown, the Handlers are closed before the executor queue is flushed therefore the
-             * closed flag is ignored if the executor is shutting down.
+             * During Tomcat shutdown, the Handlers are closed before the executor queue is flushed therefore the closed
+             * flag is ignored if the executor is shutting down.
              */
             if (!closed || loggerService.isTerminating()) {
                 publishInternal(record);
