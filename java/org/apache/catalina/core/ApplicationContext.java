@@ -374,7 +374,7 @@ public class ApplicationContext implements ServletContext {
 
         // From this point, the removal of path parameters, decoding and normalization is only for mapping purposes.
         // Remove path parameters
-        String uriToMap = stripPathParams(uri);
+        String uriToMap = org.apache.catalina.util.RequestUtil.stripPathParams(uri, null);
 
         // Decode only if the uri derived from the provided path is expected to be encoded
         if (getContext().getDispatchersUseEncodedPaths()) {
@@ -446,34 +446,6 @@ public class ApplicationContext implements ServletContext {
             uriMB.recycle();
             mappingData.recycle();
         }
-    }
-
-
-    // Package private to facilitate testing
-    static String stripPathParams(String input) {
-        // Shortcut
-        if (input.indexOf(';') < 0) {
-            return input;
-        }
-
-        StringBuilder sb = new StringBuilder(input.length());
-        int pos = 0;
-        int limit = input.length();
-        while (pos < limit) {
-            int nextSemiColon = input.indexOf(';', pos);
-            if (nextSemiColon < 0) {
-                nextSemiColon = limit;
-            }
-            sb.append(input, pos, nextSemiColon);
-            int followingSlash = input.indexOf('/', nextSemiColon);
-            if (followingSlash < 0) {
-                pos = limit;
-            } else {
-                pos = followingSlash;
-            }
-        }
-
-        return sb.toString();
     }
 
 
