@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.7 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        Process possible path parameters rewrite production in the rewrite
+        valve. (remm)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.6 (markt)" rtext="release in progress">
   <subsection name="Catalina">
