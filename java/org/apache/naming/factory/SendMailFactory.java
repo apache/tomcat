@@ -32,6 +32,8 @@ import javax.naming.RefAddr;
 import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
+import org.apache.tomcat.util.ExceptionUtils;
+
 /**
  * Factory class that creates a JNDI named javamail MimePartDataSource object which can be used for sending email using
  * SMTP.
@@ -96,10 +98,11 @@ public class SendMailFactory implements ObjectFactory {
                         message.setFrom(new InternetAddress(from));
                     }
                     message.setSubject("");
-                } catch (Exception e) {
-                    /* Ignore */}
-                MimePartDataSource mds = new MimePartDataSource(message);
-                return mds;
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    // Otherwise ignore
+                }
+                return new MimePartDataSource(message);
             });
         } else { // We can't create an instance of the DataSource
             return null;

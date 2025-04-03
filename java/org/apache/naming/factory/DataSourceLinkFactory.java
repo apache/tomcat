@@ -66,9 +66,9 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
             DataSourceHandler handler = new DataSourceHandler((DataSource) datasource, username, password);
             return Proxy.newProxyInstance(datasource.getClass().getClassLoader(), datasource.getClass().getInterfaces(),
                     handler);
-        } catch (Exception x) {
-            if (x instanceof InvocationTargetException) {
-                Throwable cause = x.getCause();
+        } catch (Exception exception) {
+            if (exception instanceof InvocationTargetException) {
+                Throwable cause = exception.getCause();
                 if (cause instanceof ThreadDeath) {
                     throw (ThreadDeath) cause;
                 }
@@ -76,14 +76,14 @@ public class DataSourceLinkFactory extends ResourceLinkFactory {
                     throw (VirtualMachineError) cause;
                 }
                 if (cause instanceof Exception) {
-                    x = (Exception) cause;
+                    exception = (Exception) cause;
                 }
             }
-            if (x instanceof NamingException) {
-                throw (NamingException) x;
+            if (exception instanceof NamingException) {
+                throw (NamingException) exception;
             } else {
-                NamingException nx = new NamingException(x.getMessage());
-                nx.initCause(x);
+                NamingException nx = new NamingException(exception.getMessage());
+                nx.initCause(exception);
                 throw nx;
             }
         }

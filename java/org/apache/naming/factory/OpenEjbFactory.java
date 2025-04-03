@@ -23,7 +23,6 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.Name;
 import javax.naming.RefAddr;
-import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
 import org.apache.naming.EjbRef;
@@ -65,8 +64,7 @@ public class OpenEjbFactory implements ObjectFactory {
         Object beanObj = null;
 
         if (obj instanceof EjbRef) {
-
-            Reference ref = (Reference) obj;
+            EjbRef ref = (EjbRef) obj;
 
             String factory = DEFAULT_OPENEJB_FACTORY;
             RefAddr factoryRefAddr = ref.get("openejb.factory");
