@@ -119,6 +119,11 @@
         Set <code>sun.io.useCanonCaches</code> in <code>service.bat</code>
         Based on pull request <pr>841</pr> by Paul Lodge. (remm)
       </fix>
+      <fix>
+        The minimum Java version to build a release is now Java 22, mirroring
+        Tomcat 10.1. This removes the need for using a
+        <code>java-ffm.home</code> property. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
