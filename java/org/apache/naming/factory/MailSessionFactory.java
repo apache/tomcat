@@ -32,19 +32,20 @@ import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
 /**
- * <p>Factory class that creates a JNDI named JavaMail Session factory,
- * which can be used for managing inbound and outbound electronic mail
- * messages via JavaMail APIs.  All messaging environment properties
- * described in the JavaMail Specification may be passed to the Session
- * factory; however the following properties are the most commonly used:</p>
+ * <p>
+ * Factory class that creates a JNDI named JavaMail Session factory, which can be used for managing inbound and outbound
+ * electronic mail messages via JavaMail APIs. All messaging environment properties described in the JavaMail
+ * Specification may be passed to the Session factory; however the following properties are the most commonly used:
+ * </p>
  * <ul>
- * <li><strong>mail.smtp.host</strong> - Hostname for outbound transport
- *     connections.  Defaults to <code>localhost</code> if not specified.</li>
+ * <li><strong>mail.smtp.host</strong> - Hostname for outbound transport connections. Defaults to <code>localhost</code>
+ * if not specified.</li>
  * </ul>
+ * <p>
+ * This factory can be configured in a <code>&lt;Context&gt;</code> element in your <code>conf/server.xml</code>
+ * configuration file. An example of factory configuration is:
+ * </p>
  *
- * <p>This factory can be configured in a
- * <code>&lt;Context&gt;</code> element in your <code>conf/server.xml</code>
- * configuration file.  An example of factory configuration is:</p>
  * <pre>
  * &lt;Resource name="mail/smtp"
  *           auth="CONTAINER"
@@ -65,8 +66,7 @@ public class MailSessionFactory implements ObjectFactory {
 
 
     @Override
-    public Object getObjectInstance(Object refObj, Name name, Context context,
-            Hashtable<?,?> env) throws Exception {
+    public Object getObjectInstance(Object refObj, Name name, Context context, Hashtable<?,?> env) throws Exception {
 
         // Return null if we cannot create an object of the requested type
         final Reference ref = (Reference) refObj;
@@ -106,18 +106,18 @@ public class MailSessionFactory implements ObjectFactory {
             Authenticator auth = null;
             if (password != null) {
                 String user = props.getProperty("mail.smtp.user");
-                if(user == null) {
+                if (user == null) {
                     user = props.getProperty("mail.user");
                 }
 
-                if(user != null) {
+                if (user != null) {
                     final PasswordAuthentication pa = new PasswordAuthentication(user, password);
                     auth = new Authenticator() {
-                            @Override
-                            protected PasswordAuthentication getPasswordAuthentication() {
-                                return pa;
-                            }
-                        };
+                        @Override
+                        protected PasswordAuthentication getPasswordAuthentication() {
+                            return pa;
+                        }
+                    };
                 }
             }
 

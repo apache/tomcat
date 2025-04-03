@@ -37,10 +37,11 @@ import org.apache.naming.StringManager;
 
 /**
  * Object factory for any Resource conforming to the JavaBean spec.
+ * <p>
+ * This factory can be configured in a <code>&lt;Context&gt;</code> element in your <code>conf/server.xml</code>
+ * configuration file. An example of factory configuration is:
+ * </p>
  *
- * <p>This factory can be configured in a <code>&lt;Context&gt;</code> element
- * in your <code>conf/server.xml</code>
- * configuration file.  An example of factory configuration is:</p>
  * <pre>
  * &lt;Resource name="jdbc/myDataSource"
  *           auth="SERVLET"
@@ -68,11 +69,13 @@ public class BeanFactory implements ObjectFactory {
     /**
      * Create a new Bean instance.
      *
-     * @param obj The reference object describing the Bean
-     * @param name the bound name
-     * @param nameCtx unused
+     * @param obj         The reference object describing the Bean
+     * @param name        the bound name
+     * @param nameCtx     unused
      * @param environment unused
+     *
      * @return the object instance
+     *
      * @throws NamingException if an error occur creating the instance
      */
     @Override
@@ -92,7 +95,7 @@ public class BeanFactory implements ObjectFactory {
                     } else {
                         beanClass = Class.forName(beanClassName);
                     }
-                } catch(ClassNotFoundException cnfe) {
+                } catch (ClassNotFoundException cnfe) {
                     NamingException ne = new NamingException(sm.getString("beanFactory.classNotFound", beanClassName));
                     ne.initCause(cnfe);
                     throw ne;
@@ -117,14 +120,12 @@ public class BeanFactory implements ObjectFactory {
                     ra = e.nextElement();
                     String propName = ra.getType();
 
-                    if (propName.equals(Constants.FACTORY) ||
-                        propName.equals("scope") || propName.equals("auth") ||
-                        propName.equals("forceString") ||
-                        propName.equals("singleton")) {
+                    if (propName.equals(Constants.FACTORY) || propName.equals("scope") || propName.equals("auth") ||
+                            propName.equals("forceString") || propName.equals("singleton")) {
                         continue;
                     }
 
-                    value = (String)ra.getContent();
+                    value = (String) ra.getContent();
 
                     Object[] valueArray = new Object[1];
 
@@ -162,12 +163,12 @@ public class BeanFactory implements ObjectFactory {
                                     setProp = bean.getClass().getMethod(setterName, String.class);
                                     valueArray[0] = value;
                                 } catch (NoSuchMethodException nsme) {
-                                    throw new NamingException(sm.getString(
-                                            "beanFactory.noStringConversion", propName, propType.getName()));
+                                    throw new NamingException(sm.getString("beanFactory.noStringConversion", propName,
+                                            propType.getName()));
                                 }
                             } else {
-                                throw new NamingException(sm.getString(
-                                        "beanFactory.noStringConversion", propName, propType.getName()));
+                                throw new NamingException(
+                                        sm.getString("beanFactory.noStringConversion", propName, propType.getName()));
                             }
 
                             if (setProp != null) {
