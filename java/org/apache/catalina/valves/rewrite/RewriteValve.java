@@ -528,6 +528,8 @@ public class RewriteValve extends ValveBase {
                         queryStringRewriteEncoded = urlStringRewriteEncoded.substring(queryIndex + 1);
                         urlStringRewriteEncoded = urlStringRewriteEncoded.substring(0, queryIndex);
                     }
+                    // Parse path parameters from rewrite production and populate request path parameters
+                    urlStringRewriteEncoded = org.apache.catalina.util.RequestUtil.stripPathParams(urlStringRewriteEncoded, request);
                     // Save the current context path before re-writing starts
                     String contextPath = null;
                     if (context) {
@@ -879,4 +881,6 @@ public class RewriteValve extends ValveBase {
             return input;
         }
     }
+
+
 }

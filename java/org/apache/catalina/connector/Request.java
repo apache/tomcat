@@ -443,11 +443,11 @@ public class Request implements HttpServletRequest {
 
     // --------------------------------------------------------- Public Methods
 
-    protected void addPathParameter(String name, String value) {
+    public void addPathParameter(String name, String value) {
         coyoteRequest.addPathParameter(name, value);
     }
 
-    protected String getPathParameter(String name) {
+    public String getPathParameter(String name) {
         return coyoteRequest.getPathParameter(name);
     }
 

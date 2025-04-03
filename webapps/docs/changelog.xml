@@ -111,6 +111,10 @@
         Fix use of <code>SSS</code> in <code>SimpleDateFormat</code>
         pattern for <code>AccessLogValve</code>. (rjung)
       </fix>
+      <fix>
+        Process possible path parameters rewrite production in the rewrite
+        valve. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
