@@ -86,8 +86,8 @@ public class FileHandler extends Handler {
     public static final int DEFAULT_BUFFER_SIZE = -1;
 
 
-    private static final ExecutorService DELETE_FILES_SERVICE = Executors
-            .newSingleThreadExecutor(new ThreadFactory("FileHandlerLogFilesCleaner-"));
+    private static final ExecutorService DELETE_FILES_SERVICE =
+            Executors.newSingleThreadExecutor(new ThreadFactory("FileHandlerLogFilesCleaner-"));
 
     // ------------------------------------------------------------ Constructor
 

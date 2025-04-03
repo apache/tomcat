@@ -20,9 +20,8 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 
 /**
- * Provides the same information as the one line format but using JSON formatting.
- * All the information of the LogRecord is included as a one line JSON document,
- * including the full stack trace of the associated exception if any.
+ * Provides the same information as the one line format but using JSON formatting. All the information of the LogRecord
+ * is included as a one line JSON document, including the full stack trace of the associated exception if any.
  * <p>
  * The LogRecord is mapped as attributes:
  * <ul>
@@ -32,9 +31,9 @@ import java.util.logging.LogRecord;
  * <li>class: the class from which the log originated</li>
  * <li>method: the method from which the log originated</li>
  * <li>message: the log message</li>
- * <li>throwable: the full stack trace from an exception, if present, represented as an array of string
- *  (the message first, then one string per stack trace element prefixed by a whitespace,
- *  then moving on to the cause exception if any)</li>
+ * <li>throwable: the full stack trace from an exception, if present, represented as an array of string (the message
+ * first, then one string per stack trace element prefixed by a whitespace, then moving on to the cause exception if
+ * any)</li>
  * </ul>
  */
 public class JsonFormatter extends OneLineFormatter {
@@ -121,15 +120,16 @@ public class JsonFormatter extends OneLineFormatter {
 
 
     /**
-     * Provides escaping of values so they can be included in a JSON document.
-     * Escaping is based on the definition of JSON found in
-     * <a href="https://www.rfc-editor.org/rfc/rfc8259.html">RFC 8259</a>.
+     * Provides escaping of values so they can be included in a JSON document. Escaping is based on the definition of
+     * JSON found in <a href="https://www.rfc-editor.org/rfc/rfc8259.html">RFC 8259</a>.
      */
     public static class JSONFilter {
 
         /**
          * Escape the given string.
+         *
          * @param input the string
+         *
          * @return the escaped string
          */
         public static String escape(String input) {
@@ -138,16 +138,17 @@ public class JsonFormatter extends OneLineFormatter {
 
         /**
          * Escape the given char sequence.
-         * @param input the char sequence
-         * @param off the offset on which escaping will start
+         *
+         * @param input  the char sequence
+         * @param off    the offset on which escaping will start
          * @param length the length which should be escaped
+         *
          * @return the escaped char sequence corresponding to the specified range
          */
         public static CharSequence escape(CharSequence input, int off, int length) {
             /*
-             * While any character MAY be escaped, only U+0000 to U+001F (control
-             * characters), U+0022 (quotation mark) and U+005C (reverse solidus)
-             * MUST be escaped.
+             * While any character MAY be escaped, only U+0000 to U+001F (control characters), U+0022 (quotation mark)
+             * and U+005C (reverse solidus) MUST be escaped.
              */
             StringBuilder escaped = null;
             int lastUnescapedStart = off;

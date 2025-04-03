@@ -42,8 +42,8 @@ public class OneLineFormatter extends Formatter {
     private static final Object threadMxBeanLock = new Object();
     private static volatile ThreadMXBean threadMxBean = null;
     private static final int THREAD_NAME_CACHE_SIZE = 10000;
-    private static final ThreadLocal<ThreadNameCache> threadNameCache = ThreadLocal
-            .withInitial(() -> new ThreadNameCache(THREAD_NAME_CACHE_SIZE));
+    private static final ThreadLocal<ThreadNameCache> threadNameCache =
+            ThreadLocal.withInitial(() -> new ThreadNameCache(THREAD_NAME_CACHE_SIZE));
 
     /* Timestamp format */
     private static final String DEFAULT_TIME_FORMAT = "dd-MMM-yyyy HH:mm:ss.SSS";
@@ -101,8 +101,8 @@ public class OneLineFormatter extends Formatter {
         }
 
         final DateFormatCache globalDateCache = new DateFormatCache(globalCacheSize, cachedTimeFormat, null);
-        localDateCache = ThreadLocal
-                .withInitial(() -> new DateFormatCache(localCacheSize, cachedTimeFormat, globalDateCache));
+        localDateCache =
+                ThreadLocal.withInitial(() -> new DateFormatCache(localCacheSize, cachedTimeFormat, globalDateCache));
     }
 
 
@@ -216,10 +216,11 @@ public class OneLineFormatter extends Formatter {
      * resulting mess that follows.
      *
      * @param logRecordThreadId the thread id
+     *
      * @return the thread name
      */
     protected static String getThreadName(int logRecordThreadId) {
-        Map<Integer, String> cache = threadNameCache.get();
+        Map<Integer,String> cache = threadNameCache.get();
         String result = cache.get(Integer.valueOf(logRecordThreadId));
 
         if (result != null) {
@@ -253,7 +254,7 @@ public class OneLineFormatter extends Formatter {
     /*
      * This is an LRU cache.
      */
-    private static class ThreadNameCache extends LinkedHashMap<Integer, String> {
+    private static class ThreadNameCache extends LinkedHashMap<Integer,String> {
 
         private static final long serialVersionUID = 1L;
 
@@ -265,7 +266,7 @@ public class OneLineFormatter extends Formatter {
         }
 
         @Override
-        protected boolean removeEldestEntry(Entry<Integer, String> eldest) {
+        protected boolean removeEldestEntry(Entry<Integer,String> eldest) {
             return (size() > cacheSize);
         }
     }
@@ -290,6 +291,10 @@ public class OneLineFormatter extends Formatter {
 
 
     private enum MillisHandling {
-        NONE, APPEND, REPLACE_S, REPLACE_SS, REPLACE_SSS,
+        NONE,
+        APPEND,
+        REPLACE_S,
+        REPLACE_SS,
+        REPLACE_SSS,
     }
 }
