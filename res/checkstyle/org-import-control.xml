@@ -128,6 +128,7 @@
     <allow pkg="javax.wsdl"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.naming"/>
+    <allow class="org.apache.tomcat.util.ExceptionUtils"/>
     <allow class="org.apache.tomcat.util.buf.UDecoder"/>
     <allow class="org.apache.tomcat.util.buf.UEncoder"/>
     <allow class="org.apache.tomcat.util.http.FastHttpDateFormat"/>
