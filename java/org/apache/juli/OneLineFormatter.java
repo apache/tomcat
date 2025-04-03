@@ -41,8 +41,8 @@ public class OneLineFormatter extends Formatter {
     private static final Object threadMxBeanLock = new Object();
     private static volatile ThreadMXBean threadMxBean = null;
     private static final int THREAD_NAME_CACHE_SIZE = 10000;
-    private static final ThreadLocal<ThreadNameCache> threadNameCache = ThreadLocal
-            .withInitial(() -> new ThreadNameCache(THREAD_NAME_CACHE_SIZE));
+    private static final ThreadLocal<ThreadNameCache> threadNameCache =
+            ThreadLocal.withInitial(() -> new ThreadNameCache(THREAD_NAME_CACHE_SIZE));
 
     /* Timestamp format */
     private static final String DEFAULT_TIME_FORMAT = "dd-MMM-yyyy HH:mm:ss.SSS";
@@ -100,8 +100,8 @@ public class OneLineFormatter extends Formatter {
         }
 
         final DateFormatCache globalDateCache = new DateFormatCache(globalCacheSize, cachedTimeFormat, null);
-        localDateCache = ThreadLocal
-                .withInitial(() -> new DateFormatCache(localCacheSize, cachedTimeFormat, globalDateCache));
+        localDateCache =
+                ThreadLocal.withInitial(() -> new DateFormatCache(localCacheSize, cachedTimeFormat, globalDateCache));
     }
 
 
@@ -211,10 +211,11 @@ public class OneLineFormatter extends Formatter {
      * LogRecord has threadID but no thread name.
      *
      * @param logRecordThreadId the thread id
+     *
      * @return the thread name
      */
     protected static String getThreadName(long logRecordThreadId) {
-        Map<Long, String> cache = threadNameCache.get();
+        Map<Long,String> cache = threadNameCache.get();
         String result = cache.get(Long.valueOf(logRecordThreadId));
 
         if (result != null) {
@@ -244,7 +245,7 @@ public class OneLineFormatter extends Formatter {
     /*
      * This is an LRU cache.
      */
-    private static class ThreadNameCache extends LinkedHashMap<Long, String> {
+    private static class ThreadNameCache extends LinkedHashMap<Long,String> {
 
         @Serial
         private static final long serialVersionUID = 1L;
@@ -257,7 +258,7 @@ public class OneLineFormatter extends Formatter {
         }
 
         @Override
-        protected boolean removeEldestEntry(Map.Entry<Long, String> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Long,String> eldest) {
             return (size() > cacheSize);
         }
     }
@@ -282,6 +283,10 @@ public class OneLineFormatter extends Formatter {
 
 
     private enum MillisHandling {
-        NONE, APPEND, REPLACE_S, REPLACE_SS, REPLACE_SSS,
+        NONE,
+        APPEND,
+        REPLACE_S,
+        REPLACE_SS,
+        REPLACE_SSS,
     }
 }
