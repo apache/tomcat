@@ -157,6 +157,10 @@
         rejected by default. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Process possible path parameters rewrite production in the rewrite
+        valve. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

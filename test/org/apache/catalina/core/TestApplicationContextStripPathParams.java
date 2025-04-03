@@ -25,42 +25,56 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.RequestUtil;
 
 @RunWith(value = Parameterized.class)
 public class TestApplicationContextStripPathParams extends TomcatBaseTest {
 
     private final String input;
     private final String expectedOutput;
+    private final Boolean hasParameter;
 
-    public TestApplicationContextStripPathParams(String input, String expectedOutput) {
+    public TestApplicationContextStripPathParams(String input, String expectedOutput, Boolean hasParameter) {
         this.input = input;
         this.expectedOutput = expectedOutput;
+        this.hasParameter = hasParameter;
     }
 
     @Parameters(name = "{index}: input[{0}]")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
-            { "/foo", "/foo"},
-            { "/foo/", "/foo/"},
-            { "/foo/bar", "/foo/bar"},
-            { "/foo;", "/foo"},
-            { "/foo;/", "/foo/"},
-            { "/foo;/bar", "/foo/bar"},
-            { "/foo;a=1", "/foo"},
-            { "/foo;a=1/", "/foo/"},
-            { "/foo;a=1/bar", "/foo/bar"},
+            { "/foo", "/foo", Boolean.FALSE },
+            { "/foo/", "/foo/", Boolean.FALSE },
+            { "/foo/bar", "/foo/bar", Boolean.FALSE },
+            { "/foo;", "/foo", Boolean.FALSE },
+            { "/foo;/", "/foo/", Boolean.FALSE },
+            { "/foo;/bar", "/foo/bar", Boolean.FALSE },
+            { "/foo;a=1", "/foo", Boolean.TRUE },
+            { "/foo;a=1/", "/foo/", Boolean.TRUE },
+            { "/foo;a=1/bar", "/foo/bar", Boolean.TRUE },
             // Arguably not valid but does the right thing anyway
-            { ";/foo", "/foo"},
-            { ";a=1/foo", "/foo"},
-            { ";/foo/bar", "/foo/bar"},
-            { ";/foo;a=1/bar", "/foo/bar"},
+            { ";/foo", "/foo", Boolean.FALSE },
+            { ";a=1/foo", "/foo", Boolean.TRUE },
+            { ";/foo/bar", "/foo/bar", Boolean.FALSE },
+            { ";/foo;a=1/bar", "/foo/bar", Boolean.TRUE },
+            { ";/foo;=/bar", "/foo/bar", Boolean.FALSE },
+            { ";/foo;a=/bar", "/foo/bar", Boolean.FALSE },
+            { ";/foo;=1/bar", "/foo/bar", Boolean.FALSE },
         });
     }
 
     @Test
     public void testStringPathParams() {
-        String output = ApplicationContext.stripPathParams(input);
+        Request request = new Request(null, new org.apache.coyote.Request());
+        String output = RequestUtil.stripPathParams(input, request);
         Assert.assertEquals(expectedOutput, output);
+        String parameter = request.getPathParameter("a");
+        if (hasParameter.booleanValue()) {
+            Assert.assertEquals("1", parameter);
+        } else {
+            Assert.assertNull(parameter);
+        }
     }
 }

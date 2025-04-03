@@ -18,6 +18,8 @@ package org.apache.catalina.util;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+import org.apache.catalina.connector.Request;
+
 /**
  * General purpose request parsing and encoding utility methods.
  *
@@ -54,4 +56,48 @@ public final class RequestUtil {
 
         return url;
     }
+
+
+    /**
+     * Strip parameters for given path.
+     * @param input the input path
+     * @param request the request to add the parameters to
+     * @return the cleaned path
+     */
+    public static String stripPathParams(String input, Request request) {
+        // Shortcut
+        if (input.indexOf(';') < 0) {
+            return input;
+        }
+
+        StringBuilder sb = new StringBuilder(input.length());
+        int pos = 0;
+        int limit = input.length();
+        while (pos < limit) {
+            int nextSemiColon = input.indexOf(';', pos);
+            if (nextSemiColon < 0) {
+                nextSemiColon = limit;
+            }
+            sb.append(input, pos, nextSemiColon);
+            int followingSlash = input.indexOf('/', nextSemiColon);
+            if (followingSlash < 0) {
+                pos = limit;
+            } else {
+                pos = followingSlash;
+            }
+            if (request != null && nextSemiColon + 1 <pos) {
+                String pathVariable = input.substring(nextSemiColon + 1, pos);
+                int equals = pathVariable.indexOf('=');
+                if (equals > -1 && equals + 1 < pathVariable.length()) {
+                    String name = pathVariable.substring(0, equals);
+                    String value = pathVariable.substring(equals + 1);
+                    request.addPathParameter(name, value);
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
+
 }
