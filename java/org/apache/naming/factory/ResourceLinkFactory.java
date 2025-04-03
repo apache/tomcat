@@ -31,7 +31,9 @@ import org.apache.naming.ResourceLinkRef;
 import org.apache.naming.StringManager;
 
 /**
- * <p>Object factory for resource links.</p>
+ * <p>
+ * Object factory for resource links.
+ * </p>
  *
  * @author Remy Maucherat
  */
@@ -46,8 +48,7 @@ public class ResourceLinkFactory implements ObjectFactory {
      */
     private static Context globalContext = null;
 
-    private static final Map<ClassLoader,Map<String,String>> globalResourceRegistrations =
-            new ConcurrentHashMap<>();
+    private static final Map<ClassLoader,Map<String,String>> globalResourceRegistrations = new ConcurrentHashMap<>();
 
     // --------------------------------------------------------- Public Methods
 
@@ -61,8 +62,7 @@ public class ResourceLinkFactory implements ObjectFactory {
     }
 
 
-    public static void registerGlobalResourceAccess(Context globalContext, String localName,
-            String globalName) {
+    public static void registerGlobalResourceAccess(Context globalContext, String localName, String globalName) {
         validateGlobalContext(globalContext);
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         // Web application initialization is single threaded so this is
@@ -89,8 +89,7 @@ public class ResourceLinkFactory implements ObjectFactory {
 
 
     private static void validateGlobalContext(Context globalContext) {
-        if (ResourceLinkFactory.globalContext != null &&
-                ResourceLinkFactory.globalContext != globalContext) {
+        if (ResourceLinkFactory.globalContext != null && ResourceLinkFactory.globalContext != globalContext) {
             throw new SecurityException(sm.getString("resourceLinkFactory.invalidGlobalContext"));
         }
     }
@@ -114,15 +113,17 @@ public class ResourceLinkFactory implements ObjectFactory {
     /**
      * Create a new resource instance.
      *
-     * @param name the bound name
-     * @param nameCtx unused
+     * @param name        the bound name
+     * @param nameCtx     unused
      * @param environment unused
+     *
      * @return the object instance
+     *
      * @throws NamingException if an error occur creating the instance
      */
     @Override
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-            Hashtable<?,?> environment) throws NamingException {
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)
+            throws NamingException {
 
         if (!(obj instanceof ResourceLinkRef ref)) {
             return null;
@@ -144,19 +145,18 @@ public class ResourceLinkFactory implements ObjectFactory {
             // Check the expected type
             String expectedClassName = ref.getClassName();
             if (expectedClassName == null) {
-                throw new IllegalArgumentException(
-                        sm.getString("resourceLinkFactory.nullType", name, globalName));
+                throw new IllegalArgumentException(sm.getString("resourceLinkFactory.nullType", name, globalName));
             }
             try {
-                Class<?> expectedClazz = Class.forName(
-                        expectedClassName, true, Thread.currentThread().getContextClassLoader());
+                Class<?> expectedClazz =
+                        Class.forName(expectedClassName, true, Thread.currentThread().getContextClassLoader());
                 if (!expectedClazz.isAssignableFrom(result.getClass())) {
-                    throw new IllegalArgumentException(sm.getString("resourceLinkFactory.wrongType",
-                            name, globalName, expectedClassName, result.getClass().getName()));
+                    throw new IllegalArgumentException(sm.getString("resourceLinkFactory.wrongType", name, globalName,
+                            expectedClassName, result.getClass().getName()));
                 }
             } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException(sm.getString("resourceLinkFactory.unknownType",
-                        name, globalName, expectedClassName), e);
+                throw new IllegalArgumentException(
+                        sm.getString("resourceLinkFactory.unknownType", name, globalName, expectedClassName), e);
             }
             return result;
         }
