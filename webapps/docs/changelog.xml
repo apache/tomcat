@@ -199,6 +199,10 @@
         21 being the minimum Java version required for Tomcat 12. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69635</bug>: Add support to <code>jakarta.el.ImportHandler</code>
+        for resolving inner classes. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
