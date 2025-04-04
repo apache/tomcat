@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.authenticator.DigestAuthenticator;
 import org.apache.tomcat.util.res.StringManager;
 
 public class TestImportHandler {
@@ -264,5 +265,21 @@ public class TestImportHandler {
         importHandler.importPackage("util.b");
 
         importHandler.resolveClass("Foo");
+    }
+
+
+    /**
+     * Support for inner classes.
+     * <p>
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=69635
+     */
+    @Test
+    public void testResolveInnerClass() {
+        ImportHandler importHandler = new ImportHandler();
+
+        importHandler.importClass("org.apache.catalina.authenticator.DigestAuthenticator.AuthDigest");
+        Class<?> clazz = importHandler.resolveClass("AuthDigest");
+
+        Assert.assertEquals(DigestAuthenticator.AuthDigest.class, clazz);
     }
 }

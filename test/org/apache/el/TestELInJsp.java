@@ -507,6 +507,16 @@ public class TestELInJsp extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testBug69635() throws Exception {
+        getTomcatInstanceTestWebapp(true, true);
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug69635.jsp");
+        String result = res.toString();
+        assertEcho(result, "01-3");
+    }
+
+
     // Assertion for text contained with <p></p>, e.g. printed by tags:echo
     private static void assertEcho(String result, String expected) {
         Assert.assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);

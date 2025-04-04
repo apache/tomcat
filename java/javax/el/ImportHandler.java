@@ -401,6 +401,18 @@ public class ImportHandler {
                 clazzes.put(name, clazz);
                 return clazz;
             }
+            // Might be an inner class
+            StringBuilder sb = new StringBuilder(className);
+            int replacementPosition = sb.lastIndexOf(".");
+            while (replacementPosition > -1) {
+                sb.setCharAt(replacementPosition, '$');
+                clazz = findClass(sb.toString(), true);
+                if (clazz != null) {
+                    clazzes.put(name, clazz);
+                    return clazz;
+                }
+                replacementPosition = sb.lastIndexOf(".", replacementPosition);
+            }
         }
 
         // Search the package imports - note there may be multiple matches
