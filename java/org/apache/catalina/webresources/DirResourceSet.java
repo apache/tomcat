@@ -173,6 +173,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
             if (f != null) {
                 File[] list = f.listFiles();
                 if (list != null) {
+                    String fCanPath = null;
                     for (File entry : list) {
                         // f has already been validated so the following checks
                         // can be much simpler than those in file()
@@ -190,7 +191,9 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
                                 // that what is left does not contain a symlink.
                                 absPath = entry.getAbsolutePath().substring(f.getAbsolutePath().length());
                                 String entryCanPath = entry.getCanonicalPath();
-                                String fCanPath = f.getCanonicalPath();
+                                if (fCanPath == null) {
+                                    fCanPath = f.getCanonicalPath();
+                                }
                                 if (entryCanPath.length() >= fCanPath.length()) {
                                     canPath = entryCanPath.substring(fCanPath.length());
                                     if (absPath.equals(canPath)) {
