@@ -342,4 +342,12 @@ public interface Options {
     default boolean getGeneratedJavaAddTimestamp() {
         return true;
     }
+
+    /**
+     * A string containing a comma-separated list of qnames to which custom tag implementations should be applied.
+     * Unknown or unused tag entries are harmless.  Generally defined via an init parameter on the JspServlet.
+     *
+     * @return
+     */
+    String getUseNonstandardTagOptimizations();
 }

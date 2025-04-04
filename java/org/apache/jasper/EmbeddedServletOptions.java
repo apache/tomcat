@@ -223,6 +223,8 @@ public final class EmbeddedServletOptions implements Options {
 
     private boolean useInstanceManagerForTags = false;
 
+    private String useNonstandardTagOptimizations;
+
     public String getProperty(String name) {
         return settings.getProperty(name);
     }
@@ -470,6 +472,11 @@ public final class EmbeddedServletOptions implements Options {
         return useInstanceManagerForTags;
     }
 
+    @Override
+    public String getUseNonstandardTagOptimizations() {
+        return useNonstandardTagOptimizations;
+    }
+
     /**
      * Create an EmbeddedServletOptions object using data available from ServletConfig and ServletContext.
      *
@@ -650,6 +657,11 @@ public final class EmbeddedServletOptions implements Options {
         String classpath = config.getInitParameter("classpath");
         if (classpath != null) {
             this.classpath = classpath;
+        }
+
+        String useNonstandardTagOptimizations = config.getInitParameter("useNonstandardTagOptimizations");
+        if (useNonstandardTagOptimizations != null) {
+            this.useNonstandardTagOptimizations = useNonstandardTagOptimizations;
         }
 
         /*
