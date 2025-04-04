@@ -117,6 +117,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Jacoco to 0.8.13. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.6 (markt)" rtext="release in progress">
   <subsection name="Catalina">
