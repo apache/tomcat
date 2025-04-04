@@ -332,8 +332,6 @@ public class RewriteValve extends ValveBase {
              * without the two becoming confused. The re-write rules also need to be able to insert literal '%'
              * characters without them being confused with %nn encoding.
              *
-             * The re-write rules cannot insert path parameters.
-             *
              * To meet these requirement, the URL is processed as follows.
              *
              * Step 1. The URL is partially re-encoded by encodeForRewrite(). This method encodes any literal '%', ';'
