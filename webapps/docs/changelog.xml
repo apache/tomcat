@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.105 (remm)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update Jacoco to 0.8.13. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.104 (remm)" rtext="release in progress">
   <subsection name="Catalina">
