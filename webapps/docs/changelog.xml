@@ -127,6 +127,9 @@
         Set <code>sun.io.useCanonCaches</code> in <code>service.bat</code>
         Based on pull request <pr>841</pr> by Paul Lodge. (remm)
       </fix>
+      <update>
+        Update Jacoco to 0.8.13. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
