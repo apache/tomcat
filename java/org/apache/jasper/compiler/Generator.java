@@ -51,6 +51,7 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.TrimSpacesOption;
 import org.apache.jasper.compiler.Node.ChildInfoBase;
+import org.apache.jasper.compiler.Node.JspAttribute;
 import org.apache.jasper.compiler.Node.NamedAttribute;
 import org.apache.jasper.runtime.JspRuntimeLibrary;
 import org.xml.sax.Attributes;
@@ -101,6 +102,8 @@ class Generator {
     private final DateFormat timestampFormat;
 
     private final ELInterpreter elInterpreter;
+
+    private final Set<String> nonstandardCustomTagNames;
 
     private final StringInterpreter stringInterpreter;
 
@@ -1480,6 +1483,9 @@ class Generator {
 
         @Override
         public void visit(Node.CustomTag n) throws JasperException {
+            if (visitPotentiallyNonstandardCustomTag(n)) {
+                return;
+            }
 
             // Use plugin to generate more efficient code if there is one.
             if (n.useTagPlugin()) {
@@ -3028,6 +3034,168 @@ class Generator {
 
             return varName;
         }
+
+        /**
+         * Determines whether a tag should be handled via nonstandard code (typically
+         * faster). Considers both configuration and level of support within Tomcat.
+         *
+         * Note that Tomcat is free to ignore any case it cannot handle, as long as it
+         * reports it accurately to the caller by returning false. For example, the
+         * initial implementation for c:set excludes support for body content. c:set
+         * tags with body content will be generated with the standard code and tags
+         * without body content will be generated via non-standard code.
+         * 
+         * @param n
+         * @param jspAttributes
+         * @return whether code was generated
+         * @throws JasperException
+         */
+        private boolean visitPotentiallyNonstandardCustomTag(Node.CustomTag n)
+                throws JasperException {
+            if (!nonstandardCustomTagNames.contains(n.getQName())) {
+                // tag is not configured, move along
+                return false;
+            }
+
+            Map<String, JspAttribute> jspAttributes = new HashMap<>();
+            if (n.getJspAttributes() != null) {
+                for (JspAttribute jspAttr : n.getJspAttributes()) {
+                    jspAttributes.put(jspAttr.getLocalName(), jspAttr);
+                }
+            }
+            switch (n.qName) {
+            case "c:set":
+                // requires var and value, scope is optional, body is prohibited
+                if (n.hasEmptyBody() && jspAttributes.containsKey("var") && jspAttributes.containsKey("value")) {
+                    if (jspAttributes.size() == 2
+                            || (jspAttributes.size() == 3 && jspAttributes.containsKey("scope"))) {
+                        generateNonstandardSetLogic(n, jspAttributes);
+                        return true;
+                    }
+                }
+                break;
+            case "c:remove":
+                // requires var, scope is optional, body is prohibited
+                if (n.hasEmptyBody() && jspAttributes.containsKey("var")) {
+                    if (jspAttributes.size() == 1
+                            || (jspAttributes.size() == 2 && jspAttributes.containsKey("scope"))) {
+                        generateNonstandardRemoveLogic(n, jspAttributes);
+                        return true;
+                    }
+                }
+                break;
+            default:
+                // This indicates someone configured a tag with no non-standard implementation.
+                // Harmless.
+            }
+            return false;
+        }
+
+        private void generateNonstandardSetLogic(Node.CustomTag n, Map<String, JspAttribute> jspAttributes)
+                throws JasperException {
+            String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+            String tagMethod = "_jspx_meth_" + baseVar;
+            ServletWriter outSave = out;
+
+            // generate method call
+            out.printin(tagMethod);
+            out.print("(");
+            out.print("_jspx_page_context");
+            out.println(");");
+            GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+            methodsBuffered.add(genBuffer);
+            out = genBuffer.getOut();
+
+            // Generate code for method declaration
+            methodNesting++;
+            out.println();
+            out.pushIndent();
+            out.printin("private void ");
+            out.print(tagMethod);
+            out.println("(javax.servlet.jsp.PageContext _jspx_page_context)");
+            out.printil("        throws java.lang.Throwable {");
+            out.pushIndent();
+            // Generated body of method
+            String varValue = jspAttributes.get("var").getValue();
+            String scopeValue = translateScopeToConstant(jspAttributes);
+            String evaluatedAttribute = evaluateAttribute(getTagHandlerInfo(n), jspAttributes.get("value"),
+                    n, null);
+            out.printil("_jspx_page_context.setAttribute(\"" + varValue + "\", " + evaluatedAttribute
+                    + ", " + scopeValue + ");");
+            // Generate end of method
+            out.popIndent();
+            out.printil("}");
+            out.popIndent();
+
+            methodNesting--;
+            // restore previous writer
+            out = outSave;
+        }
+
+        private String translateScopeToConstant(Map<String, JspAttribute> jspAttributes) {
+            String scopeValue;
+            JspAttribute scopeAttribute = jspAttributes.get("scope");
+            if (scopeAttribute == null) {
+                scopeValue = "javax.servlet.jsp.PageContext.PAGE_SCOPE";
+            } else {
+                switch (scopeAttribute.getValue()) {
+                case "":
+                case "page":
+                    scopeValue = "javax.servlet.jsp.PageContext.PAGE_SCOPE";
+                    break;
+                case "request":
+                    scopeValue = "javax.servlet.jsp.PageContext.REQUEST_SCOPE";
+                    break;
+                case "session":
+                    scopeValue = "javax.servlet.jsp.PageContext.SESSION_SCOPE";
+                    break;
+                case "application":
+                    scopeValue = "javax.servlet.jsp.PageContext.APPLICATION_SCOPE";
+                    break;
+                default:
+                    throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
+                }
+            }
+            return scopeValue;
+        }
+
+        private void generateNonstandardRemoveLogic(Node.CustomTag n, Map<String, JspAttribute> jspAttributes)
+                throws JasperException {
+            String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+            String tagMethod = "_jspx_meth_" + baseVar;
+            ServletWriter outSave = out;
+
+            // generate method call
+            out.printin(tagMethod);
+            out.print("(");
+            out.print("_jspx_page_context");
+            out.println(");");
+            GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+            methodsBuffered.add(genBuffer);
+            out = genBuffer.getOut();
+
+            // Generate code for method declaration
+            methodNesting++;
+            out.println();
+            out.pushIndent();
+            out.printin("private void ");
+            out.print(tagMethod);
+            out.println("(javax.servlet.jsp.PageContext _jspx_page_context)");
+            out.printil("        throws java.lang.Throwable {");
+            out.pushIndent();
+            // Generated body of method
+            String varValue = jspAttributes.get("var").getValue();
+            String scopeValue = translateScopeToConstant(jspAttributes);
+            out.printil("_jspx_page_context.removeAttribute(\"" + varValue + "\", " + scopeValue + ");");
+            // Generate end of method
+            out.popIndent();
+            out.printil("}");
+            out.popIndent();
+
+            methodNesting--;
+            // restore previous writer
+            out = outSave;
+        }
     }
 
     private static void generateLocalVariables(ServletWriter out, ChildInfoBase n) {
@@ -3170,6 +3338,12 @@ class Generator {
         }
         timestampFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         timestampFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String nonstandardOptionsList = ctxt.getOptions().getUseNonstandardTagOptimizations();
+        if (nonstandardOptionsList == null) {
+            nonstandardCustomTagNames = Collections.emptySet();
+        } else {
+            nonstandardCustomTagNames = new HashSet<>(Arrays.asList(nonstandardOptionsList.split(",")));
+        }
     }
 
     /**
