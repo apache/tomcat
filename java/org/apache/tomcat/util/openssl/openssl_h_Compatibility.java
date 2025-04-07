@@ -159,7 +159,7 @@ public class openssl_h_Compatibility {
     // LibreSSL SSL_get_options
     public static long SSL_get_options(MemorySegment s) {
         if (LIBRESSL) {
-            return openssl_h.SSL_ctrl(s, SSL_CTRL_OPTIONS, 0, MemorySegment.NULL);
+            return SSL_ctrl(s, SSL_CTRL_OPTIONS, 0, MemorySegment.NULL);
         } else {
             return openssl_h.SSL_get_options(s);
         }
@@ -168,7 +168,7 @@ public class openssl_h_Compatibility {
     // LibreSSL SSL_set_options
     public static long SSL_set_options(MemorySegment s, long op) {
         if (LIBRESSL) {
-            return openssl_h.SSL_ctrl(s, SSL_CTRL_OPTIONS, op, MemorySegment.NULL);
+            return SSL_ctrl(s, SSL_CTRL_OPTIONS, op, MemorySegment.NULL);
         } else {
             return openssl_h.SSL_set_options(s, op);
         }
@@ -235,6 +235,194 @@ public class openssl_h_Compatibility {
         if (!BORINGSSL) {
             openssl_h.SSL_set_verify_result(ssl, v);
         }
+    }
+
+    /**
+     * {@snippet lang=c :
+     * long SSL_ctrl(SSL *ssl, int cmd, long larg, void *parg)
+     * }
+     */
+    public static long SSL_ctrl(MemorySegment ssl, int cmd, long larg, MemorySegment parg) {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_LONG,
+                openssl_h.C_POINTER,
+                openssl_h.C_INT,
+                openssl_h.C_LONG,
+                openssl_h.C_POINTER
+            );
+
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("SSL_ctrl"),
+                    DESC);
+        }
+        var mh$ = Holder.MH;
+        try {
+            return (long) mh$.invokeExact(ssl, cmd, larg, parg);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    // OpenSSL 1.x engine APIs
+
+    /**
+     * {@snippet lang=c :
+     * ENGINE *ENGINE_by_id(const char *id)
+     * }
+     */
+    public static MemorySegment ENGINE_by_id(MemorySegment id) {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER
+            );
+
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("ENGINE_by_id"),
+                    DESC);
+        }
+        var mh$ = Holder.MH;
+        try {
+            return (MemorySegment) mh$.invokeExact(id);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    /**
+     * {@snippet lang=c :
+     * int ENGINE_register_all_complete(void)
+     * }
+     */
+    public static int ENGINE_register_all_complete() {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_INT        );
+
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("ENGINE_register_all_complete"),
+                    DESC);
+        }
+        var mh$ = Holder.MH;
+        try {
+            return (int) mh$.invokeExact();
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    /**
+     * {@snippet lang=c :
+     * int ENGINE_ctrl_cmd_string(ENGINE *e, const char *cmd_name, const char *arg, int cmd_optional)
+     * }
+     */
+    public static int ENGINE_ctrl_cmd_string(MemorySegment e, MemorySegment cmd_name, MemorySegment arg, int cmd_optional) {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_INT,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_INT
+            );
+
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("ENGINE_ctrl_cmd_string"),
+                    DESC);
+        }
+        var mh$ = Holder.MH;
+        try {
+            return (int) mh$.invokeExact(e, cmd_name, arg, cmd_optional);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    /**
+     * {@snippet lang=c :
+     * int ENGINE_free(ENGINE *e)
+     * }
+     */
+    public static int ENGINE_free(MemorySegment e) {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_INT,
+                openssl_h.C_POINTER
+            );
+
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("ENGINE_free"),
+                    DESC);
+        }
+        var mh$ = Holder.MH;
+        try {
+            return (int) mh$.invokeExact(e);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    /**
+     * {@snippet lang=c :
+     * EVP_PKEY *ENGINE_load_private_key(ENGINE *e, const char *key_id, UI_METHOD *ui_method, void *callback_data)
+     * }
+     */
+    public static MemorySegment ENGINE_load_private_key(MemorySegment e, MemorySegment key_id, MemorySegment ui_method, MemorySegment callback_data) {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER,
+                openssl_h.C_POINTER
+            );
+
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("ENGINE_load_private_key"),
+                    DESC);
+        }
+        var mh$ = Holder.MH;
+        try {
+            return (MemorySegment) mh$.invokeExact(e, key_id, ui_method, callback_data);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    /**
+     * {@snippet lang=c :
+     * int ENGINE_set_default(ENGINE *e, unsigned int flags)
+     * }
+     */
+    public static int ENGINE_set_default(MemorySegment e, int flags) {
+        class Holder {
+            static final FunctionDescriptor DESC = FunctionDescriptor.of(
+                openssl_h.C_INT,
+                openssl_h.C_POINTER,
+                openssl_h.C_INT
+            );
+
+            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
+                    openssl_h.findOrThrow("ENGINE_set_default"),
+                    DESC);
+        }
+        var mh$ = Holder.MH;
+        try {
+            return (int) mh$.invokeExact(e, flags);
+        } catch (Throwable ex$) {
+           throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
+    private static final int ENGINE_METHOD_ALL = (int)65535L;
+    /**
+     * {@snippet lang=c :
+     * #define ENGINE_METHOD_ALL 65535
+     * }
+     */
+    public static int ENGINE_METHOD_ALL() {
+        return ENGINE_METHOD_ALL;
     }
 
 }
