@@ -122,6 +122,10 @@
       <update>
         Update Jacoco to 0.8.13. (remm)
       </update>
+      <add>
+        Explicitly set the locale to be used for Javadoc. For official releases,
+        this locale will be English (US) to support reproducible builds. (schultz)
+      </add>
     </changelog>
   </subsection>
 </section>
