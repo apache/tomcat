@@ -3065,9 +3065,13 @@ class Generator {
             }
             switch (n.qName) {
             case "c:set":
-                // requires var and value, scope is optional, body is prohibited
+                // requires var and value, scope is optional, body is prohibited, value cannot be deferred
                 if (n.hasEmptyBody() && jspAttributes.containsKey("var") && jspAttributes.containsKey("value")) {
-                    if (jspAttributes.size() == 2
+                    // verify value is not a deferred expression
+                    String valueText = jspAttributes.get("value").getValue();
+                    if (valueText.startsWith("#")) {
+                        return false;
+                    } else if (jspAttributes.size() == 2
                             || (jspAttributes.size() == 3 && jspAttributes.containsKey("scope"))) {
                         generateNonstandardSetLogic(n, jspAttributes);
                         return true;
@@ -3112,16 +3116,28 @@ class Generator {
             out.pushIndent();
             out.printin("private void ");
             out.print(tagMethod);
-            out.println("(javax.servlet.jsp.PageContext _jspx_page_context)");
+            out.println("(jakarta.servlet.jsp.PageContext _jspx_page_context)");
             out.printil("        throws java.lang.Throwable {");
             out.pushIndent();
             // Generated body of method
-            String varValue = jspAttributes.get("var").getValue();
+            out.printil("//  " + n.getQName());
+
+            JspAttribute varAttribute = jspAttributes.get("var");
+            Mark m = n.getStart();
+            out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") "
+                    + varAttribute.getTagAttributeInfo());
+
+            JspAttribute valueAttribute = jspAttributes.get("value");
+            m = n.getStart();
+            out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") "
+                    + valueAttribute.getTagAttributeInfo());
+
+            String varValue = varAttribute.getValue();
             String scopeValue = translateScopeToConstant(jspAttributes);
-            String evaluatedAttribute = evaluateAttribute(getTagHandlerInfo(n), jspAttributes.get("value"),
+            String evaluatedAttribute = evaluateAttribute(getTagHandlerInfo(n), valueAttribute,
                     n, null);
-            out.printil("_jspx_page_context.setAttribute(\"" + varValue + "\", " + evaluatedAttribute
-                    + ", " + scopeValue + ");");
+            out.printil("org.apache.jasper.runtime.JspRuntimeLibrary.nonstandardSetTag(_jspx_page_context, \""
+                    + varValue + "\", " + evaluatedAttribute + ", " + scopeValue + ");");
             // Generate end of method
             out.popIndent();
             out.printil("}");
@@ -3136,21 +3152,21 @@ class Generator {
             String scopeValue;
             JspAttribute scopeAttribute = jspAttributes.get("scope");
             if (scopeAttribute == null) {
-                scopeValue = "javax.servlet.jsp.PageContext.PAGE_SCOPE";
+                scopeValue = "jakarta.servlet.jsp.PageContext.PAGE_SCOPE";
             } else {
                 switch (scopeAttribute.getValue()) {
                 case "":
                 case "page":
-                    scopeValue = "javax.servlet.jsp.PageContext.PAGE_SCOPE";
+                    scopeValue = "jakarta.servlet.jsp.PageContext.PAGE_SCOPE";
                     break;
                 case "request":
-                    scopeValue = "javax.servlet.jsp.PageContext.REQUEST_SCOPE";
+                    scopeValue = "jakarta.servlet.jsp.PageContext.REQUEST_SCOPE";
                     break;
                 case "session":
-                    scopeValue = "javax.servlet.jsp.PageContext.SESSION_SCOPE";
+                    scopeValue = "jakarta.servlet.jsp.PageContext.SESSION_SCOPE";
                     break;
                 case "application":
-                    scopeValue = "javax.servlet.jsp.PageContext.APPLICATION_SCOPE";
+                    scopeValue = "jakarta.servlet.jsp.PageContext.APPLICATION_SCOPE";
                     break;
                 default:
                     throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
@@ -3180,13 +3196,18 @@ class Generator {
             out.pushIndent();
             out.printin("private void ");
             out.print(tagMethod);
-            out.println("(javax.servlet.jsp.PageContext _jspx_page_context)");
+            out.println("(jakarta.servlet.jsp.PageContext pageContext)");
             out.printil("        throws java.lang.Throwable {");
             out.pushIndent();
             // Generated body of method
             String varValue = jspAttributes.get("var").getValue();
-            String scopeValue = translateScopeToConstant(jspAttributes);
-            out.printil("_jspx_page_context.removeAttribute(\"" + varValue + "\", " + scopeValue + ");");
+            JspAttribute scope = jspAttributes.get("scope");
+            if (scope == null) {
+                out.printil("pageContext.removeAttribute(\"" + varValue + "\");");
+            } else {
+                String scopeValue = translateScopeToConstant(jspAttributes);
+                out.printil("pageContext.removeAttribute(\"" + varValue + "\", " + scopeValue + ");");
+            }
             // Generate end of method
             out.popIndent();
             out.printil("}");
