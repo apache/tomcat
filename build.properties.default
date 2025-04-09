@@ -63,7 +63,7 @@ execute.spotbugs=false
 # works better for Tomcat.
 javadoc.failonerror=true
 javadoc.failonwarning=false
-javadoc.locale=en_US
+javadoc.locale=en
 
 # ----- Test configuration -----
 execute.test.nio=true
