@@ -17,16 +17,15 @@
 package org.apache.catalina.util;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.GenericFilter;
-import jakarta.servlet.GenericServlet;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletResponse;
+import javax.servlet.FilterChain;
+import javax.servlet.GenericFilter;
+import javax.servlet.GenericServlet;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -114,7 +113,7 @@ public class TestFilterUtil extends TomcatBaseTest {
         @Override
         public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
             res.setContentType("text/plain");
-            res.setCharacterEncoding(StandardCharsets.UTF_8);
+            res.setCharacterEncoding("UTF-8");
             res.getWriter().print("OK");
         }
     }
