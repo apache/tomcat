@@ -17,7 +17,6 @@
 package org.apache.catalina.util;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import jakarta.servlet.FilterChain;
@@ -114,7 +113,7 @@ public class TestFilterUtil extends TomcatBaseTest {
         @Override
         public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
             res.setContentType("text/plain");
-            res.setCharacterEncoding(StandardCharsets.UTF_8);
+            res.setCharacterEncoding("UTF-8");
             res.getWriter().print("OK");
         }
     }
