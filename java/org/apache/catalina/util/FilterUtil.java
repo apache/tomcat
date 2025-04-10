@@ -79,6 +79,11 @@ public class FilterUtil {
             return false;
         }
 
+        /*
+         * Note: Order does not matter here in terms of specification compliance because this is Filter mapping. If any
+         * rule matches then this method returns true. Order would matter if this was Servlet mapping.
+         */
+
         // Case 1 - Exact Match
         if (testPath.equals(requestPath)) {
             return true;
@@ -109,7 +114,12 @@ public class FilterUtil {
             }
         }
 
-        // Case 4 - "Default" Match
+        // Case 4 - Context Root
+        if (testPath.isEmpty() && requestPath.equals("/")) {
+            return true;
+        }
+
+        // Case 5 - "Default" Match
         return false; // NOTE - Not relevant for selecting filters
     }
 
