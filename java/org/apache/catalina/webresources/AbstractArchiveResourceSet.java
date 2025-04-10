@@ -293,6 +293,25 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         throw new IllegalArgumentException(sm.getString("abstractArchiveResourceSet.setReadOnlyFalse"));
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Calls to this method will be ignored as archives do not allow linking.
+     */
+    @Override
+    public void setAllowLinking(boolean allowLinking) {
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Calls to this method always return {@code false} as archives do not allow linking.
+     */
+    @Override
+    public boolean getAllowLinking() {
+        return false;
+    }
+
     @SuppressWarnings("deprecation")
     protected JarFile openJarFile() throws IOException {
         synchronized (archiveLock) {
