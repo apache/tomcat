@@ -174,7 +174,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
                     for (File entry : list) {
                         // f has already been validated so the following checks
                         // can be much simpler than those in file()
-                        if (!getRoot().getAllowLinking()) {
+                        if (!getAllowLinking()) {
                             // allow linking is disabled so need to check for
                             // symlinks
                             boolean symlink = true;
