@@ -136,6 +136,12 @@
         Process possible path parameters rewrite production in the rewrite
         valve. (remm)
       </fix>
+      <add>
+        <bug>69588</bug>: Enable <code>allowLinking</code> to be set on
+        <code>PreResources</code>, <code>JarResources</code> and
+        <code>PostResources</code>. If not set explicitly, the setting will be
+        inherited from the <code>Resources</code>. (markt)
+      </add>
       <fix>
         <bug>69643</bug>: Optimize directory listing for large amount of files.
         Patch submitted by  Loic de l'Eprevier. (remm)

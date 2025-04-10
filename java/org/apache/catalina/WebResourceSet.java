@@ -135,4 +135,19 @@ public interface WebResourceSet extends Lifecycle {
      * resources.
      */
     void gc();
+
+    /**
+     * Configure if this {@code ResourceSet} allows the use of symbolic links.
+     *
+     * @param allowLinking <code>true</code> if symbolic links are allowed.
+     */
+    void setAllowLinking(boolean allowLinking);
+
+    /**
+     * Determine if this {@code ResourceSet} allows the use of symbolic links. If {@link #setAllowLinking(boolean)} has
+     * not been called for this instance, the value of {@link WebResourceRoot#getAllowLinking()} is returned.
+     *
+     * @return <code>true</code> if symbolic links are allowed
+     */
+    boolean getAllowLinking();
 }
