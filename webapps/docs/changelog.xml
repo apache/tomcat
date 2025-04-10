@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.105 (remm)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <fix>
+        <bug>69633</bug>: Add support for Filters using context root mappings.
+        (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
@@ -127,10 +135,6 @@
       <fix>
         Process possible path parameters rewrite production in the rewrite
         valve. (remm)
-      </fix>
-      <fix>
-        <bug>69633</bug>: Add support for Filters using context root mappings.
-        (markt)
       </fix>
       <fix>
         <bug>69643</bug>: Optimize directory listing for large amount of files.
