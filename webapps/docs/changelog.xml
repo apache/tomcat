@@ -161,6 +161,16 @@
         Process possible path parameters rewrite production in the rewrite
         valve. (remm)
       </fix>
+      <add>
+        <bug>69588</bug>: Enable <code>allowLinking</code> to be set on
+        <code>PreResources</code>, <code>JarResources</code> and
+        <code>PostResources</code>. If not set explicitly, the setting will be
+        inherited from the <code>Resources</code>. (markt)
+      </add>
+      <fix>
+        <bug>69633</bug>: Add support for Filters using context root mappings.
+        (markt)
+      </fix>
       <fix>
         <bug>69643</bug>: Optimize directory listing for large amount of files.
         Patch submitted by  Loic de l'Eprevier. (remm)
@@ -221,6 +231,9 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Update Jacoco to 0.8.13. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>

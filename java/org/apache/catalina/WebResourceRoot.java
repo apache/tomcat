@@ -21,6 +21,8 @@ import java.net.URL;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.catalina.util.ResourceSet;
+
 /**
  * Represents the complete set of resources for a web application. The resources for a web application consist of
  * multiple ResourceSets and when looking for a Resource, the ResourceSets are processed in the following order:
@@ -246,14 +248,16 @@ public interface WebResourceRoot extends Lifecycle {
     void setContext(Context context);
 
     /**
-     * Configure if this resources allow the use of symbolic links.
+     * Configure if this web application allows the use of symbolic links by default. Individual {@link ResourceSet}s
+     * may override this setting.
      *
      * @param allowLinking <code>true</code> if symbolic links are allowed.
      */
     void setAllowLinking(boolean allowLinking);
 
     /**
-     * Determine if this resources allow the use of symbolic links.
+     * Determine if this web application allows the use of symbolic links by default. Individual {@link ResourceSet}s
+     * may override this setting.
      *
      * @return <code>true</code> if symbolic links are allowed
      */
