@@ -957,4 +957,21 @@ public class JspRuntimeLibrary {
         }
 
     }
+
+    public static void nonstandardSetTag(jakarta.servlet.jsp.PageContext pageContext, String var, Object value) {
+        if (value == null) {
+            pageContext.removeAttribute(var);
+        } else {
+            pageContext.setAttribute(var, value);
+        }
+    }
+
+    public static void nonstandardSetTag(jakarta.servlet.jsp.PageContext pageContext, String var, Object value,
+            int scope) {
+        if (value == null) {
+            pageContext.removeAttribute(var, scope);
+        } else {
+            pageContext.setAttribute(var, value, scope);
+        }
+    }
 }
