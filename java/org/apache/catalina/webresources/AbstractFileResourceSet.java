@@ -37,6 +37,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     private String absoluteBase;
     private String canonicalBase;
     private boolean readOnly = false;
+    private Boolean allowLinking;
 
     protected AbstractFileResourceSet(String internalPath) {
         setInternalPath(internalPath);
@@ -54,6 +55,19 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
     @Override
     public boolean isReadOnly() {
         return readOnly;
+    }
+
+    @Override
+    public void setAllowLinking(boolean allowLinking) {
+        this.allowLinking = Boolean.valueOf(allowLinking);
+    }
+
+    @Override
+    public boolean getAllowLinking() {
+        if (allowLinking == null) {
+            return getRoot().getAllowLinking();
+        }
+        return allowLinking.booleanValue();
     }
 
     protected final File file(String name, boolean mustExist) {
@@ -78,7 +92,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
         // If allow linking is enabled, files are not limited to being located
         // under the fileBase so all further checks are disabled.
-        if (getRoot().getAllowLinking()) {
+        if (getAllowLinking()) {
             return file;
         }
 
