@@ -297,17 +297,9 @@ public class openssl_h_Compatibility {
      * }
      */
     public static int ENGINE_register_all_complete() {
-        class Holder {
-            static final FunctionDescriptor DESC = FunctionDescriptor.of(
-                openssl_h.C_INT        );
-
-            static final MethodHandle MH = Linker.nativeLinker().downcallHandle(
-                    openssl_h.findOrThrow("ENGINE_register_all_complete"),
-                    DESC);
-        }
-        var mh$ = Holder.MH;
         try {
-            return (int) mh$.invokeExact();
+            return (int) Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow("ENGINE_register_all_complete"),
+                    FunctionDescriptor.of(JAVA_INT)).invokeExact();
         } catch (Throwable ex$) {
            throw new AssertionError("should not reach here", ex$);
         }
