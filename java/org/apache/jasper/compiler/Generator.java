@@ -71,6 +71,8 @@ class Generator {
 
     private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("(\\s*(\\n|\\r)+\\s*)");
 
+    private static final String CORE_LIBS_URI = "http://java.sun.com/jsp/jstl/core";
+
     private final ServletWriter out;
 
     private final ArrayList<GenBuffer> methodsBuffered;
@@ -3066,7 +3068,10 @@ class Generator {
             switch (n.qName) {
             case "c:set":
                 // requires var and value, scope is optional, body is prohibited, value cannot be deferred
-                if (n.hasEmptyBody() && jspAttributes.containsKey("var") && jspAttributes.containsKey("value")) {
+                if (n.hasEmptyBody()
+                        && jspAttributes.containsKey("var")
+                        && jspAttributes.containsKey("value")
+                        && CORE_LIBS_URI.equals(n.getURI())) {
                     // verify value is not a deferred expression
                     String valueText = jspAttributes.get("value").getValue();
                     if (valueText.startsWith("#")) {
@@ -3080,12 +3085,15 @@ class Generator {
                 break;
             case "c:remove":
                 // requires var, scope is optional, body is prohibited
-                if (n.hasEmptyBody() && jspAttributes.containsKey("var")) {
-                    if (jspAttributes.size() == 1
-                            || (jspAttributes.size() == 2 && jspAttributes.containsKey("scope"))) {
-                        generateNonstandardRemoveLogic(n, jspAttributes);
-                        return true;
-                    }
+                if (n.hasEmptyBody()
+                        && jspAttributes.containsKey("var")
+                        && CORE_LIBS_URI.equals(n.getURI())
+                        && (jspAttributes.size() == 1
+                                || (jspAttributes.size() == 2
+                                && jspAttributes.containsKey("scope")))) {
+                    generateNonstandardRemoveLogic(n, jspAttributes);
+                    return true;
+
                 }
                 break;
             default:
