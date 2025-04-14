@@ -41,9 +41,9 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestDefaultServletPut extends TomcatBaseTest {
 
     private static final String START_TEXT= "Starting text";
-    private static final String START_LEN = Integer.toString(START_TEXT.length());
+    private static final int START_LEN = START_TEXT.length();
     private static final String PATCH_TEXT= "Ending *";
-    private static final String PATCH_LEN = Integer.toString(PATCH_TEXT.length());
+    private static final int PATCH_LEN = PATCH_TEXT.length();
     private static final String END_TEXT= "Ending * text";
 
     @Parameterized.Parameters(name = "{index} rangeHeader [{0}]")
@@ -52,23 +52,23 @@ public class TestDefaultServletPut extends TomcatBaseTest {
 
         // Valid partial PUT
         parameterSets.add(new Object[] {
-                "Content-Range: bytes 0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
+                "Content-Range: bytes 0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: ByTeS 0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
+                "Content-Range: ByTeS 0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
         // Full PUT
         parameterSets.add(new Object[] {
                 "", null, PATCH_TEXT, Boolean.TRUE });
         // Invalid range
         parameterSets.add(new Object[] {
-                "Content-Range: apples 0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+                "Content-Range: apples 0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes00-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+                "Content-Range: bytes00-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+                "Content-Range: bytes0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes=0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+                "Content-Range: bytes=0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes@0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+                "Content-Range: bytes@0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
                 "Content-Range: bytes 9-7/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
@@ -82,16 +82,17 @@ public class TestDefaultServletPut extends TomcatBaseTest {
         parameterSets.add(new Object[] {
                 "Content-Range: bytes 0-5/0x5" + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes 0-" + PATCH_LEN + "/" + PATCH_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+                "Content-Range: bytes 0-" + (PATCH_LEN) + "/" + PATCH_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         // Valid partial PUT but partial PUT is disabled
         parameterSets.add(new Object[] {
-                "Content-Range: bytes 0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.TRUE, START_TEXT, Boolean.FALSE });
+                "Content-Range: bytes 0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.TRUE, START_TEXT, Boolean.FALSE });
         // Errors due to incorrect length
         parameterSets.add(new Object[] {
                 "Content-Range: bytes 0-1/" + PATCH_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
-        parameterSets.add(new Object[] {
-                "Content-Range: bytes 0-19/20" + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
-
+        parameterSets.add(new Object[] { "Content-Range: bytes 0-" + PATCH_LEN + "/20" + CRLF, Boolean.FALSE,
+                START_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] { "Content-Range: bytes 0-" + (PATCH_LEN - 2) + "/20" + CRLF, Boolean.FALSE,
+                START_TEXT, Boolean.TRUE });
         return parameterSets;
     }
 
