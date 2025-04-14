@@ -117,6 +117,10 @@
         <bug>69633</bug>: Add support for Filters using context root mappings.
         (markt)
       </fix>
+      <fix>
+        <pr>843</pr>: Fix off by one validation logic for partial PUT ranges
+        and associated test case. Submitted by Chenjp. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
