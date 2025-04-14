@@ -175,6 +175,10 @@
         <bug>69643</bug>: Optimize directory listing for large amount of files.
         Patch submitted by  Loic de l'Eprevier. (remm)
       </fix>
+      <fix>
+        <pr>843</pr>: Fix off by one validation logic for partial PUT ranges
+        and associated test case. Submitted by Chenjp. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
