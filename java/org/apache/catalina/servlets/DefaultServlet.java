@@ -731,19 +731,20 @@ public class DefaultServlet extends HttpServlet {
 
             // Append data in request input stream to contentFile
             randAccessContentFile.seek(range.getStart());
+            long rangeSize = range.getEnd() - range.getStart() + 1;
             long received = 0;
-            int numBytesRead;
             byte[] transferBuffer = new byte[BUFFER_SIZE];
             try (BufferedInputStream requestBufInStream = new BufferedInputStream(req.getInputStream(), BUFFER_SIZE)) {
+                int numBytesRead;
                 while ((numBytesRead = requestBufInStream.read(transferBuffer)) != -1) {
                     received += numBytesRead;
-                    if (received > range.getEnd() - range.getStart()) {
+                    if (received > rangeSize) {
                         throw new IllegalStateException(sm.getString("defaultServlet.wrongByteCountForRange",
                                 String.valueOf(received), String.valueOf(range.getEnd() - range.getStart())));
                     }
                     randAccessContentFile.write(transferBuffer, 0, numBytesRead);
                 }
-                if (received < range.getEnd() - range.getStart()) {
+                if (received < rangeSize) {
                     throw new IllegalStateException(sm.getString("defaultServlet.wrongByteCountForRange",
                             String.valueOf(received), String.valueOf(range.getEnd() - range.getStart())));
                 }
