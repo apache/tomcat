@@ -137,6 +137,7 @@ public class JspC extends Task implements Options {
     protected static final String SWITCH_QUOTE_ATTRIBUTE_EL = "-quoteAttributeEL";
     protected static final String SWITCH_NO_QUOTE_ATTRIBUTE_EL = "-no-quoteAttributeEL";
     protected static final String SWITCH_THREAD_COUNT = "-threadCount";
+    protected static final String SWITCH_USENONSTANDARD_TAG_OPTIMIZATIONS = "-useNonstandardTagOptimizations";
     protected static final String SHOW_SUCCESS = "-s";
     protected static final String LIST_ERRORS = "-l";
     protected static final int INC_WEBXML = 10;
@@ -267,6 +268,8 @@ public class JspC extends Task implements Options {
     protected int argPos;
     protected boolean fullstop = false;
     protected String[] args;
+
+    protected String useNonstandardTagOptimizations;
 
     public static void main(String[] arg) {
         if (arg.length == 0) {
@@ -399,6 +402,8 @@ public class JspC extends Task implements Options {
                 setQuoteAttributeEL(false);
             } else if (tok.equals(SWITCH_THREAD_COUNT)) {
                 setThreadCount(nextArg());
+            } else if (tok.equals(SWITCH_USENONSTANDARD_TAG_OPTIMIZATIONS)) {
+                setUseNonstandardTagOptimizations(nextArg());
             } else {
                 if (tok.startsWith("-")) {
                     throw new JasperException(Localizer.getMessage("jspc.error.unknownOption", tok));
@@ -993,6 +998,15 @@ public class JspC extends Task implements Options {
      */
     public void setFailOnError(final boolean b) {
         failOnError = b;
+    }
+
+    /**
+     * Sets the set of custom tags to use nonstandard optimizations.
+     *
+     * @param useNonstandardTagOptimizations which tags to override
+     */
+    public void setUseNonstandardTagOptimizations(String useNonstandardTagOptimizations) {
+        this.useNonstandardTagOptimizations = useNonstandardTagOptimizations;
     }
 
     /**
@@ -1722,6 +1736,11 @@ public class JspC extends Task implements Options {
         }
     }
 
+
+    @Override
+    public String getUseNonstandardTagOptimizations() {
+        return useNonstandardTagOptimizations;
+    }
 
     private class ProcessFile implements Callable<Void> {
         private final String file;

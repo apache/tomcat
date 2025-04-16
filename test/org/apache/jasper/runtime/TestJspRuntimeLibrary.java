@@ -16,13 +16,19 @@
  */
 package org.apache.jasper.runtime;
 
+import jakarta.servlet.jsp.PageContext;
+import jakarta.servlet.jsp.TesterPageContextWithAttributes;
+
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestJspRuntimeLibrary extends TomcatBaseTest {
+
+    private PageContext pageContext;
 
     /*
      * Tests successful conversions
@@ -135,9 +141,38 @@ public class TestJspRuntimeLibrary extends TomcatBaseTest {
         assertEcho(result, "191-");
     }
 
-
     // Assertion for text contained with <p></p>, e.g. printed by tags:echo
     private static void assertEcho(String result, String expected) {
         Assert.assertTrue(result, result.indexOf("<p>" + expected + "</p>") > 0);
+    }
+
+    @Before
+    public void setupTestVars() {
+        pageContext = new TesterPageContextWithAttributes();
+    }
+
+    @Test
+    public void testNonstandardSetWithUndefinedScope() {
+        JspRuntimeLibrary.nonstandardSetTag(pageContext, "var", "value", PageContext.PAGE_SCOPE);
+        Assert.assertEquals("value", pageContext.getAttribute("var"));
+        Assert.assertEquals("value", pageContext.getAttribute("var", PageContext.PAGE_SCOPE));
+        Assert.assertEquals(null, pageContext.getAttribute("var", PageContext.REQUEST_SCOPE));
+
+        JspRuntimeLibrary.nonstandardSetTag(pageContext, "var", null, PageContext.PAGE_SCOPE);
+        Assert.assertEquals(null, pageContext.getAttribute("var"));
+
+    }
+
+    @Test
+    public void testNonstandardSetWithDefinedScope() {
+        final int[] scopes = {PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE, PageContext.APPLICATION_SCOPE};
+        for (int scope : scopes) {
+        JspRuntimeLibrary.nonstandardSetTag(pageContext, "var", "value", scope);
+        Assert.assertEquals("value", pageContext.getAttribute("var", scope));
+
+        JspRuntimeLibrary.nonstandardSetTag(pageContext, "var", null, scope);
+        Assert.assertEquals(null, pageContext.getAttribute("var", scope));
+        }
+
     }
 }
