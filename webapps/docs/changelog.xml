@@ -212,6 +212,11 @@
         <code>compilerTargetVM</code> have been updated to 21 to align with Java
         21 being the minimum Java version required for Tomcat 12. (markt)
       </update>
+      <add>
+        Add support for optimized execution of c:set and c:remove tags, when
+        activated via JSP servlet param useNonstandardTagOptimizations.
+        (jengebr)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         <bug>69635</bug>: Add support to <code>jakarta.el.ImportHandler</code>
