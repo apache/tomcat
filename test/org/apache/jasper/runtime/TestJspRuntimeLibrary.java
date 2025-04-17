@@ -16,6 +16,7 @@
  */
 package org.apache.jasper.runtime;
 
+import jakarta.el.ELManager;
 import jakarta.servlet.jsp.PageContext;
 import jakarta.servlet.jsp.TesterPageContextWithAttributes;
 
@@ -148,7 +149,7 @@ public class TestJspRuntimeLibrary extends TomcatBaseTest {
 
     @Before
     public void setupTestVars() {
-        pageContext = new TesterPageContextWithAttributes();
+        pageContext = new TesterPageContextWithAttributes((new ELManager()).getELContext());
     }
 
     @Test
