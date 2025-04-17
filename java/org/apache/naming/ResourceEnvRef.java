@@ -32,8 +32,7 @@ public class ResourceEnvRef extends AbstractRef {
     /**
      * Default factory for this reference.
      */
-    public static final String DEFAULT_FACTORY =
-            org.apache.naming.factory.Constants.DEFAULT_RESOURCE_ENV_FACTORY;
+    public static final String DEFAULT_FACTORY = org.apache.naming.factory.Constants.DEFAULT_RESOURCE_ENV_FACTORY;
 
 
     /**
