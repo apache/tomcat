@@ -45,15 +45,13 @@ public class ContextAccessController {
     /**
      * Set a security token for a Catalina context. Can be set only once.
      *
-     * @param name Name of the Catalina context
+     * @param name  Name of the Catalina context
      * @param token Security token
      */
     public static void setSecurityToken(Object name, Object token) {
         SecurityManager sm = System.getSecurityManager();
         if (sm != null) {
-            sm.checkPermission(new RuntimePermission(
-                    ContextAccessController.class.getName()
-                            + ".setSecurityToken"));
+            sm.checkPermission(new RuntimePermission(ContextAccessController.class.getName() + ".setSecurityToken"));
         }
         if ((!securityTokens.containsKey(name)) && (token != null)) {
             securityTokens.put(name, token);
@@ -64,7 +62,7 @@ public class ContextAccessController {
     /**
      * Remove a security token for a context.
      *
-     * @param name Name of the Catalina context
+     * @param name  Name of the Catalina context
      * @param token Security token
      */
     public static void unsetSecurityToken(Object name, Object token) {
@@ -77,15 +75,13 @@ public class ContextAccessController {
     /**
      * Check a submitted security token.
      *
-     * @param name Name of the Catalina context
+     * @param name  Name of the Catalina context
      * @param token Submitted security token
      *
-     * @return <code>true</code> if the submitted token is equal to the token
-     *         in the repository or if no token is present in the repository.
-     *         Otherwise, <code>false</code>
+     * @return <code>true</code> if the submitted token is equal to the token in the repository or if no token is
+     *             present in the repository. Otherwise, <code>false</code>
      */
-    public static boolean checkSecurityToken
-        (Object name, Object token) {
+    public static boolean checkSecurityToken(Object name, Object token) {
         Object refToken = securityTokens.get(name);
         return (refToken == null || refToken.equals(token));
     }
@@ -94,7 +90,7 @@ public class ContextAccessController {
     /**
      * Allow writing to a context.
      *
-     * @param name Name of the Catalina context
+     * @param name  Name of the Catalina context
      * @param token Security token
      */
     public static void setWritable(Object name, Object token) {
