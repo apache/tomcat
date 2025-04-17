@@ -27,8 +27,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.jasper.runtime.JspRuntimeLibrary;
-import org.apache.tomcat.InstanceManager;
-import org.apache.tomcat.SimpleInstanceManager;
 
 public class TestNonstandardTagPerformance {
     static final long NUM_ITERATIONS = 100000000L;
@@ -39,17 +37,11 @@ public class TestNonstandardTagPerformance {
 
     private ExpressionFactory factory;
 
-    private InstanceManager instanceManager = new SimpleInstanceManager();
-
     private ELManager manager;
     public PageContext pageContext;
 
     public jakarta.el.ExpressionFactory _jsp_getExpressionFactory() {
         return factory;
-    }
-
-    private InstanceManager _jsp_getInstanceManager() {
-        return instanceManager;
     }
 
     private void newCode(jakarta.servlet.jsp.PageContext _jspx_page_context) throws java.lang.Throwable {
