@@ -18,6 +18,7 @@ package jakarta.websocket.server;
 
 import java.net.URI;
 import java.security.Principal;
+import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Map;
 
@@ -50,4 +51,16 @@ public interface HandshakeRequest {
     Map<String,List<String>> getParameterMap();
 
     String getQueryString();
+
+    /**
+     * Returns the client certificate chain associated with this request, if any. The array is ordered in ascending
+     * order of trust. The first certificate in the array is the one that identifies the client. The next certificate is
+     * is for the certificate authority that issued the first. And so on to the root certificate authority.
+     *
+     * @return An ordered array of client certificates, with the client's own certificate first followed by any
+     *             certificate authorities or {@code null} if the client did not present a certificate.
+     *
+     * @since WebSocket 2.3
+     */
+    X509Certificate[] getUserX509CertificateChain();
 }

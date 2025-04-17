@@ -26,6 +26,7 @@ public class Constants {
 
     public static final String SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE = "jakarta.websocket.server.ServerContainer";
 
+    public static final String CERTIFICATE_SERVLET_REQUEST_ATTRIBUTE = "jakarta.servlet.request.X509Certificate";
 
     private Constants() {
         // Hide default constructor
