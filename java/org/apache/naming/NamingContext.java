@@ -68,7 +68,7 @@ public class NamingContext implements Context {
     /**
      * Builds a naming context.
      *
-     * @param env The environment to use to construct the naming context
+     * @param env  The environment to use to construct the naming context
      * @param name The name of the associated Catalina Context
      */
     public NamingContext(Hashtable<String,Object> env, String name) {
@@ -79,17 +79,16 @@ public class NamingContext implements Context {
     /**
      * Builds a naming context.
      *
-     * @param env The environment to use to construct the naming context
-     * @param name The name of the associated Catalina Context
+     * @param env      The environment to use to construct the naming context
+     * @param name     The name of the associated Catalina Context
      * @param bindings The initial bindings for the naming context
      */
-    public NamingContext(Hashtable<String,Object> env, String name,
-            HashMap<String,NamingEntry> bindings) {
+    public NamingContext(Hashtable<String,Object> env, String name, HashMap<String,NamingEntry> bindings) {
 
         this.env = new Hashtable<>();
         this.name = name;
         // Populating the environment hashtable
-        if (env != null ) {
+        if (env != null) {
             Enumeration<String> envEntries = env.keys();
             while (envEntries.hasMoreElements()) {
                 String entryName = envEntries.nextElement();
@@ -128,13 +127,14 @@ public class NamingContext implements Context {
 
 
     /**
-     * Determines if an attempt to write to a read-only context results in an
-     * exception or if the request is ignored.
+     * Determines if an attempt to write to a read-only context results in an exception or if the request is ignored.
      */
     private boolean exceptionOnFailedWrite = true;
+
     public boolean getExceptionOnFailedWrite() {
         return exceptionOnFailedWrite;
     }
+
     public void setExceptionOnFailedWrite(boolean exceptionOnFailedWrite) {
         this.exceptionOnFailedWrite = exceptionOnFailedWrite;
     }
@@ -143,43 +143,37 @@ public class NamingContext implements Context {
     // -------------------------------------------------------- Context Methods
 
     @Override
-    public Object lookup(Name name)
-        throws NamingException {
+    public Object lookup(Name name) throws NamingException {
         return lookup(name, true);
     }
 
 
     @Override
-    public Object lookup(String name)
-        throws NamingException {
+    public Object lookup(String name) throws NamingException {
         return lookup(new CompositeName(name), true);
     }
 
 
     @Override
-    public void bind(Name name, Object obj)
-        throws NamingException {
+    public void bind(Name name, Object obj) throws NamingException {
         bind(name, obj, false);
     }
 
 
     @Override
-    public void bind(String name, Object obj)
-        throws NamingException {
+    public void bind(String name, Object obj) throws NamingException {
         bind(new CompositeName(name), obj);
     }
 
 
     @Override
-    public void rebind(Name name, Object obj)
-        throws NamingException {
+    public void rebind(Name name, Object obj) throws NamingException {
         bind(name, obj, true);
     }
 
 
     @Override
-    public void rebind(String name, Object obj)
-        throws NamingException {
+    public void rebind(String name, Object obj) throws NamingException {
         rebind(new CompositeName(name), obj);
     }
 
@@ -195,23 +189,20 @@ public class NamingContext implements Context {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
-            throw new NamingException
-                (sm.getString("namingContext.invalidName"));
+            throw new NamingException(sm.getString("namingContext.invalidName"));
         }
 
         NamingEntry entry = bindings.get(name.get(0));
 
         if (entry == null) {
-            throw new NameNotFoundException
-                (sm.getString("namingContext.nameNotBound", name, name.get(0)));
+            throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
         }
 
         if (name.size() > 1) {
             if (entry.type == NamingEntry.CONTEXT) {
                 ((Context) entry.value).unbind(name.getSuffix(1));
             } else {
-                throw new NamingException
-                    (sm.getString("namingContext.contextExpected"));
+                throw new NamingException(sm.getString("namingContext.contextExpected"));
             }
         } else {
             bindings.remove(name.get(0));
@@ -221,15 +212,13 @@ public class NamingContext implements Context {
 
 
     @Override
-    public void unbind(String name)
-        throws NamingException {
+    public void unbind(String name) throws NamingException {
         unbind(new CompositeName(name));
     }
 
 
     @Override
-    public void rename(Name oldName, Name newName)
-        throws NamingException {
+    public void rename(Name oldName, Name newName) throws NamingException {
         Object value = lookup(oldName);
         bind(newName, value);
         unbind(oldName);
@@ -237,15 +226,13 @@ public class NamingContext implements Context {
 
 
     @Override
-    public void rename(String oldName, String newName)
-        throws NamingException {
+    public void rename(String oldName, String newName) throws NamingException {
         rename(new CompositeName(oldName), new CompositeName(newName));
     }
 
 
     @Override
-    public NamingEnumeration<NameClassPair> list(Name name)
-        throws NamingException {
+    public NamingEnumeration<NameClassPair> list(Name name) throws NamingException {
         // Removing empty parts
         while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
@@ -257,28 +244,24 @@ public class NamingContext implements Context {
         NamingEntry entry = bindings.get(name.get(0));
 
         if (entry == null) {
-            throw new NameNotFoundException
-                (sm.getString("namingContext.nameNotBound", name, name.get(0)));
+            throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
         }
 
         if (entry.type != NamingEntry.CONTEXT) {
-            throw new NamingException
-                (sm.getString("namingContext.contextExpected"));
+            throw new NamingException(sm.getString("namingContext.contextExpected"));
         }
         return ((Context) entry.value).list(name.getSuffix(1));
     }
 
 
     @Override
-    public NamingEnumeration<NameClassPair> list(String name)
-        throws NamingException {
+    public NamingEnumeration<NameClassPair> list(String name) throws NamingException {
         return list(new CompositeName(name));
     }
 
 
     @Override
-    public NamingEnumeration<Binding> listBindings(Name name)
-        throws NamingException {
+    public NamingEnumeration<Binding> listBindings(Name name) throws NamingException {
         // Removing empty parts
         while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
@@ -290,21 +273,18 @@ public class NamingContext implements Context {
         NamingEntry entry = bindings.get(name.get(0));
 
         if (entry == null) {
-            throw new NameNotFoundException
-                (sm.getString("namingContext.nameNotBound", name, name.get(0)));
+            throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
         }
 
         if (entry.type != NamingEntry.CONTEXT) {
-            throw new NamingException
-                (sm.getString("namingContext.contextExpected"));
+            throw new NamingException(sm.getString("namingContext.contextExpected"));
         }
         return ((Context) entry.value).listBindings(name.getSuffix(1));
     }
 
 
     @Override
-    public NamingEnumeration<Binding> listBindings(String name)
-        throws NamingException {
+    public NamingEnumeration<Binding> listBindings(String name) throws NamingException {
         return listBindings(new CompositeName(name));
     }
 
@@ -320,31 +300,27 @@ public class NamingContext implements Context {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
-            throw new NamingException
-                (sm.getString("namingContext.invalidName"));
+            throw new NamingException(sm.getString("namingContext.invalidName"));
         }
 
         NamingEntry entry = bindings.get(name.get(0));
 
         if (entry == null) {
-            throw new NameNotFoundException
-                (sm.getString("namingContext.nameNotBound", name, name.get(0)));
+            throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
         }
 
         if (name.size() > 1) {
             if (entry.type == NamingEntry.CONTEXT) {
                 ((Context) entry.value).destroySubcontext(name.getSuffix(1));
             } else {
-                throw new NamingException
-                    (sm.getString("namingContext.contextExpected"));
+                throw new NamingException(sm.getString("namingContext.contextExpected"));
             }
         } else {
             if (entry.type == NamingEntry.CONTEXT) {
                 ((Context) entry.value).close();
                 bindings.remove(name.get(0));
             } else {
-                throw new NotContextException
-                    (sm.getString("namingContext.contextExpected"));
+                throw new NotContextException(sm.getString("namingContext.contextExpected"));
             }
         }
 
@@ -352,8 +328,7 @@ public class NamingContext implements Context {
 
 
     @Override
-    public void destroySubcontext(String name)
-        throws NamingException {
+    public void destroySubcontext(String name) throws NamingException {
         destroySubcontext(new CompositeName(name));
     }
 
@@ -374,29 +349,25 @@ public class NamingContext implements Context {
 
 
     @Override
-    public Context createSubcontext(String name)
-        throws NamingException {
+    public Context createSubcontext(String name) throws NamingException {
         return createSubcontext(new CompositeName(name));
     }
 
 
     @Override
-    public Object lookupLink(Name name)
-        throws NamingException {
+    public Object lookupLink(Name name) throws NamingException {
         return lookup(name, false);
     }
 
 
     @Override
-    public Object lookupLink(String name)
-        throws NamingException {
+    public Object lookupLink(String name) throws NamingException {
         return lookup(new CompositeName(name), false);
     }
 
 
     @Override
-    public NameParser getNameParser(Name name)
-        throws NamingException {
+    public NameParser getNameParser(Name name) throws NamingException {
 
         while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
             name = name.getSuffix(1);
@@ -410,8 +381,7 @@ public class NamingContext implements Context {
             if (obj instanceof Context) {
                 return ((Context) obj).getNameParser(name.getSuffix(1));
             } else {
-                throw new NotContextException
-                    (sm.getString("namingContext.contextExpected"));
+                throw new NotContextException(sm.getString("namingContext.contextExpected"));
             }
         }
 
@@ -421,8 +391,7 @@ public class NamingContext implements Context {
 
 
     @Override
-    public NameParser getNameParser(String name)
-        throws NamingException {
+    public NameParser getNameParser(String name) throws NamingException {
         return getNameParser(new CompositeName(name));
     }
 
@@ -447,7 +416,7 @@ public class NamingContext implements Context {
 
 
     @Override
-    public Object removeFromEnvironment(String propName){
+    public Object removeFromEnvironment(String propName) {
         return env.remove(propName);
     }
 
@@ -468,10 +437,8 @@ public class NamingContext implements Context {
 
 
     @Override
-    public String getNameInNamespace()
-        throws NamingException {
-        throw  new OperationNotSupportedException
-            (sm.getString("namingContext.noAbsoluteName"));
+    public String getNameInNamespace() throws NamingException {
+        throw new OperationNotSupportedException(sm.getString("namingContext.noAbsoluteName"));
     }
 
 
@@ -496,13 +463,14 @@ public class NamingContext implements Context {
     /**
      * Retrieves the named object.
      *
-     * @param name the name of the object to look up
+     * @param name         the name of the object to look up
      * @param resolveLinks If true, the links will be resolved
+     *
      * @return the object bound to name
+     *
      * @exception NamingException if a naming exception is encountered
      */
-    protected Object lookup(Name name, boolean resolveLinks)
-        throws NamingException {
+    protected Object lookup(Name name, boolean resolveLinks) throws NamingException {
 
         // Removing empty parts
         while ((!name.isEmpty()) && (name.get(0).isEmpty())) {
@@ -516,16 +484,14 @@ public class NamingContext implements Context {
         NamingEntry entry = bindings.get(name.get(0));
 
         if (entry == null) {
-            throw new NameNotFoundException
-                (sm.getString("namingContext.nameNotBound", name, name.get(0)));
+            throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
         }
 
         if (name.size() > 1) {
             // If the size of the name is greater than 1, then we go through a
             // number of sub contexts.
             if (entry.type != NamingEntry.CONTEXT) {
-                throw new NamingException
-                    (sm.getString("namingContext.contextExpected"));
+                throw new NamingException(sm.getString("namingContext.contextExpected"));
             }
             return ((Context) entry.value).lookup(name.getSuffix(1));
         } else {
@@ -556,8 +522,7 @@ public class NamingContext implements Context {
                     }
                     if (entry.value instanceof ResourceRef) {
                         boolean singleton = Boolean.parseBoolean(
-                                    (String) ((ResourceRef) entry.value).get(
-                                            ResourceRef.SINGLETON).getContent());
+                                (String) ((ResourceRef) entry.value).get(ResourceRef.SINGLETON).getContent());
                         if (singleton) {
                             entry.type = NamingEntry.ENTRY;
                             entry.value = obj;
@@ -585,20 +550,18 @@ public class NamingContext implements Context {
 
 
     /**
-     * Binds a name to an object. All intermediate contexts and the target
-     * context (that named by all but terminal atomic component of the name)
-     * must already exist.
+     * Binds a name to an object. All intermediate contexts and the target context (that named by all but terminal
+     * atomic component of the name) must already exist.
      *
-     * @param name the name to bind; may not be empty
-     * @param obj the object to bind; possibly null
+     * @param name   the name to bind; may not be empty
+     * @param obj    the object to bind; possibly null
      * @param rebind if true, then perform a rebind (ie, overwrite)
-     * @exception NameAlreadyBoundException if name is already bound
-     * @exception javax.naming.directory.InvalidAttributesException if object
-     * did not supply all mandatory attributes
-     * @exception NamingException if a naming exception is encountered
+     *
+     * @exception NameAlreadyBoundException                         if name is already bound
+     * @exception javax.naming.directory.InvalidAttributesException if object did not supply all mandatory attributes
+     * @exception NamingException                                   if a naming exception is encountered
      */
-    protected void bind(Name name, Object obj, boolean rebind)
-        throws NamingException {
+    protected void bind(Name name, Object obj, boolean rebind) throws NamingException {
 
         if (!checkWritable()) {
             return;
@@ -608,16 +571,14 @@ public class NamingContext implements Context {
             name = name.getSuffix(1);
         }
         if (name.isEmpty()) {
-            throw new NamingException
-                (sm.getString("namingContext.invalidName"));
+            throw new NamingException(sm.getString("namingContext.invalidName"));
         }
 
         NamingEntry entry = bindings.get(name.get(0));
 
         if (name.size() > 1) {
             if (entry == null) {
-                throw new NameNotFoundException(sm.getString(
-                        "namingContext.nameNotBound", name, name.get(0)));
+                throw new NameNotFoundException(sm.getString("namingContext.nameNotBound", name, name.get(0)));
             }
             if (entry.type == NamingEntry.CONTEXT) {
                 if (rebind) {
@@ -626,32 +587,27 @@ public class NamingContext implements Context {
                     ((Context) entry.value).bind(name.getSuffix(1), obj);
                 }
             } else {
-                throw new NamingException
-                    (sm.getString("namingContext.contextExpected"));
+                throw new NamingException(sm.getString("namingContext.contextExpected"));
             }
         } else {
             if ((!rebind) && (entry != null)) {
-                throw new NameAlreadyBoundException
-                    (sm.getString("namingContext.alreadyBound", name.get(0)));
+                throw new NameAlreadyBoundException(sm.getString("namingContext.alreadyBound", name.get(0)));
             } else {
                 // Getting the type of the object and wrapping it within a new
                 // NamingEntry
-                Object toBind =
-                    NamingManager.getStateToBind(obj, name, this, env);
+                Object toBind = NamingManager.getStateToBind(obj, name, this, env);
                 switch (toBind) {
-                    case @SuppressWarnings("unused") Context context -> entry = new NamingEntry(name.get(0), toBind,
-                        NamingEntry.CONTEXT);
-                    case @SuppressWarnings("unused") LinkRef linkRef -> entry = new NamingEntry(name.get(0), toBind,
-                        NamingEntry.LINK_REF);
-                    case @SuppressWarnings("unused") Reference reference -> entry = new NamingEntry(name.get(0), toBind,
-                        NamingEntry.REFERENCE);
+                    case @SuppressWarnings("unused") Context context ->
+                        entry = new NamingEntry(name.get(0), toBind, NamingEntry.CONTEXT);
+                    case @SuppressWarnings("unused") LinkRef linkRef ->
+                        entry = new NamingEntry(name.get(0), toBind, NamingEntry.LINK_REF);
+                    case @SuppressWarnings("unused") Reference reference ->
+                        entry = new NamingEntry(name.get(0), toBind, NamingEntry.REFERENCE);
                     case Referenceable referenceable -> {
                         toBind = referenceable.getReference();
-                        entry = new NamingEntry(name.get(0), toBind,
-                            NamingEntry.REFERENCE);
+                        entry = new NamingEntry(name.get(0), toBind, NamingEntry.REFERENCE);
                     }
-                    case null, default -> entry = new NamingEntry(name.get(0), toBind,
-                        NamingEntry.ENTRY);
+                    case null, default -> entry = new NamingEntry(name.get(0), toBind, NamingEntry.ENTRY);
                 }
                 bindings.put(name.get(0), entry);
             }
@@ -670,9 +626,11 @@ public class NamingContext implements Context {
 
     /**
      * Throws a naming exception is Context is not writable.
+     *
      * @return <code>true</code> if the Context is writable
-     * @throws NamingException if the Context is not writable and
-     *  <code>exceptionOnFailedWrite</code> is <code>true</code>
+     *
+     * @throws NamingException if the Context is not writable and <code>exceptionOnFailedWrite</code> is
+     *                             <code>true</code>
      */
     protected boolean checkWritable() throws NamingException {
         if (isWritable()) {

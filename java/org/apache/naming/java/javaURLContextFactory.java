@@ -31,22 +31,17 @@ import org.apache.naming.SelectorContext;
 /**
  * Context factory for the "java:" namespace.
  * <p>
- * <b>Important note</b> : This factory MUST be associated with the "java" URL
- * prefix, which can be done by either :
+ * <b>Important note</b> : This factory MUST be associated with the "java" URL prefix, which can be done by either :
  * <ul>
- * <li>Adding a
- * java.naming.factory.url.pkgs=org.apache.naming property
- * to the JNDI properties file</li>
- * <li>Setting an environment variable named Context.URL_PKG_PREFIXES with
- * its value including the org.apache.naming package name.
- * More detail about this can be found in the JNDI documentation :
+ * <li>Adding a java.naming.factory.url.pkgs=org.apache.naming property to the JNDI properties file</li>
+ * <li>Setting an environment variable named Context.URL_PKG_PREFIXES with its value including the org.apache.naming
+ * package name. More detail about this can be found in the JNDI documentation :
  * {@link javax.naming.spi.NamingManager#getURLContext(String, java.util.Hashtable)}.</li>
  * </ul>
  *
  * @author Remy Maucherat
  */
-public class javaURLContextFactory
-    implements ObjectFactory, InitialContextFactory {
+public class javaURLContextFactory implements ObjectFactory, InitialContextFactory {
 
 
     // ----------------------------------------------------------- Constructors
@@ -75,22 +70,22 @@ public class javaURLContextFactory
 
     /**
      * Create a new Context's instance.
-     * @param obj unused
-     * @param name unused
-     * @param nameCtx unused
+     *
+     * @param obj         unused
+     * @param name        unused
+     * @param nameCtx     unused
      * @param environment the environment used
-     * @return a selector context if the thread or classloader are bound, and
-     *   null otherwise
+     *
+     * @return a selector context if the thread or classloader are bound, and null otherwise
+     *
      * @throws NamingException not thrown by this implementationm
      */
     @SuppressWarnings("unchecked")
     @Override
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-                                    Hashtable<?,?> environment)
-        throws NamingException {
-        if ((ContextBindings.isThreadBound()) ||
-            (ContextBindings.isClassLoaderBound())) {
-            return new SelectorContext((Hashtable<String,Object>)environment);
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)
+            throws NamingException {
+        if ((ContextBindings.isThreadBound()) || (ContextBindings.isClassLoaderBound())) {
+            return new SelectorContext((Hashtable<String,Object>) environment);
         }
         return null;
     }
@@ -98,28 +93,26 @@ public class javaURLContextFactory
 
     /**
      * Get a new (writable) initial context.
+     *
      * @param environment the environment used
-     * @return a selector context if the thread or classloader are bound, and
-     *   a shared writable context otherwise
+     *
+     * @return a selector context if the thread or classloader are bound, and a shared writable context otherwise
+     *
      * @throws NamingException not thrown by this implementationm
      */
     @SuppressWarnings("unchecked")
     @Override
-    public Context getInitialContext(Hashtable<?,?> environment)
-        throws NamingException {
-        if (ContextBindings.isThreadBound() ||
-            (ContextBindings.isClassLoaderBound())) {
+    public Context getInitialContext(Hashtable<?,?> environment) throws NamingException {
+        if (ContextBindings.isThreadBound() || (ContextBindings.isClassLoaderBound())) {
             // Redirect the request to the bound initial context
-            return new SelectorContext(
-                    (Hashtable<String,Object>)environment, true);
+            return new SelectorContext((Hashtable<String,Object>) environment, true);
         }
 
         // If the thread is not bound, return a shared writable context
         if (initialContext == null) {
-            synchronized(javaURLContextFactory.class) {
+            synchronized (javaURLContextFactory.class) {
                 if (initialContext == null) {
-                    initialContext = new NamingContext(
-                            (Hashtable<String,Object>)environment, MAIN);
+                    initialContext = new NamingContext((Hashtable<String,Object>) environment, MAIN);
                 }
             }
         }
