@@ -165,14 +165,14 @@ public class TestJspRuntimeLibrary extends TomcatBaseTest {
 
     @Test
     public void testNonstandardSetWithDefinedScope() {
-        final int[] scopes = {PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE, PageContext.APPLICATION_SCOPE};
+        final int[] scopes = { PageContext.PAGE_SCOPE, PageContext.REQUEST_SCOPE, PageContext.SESSION_SCOPE,
+                PageContext.APPLICATION_SCOPE };
         for (int scope : scopes) {
-        JspRuntimeLibrary.nonstandardSetTag(pageContext, "var", "value", scope);
-        Assert.assertEquals("value", pageContext.getAttribute("var", scope));
+            JspRuntimeLibrary.nonstandardSetTag(pageContext, "var", "value", scope);
+            Assert.assertEquals("value", pageContext.getAttribute("var", scope));
 
-        JspRuntimeLibrary.nonstandardSetTag(pageContext, "var", null, scope);
-        Assert.assertEquals(null, pageContext.getAttribute("var", scope));
+            JspRuntimeLibrary.nonstandardSetTag(pageContext, "var", null, scope);
+            Assert.assertEquals(null, pageContext.getAttribute("var", scope));
         }
-
     }
 }
