@@ -15,4 +15,4 @@
   limitations under the License.
 --%>
 <%@page import="org.apache.catalina.authenticator.DigestAuthenticator.AuthDigest"%>
-<p>01-${ AuthDigest.values().length }</p>
+<p>01-${ AuthDigest.values().stream().count() }</p>
