@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.Enumeration;
 
+import javax.el.VariableMapper;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -967,5 +968,31 @@ public class JspRuntimeLibrary {
             log.warn(Localizer.getMessage("jsp.warning.tagPreDestroy", tag.getClass().getName()), t);
         }
 
+    }
+
+    /**
+     * This method parallels the logic of {@code SetSupport.doEndTag()}.
+     *
+     * @param pageContext pageContext
+     * @param var name of the variable
+     * @param value value to store
+     * @param scope scope
+     */
+    public static void nonstandardSetTag(javax.servlet.jsp.PageContext pageContext, String var, Object value,
+            int scope) {
+        if (value == null) {
+            // matches SetTag and removes the key from the specified scope
+            pageContext.removeAttribute(var, scope);
+        } else {
+            if (scope == PageContext.PAGE_SCOPE) {
+                // matches SetTag and cleans up the VariableMapper
+                VariableMapper vm = pageContext.getELContext().getVariableMapper();
+                if (vm != null) {
+                    vm.setVariable(var, null);
+                }
+            }
+            // does the all-important set of the correct scope
+            pageContext.setAttribute(var, value, scope);
+        }
     }
 }
