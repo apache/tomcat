@@ -137,6 +137,11 @@
         <bug>69635</bug>: Add support to <code>jakarta.el.ImportHandler</code>
         for resolving inner classes. (markt)
       </fix>
+      <add>
+        <pr>842</pr>Add support for optimized execution of c:set and c:remove tags, when
+        activated via JSP servlet param useNonstandardTagOptimizations.
+        (jengebr)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">

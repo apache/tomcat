@@ -29,6 +29,15 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 public class TesterPageContext extends PageContext {
+    private final ELContext elContext;
+
+    public TesterPageContext() {
+        this.elContext = null;
+    }
+
+    public TesterPageContext(ELContext elContext) {
+        this.elContext = elContext;
+    }
 
     @Override
     public void initialize(Servlet servlet, ServletRequest request,
@@ -174,7 +183,6 @@ public class TesterPageContext extends PageContext {
 
     @Override
     public ELContext getELContext() {
-        // NO-OP
-        return null;
+        return elContext;
     }
 }
