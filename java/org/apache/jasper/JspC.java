@@ -268,6 +268,8 @@ public class JspC extends Task implements Options {
     protected boolean fullstop = false;
     protected String[] args;
 
+    protected String useNonstandardTagOptimizations;
+
     public static void main(String[] arg) {
         if (arg.length == 0) {
             System.out.println(Localizer.getMessage("jspc.usage"));
@@ -996,6 +998,15 @@ public class JspC extends Task implements Options {
     }
 
     /**
+     * Sets the set of custom tags to use nonstandard optimizations.
+     *
+     * @param useNonstandardTagOptimizations which tags to override
+     */
+    public void setUseNonstandardTagOptimizations(String useNonstandardTagOptimizations) {
+        this.useNonstandardTagOptimizations = useNonstandardTagOptimizations;
+    }
+
+    /**
      * @return <code>true</code> if an exception will be thrown in case of a compilation error.
      */
     public boolean getFailOnError() {
@@ -1720,6 +1731,11 @@ public class JspC extends Task implements Options {
             fos.close();
             throw ex;
         }
+    }
+
+    @Override
+    public String getUseNonstandardTagOptimizations() {
+        return useNonstandardTagOptimizations;
     }
 
 
