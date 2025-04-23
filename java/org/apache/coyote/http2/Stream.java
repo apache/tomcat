@@ -72,6 +72,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
     private static final Integer HTTP_UPGRADE_STREAM = Integer.valueOf(1);
 
     private static final Set<String> HTTP_CONNECTION_SPECIFIC_HEADERS = new HashSet<>();
+    private static final boolean externalRequest;
 
     static {
         Response response = new Response();
@@ -127,6 +128,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
         if (coyoteRequest == null) {
             // HTTP/2 new request
+            externalRequest = false;
             this.coyoteRequest = handler.getProtocol().popRequestAndResponse();
             this.coyoteResponse = this.coyoteRequest.getResponse();
             this.inputBuffer = new StandardStreamInputBuffer();
@@ -137,6 +139,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
              * Implementation note. The request passed in is always newly created so it is safe to recycle it for re-use
              * in the Stream.recyle() method. Need to create a matching, new response.
              */
+            externalRequest = true;
             this.coyoteRequest = coyoteRequest;
             this.coyoteResponse = new Response();
             this.coyoteRequest.setResponse(coyoteResponse);
@@ -844,7 +847,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         }
         coyoteRequest.recycle();
         coyoteResponse.recycle();
-        handler.getProtocol().pushRequestAndResponse(coyoteRequest);
+        if (!externalRequest) {
+            handler.getProtocol().pushRequestAndResponse(coyoteRequest);
+        }
     }
 
 
