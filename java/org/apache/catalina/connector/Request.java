@@ -1841,6 +1841,12 @@ public class Request implements HttpServletRequest {
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Tomcat neither normalizes nor decodes the returned value. It will be identical to the part of the request URI
+     * provided by the user agent that was used to determine the context path.
+     */
     @Override
     public String getContextPath() {
         int lastSlash = mappingData.contextSlashCount;

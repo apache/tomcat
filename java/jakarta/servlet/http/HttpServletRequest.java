@@ -77,8 +77,8 @@ public interface HttpServletRequest extends ServletRequest {
      * <code>Date</code> object. Use this method with headers that contain dates, such as
      * <code>If-Modified-Since</code>.
      * <p>
-     * The date is returned as the number of milliseconds since January 1, 1970 GMT. The header name
-     * is case-insensitive.
+     * The date is returned as the number of milliseconds since January 1, 1970 GMT. The header name is
+     * case-insensitive.
      * <p>
      * If the request did not have a header of the specified name, this method returns -1. If the header can't be
      * converted to a date, the method throws an <code>IllegalArgumentException</code>.
@@ -239,7 +239,11 @@ public interface HttpServletRequest extends ServletRequest {
     /**
      * Returns the portion of the request URI that indicates the context of the request. The context path always comes
      * first in a request URI. The path starts with a "/" character but does not end with a "/" character. For servlets
-     * in the default (root) context, this method returns "". The container does not decode this string.
+     * in the default (root) context, this method returns "".
+     * <p>
+     * The value returned will be suitable for inclusion in a URI. It will be equivalent to the value provided by the
+     * user agent but it may not be identical to the value provided by the user agent. Path parameters will be removed,
+     * the path may be normalized or partially normalized and optional %nn encoding may be decoded or partially decoded.
      *
      * @return a <code>String</code> specifying the portion of the request URI that indicates the context of the request
      */
