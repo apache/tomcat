@@ -199,8 +199,8 @@
   <subsection name="Jasper">
     <changelog>
       <add>
-        Add support for the new Elvis operator (<code>:?</code>) in Jakarta
-        Expression language. (markt)
+        Add support for the new Elvis (<code>:?</code>) and Null coalescing
+        (<code>??</code>) operators in Jakarta Expression language. (markt)
       </add>
       <add>
         Extend the existing <code>+</code> operator in Jakarta Expression

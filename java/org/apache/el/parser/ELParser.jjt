@@ -154,8 +154,9 @@ void Ternary() : {}
 {
     Or()
     (
-    LOOKAHEAD(3)
-        (<QUESTIONMARK><COLON> Ternary() #Elvis(2))
+        LOOKAHEAD(2) (<QUESTIONMARK><QUESTIONMARK> Ternary() #NullCoalescing(2))
+    |
+        LOOKAHEAD(2) (<QUESTIONMARK><COLON> Ternary() #Elvis(2))
     |
         (<QUESTIONMARK> Ternary() <COLON> Ternary() #Choice(3))
     )*

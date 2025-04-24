@@ -247,12 +247,40 @@ public class TestELEvaluation {
 
     @Test
     public void testElvis01() throws Exception {
-        Assert.assertEquals("OK", evaluateExpression("${'OK'?:'FAIL'}"));
+        Assert.assertEquals("true", evaluateExpression("${'true'?:'FAIL'}"));
     }
 
     @Test
     public void testElvis02() throws Exception {
+        // null coerces to false
         Assert.assertEquals("OK", evaluateExpression("${null?:'OK'}"));
+    }
+
+    @Test
+    public void testElvis03() throws Exception {
+        Assert.assertEquals("OK", evaluateExpression("${'false'?:'OK'}"));
+    }
+
+    @Test
+    public void testElvis04() throws Exception {
+        // Any string other "true" (ignoring case) coerces to false
+        evaluateExpression("${'error'?:'OK'}");
+    }
+
+    @Test(expected = ELException.class)
+    public void testElvis05() throws Exception {
+        // Non-string values do not coerce
+        evaluateExpression("${1234?:'OK'}");
+    }
+
+    @Test
+    public void testNullCoalescing01() throws Exception {
+        Assert.assertEquals("OK", evaluateExpression("${'OK'??'FAIL'}"));
+    }
+
+    @Test
+    public void testNullCoalescing02() throws Exception {
+        Assert.assertEquals("OK", evaluateExpression("${null??'OK'}"));
     }
 
 
