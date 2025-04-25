@@ -51,6 +51,7 @@ import org.apache.jasper.JasperException;
 import org.apache.jasper.JspCompilationContext;
 import org.apache.jasper.TrimSpacesOption;
 import org.apache.jasper.compiler.Node.ChildInfoBase;
+import org.apache.jasper.compiler.Node.CustomTag;
 import org.apache.jasper.compiler.Node.JspAttribute;
 import org.apache.jasper.compiler.Node.NamedAttribute;
 import org.apache.jasper.runtime.JspRuntimeLibrary;
@@ -70,8 +71,6 @@ class Generator {
     private static final Pattern PRE_TAG_PATTERN = Pattern.compile("(?s).*(<pre>|</pre>).*");
 
     private static final Pattern BLANK_LINE_PATTERN = Pattern.compile("(\\s*(\\n|\\r)+\\s*)");
-
-    private static final String CORE_LIBS_URI = "http://java.sun.com/jsp/jstl/core";
 
     private final ServletWriter out;
 
@@ -866,6 +865,461 @@ class Generator {
      */
     private class GenerateVisitor extends Node.Visitor {
 
+        private interface NonstandardCustomTagGenerator {
+            String CORE_LIBS_URI = "http://java.sun.com/jsp/jstl/core";
+
+            boolean appliesTo(Node.CustomTag n, Map<String, JspAttribute> jspAttributes);
+
+            void generate(Node.CustomTag n, Map<String, JspAttribute> jspAttributes) throws JasperException;
+        }
+
+        private class RemoveTagGenerator implements NonstandardCustomTagGenerator {
+            @Override
+            public boolean appliesTo(CustomTag n, Map<String, JspAttribute> jspAttributes) {
+                return (n.hasEmptyBody() && jspAttributes.containsKey("var") && CORE_LIBS_URI.equals(n.getURI())
+                        && (jspAttributes.size() == 1
+                                || (jspAttributes.size() == 2 && jspAttributes.containsKey("scope"))));
+            }
+
+            @Override
+            public void generate(CustomTag n, Map<String, JspAttribute> jspAttributes) throws JasperException {
+                String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+                String tagMethod = "_jspx_meth_" + baseVar;
+                ServletWriter outSave = out;
+
+                // generate method call
+                out.printin(tagMethod);
+                out.print("(");
+                out.print("_jspx_page_context");
+                out.println(");");
+                GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+                methodsBuffered.add(genBuffer);
+                out = genBuffer.getOut();
+
+                // Generate code for method declaration
+                methodNesting++;
+                out.println();
+                out.pushIndent();
+                out.printin("private void ");
+                out.print(tagMethod);
+                out.println("(jakarta.servlet.jsp.PageContext pageContext)");
+                out.printil("        throws java.lang.Throwable {");
+                out.pushIndent();
+                // Generated body of method
+                String varValue = jspAttributes.get("var").getValue();
+                JspAttribute scope = jspAttributes.get("scope");
+                if (scope == null) {
+                    // c:remove without a scope means remove from all scopes
+                    out.printil("pageContext.removeAttribute(\"" + varValue + "\");");
+                } else {
+                    // c:remove with a scope means remove only from the specified scope
+                    String scopeValue = translateScopeToConstant(jspAttributes);
+                    out.printil("pageContext.removeAttribute(\"" + varValue + "\", " + scopeValue + ");");
+                }
+                // Generate end of method
+                out.popIndent();
+                out.printil("}");
+                out.popIndent();
+
+                methodNesting--;
+                // restore previous writer
+                out = outSave;
+
+            }
+        }
+
+        private class IfTagGenerator implements NonstandardCustomTagGenerator {
+
+            @Override
+            public boolean appliesTo(CustomTag n, Map<String, JspAttribute> jspAttributes) {
+                return (!n.hasEmptyBody() && CORE_LIBS_URI.equals(n.getURI()) && jspAttributes.size() == 1
+                        && jspAttributes.containsKey("test"));
+            }
+
+            @Override
+            public void generate(CustomTag n, Map<String, JspAttribute> jspAttributes) throws JasperException {
+                String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+                String tagMethod = "_jspx_meth_" + baseVar;
+                ServletWriter outSave = out;
+
+                // generate method call
+                out.printin(tagMethod);
+                out.print("(");
+                out.print("_jspx_page_context");
+                out.println(");");
+                GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+                methodsBuffered.add(genBuffer);
+                out = genBuffer.getOut();
+
+                // Generate code for method declaration
+                methodNesting++;
+                out.println();
+                out.pushIndent();
+                out.printin("private void ");
+                out.print(tagMethod);
+                out.println("(jakarta.servlet.jsp.PageContext _jspx_page_context)");
+                out.printil("        throws java.lang.Throwable {");
+                out.pushIndent();
+                // Generated body of method
+                out.printil("jakarta.servlet.jsp.JspWriter out = _jspx_page_context.getOut();");
+                JspAttribute testAttribute = jspAttributes.get("test");
+                Mark m = n.getStart();
+                m = n.getStart();
+                out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") "
+                        + testAttribute.getTagAttributeInfo());
+
+                // translates the specified value attributes into EL-interpretation code using
+                // standard logic
+                String evaluatedAttribute = evaluateAttribute(getTagHandlerInfo(n), testAttribute, n, null);
+                out.printil("boolean condition = " + evaluatedAttribute + ";");
+                out.printil("if (condition) {");
+
+                // generate body
+                out.pushIndent();
+                n.getBody().visit(GenerateVisitor.this);
+                out.popIndent();
+
+                // Generate end of method
+                out.printil("}");
+                out.popIndent();
+                out.printil("}");
+                out.popIndent();
+
+                methodNesting--;
+                // restore previous writer
+                out = outSave;
+            }
+        }
+
+        private class CatchTagGenerator implements NonstandardCustomTagGenerator {
+
+            @Override
+            public boolean appliesTo(CustomTag n, Map<String, JspAttribute> jspAttributes) {
+                return (!n.hasEmptyBody() && CORE_LIBS_URI.equals(n.getURI()) && (jspAttributes.size() == 0
+                        || (jspAttributes.size() == 1 && jspAttributes.containsKey("var"))));
+            }
+
+            @Override
+            public void generate(CustomTag n, Map<String, JspAttribute> jspAttributes) throws JasperException {
+                String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+                String tagMethod = "_jspx_meth_" + baseVar;
+                ServletWriter outSave = out;
+
+                // generate method call
+                out.printin(tagMethod);
+                out.print("(");
+                out.print("_jspx_page_context");
+                out.println(");");
+                GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+                methodsBuffered.add(genBuffer);
+                out = genBuffer.getOut();
+
+                // Generate code for method declaration
+                methodNesting++;
+                out.println();
+                out.pushIndent();
+                out.printin("private void ");
+                out.print(tagMethod);
+                out.println("(jakarta.servlet.jsp.PageContext pageContext)");
+                out.printil("        throws java.lang.Throwable {");
+                out.pushIndent();
+                // Generated body of method
+                JspAttribute var = jspAttributes.get("var");
+                out.printil("jakarta.servlet.jsp.JspWriter out = pageContext.getOut();");
+                out.printil("int[] _jspx_push_body_count_c_005fcatch_005f0 = new int[] { 0 };");
+                out.printil("boolean caught = false;");
+                out.printil("try {");
+                // generate body
+                out.pushIndent();
+                n.getBody().visit(GenerateVisitor.this);
+                out.popIndent();
+
+                // generate catch/finally
+                out.printil("} catch (java.lang.Throwable _jspx_exception) { ");
+                out.pushIndent();
+                out.printil("caught = true;");
+                out.printil("while (_jspx_push_body_count_c_005fcatch_005f0[0]-- > 0)");
+                out.pushIndent();
+                out.printil("out = pageContext.popBody();");
+                out.popIndent();
+
+                if (var != null) {
+                    out.printil("pageContext.setAttribute(\"" + var.getValue()
+                            + "\", _jspx_exception, PageContext.PAGE_SCOPE);");
+                }
+                out.popIndent();
+                out.printil("} finally {");
+                out.pushIndent();
+                if (var != null) {
+                    out.printil("if (!caught)");
+                    out.pushIndent();
+                    out.printil("pageContext.removeAttribute(\"" + var.getValue() + "\", PageContext.PAGE_SCOPE);");
+                    out.popIndent();
+                }
+                // Generate end of method
+                out.popIndent();
+                out.printil("}");
+                out.popIndent();
+                out.printil("}");
+                out.popIndent();
+
+                methodNesting--;
+                // restore previous writer
+                out = outSave;
+            }
+        }
+
+        private class ChooseTagGenerator implements NonstandardCustomTagGenerator {
+
+            @Override
+            public boolean appliesTo(CustomTag n, Map<String, JspAttribute> jspAttributes) {
+                return (CORE_LIBS_URI.equals(n.getURI()) && jspAttributes.size() == 0);
+            }
+
+            public void generate(Node.CustomTag n, Map<String, JspAttribute> jspAttributes) throws JasperException {
+                String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+                String tagMethod = "_jspx_meth_" + baseVar;
+                ServletWriter outSave = out;
+
+                // generate method call
+                out.printin(tagMethod);
+                out.print("(");
+                out.print("_jspx_page_context");
+                out.println(");");
+                GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+                methodsBuffered.add(genBuffer);
+                out = genBuffer.getOut();
+
+                // Generate code for method declaration
+                methodNesting++;
+                out.println();
+                out.pushIndent();
+                out.printin("private void ");
+                out.print(tagMethod);
+                out.println("(jakarta.servlet.jsp.PageContext _jspx_page_context)");
+                out.printil("        throws java.lang.Throwable {");
+                out.pushIndent();
+
+                // Generated body of method
+                out.printil("jakarta.servlet.jsp.JspWriter out = _jspx_page_context.getOut();");
+                out.printil("boolean completed = false;");
+
+                // generate body
+                n.getBody().visit(GenerateVisitor.this);
+
+                // Generate end of method
+                out.popIndent();
+                out.printil("}");
+                out.popIndent();
+
+                methodNesting--;
+                // restore previous writer
+                out = outSave;
+            }
+        }
+
+        private class WhenTagGenerator implements NonstandardCustomTagGenerator {
+
+            @Override
+            public boolean appliesTo(CustomTag n, Map<String, JspAttribute> jspAttributes) {
+                return (CORE_LIBS_URI.equals(n.getURI()) && jspAttributes.size() == 1
+                        && jspAttributes.containsKey("test"));
+            }
+
+            @Override
+            public void generate(CustomTag n, Map<String, JspAttribute> jspAttributes) throws JasperException {
+                String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+                String tagMethod = "_jspx_meth_" + baseVar;
+                ServletWriter outSave = out;
+
+                // generate method call
+                out.printin("completed = (completed || ");
+                out.print(tagMethod);
+                out.print("(");
+                out.print("_jspx_page_context");
+                out.println("));");
+                GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+                methodsBuffered.add(genBuffer);
+                out = genBuffer.getOut();
+
+                // Generate code for method declaration
+                methodNesting++;
+                out.println();
+                out.pushIndent();
+                out.printin("private boolean ");
+                out.print(tagMethod);
+                out.println("(jakarta.servlet.jsp.PageContext _jspx_page_context)");
+                out.printil("        throws java.lang.Throwable {");
+                out.pushIndent();
+                // Generated body of method
+                out.printil("jakarta.servlet.jsp.JspWriter out = _jspx_page_context.getOut();");
+                JspAttribute testAttribute = jspAttributes.get("test");
+                Mark m = n.getStart();
+                m = n.getStart();
+                out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") "
+                        + testAttribute.getTagAttributeInfo());
+
+                // translates the specified value attributes into EL-interpretation code using
+                // standard logic
+                String evaluatedAttribute = evaluateAttribute(getTagHandlerInfo(n), testAttribute, n, null);
+                out.printil("boolean condition = " + evaluatedAttribute + ";");
+                out.printil("if (condition) {");
+
+                // generate body
+                out.pushIndent();
+                n.getBody().visit(GenerateVisitor.this);
+                out.printil("return true;");
+                out.popIndent();
+
+                // Generate end of method
+                out.printil("}");
+                out.printil("return false;");
+                out.popIndent();
+                out.printil("}");
+                out.popIndent();
+
+                methodNesting--;
+                // restore previous writer
+                out = outSave;
+            }
+        }
+
+        private class OtherwiseTagGenerator implements NonstandardCustomTagGenerator {
+
+            @Override
+            public boolean appliesTo(CustomTag n, Map<String, JspAttribute> jspAttributes) {
+                return (CORE_LIBS_URI.equals(n.getURI()) && jspAttributes.size() == 0);
+            }
+
+            @Override
+            public void generate(CustomTag n, Map<String, JspAttribute> jspAttributes) throws JasperException {
+                String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+                String tagMethod = "_jspx_meth_" + baseVar;
+                ServletWriter outSave = out;
+
+                // generate method call
+                out.printil("if (!completed)");
+                out.pushIndent();
+                out.printin(tagMethod);
+                out.print("(");
+                out.print("_jspx_page_context");
+                out.println(");");
+                out.popIndent();
+                GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+                methodsBuffered.add(genBuffer);
+                out = genBuffer.getOut();
+
+                // Generate code for method declaration
+                methodNesting++;
+                out.println();
+                out.pushIndent();
+                out.printin("private boolean ");
+                out.print(tagMethod);
+                out.println("(jakarta.servlet.jsp.PageContext _jspx_page_context)");
+                out.printil("        throws java.lang.Throwable {");
+                out.pushIndent();
+
+                // Generated body of method
+                out.printil("jakarta.servlet.jsp.JspWriter out = _jspx_page_context.getOut();");
+
+                // generate body
+                n.getBody().visit(GenerateVisitor.this);
+                out.printil("return true;");
+                out.popIndent();
+
+                out.printil("}");
+                out.popIndent();
+
+                methodNesting--;
+                // restore previous writer
+                out = outSave;
+            }
+        }
+
+        private class SetTagGenerator implements NonstandardCustomTagGenerator {
+            public boolean appliesTo(Node.CustomTag n, Map<String, JspAttribute> jspAttributes) {
+                if (n.hasEmptyBody()
+                        && jspAttributes.containsKey("var")
+                        && jspAttributes.containsKey("value")
+                        && CORE_LIBS_URI.equals(n.getURI())) {
+                    // verify value is not a deferred expression
+                    String valueText = jspAttributes.get("value").getValue();
+                    if (valueText.startsWith("#")) {
+                        return false;
+                    } else if (jspAttributes.size() == 2
+                            || (jspAttributes.size() == 3 && jspAttributes.containsKey("scope"))) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                return false;
+            }
+
+            public void generate(Node.CustomTag n, Map<String, JspAttribute> jspAttributes) throws JasperException {
+                // requires var and value, scope is optional, body is prohibited, value cannot
+                // be deferred
+
+                String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
+                String tagMethod = "_jspx_meth_" + baseVar;
+                ServletWriter outSave = out;
+
+                // generate method call
+                out.printin(tagMethod);
+                out.print("(");
+                out.print("_jspx_page_context");
+                out.println(");");
+                GenBuffer genBuffer = new GenBuffer(n, n.getBody());
+                methodsBuffered.add(genBuffer);
+                out = genBuffer.getOut();
+
+                // Generate code for method declaration
+                methodNesting++;
+                out.println();
+                out.pushIndent();
+                out.printin("private void ");
+                out.print(tagMethod);
+                out.println("(jakarta.servlet.jsp.PageContext _jspx_page_context)");
+                out.printil("        throws java.lang.Throwable {");
+                out.pushIndent();
+                // Generated body of method
+                out.printil("//  " + n.getQName());
+
+                JspAttribute varAttribute = jspAttributes.get("var");
+                Mark m = n.getStart();
+                out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") "
+                        + varAttribute.getTagAttributeInfo());
+
+                JspAttribute valueAttribute = jspAttributes.get("value");
+                m = n.getStart();
+                out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") "
+                        + valueAttribute.getTagAttributeInfo());
+
+                String varValue = varAttribute.getValue();
+
+                // get the scope constant at compile-time, where blank means page
+                String scopeValue = translateScopeToConstant(jspAttributes);
+
+                // translates the specified value attributes into EL-interpretation code using
+                // standard logic
+                String evaluatedAttribute = evaluateAttribute(getTagHandlerInfo(n), valueAttribute, n, null);
+
+                // call the multi-line logic equivalent of SetTag
+                out.printil("org.apache.jasper.runtime.JspRuntimeLibrary.nonstandardSetTag(_jspx_page_context, \""
+                        + varValue + "\", " + evaluatedAttribute + ", " + scopeValue + ");");
+
+                // Generate end of method
+                out.popIndent();
+                out.printil("}");
+                out.popIndent();
+
+                methodNesting--;
+                // restore previous writer
+                out = outSave;
+            }
+
+        }
+
         private static final String REQUEST_CHARACTER_ENCODING_TEXT = "request.getCharacterEncoding()";
 
         /*
@@ -907,6 +1361,8 @@ class Generator {
 
         private final boolean useInstanceManagerForTags;
 
+        private final Map<String, NonstandardCustomTagGenerator> nonstandardTagGenerators;
+
         GenerateVisitor(boolean isTagFile, ServletWriter out, ArrayList<GenBuffer> methodsBuffered,
                 FragmentHelperClass fragmentHelperClass, boolean useInstanceManagerForTags) {
 
@@ -919,6 +1375,15 @@ class Generator {
             handlerInfos = new HashMap<>();
             tagVarNumbers = new HashMap<>();
             textMap = new HashMap<>();
+
+            nonstandardTagGenerators = new HashMap<>();
+            nonstandardTagGenerators.put("c:set", new SetTagGenerator());
+            nonstandardTagGenerators.put("c:remove", new RemoveTagGenerator());
+            nonstandardTagGenerators.put("c:catch", new CatchTagGenerator());
+            nonstandardTagGenerators.put("c:if", new IfTagGenerator());
+            nonstandardTagGenerators.put("c:choose", new ChooseTagGenerator());
+            nonstandardTagGenerators.put("c:when", new WhenTagGenerator());
+            nonstandardTagGenerators.put("c:otherwise", new OtherwiseTagGenerator());
         }
 
         /**
@@ -3052,116 +3517,27 @@ class Generator {
          * @return whether code was generated
          * @throws JasperException unexpected error
          */
-        private boolean visitPotentiallyNonstandardCustomTag(Node.CustomTag n)
-                throws JasperException {
+        private boolean visitPotentiallyNonstandardCustomTag(Node.CustomTag n) throws JasperException {
+            // verify tag is configured
             if (!nonstandardCustomTagNames.contains(n.getQName())) {
                 // tag is not configured, move along
                 return false;
             }
-
-            // collect the attributes into one Map for further checks
-            Map<String, JspAttribute> jspAttributes = new HashMap<>();
-            if (n.getJspAttributes() != null) {
-                for (JspAttribute jspAttr : n.getJspAttributes()) {
-                    jspAttributes.put(jspAttr.getLocalName(), jspAttr);
-                }
-            }
-            switch (n.qName) {
-            case "c:set":
-                // requires var and value, scope is optional, body is prohibited, value cannot be deferred
-                if (n.hasEmptyBody()
-                        && jspAttributes.containsKey("var")
-                        && jspAttributes.containsKey("value")
-                        && CORE_LIBS_URI.equals(n.getURI())) {
-                    // verify value is not a deferred expression
-                    String valueText = jspAttributes.get("value").getValue();
-                    if (valueText.startsWith("#")) {
-                        return false;
-                    } else if (jspAttributes.size() == 2
-                            || (jspAttributes.size() == 3 && jspAttributes.containsKey("scope"))) {
-                        generateNonstandardSetLogic(n, jspAttributes);
-                        return true;
+            NonstandardCustomTagGenerator generator = nonstandardTagGenerators.get(n.getQName());
+            if (generator != null) {
+                // we have a configured generator, now test if it will accept this instance
+                Map<String, JspAttribute> jspAttributes = new HashMap<>();
+                if (n.getJspAttributes() != null) {
+                    for (JspAttribute jspAttr : n.getJspAttributes()) {
+                        jspAttributes.put(jspAttr.getLocalName(), jspAttr);
                     }
                 }
-                break;
-            case "c:remove":
-                // requires var, scope is optional, body is prohibited
-                if (n.hasEmptyBody()
-                        && jspAttributes.containsKey("var")
-                        && CORE_LIBS_URI.equals(n.getURI())
-                        && (jspAttributes.size() == 1
-                                || (jspAttributes.size() == 2
-                                && jspAttributes.containsKey("scope")))) {
-                    generateNonstandardRemoveLogic(n, jspAttributes);
+                if (generator.appliesTo(n, jspAttributes)) {
+                    generator.generate(n, jspAttributes);
                     return true;
-
                 }
-                break;
-            default:
-                // This indicates someone configured a tag with no non-standard implementation.
-                // Harmless, fall back to the standard implementation.
             }
             return false;
-        }
-
-        private void generateNonstandardSetLogic(Node.CustomTag n, Map<String, JspAttribute> jspAttributes)
-                throws JasperException {
-            String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
-            String tagMethod = "_jspx_meth_" + baseVar;
-            ServletWriter outSave = out;
-
-            // generate method call
-            out.printin(tagMethod);
-            out.print("(");
-            out.print("_jspx_page_context");
-            out.println(");");
-            GenBuffer genBuffer = new GenBuffer(n, n.getBody());
-            methodsBuffered.add(genBuffer);
-            out = genBuffer.getOut();
-
-            // Generate code for method declaration
-            methodNesting++;
-            out.println();
-            out.pushIndent();
-            out.printin("private void ");
-            out.print(tagMethod);
-            out.println("(jakarta.servlet.jsp.PageContext _jspx_page_context)");
-            out.printil("        throws java.lang.Throwable {");
-            out.pushIndent();
-            // Generated body of method
-            out.printil("//  " + n.getQName());
-
-            JspAttribute varAttribute = jspAttributes.get("var");
-            Mark m = n.getStart();
-            out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") "
-                    + varAttribute.getTagAttributeInfo());
-
-            JspAttribute valueAttribute = jspAttributes.get("value");
-            m = n.getStart();
-            out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") "
-                    + valueAttribute.getTagAttributeInfo());
-
-            String varValue = varAttribute.getValue();
-
-            // get the scope constant at compile-time, where blank means page
-            String scopeValue = translateScopeToConstant(jspAttributes);
-
-            // translates the specified value attributes into EL-interpretation code using standard logic
-            String evaluatedAttribute = evaluateAttribute(getTagHandlerInfo(n), valueAttribute,
-                    n, null);
-
-            // call the multi-line logic equivalent of SetTag
-            out.printil("org.apache.jasper.runtime.JspRuntimeLibrary.nonstandardSetTag(_jspx_page_context, \""
-                    + varValue + "\", " + evaluatedAttribute + ", " + scopeValue + ");");
-
-            // Generate end of method
-            out.popIndent();
-            out.printil("}");
-            out.popIndent();
-
-            methodNesting--;
-            // restore previous writer
-            out = outSave;
         }
 
         /**
@@ -3196,58 +3572,6 @@ class Generator {
                 }
             }
             return scopeValue;
-        }
-
-        /**
-         * Generates the code for a non-standard remove.  Note that removes w/o a specified scope will remove from all scopes.
-         *
-         * @param n tag
-         * @param jspAttributes attributes
-         * @throws JasperException unspecified error
-         */
-        private void generateNonstandardRemoveLogic(Node.CustomTag n, Map<String, JspAttribute> jspAttributes)
-                throws JasperException {
-            String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
-            String tagMethod = "_jspx_meth_" + baseVar;
-            ServletWriter outSave = out;
-
-            // generate method call
-            out.printin(tagMethod);
-            out.print("(");
-            out.print("_jspx_page_context");
-            out.println(");");
-            GenBuffer genBuffer = new GenBuffer(n, n.getBody());
-            methodsBuffered.add(genBuffer);
-            out = genBuffer.getOut();
-
-            // Generate code for method declaration
-            methodNesting++;
-            out.println();
-            out.pushIndent();
-            out.printin("private void ");
-            out.print(tagMethod);
-            out.println("(jakarta.servlet.jsp.PageContext pageContext)");
-            out.printil("        throws java.lang.Throwable {");
-            out.pushIndent();
-            // Generated body of method
-            String varValue = jspAttributes.get("var").getValue();
-            JspAttribute scope = jspAttributes.get("scope");
-            if (scope == null) {
-                // c:remove without a scope means remove from all scopes
-                out.printil("pageContext.removeAttribute(\"" + varValue + "\");");
-            } else {
-                // c:remove with a scope means remove only from the specified scope
-                String scopeValue = translateScopeToConstant(jspAttributes);
-                out.printil("pageContext.removeAttribute(\"" + varValue + "\", " + scopeValue + ");");
-            }
-            // Generate end of method
-            out.popIndent();
-            out.printil("}");
-            out.popIndent();
-
-            methodNesting--;
-            // restore previous writer
-            out = outSave;
         }
     }
 

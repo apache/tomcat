@@ -1132,4 +1132,78 @@ public class TestGenerator extends TomcatBaseTest {
                 + "application value=null", body.toString());
         body.recycle();
     }
+
+    @Test
+    public void testNonstandardCatch() throws Exception {
+        getTomcatInstanceTestWebapp(true, true);
+
+        ByteChunk body = new ByteChunk();
+        // catch with no variable to store the exception, but no exception
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/catch-01.jsp", body, null);
+        Assert.assertEquals("\n\n\nNo exception\n\n", body.toString());
+        body.recycle();
+
+        // catch with no variable to store the exception, and an exception
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/catch-02.jsp", body, null);
+        Assert.assertEquals("\n\n\n\n", body.toString());
+        body.recycle();
+
+        // catch with variable, and an exception
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/catch-03.jsp", body, null);
+        Assert.assertEquals("\n\n\n\njava.lang.RuntimeException: test", body.toString());
+        body.recycle();
+
+        // catch with variable, but no exception
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/catch-04.jsp", body, null);
+        Assert.assertEquals("\n\n\nNo exception thrown\n\n", body.toString());
+        body.recycle();
+
+    }
+
+    @Test
+    public void testNonstandardIf() throws Exception {
+        getTomcatInstanceTestWebapp(true, true);
+
+        ByteChunk body = new ByteChunk();
+        // if with false (no body execution)
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/if-01.jsp", body, null);
+        Assert.assertEquals("\n\n\n\n", body.toString());
+        body.recycle();
+
+        // if with true (body execution)
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/if-02.jsp", body, null);
+        Assert.assertEquals("\n\n\n\n  true case\n\n", body.toString());
+        body.recycle();
+    }
+
+    @Test
+    public void testNonstandardChooseWhenOtherwise() throws Exception {
+        getTomcatInstanceTestWebapp(true, true);
+
+        ByteChunk body = new ByteChunk();
+        // branch 1
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/choose-01.jsp?branch=1", body, null);
+        Assert.assertEquals("\n\n\n\n  1\n  \n  \n  \n\n", body.toString());
+        body.recycle();
+
+        // branch 2
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/choose-01.jsp?branch=2", body, null);
+        Assert.assertEquals("\n\n\n\n  \n  2\n  \n  \n\n", body.toString());
+        body.recycle();
+
+        // branch 3
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/choose-01.jsp?branch=3", body, null);
+        Assert.assertEquals("\n\n\n\n  \n  \n  3\n  \n\n", body.toString());
+        body.recycle();
+
+        // branch none (== otherwise)
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/choose-01.jsp?branch=", body, null);
+        Assert.assertEquals("\n\n\n\n  \n  \n  \n  Otherwise\n\n", body.toString());
+        body.recycle();
+
+        // branch none (no otherwise)
+        getUrl("http://localhost:" + getPort() + "/test/jsp/generator/nonstandard/choose-02.jsp?branch=", body, null);
+        Assert.assertEquals("\n\n\n\n  \n  \n  \n\n", body.toString());
+        body.recycle();
+    }
 }

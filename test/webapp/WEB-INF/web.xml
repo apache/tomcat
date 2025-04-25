@@ -65,7 +65,7 @@
       </init-param>
       <init-param>
         <param-name>useNonstandardTagOptimizations</param-name>
-        <param-value>c:set,c:remove</param-value>
+        <param-value>c:set,c:remove,c:catch,c:if,c:choose,c:when,c:otherwise</param-value>
       </init-param>
       <!-- Required by /jsp/tagFileInJar.jsp / TestJspCompilationContext  -->
       <init-param>
