@@ -1507,7 +1507,11 @@ public class Digester extends DefaultHandler2 {
         configure();
         InputSource input = new InputSource(new FileInputStream(file));
         input.setSystemId("file://" + file.getAbsolutePath());
-        getXMLReader().parse(input);
+        XMLReader reader = getXMLReader();
+        reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        reader.parse(input);
         return root;
     }
 
@@ -1523,7 +1527,11 @@ public class Digester extends DefaultHandler2 {
      */
     public Object parse(InputSource input) throws IOException, SAXException {
         configure();
-        getXMLReader().parse(input);
+        XMLReader reader = getXMLReader();
+        reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        reader.parse(input);
         return root;
     }
 
@@ -1540,7 +1548,11 @@ public class Digester extends DefaultHandler2 {
     public Object parse(InputStream input) throws IOException, SAXException {
         configure();
         InputSource is = new InputSource(input);
-        getXMLReader().parse(is);
+        XMLReader reader = getXMLReader();
+        reader.setFeature("http://xml.org/sax/features/external-general-entities", false);
+        reader.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+        reader.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+        reader.parse(is);
         return root;
     }
 
