@@ -547,6 +547,14 @@
     <p>The WebDAV servlet enables edit functionality for web application
     content. If the WebDAV servlet is enabled, the WebDAV functionality should
     be appropriately secured.</p>
+
+    <p>When configuring security constraints, care should be taken if the URL
+    pattern for one or more constraints covers any segment of the URL that
+    becomes part of the pathInfo for a servlet and the servlet uses the pathInfo
+    to identify some other resource (like the default servlet does). In those
+    circumstances, correct application of the security constraint depends on the
+    implementation of the Servlet. All servlets included with Tomcat will behave
+    correctly in this scenario.</p>
   </section>
 
   <section name="Embedded Tomcat">
