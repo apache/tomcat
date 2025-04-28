@@ -177,6 +177,9 @@
       <update>
         Update Byte Buddy to 1.17.5. (markt)
       </update>
+      <update>
+        Update Checkstyle to 10.23.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
