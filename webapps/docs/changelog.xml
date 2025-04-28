@@ -252,6 +252,9 @@
       <update>
         Update Jacoco to 0.8.13. (remm)
       </update>
+      <update>
+        Update Byte Buddy to 1.17.5. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
