@@ -571,7 +571,7 @@ public final class CGIServlet extends HttpServlet {
     @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         // Note: This method will never be called if cgiMethods is "*" so that
-        // case does nto need to be handled here.
+        // case does not need to be handled here.
         Set<String> allowedMethods = new HashSet<>();
         allowedMethods.addAll(cgiMethods);
         allowedMethods.addAll(DEFAULT_SUPER_METHODS);
