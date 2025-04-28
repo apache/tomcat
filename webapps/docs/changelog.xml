@@ -126,6 +126,10 @@
         <code>org.apache.catalina.connector.InputBuffer</code> with a static,
         zero length buffer. (markt)
       </scode>
+      <scode>
+        Refactor GCI servlet to access resources via the
+        <code>WebResource</code> API. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
