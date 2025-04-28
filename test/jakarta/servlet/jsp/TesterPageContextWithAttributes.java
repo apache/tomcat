@@ -50,15 +50,15 @@ public class TesterPageContextWithAttributes extends TesterPageContext {
 
         switch (scope) {
         case PAGE_SCOPE:
-        	return pageAttributes.get(name);
+            return pageAttributes.get(name);
         case REQUEST_SCOPE:
-        	return requestAttributes.get(name);
+            return requestAttributes.get(name);
         case SESSION_SCOPE:
-        	return sessionAttributes.get(name);
+            return sessionAttributes.get(name);
         case APPLICATION_SCOPE:
-        	return applicationAttributes.get(name);
+            return applicationAttributes.get(name);
         default:
-        	throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
+            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
         }
     }
 
