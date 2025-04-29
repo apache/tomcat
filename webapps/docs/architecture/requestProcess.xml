@@ -44,7 +44,7 @@ UML diagrams have been created for each Endpoint implementation to show how
 requests flow from the endpoint to the protocol.
 </p>
 <p>
-<a href="requestProcess/1_nio.png">Diagram 1</a> shows how requests received via
+<a href="requestProcess/11_nio.png">Diagram 1.1</a> shows how requests received via
 an NIO based endpoint are processed upto the point they reach the processor
 instance.
 </p>
@@ -59,7 +59,8 @@ UML diagrams have been created for each protocol to show how requests flow from
 the processor instance to the CoyoteAdapter.
 </p>
 <p>
-HTTP/1.1 TBD.
+<a href="requestProcess/21_http11.png">Diagram 2.1</a> shows how HTTP/0.9, HTTP/1.0
+and HTTP/1.1 requests are processed.
 </p>
 <p>
 HTTP/2 - TBD.
