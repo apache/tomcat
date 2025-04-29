@@ -152,6 +152,16 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+
+      <fix>
+        <bug>68876</bug>: Documentation. Update the UML diagrams for server
+        start-up, request processing and authentication using PlantUML and
+        include the source files for each diagram. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
