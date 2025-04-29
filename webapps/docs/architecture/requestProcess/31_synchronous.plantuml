@@ -1,0 +1,109 @@
+@startuml
+
+' Licensed to the Apache Software Foundation (ASF) under one or more
+' contributor license agreements.  See the NOTICE file distributed with
+' this work for additional information regarding copyright ownership.
+' The ASF licenses this file to You under the Apache License, Version 2.0
+' (the "License"); you may not use this file except in compliance with
+' the License.  You may obtain a copy of the License at
+'
+'     http://www.apache.org/licenses/LICENSE-2.0
+'
+' Unless required by applicable law or agreed to in writing, software
+' distributed under the License is distributed on an "AS IS" BASIS,
+' WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+' See the License for the specific language governing permissions and
+' limitations under the License.
+
+hide footbox
+skinparam style strictuml
+
+participant CoyoteRequest
+participant CoyoteResponse
+activate CoyoteAdapter
+
+CoyoteAdapter -> Connector ++: createRequest()
+return
+
+CoyoteAdapter -> Connector ++: createResponse()
+return
+
+CoyoteAdapter -> Request ++: setRequest()
+return
+CoyoteAdapter -> Response ++: setResponse()
+return
+CoyoteAdapter -> CoyoteRequest ++: setNote()
+return
+CoyoteAdapter -> CoyoteResponse ++: setNote()
+return
+
+CoyoteAdapter -> CoyoteAdapter ++: postParseRequest()
+return
+
+CoyoteAdapter -> Connector ++: getService()
+return
+CoyoteAdapter -> Service ++: getContainer()
+return
+CoyoteAdapter -> Engine ++: getPipeline()
+return
+CoyoteAdapter -> "StandardPipeline\n(Engine)" ++: getFirst()
+return
+CoyoteAdapter -> StandardEngineValve ++: invoke()
+StandardEngineValve -> Request ++: getHost()
+return
+StandardEngineValve -> Host ++: getPipeline()
+return
+StandardEngineValve -> "StandardPipeline\n(Host)" ++: getFirst()
+return
+StandardEngineValve -> AccessLogValve ++: invoke()
+AccessLogValve -> AccessLogValve ++: getNext()
+return
+AccessLogValve -> ErrorReportValve ++: invoke()
+ErrorReportValve -> ErrorReportValve ++: getNext()
+return
+ErrorReportValve -> StandardHostValve ++: invoke()
+StandardHostValve -> Request ++: getContext()
+return
+StandardHostValve -> Context ++: bind()
+return
+StandardHostValve -> Context ++: getPipeline()
+return
+StandardHostValve -> "StandardPipeline\n(Context)" ++: getFirst()
+return
+StandardHostValve -> StandardContextValve ++: invoke()
+StandardContextValve -> Request ++: getWrapper()
+return
+StandardContextValve -> Wrapper ++: getPipeline()
+return
+StandardContextValve -> "StandardPipeline\n(Wrapper)" ++: getFirst()
+return
+StandardContextValve -> StandardWrapperValve ++: invoke()
+StandardWrapperValve -> Wrapper ++: allocate()
+return
+StandardWrapperValve -> ApplicationFilterFactory ++: createFilterChain
+ApplicationFilterFactory --> FilterChain **:
+return
+StandardWrapperValve -> FilterChain ++: doFilter()
+FilterChain -> "Filter\nA" ++: doFilter()
+"Filter\nA" -> FilterChain ++: doFilter()
+FilterChain -> "Filter\nB" ++: doFilter()
+"Filter\nB" -> FilterChain ++: doFilter()
+FilterChain -> Servlet ++: service()
+|||
+return
+return
+return
+return
+return
+return
+StandardWrapperValve -> FilterChain ++: release()
+return
+StandardWrapperValve -> Wrapper ++: deallocate()
+return
+return
+return
+return
+return
+return
+return
+@enduml
