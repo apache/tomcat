@@ -179,6 +179,10 @@
         <pr>843</pr>: Fix off by one validation logic for partial PUT ranges
         and associated test case. Submitted by Chenjp. (remm)
       </fix>
+      <scode>
+        Refactor GCI servlet to access resources via the
+        <code>WebResource</code> API. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
