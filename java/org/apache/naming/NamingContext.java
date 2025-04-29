@@ -16,10 +16,6 @@
  */
 package org.apache.naming;
 
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-
 import javax.naming.Binding;
 import javax.naming.CompositeName;
 import javax.naming.Context;
@@ -38,6 +34,9 @@ import javax.naming.Reference;
 import javax.naming.Referenceable;
 import javax.naming.spi.NamingManager;
 import javax.naming.spi.ObjectFactory;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -491,7 +490,7 @@ public class NamingContext implements Context {
             // If the size of the name is greater than 1, then we go through a
             // number of sub contexts.
             if (entry.type != NamingEntry.CONTEXT) {
-                throw new NamingException(sm.getString("namingContext.contextExpected"));
+                throw new NamingException(sm.getString("namingContext.contextExpected", name));
             }
             return ((Context) entry.value).lookup(name.getSuffix(1));
         } else {
@@ -529,13 +528,13 @@ public class NamingContext implements Context {
                         }
                     }
                     if (obj == null) {
-                        throw new NamingException(sm.getString("namingContext.failResolvingReference"));
+                        throw new NamingException(sm.getString("namingContext.failResolvingReference", name));
                     }
                     return obj;
                 } catch (NamingException e) {
                     throw e;
                 } catch (Exception e) {
-                    String msg = sm.getString("namingContext.failResolvingReference");
+                    String msg = sm.getString("namingContext.failResolvingReference", name);
                     log.warn(msg, e);
                     NamingException ne = new NamingException(msg);
                     ne.initCause(e);
