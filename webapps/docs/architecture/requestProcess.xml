@@ -29,21 +29,56 @@
 
 <body>
 
-
-<section name="Request Process Flow">
-
+<section name="Introduction">
 <p>
-This page describes the process used by Tomcat to handle
-an incoming request.  This process is largely defined by
-the Servlet Specification, which outlines the order
-of events that must take place.
+This page describes how requests flow through Tomcat during processing. Requests
+start processing in an endpoint, then get passed to the protocol and then the
+Coyote adapter which is the common entry point for all servlet request
+processing.
 </p>
+</section>
 
-<subsection name="description">
+<section name="Endpoint implementations">
 <p>
-TODO
+UML diagrams have been created for each Endpoint implementation to show how
+requests flow from the endpoint to the protocol.
 </p>
-</subsection>
+<p>
+<a href="requestProcess/1_nio.png">Diagram 1</a> shows how requests received via
+an NIO based endpoint are processed upto the point they reach the processor
+instance.
+</p>
+<p>
+NIO2 - TBD.
+</p>
+</section>
+
+<section name="Protocols">
+<p>
+UML diagrams have been created for each protocol to show how requests flow from
+the processor instance to the CoyoteAdapter.
+</p>
+<p>
+HTTP/1.1 TBD.
+</p>
+<p>
+HTTP/2 - TBD.
+</p>
+<p>
+AJP - TBD.
+</p>
+</section>
+
+<section name="Servlet engine">
+<p>
+Synchronous - TBD
+</p>
+<p>
+Asynchronous - TBD.
+</p>
+</section>
+
+<section name="Legacy information">
 
 <subsection name="diagrams">
 <p>
