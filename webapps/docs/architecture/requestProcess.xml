@@ -36,6 +36,10 @@ start processing in an endpoint, then get passed to the protocol and then the
 Coyote adapter which is the common entry point for all servlet request
 processing.
 </p>
+<p>
+The UML diagrams do not show every detail of Tomcat's internal processing. They
+are intended to show the key elements of the processing chain.
+</p>
 </section>
 
 <section name="Endpoint implementations">
