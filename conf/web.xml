@@ -826,6 +826,10 @@
         <mime-type>video/x-msvideo</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>avif</extension>
+        <mime-type>image/avif</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>avx</extension>
         <mime-type>video/x-rad-screenplay</mime-type>
     </mime-mapping>
@@ -2130,6 +2134,10 @@
         <mime-type>text/plain</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>jxl</extension>
+        <mime-type>image/jxl</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>kar</extension>
         <mime-type>audio/midi</mime-type>
     </mime-mapping>
@@ -2296,6 +2304,14 @@
     <mime-mapping>
         <extension>m2a</extension>
         <mime-type>audio/mpeg</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>m2t</extension>
+        <mime-type>video/mp2t</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>m2ts</extension>
+        <mime-type>video/mp2t</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>m2v</extension>
@@ -2667,7 +2683,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>mts</extension>
-        <mime-type>model/vnd.mts</mime-type>
+        <mime-type>video/mp2t</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mus</extension>
@@ -3953,6 +3969,10 @@
     <mime-mapping>
         <extension>trm</extension>
         <mime-type>application/x-msterminal</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>ts</extension>
+        <mime-type>video/mp2t</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>tsd</extension>

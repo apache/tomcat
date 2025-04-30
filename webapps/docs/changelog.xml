@@ -167,6 +167,10 @@
       <update>
         Update Checkstyle to 10.23.1. (markt)
       </update>
+      <update>
+        Update file extension to media type mappings to align with the current
+        list used by the Apache Web Server (httpd). (markt) 
+      </update>
     </changelog>
   </subsection>
 </section>
