@@ -133,6 +133,10 @@
         Refactor GCI servlet to access resources via the
         <code>WebResource</code> API. (markt)
       </scode>
+      <fix>
+        <bug>69662</bug>: Report name in exception message when a naming lookup
+        failure occurs. Based on code submitted by Donald Smith. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
