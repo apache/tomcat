@@ -202,7 +202,7 @@ public class NamingContext implements Context {
             if (entry.type == NamingEntry.CONTEXT) {
                 ((Context) entry.value).unbind(name.getSuffix(1));
             } else {
-                throw new NamingException(sm.getString("namingContext.contextExpected"));
+                throw new NamingException(sm.getString("namingContext.contextExpected", name.get(0)));
             }
         } else {
             bindings.remove(name.get(0));
@@ -248,7 +248,7 @@ public class NamingContext implements Context {
         }
 
         if (entry.type != NamingEntry.CONTEXT) {
-            throw new NamingException(sm.getString("namingContext.contextExpected"));
+            throw new NamingException(sm.getString("namingContext.contextExpected", name.get(0)));
         }
         return ((Context) entry.value).list(name.getSuffix(1));
     }
@@ -277,7 +277,7 @@ public class NamingContext implements Context {
         }
 
         if (entry.type != NamingEntry.CONTEXT) {
-            throw new NamingException(sm.getString("namingContext.contextExpected"));
+            throw new NamingException(sm.getString("namingContext.contextExpected", name.get(0)));
         }
         return ((Context) entry.value).listBindings(name.getSuffix(1));
     }
@@ -313,14 +313,14 @@ public class NamingContext implements Context {
             if (entry.type == NamingEntry.CONTEXT) {
                 ((Context) entry.value).destroySubcontext(name.getSuffix(1));
             } else {
-                throw new NamingException(sm.getString("namingContext.contextExpected"));
+                throw new NamingException(sm.getString("namingContext.contextExpected", name.get(0)));
             }
         } else {
             if (entry.type == NamingEntry.CONTEXT) {
                 ((Context) entry.value).close();
                 bindings.remove(name.get(0));
             } else {
-                throw new NotContextException(sm.getString("namingContext.contextExpected"));
+                throw new NotContextException(sm.getString("namingContext.contextExpected", name.get(0)));
             }
         }
 
@@ -381,7 +381,7 @@ public class NamingContext implements Context {
             if (obj instanceof Context) {
                 return ((Context) obj).getNameParser(name.getSuffix(1));
             } else {
-                throw new NotContextException(sm.getString("namingContext.contextExpected"));
+                throw new NotContextException(sm.getString("namingContext.contextExpected", name.get(0)));
             }
         }
 
@@ -491,7 +491,7 @@ public class NamingContext implements Context {
             // If the size of the name is greater than 1, then we go through a
             // number of sub contexts.
             if (entry.type != NamingEntry.CONTEXT) {
-                throw new NamingException(sm.getString("namingContext.contextExpected"));
+                throw new NamingException(sm.getString("namingContext.contextExpected", name.get(0)));
             }
             return ((Context) entry.value).lookup(name.getSuffix(1));
         } else {
@@ -529,13 +529,13 @@ public class NamingContext implements Context {
                         }
                     }
                     if (obj == null) {
-                        throw new NamingException(sm.getString("namingContext.failResolvingReference"));
+                        throw new NamingException(sm.getString("namingContext.failResolvingReference", name));
                     }
                     return obj;
                 } catch (NamingException e) {
                     throw e;
                 } catch (Exception e) {
-                    String msg = sm.getString("namingContext.failResolvingReference");
+                    String msg = sm.getString("namingContext.failResolvingReference", name);
                     log.warn(msg, e);
                     NamingException ne = new NamingException(msg);
                     ne.initCause(e);
@@ -587,7 +587,7 @@ public class NamingContext implements Context {
                     ((Context) entry.value).bind(name.getSuffix(1), obj);
                 }
             } else {
-                throw new NamingException(sm.getString("namingContext.contextExpected"));
+                throw new NamingException(sm.getString("namingContext.contextExpected", name.get(0)));
             }
         } else {
             if ((!rebind) && (entry != null)) {
