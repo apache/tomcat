@@ -84,10 +84,6 @@ Asynchronous - TBD.
 
 <subsection name="diagrams">
 <p>
-A UML sequence diagram of the request process is available
-<a href="requestProcess/request-process.png">here.</a>
-</p>
-<p>
 A UML sequence diagram of the authentication process is available
 <a href="requestProcess/authentication-process.png">here.</a>
 </p>
