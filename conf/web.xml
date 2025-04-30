@@ -3949,6 +3949,10 @@
         <mime-type>application/x-msterminal</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>ts</extension>
+        <mime-type>video/mp2t</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>tsd</extension>
         <mime-type>application/timestamped-data</mime-type>
     </mime-mapping>
