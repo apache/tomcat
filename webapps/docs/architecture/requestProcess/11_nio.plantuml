@@ -76,6 +76,10 @@ return
 SocketProcessor -> ConnectionHandler ++: process()
 ConnectionHandler -> Protocol ++: createProcessor()
 Protocol -->> Processor **:
+activate Processor
+Processor -->> CoyoteRequest **:
+Processor -->> CoyoteResponse **:
+return
 return
 ConnectionHandler -> Processor ++: process()
 Processor -> Processor ++: service()

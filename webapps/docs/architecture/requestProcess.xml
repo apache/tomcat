@@ -72,7 +72,8 @@ AJP - TBD.
 
 <section name="Servlet engine">
 <p>
-Synchronous - TBD
+<a href="requestProcess/31_synchronous.png">Diagram 3.1</a> shows synchronous
+Servlet requests are processed.
 </p>
 <p>
 Asynchronous - TBD.
