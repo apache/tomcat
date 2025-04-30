@@ -177,7 +177,7 @@ if ($opt_m eq '' || $opt_i eq '' || $opt_o eq '') {
 
 # Switch locale for alphabetical ordering
 setlocale(LC_COLLATE, $LOCALE);
-    
+
 print STDERR "INFO Using lists TOMCAT_KEEP and TOMCAT_ONLY defined in this script.\n";
 
 # Check whether TOMCAT_ONLY and TOMCAT_KEEP are disjoint
