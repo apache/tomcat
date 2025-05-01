@@ -249,6 +249,11 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>68876</bug>: Documentation. Update the UML diagrams for server
+        start-up, request processing and authentication using PlantUML and
+        include the source files for each diagram. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
