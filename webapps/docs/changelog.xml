@@ -119,6 +119,9 @@
   <subsection name="Catalina">
     <changelog>
       <add>
+        Add the Jakarta EE 12 XML schemas. (markt)
+      </add>
+      <add>
         Add support for the new Servlet API method
         <code>HttpServletResponse.sendEarlyHints()</code>. (markt)
       </add>

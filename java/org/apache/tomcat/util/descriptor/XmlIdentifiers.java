@@ -97,6 +97,11 @@ public final class XmlIdentifiers {
     public static final String WEB_FRAGMENT_61_XSD = JAKARTAEE_11_NS + "/web-fragment_6_1.xsd";
     public static final String TLD_40_XSD = JAKARTAEE_11_NS + "/web-jsptaglibrary_4_0.xsd";
 
+    // from Jakarta EE 12
+    public static final String JAKARTAEE_12_NS = JAKARTAEE_11_NS;
+    public static final String WEB_62_XSD = JAKARTAEE_12_NS + "/web-app_6_2.xsd";
+    public static final String WEB_FRAGMENT_62_XSD = JAKARTAEE_12_NS + "/web-fragment_6_2.xsd";
+
     private XmlIdentifiers() {
     }
 }

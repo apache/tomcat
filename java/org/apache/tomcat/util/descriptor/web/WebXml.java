@@ -774,6 +774,9 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             } else if ("6.1".equals(version)) {
                 javaeeNamespace = XmlIdentifiers.JAKARTAEE_11_NS;
                 webXmlSchemaLocation = XmlIdentifiers.WEB_61_XSD;
+            } else if ("6.2".equals(version)) {
+                javaeeNamespace = XmlIdentifiers.JAKARTAEE_12_NS;
+                webXmlSchemaLocation = XmlIdentifiers.WEB_62_XSD;
             }
             sb.append("<web-app xmlns=\"");
             sb.append(javaeeNamespace);
