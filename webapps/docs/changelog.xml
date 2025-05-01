@@ -171,7 +171,6 @@
   </subsection>
   <subsection name="Web applications">
     <changelog>
-
       <fix>
         <bug>68876</bug>: Documentation. Update the UML diagrams for server
         start-up, request processing and authentication using PlantUML and
