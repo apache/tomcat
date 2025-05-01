@@ -39,7 +39,7 @@ public class TestSchemaValidation {
         digester.push(new WebXml());
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp/WEB-INF/web.xml"));
-        Assert.assertEquals("6.1", desc.getVersion());
+        Assert.assertEquals("6.2", desc.getVersion());
         Assert.assertEquals(0, handler.getErrors().size());
         Assert.assertEquals(0, handler.getWarnings().size());
     }
@@ -184,6 +184,21 @@ public class TestSchemaValidation {
         WebXml desc = (WebXml) digester.parse(
                 new File("test/webapp-6.1/WEB-INF/web.xml"));
         Assert.assertEquals("6.1", desc.getVersion());
+        Assert.assertEquals(0, handler.getErrors().size());
+        Assert.assertEquals(0, handler.getWarnings().size());
+    }
+
+
+    @Test
+    public void testWebapp_6_2() throws Exception {
+        XmlErrorHandler handler = new XmlErrorHandler();
+        Digester digester = DigesterFactory.newDigester(
+                true, true, new WebRuleSet(false), true);
+        digester.setErrorHandler(handler);
+        digester.push(new WebXml());
+        WebXml desc = (WebXml) digester.parse(
+                new File("test/webapp-6.2/WEB-INF/web.xml"));
+        Assert.assertEquals("6.2", desc.getVersion());
         Assert.assertEquals(0, handler.getErrors().size());
         Assert.assertEquals(0, handler.getWarnings().size());
     }

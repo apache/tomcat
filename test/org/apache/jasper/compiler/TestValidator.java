@@ -277,6 +277,33 @@ public class TestValidator extends TomcatBaseTest {
         Assert.assertTrue(result.indexOf("<p>09-hello world</p>") > 0);
     }
 
+    @Test
+    public void testTldVersions62() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        File appDir = new File("test/webapp-6.2");
+        // app dir is relative to server home
+        tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
+
+        tomcat.start();
+
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/tld-versions.jsp");
+
+        String result = res.toString();
+
+        Assert.assertTrue(result.indexOf("<p>00-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'01-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>02-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'03-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>04-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>#{'05-hello world'}</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>06-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>07-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>08-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>09-hello world</p>") > 0);
+        Assert.assertTrue(result.indexOf("<p>10-hello world</p>") > 0);
+    }
+
     public static class Echo extends TagSupport {
 
         private static final long serialVersionUID = 1L;

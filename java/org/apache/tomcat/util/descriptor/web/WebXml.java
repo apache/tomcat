@@ -199,6 +199,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 majorVersion = 6;
                 minorVersion = 1;
                 break;
+            case "6.2":
+                majorVersion = 6;
+                minorVersion = 2;
+                break;
             default:
                 log.warn(sm.getString("webXml.version.unknown", version));
         }

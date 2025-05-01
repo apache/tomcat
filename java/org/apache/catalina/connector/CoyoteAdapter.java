@@ -68,7 +68,7 @@ public class CoyoteAdapter implements Adapter {
 
     // -------------------------------------------------------------- Constants
 
-    private static final String POWERED_BY = "Servlet/6.1 JSP/4.0 " + "(" + ServerInfo.getServerInfo() + " Java/" +
+    private static final String POWERED_BY = "Servlet/6.2 JSP/4.1 " + "(" + ServerInfo.getServerInfo() + " Java/" +
             System.getProperty("java.vm.vendor") + "/" + System.getProperty("java.runtime.version") + ")";
 
     private static final EnumSet<SessionTrackingMode> SSL_ONLY = EnumSet.of(SessionTrackingMode.SSL);

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Licensed to the Apache Software Foundation (ASF) under one or more
+  Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
   this work for additional information regarding copyright ownership.
   The ASF licenses this file to You under the Apache License, Version 2.0
@@ -22,9 +22,15 @@
   version="6.2"
   metadata-complete="true">
 
-  <display-name>Welcome to Tomcat</display-name>
+  <display-name>Tomcat Servlet 6.2 Tests</display-name>
   <description>
-     Welcome to Tomcat
+    Provides a web application used by the Tomcat unit tests to ensure that
+    Tomcat meets the requirements of the current JSP and Servlet specification
+    for web applications that declare that they follow version 6.2 of the
+    Servlet specification and version 4.1 of the JSP specification. This
+    typically means ensuring that features introduced in later versions of the
+    specification do not change the behaviour of applications that declared an
+    earlier version of the specification.
   </description>
 
 </web-app>

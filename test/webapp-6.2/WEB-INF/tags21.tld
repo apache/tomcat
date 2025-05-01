@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-1" ?>
 <!--
   Licensed to the Apache Software Foundation (ASF) under one or more
   contributor license agreements.  See the NOTICE file distributed with
@@ -14,13 +14,24 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
--->
-<web-fragment xmlns="https://jakarta.ee/xml/ns/jakartaee"
-              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                      https://jakarta.ee/xml/ns/jakartaee/web-fragment_6_2.xsd"
-              version="6.2"
-              metadata-complete="true">
-    <name>org_apache_jasper_el</name>
-    <distributable/>
-</web-fragment>
+--><taglib xmlns="http://java.sun.com/xml/ns/javaee"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
+      http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd"
+      version="2.1">
+  <tlib-version>1.0</tlib-version>
+  <short-name>Tags21</short-name>
+  <uri>http://tomcat.apache.org/tags21</uri>
+
+  <tag>
+    <name>Echo</name>
+    <tag-class>org.apache.jasper.compiler.TestValidator$Echo</tag-class>
+    <body-content>empty</body-content>
+    <attribute>
+      <name>echo</name>
+      <required>yes</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+  </tag>
+
+</taglib>
