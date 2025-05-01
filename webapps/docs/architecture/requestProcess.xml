@@ -84,28 +84,21 @@ Asynchronous - TBD.
 </p>
 </section>
 
-<section name="Legacy information">
-
-<subsection name="diagrams">
+<section name="Authentication">
 <p>
-A UML sequence diagram of the authentication process is available
-<a href="requestProcess/authentication-process.png">here.</a>
+<a href="requestProcess/41_basic.png">Diagram 4.1</a> shows how BASIC
+authentication is processed.
 </p>
-
-</subsection>
-
-<subsection name="comments">
 <p>
-The Servlet Specification provides many opportunities for
-listening in (using Listeners) or modifying (using Filters)
-the request handling process even before the request arrives
-at the servlet that will handle it.
+DIGEST - TBD.
 </p>
-
-</subsection>
-
+<p>
+FORM - TBD.
+</p>
+<p>
+Jakarta Authentication (JASPIC) - TBD.
+</p>
 </section>
-
 
 </body>
 </document>
