@@ -87,6 +87,7 @@
         web-jsptaglibrary_3_0.xsd
         web-jsptaglibrary_3_1.xsd
         web-jsptaglibrary_4_0.xsd
+        web-jsptaglibrary_4_1.xsd
         to which the EPLv2 applies.
       </comments>
     </license>
