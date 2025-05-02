@@ -24,8 +24,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -44,12 +42,16 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.UnavailableException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.catalina.Globals;
+import org.apache.catalina.WebResource;
+import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -244,6 +246,8 @@ public final class CGIServlet extends HttpServlet {
     private final Set<String> cgiMethods = new HashSet<>();
     private boolean cgiMethodsAll = false;
 
+    private transient WebResourceRoot resources = null;
+
 
     /**
      * The time (in milliseconds) to wait for the reading of stderr to complete before terminating the CGI process.
@@ -378,6 +382,13 @@ public final class CGIServlet extends HttpServlet {
             cmdLineArgumentsDecodedPattern = null;
         } else if (value != null) {
             cmdLineArgumentsDecodedPattern = Pattern.compile(value);
+        }
+
+        // Load the web resources
+        resources = (WebResourceRoot) getServletContext().getAttribute(Globals.RESOURCES_ATTR);
+
+        if (resources == null) {
+            throw new UnavailableException(sm.getString("cgiServlet.noResources"));
         }
     }
 
@@ -802,7 +813,7 @@ public final class CGIServlet extends HttpServlet {
             StringBuilder cgiPath = new StringBuilder();
             StringBuilder urlPath = new StringBuilder();
 
-            URL cgiScriptURL = null;
+            WebResource cgiScript = null;
 
             if (cgiPathPrefix == null || cgiPathPrefix.isEmpty()) {
                 cgiPath.append(servletPath);
@@ -814,7 +825,7 @@ public final class CGIServlet extends HttpServlet {
 
             StringTokenizer pathWalker = new StringTokenizer(pathInfo, "/");
 
-            while (pathWalker.hasMoreElements() && cgiScriptURL == null) {
+            while (pathWalker.hasMoreElements() && (cgiScript == null || !cgiScript.isFile())) {
                 String urlSegment = pathWalker.nextToken();
                 cgiPath.append('/');
                 cgiPath.append(urlSegment);
@@ -823,15 +834,11 @@ public final class CGIServlet extends HttpServlet {
                 if (log.isTraceEnabled()) {
                     log.trace(sm.getString("cgiServlet.find.location", cgiPath.toString()));
                 }
-                try {
-                    cgiScriptURL = context.getResource(cgiPath.toString());
-                } catch (MalformedURLException e) {
-                    // Ignore - should never happen
-                }
+                cgiScript = resources.getResource(cgiPath.toString());
             }
 
             // No script was found
-            if (cgiScriptURL == null) {
+            if (cgiScript == null || !cgiScript.isFile()) {
                 return new String[] { null, null, null, null };
             }
 
@@ -841,7 +848,7 @@ public final class CGIServlet extends HttpServlet {
             String cgiName = null;
             String name = null;
 
-            path = context.getRealPath(cgiPath.toString());
+            path = cgiScript.getCanonicalPath();
             if (path == null) {
                 /*
                  * The script doesn't exist directly on the file system. It might be located in an archive or similar.
@@ -857,14 +864,14 @@ public final class CGIServlet extends HttpServlet {
                         return new String[] { null, null, null, null };
                     }
 
-                    try (InputStream is = context.getResourceAsStream(cgiPath.toString())) {
+                    try (InputStream is = cgiScript.getInputStream()) {
                         synchronized (expandFileLock) {
                             // Check if file was created by concurrent request
                             if (!tmpCgiFile.exists()) {
                                 try {
                                     Files.copy(is, tmpCgiFile.toPath());
                                 } catch (IOException ioe) {
-                                    log.warn(sm.getString("cgiServlet.expandFail", cgiScriptURL,
+                                    log.warn(sm.getString("cgiServlet.expandFail", cgiScript.getURL(),
                                             tmpCgiFile.getAbsolutePath()), ioe);
                                     if (tmpCgiFile.exists()) {
                                         if (!tmpCgiFile.delete()) {
@@ -875,13 +882,13 @@ public final class CGIServlet extends HttpServlet {
                                     return new String[] { null, null, null, null };
                                 }
                                 if (log.isDebugEnabled()) {
-                                    log.debug(sm.getString("cgiServlet.expandOk", cgiScriptURL,
+                                    log.debug(sm.getString("cgiServlet.expandOk", cgiScript.getURL(),
                                             tmpCgiFile.getAbsolutePath()));
                                 }
                             }
                         }
                     } catch (IOException ioe) {
-                        log.warn(sm.getString("cgiServlet.expandCloseFail", cgiScriptURL), ioe);
+                        log.warn(sm.getString("cgiServlet.expandCloseFail", cgiScript.getURL()), ioe);
                     }
                 }
                 path = tmpCgiFile.getAbsolutePath();
