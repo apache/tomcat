@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.StringTokenizer;
 
 import org.apache.jasper.JasperException;
+import org.apache.jasper.runtime.ExceptionUtils;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.eclipse.jdt.core.compiler.IProblem;
@@ -217,16 +218,24 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             }
 
             private boolean isPackage(String result) {
+                System.out.println("isPackage(\"" + result + "\")");
                 if (result.equals(targetClassName) || result.startsWith(targetClassName + '$')) {
                     return false;
                 }
-                String resourceName = result.replace('.', '/') + ".class";
-                try (InputStream is = classLoader.getResourceAsStream(resourceName)) {
-                    return is == null;
-                } catch (IOException e) {
-                    // we are here, since close on is failed. That means it was not null
-                    return false;
+                /*
+                 * This might look heavy-weight but, with only the ClassLoader API available, trying to load the
+                 * resource as a class is the only reliable way found so far to differentiate between a class and a
+                 * package. Other options, such as getResource(), fail for some edge cases on case insensitive file
+                 * systems. As this code is only called at compile time, the performance impact is not a significant
+                 * concern.
+                 */
+                try {
+                    classLoader.loadClass(result);
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    return true;
                 }
+                return false;
             }
 
             @Override

@@ -167,6 +167,11 @@
         activated via JSP servlet param useNonstandardTagOptimizations.
         (jengebr)
       </add>
+      <fix>
+        Fix an edge case compilation bug for JSP and tag files on case
+        insensitive file systems that was exposed by the test case for
+        <bug>69635</bug>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
