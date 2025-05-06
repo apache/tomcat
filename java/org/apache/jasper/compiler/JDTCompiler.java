@@ -217,7 +217,6 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
             }
 
             private boolean isPackage(String result) {
-                System.out.println("isPackage(\"" + result + "\")");
                 if (result.equals(targetClassName) || result.startsWith(targetClassName + '$')) {
                     return false;
                 }
