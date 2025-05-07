@@ -190,19 +190,6 @@ public final class SavedRequest implements Serializable {
         return originalMaxInactiveInterval;
     }
 
-    /**
-     * Obtain the original session maxInactiveInterval.
-     *
-     * @return the original session maxInactiveInterval
-     *
-     * @deprecated This method will be removed in Tomcat 12.0.x onwards. Use
-     *                 {@link SavedRequest#getOriginalMaxInactiveIntervalOptional()}
-     */
-    @Deprecated
-    public int getOriginalMaxInactiveInterval() {
-        return originalMaxInactiveInterval.orElse(-1);
-    }
-
     public void setOriginalMaxInactiveInterval(int originalMaxInactiveInterval) {
         this.originalMaxInactiveInterval = OptionalInt.of(originalMaxInactiveInterval);
     }
