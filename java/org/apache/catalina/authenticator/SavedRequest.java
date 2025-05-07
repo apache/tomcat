@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.OptionalInt;
 
 import javax.servlet.http.Cookie;
 
@@ -181,13 +182,26 @@ public final class SavedRequest implements Serializable {
     /**
      * The original maxInactiveInterval for the session.
      */
-    private int originalMaxInactiveInterval = -1;
+    private OptionalInt originalMaxInactiveInterval = OptionalInt.empty();
 
-    public int getOriginalMaxInactiveInterval() {
+    public OptionalInt getOriginalMaxInactiveIntervalOptional() {
         return originalMaxInactiveInterval;
     }
 
+    /**
+     * Obtain the original session maxInactiveInterval.
+     *
+     * @return the original session maxInactiveInterval
+     *
+     * @deprecated This method will be removed in Tomcat 12.0.x onwards. Use
+     *                 {@link SavedRequest#getOriginalMaxInactiveIntervalOptional()}
+     */
+    @Deprecated
+    public int getOriginalMaxInactiveInterval() {
+        return originalMaxInactiveInterval.orElse(-1);
+    }
+
     public void setOriginalMaxInactiveInterval(int originalMaxInactiveInterval) {
-        this.originalMaxInactiveInterval = originalMaxInactiveInterval;
+        this.originalMaxInactiveInterval = OptionalInt.of(originalMaxInactiveInterval);
     }
 }
