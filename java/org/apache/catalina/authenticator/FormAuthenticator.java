@@ -646,8 +646,8 @@ public class FormAuthenticator extends AuthenticatorBase {
         request.getCoyoteRequest().queryString().toStringType();
         request.getCoyoteRequest().protocol().toStringType();
 
-        if (saved.getOriginalMaxInactiveInterval() > 0) {
-            session.setMaxInactiveInterval(saved.getOriginalMaxInactiveInterval());
+        if (saved.getOriginalMaxInactiveIntervalOptional().isPresent()) {
+            session.setMaxInactiveInterval(saved.getOriginalMaxInactiveIntervalOptional().getAsInt());
         }
 
         return true;
@@ -719,17 +719,19 @@ public class FormAuthenticator extends AuthenticatorBase {
         if (session instanceof HttpSession) {
             if (((HttpSession) session).isNew()) {
                 int originalMaxInactiveInterval = session.getMaxInactiveInterval();
-                if (originalMaxInactiveInterval > getAuthenticationSessionTimeout()) {
+                if (originalMaxInactiveInterval > getAuthenticationSessionTimeout() || originalMaxInactiveInterval <= 0) {
                     saved.setOriginalMaxInactiveInterval(originalMaxInactiveInterval);
                     session.setMaxInactiveInterval(getAuthenticationSessionTimeout());
                 }
-            } else if (previousSavedRequest != null && previousSavedRequest.getOriginalMaxInactiveInterval() > 0) {
+            } else if (previousSavedRequest != null &&
+                    previousSavedRequest.getOriginalMaxInactiveIntervalOptional().isPresent()) {
                 /*
-                 * The user may have refreshed the browser page during authentication. Transfer the original max
-                 * inactive interval from previous saved request to current one else, once authentication is completed,
-                 * the session will retain the the shorter authentication session timeout
+                 * The user may have refreshed the browser page during authentication. Transfer the original max inactive
+                 * interval from previous saved request to current one else, once authentication is completed, the session
+                 * will retain the shorter authentication session timeout
                  */
-                saved.setOriginalMaxInactiveInterval(previousSavedRequest.getOriginalMaxInactiveInterval());
+                saved.setOriginalMaxInactiveInterval(
+                        previousSavedRequest.getOriginalMaxInactiveIntervalOptional().getAsInt());
             }
         }
 

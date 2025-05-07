@@ -146,6 +146,11 @@
         <bug>69662</bug>: Report name in exception message when a naming lookup
         failure occurs. Based on code submitted by Donald Smith. (remm)
       </fix>
+      <fix>
+        Ensure that the FORM authentication attribute
+        <code>authenticationSessionTimeout</code> works correctly when sessions
+        have an infinite timeout when authentication starts. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
