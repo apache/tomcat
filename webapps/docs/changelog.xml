@@ -194,6 +194,9 @@
         Update file extension to media type mappings to align with the current
         list used by the Apache Web Server (httpd). (markt)
       </update>
+      <update>
+        Improvements to French translations. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
