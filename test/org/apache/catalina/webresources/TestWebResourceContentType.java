@@ -64,7 +64,7 @@ public class TestWebResourceContentType extends TomcatBaseTest {
         int rc = getUrl("http://localhost:" + getPort() + "/test/anything", body, resHead);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-        Assert.assertEquals("text/html", resHead.get("Content-Type").getFirst());
+        Assert.assertEquals("text/html", resHead.get("Content-Type").get(0));
     }
 
 
