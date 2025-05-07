@@ -53,8 +53,8 @@ import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestGenerator extends TomcatBaseTest {
 
-	private static final String NEW_LINE = System.lineSeparator();
-	
+    private static final String NEW_LINE = System.lineSeparator();
+
     @Test
     public void testBug45015a() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
