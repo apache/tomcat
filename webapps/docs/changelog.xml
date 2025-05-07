@@ -195,6 +195,10 @@
         <code>authenticationSessionTimeout</code> works correctly when sessions
         have an infinite timeout when authentication starts. (markt)
       </fix>
+      <add>
+        Provide a content type based on file extension when web application
+        resources are accessed via a URL. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
