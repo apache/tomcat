@@ -399,8 +399,7 @@ public final class UserConfig implements LifecycleListener {
         return true;
     }
 
-    private record DeployUserDirectory(UserConfig config, String user,
-                                       String home) implements Runnable {
+    private record DeployUserDirectory(UserConfig config, String user, String home) implements Runnable {
         @Override
         public void run() {
             config.deploy(user, home);

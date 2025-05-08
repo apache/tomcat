@@ -2247,11 +2247,10 @@ public class ContextConfig implements LifecycleListener {
                 String type = ae.getAnnotationType();
                 switch (type) {
                     case "Ljakarta/servlet/annotation/WebServlet;" ->
-                            processAnnotationWebServlet(className, ae, fragment);
+                        processAnnotationWebServlet(className, ae, fragment);
                     case "Ljakarta/servlet/annotation/WebFilter;" ->
-                            processAnnotationWebFilter(className, ae, fragment);
-                    case "Ljakarta/servlet/annotation/WebListener;" ->
-                            fragment.addListener(className);
+                        processAnnotationWebFilter(className, ae, fragment);
+                    case "Ljakarta/servlet/annotation/WebListener;" -> fragment.addListener(className);
                     case null, default -> {
                         // Unknown annotation - ignore
                     }

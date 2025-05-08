@@ -808,7 +808,8 @@ public class HostConfig implements LifecycleListener {
         // If there is an expanded directory then any xml in that directory
         // should only be used if the directory is not out of date and
         // unpackWARs is true. Note the code below may apply further limits
-        boolean useXml = xml.exists() && unpackWARs && (!warTracker.exists() || warTracker.lastModified() == war.lastModified());
+        boolean useXml =
+                xml.exists() && unpackWARs && (!warTracker.exists() || warTracker.lastModified() == war.lastModified());
         // If the xml file exists then expandedDir must exist so no need to
         // test that here
 
@@ -1823,8 +1824,7 @@ public class HostConfig implements LifecycleListener {
         public boolean loggedDirWarning = false;
     }
 
-    private record DeployDescriptor(HostConfig config, ContextName cn,
-                                    File descriptor) implements Runnable {
+    private record DeployDescriptor(HostConfig config, ContextName cn, File descriptor) implements Runnable {
         @Override
         public void run() {
             try {
@@ -1846,8 +1846,7 @@ public class HostConfig implements LifecycleListener {
         }
     }
 
-    private record DeployDirectory(HostConfig config, ContextName cn,
-                                   File dir) implements Runnable {
+    private record DeployDirectory(HostConfig config, ContextName cn, File dir) implements Runnable {
         @Override
         public void run() {
             try {
@@ -1859,8 +1858,7 @@ public class HostConfig implements LifecycleListener {
     }
 
 
-    private record MigrateApp(HostConfig config, ContextName cn, File source,
-                              File destination) implements Runnable {
+    private record MigrateApp(HostConfig config, ContextName cn, File source, File destination) implements Runnable {
         @Override
         public void run() {
             try {
@@ -1873,16 +1871,15 @@ public class HostConfig implements LifecycleListener {
 
 
     /*
-         * The purpose of this class is to provide a way for HostConfig to get a Context to delete an expanded WAR after the
-         * Context stops. This is to resolve this issue described in Bug 57772. The alternative solutions require either
-         * duplicating a lot of the Context.reload() code in HostConfig or adding a new reload(boolean) method to Context
-         * that allows the caller to optionally delete any expanded WAR.
-         *
-         * The LifecycleListener approach offers greater flexibility and enables the behaviour to be changed / extended /
-         * removed in future without changing the Context API.
-         */
-        private record ExpandedDirectoryRemovalListener(File toDelete,
-                                                        String newDocBase) implements LifecycleListener {
+     * The purpose of this class is to provide a way for HostConfig to get a Context to delete an expanded WAR after the
+     * Context stops. This is to resolve this issue described in Bug 57772. The alternative solutions require either
+     * duplicating a lot of the Context.reload() code in HostConfig or adding a new reload(boolean) method to Context
+     * that allows the caller to optionally delete any expanded WAR.
+     *
+     * The LifecycleListener approach offers greater flexibility and enables the behaviour to be changed / extended /
+     * removed in future without changing the Context API.
+     */
+    private record ExpandedDirectoryRemovalListener(File toDelete, String newDocBase) implements LifecycleListener {
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
             if (Lifecycle.AFTER_STOP_EVENT.equals(event.getType())) {

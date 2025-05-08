@@ -575,9 +575,8 @@ public class AsyncContextImpl implements AsyncContext, AsyncContextCallback {
     }
 
 
-    private record AsyncRunnable(Request request, AsyncDispatcher applicationDispatcher,
-                                 ServletRequest servletRequest,
-                                 ServletResponse servletResponse) implements Runnable {
+    private record AsyncRunnable(Request request, AsyncDispatcher applicationDispatcher, ServletRequest servletRequest,
+            ServletResponse servletResponse) implements Runnable {
 
         @Override
         public void run() {

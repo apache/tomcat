@@ -80,8 +80,8 @@ public class ApplicationMapping {
         mapping = null;
     }
 
-    private record MappingImpl(String matchValue, String pattern, MappingMatch mappingType,
-                               String servletName) implements HttpServletMapping {
+    private record MappingImpl(String matchValue, String pattern, MappingMatch mappingType, String servletName)
+            implements HttpServletMapping {
 
         @Override
         public String getMatchValue() {

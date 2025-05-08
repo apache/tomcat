@@ -4076,7 +4076,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(throwable);
                     getLogger().error(sm.getString("standardContext.listenerStop", listeners[j].getClass().getName()),
-                        throwable);
+                            throwable);
                     ok = false;
                 }
             }
@@ -4098,7 +4098,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(throwable);
                     getLogger().error(sm.getString("standardContext.listenerStop", listeners[j].getClass().getName()),
-                        throwable);
+                            throwable);
                     ok = false;
                 }
             }
@@ -5381,11 +5381,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     @Override
     protected String getObjectNameKeyProperties() {
-        return "j2eeType=WebModule," + getObjectKeyPropertiesNameOnly() +
-            ",J2EEApplication=" +
-            getJ2EEApplication() +
-            ",J2EEServer=" +
-            getJ2EEServer();
+        return "j2eeType=WebModule," + getObjectKeyPropertiesNameOnly() + ",J2EEApplication=" + getJ2EEApplication() +
+                ",J2EEServer=" + getJ2EEServer();
     }
 
     private String getObjectKeyPropertiesNameOnly() {
@@ -5701,7 +5698,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         @Override
-        public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+        public Map<String,? extends ServletRegistration> getServletRegistrations() {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 
@@ -5731,7 +5728,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         }
 
         @Override
-        public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+        public Map<String,? extends FilterRegistration> getFilterRegistrations() {
             throw new UnsupportedOperationException(sm.getString("noPluggabilityServletContext.notAllowed"));
         }
 

@@ -97,8 +97,8 @@ public interface WebResourceRoot extends Lifecycle {
      * calls to this method until the web application is reloaded. No guarantee is made as to what the search order for
      * JAR files may be.
      *
-     * @param path The path of the class loader resource of interest relative to the root of class loader resources
-     *                 for this web application.
+     * @param path The path of the class loader resource of interest relative to the root of class loader resources for
+     *                 this web application.
      *
      * @return The object that represents the class loader resource at the given path
      */
