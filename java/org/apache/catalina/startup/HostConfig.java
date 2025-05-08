@@ -895,7 +895,8 @@ public class HostConfig implements LifecycleListener {
         // If there is an expanded directory then any xml in that directory
         // should only be used if the directory is not out of date and
         // unpackWARs is true. Note the code below may apply further limits
-        boolean useXml = xml.exists() && unpackWARs && (!warTracker.exists() || warTracker.lastModified() == war.lastModified());
+        boolean useXml =
+                xml.exists() && unpackWARs && (!warTracker.exists() || warTracker.lastModified() == war.lastModified());
         // If the xml file exists then expandedDir must exist so no need to
         // test that here
 
@@ -1888,14 +1889,14 @@ public class HostConfig implements LifecycleListener {
 
 
     /*
-         * The purpose of this class is to provide a way for HostConfig to get a Context to delete an expanded WAR after the
-         * Context stops. This is to resolve this issue described in Bug 57772. The alternative solutions require either
-         * duplicating a lot of the Context.reload() code in HostConfig or adding a new reload(boolean) method to Context
-         * that allows the caller to optionally delete any expanded WAR.
-         *
-         * The LifecycleListener approach offers greater flexibility and enables the behaviour to be changed / extended /
-         * removed in future without changing the Context API.
-         */
+     * The purpose of this class is to provide a way for HostConfig to get a Context to delete an expanded WAR after the
+     * Context stops. This is to resolve this issue described in Bug 57772. The alternative solutions require either
+     * duplicating a lot of the Context.reload() code in HostConfig or adding a new reload(boolean) method to Context
+     * that allows the caller to optionally delete any expanded WAR.
+     *
+     * The LifecycleListener approach offers greater flexibility and enables the behaviour to be changed / extended /
+     * removed in future without changing the Context API.
+     */
     private static class ExpandedDirectoryRemovalListener implements LifecycleListener {
 
         private final File toDelete;

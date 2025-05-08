@@ -178,11 +178,8 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
 
     @Override
     public String toString() {
-        return "ApplicationFilterConfig[" + "name=" +
-            filterDef.getFilterName() +
-            ", filterClass=" +
-            filterDef.getFilterClass() +
-            ']';
+        return "ApplicationFilterConfig[" + "name=" + filterDef.getFilterName() + ", filterClass=" +
+                filterDef.getFilterClass() + ']';
     }
 
     // --------------------------------------------------------- Public Methods

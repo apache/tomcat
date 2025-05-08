@@ -1106,7 +1106,7 @@ public interface Context extends Container, ContextBind {
 
     /**
      * @return the array of watched resources for this Context. If none are defined, a zero length array will be
-     * returned.
+     *             returned.
      */
     String[] findWatchedResources();
 
@@ -1122,7 +1122,7 @@ public interface Context extends Container, ContextBind {
 
     /**
      * @return the array of welcome files defined for this Context. If none are defined, a zero-length array is
-     * returned.
+     *             returned.
      */
     String[] findWelcomeFiles();
 

@@ -188,8 +188,7 @@ public class DefaultInstanceManager implements InstanceManager {
     }
 
     /**
-     * Call postConstruct method on the specified instance recursively from the deepest superclass
-     * to actual class.
+     * Call postConstruct method on the specified instance recursively from the deepest superclass to actual class.
      *
      * @param instance object to call postconstruct methods on
      * @param clazz    (super) class to examine for postConstruct annotation.
@@ -225,8 +224,7 @@ public class DefaultInstanceManager implements InstanceManager {
 
 
     /**
-     * Call preDestroy method on the specified instance recursively from the deepest superclass
-     * to actual class.
+     * Call preDestroy method on the specified instance recursively from the deepest superclass to actual class.
      *
      * @param instance object to call preDestroy methods on
      * @param clazz    (super) class to examine for preDestroy annotation.
@@ -327,13 +325,11 @@ public class DefaultInstanceManager implements InstanceManager {
                         } else if (JPA_PRESENT && (persistenceContextAnnotation =
                                 method.getAnnotation(PersistenceContext.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(method.getName(), method.getParameterTypes(),
-                                    persistenceContextAnnotation.name(),
-                                    AnnotationCacheEntryType.SETTER));
+                                    persistenceContextAnnotation.name(), AnnotationCacheEntryType.SETTER));
                         } else if (JPA_PRESENT &&
                                 (persistenceUnitAnnotation = method.getAnnotation(PersistenceUnit.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(method.getName(), method.getParameterTypes(),
-                                    persistenceUnitAnnotation.name(),
-                                    AnnotationCacheEntryType.SETTER));
+                                    persistenceUnitAnnotation.name(), AnnotationCacheEntryType.SETTER));
                         }
                     }
 
@@ -380,17 +376,15 @@ public class DefaultInstanceManager implements InstanceManager {
                                     AnnotationCacheEntryType.FIELD));
                         } else if (WS_PRESENT &&
                                 (webServiceRefAnnotation = field.getAnnotation(WebServiceRef.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    webServiceRefAnnotation.name(), AnnotationCacheEntryType.FIELD));
+                            annotations.add(new AnnotationCacheEntry(fieldName, null, webServiceRefAnnotation.name(),
+                                    AnnotationCacheEntryType.FIELD));
                         } else if (JPA_PRESENT && (persistenceContextAnnotation =
                                 field.getAnnotation(PersistenceContext.class)) != null) {
                             annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    persistenceContextAnnotation.name(),
-                                    AnnotationCacheEntryType.FIELD));
+                                    persistenceContextAnnotation.name(), AnnotationCacheEntryType.FIELD));
                         } else if (JPA_PRESENT &&
                                 (persistenceUnitAnnotation = field.getAnnotation(PersistenceUnit.class)) != null) {
-                            annotations.add(new AnnotationCacheEntry(fieldName, null,
-                                    persistenceUnitAnnotation.name(),
+                            annotations.add(new AnnotationCacheEntry(fieldName, null, persistenceUnitAnnotation.name(),
                                     AnnotationCacheEntryType.FIELD));
                         }
                     }
