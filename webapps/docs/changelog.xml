@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.6 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.7 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -160,45 +160,6 @@
         rejected by default. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Process possible path parameters rewrite production in the rewrite
-        valve. (remm)
-      </fix>
-      <add>
-        <bug>69588</bug>: Enable <code>allowLinking</code> to be set on
-        <code>PreResources</code>, <code>JarResources</code> and
-        <code>PostResources</code>. If not set explicitly, the setting will be
-        inherited from the <code>Resources</code>. (markt)
-      </add>
-      <fix>
-        <bug>69633</bug>: Add support for Filters using context root mappings.
-        (markt)
-      </fix>
-      <fix>
-        <bug>69643</bug>: Optimize directory listing for large amount of files.
-        Patch submitted by  Loic de l'Eprevier. (remm)
-      </fix>
-      <fix>
-        <pr>843</pr>: Fix off by one validation logic for partial PUT ranges
-        and associated test case. Submitted by Chenjp. (remm)
-      </fix>
-      <scode>
-        Refactor GCI servlet to access resources via the
-        <code>WebResource</code> API. (markt)
-      </scode>
-      <fix>
-        <bug>69662</bug>: Report name in exception message when a naming lookup
-        failure occurs. Based on code submitted by Donald Smith. (remm)
-      </fix>
-      <fix>
-        Ensure that the FORM authentication attribute
-        <code>authenticationSessionTimeout</code> works correctly when sessions
-        have an infinite timeout when authentication starts. (markt)
-      </fix>
-      <add>
-        Provide a content type based on file extension when web application
-        resources are accessed via a URL. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -233,20 +194,6 @@
         21 being the minimum Java version required for Tomcat 12. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69635</bug>: Add support to <code>jakarta.el.ImportHandler</code>
-        for resolving inner classes. (markt)
-      </fix>
-      <add>
-        Add support for optimized execution of c:set and c:remove tags, when
-        activated via JSP servlet param useNonstandardTagOptimizations.
-        (jengebr)
-      </add>
-      <fix>
-        Fix an edge case compilation bug for JSP and tag files on case
-        insensitive file systems that was exposed by the test case for
-        <bug>69635</bug>. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
@@ -266,11 +213,6 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>68876</bug>: Documentation. Update the UML diagrams for server
-        start-up, request processing and authentication using PlantUML and
-        include the source files for each diagram. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -279,25 +221,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update Jacoco to 0.8.13. (remm)
-      </update>
-      <update>
-        Update Byte Buddy to 1.17.5. (markt)
-      </update>
-      <update>
-        Update Checkstyle to 10.23.1. (markt)
-      </update>
-      <update>
-        Update file extension to media type mappings to align with the current
-        list used by the Apache Web Server (httpd). (markt)
-      </update>
-      <update>
-        Improvements to French translations. (remm)
-      </update>
-      <update>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
