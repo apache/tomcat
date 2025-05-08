@@ -877,10 +877,10 @@ public class Tomcat {
 
 
     /**
-     * By default, when calling addWebapp() to create a Context, the settings from the default web.xml are added to
-     * the context. Calling this method with a <code>false</code> value prior to calling addWebapp() allows to opt out
-     * of the default settings. In that event you will need to add the configurations yourself, either programmatically
-     * or by using web.xml deployment descriptors.
+     * By default, when calling addWebapp() to create a Context, the settings from the default web.xml are added to the
+     * context. Calling this method with a <code>false</code> value prior to calling addWebapp() allows to opt out of
+     * the default settings. In that event you will need to add the configurations yourself, either programmatically or
+     * by using web.xml deployment descriptors.
      *
      * @param addDefaultWebXmlToWebapp <code>false</code> will prevent the class from automatically adding the default
      *                                     settings when calling addWebapp(). <code>true</code> will add the default
@@ -1194,7 +1194,7 @@ public class Tomcat {
         // Graal native images don't load any configuration except the VM default
         if (JreCompat.isGraalAvailable()) {
             try (InputStream is = new FileInputStream(
-                System.getProperty("java.util.logging.config.file", "conf/logging.properties"))) {
+                    System.getProperty("java.util.logging.config.file", "conf/logging.properties"))) {
                 LogManager.getLogManager().readConfiguration(is);
             } catch (SecurityException | IOException e) {
                 // Ignore, the VM default will be used

@@ -59,8 +59,7 @@ class ApplicationRequest extends ServletRequestWrapper {
      */
     private static final Set<String> specialsSet = new HashSet<>(Arrays.asList(specials));
 
-    private static final int shortestSpecialNameLength =
-            specialsSet.stream().mapToInt(String::length).min().getAsInt();
+    private static final int shortestSpecialNameLength = specialsSet.stream().mapToInt(String::length).min().getAsInt();
 
 
     /**

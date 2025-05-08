@@ -273,8 +273,8 @@ public class ExpandWar {
 
 
     /**
-     * Delete the specified directory, including all of its contents and subdirectories recursively. Any failure will
-     * be logged.
+     * Delete the specified directory, including all of its contents and subdirectories recursively. Any failure will be
+     * logged.
      *
      * @param dir File object representing the directory to be deleted
      *
@@ -313,8 +313,8 @@ public class ExpandWar {
 
 
     /**
-     * Delete the specified directory, including all of its contents and subdirectories recursively. Any failure will
-     * be logged.
+     * Delete the specified directory, including all of its contents and subdirectories recursively. Any failure will be
+     * logged.
      *
      * @param dir File object representing the directory to be deleted
      *

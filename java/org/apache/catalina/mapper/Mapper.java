@@ -439,7 +439,7 @@ public final class Mapper {
      * @param resourceOnly true if this wrapper always expects a physical resource to be present (such as a JSP)
      */
     private void addWrapper(ContextVersion context, String path, Wrapper wrapper, boolean jspWildCard,
-                            boolean resourceOnly) {
+            boolean resourceOnly) {
 
         synchronized (context) {
             if (path.endsWith("/*")) {
