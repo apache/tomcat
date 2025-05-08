@@ -185,7 +185,7 @@
       </add>
       <add>
         Extend the existing <code>+</code> operator in Jakarta Expression
-        Language to support mergin <code>Map</code>Map and <code>Set</code>Set
+        Language to support merging <code>Map</code>Map and <code>Set</code>Set
         and concatenating <code>List</code>s. (markt)
       </add>
       <update>
