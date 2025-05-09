@@ -158,7 +158,7 @@
   <subsection name="Jasper">
     <changelog>
       <fix>
-        <bug>69635</bug>: Add support to <code>jakarta.el.ImportHandler</code>
+        <bug>69635</bug>: Add support to <code>javax.el.ImportHandler</code>
         for resolving inner classes. (markt)
       </fix>
       <add>
