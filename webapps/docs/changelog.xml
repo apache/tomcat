@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.106 (remm)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <fix>
+        Add thread name to webappClassLoader.stackTraceRequestThread message.
+        Patch provided by Felix Zhang. (schultz)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.105 (remm)" rtext="release in progress">
   <subsection name="Catalina">
