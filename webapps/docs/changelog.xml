@@ -106,10 +106,12 @@
 -->
 <section name="Tomcat 11.0.8 (markt)" rtext="in development">
   <subsection name="Other">
-    <fix>
-      Add thread name to webappClassLoader.stackTraceRequestThread message.
-      Patch provided by Felix Zhang. (schultz)
-    </fix>
+    <changelog>
+      <fix>
+        Add thread name to webappClassLoader.stackTraceRequestThread message.
+        Patch provided by Felix Zhang. (schultz)
+      </fix>
+    </changelog>
   </subsection>
 </section>
 <section name="Tomcat 11.0.7 (markt)" rtext="release in progress">
