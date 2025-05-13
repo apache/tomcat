@@ -35,17 +35,15 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
 /**
- * Ant task to convert a given set of files from Text to HTML.
- * Inserts an HTML header including pre tags and replaces special characters
- * with their HTML escaped equivalents.
- *
- * <p>This task is currently used by the ant script to build our examples</p>
+ * Ant task to convert a given set of files from Text to HTML. Inserts an HTML header including pre tags and replaces
+ * special characters with their HTML escaped equivalents.
+ * <p>
+ * This task is currently used by the ant script to build our examples
+ * </p>
  *
  * @author Mark Roth
  */
-public class Txt2Html
-    extends Task
-{
+public class Txt2Html extends Task {
 
     /** The directory to contain the resulting files */
     private File todir;
@@ -54,14 +52,13 @@ public class Txt2Html
     private final List<FileSet> filesets = new ArrayList<>();
 
     /**
-     * The encoding of the source files (.java and .jsp).  Once they use
-     * UTF-8, this will need to be updated.
+     * The encoding of the source files (.java and .jsp). Once they use UTF-8, this will need to be updated.
      */
     private static final String SOURCE_ENCODING = "ISO-8859-1";
 
     /**
-     * Line terminator to be used for separating lines of the generated
-     * HTML page, to be independent of the "line.separator" system property.
+     * Line terminator to be used for separating lines of the generated HTML page, to be independent of the
+     * "line.separator" system property.
      */
     private static final String LINE_SEPARATOR = "\r\n";
 
@@ -70,7 +67,7 @@ public class Txt2Html
      *
      * @param todir The directory
      */
-    public void setTodir( File todir ) {
+    public void setTodir(File todir) {
         this.todir = todir;
     }
 
@@ -79,20 +76,17 @@ public class Txt2Html
      *
      * @param fs The fileset to be converted.
      */
-    public void addFileset( FileSet fs ) {
-        filesets.add( fs );
+    public void addFileset(FileSet fs) {
+        filesets.add(fs);
     }
 
     /**
      * Perform the conversion
      *
-     * @throws BuildException if an error occurs during execution of
-     *    this task.
+     * @throws BuildException if an error occurs during execution of this task.
      */
     @Override
-    public void execute()
-        throws BuildException
-    {
+    public void execute() throws BuildException {
         int count = 0;
 
         // Step through each file and convert.
@@ -103,23 +97,21 @@ public class Txt2Html
             for (String file : files) {
                 File from = new File(basedir, file);
                 File to = new File(todir, file + ".html");
-                if (!to.exists() ||
-                        (from.lastModified() > to.lastModified())) {
-                    log("Converting file '" + from.getAbsolutePath() +
-                            "' to '" + to.getAbsolutePath(), Project.MSG_VERBOSE);
+                if (!to.exists() || (from.lastModified() > to.lastModified())) {
+                    log("Converting file '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath(),
+                            Project.MSG_VERBOSE);
                     try {
                         convert(from, to);
                     } catch (IOException e) {
-                        throw new BuildException("Could not convert '" +
-                                from.getAbsolutePath() + "' to '" +
-                                to.getAbsolutePath() + "'", e);
+                        throw new BuildException(
+                                "Could not convert '" + from.getAbsolutePath() + "' to '" + to.getAbsolutePath() + "'",
+                                e);
                     }
                     count++;
                 }
             }
-            if( count > 0 ) {
-                log( "Converted " + count + " file" + (count > 1 ? "s" : "") +
-                    " to " + todir.getAbsolutePath() );
+            if (count > 0) {
+                log("Converted " + count + " file" + (count > 1 ? "s" : "") + " to " + todir.getAbsolutePath());
             }
         }
     }
@@ -128,50 +120,48 @@ public class Txt2Html
      * Perform the actual copy and conversion
      *
      * @param from The input file
-     * @param to The output file
+     * @param to   The output file
+     *
      * @throws IOException Thrown if an error occurs during the conversion
      */
-    private void convert( File from, File to )
-        throws IOException
-    {
+    private void convert(File from, File to) throws IOException {
         // Open files:
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(
-                new FileInputStream(from), SOURCE_ENCODING))) {
-            try (PrintWriter out = new PrintWriter(new OutputStreamWriter(
-                    new FileOutputStream(to), StandardCharsets.UTF_8))) {
+        try (BufferedReader in =
+                new BufferedReader(new InputStreamReader(new FileInputStream(from), SOURCE_ENCODING))) {
+            try (PrintWriter out =
+                    new PrintWriter(new OutputStreamWriter(new FileOutputStream(to), StandardCharsets.UTF_8))) {
 
                 // Output header:
-                out.print("<!DOCTYPE html><html><head><meta charset=\"UTF-8\" />"
-                        + "<title>Source Code</title></head><body><pre>" );
+                out.print("<!DOCTYPE html><html><head><meta charset=\"UTF-8\" />" +
+                        "<title>Source Code</title></head><body><pre>");
 
                 // Convert, line-by-line:
                 String line;
-                while( (line = in.readLine()) != null ) {
+                while ((line = in.readLine()) != null) {
                     StringBuilder result = new StringBuilder();
                     int len = line.length();
-                    for( int i = 0; i < len; i++ ) {
-                        char c = line.charAt( i );
-                        switch( c ) {
+                    for (int i = 0; i < len; i++) {
+                        char c = line.charAt(i);
+                        switch (c) {
                             case '&':
-                                result.append( "&amp;" );
+                                result.append("&amp;");
                                 break;
                             case '<':
-                                result.append( "&lt;" );
+                                result.append("&lt;");
                                 break;
                             default:
-                                result.append( c );
+                                result.append(c);
                         }
                     }
-                    out.print( result.toString() + LINE_SEPARATOR );
+                    out.print(result.toString() + LINE_SEPARATOR);
                 }
 
                 // Output footer:
-                out.print( "</pre></body></html>" );
+                out.print("</pre></body></html>");
 
             }
         }
     }
 
 }
-
 

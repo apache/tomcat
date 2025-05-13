@@ -20,10 +20,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Generates a set of translated property files to back-port updates to a
- * previous version. If the source and target use the same value for the English
- * key then any translated value for that key is copied from the source to the
- * target.
+ * Generates a set of translated property files to back-port updates to a previous version. If the source and target use
+ * the same value for the English key then any translated value for that key is copied from the source to the target.
  */
 public class BackportTranslations extends BackportBase {
 
@@ -53,8 +51,7 @@ public class BackportTranslations extends BackportBase {
             }
 
             for (Object key : targetEnglish.keySet()) {
-                if (sourceTranslated.containsKey(key) &&
-                        targetEnglish.get(key).equals(sourceEnglish.get(key))) {
+                if (sourceTranslated.containsKey(key) && targetEnglish.get(key).equals(sourceEnglish.get(key))) {
 
                     targetTranslated.put(key, sourceTranslated.get(key));
                 }
