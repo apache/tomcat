@@ -21,11 +21,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Generates a set of English property files to back-port updates to a previous
- * version. Where a key exists in the source and target versions the value is
- * copied from the source to the target, overwriting the value in the target.
- * The expectation is that the changes will be manually reviewed before
- * committing them.
+ * Generates a set of English property files to back-port updates to a previous version. Where a key exists in the
+ * source and target versions the value is copied from the source to the target, overwriting the value in the target.
+ * The expectation is that the changes will be manually reviewed before committing them.
  */
 public class BackportEnglish extends BackportBase {
 

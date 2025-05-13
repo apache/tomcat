@@ -31,13 +31,10 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 
 /**
- * Ant task that checks that all the files in the given fileset have end-of-line
- * delimiters that are appropriate.
- *
+ * Ant task that checks that all the files in the given fileset have end-of-line delimiters that are appropriate.
  * <p>
- * The goal is to check whether we have problems with Subversion's svn:eol-style
- * property or Git's autocrlf setting when files are committed on one OS and then
- * checked on another one.
+ * The goal is to check whether we have problems with Subversion's svn:eol-style property or Git's autocrlf setting when
+ * files are committed on one OS and then checked on another one.
  */
 public class CheckEol extends Task {
 
@@ -52,8 +49,8 @@ public class CheckEol extends Task {
      *
      * @param fs The fileset to be checked.
      */
-    public void addFileset( FileSet fs ) {
-        filesets.add( fs );
+    public void addFileset(FileSet fs) {
+        filesets.add(fs);
     }
 
     /**
@@ -61,12 +58,12 @@ public class CheckEol extends Task {
      *
      * @param mode The line ending mode (either LF or CRLF)
      */
-    public void setMode( String mode ) {
-        this.mode = Mode.valueOf( mode.toUpperCase(Locale.ENGLISH) );
+    public void setMode(String mode) {
+        this.mode = Mode.valueOf(mode.toUpperCase(Locale.ENGLISH));
     }
 
     private Mode getMode() {
-        if ( mode != null ) {
+        if (mode != null) {
             return mode;
         } else {
             if ("\n".equals(System.lineSeparator())) {
@@ -82,14 +79,13 @@ public class CheckEol extends Task {
     /**
      * Perform the check
      *
-     * @throws BuildException if an error occurs during execution of
-     *    this task.
+     * @throws BuildException if an error occurs during execution of this task.
      */
     @Override
     public void execute() throws BuildException {
 
         Mode mode = getMode();
-        if ( mode == null ) {
+        if (mode == null) {
             log("Line ends check skipped, because OS line ends setting is neither LF nor CRLF.", Project.MSG_VERBOSE);
             return;
         }
@@ -107,25 +103,21 @@ public class CheckEol extends Task {
                 log("Checking line ends in " + files.length + " file(s)");
                 for (String filename : files) {
                     File file = new File(basedir, filename);
-                    log("Checking file '" + file + "' for correct line ends",
-                            Project.MSG_DEBUG);
+                    log("Checking file '" + file + "' for correct line ends", Project.MSG_DEBUG);
                     try {
                         check(file, errors, mode);
                     } catch (IOException e) {
-                        throw new BuildException("Could not check file '"
-                                + file.getAbsolutePath() + "'", e);
+                        throw new BuildException("Could not check file '" + file.getAbsolutePath() + "'", e);
                     }
                     count++;
                 }
             }
         }
         if (count > 0) {
-            log("Done line ends check in " + count + " file(s), "
-                    + errors.size() + " error(s) found.");
+            log("Done line ends check in " + count + " file(s), " + errors.size() + " error(s) found.");
         }
         if (!errors.isEmpty()) {
-            String message = "The following files have wrong line ends: "
-                    + errors;
+            String message = "The following files have wrong line ends: " + errors;
             // We need to explicitly write the message to the log, because
             // long BuildException messages may be trimmed. E.g. I observed
             // this problem with Eclipse IDE 3.7.
@@ -135,7 +127,8 @@ public class CheckEol extends Task {
     }
 
     private enum Mode {
-        LF, CRLF
+        LF,
+        CRLF
     }
 
     private record CheckFailure(File file, int line, String value) {
@@ -146,8 +139,7 @@ public class CheckEol extends Task {
     }
 
     private void check(File file, List<CheckFailure> errors, Mode mode) throws IOException {
-        try (FileInputStream fis = new FileInputStream(file);
-                BufferedInputStream is = new BufferedInputStream(fis)) {
+        try (FileInputStream fis = new FileInputStream(file); BufferedInputStream is = new BufferedInputStream(fis)) {
             int line = 1;
             int prev = -1;
             int ch;
