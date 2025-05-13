@@ -68,7 +68,8 @@ public class Import {
                 if (w != null) {
                     w.close();
                 }
-                File outFile = new File(currentPkg.replace('.', File.separatorChar), Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
+                File outFile = new File(currentPkg.replace('.', File.separatorChar),
+                        Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
                 FileOutputStream fos = new FileOutputStream(outFile);
                 w = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
                 org.apache.tomcat.buildutil.Utils.insertLicense(w);

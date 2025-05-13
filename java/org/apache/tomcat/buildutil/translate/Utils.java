@@ -81,9 +81,8 @@ public class Utils {
 
 
     /*
-     * Values containing "[{n}]" and "'" need to have the "'" escaped as "''".
-     * POEditor attempts to do this automatically but does it for any value
-     * containing "{" or "}" leading to some unnecessary escaping. This method
+     * Values containing "[{n}]" and "'" need to have the "'" escaped as "''". POEditor attempts to do this
+     * automatically but does it for any value containing "{" or "}" leading to some unnecessary escaping. This method
      * undoes the unnecessary escaping.
      */
     static String fixUnnecessaryEscaping(String key, String value) {
@@ -95,8 +94,7 @@ public class Utils {
 
 
     /*
-     * Common formatting to convert a String for storage as a value in a
-     * property file.
+     * Common formatting to convert a String for storage as a value in a property file.
      */
     static String formatValueCommon(String in) {
         String result = in.replace("\n", "\\n\\\n");
