@@ -37,6 +37,8 @@ import jakarta.servlet.SessionCookieConfig;
 import jakarta.servlet.SessionTrackingMode;
 import jakarta.servlet.descriptor.JspConfigDescriptor;
 
+import org.apache.tomcat.util.http.fileupload.ProgressListenerFactory;
+
 
 /**
  * Facade object which masks the internal <code>ApplicationContext</code> object from the web application.
@@ -359,6 +361,9 @@ public class ApplicationContextFacade implements ServletContext {
         return context.getServletRegistrations();
     }
 
+    public ProgressListenerFactory getProgressListenerFactory() {
+        return context.getProgressListenerFactory();
+    }
 
     @Override
     public String getVirtualServerName() {

@@ -14,33 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.tomcat.util.http.fileupload;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 /**
- * The {@link ProgressListener} may be used to display a progress bar
- * or do stuff like that.
+ * Factory for {@link ProgressListener}. Users can specify this via a System property. See FACTORY_NAME
  */
-public interface ProgressListener {
+public interface ProgressListenerFactory {
 
     /**
-     * Notify that processing the file upload has started.
+     * Constant for the servlet init parameter that can be used to specify a factory for ProgressListeners
      */
-    void uploadStarted();
+    String FACTORY_NAME = "tomcat.fileUploadProgressListenerFactory";
+
 
     /**
-     * Updates the listener's status information.
+     * Creaste a new {@link ProgressListener} for the current multipart request.
      *
-     * @param pBytesRead The total number of bytes, which have been read
-     *   so far.
-     * @param pContentLength The total number of bytes, which are being
-     *   read. May be -1, if this number is unknown.
-     * @param pItems The number of the field, which is currently being
-     *   read. (0 = no item so far, 1 = first item is being read, ...)
+     * @param servletRequest The {@link HttpServletRequest}
+     *
+     * @return returns a new {@link ProgressListener} for current request.
      */
-    void update(long pBytesRead, long pContentLength, int pItems);
+    ProgressListener newProgressListener(HttpServletRequest servletRequest);
 
-    /**
-     * Notify that processing the file upload has finished.
-     */
-    void uploadFinished();
 }

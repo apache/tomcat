@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.io.InputStream;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -67,16 +68,20 @@ import org.apache.catalina.Service;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.connector.Request;
 import org.apache.catalina.mapper.MappingData;
 import org.apache.catalina.util.Introspection;
 import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.http.RequestUtil;
+import org.apache.tomcat.util.http.fileupload.ProgressListenerFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -88,6 +93,8 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Remy Maucherat
  */
 public class ApplicationContext implements ServletContext {
+
+    private static final Log log = LogFactory.getLog(Request.class);
 
     // ----------------------------------------------------------- Constructors
 
@@ -145,6 +152,11 @@ public class ApplicationContext implements ServletContext {
      */
     private final Map<String,String> parameters = new ConcurrentHashMap<>();
 
+
+    /**
+     * The ProgressListenerFactory used to create {@link org.apache.tomcat.util.http.fileupload.ProgressListener}
+     */
+    private ProgressListenerFactory progressListenerFactory;
 
     /**
      * The string manager for this package.
@@ -1159,6 +1171,30 @@ public class ApplicationContext implements ServletContext {
     // -------------------------------------------------------- Package Methods
     protected StandardContext getContext() {
         return this.context;
+    }
+
+    public ProgressListenerFactory getProgressListenerFactory() {
+        if (progressListenerFactory == null) {
+            progressListenerFactory = newProgressListenerFactory();
+        }
+        return progressListenerFactory;
+    }
+
+    private ProgressListenerFactory newProgressListenerFactory() {
+        String progressListenerFactoryClassName = getInitParameter(ProgressListenerFactory.FACTORY_NAME);
+        if (progressListenerFactoryClassName == null || progressListenerFactoryClassName.isEmpty()) {
+            log.warn(sm.getString("applicationContext.no.upload.progressListenerFactory", progressListenerFactoryClassName));
+            return null;
+        }
+        try {
+            Class<?> progressListenerFactoryClass = Introspection.loadClass(context, progressListenerFactoryClassName);
+            Constructor<?> ctor = progressListenerFactoryClass.getConstructor();
+            return (ProgressListenerFactory) ctor.newInstance();
+        } catch (InvocationTargetException | NoSuchMethodException | InstantiationException
+                 | ClassCastException | IllegalAccessException e) {
+            log.error(sm.getString("applicationContext.invalid.progressListenerFactory", progressListenerFactoryClassName), e);
+            return null;
+        }
     }
 
     /**

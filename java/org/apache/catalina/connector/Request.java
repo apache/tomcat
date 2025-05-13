@@ -76,6 +76,7 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.Session;
 import org.apache.catalina.TomcatPrincipal;
 import org.apache.catalina.Wrapper;
+import org.apache.catalina.core.ApplicationContextFacade;
 import org.apache.catalina.core.ApplicationFilterChain;
 import org.apache.catalina.core.ApplicationMapping;
 import org.apache.catalina.core.ApplicationPart;
@@ -110,6 +111,7 @@ import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileUpload;
+import org.apache.tomcat.util.http.fileupload.ProgressListenerFactory;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
 import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
 import org.apache.tomcat.util.http.fileupload.impl.SizeException;
@@ -2486,7 +2488,15 @@ public class Request implements HttpServletRequest {
         }
         factory.setSizeThreshold(mce.getFileSizeThreshold());
 
+        ServletContext servletContext = getServletContext();
         FileUpload upload = new FileUpload();
+        // allow applications to register custom progress listeners
+        if (servletContext instanceof ApplicationContextFacade applicationContext) {
+            ProgressListenerFactory progressListenerFactory = applicationContext.getProgressListenerFactory();
+            if (progressListenerFactory != null) {
+                upload.setProgressListener(progressListenerFactory.newProgressListener(this.getRequest()));
+            }
+        }
         upload.setFileItemFactory(factory);
         upload.setFileSizeMax(mce.getMaxFileSize());
         upload.setSizeMax(mce.getMaxRequestSize());
@@ -2544,7 +2554,6 @@ public class Request implements HttpServletRequest {
             partsParseException = e;
         }
     }
-
 
     @Override
     public Part getPart(String name) throws IOException, IllegalStateException, ServletException {
