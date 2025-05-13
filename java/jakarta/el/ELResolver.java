@@ -133,4 +133,23 @@ public abstract class ELResolver {
         context.setPropertyResolved(false);
         return null;
     }
+
+    /**
+     * This class is used as a key for {@link ELContext#getContext(Class)}. The key references a context object that if
+     * present and set to {@code Boolean#TRUE}, indicates that the identifier being resolved is a single, stand-alone
+     * identifier. This allows {@link ELResolver} instances - and in particular
+     * {@code jakarta.servlet.jsp.el.ImportELResolver} - to optimise the resolution of the identifier and avoid
+     * unnecessary and expensive class loader lookups.
+     * <p>
+     * The EL implementation is required to set this key with the value {@code Boolean#TRUE} when resolving a single,
+     * stand-alone identifier.
+     *
+     * @since Jakarta Expression Language 6.1
+     */
+    public class StandaloneIdentifierMarker {
+
+        private StandaloneIdentifierMarker() {
+            // Non-public default constructor as there is no need to create instances of this class.
+        }
+    }
 }

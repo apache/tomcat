@@ -193,6 +193,12 @@
         <code>compilerTargetVM</code> have been updated to 21 to align with Java
         21 being the minimum Java version required for Tomcat 12. (markt)
       </update>
+      <scode>
+        Refactor the performance optimisation for
+        <code>jakarta.servlet.jsp.el.ImportELResolver</code> to use the new
+        marker class,
+        <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. (markt)
+      </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
