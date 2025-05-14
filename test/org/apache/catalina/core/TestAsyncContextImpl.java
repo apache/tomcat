@@ -2702,7 +2702,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private static final String ENCODED_URI = "/foo/vv%2F1234/add/2";
+        private static final String ENCODED_URI = "/foo/vv%201234/add/2";
 
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

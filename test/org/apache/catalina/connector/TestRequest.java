@@ -704,17 +704,17 @@ public class TestRequest extends TomcatBaseTest {
 
     @Test
     public void testBug56501j() throws Exception {
-        doBug56501("/pa_th/abc", "/pa%5Fth/abc", "/pa%5Fth/abc");
+        doBug56501("/pa_th/abc", "/pa%5Fth/abc", "/pa_th/abc");
     }
 
     @Test
     public void testBug56501k() throws Exception {
-        doBug56501("/pa_th/abc", "/pa%5Fth/abc/", "/pa%5Fth/abc");
+        doBug56501("/pa_th/abc", "/pa%5Fth/abc/", "/pa_th/abc");
     }
 
     @Test
     public void testBug56501l() throws Exception {
-        doBug56501("/pa_th/abc", "/pa%5Fth/abc/xxx", "/pa%5Fth/abc");
+        doBug56501("/pa_th/abc", "/pa%5Fth/abc/xxx", "/pa_th/abc");
     }
 
     @Test
@@ -734,12 +734,12 @@ public class TestRequest extends TomcatBaseTest {
 
     @Test
     public void testBug56501p() throws Exception {
-        doBug56501("/path/abc", "/path;a=b/abc/xxx", "/path;a=b/abc");
+        doBug56501("/path/abc", "/path;a=b/abc/xxx", "/path/abc");
     }
 
     @Test
     public void testBug56501q() throws Exception {
-        doBug56501("/path/abc", "/path/abc;a=b/xxx", "/path/abc;a=b");
+        doBug56501("/path/abc", "/path/abc;a=b/xxx", "/path/abc");
     }
 
     @Test
@@ -749,37 +749,37 @@ public class TestRequest extends TomcatBaseTest {
 
     @Test
     public void testBug56501s() throws Exception {
-        doBug56501("/path/abc", "/.;a=b/path/abc/xxx", "/.;a=b/path/abc");
+        doBug56501("/path/abc", "/.;a=b/path/abc/xxx", "/path/abc");
     }
 
     @Test
     public void testBug57215a() throws Exception {
-        doBug56501("/path", "//path", "//path");
+        doBug56501("/path", "//path", "/path");
     }
 
     @Test
     public void testBug57215b() throws Exception {
-        doBug56501("/path", "//path/", "//path");
+        doBug56501("/path", "//path/", "/path");
     }
 
     @Test
     public void testBug57215c() throws Exception {
-        doBug56501("/path", "/%2Fpath", "/%2Fpath", EncodedSolidusHandling.DECODE);
+        doBug56501("/path", "/%2Fpath", "/path", EncodedSolidusHandling.DECODE);
     }
 
     @Test
     public void testBug57215d() throws Exception {
-        doBug56501("/path", "/%2Fpath%2F", "/%2Fpath", EncodedSolidusHandling.DECODE);
+        doBug56501("/path", "/%2Fpath%2F", "/path", EncodedSolidusHandling.DECODE);
     }
 
     @Test
     public void testBug57215e() throws Exception {
-        doBug56501("/path", "/foo/../path", "/foo/../path");
+        doBug56501("/path", "/foo/../path", "/path");
     }
 
     @Test
     public void testBug57215f() throws Exception {
-        doBug56501("/path", "/foo/..%2fpath", "/foo/..%2fpath", EncodedSolidusHandling.DECODE);
+        doBug56501("/path", "/foo/..%2fpath", "/path", EncodedSolidusHandling.DECODE);
     }
 
     private void doBug56501(String deployPath, String requestPath, String expected) throws Exception {

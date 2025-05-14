@@ -34,6 +34,8 @@ import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterContext;
+import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -217,6 +219,9 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
             org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
             Request request = new Request(null, coyoteRequest);
             request.setAttribute("key", "value");
+            TesterContext ctxt = new TesterContext();
+            ctxt.setServletContext(new TesterServletContext());
+            request.getMappingData().context = ctxt;
             return request;
         }
         return new ApplicationHttpRequest(getNestedRequest(depth - 1), null, false);

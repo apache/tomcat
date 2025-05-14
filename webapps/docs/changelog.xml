@@ -159,6 +159,12 @@
         or an include) for a static resource using the POST method will be
         rejected by default. (markt)
       </update>
+      <scode>
+        Calls to <code>HttpServletRequest.getContextPath()</code> now return the
+        canonical context path for the web application rather than the component
+        of the request URI presented by the user agent that maps to the context
+        path. (markt)
+      </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
