@@ -272,6 +272,7 @@ public abstract class FileUploadBase {
             throws FileUploadException {
         final List<FileItem> items = new ArrayList<>();
         boolean successful = false;
+        notifyUploadStarted();
         try {
             final FileItemIterator iter = getItemIterator(ctx);
             final FileItemFactory fileItemFactory = Objects.requireNonNull(getFileItemFactory(),
@@ -315,6 +316,19 @@ public abstract class FileUploadBase {
                     }
                 }
             }
+            notifyUploadFinished();
+        }
+    }
+
+    private void notifyUploadStarted() {
+        if (listener != null) {
+            listener.uploadStarted();
+        }
+    }
+
+    private void notifyUploadFinished() {
+        if (listener != null) {
+            listener.uploadFinished();
         }
     }
 
