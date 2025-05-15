@@ -40,6 +40,7 @@ public class TLSClientHelloExtractor {
     private static final Log log = LogFactory.getLog(TLSClientHelloExtractor.class);
     private static final StringManager sm = StringManager.getManager(TLSClientHelloExtractor.class);
 
+    private final ByteBuffer netInBuffer;
     private final ExtractorResult result;
     private final List<Cipher> clientRequestedCiphers;
     private final List<String> clientRequestedCipherNames;
@@ -60,6 +61,7 @@ public class TLSClientHelloExtractor {
             "Bad Request\r\n" +
             "This combination of host and port requires TLS.\r\n").getBytes(StandardCharsets.UTF_8);
 
+    public static ResponseCustomizer RESPONSE_CUSTOMIZER = new ResponseCustomizer() {};
 
     /**
      * Creates the instance of the parser and processes the provided buffer. The
@@ -71,6 +73,7 @@ public class TLSClientHelloExtractor {
      * @throws IOException If the client hello message is malformed
      */
     public TLSClientHelloExtractor(ByteBuffer netInBuffer) throws IOException {
+        this.netInBuffer = netInBuffer;
         // Buffer is in write mode at this point. Record the current position so
         // the buffer state can be restored at the end of this method.
         int pos = netInBuffer.position();
@@ -245,6 +248,20 @@ public class TLSClientHelloExtractor {
         }
     }
 
+    public byte[] getUseTlsResponse() {
+        // Buffer is in write mode at this point. Record the current position so
+        // the buffer state can be restored at the end of this method.
+        int pos = netInBuffer.position();
+        int limit = netInBuffer.limit();
+        try {
+            netInBuffer.flip();
+            return RESPONSE_CUSTOMIZER.customize(netInBuffer);
+        } finally {
+            // Whatever happens, return the buffer to its original state
+            netInBuffer.limit(limit);
+            netInBuffer.position(pos);
+        }
+    }
 
     private static ExtractorResult handleIncompleteRead(ByteBuffer bb) {
         if (bb.limit() == bb.capacity()) {
@@ -416,12 +433,32 @@ public class TLSClientHelloExtractor {
         }
     }
 
-
     public enum ExtractorResult {
         COMPLETE,
         NOT_PRESENT,
         UNDERFLOW,
         NEED_READ,
         NON_SECURE
+    }
+
+    /**
+     * Allows the HTTP response to be changed.
+     * <pre>
+     * {@code
+     * TLSClientHelloExtractor.RESPONSE_CUSTOMIZER = new ResponseCustomizer() {
+     *     @Override
+     *     public byte[] customize(ByteBuffer netInBuffer) {
+     *         return ("HTTP/1.1 302 \r\n" +
+     *             "Location: https://www.example.org/index.html\r\n" +
+     *             "\r\n").getBytes(StandardCharsets.UTF_8);
+     *     }
+     * };
+     * }
+     * </pre>
+     */
+    public interface ResponseCustomizer {
+        default byte[] customize(ByteBuffer netInBuffer) {
+            return TLSClientHelloExtractor.USE_TLS_RESPONSE;
+        }
     }
 }
