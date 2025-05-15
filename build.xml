@@ -563,9 +563,7 @@
     <!-- Remove connectors that are not default -->
     <exclude name="**/AbstractAjpProtocol.class"/>
     <exclude name="**/Ajp*.class"/>
-    <exclude name="**/Http11Nio2*.class"/>
     <exclude name="**/JniLifecycleListener.class"/>
-    <exclude name="org/apache/tomcat/**/*Nio2*.class"/>
 
     <!-- Minimize bundles to the default set -->
     <exclude name="org/apache/**/LocalStrings_*.properties"/>
@@ -1936,13 +1934,13 @@
   <property name="junit.formatter.extension" value=".txt" />
 
   <target name="test" description="Runs the JUnit test cases"
-          depends="test-nio,test-nio2,coverage-report,test-status" />
+          depends="test-nio,coverage-report,test-status" />
 
   <target name="test-clean" description="Runs the JUnit test cases"
-          depends="clean-classes,test-nio,test-nio2,coverage-report,test-status" />
+          depends="clean-classes,test-nio,coverage-report,test-status" />
 
   <target name="test-only" description="Runs the JUnit test cases, without compilation"
-          depends="test-only-nio,test-only-nio2,test-status" />
+          depends="test-only-nio,test-status" />
 
   <target name="test-status"
           description="Analyses logs directory and reports on skipped tests, test failures and test errors">
@@ -1989,18 +1987,6 @@
           depends="setup-jacoco,test-openssl-exists" if="${execute.test.nio}">
     <runtests protocol="org.apache.coyote.http11.Http11NioProtocol"
               extension=".NIO" />
-  </target>
-
-  <target name="test-nio2" description="Runs the JUnit test cases for NIO2. Does not stop on errors."
-          depends="setup-jacoco,test-compile,deploy,test-openssl-exists" if="${execute.test.nio2}">
-    <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
-              extension=".NIO2" />
-  </target>
-
-  <target name="test-only-nio2" description="Runs the JUnit test cases or NIO2 without test preparations. Does not stop on errors."
-          depends="setup-jacoco,test-openssl-exists" if="${execute.test.nio2}">
-    <runtests protocol="org.apache.coyote.http11.Http11Nio2Protocol"
-          extension=".NIO2" />
   </target>
 
   <target name="test-openssl-exists" description="Checks for the OpenSSL binary">
@@ -2115,7 +2101,7 @@
   </macrodef>
 
   <target name="coverage-report" if="${test.coverage}"
-          depends="test-nio,test-nio2"
+          depends="test-nio"
           description="Creates report from gathered Code coverage results">
 
     <jacoco:report>

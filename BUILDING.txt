@@ -423,16 +423,6 @@ directory:
 
     output/build/logs
 
-By default the testsuite is run twice to test the 2 different implementations
-of Tomcat connectors: NIO and NIO2. (If you are not familiar with Tomcat
-connectors, see config/http.html in documentation for details).
-
-The 2 runs are activated and deactivated individually by the following
-properties, which all are "true" by default:
-
-    execute.test.nio=true
-    execute.test.nio2=true
-
 The SSL tests will be run twice. Once with the JSSE implementation and once
 with the OpenSSL implementation. The OpenSSL implementation can only be
 tested if Tomcat-Native library binaries are found by the testsuite. The

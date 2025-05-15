@@ -241,11 +241,7 @@
         To use an explicit protocol, the following values may be used:<br/>
         <code>org.apache.coyote.ajp.AjpNioProtocol</code>
         - non blocking Java NIO connector.<br/>
-        <code>org.apache.coyote.ajp.AjpNio2Protocol</code>
-        - non blocking Java NIO2 connector.<br/>
         Custom implementations may also be used.<br/>
-        Take a look at our <a href="#Connector_Comparison">Connector
-        Comparison</a> chart.
       </p>
     </attribute>
 
@@ -333,7 +329,7 @@
 
   <p>To use AJP, you must specify the protocol attribute (see above).</p>
 
-  <p>The standard AJP connectors (NIO and NIO2) both support the following
+  <p>The standard AJP connector supports the following
   attributes in addition to the common Connector attributes listed above.</p>
 
   <attributes>
@@ -360,7 +356,7 @@
       which address will be used for listening on the specified port. By
       default, the connector will listen on the loopback address. Unless the JVM
       is configured otherwise using system properties, the Java based connectors
-      (NIO, NIO2) will listen on both IPv4 and IPv6 addresses when configured
+      will listen on both IPv4 and IPv6 addresses when configured
       with either <code>0.0.0.0</code> or <code>::</code>.</p>
     </attribute>
 
@@ -466,7 +462,7 @@
       limit has been reached, the operating system may still accept connections
       based on the <code>acceptCount</code> setting. The default value
       is <code>8192</code>.</p>
-      <p>For NIO/NIO2 only, setting the value to -1, will disable the
+      <p>For NIO only, setting the value to -1, will disable the
       maxConnections feature and connections will not be counted.</p>
     </attribute>
 
@@ -605,7 +601,7 @@
 
   <subsection name="Java TCP socket attributes">
 
-    <p>The NIO and NIO2 implementation support the following Java TCP socket
+    <p>The NIO implementation support the following Java TCP socket
     attributes in addition to the common Connector and HTTP attributes listed
     above.</p>
 
@@ -754,66 +750,6 @@
     </attributes>
   </subsection>
 
-  <subsection name="NIO2 specific configuration">
-
-    <p>The following attributes are specific to the NIO2 connector.</p>
-
-    <attributes>
-
-      <attribute name="useCaches" required="false">
-        <p>(bool)Use this attribute to enable or disable object caching to
-        reduce the amount of GC objects produced.
-        The default value is <code>false</code>.</p>
-      </attribute>
-
-      <attribute name="socket.directBuffer" required="false">
-        <p>(bool)Boolean value, whether to use direct ByteBuffers or java mapped
-        ByteBuffers. Default is <code>false</code>.<br/>
-        When you are using direct buffers, make sure you allocate the
-        appropriate amount of memory for the direct memory space. On Sun's JDK
-        that would be something like <code>-XX:MaxDirectMemorySize=256m</code>.
-        </p>
-      </attribute>
-
-      <attribute name="socket.appReadBufSize" required="false">
-        <p>(int)Each connection that is opened up in Tomcat get associated with
-        a read ByteBuffer. This attribute controls the size of this buffer. By
-        default this read buffer is sized at <code>8192</code> bytes. For lower
-        concurrency, you can increase this to buffer more data. For an extreme
-        amount of keep alive connections, decrease this number or increase your
-        heap size.</p>
-      </attribute>
-
-      <attribute name="socket.appWriteBufSize" required="false">
-        <p>(int)Each connection that is opened up in Tomcat get associated with
-        a write ByteBuffer. This attribute controls the size of this buffer. By
-        default this write buffer is sized at <code>8192</code> bytes. For low
-        concurrency you can increase this to buffer more response data. For an
-        extreme amount of keep alive connections, decrease this number or
-        increase your heap size.<br/>
-        The default value here is pretty low, you should up it if you are not
-        dealing with tens of thousands concurrent connections.</p>
-      </attribute>
-
-      <attribute name="socket.bufferPoolSize" required="false">
-        <p>(int)The NIO2 connector uses a class called Nio2Channel that holds
-        elements linked to a socket. To reduce garbage collection, the NIO
-        connector caches these channel objects. This value specifies the size of
-        this cache. The default value is <code>500</code>, and represents that
-        the cache will hold 500 Nio2Channel objects. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
-      </attribute>
-
-      <attribute name="socket.processorCache" required="false">
-        <p>(int)Tomcat will cache SocketProcessor objects to reduce garbage
-        collection. The integer value specifies how many objects to keep in the
-        cache at most. The default is <code>0</code>. Other values are
-        <code>-1</code> for unlimited cache and <code>0</code> for no cache.</p>
-      </attribute>
-
-    </attributes>
-  </subsection>
-
 </section>
 
 
@@ -839,65 +775,6 @@
 
   <p>For more information, see the
   <a href="../proxy-howto.html">Proxy Support How-To</a>.</p>
-
-  </subsection>
-
-  <subsection name="Connector Comparison">
-
-    <p>Below is a small chart that shows how the connectors differ.</p>
-
-    <table class="defaultTable" style="text-align: center;">
-      <tr>
-        <th />
-        <th style="text-align: center;">Java Nio Connector<br />NIO</th>
-        <th style="text-align: center;">Java Nio2 Connector<br />NIO2</th>
-      </tr>
-      <tr>
-        <th>Classname</th>
-        <td><code class="noHighlight">AjpNioProtocol</code></td>
-        <td><code class="noHighlight">AjpNio2Protocol</code></td>
-      </tr>
-      <tr>
-        <th>Tomcat Version</th>
-        <td>7.x onwards</td>
-        <td>8.x onwards</td>
-      </tr>
-      <tr>
-        <th>Support Polling</th>
-        <td>YES</td>
-        <td>YES</td>
-      </tr>
-      <tr>
-        <th>Polling Size</th>
-        <td><code class="noHighlight">maxConnections</code></td>
-        <td><code class="noHighlight">maxConnections</code></td>
-      </tr>
-      <tr>
-        <th>Read Request Headers</th>
-        <td>Blocking</td>
-        <td>Blocking</td>
-      </tr>
-      <tr>
-        <th>Read Request Body</th>
-        <td>Blocking</td>
-        <td>Blocking</td>
-      </tr>
-      <tr>
-        <th>Write Response Headers and Body</th>
-        <td>Blocking</td>
-        <td>Blocking</td>
-      </tr>
-      <tr>
-        <th>Wait for next Request</th>
-        <td>Non Blocking</td>
-        <td>Non Blocking</td>
-      </tr>
-      <tr>
-        <th>Max Connections</th>
-        <td><code class="noHighlight">maxConnections</code></td>
-        <td><code class="noHighlight">maxConnections</code></td>
-      </tr>
-    </table>
 
   </subsection>
 

@@ -180,6 +180,9 @@
         <code>certificateKeystorePassword</code> attribute of a certificate.
         (remm)
       </update>
+      <update>
+        Remove NIO2 connector. (remm)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>

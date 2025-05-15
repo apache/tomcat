@@ -276,11 +276,6 @@ loaded or not, use one of the following:</p>
            sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"
            port="8443" .../>
 
-<!-- Define an HTTP/1.1 Connector on port 8443, JSSE NIO2 implementation -->
-<Connector protocol="org.apache.coyote.http11.Http11Nio2Protocol"
-           sslImplementationName="org.apache.tomcat.util.net.jsse.JSSEImplementation"
-           port="8443" .../>]]></source>
-
 <p>The OpenSSL JSSE implementation can also be configured explicitly if needed.
 If the Tomcat Native library or Java 22 is installed, using the
 <code>sslImplementationName</code>
@@ -523,10 +518,7 @@ nsComment="Testing OCSP Certificate"
 <p>Additional information may be obtained about TLS handshake failures by
 configuring the dedicated TLS handshake logger to log debug level messages by
 adding the following to <code>$CATALINA_BASE/conf/logging.properties</code>:
-<source>org.apache.tomcat.util.net.NioEndpoint.handshake.level=FINE</source>
-or
-<source>org.apache.tomcat.util.net.Nio2Endpoint.handshake.level=FINE</source>
-depending on the <strong>Connector</strong> being used.
+<source>org.apache.tomcat.util.net.NioEndpoint.handshake.level=FINE</source>.
 </p>
 
 <p>Here is a list of common problems that you may encounter when setting up

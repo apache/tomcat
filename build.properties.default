@@ -69,7 +69,6 @@ javadoc.locale=en
 
 # ----- Test configuration -----
 execute.test.nio=true
-execute.test.nio2=true
 # Stop testing if a failure occurs
 test.haltonfailure=false
 # Activate AccessLog during testing
