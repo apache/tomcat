@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.106 (remm)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        <bug>69694</bug>: Improve error reporting of deployment tasks done
+        using the manager webapp when a copy operation fails. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <fix>
