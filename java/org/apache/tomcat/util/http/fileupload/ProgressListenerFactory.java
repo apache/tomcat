@@ -20,14 +20,15 @@ package org.apache.tomcat.util.http.fileupload;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * Factory for {@link ProgressListener}. Users can specify this via a System property. See FACTORY_NAME
+ * Factory for {@link ProgressListener}. Users can specify this via an init parameter to a filter
+ * or a servlet. With parameter name <em>fileUploadProgressListenerFactory</em>
  */
 public interface ProgressListenerFactory {
 
     /**
      * Constant for the servlet init parameter that can be used to specify a factory for ProgressListeners
      */
-    String FACTORY_NAME = "tomcat.fileUploadProgressListenerFactory";
+    String FACTORY_NAME = "fileUploadProgressListenerFactory";
 
 
     /**

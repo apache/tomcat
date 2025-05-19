@@ -17,8 +17,8 @@
 package org.apache.tomcat.util.http.fileupload;
 
 /**
- * The {@link ProgressListener} may be used to display a progress bar
- * or do stuff like that.
+ * The {@link ProgressListener} may be used to track multipart processing (e.g., by displaying
+ * some progress bar to users)
  */
 public interface ProgressListener {
 
