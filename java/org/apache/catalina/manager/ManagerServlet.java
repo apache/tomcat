@@ -735,7 +735,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             return;
                         }
                         if (!ExpandWar.copy(new File(config), new File(configBase, baseName + ".xml"))) {
-                            throw new Exception(sm.getString("managerServlet.copyError", config));
+                            writer.println(smClient.getString("managerServlet.copyFail", new File(config), new File(configBase, baseName + ".xml")));
+                            return;
                         }
                     }
                     // Upload WAR
@@ -753,7 +754,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     }
                     if (tag != null) {
                         // Copy WAR to the host's appBase
-                        ExpandWar.copy(uploadedWar, deployedWar);
+                        if (!ExpandWar.copy(uploadedWar, deployedWar)) {
+                            writer.println(smClient.getString("managerServlet.copyFail", uploadedWar, deployedWar));
+                            return;
+                        }
                     }
                 } finally {
                     removeServiced(name);
@@ -807,7 +811,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         writer.println(smClient.getString("managerServlet.deleteFail", deployedWar));
                         return;
                     }
-                    ExpandWar.copy(localWar, deployedWar);
+                    if (!ExpandWar.copy(localWar, deployedWar)) {
+                        writer.println(smClient.getString("managerServlet.copyFail", localWar, deployedWar));
+                        return;
+                    }
                 } finally {
                     removeServiced(name);
                 }
@@ -901,7 +908,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 writer.println(smClient.getString("managerServlet.deleteFail", localConfigFile));
                                 return;
                             }
-                            ExpandWar.copy(configFile, localConfigFile);
+                            if (!ExpandWar.copy(configFile, localConfigFile)) {
+                                writer.println(smClient.getString("managerServlet.copyFail", configFile, localConfigFile));
+                                return;
+                            }
                         }
                     }
                     if (war != null) {
@@ -921,7 +931,10 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 writer.println(smClient.getString("managerServlet.deleteFail", localWarFile));
                                 return;
                             }
-                            ExpandWar.copy(warFile, localWarFile);
+                            if (!ExpandWar.copy(warFile, localWarFile)) {
+                                writer.println(smClient.getString("managerServlet.copyFail", warFile, localWarFile));
+                                return;
+                            }
                         }
                     }
                 } finally {
