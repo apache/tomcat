@@ -589,7 +589,6 @@ public class JspCompilationContext {
                 jspCompiler.removeGeneratedFiles();
                 jspLoader = null;
                 jspCompiler.compile();
-                jsw.setReload(true);
                 jsw.setCompilationException(null);
             } catch (JasperException ex) {
                 // Cache compilation exception
@@ -607,6 +606,8 @@ public class JspCompilationContext {
                 // Cache compilation exception
                 jsw.setCompilationException(je);
                 throw je;
+            } finally {
+                jsw.setReload(true);
             }
         }
     }

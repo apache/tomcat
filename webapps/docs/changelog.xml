@@ -213,6 +213,10 @@
         <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69696</bug>: Mark the JSP wrapper for reload after a failed
+        compilation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
