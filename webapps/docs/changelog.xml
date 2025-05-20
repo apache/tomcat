@@ -166,6 +166,10 @@
         path. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Add support for the <code>java:module</code> namespace which mirrors
+        the <code>java:comp</code> namespace. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
