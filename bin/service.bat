@@ -200,6 +200,14 @@ if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
     )
 )
 
+rem Configure JAVA 9 specific start-up parameters - ensure to keep it in line with catalina.bat
+set                "JVM9_OPTIONS=--add-opens=java.base/java.lang=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.io=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.util=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
+
 "%EXECUTABLE%" //IS//%SERVICE_NAME% ^
     --Description "Apache Tomcat @VERSION@ Server - https://tomcat.apache.org/" ^
     --DisplayName "Apache Tomcat @VERSION_MAJOR_MINOR@ %SERVICE_NAME%" ^
@@ -218,7 +226,7 @@ if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
     --StartParams start ^
     --StopParams stop ^
     --JvmOptions "-Dcatalina.home=%CATALINA_HOME%;-Dcatalina.base=%CATALINA_BASE%;-Djava.io.tmpdir=%CATALINA_BASE%\temp;-Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager;-Djava.util.logging.config.file=%CATALINA_BASE%\conf\logging.properties;%JvmArgs%" ^
-    --JvmOptions9 "--add-opens=java.base/java.lang=ALL-UNNAMED#--add-opens=java.base/java.io=ALL-UNNAMED#--add-opens=java.base/java.util=ALL-UNNAMED#--add-opens=java.base/java.util.concurrent=ALL-UNNAMED#--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED" ^
+    --JvmOptions9 "%JVM9_OPTIONS%" ^
     --Startup "%SERVICE_STARTUP_MODE%" ^
     --JvmMs "%JvmMs%" ^
     --JvmMx "%JvmMx%"
