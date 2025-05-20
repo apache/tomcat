@@ -235,9 +235,9 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                 }
             }
         } else {
-            serverSock = ServerSocketChannel.open();
-            socketProperties.setProperties(serverSock.socket());
             InetSocketAddress addr = new InetSocketAddress(getAddress(), getPortWithOffset());
+            serverSock = ServerSocketChannel.open(addr.getAddress().getAddress().length == 4 ? StandardProtocolFamily.INET : StandardProtocolFamily.INET6);
+            socketProperties.setProperties(serverSock.socket());
             serverSock.bind(addr, getAcceptCount());
         }
         serverSock.configureBlocking(true); //mimic APR behavior
