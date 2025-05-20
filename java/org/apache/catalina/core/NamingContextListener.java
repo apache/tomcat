@@ -491,6 +491,13 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
         } else {
             compCtx = namingContext.createSubcontext("comp");
             envCtx = compCtx.createSubcontext("env");
+            /*
+             * Jakarta Platform Specification, 5.2.2: Application Component Environment Namespaces
+             *
+             * "java:module" and "java:comp" refer to the same namespace in a web module (i.e. a web application).
+             * Implement this by binding the "comp" sub-context we just created to the "module" name as well.
+             */
+            namingContext.bind("module", compCtx);
         }
 
         int i;
