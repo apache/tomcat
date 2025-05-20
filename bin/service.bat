@@ -223,12 +223,12 @@ if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
 
 rem Configure JAVA 9 specific start-up parameters - KEEP in line with catalina.bat
 set                "JVM9_OPTIONS=--add-opens=java.base/java.lang=ALL-UNNAMED"
-set "JVM9_OPTIONS=%JVM9_OPTIONS%#--add-opens=java.base/java.lang.invoke=ALL-UNNAMED"
-set "JVM9_OPTIONS=%JVM9_OPTIONS%#--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
-set "JVM9_OPTIONS=%JVM9_OPTIONS%#--add-opens=java.base/java.io=ALL-UNNAMED"
-set "JVM9_OPTIONS=%JVM9_OPTIONS%#--add-opens=java.base/java.util=ALL-UNNAMED"
-set "JVM9_OPTIONS=%JVM9_OPTIONS%#--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
-set "JVM9_OPTIONS=%JVM9_OPTIONS%#--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.lang.invoke=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.io=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.util=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
 
 "%EXECUTABLE%" //IS//%SERVICE_NAME% ^
     --Description "Apache Tomcat @VERSION@ Server - https://tomcat.apache.org/" ^
