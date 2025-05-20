@@ -22,6 +22,8 @@ import javax.naming.NamingException;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.LifecycleListener;
+import org.apache.catalina.core.NamingContextListener;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.naming.factory.ResourceLinkFactory;
@@ -31,6 +33,7 @@ import org.apache.tomcat.util.descriptor.web.ContextResourceLink;
 public class TestNamingContext extends TomcatBaseTest {
 
     private static final String COMP_ENV = "comp/env";
+    private static final String MODULE_ENV = "module/env";
     private static final String GLOBAL_NAME = "global";
     private static final String LOCAL_NAME = "local";
     private static final String DATA = "Cabbage";
@@ -89,6 +92,58 @@ public class TestNamingContext extends TomcatBaseTest {
         // Shortcut should fail too
         obj = factory.getObjectInstance(rlr, null, null, null);
         Assert.assertNull(obj);
+    }
+
+
+    @Test
+    public void testModuleEquivalentToComp() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.enableNaming();
+
+        org.apache.catalina.Context ctx = getProgrammaticRootContext();
+
+        tomcat.start();
+
+        // Equivalent to: Context initContext = new InitialContext();
+        Context webappInitial = ContextBindings.getContext(ctx);
+
+        // Make it writable (it is normally read-only)
+        String namingContextName = null;
+        LifecycleListener[] listeners = ctx.findLifecycleListeners();
+        for (LifecycleListener listener : listeners) {
+            if (listener instanceof NamingContextListener namingListener) {
+                namingContextName = namingListener.getName();
+                break;
+            }
+        }
+        ContextAccessController.setWritable(namingContextName, ctx.getNamingToken());
+
+        // Nothing created so should be null
+        Object obj = doLookup(webappInitial, COMP_ENV + "/" + LOCAL_NAME);
+        Assert.assertNull(obj);
+        obj = doLookup(webappInitial, MODULE_ENV + "/" + LOCAL_NAME);
+        Assert.assertNull(obj);
+
+        // Create in java:comp/env
+        webappInitial.bind(COMP_ENV + "/" + LOCAL_NAME, DATA);
+
+        // Check it was created in java:comp/env and java:module/env
+        obj = doLookup(webappInitial, COMP_ENV + "/" + LOCAL_NAME);
+        Assert.assertEquals(DATA,  obj);
+        obj = doLookup(webappInitial, MODULE_ENV + "/" + LOCAL_NAME);
+        Assert.assertEquals(DATA,  obj);
+
+        // Remove it
+        webappInitial.unbind(COMP_ENV + "/" + LOCAL_NAME);
+
+        // Create in java:module/env
+        webappInitial.bind(MODULE_ENV + "/" + LOCAL_NAME, DATA);
+
+        // Check it was created in java:comp/env and java:module/env
+        obj = doLookup(webappInitial, COMP_ENV + "/" + LOCAL_NAME);
+        Assert.assertEquals(DATA,  obj);
+        obj = doLookup(webappInitial, MODULE_ENV + "/" + LOCAL_NAME);
+        Assert.assertEquals(DATA,  obj);
     }
 
 
