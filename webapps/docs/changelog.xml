@@ -111,6 +111,15 @@
         Add support for the <code>java:module</code> namespace which mirrors
         the <code>java:comp</code> namespace. (markt)
       </fix>
+      <fix>
+        <bug>69690</bug>: Calling <code>HttpServletRequest.getParameter()</code>
+        and related methods for a request with content type
+        <code>multipart/form-data</code> when the mapped servlet does not have a
+        <code>@MultipartConfig</code> or equivalent should not trigger an
+        exception. Note that calling <code>getPart()</code> or
+        <code>getParts()</code> is these circumstances will trigger an
+        exception. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

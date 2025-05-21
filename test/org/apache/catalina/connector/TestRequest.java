@@ -443,7 +443,7 @@ public class TestRequest extends TomcatBaseTest {
         HttpURLConnection conn = getConnection("http://localhost:" + getPort()
                 + "/parseParametersBeforeParseParts");
 
-        prepareRequestBug54984(conn);
+        prepareMultiPartRequest(conn);
 
         checkResponseBug54984(conn);
 
@@ -451,7 +451,7 @@ public class TestRequest extends TomcatBaseTest {
 
         conn = getConnection("http://localhost:" + getPort() + "/");
 
-        prepareRequestBug54984(conn);
+        prepareMultiPartRequest(conn);
 
         checkResponseBug54984(conn);
 
@@ -617,7 +617,7 @@ public class TestRequest extends TomcatBaseTest {
         }
     }
 
-    private void prepareRequestBug54984(HttpURLConnection conn)
+    private void prepareMultiPartRequest(HttpURLConnection conn)
             throws Exception {
         String boundary = "-----" + System.currentTimeMillis();
         conn.setRequestProperty("Content-Type",
@@ -978,6 +978,85 @@ public class TestRequest extends TomcatBaseTest {
                 String name = names.nextElement();
                 String[] values = req.getParameterValues(name);
                 pw.println(name + "=" + StringUtils.join(values));
+            }
+        }
+    }
+
+
+    /*
+     * getParameter should work with a multipart/form-data request if there is no multipart config.
+     */
+    @Test
+    public void testBug69690a() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context ctx = getProgrammaticRootContext();
+        Tomcat.addServlet(ctx, "Bug69690", new Bug69690Servlet());
+        ctx.addServletMappingDecoded("/", "Bug69690");
+        tomcat.start();
+
+        HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/parameter?a=b");
+
+        prepareMultiPartRequest(conn);
+
+        List<String> response = new ArrayList<>();
+        int status = conn.getResponseCode();
+        if (status == HttpURLConnection.HTTP_OK) {
+            try (InputStreamReader isr = new InputStreamReader(conn.getInputStream(), "UTF-8");
+                    BufferedReader reader = new BufferedReader(isr)) {
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    response.add(line);
+                }
+                Assert.assertTrue(response.contains("OK"));
+            }
+        } else {
+            Assert.fail("OK status was expected: " + status);
+        }
+
+        conn.disconnect();
+    }
+
+
+    /*
+     * getPart should not work with a multipart/form-data request if there is no multipart config.
+     */
+    @Test
+    public void testBug69690b() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context ctx = getProgrammaticRootContext();
+        Tomcat.addServlet(ctx, "Bug69690", new Bug69690Servlet());
+        ctx.addServletMappingDecoded("/", "Bug69690");
+        tomcat.start();
+
+        HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/part?a=b");
+
+        prepareMultiPartRequest(conn);
+
+        Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, conn.getResponseCode());
+
+        conn.disconnect();
+    }
+
+
+    private class Bug69690Servlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setContentType("text/plain");
+            PrintWriter pw = resp.getWriter();
+
+            if (req.getRequestURI().endsWith("/parameter")) {
+                if ("b".equals(req.getParameter("a"))) {
+                    pw.print("OK");
+                } else {
+                    pw.print("FAIL - Parameter 'a' not set to 'b'");
+                }
+            } else {
+                // This should trigger an error since the servlet does not have a multi-part configuration.
+                req.getPart("any");
             }
         }
     }
