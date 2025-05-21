@@ -2314,7 +2314,7 @@ public class Request implements HttpServletRequest {
     }
 
 
-    private void parseParts(boolean mustParse) {
+    private void parseParts(boolean explicit) {
 
         // Return immediately if the parts have already been parsed
         if (parts != null || partsParseException != null) {
@@ -2329,8 +2329,10 @@ public class Request implements HttpServletRequest {
                 mce = new MultipartConfigElement(null, connector.getMaxPostSize(), connector.getMaxPostSize(),
                         connector.getMaxPostSize());
             } else {
-                if (mustParse) {
+                if (explicit) {
                     partsParseException = new IllegalStateException(sm.getString("coyoteRequest.noMultipartConfig"));
+                } else {
+                    parts = Collections.emptyList();
                 }
                 return;
             }
