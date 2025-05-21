@@ -221,7 +221,7 @@ if exist "%CATALINA_HOME%\bin\%DEFAULT_SERVICE_NAME%.exe" (
     )
 )
 
-rem Configure JAVA 9 specific start-up parameters - KEEP in line with catalina.bat
+rem Configure JAVA 9 specific start-up parameters - ensure to keep it in line with catalina.bat
 set                "JVM9_OPTIONS=--add-opens=java.base/java.lang=ALL-UNNAMED"
 set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.lang.invoke=ALL-UNNAMED"
 set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.lang.reflect=ALL-UNNAMED"
