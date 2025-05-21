@@ -2554,11 +2554,10 @@ public class Request implements HttpServletRequest {
             } else {
                 if (explicit) {
                     partsParseException = new IllegalStateException(sm.getString("coyoteRequest.noMultipartConfig"));
-                    return;
                 } else {
                     parts = Collections.emptyList();
-                    return;
                 }
+                return;
             }
         }
 
