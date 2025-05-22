@@ -23,7 +23,7 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
  * Extend {@link IllegalStateException} to identify the cause as an invalid parameter.
  * <p>
- * Implementation note: This class extends  {@link IllegalStateException} since that is the class that the Servlet 6.1
+ * Implementation note: This class extends {@link IllegalStateException} since that is the class that the Servlet 6.1
  * onwards Javadocs define is thrown by the various {@code ServletRequest.getParameterXXX()} methods.
  */
 public class InvalidParameterException extends IllegalStateException {
@@ -81,7 +81,7 @@ public class InvalidParameterException extends IllegalStateException {
      * Construct a new exception with the given cause and error code. The message for this exception will be generated
      * by calling {@code cause.toString()}.
      *
-     * @param cause The exception to use as the cause of this exception
+     * @param cause     The exception to use as the cause of this exception
      * @param errorCode The HTTP status code to use when reporting this error. Expected to be >= 400.
      */
     public InvalidParameterException(Throwable cause, int errorCode) {
