@@ -31,9 +31,9 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * The <code>IfHeader</code> class represents the state lists defined
- * through the HTTP <em>If</em> header, which is specified in RFC 2518 as
- * follows :
+ * The <code>IfHeader</code> class represents the state lists defined through the HTTP <em>If</em> header, which is
+ * specified in RFC 2518 as follows :
+ *
  * <pre>
  *    If = "If" ":" ( 1*No-tag-list | 1*Tagged-list)
  *    No-tag-list = List
@@ -44,10 +44,10 @@ import org.apache.tomcat.util.res.StringManager;
  *    Coded-URL = "&lt;" absoluteURI "&gt;"
  * </pre>
  * <p>
- * Reformulating this specification into proper EBNF as specified by N. Wirth
- * we get the following productions, which map to the parse METHODS of this
- * class. Any whitespace is ignored except for white space surrounding and
- * within words which is considered significant.
+ * Reformulating this specification into proper EBNF as specified by N. Wirth we get the following productions, which
+ * map to the parse METHODS of this class. Any whitespace is ignored except for white space surrounding and within words
+ * which is considered significant.
+ *
  * <pre>
  *    If = "If:" ( Tagged | Untagged ).
  *    Tagged = { "&lt;" Word "&gt;" Untagged } .
@@ -56,24 +56,18 @@ import org.apache.tomcat.util.res.StringManager;
  *    Word = characters .
  * </pre>
  * <p>
- * An <em>If</em> header either contains untagged <em>IfList</em> entries or
- * tagged <em>IfList</em> entries but not a mixture of both. An <em>If</em>
- * header containing tagged entries is said to be of <em>tagged</em> type while
- * an <em>If</em> header containing untagged entries is said to be of
- * <em>untagged</em> type.
+ * An <em>If</em> header either contains untagged <em>IfList</em> entries or tagged <em>IfList</em> entries but not a
+ * mixture of both. An <em>If</em> header containing tagged entries is said to be of <em>tagged</em> type while an
+ * <em>If</em> header containing untagged entries is said to be of <em>untagged</em> type.
  * <p>
- * An <em>IfList</em> is a list of tokens - words enclosed in <em>&lt; &gt;</em>
- * - and etags - words enclosed in <em>[ ]</em>. An <em>IfList</em> matches a
- * (token, etag) tuple if all entries in the list match. If an entry in the list
- * is prefixed with the word <em>Not</em> (parsed case insensitively) the entry
- * must not match the concrete token or etag.
+ * An <em>IfList</em> is a list of tokens - words enclosed in <em>&lt; &gt;</em> - and etags - words enclosed in <em>[
+ * ]</em>. An <em>IfList</em> matches a (token, etag) tuple if all entries in the list match. If an entry in the list is
+ * prefixed with the word <em>Not</em> (parsed case insensitively) the entry must not match the concrete token or etag.
  * <p>
- * Example: The <em>ifList</em> <code>(&lt;token&gt; [etag])</code> only matches
- * if the concrete token has the value <code>token</code> and the concrete etag
- * has the value <code>etag</code>. On the other hand, the <em>ifList</em>
- * <code>(Not &lt;notoken&gt;)</code> matches any token which is not
- * <code>notoken</code> (in this case the concrete value of the etag is
- * not taken into consideration).
+ * Example: The <em>ifList</em> <code>(&lt;token&gt; [etag])</code> only matches if the concrete token has the value
+ * <code>token</code> and the concrete etag has the value <code>etag</code>. On the other hand, the <em>ifList</em>
+ * <code>(Not &lt;notoken&gt;)</code> matches any token which is not <code>notoken</code> (in this case the concrete
+ * value of the etag is not taken into consideration).
  * <p>
  * This class was contributed by Apache Jackrabbit
  *
@@ -82,8 +76,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class WebdavIfHeader {
 
     private static final Log log = LogFactory.getLog(WebdavIfHeader.class);
-    private static final StringManager sm =
-            StringManager.getManager(WebdavIfHeader.class.getPackage().getName());
+    private static final StringManager sm = StringManager.getManager(WebdavIfHeader.class.getPackage().getName());
 
     /**
      * The string representation of the header value
@@ -132,10 +125,9 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Parses the <em>If</em> header and creates and internal representation
-     * which is easy to query.
+     * Parses the <em>If</em> header and creates and internal representation which is easy to query.
      *
-     * @param uriPrefix The uri prefix to use for the absolute href
+     * @param uriPrefix     The uri prefix to use for the absolute href
      * @param ifHeaderValue the if header
      *
      * @throws IOException If the parsing of the <code>IfHeader</code> fails
@@ -154,8 +146,7 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Return the String representation of the If header present on
-     * the given request or <code>null</code>.
+     * Return the String representation of the If header present on the given request or <code>null</code>.
      *
      * @return If header value as String or <code>null</code>.
      */
@@ -166,32 +157,28 @@ public class WebdavIfHeader {
     /**
      * Returns true if an If header was present in the given request. False otherwise.
      *
-     * @return  true if an If header was present.
+     * @return true if an If header was present.
      */
     public boolean hasValue() {
         return ifHeader != null;
     }
 
     /**
-     * Tries to match the contents of the <em>If</em> header with the given
-     * token and etag values with the restriction to only check for the tag.
+     * Tries to match the contents of the <em>If</em> header with the given token and etag values with the restriction
+     * to only check for the tag.
      * <p>
-     * If the <em>If</em> header is of untagged type, the untagged <em>IfList</em>
-     * is matched against the token and etag given: A match of the token and
-     * etag is found if at least one of the <em>IfList</em> entries match the
-     * token and etag tuple.
+     * If the <em>If</em> header is of untagged type, the untagged <em>IfList</em> is matched against the token and etag
+     * given: A match of the token and etag is found if at least one of the <em>IfList</em> entries match the token and
+     * etag tuple.
      *
-     * @param tag The tag to identify the <em>IfList</em> to match the token
-     * and etag against.
+     * @param tag    The tag to identify the <em>IfList</em> to match the token and etag against.
      * @param tokens The tokens to compare.
-     * @param etag The ETag value to compare.
+     * @param etag   The ETag value to compare.
      *
-     * @return If the <em>If</em> header is of untagged type the result is
-     *      <code>true</code> if any of the <em>IfList</em> entries matches
-     *      the token and etag values. For tagged type <em>If</em> header the
-     *      result is <code>true</code> if either no entry for the given tag
-     *      exists in the <em>If</em> header or if the <em>IfList</em> for the
-     *      given tag matches the token and etag given.
+     * @return If the <em>If</em> header is of untagged type the result is <code>true</code> if any of the
+     *             <em>IfList</em> entries matches the token and etag values. For tagged type <em>If</em> header the
+     *             result is <code>true</code> if either no entry for the given tag exists in the <em>If</em> header or
+     *             if the <em>IfList</em> for the given tag matches the token and etag given.
      */
     public boolean matches(String tag, List<String> tokens, String etag) {
         if (ifHeader == null) {
@@ -212,27 +199,23 @@ public class WebdavIfHeader {
     }
 
     /**
-     * @return an iterator over all tokens present in the if header, that were
-     * not denied by a leading NOT statement.
+     * @return an iterator over all tokens present in the if header, that were not denied by a leading NOT statement.
      */
     public Iterator<String> getAllTokens() {
         return allTokens.iterator();
     }
 
     /**
-     * @return an iterator over all NOT tokens present in the if header, that
-     * were explicitly denied.
+     * @return an iterator over all NOT tokens present in the if header, that were explicitly denied.
      */
     public Iterator<String> getAllNotTokens() {
         return allNotTokens.iterator();
     }
 
     /**
-     * Parse the original header value and build the internal IfHeaderInterface
-     * object that is easy to query.
+     * Parse the original header value and build the internal IfHeaderInterface object that is easy to query.
      */
-    private IfHeaderInterface parse()
-            throws IOException  {
+    private IfHeaderInterface parse() throws IOException {
         IfHeaderInterface ifHeader;
         if (headerValue != null && !headerValue.isEmpty()) {
 
@@ -267,19 +250,20 @@ public class WebdavIfHeader {
         return ifHeader;
     }
 
-    //---------- internal IF header parser -------------------------------------
+    // ---------- internal IF header parser -------------------------------------
     /**
-     * Parses a tagged type <em>If</em> header. This method implements the
-     * <em>Tagged</em> production given in the class comment :
+     * Parses a tagged type <em>If</em> header. This method implements the <em>Tagged</em> production given in the class
+     * comment :
+     *
      * <pre>
      *    Tagged = { "<" Word ">" Untagged } .
      * </pre>
      *
      * @param reader the reader
+     *
      * @return the parsed map
      */
-    private IfHeaderMap parseTagged(StringReader reader)
-        throws IOException {
+    private IfHeaderMap parseTagged(StringReader reader) throws IOException {
         IfHeaderMap map = new IfHeaderMap();
         while (true) {
             // read next non-white space
@@ -308,8 +292,9 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Parses an untagged type <em>If</em> header. This method implements the
-     * <em>Untagged</em> production given in the class comment :
+     * Parses an untagged type <em>If</em> header. This method implements the <em>Untagged</em> production given in the
+     * class comment :
+     *
      * <pre>
      *    Untagged = { "(" IfList ")" } .
      * </pre>
@@ -318,8 +303,7 @@ public class WebdavIfHeader {
      *
      * @return An <code>ArrayList</code> of {@link IfList} entries.
      */
-    private IfHeaderList parseUntagged(StringReader reader)
-            throws IOException  {
+    private IfHeaderList parseUntagged(StringReader reader) throws IOException {
         IfHeaderList list = new IfHeaderList();
         while (true) {
             // read next non whitespace
@@ -348,8 +332,9 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Parses an <em>IfList</em> in the <em>If</em> header. This method
-     * implements the <em>Tagged</em> production given in the class comment :
+     * Parses an <em>IfList</em> in the <em>If</em> header. This method implements the <em>Tagged</em> production given
+     * in the class comment :
+     *
      * <pre>
      *    IfList = { [ "Not" ] ( ("<" Word ">" ) | ( "[" Word "]" ) ) } .
      * </pre>
@@ -382,7 +367,7 @@ public class WebdavIfHeader {
 
                     // check whether t or T
                     not = reader.read();
-                    if (not !='t' && not != 'T') {
+                    if (not != 't' && not != 'T') {
                         logIllegalState("IfList-Not", not, "t", null);
                         break;
                     }
@@ -439,8 +424,7 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Returns the first non-whitespace character from the reader or -1 if
-     * the end of the reader is encountered.
+     * Returns the first non-whitespace character from the reader or -1 if the end of the reader is encountered.
      *
      * @param reader The <code>Reader</code> to read from
      *
@@ -451,25 +435,22 @@ public class WebdavIfHeader {
     private int readWhiteSpace(Reader reader) throws IOException {
         int c = reader.read();
         while (c >= 0 && Character.isWhitespace((char) c)) {
-             c = reader.read();
+            c = reader.read();
         }
         return c;
     }
 
     /**
-     * Reads from the input until the end character is encountered and returns
-     * the string up to but not including this end character. If the end of input
-     * is reached before reading the end character <code>null</code> is
-     * returned.
+     * Reads from the input until the end character is encountered and returns the string up to but not including this
+     * end character. If the end of input is reached before reading the end character <code>null</code> is returned.
      * <p>
      * Note that this method does not support any escaping.
      *
      * @param reader The <code>Reader</code> to read from
-     * @param end The ending character limiting the word.
+     * @param end    The ending character limiting the word.
      *
-     * @return The string read up to but not including the ending character or
-     *      <code>null</code> if the end of input is reached before the ending
-     *      character has been read.
+     * @return The string read up to but not including the ending character or <code>null</code> if the end of input is
+     *             reached before the ending character has been read.
      *
      * @throws IOException if a problem occurs during reading.
      */
@@ -478,7 +459,7 @@ public class WebdavIfHeader {
 
         // read the word value
         int c = reader.read();
-        for (; c >= 0 && c != end; c=reader.read()) {
+        for (; c >= 0 && c != end; c = reader.read()) {
             buf.append((char) c);
         }
 
@@ -493,22 +474,18 @@ public class WebdavIfHeader {
     }
 
     /**
-     * Logs an unexpected character with the corresponding state and list of
-     * expected characters. If the reader parameter is not null, characters
-     * are read until either the end of the input is reached or any of the
-     * characters in the expChar string is read.
+     * Logs an unexpected character with the corresponding state and list of expected characters. If the reader
+     * parameter is not null, characters are read until either the end of the input is reached or any of the characters
+     * in the expChar string is read.
      *
-     * @param state The name of the current parse state. This method logs this
-     *      name in the message. The intended value would probably be the
-     *      name of the EBNF production during which the error occurs.
+     * @param state   The name of the current parse state. This method logs this name in the message. The intended value
+     *                    would probably be the name of the EBNF production during which the error occurs.
      * @param effChar The effective character read.
      * @param expChar The list of characters acceptable in the current state.
-     * @param reader The reader to be caught up to any of the expected
-     *      characters. If <code>null</code> the input is not caught up to
-     *      any of the expected characters (of course ;-).
+     * @param reader  The reader to be caught up to any of the expected characters. If <code>null</code> the input is
+     *                    not caught up to any of the expected characters (of course ;-).
      */
-    private void logIllegalState(String state, int effChar, String expChar,
-                                 StringReader reader) {
+    private void logIllegalState(String state, int effChar, String expChar, StringReader reader) {
 
         // format the effective character to be logged
         String effString = (effChar < 0) ? "<EOF>" : String.valueOf((char) effChar);
@@ -520,7 +497,7 @@ public class WebdavIfHeader {
         if (reader != null && effChar >= 0) {
             try {
                 if (log.isTraceEnabled()) {
-                    log.trace("logIllegalState: Catch up to any of "+expChar);
+                    log.trace("logIllegalState: Catch up to any of " + expChar);
                 }
                 do {
                     reader.mark(1);
@@ -535,20 +512,17 @@ public class WebdavIfHeader {
         }
     }
 
-    //---------- internal If header structure ----------------------------------
+    // ---------- internal If header structure ----------------------------------
 
     /**
-     * The <code>IfListEntry</code> abstract class is the base class for
-     * entries in an <em>IfList</em> production. This abstract base class
-     * provides common functionality to both types of entries, namely tokens
-     * enclosed in angle brackets (<code>&lt; &gt;</code>) and etags enclosed
-     * in square brackets (<code>[ ]</code>).
+     * The <code>IfListEntry</code> abstract class is the base class for entries in an <em>IfList</em> production. This
+     * abstract base class provides common functionality to both types of entries, namely tokens enclosed in angle
+     * brackets (<code>&lt; &gt;</code>) and etags enclosed in square brackets (<code>[ ]</code>).
      */
     private abstract static class IfListEntry {
 
         /**
-         * The entry string value - the semantics of this value depends on the
-         * implementing class.
+         * The entry string value - the semantics of this value depends on the implementing class.
          */
         protected final String value;
 
@@ -559,11 +533,10 @@ public class WebdavIfHeader {
         protected String stringValue;
 
         /**
-         * Sets up the final fields of this abstract class. The meaning of
-         * value parameter depends solely on the implementing class. From the
-         * point of view of this abstract class, it is simply a string value.
+         * Sets up the final fields of this abstract class. The meaning of value parameter depends solely on the
+         * implementing class. From the point of view of this abstract class, it is simply a string value.
          *
-         * @param value The string value of this instance
+         * @param value    The string value of this instance
          * @param positive <code>true</code> if matches are positive
          */
         protected IfListEntry(String value, boolean positive) {
@@ -572,47 +545,39 @@ public class WebdavIfHeader {
         }
 
         /**
-         * Matches the value from the parameter to the internal string value.
-         * If the parameter and the {@link #value} field match, the method
-         * returns <code>true</code> for positive matches and <code>false</code>
-         * for negative matches.
+         * Matches the value from the parameter to the internal string value. If the parameter and the {@link #value}
+         * field match, the method returns <code>true</code> for positive matches and <code>false</code> for negative
+         * matches.
          * <p>
-         * This helper method can be called by implementations to evaluate the
-         * concrete match on the correct value parameter. See
-         * {@link #match(String, String)} for the external API method.
+         * This helper method can be called by implementations to evaluate the concrete match on the correct value
+         * parameter. See {@link #match(String, String)} for the external API method.
          *
-         * @param value The string value to compare to the {@link #value}
-         *      field.
+         * @param value The string value to compare to the {@link #value} field.
          *
-         * @return <code>true</code> if the value parameter and the
-         *      {@link #value} field match and the {@link #positive} field is
-         *      <code>true</code> or if the values do not match and the
-         *      {@link #positive} field is <code>false</code>.
+         * @return <code>true</code> if the value parameter and the {@link #value} field match and the {@link #positive}
+         *             field is <code>true</code> or if the values do not match and the {@link #positive} field is
+         *             <code>false</code>.
          */
         protected boolean match(String value) {
             return positive == this.value.equals(value);
         }
 
         /**
-         * Matches the entry's value to the token or etag. Depending on the
-         * concrete implementation, only one of the parameters may be evaluated
-         * while the other may be ignored.
+         * Matches the entry's value to the token or etag. Depending on the concrete implementation, only one of the
+         * parameters may be evaluated while the other may be ignored.
          * <p>
-         * Implementing METHODS may call the helper method {@link #match(String)}
-         * for the actual matching.
+         * Implementing METHODS may call the helper method {@link #match(String)} for the actual matching.
          *
          * @param token The token value to compare
-         * @param etag The etag value to compare
+         * @param etag  The etag value to compare
          *
-         * @return <code>true</code> if the token/etag matches the <em>IfList</em>
-         *      entry.
+         * @return <code>true</code> if the token/etag matches the <em>IfList</em> entry.
          */
         public abstract boolean match(String token, String etag);
 
         /**
-         * Returns a short type name for the implementation. This method is
-         * used by the {@link #toString} method to build the string representation
-         * if the instance.
+         * Returns a short type name for the implementation. This method is used by the {@link #toString} method to
+         * build the string representation if the instance.
          *
          * @return The type name of the implementation.
          */
@@ -626,8 +591,8 @@ public class WebdavIfHeader {
         }
 
         /**
-         * Returns the String representation of this entry. This method uses the
-         * {@link #getType} to build the string representation.
+         * Returns the String representation of this entry. This method uses the {@link #getType} to build the string
+         * representation.
          *
          * @return the String representation of this entry.
          */
@@ -641,15 +606,15 @@ public class WebdavIfHeader {
     }
 
     /**
-     * The <code>IfListEntryToken</code> extends the {@link IfListEntry}
-     * abstract class to represent an entry for token matching.
+     * The <code>IfListEntryToken</code> extends the {@link IfListEntry} abstract class to represent an entry for token
+     * matching.
      */
     private static class IfListEntryToken extends IfListEntry {
 
         /**
          * Creates a token matching entry.
          *
-         * @param token The token value pertinent to this instance.
+         * @param token    The token value pertinent to this instance.
          * @param positive <code>true</code> if this is a positive match entry.
          */
         IfListEntryToken(String token, boolean positive) {
@@ -657,17 +622,13 @@ public class WebdavIfHeader {
         }
 
         /**
-         * Matches the token parameter to the stored token value and returns
-         * <code>true</code> if the values match and if the match is positive.
-         * <code>true</code> is also returned for negative matches if the values
-         * do not match.
+         * Matches the token parameter to the stored token value and returns <code>true</code> if the values match and
+         * if the match is positive. <code>true</code> is also returned for negative matches if the values do not match.
          *
          * @param token The token value to compare
-         * @param etag The etag value to compare, which is ignored in this
-         *      implementation.
+         * @param etag  The etag value to compare, which is ignored in this implementation.
          *
-         * @return <code>true</code> if the token matches the <em>IfList</em>
-         *      entry's token value.
+         * @return <code>true</code> if the token matches the <em>IfList</em> entry's token value.
          */
         @Override
         public boolean match(String token, String etag) {
@@ -675,8 +636,7 @@ public class WebdavIfHeader {
         }
 
         /**
-         * Returns the type name of this implementation, which is fixed to
-         * be <em>Token</em>.
+         * Returns the type name of this implementation, which is fixed to be <em>Token</em>.
          *
          * @return The fixed string <em>Token</em> as the type name.
          */
@@ -687,15 +647,15 @@ public class WebdavIfHeader {
     }
 
     /**
-     * The <code>IfListEntryToken</code> extends the {@link IfListEntry}
-     * abstract class to represent an entry for etag matching.
+     * The <code>IfListEntryToken</code> extends the {@link IfListEntry} abstract class to represent an entry for etag
+     * matching.
      */
     private static class IfListEntryEtag extends IfListEntry {
 
         /**
          * Creates an etag matching entry.
          *
-         * @param etag The etag value pertinent to this instance.
+         * @param etag     The etag value pertinent to this instance.
          * @param positive <code>true</code> if this is a positive match entry.
          */
         IfListEntryEtag(String etag, boolean positive) {
@@ -703,17 +663,13 @@ public class WebdavIfHeader {
         }
 
         /**
-         * Matches the etag parameter to the stored etag value and returns
-         * <code>true</code> if the values match and if the match is positive.
-         * <code>true</code> is also returned for negative matches if the values
-         * do not match.
+         * Matches the etag parameter to the stored etag value and returns <code>true</code> if the values match and if
+         * the match is positive. <code>true</code> is also returned for negative matches if the values do not match.
          *
-         * @param token The token value to compare, which is ignored in this
-         *      implementation.
-         * @param etag The etag value to compare
+         * @param token The token value to compare, which is ignored in this implementation.
+         * @param etag  The etag value to compare
          *
-         * @return <code>true</code> if the etag matches the <em>IfList</em>
-         *      entry's etag value.
+         * @return <code>true</code> if the etag matches the <em>IfList</em> entry's etag value.
          */
         @Override
         public boolean match(String token, String etag) {
@@ -721,8 +677,7 @@ public class WebdavIfHeader {
         }
 
         /**
-         * Returns the type name of this implementation, which is fixed to
-         * be <em>ETag</em>.
+         * Returns the type name of this implementation, which is fixed to be <em>ETag</em>.
          *
          * @return The fixed string <em>ETag</em> as the type name.
          */
@@ -733,12 +688,11 @@ public class WebdavIfHeader {
     }
 
     /**
-     * The <code>IfList</code> class extends the <code>ArrayList</code> class
-     * with the limitation to only support adding {@link IfListEntry} objects
-     * and adding a {@link #match} method.
+     * The <code>IfList</code> class extends the <code>ArrayList</code> class with the limitation to only support adding
+     * {@link IfListEntry} objects and adding a {@link #match} method.
      * <p>
-     * This class is a container for data contained in the <em>If</em>
-     * production <em>IfList</em>
+     * This class is a container for data contained in the <em>If</em> production <em>IfList</em>
+     *
      * <pre>
      *    IfList = { [ "Not" ] ( ("&lt;" Word "&gt;" ) | ( "[" Word "]" ) ) } .
      * </pre>
@@ -767,8 +721,7 @@ public class WebdavIfHeader {
          * @param index the index
          * @param entry the entry
          *
-         * @throws IndexOutOfBoundsException if index is out of range
-         *      <code>(index &lt; 0 || index &gt; size())</code>.
+         * @throws IndexOutOfBoundsException if index is out of range <code>(index &lt; 0 || index &gt; size())</code>.
          */
         @Override
         public void add(int index, IfListEntry entry) {
@@ -776,21 +729,19 @@ public class WebdavIfHeader {
         }
 
         /**
-         * Returns <code>true</code> if all {@link IfListEntry} objects in the
-         * list match the given token and etag. If the list is entry, it is
-         * considered to match the token and etag.
+         * Returns <code>true</code> if all {@link IfListEntry} objects in the list match the given token and etag. If
+         * the list is entry, it is considered to match the token and etag.
          *
          * @param tokens The token to compare.
-         * @param etag The etag to compare.
+         * @param etag   The etag to compare.
          *
-         * @return <code>true</code> if all entries in the list match the
-         *      given tag and token.
+         * @return <code>true</code> if all entries in the list match the given tag and token.
          */
         public boolean match(List<String> tokens, String etag) {
             if (log.isTraceEnabled()) {
                 log.trace("match: Trying to match token=" + tokens + ", etag=" + etag);
             }
-            for (int i=0; i < size(); i++) {
+            for (int i = 0; i < size(); i++) {
                 IfListEntry ile = get(i);
                 boolean match = false;
                 for (String token : tokens) {
@@ -812,35 +763,31 @@ public class WebdavIfHeader {
     }
 
     /**
-     * The <code>IfHeaderInterface</code> interface abstracts away the difference of
-     * tagged and untagged <em>If</em> header lists. The single method provided
-     * by this interface is to check whether a request may be applied to a
+     * The <code>IfHeaderInterface</code> interface abstracts away the difference of tagged and untagged <em>If</em>
+     * header lists. The single method provided by this interface is to check whether a request may be applied to a
      * resource with given token and etag.
      */
     private interface IfHeaderInterface {
 
         /**
-         * Matches the resource, token, and etag against this
-         * <code>IfHeaderInterface</code> instance.
+         * Matches the resource, token, and etag against this <code>IfHeaderInterface</code> instance.
          *
-         * @param resource The resource to match this instance against. This
-         *      must be absolute URI of the resource as defined in Section 3
-         *      (URI Syntactic Components) of RFC 2396 Uniform Resource
-         *      Identifiers (URI): Generic Syntax.
-         * @param tokens The resource's lock token to match
-         * @param etag The resource's etag to match
+         * @param resource The resource to match this instance against. This must be absolute URI of the resource as
+         *                     defined in Section 3 (URI Syntactic Components) of RFC 2396 Uniform Resource Identifiers
+         *                     (URI): Generic Syntax.
+         * @param tokens   The resource's lock token to match
+         * @param etag     The resource's etag to match
          *
-         * @return <code>true</code> if the header matches the resource with
-         *      token and etag, which means that the request is applicable
-         *      to the resource according to the <em>If</em> header.
+         * @return <code>true</code> if the header matches the resource with token and etag, which means that the
+         *             request is applicable to the resource according to the <em>If</em> header.
          */
         boolean matches(String resource, List<String> tokens, String etag);
     }
 
     /**
-     * The <code>IfHeaderList</code> class implements the {@link IfHeaderInterface}
-     * interface to support untagged lists of {@link IfList}s. This class
-     * implements the data container for the production :
+     * The <code>IfHeaderList</code> class implements the {@link IfHeaderInterface} interface to support untagged lists
+     * of {@link IfList}s. This class implements the data container for the production :
+     *
      * <pre>
      *    Untagged = { "(" IfList ")" } .
      * </pre>
@@ -851,19 +798,17 @@ public class WebdavIfHeader {
         private static final long serialVersionUID = 1L;
 
         /**
-         * Matches a list of {@link IfList}s against the token and etag. If any of
-         * the {@link IfList}s matches, the method returns <code>true</code>.
-         * On the other hand <code>false</code> is only returned if none of the
+         * Matches a list of {@link IfList}s against the token and etag. If any of the {@link IfList}s matches, the
+         * method returns <code>true</code>. On the other hand <code>false</code> is only returned if none of the
          * {@link IfList}s match.
          *
-         * @param resource The resource to match, which is ignored by this
-         *      implementation. A value of <code>null</code> is therefor
-         *      acceptable.
-         * @param tokens The tokens to compare.
-         * @param etag The ETag value to compare.
+         * @param resource The resource to match, which is ignored by this implementation. A value of <code>null</code>
+         *                     is therefor acceptable.
+         * @param tokens   The tokens to compare.
+         * @param etag     The ETag value to compare.
          *
-         * @return <code>True</code> if any of the {@link IfList}s matches the token
-         *      and etag, else <code>false</code> is returned.
+         * @return <code>True</code> if any of the {@link IfList}s matches the token and etag, else <code>false</code>
+         *             is returned.
          */
         @Override
         public boolean matches(String resource, List<String> tokens, String etag) {
@@ -886,30 +831,28 @@ public class WebdavIfHeader {
     }
 
     /**
-     * The <code>IfHeaderMap</code> class implements the {@link IfHeaderInterface}
-     * interface to support tagged lists of {@link IfList}s. This class
-     * implements the data container for the production :
+     * The <code>IfHeaderMap</code> class implements the {@link IfHeaderInterface} interface to support tagged lists of
+     * {@link IfList}s. This class implements the data container for the production :
+     *
      * <pre>
      *    Tagged = { "&lt;" Word "&gt;" "(" IfList ")" } .
      * </pre>
      */
-    private class IfHeaderMap extends HashMap<String, IfHeaderList> implements IfHeaderInterface {
+    private class IfHeaderMap extends HashMap<String,IfHeaderList> implements IfHeaderInterface {
 
         @Serial
         private static final long serialVersionUID = 1L;
 
         /**
-         * Matches the token and etag for the given resource. If the resource is
-         * not mentioned in the header, a match is assumed and <code>true</code>
-         * is returned in this case.
+         * Matches the token and etag for the given resource. If the resource is not mentioned in the header, a match is
+         * assumed and <code>true</code> is returned in this case.
          *
-         * @param resource The absolute URI of the resource for which to find
-         *      a match.
-         * @param tokens The tokens to compare.
-         * @param etag The etag to compare.
+         * @param resource The absolute URI of the resource for which to find a match.
+         * @param tokens   The tokens to compare.
+         * @param etag     The etag to compare.
          *
-         * @return <code>true</code> if either no entry exists for the resource
-         *      or if the entry for the resource matches the token and etag.
+         * @return <code>true</code> if either no entry exists for the resource or if the entry for the resource matches
+         *             the token and etag.
          */
         @Override
         public boolean matches(String resource, List<String> tokens, String etag) {
