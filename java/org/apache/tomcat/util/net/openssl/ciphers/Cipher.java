@@ -27,20 +27,19 @@ import java.util.Set;
 /**
  * All the standard cipher suites for SSL/TSL.
  *
- * @see <a href="https://github.com/openssl/openssl/blob/master/ssl/s3_lib.c"
- *      >OpenSSL cipher definitions</a>
- * @see <a href="http://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4"
- *      >The cipher suite registry</a>
- * @see <a href="https://www.thesprawl.org/research/tls-and-ssl-cipher-suites/"
- *      >Another list of cipher suites with some non-standard IDs</a>
- * @see <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#ciphersuites"
- *      >Oracle standard names for cipher suites</a>
- * @see <a href="https://www.openssl.org/docs/apps/ciphers.html"
- *      >Mapping of OpenSSL cipher suites names to registry names</a>
- * @see <a href="https://github.com/ssllabs/sslhaf/blob/0.1.x/suites.csv"
- *      >SSL Labs tool - list of ciphers</a>
- * @see <a href="http://hg.openjdk.java.net/jdk9/jdk9/jdk/file/e30cd0d37abf/src/java.base/share/classes/sun/security/ssl/CipherSuite.java"
- *      >OpenJDK source code</a>
+ * @see <a href="https://github.com/openssl/openssl/blob/master/ssl/s3_lib.c" >OpenSSL cipher definitions</a>
+ * @see <a href="http://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-parameters-4" >The cipher suite
+ *          registry</a>
+ * @see <a href="https://www.thesprawl.org/research/tls-and-ssl-cipher-suites/" >Another list of cipher suites with some
+ *          non-standard IDs</a>
+ * @see <a href="http://docs.oracle.com/javase/8/docs/technotes/guides/security/StandardNames.html#ciphersuites" >Oracle
+ *          standard names for cipher suites</a>
+ * @see <a href="https://www.openssl.org/docs/apps/ciphers.html" >Mapping of OpenSSL cipher suites names to registry
+ *          names</a>
+ * @see <a href="https://github.com/ssllabs/sslhaf/blob/0.1.x/suites.csv" >SSL Labs tool - list of ciphers</a>
+ * @see <a href=
+ *          "http://hg.openjdk.java.net/jdk9/jdk9/jdk/file/e30cd0d37abf/src/java.base/share/classes/sun/security/ssl/CipherSuite.java"
+ *          >OpenJDK source code</a>
  */
 public enum Cipher {
 
@@ -5012,10 +5011,9 @@ public enum Cipher {
      */
     private final int alg_bits;
 
-    Cipher(int id, String openSSLAlias, KeyExchange kx, Authentication au, Encryption enc,
-            MessageDigest mac, Protocol protocol, boolean export, EncryptionLevel level,
-            boolean fipsCompatible, int strength_bits, int alg_bits, String[] jsseAltNames,
-            String[] openSSlAltNames) {
+    Cipher(int id, String openSSLAlias, KeyExchange kx, Authentication au, Encryption enc, MessageDigest mac,
+            Protocol protocol, boolean export, EncryptionLevel level, boolean fipsCompatible, int strength_bits,
+            int alg_bits, String[] jsseAltNames, String[] openSSlAltNames) {
         this.id = id;
         this.openSSLAlias = openSSLAlias;
         if (openSSlAltNames != null && openSSlAltNames.length != 0) {

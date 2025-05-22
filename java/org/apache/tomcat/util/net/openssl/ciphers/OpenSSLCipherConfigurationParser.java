@@ -48,45 +48,44 @@ public class OpenSSLCipherConfigurationParser {
 
     private static final String SEPARATOR = ":|,| ";
     /**
-     * If ! is used then the ciphers are permanently deleted from the list. The ciphers deleted can never reappear in the list
-     * even if they are explicitly stated.
+     * If ! is used then the ciphers are permanently deleted from the list. The ciphers deleted can never reappear in
+     * the list even if they are explicitly stated.
      */
     private static final String EXCLUDE = "!";
     /**
-     * If - is used then the ciphers are deleted from the list, but some or all of the ciphers can be added again by later
-     * options.
+     * If - is used then the ciphers are deleted from the list, but some or all of the ciphers can be added again by
+     * later options.
      */
     private static final String DELETE = "-";
     /**
-     * If + is used then the ciphers are moved to the end of the list. This option doesn't add any new ciphers it just moves
-     * matching existing ones.
+     * If + is used then the ciphers are moved to the end of the list. This option doesn't add any new ciphers it just
+     * moves matching existing ones.
      */
     private static final String TO_END = "+";
-     /**
-     * Lists of cipher suites can be combined in a single cipher string using the + character.
-     * This is used as a logical and operation.
-     * For example SHA1+DES represents all cipher suites containing the SHA1 and the DES algorithms.
+    /**
+     * Lists of cipher suites can be combined in a single cipher string using the + character. This is used as a logical
+     * and operation. For example SHA1+DES represents all cipher suites containing the SHA1 and the DES algorithms.
      */
     private static final String AND = "+";
     /**
      * All ciphers by their openssl alias name.
      */
-    private static final Map<String, List<Cipher>> aliases = new LinkedHashMap<>();
+    private static final Map<String,List<Cipher>> aliases = new LinkedHashMap<>();
 
     /**
-     * the 'NULL' ciphers that is those offering no encryption. Because these offer no encryption at all and are a security risk
-     * they are disabled unless explicitly included.
+     * the 'NULL' ciphers that is those offering no encryption. Because these offer no encryption at all and are a
+     * security risk they are disabled unless explicitly included.
      */
     private static final String eNULL = "eNULL";
     /**
-     * The cipher suites offering no authentication. This is currently the anonymous DH algorithms. T These cipher suites are
-     * vulnerable to a 'man in the middle' attack and so their use is normally discouraged.
+     * The cipher suites offering no authentication. This is currently the anonymous DH algorithms. T These cipher
+     * suites are vulnerable to a 'man in the middle' attack and so their use is normally discouraged.
      */
     private static final String aNULL = "aNULL";
 
     /**
-     * 'high' encryption cipher suites. This currently means those with key lengths larger than 128 bits, and some cipher suites
-     * with 128-bit keys.
+     * 'high' encryption cipher suites. This currently means those with key lengths larger than 128 bits, and some
+     * cipher suites with 128-bit keys.
      */
     private static final String HIGH = "HIGH";
     /**
@@ -94,8 +93,8 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String MEDIUM = "MEDIUM";
     /**
-     * 'low' encryption cipher suites, currently those using 64 or 56 bit encryption algorithms but excluding export cipher
-     * suites.
+     * 'low' encryption cipher suites, currently those using 64 or 56 bit encryption algorithms but excluding export
+     * cipher suites.
      */
     private static final String LOW = "LOW";
     /**
@@ -119,8 +118,7 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String aRSA = "aRSA";
     /**
-     * Cipher suites using RSA for key exchange
-     * Despite what the docs say, RSA is equivalent to kRSA.
+     * Cipher suites using RSA for key exchange Despite what the docs say, RSA is equivalent to kRSA.
      */
     private static final String RSA = "RSA";
     /**
@@ -168,8 +166,7 @@ public class OpenSSLCipherConfigurationParser {
      */
     private static final String kEECDH = "kEECDH";
     /**
-     * Cipher suites using ephemeral ECDH key agreement, excluding anonymous cipher suites.
-     * Same as "kEECDH:-AECDH"
+     * Cipher suites using ephemeral ECDH key agreement, excluding anonymous cipher suites. Same as "kEECDH:-AECDH"
      */
     private static final String EECDH = "EECDH";
     /**
@@ -437,7 +434,8 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(HIGH, filterByEncryptionLevel(allCiphers, Collections.singleton(EncryptionLevel.HIGH)));
         addListAlias(MEDIUM, filterByEncryptionLevel(allCiphers, Collections.singleton(EncryptionLevel.MEDIUM)));
         addListAlias(LOW, filterByEncryptionLevel(allCiphers, Collections.singleton(EncryptionLevel.LOW)));
-        addListAlias(EXPORT, filterByEncryptionLevel(allCiphers, new HashSet<>(Arrays.asList(EncryptionLevel.EXP40, EncryptionLevel.EXP56))));
+        addListAlias(EXPORT, filterByEncryptionLevel(allCiphers,
+                new HashSet<>(Arrays.asList(EncryptionLevel.EXP40, EncryptionLevel.EXP56))));
         aliases.put("EXP", aliases.get(EXPORT));
         addListAlias(EXPORT40, filterByEncryptionLevel(allCiphers, Collections.singleton(EncryptionLevel.EXP40)));
         addListAlias(EXPORT56, filterByEncryptionLevel(allCiphers, Collections.singleton(EncryptionLevel.EXP56)));
@@ -456,12 +454,15 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(DHE, edh);
         addListAlias(kDHr, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.DHr)));
         addListAlias(kDHd, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.DHd)));
-        addListAlias(kDH, filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.DHr, KeyExchange.DHd))));
+        addListAlias(kDH,
+                filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.DHr, KeyExchange.DHd))));
 
         addListAlias(kECDHr, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.ECDHr)));
         addListAlias(kECDHe, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.ECDHe)));
-        addListAlias(kECDH, filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr))));
-        addListAlias(ECDH, filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr, KeyExchange.EECDH))));
+        addListAlias(kECDH,
+                filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr))));
+        addListAlias(ECDH, filterByKeyExchange(allCiphers,
+                new HashSet<>(Arrays.asList(KeyExchange.ECDHe, KeyExchange.ECDHr, KeyExchange.EECDH))));
         addListAlias(kECDHE, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EECDH)));
 
         Set<Cipher> ecdhe = filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EECDH));
@@ -483,26 +484,40 @@ public class OpenSSLCipherConfigurationParser {
         addListAlias(kFZA, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.FZA)));
         addListAlias(aFZA, filterByAuthentication(allCiphers, Collections.singleton(Authentication.FZA)));
         addListAlias(eFZA, filterByEncryption(allCiphers, Collections.singleton(Encryption.FZA)));
-        addListAlias(FZA, filter(allCiphers, null, Collections.singleton(KeyExchange.FZA), Collections.singleton(Authentication.FZA), Collections.singleton(Encryption.FZA), null, null));
-        addListAlias(Constants.SSL_PROTO_TLSv1_2, filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1_2)));
+        addListAlias(FZA, filter(allCiphers, null, Collections.singleton(KeyExchange.FZA),
+                Collections.singleton(Authentication.FZA), Collections.singleton(Encryption.FZA), null, null));
+        addListAlias(Constants.SSL_PROTO_TLSv1_2,
+                filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1_2)));
         addListAlias(Constants.SSL_PROTO_TLSv1_0, filterByProtocol(allCiphers, Collections.singleton(Protocol.TLSv1)));
         addListAlias(Constants.SSL_PROTO_SSLv3, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv3)));
         aliases.put(Constants.SSL_PROTO_TLSv1, aliases.get(Constants.SSL_PROTO_TLSv1_0));
         addListAlias(Constants.SSL_PROTO_SSLv2, filterByProtocol(allCiphers, Collections.singleton(Protocol.SSLv2)));
-        addListAlias(DH, filterByKeyExchange(allCiphers, new HashSet<>(Arrays.asList(KeyExchange.DHr, KeyExchange.DHd, KeyExchange.EDH))));
+        addListAlias(DH, filterByKeyExchange(allCiphers,
+                new HashSet<>(Arrays.asList(KeyExchange.DHr, KeyExchange.DHd, KeyExchange.EDH))));
         Set<Cipher> adh = filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.EDH));
         adh.retainAll(filterByAuthentication(allCiphers, Collections.singleton(Authentication.aNULL)));
         addListAlias(ADH, adh);
-        addListAlias(AES128, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128CCM, Encryption.AES128CCM8, Encryption.AES128GCM))));
-        addListAlias(AES256, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES256, Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256GCM))));
-        addListAlias(AES, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128CCM, Encryption.AES128CCM8, Encryption.AES128GCM, Encryption.AES256, Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256GCM))));
+        addListAlias(AES128, filterByEncryption(allCiphers, new HashSet<>(
+                Arrays.asList(Encryption.AES128, Encryption.AES128CCM, Encryption.AES128CCM8, Encryption.AES128GCM))));
+        addListAlias(AES256, filterByEncryption(allCiphers, new HashSet<>(
+                Arrays.asList(Encryption.AES256, Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256GCM))));
+        addListAlias(AES,
+                filterByEncryption(allCiphers,
+                        new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128CCM, Encryption.AES128CCM8,
+                                Encryption.AES128GCM, Encryption.AES256, Encryption.AES256CCM, Encryption.AES256CCM8,
+                                Encryption.AES256GCM))));
         addListAlias(ARIA128, filterByEncryption(allCiphers, Collections.singleton(Encryption.ARIA128GCM)));
         addListAlias(ARIA256, filterByEncryption(allCiphers, Collections.singleton(Encryption.ARIA256GCM)));
-        addListAlias(ARIA, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.ARIA128GCM, Encryption.ARIA256GCM))));
-        addListAlias(AESGCM, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128GCM, Encryption.AES256GCM))));
-        addListAlias(AESCCM, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128CCM, Encryption.AES128CCM8, Encryption.AES256CCM, Encryption.AES256CCM8))));
-        addListAlias(AESCCM8, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128CCM8, Encryption.AES256CCM8))));
-        addListAlias(CAMELLIA, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.CAMELLIA128, Encryption.CAMELLIA256))));
+        addListAlias(ARIA, filterByEncryption(allCiphers,
+                new HashSet<>(Arrays.asList(Encryption.ARIA128GCM, Encryption.ARIA256GCM))));
+        addListAlias(AESGCM, filterByEncryption(allCiphers,
+                new HashSet<>(Arrays.asList(Encryption.AES128GCM, Encryption.AES256GCM))));
+        addListAlias(AESCCM, filterByEncryption(allCiphers, new HashSet<>(Arrays.asList(Encryption.AES128CCM,
+                Encryption.AES128CCM8, Encryption.AES256CCM, Encryption.AES256CCM8))));
+        addListAlias(AESCCM8, filterByEncryption(allCiphers,
+                new HashSet<>(Arrays.asList(Encryption.AES128CCM8, Encryption.AES256CCM8))));
+        addListAlias(CAMELLIA, filterByEncryption(allCiphers,
+                new HashSet<>(Arrays.asList(Encryption.CAMELLIA128, Encryption.CAMELLIA256))));
         addListAlias(CAMELLIA128, filterByEncryption(allCiphers, Collections.singleton(Encryption.CAMELLIA128)));
         addListAlias(CAMELLIA256, filterByEncryption(allCiphers, Collections.singleton(Encryption.CAMELLIA256)));
         addListAlias(CHACHA20, filterByEncryption(allCiphers, Collections.singleton(Encryption.CHACHA20POLY1305)));
@@ -517,27 +532,34 @@ public class OpenSSLCipherConfigurationParser {
         aliases.put(SHA, aliases.get(SHA1));
         addListAlias(SHA256, filterByMessageDigest(allCiphers, Collections.singleton(MessageDigest.SHA256)));
         addListAlias(SHA384, filterByMessageDigest(allCiphers, Collections.singleton(MessageDigest.SHA384)));
-        addListAlias(aGOST, filterByAuthentication(allCiphers, new HashSet<>(Arrays.asList(Authentication.GOST01, Authentication.GOST94))));
+        addListAlias(aGOST, filterByAuthentication(allCiphers,
+                new HashSet<>(Arrays.asList(Authentication.GOST01, Authentication.GOST94))));
         addListAlias(aGOST01, filterByAuthentication(allCiphers, Collections.singleton(Authentication.GOST01)));
         addListAlias(aGOST94, filterByAuthentication(allCiphers, Collections.singleton(Authentication.GOST94)));
         addListAlias(kGOST, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.GOST)));
         addListAlias(GOST94, filterByMessageDigest(allCiphers, Collections.singleton(MessageDigest.GOST94)));
         addListAlias(GOST89MAC, filterByMessageDigest(allCiphers, Collections.singleton(MessageDigest.GOST89MAC)));
-        addListAlias(PSK, filter(allCiphers, null, new HashSet<>(Arrays.asList(KeyExchange.PSK, KeyExchange.RSAPSK, KeyExchange.DHEPSK, KeyExchange.ECDHEPSK)), Collections.singleton(Authentication.PSK), null, null, null));
+        addListAlias(PSK,
+                filter(allCiphers, null, new HashSet<>(
+                        Arrays.asList(KeyExchange.PSK, KeyExchange.RSAPSK, KeyExchange.DHEPSK, KeyExchange.ECDHEPSK)),
+                        Collections.singleton(Authentication.PSK), null, null, null));
         addListAlias(aPSK, filterByAuthentication(allCiphers, Collections.singleton(Authentication.PSK)));
         addListAlias(kPSK, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.PSK)));
         addListAlias(kRSAPSK, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.RSAPSK)));
         addListAlias(kECDHEPSK, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.ECDHEPSK)));
         addListAlias(kDHEPSK, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.DHEPSK)));
-        addListAlias(KRB5, filter(allCiphers, null, Collections.singleton(KeyExchange.KRB5), Collections.singleton(Authentication.KRB5), null, null, null));
+        addListAlias(KRB5, filter(allCiphers, null, Collections.singleton(KeyExchange.KRB5),
+                Collections.singleton(Authentication.KRB5), null, null, null));
         addListAlias(aSRP, filterByAuthentication(allCiphers, Collections.singleton(Authentication.SRP)));
         addListAlias(kSRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         addListAlias(SRP, filterByKeyExchange(allCiphers, Collections.singleton(KeyExchange.SRP)));
         initialized = true;
         // Despite what the OpenSSL docs say, DEFAULT also excludes SSLv2
-        addListAlias(DEFAULT, parse("ALL:!EXPORT:!eNULL:!aNULL:!SSLv2:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES:!ARIA"));
+        addListAlias(DEFAULT, parse(
+                "ALL:!EXPORT:!eNULL:!aNULL:!SSLv2:!DES:!RC2:!RC4:!DSS:!SEED:!IDEA:!CAMELLIA:!AESCCM:!3DES:!ARIA"));
         // COMPLEMENTOFDEFAULT is also not exactly as defined by the docs
-        LinkedHashSet<Cipher> complementOfDefault = filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH,KeyExchange.EECDH)));
+        LinkedHashSet<Cipher> complementOfDefault =
+                filterByKeyExchange(all, new HashSet<>(Arrays.asList(KeyExchange.EDH, KeyExchange.EECDH)));
         complementOfDefault = filterByAuthentication(complementOfDefault, Collections.singleton(Authentication.aNULL));
         aliases.get(eNULL).forEach(complementOfDefault::remove);
         complementOfDefault.addAll(aliases.get(Constants.SSL_PROTO_SSLv2));
@@ -590,9 +612,8 @@ public class OpenSSLCipherConfigurationParser {
 
     static LinkedHashSet<Cipher> strengthSort(final LinkedHashSet<Cipher> ciphers) {
         /*
-         * This routine sorts the ciphers with descending strength. The sorting
-         * must keep the pre-sorted sequence, so we apply the normal sorting
-         * routine as '+' movement to the end of the list.
+         * This routine sorts the ciphers with descending strength. The sorting must keep the pre-sorted sequence, so we
+         * apply the normal sorting routine as '+' movement to the end of the list.
          */
         Set<Integer> keySizes = new HashSet<>();
         for (Cipher cipher : ciphers) {
@@ -609,8 +630,7 @@ public class OpenSSLCipherConfigurationParser {
     }
 
     /*
-     * See
-     * https://github.com/openssl/openssl/blob/7c96dbcdab959fef74c4caae63cdebaa354ab252/ssl/ssl_ciph.c#L1371
+     * See https://github.com/openssl/openssl/blob/7c96dbcdab959fef74c4caae63cdebaa354ab252/ssl/ssl_ciph.c#L1371
      */
     static LinkedHashSet<Cipher> defaultSort(final LinkedHashSet<Cipher> ciphers) {
         final LinkedHashSet<Cipher> result = new LinkedHashSet<>(ciphers.size());
@@ -620,9 +640,9 @@ public class OpenSSLCipherConfigurationParser {
         ecdh.addAll(filterByKeyExchange(ciphers, Collections.singleton(KeyExchange.EECDH)));
 
         /* AES is our preferred symmetric cipher */
-        Set<Encryption> aes = new HashSet<>(Arrays.asList(Encryption.AES128, Encryption.AES128CCM,
-                Encryption.AES128CCM8, Encryption.AES128GCM, Encryption.AES256,
-                Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256GCM));
+        Set<Encryption> aes = new HashSet<>(
+                Arrays.asList(Encryption.AES128, Encryption.AES128CCM, Encryption.AES128CCM8, Encryption.AES128GCM,
+                        Encryption.AES256, Encryption.AES256CCM, Encryption.AES256CCM8, Encryption.AES256GCM));
 
         /* Now arrange all ciphers by preference: */
         result.addAll(filterByEncryption(ecdh, aes));
@@ -635,9 +655,10 @@ public class OpenSSLCipherConfigurationParser {
         /* Low priority for MD5 */
         moveToEnd(result, filterByMessageDigest(result, Collections.singleton(MessageDigest.MD5)));
 
-        /* Move anonymous ciphers to the end.  Usually, these will remain disabled.
-         * (For applications that allow them, they aren't too bad, but we prefer
-         * authenticated ciphers.) */
+        /*
+         * Move anonymous ciphers to the end. Usually, these will remain disabled. (For applications that allow them,
+         * they aren't too bad, but we prefer authenticated ciphers.)
+         */
         moveToEnd(result, filterByAuthentication(result, Collections.singleton(Authentication.aNULL)));
 
         /* Move ciphers without forward secrecy to the end */
@@ -721,15 +742,18 @@ public class OpenSSLCipherConfigurationParser {
             if (JreCompat.isJre22Available()) {
                 if (OpenSSLStatus.isLibraryInitialized()) {
                     try {
-                        Class<?> openSSLLibraryClass = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
+                        Class<?> openSSLLibraryClass =
+                                Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLLibrary");
                         @SuppressWarnings("unchecked")
-                        List<String> cipherList = (List<String>) openSSLLibraryClass.getMethod("findCiphers", String.class).invoke(null, elements[0]);
+                        List<String> cipherList = (List<String>) openSSLLibraryClass
+                                .getMethod("findCiphers", String.class).invoke(null, elements[0]);
                         // Replace the original list with the profile contents
                         elements = cipherList.toArray(new String[0]);
                     } catch (Throwable t) {
                         Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
                         ExceptionUtils.handleThrowable(throwable);
-                        log.error(sm.getString("opensslCipherConfigurationParser.unknownProfile", elements[0]), throwable);
+                        log.error(sm.getString("opensslCipherConfigurationParser.unknownProfile", elements[0]),
+                                throwable);
                     }
                 } else {
                     // OpenSSL is not available
@@ -768,14 +792,14 @@ public class OpenSSLCipherConfigurationParser {
                 add(ciphers, element);
             } else if (element.contains(AND)) {
                 String[] intersections = element.split("\\" + AND);
-                if(intersections.length > 0 && aliases.containsKey(intersections[0])) {
+                if (intersections.length > 0 && aliases.containsKey(intersections[0])) {
                     List<Cipher> result = new ArrayList<>(aliases.get(intersections[0]));
-                    for(int i = 1; i < intersections.length; i++) {
-                        if(aliases.containsKey(intersections[i])) {
+                    for (int i = 1; i < intersections.length; i++) {
+                        if (aliases.containsKey(intersections[i])) {
                             result.retainAll(aliases.get(intersections[i]));
                         }
                     }
-                     ciphers.addAll(result);
+                    ciphers.addAll(result);
                 }
             }
         }
@@ -789,16 +813,17 @@ public class OpenSSLCipherConfigurationParser {
             result.addAll(cipher.getJsseNames());
         }
         if (log.isDebugEnabled()) {
-            log.debug(sm.getString("opensslCipherConfigurationParser.effectiveCiphers", displayResult(ciphers, true, ",")));
+            log.debug(sm.getString("opensslCipherConfigurationParser.effectiveCiphers",
+                    displayResult(ciphers, true, ",")));
         }
         return result;
     }
 
     /**
-     * Parse the specified expression according to the OpenSSL syntax and
-     * returns a list of standard JSSE cipher names.
+     * Parse the specified expression according to the OpenSSL syntax and returns a list of standard JSSE cipher names.
      *
      * @param expression the openssl expression to define a list of cipher.
+     *
      * @return the corresponding list of ciphers.
      */
     public static List<String> parseExpression(String expression) {
@@ -826,8 +851,8 @@ public class OpenSSLCipherConfigurationParser {
      *
      * @param opensslCipherName The OpenSSL name for a cipher
      *
-     * @return The JSSE name for the specified OpenSSL cipher. If none is known,
-     *         the IANA standard name will be returned instead
+     * @return The JSSE name for the specified OpenSSL cipher. If none is known, the IANA standard name will be returned
+     *             instead
      */
     public static String openSSLToJsse(String opensslCipherName) {
         if (!initialized) {
@@ -864,7 +889,8 @@ public class OpenSSLCipherConfigurationParser {
     }
 
     public static void usage() {
-        System.out.println("Usage: java " + OpenSSLCipherConfigurationParser.class.getName() + " [options] cipher spec");
+        System.out
+                .println("Usage: java " + OpenSSLCipherConfigurationParser.class.getName() + " [options] cipher spec");
         System.out.println();
         System.out.println("Displays the TLS cipher suites matching the cipher spec.");
         System.out.println();
@@ -875,26 +901,23 @@ public class OpenSSLCipherConfigurationParser {
         System.out.println(" -v          Provide detailed cipher listing");
     }
 
-    public static void main(String[] args) throws Exception
-    {
+    public static void main(String[] args) throws Exception {
         boolean verbose = false;
         boolean useOpenSSLNames = false;
         int argindex;
-        for(argindex = 0; argindex < args.length; ++argindex)
-        {
+        for (argindex = 0; argindex < args.length; ++argindex) {
             String arg = args[argindex];
-            if("--verbose".equals(arg) || "-v".equals(arg)) {
+            if ("--verbose".equals(arg) || "-v".equals(arg)) {
                 verbose = true;
-            } else if("--openssl".equals(arg)) {
+            } else if ("--openssl".equals(arg)) {
                 useOpenSSLNames = true;
-            } else if("--help".equals(arg) || "-h".equals(arg)) {
+            } else if ("--help".equals(arg) || "-h".equals(arg)) {
                 usage();
                 System.exit(0);
-            }
-            else if("--".equals(arg)) {
+            } else if ("--".equals(arg)) {
                 ++argindex;
                 break;
-            } else if(arg.startsWith("-")) {
+            } else if (arg.startsWith("-")) {
                 System.out.println("Unknown option: " + arg);
                 usage();
                 System.exit(1);
@@ -905,30 +928,30 @@ public class OpenSSLCipherConfigurationParser {
         }
 
         String cipherSpec;
-        if(argindex < args.length) {
+        if (argindex < args.length) {
             cipherSpec = args[argindex];
         } else {
             cipherSpec = "DEFAULT";
         }
         Set<Cipher> ciphers = parse(cipherSpec);
         boolean first = true;
-        if(!ciphers.isEmpty()) {
-            for(Cipher cipher : ciphers)
-            {
-                if(first) {
+        if (!ciphers.isEmpty()) {
+            for (Cipher cipher : ciphers) {
+                if (first) {
                     first = false;
                 } else {
-                    if(!verbose) {
+                    if (!verbose) {
                         System.out.print(',');
                     }
                 }
-                if(useOpenSSLNames) {
+                if (useOpenSSLNames) {
                     System.out.print(cipher.getOpenSSLAlias());
                 } else {
                     System.out.print(cipher.name());
                 }
-                if(verbose) {
-                    System.out.println("\t" + cipher.getProtocol() + "\tKx=" + cipher.getKx() + "\tAu=" + cipher.getAu() + "\tEnc=" + cipher.getEnc() + "\tMac=" + cipher.getMac());
+                if (verbose) {
+                    System.out.println("\t" + cipher.getProtocol() + "\tKx=" + cipher.getKx() + "\tAu=" +
+                            cipher.getAu() + "\tEnc=" + cipher.getEnc() + "\tMac=" + cipher.getMac());
                 }
             }
             System.out.println();
