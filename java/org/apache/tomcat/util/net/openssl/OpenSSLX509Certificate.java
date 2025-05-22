@@ -134,16 +134,14 @@ final class OpenSSLX509Certificate extends X509Certificate {
     }
 
     @Override
-    public void verify(PublicKey key)
-            throws CertificateException, NoSuchAlgorithmException,
-            InvalidKeyException, NoSuchProviderException, SignatureException {
+    public void verify(PublicKey key) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
+            NoSuchProviderException, SignatureException {
         unwrap().verify(key);
     }
 
     @Override
-    public void verify(PublicKey key, String sigProvider)
-            throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
-            NoSuchProviderException, SignatureException {
+    public void verify(PublicKey key, String sigProvider) throws CertificateException, NoSuchAlgorithmException,
+            InvalidKeyException, NoSuchProviderException, SignatureException {
         unwrap().verify(key, sigProvider);
     }
 
@@ -181,8 +179,8 @@ final class OpenSSLX509Certificate extends X509Certificate {
         X509Certificate wrapped = this.wrapped;
         if (wrapped == null) {
             try {
-                wrapped = this.wrapped = (X509Certificate) OpenSSLContext.X509_CERT_FACTORY.generateCertificate(
-                        new ByteArrayInputStream(bytes));
+                wrapped = this.wrapped = (X509Certificate) OpenSSLContext.X509_CERT_FACTORY
+                        .generateCertificate(new ByteArrayInputStream(bytes));
             } catch (CertificateException e) {
                 throw new IllegalStateException(e);
             }
