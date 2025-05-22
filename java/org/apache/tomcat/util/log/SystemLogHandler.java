@@ -25,10 +25,8 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * This helper class may be used to do sophisticated redirection of
- * System.out and System.err on a per Thread basis.
- * A stack is implemented per Thread so that nested startCapture
- * and stopCapture can be used.
+ * This helper class may be used to do sophisticated redirection of System.out and System.err on a per Thread basis. A
+ * stack is implemented per Thread so that nested startCapture and stopCapture can be used.
  *
  * @author Remy Maucherat
  * @author Glenn L. Nielsen
@@ -123,6 +121,7 @@ public class SystemLogHandler extends PrintStream {
 
     /**
      * Find PrintStream to which the output must be written to.
+     *
      * @return the print stream
      */
     protected PrintStream findStream() {
@@ -160,7 +159,7 @@ public class SystemLogHandler extends PrintStream {
 
     @Override
     protected void setError() {
-        //findStream().setError();
+        // findStream().setError();
     }
 
     @Override
@@ -169,8 +168,7 @@ public class SystemLogHandler extends PrintStream {
     }
 
     @Override
-    public void write(byte[] b)
-        throws IOException {
+    public void write(byte[] b) throws IOException {
         findStream().write(b);
     }
 
