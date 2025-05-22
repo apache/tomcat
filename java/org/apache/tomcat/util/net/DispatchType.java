@@ -17,9 +17,8 @@
 package org.apache.tomcat.util.net;
 
 /**
- * This enumeration lists the different types of dispatches that request
- * processing can trigger. In this instance, dispatch means re-process this
- * request using the given socket status.
+ * This enumeration lists the different types of dispatches that request processing can trigger. In this instance,
+ * dispatch means re-process this request using the given socket status.
  */
 public enum DispatchType {
 

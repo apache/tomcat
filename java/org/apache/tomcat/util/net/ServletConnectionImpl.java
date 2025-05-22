@@ -18,8 +18,8 @@ package org.apache.tomcat.util.net;
 
 import jakarta.servlet.ServletConnection;
 
-public record ServletConnectionImpl(String connectionId, String protocol, String protocolConnectionId,
-                                    boolean secure) implements ServletConnection {
+public record ServletConnectionImpl(String connectionId, String protocol, String protocolConnectionId, boolean secure)
+        implements ServletConnection {
     @Override
     public String getConnectionId() {
         return connectionId;

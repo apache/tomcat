@@ -32,8 +32,7 @@ import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This class extracts the SNI host name and ALPN protocols from a TLS
- * client-hello message.
+ * This class extracts the SNI host name and ALPN protocols from a TLS client-hello message.
  */
 public class TLSClientHelloExtractor {
 
@@ -53,21 +52,19 @@ public class TLSClientHelloExtractor {
     private static final int TLS_EXTENSION_ALPN = 16;
     private static final int TLS_EXTENSION_SUPPORTED_VERSION = 43;
 
-    public static byte[] USE_TLS_RESPONSE = ("HTTP/1.1 400 \r\n" +
-            "Content-Type: text/plain;charset=UTF-8\r\n" +
-            "Connection: close\r\n" +
-            "\r\n" +
-            "Bad Request\r\n" +
-            "This combination of host and port requires TLS.\r\n").getBytes(StandardCharsets.UTF_8);
+    public static byte[] USE_TLS_RESPONSE =
+            ("HTTP/1.1 400 \r\n" + "Content-Type: text/plain;charset=UTF-8\r\n" + "Connection: close\r\n" + "\r\n" +
+                    "Bad Request\r\n" + "This combination of host and port requires TLS.\r\n")
+                    .getBytes(StandardCharsets.UTF_8);
 
 
     /**
-     * Creates the instance of the parser and processes the provided buffer. The
-     * buffer position and limit will be modified during the execution of this
-     * method, but they will be returned to the original values before the method
+     * Creates the instance of the parser and processes the provided buffer. The buffer position and limit will be
+     * modified during the execution of this method, but they will be returned to the original values before the method
      * exits.
      *
      * @param netInBuffer The buffer containing the TLS data to process
+     *
      * @throws IOException If the client hello message is malformed
      */
     public TLSClientHelloExtractor(ByteBuffer netInBuffer) throws IOException {
@@ -150,26 +147,26 @@ public class TLSClientHelloExtractor {
             skipBytes(netInBuffer, 2);
             // Read the extensions until we run out of data or find the data
             // we need
-            while (netInBuffer.hasRemaining() && (sniValue == null ||
-                    clientRequestedApplicationProtocols.isEmpty() || clientRequestedProtocols.isEmpty())) {
+            while (netInBuffer.hasRemaining() && (sniValue == null || clientRequestedApplicationProtocols.isEmpty() ||
+                    clientRequestedProtocols.isEmpty())) {
                 // Extension type is two byte
                 char extensionType = netInBuffer.getChar();
                 // Extension size is another two bytes
                 char extensionDataSize = netInBuffer.getChar();
                 switch (extensionType) {
-                case TLS_EXTENSION_SERVER_NAME: {
-                    sniValue = readSniExtension(netInBuffer);
-                    break;
-                }
-                case TLS_EXTENSION_ALPN:
-                    readAlpnExtension(netInBuffer, clientRequestedApplicationProtocols);
-                    break;
-                case TLS_EXTENSION_SUPPORTED_VERSION:
-                    readSupportedVersions(netInBuffer, clientRequestedProtocols);
-                    break;
-                default: {
-                    skipBytes(netInBuffer, extensionDataSize);
-                }
+                    case TLS_EXTENSION_SERVER_NAME: {
+                        sniValue = readSniExtension(netInBuffer);
+                        break;
+                    }
+                    case TLS_EXTENSION_ALPN:
+                        readAlpnExtension(netInBuffer, clientRequestedApplicationProtocols);
+                        break;
+                    case TLS_EXTENSION_SUPPORTED_VERSION:
+                        readSupportedVersions(netInBuffer, clientRequestedProtocols);
+                        break;
+                    default: {
+                        skipBytes(netInBuffer, extensionDataSize);
+                    }
                 }
             }
             if (clientRequestedProtocols.isEmpty()) {
@@ -198,8 +195,7 @@ public class TLSClientHelloExtractor {
 
 
     /**
-     * @return The SNI value provided by the client converted to lower case if
-     *         not already lower case.
+     * @return The SNI value provided by the client converted to lower case if not already lower case.
      */
     public String getSNIValue() {
         if (result == ExtractorResult.COMPLETE) {
@@ -281,8 +277,8 @@ public class TLSClientHelloExtractor {
     private static boolean isHttp(ByteBuffer bb) {
         // Based on code in Http11InputBuffer
         // Note: The actual request is not important. This code only checks that
-        //       the buffer contains a correctly formatted HTTP request line.
-        //       The method, target and protocol are not validated.
+        // the buffer contains a correctly formatted HTTP request line.
+        // The method, target and protocol are not validated.
         byte chr;
         bb.position(0);
 

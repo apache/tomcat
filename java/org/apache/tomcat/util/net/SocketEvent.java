@@ -17,9 +17,8 @@
 package org.apache.tomcat.util.net;
 
 /**
- * Defines events that occur per socket that require further processing by the
- * container. Usually these events are triggered by the socket implementation,
- * but they may be triggered by the container.
+ * Defines events that occur per socket that require further processing by the container. Usually these events are
+ * triggered by the socket implementation, but they may be triggered by the container.
  */
 public enum SocketEvent {
 
@@ -34,14 +33,13 @@ public enum SocketEvent {
     OPEN_WRITE,
 
     /**
-     * The associated Connector/Endpoint is stopping and the connection/socket
-     * needs to be closed cleanly.
+     * The associated Connector/Endpoint is stopping and the connection/socket needs to be closed cleanly.
      */
     STOP,
 
     /**
-     * A timeout has occurred and the connection needs to be closed cleanly.
-     * Currently, this is only used by the Servlet 3.0 async processing.
+     * A timeout has occurred and the connection needs to be closed cleanly. Currently, this is only used by the Servlet
+     * 3.0 async processing.
      */
     TIMEOUT,
 
@@ -51,20 +49,18 @@ public enum SocketEvent {
     DISCONNECT,
 
     /**
-     * An error has occurred on a non-container thread and processing needs to
-     * return to the container for any necessary clean-up. Examples of where
-     * this is used include:
+     * An error has occurred on a non-container thread and processing needs to return to the container for any necessary
+     * clean-up. Examples of where this is used include:
      * <ul>
      * <li>by NIO2 to signal the failure of a completion handler</li>
-     * <li>by the container to signal an I/O error on a non-container thread
-     *     during Servlet 3.0 asynchronous processing.</li>
+     * <li>by the container to signal an I/O error on a non-container thread during Servlet 3.0 asynchronous
+     * processing.</li>
      * </ul>
      */
     ERROR,
 
     /**
-     * A client attempted to establish a connection but failed. Examples of
-     * where this is used include:
+     * A client attempted to establish a connection but failed. Examples of where this is used include:
      * <ul>
      * <li>TLS handshake failures</li>
      * </ul>

@@ -25,9 +25,8 @@ import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 /**
- * Provides a common interface for {@link SSLImplementation}s to create the
- * necessary JSSE implementation objects for TLS connections created via the
- * JSSE API.
+ * Provides a common interface for {@link SSLImplementation}s to create the necessary JSSE implementation objects for
+ * TLS connections created via the JSSE API.
  */
 public interface SSLUtil {
 
@@ -56,43 +55,37 @@ public interface SSLUtil {
     void configureSessionContext(SSLSessionContext sslSessionContext);
 
     /**
-     * The set of enabled protocols is the intersection of the implemented
-     * protocols and the configured protocols. If no protocols are explicitly
-     * configured, then all of the implemented protocols will be included in the
-     * returned array.
+     * The set of enabled protocols is the intersection of the implemented protocols and the configured protocols. If no
+     * protocols are explicitly configured, then all of the implemented protocols will be included in the returned
+     * array.
      *
-     * @return The protocols currently enabled and available for clients to
-     *         select from for the associated connection
+     * @return The protocols currently enabled and available for clients to select from for the associated connection
      *
-     * @throws IllegalArgumentException  If there is no intersection between the
-     *         implemented and configured protocols
+     * @throws IllegalArgumentException If there is no intersection between the implemented and configured protocols
      */
     String[] getEnabledProtocols() throws IllegalArgumentException;
 
     /**
-     * The set of enabled ciphers is the intersection of the implemented ciphers
-     * and the configured ciphers. If no ciphers are explicitly configured, then
-     * the default ciphers will be included in the returned array.
+     * The set of enabled ciphers is the intersection of the implemented ciphers and the configured ciphers. If no
+     * ciphers are explicitly configured, then the default ciphers will be included in the returned array.
      * <p>
-     * The ciphers used during the TLS handshake may be further restricted by
-     * the {@link #getEnabledProtocols()} and the certificates.
+     * The ciphers used during the TLS handshake may be further restricted by the {@link #getEnabledProtocols()} and the
+     * certificates.
      *
-     * @return The ciphers currently enabled and available for clients to select
-     *         from for the associated connection
+     * @return The ciphers currently enabled and available for clients to select from for the associated connection
      *
-     * @throws IllegalArgumentException  If there is no intersection between the
-     *         implemented and configured ciphers
+     * @throws IllegalArgumentException If there is no intersection between the implemented and configured ciphers
      */
     String[] getEnabledCiphers() throws IllegalArgumentException;
 
     /**
-     * Optional interface that can be implemented by
-     * {@link javax.net.ssl.SSLEngine}s to indicate that they support ALPN and
-     * can provide the protocol agreed with the client.
+     * Optional interface that can be implemented by {@link javax.net.ssl.SSLEngine}s to indicate that they support ALPN
+     * and can provide the protocol agreed with the client.
      */
     interface ProtocolInfo {
         /**
          * ALPN information.
+         *
          * @return the protocol selected using ALPN
          */
         String getNegotiatedProtocol();

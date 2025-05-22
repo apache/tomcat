@@ -35,9 +35,8 @@ public class Acceptor<U> implements Runnable {
     private final AbstractEndpoint<?,U> endpoint;
     private String threadName;
     /*
-     * Tracked separately rather than using endpoint.isRunning() as calls to
-     * endpoint.stop() and endpoint.start() in quick succession can cause the
-     * acceptor to continue running when it should terminate.
+     * Tracked separately rather than using endpoint.isRunning() as calls to endpoint.stop() and endpoint.start() in
+     * quick succession can cause the acceptor to continue running when it should terminate.
      */
     private volatile boolean stopCalled = false;
     private final CountDownLatch stopLatch = new CountDownLatch(1);
@@ -83,9 +82,9 @@ public class Acceptor<U> implements Runnable {
                 // excessive CPU usage.
                 // Therefore, we start with a tight loop but if there isn't a
                 // rapid transition to stop then sleeps are introduced.
-                // < 1ms       - tight loop
+                // < 1ms - tight loop
                 // 1ms to 10ms - 1ms sleep
-                // > 10ms      - 10ms sleep
+                // > 10ms - 10ms sleep
                 while (endpoint.isPaused() && !stopCalled) {
                     if (state != AcceptorState.PAUSED) {
                         pauseStart = System.nanoTime();
@@ -112,7 +111,7 @@ public class Acceptor<U> implements Runnable {
                 state = AcceptorState.RUNNING;
 
                 try {
-                    //if we have reached max connections, wait
+                    // if we have reached max connections, wait
                     endpoint.countUpOrAwaitConnection();
 
                     // Endpoint might have been paused while waiting for latch
@@ -169,7 +168,7 @@ public class Acceptor<U> implements Runnable {
         if (waitMilliseconds > 0) {
             try {
                 if (!stopLatch.await(waitMilliseconds, TimeUnit.MILLISECONDS)) {
-                   log.warn(sm.getString("acceptor.stop.fail", getThreadName()));
+                    log.warn(sm.getString("acceptor.stop.fail", getThreadName()));
                 }
             } catch (InterruptedException e) {
                 log.warn(sm.getString("acceptor.stop.interrupted", getThreadName()), e);
@@ -179,13 +178,13 @@ public class Acceptor<U> implements Runnable {
 
 
     /**
-     * Handles exceptions where a delay is required to prevent a Thread from
-     * entering a tight loop which will consume CPU and may also trigger large
-     * amounts of logging. For example, this can happen if the ulimit for open
-     * files is reached.
+     * Handles exceptions where a delay is required to prevent a Thread from entering a tight loop which will consume
+     * CPU and may also trigger large amounts of logging. For example, this can happen if the ulimit for open files is
+     * reached.
      *
      * @param currentErrorDelay The current delay being applied on failure
-     * @return  The delay to apply on the next failure
+     *
+     * @return The delay to apply on the next failure
      */
     protected int handleExceptionWithDelay(int currentErrorDelay) {
         // Don't delay on first exception
@@ -210,6 +209,9 @@ public class Acceptor<U> implements Runnable {
 
 
     public enum AcceptorState {
-        NEW, RUNNING, PAUSED, ENDED
+        NEW,
+        RUNNING,
+        PAUSED,
+        ENDED
     }
 }
