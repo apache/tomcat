@@ -27,8 +27,7 @@ import org.xml.sax.SAXParseException;
 
 public class XmlErrorHandler implements ErrorHandler {
 
-    private static final StringManager sm =
-        StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final List<SAXParseException> errors = new ArrayList<>();
 
@@ -64,12 +63,10 @@ public class XmlErrorHandler implements ErrorHandler {
 
     public void logFindings(Log log, String source) {
         for (SAXParseException e : getWarnings()) {
-            log.warn(sm.getString(
-                    "xmlErrorHandler.warning", e.getMessage(), source));
+            log.warn(sm.getString("xmlErrorHandler.warning", e.getMessage(), source));
         }
         for (SAXParseException e : getErrors()) {
-            log.warn(sm.getString(
-                    "xmlErrorHandler.error", e.getMessage(), source));
+            log.warn(sm.getString("xmlErrorHandler.error", e.getMessage(), source));
         }
     }
 }
