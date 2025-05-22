@@ -43,10 +43,8 @@ import org.apache.tomcat.util.modeler.modules.ModelerSource;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Registry for modeler MBeans.
- * This is the main entry point into modeler. It provides methods to create and
- * manipulate model mbeans and simplify their use.
- * This class is itself a mbean.
+ * Registry for modeler MBeans. This is the main entry point into modeler. It provides methods to create and manipulate
+ * model mbeans and simplify their use. This class is itself a mbean.
  *
  * @author Craig R. McClanahan
  * @author Costin Manolache
@@ -62,40 +60,37 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     // Support for the factory methods
 
     /**
-     * The registry instance created by our factory method the first time it is
-     * called.
+     * The registry instance created by our factory method the first time it is called.
      */
     private static Registry registry = null;
 
     // Per registry fields
 
     /**
-     * The <code>MBeanServer</code> instance that we will use to register
-     * management beans.
+     * The <code>MBeanServer</code> instance that we will use to register management beans.
      */
     private volatile MBeanServer server = null;
     private final Object serverLock = new Object();
 
     /**
-     * The set of ManagedBean instances for the beans this registry knows about,
-     * keyed by name.
+     * The set of ManagedBean instances for the beans this registry knows about, keyed by name.
      */
-    private Map<String, ManagedBean> descriptors = new HashMap<>();
+    private Map<String,ManagedBean> descriptors = new HashMap<>();
 
     /**
      * List of managed beans, keyed by class name
      */
-    private Map<String, ManagedBean> descriptorsByClass = new HashMap<>();
+    private Map<String,ManagedBean> descriptorsByClass = new HashMap<>();
 
     // map to avoid duplicated searching or loading descriptors
-    private Map<String, URL> searchedPaths = new HashMap<>();
+    private Map<String,URL> searchedPaths = new HashMap<>();
 
     private Object guard;
 
     // Id - small ints to use array access. No reset on stop()
     // Used for notifications
-    private final Hashtable<String, Hashtable<String, Integer>> idDomains = new Hashtable<>();
-    private final Hashtable<String, int[]> ids = new Hashtable<>();
+    private final Hashtable<String,Hashtable<String,Integer>> idDomains = new Hashtable<>();
+    private final Hashtable<String,int[]> ids = new Hashtable<>();
 
 
     // ----------------------------------------------------------- Constructors
@@ -109,13 +104,13 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     // Factories
 
     /**
-     * Factory method to create (if necessary) and return our
-     * <code>Registry</code> instance.
+     * Factory method to create (if necessary) and return our <code>Registry</code> instance.
      *
-     * @param key Unused
+     * @param key   Unused
      * @param guard Prevent access to the registry by untrusted components
      *
      * @return the registry
+     *
      * @since 1.1
      */
     public static synchronized Registry getRegistry(Object key, Object guard) {
@@ -131,11 +126,12 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Factory method to create (if necessary) and return our
-     * <code>Registry</code> instance.
+     * Factory method to create (if necessary) and return our <code>Registry</code> instance.
      *
      * @param guard Prevent access to the registry by untrusted components
+     *
      * @return the registry
+     *
      * @throws IllegalArgumentException if the guard object does not allow access
      */
     public static synchronized Registry getRegistry(Object guard) {
@@ -162,8 +158,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     // -------------------- Generic methods --------------------
 
     /**
-     * Lifecycle method - clean up the registry metadata. Called from
-     * resetMetadata().
+     * Lifecycle method - clean up the registry metadata. Called from resetMetadata().
      *
      * @since 1.1
      */
@@ -176,28 +171,21 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Register a bean by creating a modeler mbean and adding it to the
-     * MBeanServer.
-     * If metadata is not loaded, we'll look up and read a file named
-     * "mbeans-descriptors.ser" or "mbeans-descriptors.xml" in the same package
-     * or parent.
-     * If the bean is an instance of DynamicMBean. its metadata will be
-     * converted to a model mbean, and we'll wrap it so modeler services are
-     * supported.
-     * If the metadata is still not found, introspection will be used to extract
-     * it automatically.
-     * If a mbean is already registered under this name, it'll be first
-     * unregistered.
-     * If the component implements MBeanRegistration, the methods will be
-     * called. If the method has a method "setRegistry" that takes a
+     * Register a bean by creating a modeler mbean and adding it to the MBeanServer. If metadata is not loaded, we'll
+     * look up and read a file named "mbeans-descriptors.ser" or "mbeans-descriptors.xml" in the same package or parent.
+     * If the bean is an instance of DynamicMBean. its metadata will be converted to a model mbean, and we'll wrap it so
+     * modeler services are supported. If the metadata is still not found, introspection will be used to extract it
+     * automatically. If a mbean is already registered under this name, it'll be first unregistered. If the component
+     * implements MBeanRegistration, the methods will be called. If the method has a method "setRegistry" that takes a
      * RegistryMBean as parameter, it'll be called with the current registry.
      *
-     * @param bean Object to be registered
+     * @param bean  Object to be registered
      * @param oname Name used for registration
-     * @param type The type of the mbean, as declared in mbeans-descriptors. If
-     *            null, the name of the class will be used. This can be used as
-     *            a hint or by subclasses.
+     * @param type  The type of the mbean, as declared in mbeans-descriptors. If null, the name of the class will be
+     *                  used. This can be used as a hint or by subclasses.
+     *
      * @throws Exception if a registration error occurred
+     *
      * @since 1.1
      */
     @Override
@@ -207,8 +195,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Unregister a component. We'll first check if it is registered, and mask
-     * all errors. This is mostly a helper.
+     * Unregister a component. We'll first check if it is registered, and mask all errors. This is mostly a helper.
      *
      * @param oname Name used for unregistration
      *
@@ -225,18 +212,18 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Invoke an operation on a list of mbeans. Can be used to implement
-     * lifecycle operations.
+     * Invoke an operation on a list of mbeans. Can be used to implement lifecycle operations.
      *
-     * @param mbeans list of ObjectName on which we'll invoke the operations
-     * @param operation  Name of the operation ( init, start, stop, etc)
-     * @param failFirst  If false, exceptions will be ignored
+     * @param mbeans    list of ObjectName on which we'll invoke the operations
+     * @param operation Name of the operation ( init, start, stop, etc)
+     * @param failFirst If false, exceptions will be ignored
+     *
      * @throws Exception Error invoking operation
+     *
      * @since 1.1
      */
     @Override
-    public void invoke(List<ObjectName> mbeans, String operation, boolean failFirst)
-            throws Exception {
+    public void invoke(List<ObjectName> mbeans, String operation, boolean failFirst) throws Exception {
 
         if (mbeans == null) {
             return;
@@ -263,12 +250,13 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     // -------------------- ID registry --------------------
 
     /**
-     * Return an int ID for faster access. Will be used for notifications and
-     * for other operations we want to optimize.
+     * Return an int ID for faster access. Will be used for notifications and for other operations we want to optimize.
      *
      * @param domain Namespace
-     * @param name Type of the notification
+     * @param name   Type of the notification
+     *
      * @return A unique id for the domain:name combination
+     *
      * @since 1.1
      */
     @Override
@@ -276,7 +264,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         if (domain == null) {
             domain = "";
         }
-        Hashtable<String, Integer> domainTable = idDomains.computeIfAbsent(domain, k -> new Hashtable<>());
+        Hashtable<String,Integer> domainTable = idDomains.computeIfAbsent(domain, k -> new Hashtable<>());
         if (name == null) {
             name = "";
         }
@@ -297,10 +285,10 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     // methods from 1.0
 
     /**
-     * Add a new bean metadata to the set of beans known to this registry. This
-     * is used by internal components.
+     * Add a new bean metadata to the set of beans known to this registry. This is used by internal components.
      *
      * @param bean The managed bean to be added
+     *
      * @since 1.0
      */
     public void addManagedBean(ManagedBean bean) {
@@ -313,12 +301,14 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Find and return the managed bean definition for the specified bean name,
-     * if any; otherwise return <code>null</code>.
+     * Find and return the managed bean definition for the specified bean name, if any; otherwise return
+     * <code>null</code>.
      *
-     * @param name Name of the managed bean to be returned. Since 1.1, both
-     *            short names or the full name of the class can be used.
+     * @param name Name of the managed bean to be returned. Since 1.1, both short names or the full name of the class
+     *                 can be used.
+     *
      * @return the managed bean
+     *
      * @since 1.0
      */
     public ManagedBean findManagedBean(String name) {
@@ -336,9 +326,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     /**
      * Get the type of an attribute of the object, from the metadata.
      *
-     * @param oname The bean name
+     * @param oname   The bean name
      * @param attName The attribute name
+     *
      * @return null if metadata about the attribute is not found
+     *
      * @since 1.1
      */
     public String getType(ObjectName oname, String attName) {
@@ -365,8 +357,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     /**
      * Find the operation info for a method
      *
-     * @param oname The bean name
+     * @param oname  The bean name
      * @param opName The operation name
+     *
      * @return the operation info for the specified operation
      */
     public MBeanOperationInfo getMethodInfo(ObjectName oname, String opName) {
@@ -389,15 +382,16 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     /**
      * Find the operation info for a method.
      *
-     * @param oname The bean name
-     * @param opName The operation name
+     * @param oname    The bean name
+     * @param opName   The operation name
      * @param argCount The number of arguments to the method
+     *
      * @return the operation info for the specified operation
+     *
      * @throws InstanceNotFoundException If the object name is not bound to an MBean
      */
     public MBeanOperationInfo getMethodInfo(ObjectName oname, String opName, int argCount)
-        throws InstanceNotFoundException
-    {
+            throws InstanceNotFoundException {
         MBeanInfo info;
         try {
             info = getMBeanServer().getMBeanInfo(oname);
@@ -409,8 +403,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         }
         MBeanOperationInfo[] attInfo = info.getOperations();
         for (MBeanOperationInfo mBeanOperationInfo : attInfo) {
-            if (opName.equals(mBeanOperationInfo.getName())
-                    && argCount == mBeanOperationInfo.getSignature().length) {
+            if (opName.equals(mBeanOperationInfo.getName()) && argCount == mBeanOperationInfo.getSignature().length) {
                 return mBeanOperationInfo;
             }
         }
@@ -418,8 +411,8 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     }
 
     /**
-     * Unregister a component. This is just a helper that avoids exceptions by
-     * checking if the mbean is already registered
+     * Unregister a component. This is just a helper that avoids exceptions by checking if the mbean is already
+     * registered
      *
      * @param oname The bean name
      */
@@ -435,8 +428,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Factory method to create (if necessary) and return our
-     * <code>MBeanServer</code> instance.
+     * Factory method to create (if necessary) and return our <code>MBeanServer</code> instance.
      *
      * @return the MBean server
      */
@@ -465,14 +457,15 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     /**
      * Find or load metadata.
      *
-     * @param bean The bean
+     * @param bean      The bean
      * @param beanClass The bean class
-     * @param type The registry type
+     * @param type      The registry type
+     *
      * @return the managed bean
+     *
      * @throws Exception An error occurred
      */
-    public ManagedBean findManagedBean(Object bean, Class<?> beanClass, String type)
-            throws Exception {
+    public ManagedBean findManagedBean(Object bean, Class<?> beanClass, String type) throws Exception {
 
         if (bean != null && beanClass == null) {
             beanClass = bean.getClass();
@@ -518,12 +511,12 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Convert a string to object, based on type. Used by several
-     * components. We could provide some pluggability. It is here to keep things
-     * consistent and avoid duplication in other tasks
+     * Convert a string to object, based on type. Used by several components. We could provide some pluggability. It is
+     * here to keep things consistent and avoid duplication in other tasks
      *
-     * @param type Fully qualified class name of the resulting value
+     * @param type  Fully qualified class name of the resulting value
      * @param value String value to be converted
+     *
      * @return Converted value
      */
     public Object convertValue(String type, String value) {
@@ -552,9 +545,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
      * Load descriptors.
      *
      * @param sourceType The source type
-     * @param source The bean
-     * @param param A type to load
+     * @param source     The bean
+     * @param param      A type to load
+     *
      * @return List of descriptors
+     *
      * @throws Exception Error loading descriptors
      */
     public List<ObjectName> load(String sourceType, Object source, String param) throws Exception {
@@ -609,9 +604,10 @@ public class Registry implements RegistryMBean, MBeanRegistration {
     /**
      * Register a component
      *
-     * @param bean The bean
+     * @param bean  The bean
      * @param oname The object name
-     * @param type The registry type
+     * @param type  The registry type
+     *
      * @throws Exception Error registering component
      */
     public void registerComponent(Object bean, ObjectName oname, String type) throws Exception {
@@ -650,8 +646,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Lookup the component descriptor in the package and in the parent
-     * packages.
+     * Lookup the component descriptor in the package and in the parent packages.
      *
      * @param packageName The package name
      * @param classLoader The class loader
@@ -687,8 +682,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
 
 
     /**
-     * Lookup the component descriptor in the package and in the parent
-     * packages.
+     * Lookup the component descriptor in the package and in the parent packages.
      */
     private void findDescriptor(Class<?> beanClass, String type) {
         if (type == null) {

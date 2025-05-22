@@ -38,8 +38,7 @@ import org.apache.tomcat.util.modeler.ParameterInfo;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
-public class MbeansDescriptorsIntrospectionSource extends ModelerSource
-{
+public class MbeansDescriptorsIntrospectionSource extends ModelerSource {
     private static final Log log = LogFactory.getLog(MbeansDescriptorsIntrospectionSource.class);
     private static final StringManager sm = StringManager.getManager(MbeansDescriptorsIntrospectionSource.class);
 
@@ -48,7 +47,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     private final List<ObjectName> mbeans = new ArrayList<>();
 
     public void setRegistry(Registry reg) {
-        this.registry=reg;
+        this.registry = reg;
     }
 
     /**
@@ -56,17 +55,16 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
      *
      * @param type The type
      */
-    public void setType( String type ) {
-       this.type=type;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public void setSource( Object source ) {
-        this.source=source;
+    public void setSource(Object source) {
+        this.source = source;
     }
 
     @Override
-    public List<ObjectName> loadDescriptors(Registry registry, String type,
-            Object source) throws Exception {
+    public List<ObjectName> loadDescriptors(Registry registry, String type, Object source) throws Exception {
         setRegistry(registry);
         setType(type);
         setSource(source);
@@ -75,65 +73,43 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     }
 
     public void execute() throws Exception {
-        if( registry==null ) {
-            registry=Registry.getRegistry(null);
+        if (registry == null) {
+            registry = Registry.getRegistry(null);
         }
         try {
-            ManagedBean managed = createManagedBean(registry, null,
-                    (Class<?>)source, type);
-            if( managed==null ) {
+            ManagedBean managed = createManagedBean(registry, null, (Class<?>) source, type);
+            if (managed == null) {
                 return;
             }
-            managed.setName( type );
+            managed.setName(type);
 
             registry.addManagedBean(managed);
 
-        } catch( Exception ex ) {
+        } catch (Exception ex) {
             log.error(sm.getString("modules.readDescriptorsError"), ex);
         }
     }
-
 
 
     // ------------ Implementation for non-declared introspection classes
 
     private static final Map<String,String> specialMethods = new HashMap<>();
     static {
-        specialMethods.put( "preDeregister", "");
-        specialMethods.put( "postDeregister", "");
+        specialMethods.put("preDeregister", "");
+        specialMethods.put("postDeregister", "");
     }
 
-    private static final Class<?>[] supportedTypes  = new Class[] {
-        Boolean.class,
-        Boolean.TYPE,
-        Byte.class,
-        Byte.TYPE,
-        Character.class,
-        Character.TYPE,
-        Short.class,
-        Short.TYPE,
-        Integer.class,
-        Integer.TYPE,
-        Long.class,
-        Long.TYPE,
-        Float.class,
-        Float.TYPE,
-        Double.class,
-        Double.TYPE,
-        String.class,
-        String[].class,
-        BigDecimal.class,
-        BigInteger.class,
-        ObjectName.class,
-        Object[].class,
-        java.io.File.class,
-    };
+    private static final Class<?>[] supportedTypes = new Class[] { Boolean.class, Boolean.TYPE, Byte.class, Byte.TYPE,
+            Character.class, Character.TYPE, Short.class, Short.TYPE, Integer.class, Integer.TYPE, Long.class,
+            Long.TYPE, Float.class, Float.TYPE, Double.class, Double.TYPE, String.class, String[].class,
+            BigDecimal.class, BigInteger.class, ObjectName.class, Object[].class, java.io.File.class, };
 
     /**
-     * Check if this class is one of the supported types.
-     * If the class is supported, returns true.  Otherwise,
-     * returns false.
+     * Check if this class is one of the supported types. If the class is supported, returns true. Otherwise, returns
+     * false.
+     *
      * @param ret The class to check
+     *
      * @return boolean True if class is supported
      */
     private boolean supportedType(Class<?> ret) {
@@ -146,10 +122,10 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     }
 
     /**
-     * Check if this class conforms to JavaBeans specifications.
-     * If the class is conformant, returns true.
+     * Check if this class conforms to JavaBeans specifications. If the class is conformant, returns true.
      *
      * @param javaType The class to check
+     *
      * @return boolean True if the class is compatible.
      */
     private boolean isBeanCompatible(Class<?> javaType) {
@@ -160,8 +136,7 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
         // Anything in the java or javax package that
         // does not have a defined mapping is excluded.
-        if (javaType.getName().startsWith("java.") ||
-            javaType.getName().startsWith("javax.")) {
+        if (javaType.getName().startsWith("java.") || javaType.getName().startsWith("javax.")) {
             return false;
         }
 
@@ -173,10 +148,8 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
         // Make sure superclass is compatible
         Class<?> superClass = javaType.getSuperclass();
-        if (superClass != null &&
-            superClass != Object.class &&
-            superClass != Exception.class &&
-            superClass != Throwable.class) {
+        if (superClass != null && superClass != Object.class && superClass != Exception.class &&
+                superClass != Throwable.class) {
             return isBeanCompatible(superClass);
         }
         return true;
@@ -185,15 +158,14 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     /**
      * Process the methods and extract 'attributes', methods, etc.
      *
-     * @param realClass The class to process
-     * @param attNames The attribute name (complete)
-     * @param getAttMap The readable attributes map
-     * @param setAttMap The settable attributes map
+     * @param realClass     The class to process
+     * @param attNames      The attribute name (complete)
+     * @param getAttMap     The readable attributes map
+     * @param setAttMap     The settable attributes map
      * @param invokeAttList The invokable attributes list
      */
-    private void initMethods(Class<?> realClass, Set<String> attNames,
-            Map<String,Method> getAttMap, Map<String,Method> setAttMap,
-            List<Method> invokeAttList) {
+    private void initMethods(Class<?> realClass, Set<String> attNames, Map<String,Method> getAttMap,
+            Map<String,Method> setAttMap, List<Method> invokeAttList) {
 
         Method[] methods = realClass.getMethods();
         for (Method method : methods) {
@@ -271,29 +243,25 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
     }
 
     /**
-     * XXX Find if the 'className' is the name of the MBean or
-     *       the real class ( I suppose first )
-     * XXX Read (optional) descriptions from a .properties, generated
-     *       from source
-     * XXX Deal with constructors
+     * XXX Find if the 'className' is the name of the MBean or the real class ( I suppose first ) XXX Read (optional)
+     * descriptions from a .properties, generated from source XXX Deal with constructors
      *
-     * @param registry The Bean registry (not used)
-     * @param domain The bean domain (not used)
+     * @param registry  The Bean registry (not used)
+     * @param domain    The bean domain (not used)
      * @param realClass The class to analyze
-     * @param type The bean type
+     * @param type      The bean type
+     *
      * @return ManagedBean The create MBean
      */
-    public ManagedBean createManagedBean(Registry registry, String domain,
-                                         Class<?> realClass, String type)
-    {
+    public ManagedBean createManagedBean(Registry registry, String domain, Class<?> realClass, String type) {
         ManagedBean mbean = new ManagedBean();
 
 
         Set<String> attrNames = new HashSet<>();
         // key: attribute val: getter method
-        Map<String, Method> getAttMap = new HashMap<>();
+        Map<String,Method> getAttMap = new HashMap<>();
         // key: attribute val: setter method
-        Map<String, Method> setAttMap = new HashMap<>();
+        Map<String,Method> setAttMap = new HashMap<>();
         // key: operation val: invoke method
         List<Method> invokeAttList = new ArrayList<>();
 
@@ -362,10 +330,10 @@ public class MbeansDescriptorsIntrospectionSource extends ModelerSource
 
     // -------------------- Utils --------------------
     /**
-     * Converts the first character of the given
-     * String into lower-case.
+     * Converts the first character of the given String into lower-case.
      *
      * @param name The string to convert
+     *
      * @return String
      */
     private static String unCapitalize(String name) {
