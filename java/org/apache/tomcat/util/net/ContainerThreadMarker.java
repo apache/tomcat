@@ -17,10 +17,9 @@
 package org.apache.tomcat.util.net;
 
 /**
- * Used to mark threads that have been allocated by the container to process
- * data from an incoming connection. Application created threads are not
- * container threads and neither are threads taken from the container thread
- * pool to execute AsyncContext.start(Runnable).
+ * Used to mark threads that have been allocated by the container to process data from an incoming connection.
+ * Application created threads are not container threads and neither are threads taken from the container thread pool to
+ * execute AsyncContext.start(Runnable).
  *
  * @deprecated Unused. Will be removed in Tomcat 10.1.x
  */

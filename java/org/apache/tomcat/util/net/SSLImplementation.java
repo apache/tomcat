@@ -27,9 +27,8 @@ import org.apache.tomcat.util.net.jsse.JSSEImplementation;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Provides a factory and base implementation for the Tomcat specific mechanism
- * that allows alternative SSL/TLS implementations to be used without requiring
- * the implementation of a full JSSE provider.
+ * Provides a factory and base implementation for the Tomcat specific mechanism that allows alternative SSL/TLS
+ * implementations to be used without requiring the implementation of a full JSSE provider.
  */
 public abstract class SSLImplementation {
 
@@ -37,19 +36,16 @@ public abstract class SSLImplementation {
     private static final StringManager sm = StringManager.getManager(SSLImplementation.class);
 
     /**
-     * Obtain an instance (not a singleton) of the implementation with the given
-     * class name.
+     * Obtain an instance (not a singleton) of the implementation with the given class name.
      *
-     * @param className The class name of the required implementation or null to
-     *                  use the default (currently {@link JSSEImplementation}).
+     * @param className The class name of the required implementation or null to use the default (currently
+     *                      {@link JSSEImplementation}).
      *
      * @return An instance of the required implementation
      *
-     * @throws ClassNotFoundException If an instance of the requested class
-     *         cannot be created
+     * @throws ClassNotFoundException If an instance of the requested class cannot be created
      */
-    public static SSLImplementation getInstance(String className)
-            throws ClassNotFoundException {
+    public static SSLImplementation getInstance(String className) throws ClassNotFoundException {
         if (className == null) {
             return new JSSEImplementation();
         }
@@ -69,12 +65,10 @@ public abstract class SSLImplementation {
     /**
      * Obtain an instance of SSLSupport.
      *
-     * @param session   The SSL session
-     * @param additionalAttributes  Additional SSL attributes that are not
-     *                              available from the session.
+     * @param session              The SSL session
+     * @param additionalAttributes Additional SSL attributes that are not available from the session.
      *
-     * @return An instance of SSLSupport based on the given session and the
-     *         provided additional attributes
+     * @return An instance of SSLSupport based on the given session and the provided additional attributes
      */
     public SSLSupport getSSLSupport(SSLSession session, Map<String,List<String>> additionalAttributes) {
         return getSSLSupport(session);
@@ -83,12 +77,11 @@ public abstract class SSLImplementation {
     /**
      * Obtain an instance of SSLSupport.
      *
-     * @param session   The TLS session
+     * @param session The TLS session
      *
      * @return An instance of SSLSupport based on the given session.
      *
-     * @deprecated This will be removed in Tomcat 10.1.x onwards.
-     *             Use {@link #getSSLSupport(SSLSession, Map)}.
+     * @deprecated This will be removed in Tomcat 10.1.x onwards. Use {@link #getSSLSupport(SSLSession, Map)}.
      */
     @Deprecated
     public abstract SSLSupport getSSLSupport(SSLSession session);

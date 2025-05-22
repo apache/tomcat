@@ -59,8 +59,8 @@ public class SSLHostConfig implements Serializable {
     public static final String DEFAULT_TLS_CIPHERS = "HIGH:!aNULL:!eNULL:!EXPORT:!DES:!RC4:!MD5:!kRSA";
 
     static {
-        /* Default used if protocols are not configured, also used if
-         * protocols="All"
+        /*
+         * Default used if protocols are not configured, also used if protocols="All"
          */
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_SSLv2Hello);
         SSL_PROTO_ALL_SET.add(Constants.SSL_PROTO_TLSv1);
@@ -172,18 +172,18 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * Set property which belongs to the specified configuration type.
-     * @param name the property name
+     *
+     * @param name       the property name
      * @param configType the configuration type
-     * @return true if the property belongs to the current configuration,
-     *   and false otherwise
+     *
+     * @return true if the property belongs to the current configuration, and false otherwise
      */
     boolean setProperty(String name, Type configType) {
         if (this.configType == null) {
             this.configType = configType;
         } else {
             if (configType != this.configType) {
-                log.warn(sm.getString("sslHostConfig.mismatch",
-                        name, getHostName(), configType, this.configType));
+                log.warn(sm.getString("sslHostConfig.mismatch", name, getHostName(), configType, this.configType));
                 return false;
             }
         }
@@ -237,8 +237,8 @@ public class SSLHostConfig implements Serializable {
 
     private void registerDefaultCertificate() {
         if (defaultCertificate == null) {
-            SSLHostConfigCertificate defaultCertificate = new SSLHostConfigCertificate(
-                    this, SSLHostConfigCertificate.Type.UNDEFINED);
+            SSLHostConfigCertificate defaultCertificate =
+                    new SSLHostConfigCertificate(this, SSLHostConfigCertificate.Type.UNDEFINED);
             addCertificate(defaultCertificate);
             this.defaultCertificate = defaultCertificate;
         }
@@ -255,7 +255,7 @@ public class SSLHostConfig implements Serializable {
 
         if (certificates.size() == 1 &&
                 certificates.iterator().next().getType() == SSLHostConfigCertificate.Type.UNDEFINED ||
-                        certificate.getType() == SSLHostConfigCertificate.Type.UNDEFINED) {
+                certificate.getType() == SSLHostConfigCertificate.Type.UNDEFINED) {
             // Invalid config
             throw new IllegalArgumentException(sm.getString("sslHostConfig.certificate.notype"));
         }
@@ -300,6 +300,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * @return The default certificate key password.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -314,6 +315,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * @param certificateKeyPassword The password for the default certificate's key.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -325,6 +327,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * @return The password for the default certificate's key.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -339,6 +342,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * @param certificateKeyPasswordFile The file containing the password for the default certificate's key.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -360,8 +364,7 @@ public class SSLHostConfig implements Serializable {
 
     public void setCertificateVerification(String certificateVerification) {
         try {
-            this.certificateVerification =
-                    CertificateVerification.fromString(certificateVerification);
+            this.certificateVerification = CertificateVerification.fromString(certificateVerification);
         } catch (IllegalArgumentException iae) {
             // If the specified value is not recognised, default to the
             // strictest possible option.
@@ -403,8 +406,8 @@ public class SSLHostConfig implements Serializable {
 
 
     /**
-     * Set the new cipher configuration. Note: Regardless of the format used to
-     * set the configuration, it is always stored in OpenSSL format.
+     * Set the new cipher configuration. Note: Regardless of the format used to set the configuration, it is always
+     * stored in OpenSSL format.
      *
      * @param ciphersList The new cipher configuration in OpenSSL or JSSE format
      */
@@ -456,9 +459,8 @@ public class SSLHostConfig implements Serializable {
 
 
     /**
-     * Obtain the list of JSSE cipher names for the current configuration.
-     * Ciphers included in the configuration but not supported by JSSE will be
-     * excluded from this list.
+     * Obtain the list of JSSE cipher names for the current configuration. Ciphers included in the configuration but not
+     * supported by JSSE will be excluded from this list.
      *
      * @return A list of the JSSE cipher names
      */
@@ -486,8 +488,7 @@ public class SSLHostConfig implements Serializable {
 
 
     /**
-     * @return The host name associated with this SSL configuration - always in
-     *         lower case.
+     * @return The host name associated with this SSL configuration - always in lower case.
      */
     public String getHostName() {
         return hostName;
@@ -509,7 +510,7 @@ public class SSLHostConfig implements Serializable {
 
         // Split using a positive lookahead to keep the separator in
         // the capture so we can check which case it is.
-        for (String value: input.split("(?=[-+,])")) {
+        for (String value : input.split("(?=[-+,])")) {
             String trimmed = value.trim();
             // Ignore token which only consists of prefix character
             if (trimmed.length() > 1) {
@@ -534,8 +535,7 @@ public class SSLHostConfig implements Serializable {
                         trimmed = trimmed.substring(1).trim();
                     }
                     if (!protocols.isEmpty()) {
-                        log.warn(sm.getString("sslHostConfig.prefix_missing",
-                                 trimmed, getHostName()));
+                        log.warn(sm.getString("sslHostConfig.prefix_missing", trimmed, getHostName()));
                     }
                     if (trimmed.equalsIgnoreCase(Constants.SSL_PROTO_ALL)) {
                         protocols.addAll(SSL_PROTO_ALL_SET);
@@ -586,6 +586,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * @return The key alias for the default certificate key.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -596,8 +597,10 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeyAlias();
         }
     }
+
     /**
      * @param certificateKeyAlias The alias of the certificate key.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -609,6 +612,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * @return The keystore file for the default certificate.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -619,8 +623,10 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeystoreFile();
         }
     }
+
     /**
      * @param certificateKeystoreFile The file containing the certificate keystore.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -632,6 +638,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * @return The password for the default certificate's keystore.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -642,8 +649,10 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeystorePassword();
         }
     }
+
     /**
      * @param certificateKeystorePassword The password for the certificate keystore.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -655,6 +664,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * @return The file containing the default certificate's keystore password.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -665,8 +675,10 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeystorePasswordFile();
         }
     }
+
     /**
      * @param certificateKeystorePasswordFile The file containing the default certificate's keystore password.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -678,6 +690,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * @return The provider for the default certificate's keystore.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -688,8 +701,10 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeystoreProvider();
         }
     }
+
     /**
      * @param certificateKeystoreProvider The provider for the default certificate's keystore.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -701,6 +716,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * @return The type of the default certificate's keystore.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -711,8 +727,10 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeystoreType();
         }
     }
+
     /**
      * @param certificateKeystoreType The type of the default certificate's keystore.
+     *
      * @deprecated Obtain the prefered Certificate and call this method, there.
      */
     @Deprecated
@@ -850,19 +868,18 @@ public class SSLHostConfig implements Serializable {
     public KeyStore getTruststore() throws IOException {
         KeyStore result = truststore;
         if (result == null) {
-            if (truststoreFile != null){
+            if (truststoreFile != null) {
                 try {
-                    result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(),
-                            getTruststoreFile(), getTruststorePassword(), null);
+                    result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(), getTruststoreFile(),
+                            getTruststorePassword(), null);
                 } catch (IOException ioe) {
                     Throwable cause = ioe.getCause();
                     if (cause instanceof UnrecoverableKeyException) {
                         // Log a warning we had a password issue
-                        log.warn(sm.getString("sslHostConfig.invalid_truststore_password"),
-                                cause);
+                        log.warn(sm.getString("sslHostConfig.invalid_truststore_password"), cause);
                         // Re-try
-                        result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(),
-                                getTruststoreFile(), null, null);
+                        result = SSLUtilBase.getStore(getTruststoreType(), getTruststoreProvider(), getTruststoreFile(),
+                                null, null);
                     } else {
                         // Something else went wrong - re-throw
                         throw ioe;
@@ -886,6 +903,7 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateChainFile();
         }
     }
+
     public void setCertificateChainFile(String certificateChainFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateChainFile(certificateChainFile);
@@ -899,6 +917,7 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateFile();
         }
     }
+
     public void setCertificateFile(String certificateFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateFile(certificateFile);
@@ -912,6 +931,7 @@ public class SSLHostConfig implements Serializable {
             return defaultCertificate.getCertificateKeyFile();
         }
     }
+
     public void setCertificateKeyFile(String certificateKeyFile) {
         registerDefaultCertificate();
         defaultCertificate.setCertificateKeyFile(certificateKeyFile);
@@ -1028,7 +1048,7 @@ public class SSLHostConfig implements Serializable {
         }
         String newPath = path;
         File f = new File(newPath);
-        if ( !f.isAbsolute()) {
+        if (!f.isAbsolute()) {
             newPath = System.getProperty(Constants.CATALINA_BASE_PROP) + File.separator + newPath;
             f = new File(newPath);
         }
@@ -1060,31 +1080,25 @@ public class SSLHostConfig implements Serializable {
         }
 
         public boolean isOptional() {
-           return optional;
+            return optional;
         }
 
         public static CertificateVerification fromString(String value) {
-            if ("true".equalsIgnoreCase(value) ||
-                    "yes".equalsIgnoreCase(value) ||
-                    "require".equalsIgnoreCase(value) ||
+            if ("true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value) || "require".equalsIgnoreCase(value) ||
                     "required".equalsIgnoreCase(value)) {
                 return REQUIRED;
-            } else if ("optional".equalsIgnoreCase(value) ||
-                    "want".equalsIgnoreCase(value)) {
+            } else if ("optional".equalsIgnoreCase(value) || "want".equalsIgnoreCase(value)) {
                 return OPTIONAL;
-            } else if ("optionalNoCA".equalsIgnoreCase(value) ||
-                    "optional_no_ca".equalsIgnoreCase(value)) {
+            } else if ("optionalNoCA".equalsIgnoreCase(value) || "optional_no_ca".equalsIgnoreCase(value)) {
                 return OPTIONAL_NO_CA;
-            } else if ("false".equalsIgnoreCase(value) ||
-                    "no".equalsIgnoreCase(value) ||
+            } else if ("false".equalsIgnoreCase(value) || "no".equalsIgnoreCase(value) ||
                     "none".equalsIgnoreCase(value)) {
                 return NONE;
             } else {
                 // Could be a typo. Don't default to NONE since that is not
                 // secure. Force user to fix config. Could default to REQUIRED
                 // instead.
-                throw new IllegalArgumentException(
-                        sm.getString("sslHostConfig.certificateVerificationInvalid", value));
+                throw new IllegalArgumentException(sm.getString("sslHostConfig.certificateVerificationInvalid", value));
             }
         }
     }

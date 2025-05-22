@@ -31,7 +31,7 @@ import javax.net.ssl.SSLParameters;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 
-public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
+public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
 
     private String sslImplementationName = null;
     private int sniParseLimit = 64 * 1024;
@@ -73,8 +73,8 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
 
             // Validate default SSLHostConfigName
             if (sslHostConfigs.get(getDefaultSSLHostConfigName()) == null) {
-                throw new IllegalArgumentException(sm.getString("endpoint.noSslHostConfig",
-                        getDefaultSSLHostConfigName(), getName()));
+                throw new IllegalArgumentException(
+                        sm.getString("endpoint.noSslHostConfig", getDefaultSSLHostConfigName(), getName()));
             }
 
         }
@@ -86,8 +86,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
 
         // HTTP/2 does not permit optional certificate authentication with any
         // version of TLS.
-        if (sslHostConfig.getCertificateVerification().isOptional() &&
-                negotiableProtocols.contains("h2")) {
+        if (sslHostConfig.getCertificateVerification().isOptional() && negotiableProtocols.contains("h2")) {
             getLog().warn(sm.getString("sslHostConfig.certificateVerificationWithHttp2", sslHostConfig.getHostName()));
         }
 
@@ -104,10 +103,10 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
             SSLContext sslContextGenerated = certificate.getSslContextGenerated();
             // Generate the SSLContext from configuration unless (e.g. embedded) an SSLContext has been provided.
             // Need to handle both initial configuration and reload.
-            // Initial, SSLContext provided     - sslContext will be non-null and sslContextGenerated will be null
+            // Initial, SSLContext provided - sslContext will be non-null and sslContextGenerated will be null
             // Initial, SSLContext not provided - sslContext null and sslContextGenerated will be null
-            // Reload,  SSLContext provided     - sslContext will be non-null and sslContextGenerated will be null
-            // Reload,  SSLContext not provided - sslContext non-null and equal to sslContextGenerated
+            // Reload, SSLContext provided - sslContext will be non-null and sslContextGenerated will be null
+            // Reload, SSLContext not provided - sslContext non-null and equal to sslContextGenerated
             if (sslContext == null || sslContext == sslContextGenerated) {
                 try {
                     sslContext = sslUtil.createSSLContext(negotiableProtocols);
@@ -131,8 +130,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
 
         SSLContext sslContext = certificate.getSslContext();
         if (sslContext == null) {
-            throw new IllegalStateException(
-                    sm.getString("endpoint.jsse.noSslContext", sniHostName));
+            throw new IllegalStateException(sm.getString("endpoint.jsse.noSslContext", sniHostName));
         }
 
         SSLEngine engine = sslContext.createSSLEngine();
@@ -142,9 +140,8 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
 
         SSLParameters sslParameters = engine.getSSLParameters();
         sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
-        if (JreCompat.isAlpnSupported() && clientRequestedApplicationProtocols != null
-                && clientRequestedApplicationProtocols.size() > 0
-                && negotiableProtocols.size() > 0) {
+        if (JreCompat.isAlpnSupported() && clientRequestedApplicationProtocols != null &&
+                clientRequestedApplicationProtocols.size() > 0 && negotiableProtocols.size() > 0) {
             // Only try to negotiate if both client and server have at least
             // one protocol in common
             // Note: Tomcat does not explicitly negotiate http/1.1
@@ -157,17 +154,17 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
             }
         }
         switch (sslHostConfig.getCertificateVerification()) {
-        case NONE:
-            sslParameters.setNeedClientAuth(false);
-            sslParameters.setWantClientAuth(false);
-            break;
-        case OPTIONAL:
-        case OPTIONAL_NO_CA:
-            sslParameters.setWantClientAuth(true);
-            break;
-        case REQUIRED:
-            sslParameters.setNeedClientAuth(true);
-            break;
+            case NONE:
+                sslParameters.setNeedClientAuth(false);
+                sslParameters.setWantClientAuth(false);
+                break;
+            case OPTIONAL:
+            case OPTIONAL_NO_CA:
+                sslParameters.setWantClientAuth(true);
+                break;
+            case REQUIRED:
+                sslParameters.setNeedClientAuth(true);
+                break;
         }
         // The getter (at least in OpenJDK and derivatives) returns a defensive copy
         engine.setSSLParameters(sslParameters);
@@ -176,8 +173,7 @@ public abstract class AbstractJsseEndpoint<S,U> extends AbstractEndpoint<S,U> {
     }
 
 
-    private SSLHostConfigCertificate selectCertificate(
-            SSLHostConfig sslHostConfig, List<Cipher> clientCiphers) {
+    private SSLHostConfigCertificate selectCertificate(SSLHostConfig sslHostConfig, List<Cipher> clientCiphers) {
 
         Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
         if (certificates.size() == 1) {

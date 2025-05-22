@@ -26,11 +26,10 @@ import org.apache.tomcat.jni.SSL;
 /**
  * Implementation of SSLSupport for APR.
  * <p>
- * TODO: Add a mechanism (or figure out how to use what we already have) to
- *       invalidate the session.
+ * TODO: Add a mechanism (or figure out how to use what we already have) to invalidate the session.
  *
- * @deprecated  The APR/Native Connector will be removed in Tomcat 9.1.x
- *              onwards and has been removed from Tomcat 10.1.x onwards.
+ * @deprecated The APR/Native Connector will be removed in Tomcat 9.1.x onwards and has been removed from Tomcat 10.1.x
+ *                 onwards.
  */
 @Deprecated
 public class AprSSLSupport implements SSLSupport {
@@ -79,7 +78,7 @@ public class AprSSLSupport implements SSLSupport {
                 certs[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(clientCert));
                 for (int i = 0; i < certLength; i++) {
                     byte[] data = socketWrapper.getSSLInfoB(SSL.SSL_INFO_CLIENT_CERT_CHAIN + i);
-                    certs[i+1] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(data));
+                    certs[i + 1] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(data));
                 }
             }
             return certs;
@@ -116,7 +115,7 @@ public class AprSSLSupport implements SSLSupport {
         } catch (Exception e) {
             throw new IOException(e);
         }
-   }
+    }
 
 
     @Override
