@@ -45,17 +45,16 @@ public class SSLHostConfigCertificate implements Serializable {
 
     static final String DEFAULT_KEYSTORE_PROVIDER = System.getProperty("javax.net.ssl.keyStoreProvider");
     static final String DEFAULT_KEYSTORE_TYPE = System.getProperty("javax.net.ssl.keyStoreType", "JKS");
-    private static final String DEFAULT_KEYSTORE_FILE =
-            System.getProperty("user.home") + File.separator + ".keystore";
+    private static final String DEFAULT_KEYSTORE_FILE = System.getProperty("user.home") + File.separator + ".keystore";
     private static final String DEFAULT_KEYSTORE_PASSWORD = "changeit";
 
     // Internal
     private ObjectName oname;
 
     /*
-     *  OpenSSL can handle multiple certs in a single config so the reference to the context is at the virtual host
-     *  level. JSSE can't so the reference is held here on the certificate. Typically, the SSLContext is generated from
-     *  the configuration but, particularly in embedded scenarios, it can be provided directly.
+     * OpenSSL can handle multiple certs in a single config so the reference to the context is at the virtual host
+     * level. JSSE can't so the reference is held here on the certificate. Typically, the SSLContext is generated from
+     * the configuration but, particularly in embedded scenarios, it can be provided directly.
      */
     private transient volatile SSLContext sslContextProvided;
     private transient volatile SSLContext sslContextGenerated;
@@ -165,8 +164,7 @@ public class SSLHostConfigCertificate implements Serializable {
     // JSSE
 
     public void setCertificateKeyAlias(String certificateKeyAlias) {
-        sslHostConfig.setProperty(
-                "Certificate.certificateKeyAlias", SSLHostConfig.Type.JSSE);
+        sslHostConfig.setProperty("Certificate.certificateKeyAlias", SSLHostConfig.Type.JSSE);
         this.certificateKeyAlias = certificateKeyAlias;
     }
 
@@ -177,8 +175,7 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     public void setCertificateKeystoreFile(String certificateKeystoreFile) {
-        sslHostConfig.setProperty(
-                "Certificate.certificateKeystoreFile", SSLHostConfig.Type.JSSE);
+        sslHostConfig.setProperty("Certificate.certificateKeystoreFile", SSLHostConfig.Type.JSSE);
         setStoreType("Certificate.certificateKeystoreFile", StoreType.KEYSTORE);
         this.certificateKeystoreFile = certificateKeystoreFile;
     }
@@ -190,8 +187,7 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     public void setCertificateKeystorePassword(String certificateKeystorePassword) {
-        sslHostConfig.setProperty(
-                "Certificate.certificateKeystorePassword", SSLHostConfig.Type.JSSE);
+        sslHostConfig.setProperty("Certificate.certificateKeystorePassword", SSLHostConfig.Type.JSSE);
         setStoreType("Certificate.certificateKeystorePassword", StoreType.KEYSTORE);
         this.certificateKeystorePassword = certificateKeystorePassword;
     }
@@ -203,8 +199,7 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     public void setCertificateKeystorePasswordFile(String certificateKeystorePasswordFile) {
-        sslHostConfig.setProperty(
-                "Certificate.certificateKeystorePasswordFile", SSLHostConfig.Type.JSSE);
+        sslHostConfig.setProperty("Certificate.certificateKeystorePasswordFile", SSLHostConfig.Type.JSSE);
         setStoreType("Certificate.certificateKeystorePasswordFile", StoreType.KEYSTORE);
         this.certificateKeystorePasswordFile = certificateKeystorePasswordFile;
     }
@@ -216,8 +211,7 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     public void setCertificateKeystoreProvider(String certificateKeystoreProvider) {
-        sslHostConfig.setProperty(
-                "Certificate.certificateKeystoreProvider", SSLHostConfig.Type.JSSE);
+        sslHostConfig.setProperty("Certificate.certificateKeystoreProvider", SSLHostConfig.Type.JSSE);
         setStoreType("Certificate.certificateKeystoreProvider", StoreType.KEYSTORE);
         this.certificateKeystoreProvider = certificateKeystoreProvider;
     }
@@ -229,8 +223,7 @@ public class SSLHostConfigCertificate implements Serializable {
 
 
     public void setCertificateKeystoreType(String certificateKeystoreType) {
-        sslHostConfig.setProperty(
-                "Certificate.certificateKeystoreType", SSLHostConfig.Type.JSSE);
+        sslHostConfig.setProperty("Certificate.certificateKeystoreType", SSLHostConfig.Type.JSSE);
         setStoreType("Certificate.certificateKeystoreType", StoreType.KEYSTORE);
         this.certificateKeystoreType = certificateKeystoreType;
     }
@@ -253,9 +246,9 @@ public class SSLHostConfigCertificate implements Serializable {
         KeyStore result = certificateKeystore;
 
         if (result == null && storeType == StoreType.KEYSTORE) {
-            result = SSLUtilBase.getStore(getCertificateKeystoreType(),
-                    getCertificateKeystoreProvider(), getCertificateKeystoreFile(),
-                    getCertificateKeystorePassword(), getCertificateKeystorePasswordFile());
+            result = SSLUtilBase.getStore(getCertificateKeystoreType(), getCertificateKeystoreProvider(),
+                    getCertificateKeystoreFile(), getCertificateKeystorePassword(),
+                    getCertificateKeystorePasswordFile());
         }
 
         return result;
@@ -311,8 +304,8 @@ public class SSLHostConfigCertificate implements Serializable {
         if (storeType == null) {
             storeType = type;
         } else if (storeType != type) {
-            log.warn(sm.getString("sslHostConfigCertificate.mismatch",
-                    name, sslHostConfig.getHostName(), type, this.storeType));
+            log.warn(sm.getString("sslHostConfigCertificate.mismatch", name, sslHostConfig.getHostName(), type,
+                    this.storeType));
         }
     }
 
