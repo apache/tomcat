@@ -41,17 +41,13 @@ import java.nio.charset.StandardCharsets;
  * chars and Strings until the strings are needed. In addition, the charset is determined later, from headers or user
  * code.
  * <p>
- * In a server it is very important to be able to operate on
- * the original byte[] without converting everything to chars.
- * Some protocols are ASCII only, and some allow different
- * non-UNICODE encodings. The encoding is not known beforehand,
- * and can even change during the execution of the protocol.
- * ( for example a multipart message may have parts with different
- *  encoding )
+ * In a server it is very important to be able to operate on the original byte[] without converting everything to chars.
+ * Some protocols are ASCII only, and some allow different non-UNICODE encodings. The encoding is not known beforehand,
+ * and can even change during the execution of the protocol. ( for example a multipart message may have parts with
+ * different encoding )
  * <p>
- * For HTTP, it is not very clear how the encoding of RequestURI
- * and mime values can be determined, but it is a great advantage
- * to be able to parse the request without converting to string.
+ * For HTTP, it is not very clear how the encoding of RequestURI and mime values can be determined, but it is a great
+ * advantage to be able to parse the request without converting to string.
  *
  * @author dac@sun.com
  * @author James Todd [gonzo@sun.com]
@@ -609,7 +605,8 @@ public final class ByteChunk extends AbstractChunk {
         // entire byte array. This is expensive if only a small subset of the
         // bytes will be used. The code below is from Apache Harmony.
         CharBuffer cb;
-        if (malformedInputAction == CodingErrorAction.REPLACE && unmappableCharacterAction == CodingErrorAction.REPLACE) {
+        if (malformedInputAction == CodingErrorAction.REPLACE &&
+                unmappableCharacterAction == CodingErrorAction.REPLACE) {
             cb = charset.decode(ByteBuffer.wrap(buff, start, end - start));
         } else {
             cb = charset.newDecoder().onMalformedInput(malformedInputAction)
@@ -744,9 +741,10 @@ public final class ByteChunk extends AbstractChunk {
      * <p>
      * NOTE: This only works for characters in the range 0-127.
      *
-     * @param c2 the array to compare to
+     * @param c2   the array to compare to
      * @param off2 offset
      * @param len2 length
+     *
      * @return <code>true</code> if the comparison succeeded, <code>false</code> otherwise
      */
     public boolean equals(char[] c2, int off2, int len2) {
