@@ -34,11 +34,12 @@ public abstract class ModelerSource {
      * Load data, returns a list of items.
      *
      * @param registry The registry
-     * @param type The bean registry type
-     * @param source Introspected object or some other source
+     * @param type     The bean registry type
+     * @param source   Introspected object or some other source
+     *
      * @return a list of object names
+     *
      * @throws Exception Error loading descriptors
      */
-    public abstract List<ObjectName> loadDescriptors(Registry registry,
-            String type, Object source) throws Exception;
+    public abstract List<ObjectName> loadDescriptors(Registry registry, String type, Object source) throws Exception;
 }
