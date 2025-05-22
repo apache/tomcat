@@ -39,34 +39,26 @@ import org.apache.tomcat.util.res.StringManager;
  * calls header methods, but is easy to avoid inside tomcat. The goal is to use _only_ MessageByte-based Fields, and
  * reduce to 0 the memory overhead of tomcat.
  * <p>
- * This class is used to contain standard internet message headers,
- * used for SMTP (RFC822) and HTTP (RFC2068) messages as well as for
- * MIME (RFC 2045) applications such as transferring typed data and
- * grouping related items in multipart message bodies.
+ * This class is used to contain standard internet message headers, used for SMTP (RFC822) and HTTP (RFC2068) messages
+ * as well as for MIME (RFC 2045) applications such as transferring typed data and grouping related items in multipart
+ * message bodies.
  * <p>
- * Message headers, as specified in RFC822, include a field name
- * and a field body.  Order has no semantic significance, and several
- * fields with the same name may exist.  However, most fields do not
- * (and should not) exist more than once in a header.
+ * Message headers, as specified in RFC822, include a field name and a field body. Order has no semantic significance,
+ * and several fields with the same name may exist. However, most fields do not (and should not) exist more than once in
+ * a header.
  * <p>
- * Many kinds of field body must conform to a specified syntax,
- * including the standard parenthesized comment syntax.  This class
- * supports only two simple syntaxes, for dates and integers.
+ * Many kinds of field body must conform to a specified syntax, including the standard parenthesized comment syntax.
+ * This class supports only two simple syntaxes, for dates and integers.
  * <p>
- * When processing headers, care must be taken to handle the case of
- * multiple same-name fields correctly.  The values of such fields are
- * only available as strings.  They may be accessed by index (treating
- * the header as an array of fields), or by name (returning an array
- * of string values).
+ * When processing headers, care must be taken to handle the case of multiple same-name fields correctly. The values of
+ * such fields are only available as strings. They may be accessed by index (treating the header as an array of fields),
+ * or by name (returning an array of string values).
  * <p>
- * Headers are first parsed and stored in the order they are
- * received. This is based on the fact that most servlets will not
- * directly access all headers, and most headers are single-valued.
- * (the alternative - a hash or similar data structure - will add
- * an overhead that is not needed in most cases)
+ * Headers are first parsed and stored in the order they are received. This is based on the fact that most servlets will
+ * not directly access all headers, and most headers are single-valued. (the alternative - a hash or similar data
+ * structure - will add an overhead that is not needed in most cases)
  * <p>
- * Apache seems to be using a similar method for storing and manipulating
- * headers.
+ * Apache seems to be using a similar method for storing and manipulating headers.
  *
  * @author dac@eng.sun.com
  * @author James Todd [gonzo@eng.sun.com]
