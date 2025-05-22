@@ -85,6 +85,7 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
     /**
      * Set the start position of the data in the buffer.
+     *
      * @param start the new start position
      */
     public void setStart(int start) {
@@ -105,6 +106,7 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
     /**
      * Set the end position of the data in the buffer.
+     *
      * @param end the new end position
      */
     public void setEnd(int end) {
@@ -114,6 +116,7 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
     /**
      * @return start
+     *
      * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
@@ -123,7 +126,9 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
     /**
      * Set start.
+     *
      * @param off the new start
+     *
      * @deprecated Unused. This method will be removed in Tomcat 12.
      */
     @Deprecated
@@ -155,15 +160,15 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
 
     /**
-     * Return the index of the first occurrence of the subsequence of
-     * the given String, or -1 if it is not found.
+     * Return the index of the first occurrence of the subsequence of the given String, or -1 if it is not found.
      *
-     * @param src the String to look for
+     * @param src      the String to look for
      * @param srcStart the subsequence start in the String
-     * @param srcLen the subsequence length in the String
+     * @param srcLen   the subsequence length in the String
      * @param myOffset the index on which to start the search in the buffer
-     * @return the position of the first character of the first occurrence
-     *         of the subsequence in the buffer, or -1 if not found
+     *
+     * @return the position of the first character of the first occurrence of the subsequence in the buffer, or -1 if
+     *             not found
      */
     public int indexOf(String src, int srcStart, int srcLen, int myOffset) {
         char first = src.charAt(srcStart);
@@ -171,7 +176,8 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
         // Look for first char
         int srcEnd = srcStart + srcLen;
 
-        mainLoop: for (int i = myOffset + start; i <= (end - srcLen); i++) {
+        mainLoop:
+        for (int i = myOffset + start; i <= (end - srcLen); i++) {
             if (getBufferElement(i) != first) {
                 continue;
             }
@@ -225,6 +231,7 @@ public abstract class AbstractChunk implements Cloneable, Serializable {
 
     /**
      * @param index the element location in the buffer
+     *
      * @return the element
      */
     protected abstract int getBufferElement(int index);

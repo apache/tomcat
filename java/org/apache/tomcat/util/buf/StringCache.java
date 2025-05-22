@@ -481,8 +481,8 @@ public class StringCache {
      *
      * @return the corresponding value
      *
-     * @deprecated Unused. Will be removed in Tomcat 11.
-     *             Use {@link #find(ByteChunk, CodingErrorAction, CodingErrorAction)}
+     * @deprecated Unused. Will be removed in Tomcat 11. Use
+     *                 {@link #find(ByteChunk, CodingErrorAction, CodingErrorAction)}
      */
     @Deprecated
     protected static final String find(ByteChunk name) {
@@ -500,7 +500,7 @@ public class StringCache {
      * @return the corresponding value
      */
     protected static String find(ByteChunk name, CodingErrorAction malformedInputAction,
-                                 CodingErrorAction unmappableCharacterAction) {
+            CodingErrorAction unmappableCharacterAction) {
         int pos = findClosest(name, bcCache, bcCache.length);
         if ((pos < 0) || (compare(name, bcCache[pos].name) != 0) || !(name.getCharset().equals(bcCache[pos].charset)) ||
                 !malformedInputAction.equals(bcCache[pos].malformedInputAction) ||
