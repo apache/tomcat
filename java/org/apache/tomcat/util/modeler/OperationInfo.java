@@ -26,8 +26,9 @@ import javax.management.MBeanOperationInfo;
 import javax.management.MBeanParameterInfo;
 
 /**
- * <p>Internal configuration information for an <code>Operation</code>
- * descriptor.</p>
+ * <p>
+ * Internal configuration information for an <code>Operation</code> descriptor.
+ * </p>
  *
  * @author Craig R. McClanahan
  */
@@ -57,9 +58,8 @@ public class OperationInfo extends FeatureInfo {
     // ------------------------------------------------------------- Properties
 
     /**
-     * @return the "impact" of this operation, which should be
-     *  a (case-insensitive) string value "ACTION", "ACTION_INFO",
-     *  "INFO", or "UNKNOWN".
+     * @return the "impact" of this operation, which should be a (case-insensitive) string value "ACTION",
+     *             "ACTION_INFO", "INFO", or "UNKNOWN".
      */
     public String getImpact() {
         return this.impact;
@@ -75,8 +75,7 @@ public class OperationInfo extends FeatureInfo {
 
 
     /**
-     * @return the role of this operation ("getter", "setter", "operation", or
-     * "constructor").
+     * @return the role of this operation ("getter", "setter", "operation", or "constructor").
      */
     public String getRole() {
         return this.role;
@@ -88,11 +87,10 @@ public class OperationInfo extends FeatureInfo {
 
 
     /**
-     * @return the fully qualified Java class name of the return type for this
-     * operation.
+     * @return the fully qualified Java class name of the return type for this operation.
      */
     public String getReturnType() {
-        if(type == null) {
+        if (type == null) {
             type = "void";
         }
         return type;
@@ -140,8 +138,9 @@ public class OperationInfo extends FeatureInfo {
 
 
     /**
-     * Create and return a <code>ModelMBeanOperationInfo</code> object that
-     * corresponds to the attribute described by this instance.
+     * Create and return a <code>ModelMBeanOperationInfo</code> object that corresponds to the attribute described by
+     * this instance.
+     *
      * @return the operation info
      */
     MBeanOperationInfo createOperationInfo() {
@@ -158,17 +157,15 @@ public class OperationInfo extends FeatureInfo {
                 impact = MBeanOperationInfo.INFO;
             }
 
-            info = new MBeanOperationInfo(getName(), getDescription(),
-                                          getMBeanParameterInfo(),
-                                          getReturnType(), impact);
+            info = new MBeanOperationInfo(getName(), getDescription(), getMBeanParameterInfo(), getReturnType(),
+                    impact);
         }
-        return (MBeanOperationInfo)info;
+        return (MBeanOperationInfo) info;
     }
 
     protected MBeanParameterInfo[] getMBeanParameterInfo() {
         ParameterInfo[] params = getSignature();
-        MBeanParameterInfo[] parameters =
-            new MBeanParameterInfo[params.length];
+        MBeanParameterInfo[] parameters = new MBeanParameterInfo[params.length];
         for (int i = 0; i < params.length; i++) {
             parameters[i] = params[i].createParameterInfo();
         }

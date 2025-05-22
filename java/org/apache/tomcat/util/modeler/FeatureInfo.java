@@ -24,9 +24,10 @@ import javax.management.MBeanFeatureInfo;
 
 
 /**
- * <p>Convenience base class for <code>AttributeInfo</code> and
- * <code>OperationInfo</code> classes that will be used to collect configuration
- * information for the <code>ModelMBean</code> beans exposed for management.</p>
+ * <p>
+ * Convenience base class for <code>AttributeInfo</code> and <code>OperationInfo</code> classes that will be used to
+ * collect configuration information for the <code>ModelMBean</code> beans exposed for management.
+ * </p>
  *
  * @author Craig R. McClanahan
  */
@@ -57,8 +58,7 @@ public class FeatureInfo implements Serializable {
 
 
     /**
-     * @return the name of this feature, which must be unique among features
-     *  in the same collection.
+     * @return the name of this feature, which must be unique among features in the same collection.
      */
     public String getName() {
         return this.name;

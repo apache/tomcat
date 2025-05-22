@@ -22,8 +22,9 @@ import java.io.Serial;
 import javax.management.MBeanParameterInfo;
 
 /**
- * <p>Internal configuration information for a <code>Parameter</code>
- * descriptor.</p>
+ * <p>
+ * Internal configuration information for a <code>Parameter</code> descriptor.
+ * </p>
  *
  * @author Craig R. McClanahan
  */
@@ -41,17 +42,17 @@ public class ParameterInfo extends FeatureInfo {
     }
 
     /**
-     * Create and return a <code>MBeanParameterInfo</code> object that
-     * corresponds to the parameter described by this instance.
+     * Create and return a <code>MBeanParameterInfo</code> object that corresponds to the parameter described by this
+     * instance.
+     *
      * @return a parameter info
      */
     public MBeanParameterInfo createParameterInfo() {
 
         // Return our cached information (if any)
         if (info == null) {
-            info = new MBeanParameterInfo
-                (getName(), getType(), getDescription());
+            info = new MBeanParameterInfo(getName(), getType(), getDescription());
         }
-        return (MBeanParameterInfo)info;
+        return (MBeanParameterInfo) info;
     }
 }
