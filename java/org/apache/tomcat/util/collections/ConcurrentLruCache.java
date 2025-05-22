@@ -77,7 +77,7 @@ public class ConcurrentLruCache<T> {
                 if (oldMap != null) {
                     map.putAll(oldMap);
                 }
-           } else {
+            } else {
                 map = null;
             }
         }
@@ -95,7 +95,7 @@ public class ConcurrentLruCache<T> {
     }
 
 
-    private static class LimitedLinkedHashMap<K,V> extends LinkedHashMap<K,V> {
+    private static class LimitedLinkedHashMap<K, V> extends LinkedHashMap<K,V> {
         @Serial
         private static final long serialVersionUID = 1L;
 

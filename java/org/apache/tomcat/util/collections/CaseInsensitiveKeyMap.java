@@ -27,11 +27,9 @@ import java.util.Set;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * A Map implementation that uses case-insensitive (using {@link
- * Locale#ENGLISH}) strings as keys.
+ * A Map implementation that uses case-insensitive (using {@link Locale#ENGLISH}) strings as keys.
  * <p>
- * Keys must be instances of {@link String}. Note that this means that
- * <code>null</code> keys are not permitted.
+ * Keys must be instances of {@link String}. Note that this means that <code>null</code> keys are not permitted.
  * <p>
  * This implementation is not thread-safe.
  *
@@ -39,8 +37,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
 
-    private static final StringManager sm =
-            StringManager.getManager(CaseInsensitiveKeyMap.class);
+    private static final StringManager sm = StringManager.getManager(CaseInsensitiveKeyMap.class);
 
     private final Map<Key,V> map = new HashMap<>();
 
@@ -64,12 +61,11 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
     /**
      * {@inheritDoc}
      * <p>
-     * <b>Use this method with caution</b>. If the input Map contains duplicate
-     * keys when the keys are compared in a case-insensitive manner then some
-     * values will be lost when inserting via this method.
+     * <b>Use this method with caution</b>. If the input Map contains duplicate keys when the keys are compared in a
+     * case-insensitive manner then some values will be lost when inserting via this method.
      */
     @Override
-    public void putAll(Map<? extends String, ? extends V> m) {
+    public void putAll(Map<? extends String,? extends V> m) {
         super.putAll(m);
     }
 
@@ -87,7 +83,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
 
 
     @Override
-    public Set<Entry<String, V>> entrySet() {
+    public Set<Entry<String,V>> entrySet() {
         return new EntrySet<>(map.entrySet());
     }
 
@@ -112,8 +108,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
     }
 
 
-    private record EntryIterator<V>(
-            Iterator<Entry<Key, V>> iterator) implements Iterator<Entry<String, V>> {
+    private record EntryIterator<V>(Iterator<Entry<Key,V>> iterator) implements Iterator<Entry<String,V>> {
 
         @Override
         public boolean hasNext() {
@@ -121,8 +116,8 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
         }
 
         @Override
-        public Entry<String, V> next() {
-            Entry<Key, V> entry = iterator.next();
+        public Entry<String,V> next() {
+            Entry<Key,V> entry = iterator.next();
             return new EntryImpl<>(entry.getKey().getKey(), entry.getValue());
         }
 
@@ -133,7 +128,7 @@ public class CaseInsensitiveKeyMap<V> extends AbstractMap<String,V> {
     }
 
 
-    private record EntryImpl<V>(String key, V value) implements Entry<String, V> {
+    private record EntryImpl<V>(String key, V value) implements Entry<String,V> {
 
         @Override
         public String getKey() {
