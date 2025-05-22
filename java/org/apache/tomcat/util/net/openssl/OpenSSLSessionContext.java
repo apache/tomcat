@@ -81,8 +81,7 @@ public class OpenSSLSessionContext implements SSLSessionContext {
     }
 
     /**
-     * @return {@code true} if caching of SSL sessions is enabled, {@code false}
-     *         otherwise.
+     * @return {@code true} if caching of SSL sessions is enabled, {@code false} otherwise.
      */
     public boolean isSessionCacheEnabled() {
         return SSLContext.getSessionCacheMode(contextID) == SSL.SSL_SESS_CACHE_SERVER;
@@ -122,12 +121,13 @@ public class OpenSSLSessionContext implements SSLSessionContext {
     }
 
     /**
-     * Set the context within which session be reused (server side only)
-     * See <a href="http://www.openssl.org/docs/ssl/SSL_CTX_set_session_id_context.html">
-     *     man SSL_CTX_set_session_id_context</a>
+     * Set the context within which session be reused (server side only) See
+     * <a href="http://www.openssl.org/docs/ssl/SSL_CTX_set_session_id_context.html"> man
+     * SSL_CTX_set_session_id_context</a>
      *
-     * @param sidCtx can be any kind of binary data, it is therefore possible to use e.g. the name
-     *               of the application and/or the hostname and/or service name
+     * @param sidCtx can be any kind of binary data, it is therefore possible to use e.g. the name of the application
+     *                   and/or the hostname and/or service name
+     *
      * @return {@code true} if success, {@code false} otherwise.
      */
     public boolean setSessionIdContext(byte[] sidCtx) {
