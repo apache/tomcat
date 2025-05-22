@@ -28,14 +28,12 @@ import javax.net.ssl.SSLSessionContext;
 import javax.net.ssl.TrustManager;
 
 /**
- * This interface is needed to override the default SSLContext class
- * to allow SSL implementation pluggability without having to use JCE. With
- * regular JSSE it will do nothing but delegate to the SSLContext.
+ * This interface is needed to override the default SSLContext class to allow SSL implementation pluggability without
+ * having to use JCE. With regular JSSE it will do nothing but delegate to the SSLContext.
  */
 public interface SSLContext {
 
-    void init(KeyManager[] kms, TrustManager[] tms,
-            SecureRandom sr) throws KeyManagementException;
+    void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) throws KeyManagementException;
 
     void destroy();
 
