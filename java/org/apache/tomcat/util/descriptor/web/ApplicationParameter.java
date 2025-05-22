@@ -21,11 +21,9 @@ import java.io.Serializable;
 
 
 /**
- * Representation of a context initialization parameter that is configured
- * in the server configuration file, rather than the application deployment
- * descriptor.  This is convenient for establishing default values (which
- * may be configured to allow application overrides or not) without having
- * to modify the application deployment descriptor itself.
+ * Representation of a context initialization parameter that is configured in the server configuration file, rather than
+ * the application deployment descriptor. This is convenient for establishing default values (which may be configured to
+ * allow application overrides or not) without having to modify the application deployment descriptor itself.
  *
  * @author Craig R. McClanahan
  */
@@ -66,8 +64,7 @@ public class ApplicationParameter implements Serializable {
 
 
     /**
-     * Does this application parameter allow overrides by the application
-     * deployment descriptor?
+     * Does this application parameter allow overrides by the application deployment descriptor?
      */
     private boolean override = true;
 

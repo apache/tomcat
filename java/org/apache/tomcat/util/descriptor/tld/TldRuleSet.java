@@ -90,29 +90,23 @@ public class TldRuleSet implements RuleSet {
 
         digester.addRule(TAG_PREFIX + "/variable", new ScriptVariableRule());
         digester.addCallMethod(TAG_PREFIX + "/variable/name-given", "setNameGiven", 0);
-        digester.addCallMethod(TAG_PREFIX + "/variable/name-from-attribute",
-                "setNameFromAttribute", 0);
+        digester.addCallMethod(TAG_PREFIX + "/variable/name-from-attribute", "setNameFromAttribute", 0);
         digester.addCallMethod(TAG_PREFIX + "/variable/variable-class", "setClassName", 0);
-        digester.addRule(TAG_PREFIX + "/variable/declare",
-                new GenericBooleanRule(Variable.class, "setDeclare"));
+        digester.addRule(TAG_PREFIX + "/variable/declare", new GenericBooleanRule(Variable.class, "setDeclare"));
         digester.addCallMethod(TAG_PREFIX + "/variable/scope", "setScope", 0);
 
         digester.addRule(TAG_PREFIX + "/attribute", new TagAttributeRule());
         digester.addCallMethod(TAG_PREFIX + "/attribute/description", "setDescription", 0);
         digester.addCallMethod(TAG_PREFIX + "/attribute/name", "setName", 0);
-        digester.addRule(TAG_PREFIX + "/attribute/required",
-                new GenericBooleanRule(Attribute.class, "setRequired"));
+        digester.addRule(TAG_PREFIX + "/attribute/required", new GenericBooleanRule(Attribute.class, "setRequired"));
         digester.addRule(TAG_PREFIX + "/attribute/rtexprvalue",
                 new GenericBooleanRule(Attribute.class, "setRequestTime"));
         digester.addCallMethod(TAG_PREFIX + "/attribute/type", "setType", 0);
         digester.addCallMethod(TAG_PREFIX + "/attribute/deferred-value", "setDeferredValue");
-        digester.addCallMethod(TAG_PREFIX + "/attribute/deferred-value/type",
-                "setExpectedTypeName", 0);
+        digester.addCallMethod(TAG_PREFIX + "/attribute/deferred-value/type", "setExpectedTypeName", 0);
         digester.addCallMethod(TAG_PREFIX + "/attribute/deferred-method", "setDeferredMethod");
-        digester.addCallMethod(TAG_PREFIX + "/attribute/deferred-method/method-signature",
-                "setMethodSignature", 0);
-        digester.addRule(TAG_PREFIX + "/attribute/fragment",
-                new GenericBooleanRule(Attribute.class, "setFragment"));
+        digester.addCallMethod(TAG_PREFIX + "/attribute/deferred-method/method-signature", "setMethodSignature", 0);
+        digester.addRule(TAG_PREFIX + "/attribute/fragment", new GenericBooleanRule(Attribute.class, "setFragment"));
 
         digester.addRule(TAG_PREFIX + "/dynamic-attributes",
                 new GenericBooleanRule(TagXml.class, "setDynamicAttributes"));
@@ -154,8 +148,10 @@ public class TldRuleSet implements RuleSet {
             StringBuilder code = digester.getGeneratedCode();
             if (code != null) {
                 code.append(System.lineSeparator());
-                code.append(TldRuleSet.class.getName()).append(".Attribute ").append(digester.toVariableName(attribute)).append(" = new ");
-                code.append(TldRuleSet.class.getName()).append(".Attribute").append('(').append(Boolean.toString(allowShortNames));
+                code.append(TldRuleSet.class.getName()).append(".Attribute ").append(digester.toVariableName(attribute))
+                        .append(" = new ");
+                code.append(TldRuleSet.class.getName()).append(".Attribute").append('(')
+                        .append(Boolean.toString(allowShortNames));
                 code.append(");").append(System.lineSeparator());
             }
         }
@@ -293,17 +289,8 @@ public class TldRuleSet implements RuleSet {
                 type = "java.lang.String";
             }
 
-            return new TagAttributeInfo(
-                    name,
-                    required,
-                    type,
-                    requestTime,
-                    fragment,
-                    description,
-                    deferredValue,
-                    deferredMethod,
-                    expectedTypeName,
-                    methodSignature);
+            return new TagAttributeInfo(name, required, type, requestTime, fragment, description, deferredValue,
+                    deferredMethod, expectedTypeName, methodSignature);
         }
     }
 
@@ -316,8 +303,10 @@ public class TldRuleSet implements RuleSet {
             StringBuilder code = digester.getGeneratedCode();
             if (code != null) {
                 code.append(System.lineSeparator());
-                code.append(TldRuleSet.class.getName()).append(".Variable ").append(digester.toVariableName(variable)).append(" = new ");
-                code.append(TldRuleSet.class.getName()).append(".Variable").append("();").append(System.lineSeparator());
+                code.append(TldRuleSet.class.getName()).append(".Variable ").append(digester.toVariableName(variable))
+                        .append(" = new ");
+                code.append(TldRuleSet.class.getName()).append(".Variable").append("();")
+                        .append(System.lineSeparator());
             }
         }
 
@@ -391,7 +380,7 @@ public class TldRuleSet implements RuleSet {
 
         @Override
         public void body(String namespace, String name, String text) throws Exception {
-            if(null != text) {
+            if (null != text) {
                 text = text.trim();
             }
             boolean value = "true".equalsIgnoreCase(text) || "yes".equalsIgnoreCase(text);

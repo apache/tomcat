@@ -17,13 +17,10 @@
 package org.apache.tomcat.util.descriptor.web;
 
 
-
 /**
- * Defines an interface for the object that is added to the representation of a
- * JNDI resource in web.xml to enable it to also be the implementation of that
- * JNDI resource. Only Catalina implements this interface but because the
- * web.xml representation is shared this interface has to be visible to Catalina
- * and Jasper.
+ * Defines an interface for the object that is added to the representation of a JNDI resource in web.xml to enable it to
+ * also be the implementation of that JNDI resource. Only Catalina implements this interface but because the web.xml
+ * representation is shared this interface has to be visible to Catalina and Jasper.
  */
 public interface NamingResources {
 

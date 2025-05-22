@@ -51,103 +51,112 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * Representation of common elements of web.xml and web-fragment.xml. Provides
- * a repository for parsed data before the elements are merged.
- * Validation is spread between multiple classes:
- * The digester checks for structural correctness (e.g. single login-config)
- * This class checks for invalid duplicates (e.g. filter/servlet names)
- * StandardContext will check validity of values (e.g. URL formats etc)
+ * Representation of common elements of web.xml and web-fragment.xml. Provides a repository for parsed data before the
+ * elements are merged. Validation is spread between multiple classes: The digester checks for structural correctness
+ * (e.g. single login-config) This class checks for invalid duplicates (e.g. filter/servlet names) StandardContext will
+ * check validity of values (e.g. URL formats etc)
  */
 public class WebXml extends XmlEncodingBase implements DocumentProperties.Charset {
 
-    protected static final String ORDER_OTHERS =
-        "org.apache.catalina.order.others";
+    protected static final String ORDER_OTHERS = "org.apache.catalina.order.others";
 
-    private static final StringManager sm =
-        StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
 
     private final Log log = LogFactory.getLog(WebXml.class); // must not be static
 
     /**
-     * Global defaults are overridable but Servlets and Servlet mappings need to
-     * be unique. Duplicates normally trigger an error. This flag indicates if
-     * newly added Servlet elements are marked as overridable.
+     * Global defaults are overridable but Servlets and Servlet mappings need to be unique. Duplicates normally trigger
+     * an error. This flag indicates if newly added Servlet elements are marked as overridable.
      */
     private boolean overridable = false;
+
     public boolean isOverridable() {
         return overridable;
     }
+
     public void setOverridable(boolean overridable) {
         this.overridable = overridable;
     }
 
     /*
-     * Ideally, fragment names will be unique. If they are not, Tomcat needs
-     * to know as the action that the specification requires (see 8.2.2 1.e and
-     * 2.c) varies depending on the ordering method used.
+     * Ideally, fragment names will be unique. If they are not, Tomcat needs to know as the action that the
+     * specification requires (see 8.2.2 1.e and 2.c) varies depending on the ordering method used.
      */
     private final List<String> duplicates = new ArrayList<>();
+
     public boolean isDuplicated() {
         return !duplicates.isEmpty();
     }
+
     public void addDuplicate(String duplicate) {
         this.duplicates.add(duplicate);
     }
+
     public List<String> getDuplicates() {
         return new ArrayList<>(this.duplicates);
     }
 
     /**
-     * web.xml only elements
-     * Absolute Ordering
+     * web.xml only elements Absolute Ordering
      */
     private Set<String> absoluteOrdering = null;
+
     public void createAbsoluteOrdering() {
         if (absoluteOrdering == null) {
             absoluteOrdering = new LinkedHashSet<>();
         }
     }
+
     public void addAbsoluteOrdering(String fragmentName) {
         createAbsoluteOrdering();
         absoluteOrdering.add(fragmentName);
     }
+
     public void addAbsoluteOrderingOthers() {
         createAbsoluteOrdering();
         absoluteOrdering.add(ORDER_OTHERS);
     }
+
     public Set<String> getAbsoluteOrdering() {
         return absoluteOrdering;
     }
 
     /**
-     * web-fragment.xml only elements
-     * Relative ordering
+     * web-fragment.xml only elements Relative ordering
      */
     private final Set<String> after = new LinkedHashSet<>();
+
     public void addAfterOrdering(String fragmentName) {
         after.add(fragmentName);
     }
+
     public void addAfterOrderingOthers() {
         if (before.contains(ORDER_OTHERS)) {
-            throw new IllegalArgumentException(sm.getString(
-                    "webXml.multipleOther"));
+            throw new IllegalArgumentException(sm.getString("webXml.multipleOther"));
         }
         after.add(ORDER_OTHERS);
     }
-    public Set<String> getAfterOrdering() { return after; }
+
+    public Set<String> getAfterOrdering() {
+        return after;
+    }
 
     private final Set<String> before = new LinkedHashSet<>();
+
     public void addBeforeOrdering(String fragmentName) {
         before.add(fragmentName);
     }
+
     public void addBeforeOrderingOthers() {
         if (after.contains(ORDER_OTHERS)) {
-            throw new IllegalArgumentException(sm.getString(
-                    "webXml.multipleOther"));
+            throw new IllegalArgumentException(sm.getString("webXml.multipleOther"));
         }
         before.add(ORDER_OTHERS);
     }
-    public Set<String> getBeforeOrdering() { return before; }
+
+    public Set<String> getBeforeOrdering() {
+        return before;
+    }
 
     // Common elements and attributes
     // Required attribute of web-app element
@@ -158,9 +167,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         sb.append(minorVersion);
         return sb.toString();
     }
+
     /**
      * Set the version for this web.xml file
-     * @param version   Values of <code>null</code> will be ignored
+     *
+     * @param version Values of <code>null</code> will be ignored
      */
     public void setVersion(String version) {
         if (version == null) {
@@ -205,10 +216,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
 
-
     // Optional publicId attribute
     private String publicId = null;
-    public String getPublicId() { return publicId; }
+
+    public String getPublicId() {
+        return publicId;
+    }
+
     public void setPublicId(String publicId) {
         // Update major and minor version
         if (publicId == null) {
@@ -233,13 +247,22 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     // Optional metadata-complete attribute
     private boolean metadataComplete = false;
-    public boolean isMetadataComplete() { return metadataComplete; }
+
+    public boolean isMetadataComplete() {
+        return metadataComplete;
+    }
+
     public void setMetadataComplete(boolean metadataComplete) {
-        this.metadataComplete = metadataComplete; }
+        this.metadataComplete = metadataComplete;
+    }
 
     // Optional name element
     private String name = null;
-    public String getName() { return name; }
+
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         if (ORDER_OTHERS.equalsIgnoreCase(name)) {
             // This is unusual. This name will be ignored. Log the fact.
@@ -252,8 +275,14 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // Derived major and minor version attributes
     private int majorVersion = 6;
     private int minorVersion = 0;
-    public int getMajorVersion() { return majorVersion; }
-    public int getMinorVersion() { return minorVersion; }
+
+    public int getMajorVersion() {
+        return majorVersion;
+    }
+
+    public int getMinorVersion() {
+        return minorVersion;
+    }
 
     // web-app elements
     // TODO: Ignored elements:
@@ -262,23 +291,33 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     // display-name - TODO should support multiple with language
     private String displayName = null;
-    public String getDisplayName() { return displayName; }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
 
     // distributable
     private boolean distributable = false;
-    public boolean isDistributable() { return distributable; }
+
+    public boolean isDistributable() {
+        return distributable;
+    }
+
     public void setDistributable(boolean distributable) {
         this.distributable = distributable;
     }
 
     // deny-uncovered-http-methods
     private boolean denyUncoveredHttpMethods = false;
+
     public boolean getDenyUncoveredHttpMethods() {
         return denyUncoveredHttpMethods;
     }
+
     public void setDenyUncoveredHttpMethods(boolean denyUncoveredHttpMethods) {
         this.denyUncoveredHttpMethods = denyUncoveredHttpMethods;
     }
@@ -286,10 +325,14 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // context-param
     // TODO: description (multiple with language) is ignored
     private final Map<String,String> contextParams = new HashMap<>();
+
     public void addContextParam(String param, String value) {
         contextParams.put(param, value);
     }
-    public Map<String,String> getContextParams() { return contextParams; }
+
+    public Map<String,String> getContextParams() {
+        return contextParams;
+    }
 
     // filter
     // TODO: Should support multiple description elements with language
@@ -297,36 +340,46 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple icon elements
     // TODO: Description for init-param is ignored
     private final Map<String,FilterDef> filters = new LinkedHashMap<>();
+
     public void addFilter(FilterDef filter) {
         if (filters.containsKey(filter.getFilterName())) {
             // Filter names must be unique within a web(-fragment).xml
-            throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateFilter",
-                            filter.getFilterName()));
+            throw new IllegalArgumentException(sm.getString("webXml.duplicateFilter", filter.getFilterName()));
         }
         filters.put(filter.getFilterName(), filter);
     }
-    public Map<String,FilterDef> getFilters() { return filters; }
+
+    public Map<String,FilterDef> getFilters() {
+        return filters;
+    }
 
     // filter-mapping
     private final Set<FilterMap> filterMaps = new LinkedHashSet<>();
     private final Set<String> filterMappingNames = new HashSet<>();
+
     public void addFilterMapping(FilterMap filterMap) {
         filterMap.setCharset(getCharset());
         filterMaps.add(filterMap);
         filterMappingNames.add(filterMap.getFilterName());
     }
-    public Set<FilterMap> getFilterMappings() { return filterMaps; }
+
+    public Set<FilterMap> getFilterMappings() {
+        return filterMaps;
+    }
 
     // listener
     // TODO: description (multiple with language) is ignored
     // TODO: display-name (multiple with language) is ignored
     // TODO: icon (multiple) is ignored
     private final Set<String> listeners = new LinkedHashSet<>();
+
     public void addListener(String className) {
         listeners.add(className);
     }
-    public Set<String> getListeners() { return listeners; }
+
+    public Set<String> getListeners() {
+        return listeners;
+    }
 
     // servlet
     // TODO: description (multiple with language) is ignored
@@ -335,65 +388,83 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: init-param/description (multiple with language) is ignored
     // TODO: security-role-ref/description (multiple with language) is ignored
     private final Map<String,ServletDef> servlets = new HashMap<>();
+
     public void addServlet(ServletDef servletDef) {
         servlets.put(servletDef.getServletName(), servletDef);
         if (overridable) {
             servletDef.setOverridable(true);
         }
     }
-    public Map<String,ServletDef> getServlets() { return servlets; }
+
+    public Map<String,ServletDef> getServlets() {
+        return servlets;
+    }
 
     // servlet-mapping
     // Note: URLPatterns from web.xml may be URL encoded
-    //       (https://svn.apache.org/r285186)
+    // (https://svn.apache.org/r285186)
     private final Map<String,String> servletMappings = new HashMap<>();
     private final Set<String> servletMappingNames = new HashSet<>();
+
     public void addServletMapping(String urlPattern, String servletName) {
         addServletMappingDecoded(UDecoder.URLDecode(urlPattern, getCharset()), servletName);
     }
+
     public void addServletMappingDecoded(String urlPattern, String servletName) {
         String oldServletName = servletMappings.put(urlPattern, servletName);
         if (oldServletName != null) {
             // Duplicate mapping. As per clarification from the Servlet EG,
             // deployment should fail.
-            throw new IllegalArgumentException(sm.getString(
-                    "webXml.duplicateServletMapping", oldServletName,
-                    servletName, urlPattern));
+            throw new IllegalArgumentException(
+                    sm.getString("webXml.duplicateServletMapping", oldServletName, servletName, urlPattern));
         }
         servletMappingNames.add(servletName);
     }
-    public Map<String,String> getServletMappings() { return servletMappings; }
+
+    public Map<String,String> getServletMappings() {
+        return servletMappings;
+    }
 
     // session-config
     // Digester will check there is only one of these
     private SessionConfig sessionConfig = new SessionConfig();
+
     public void setSessionConfig(SessionConfig sessionConfig) {
         this.sessionConfig = sessionConfig;
     }
-    public SessionConfig getSessionConfig() { return sessionConfig; }
+
+    public SessionConfig getSessionConfig() {
+        return sessionConfig;
+    }
 
     // mime-mapping
     private final Map<String,String> mimeMappings = new HashMap<>();
+
     public void addMimeMapping(String extension, String mimeType) {
         mimeMappings.put(extension, mimeType);
     }
-    public Map<String,String> getMimeMappings() { return mimeMappings; }
+
+    public Map<String,String> getMimeMappings() {
+        return mimeMappings;
+    }
 
     // welcome-file-list merge control
     private boolean replaceWelcomeFiles = false;
     private boolean alwaysAddWelcomeFiles = true;
+
     /**
-     * When merging/parsing web.xml files into this web.xml should the current
-     * set be completely replaced?
-     * @param replaceWelcomeFiles <code>true</code> to replace welcome files
-     *  rather than add to the list
+     * When merging/parsing web.xml files into this web.xml should the current set be completely replaced?
+     *
+     * @param replaceWelcomeFiles <code>true</code> to replace welcome files rather than add to the list
      */
     public void setReplaceWelcomeFiles(boolean replaceWelcomeFiles) {
         this.replaceWelcomeFiles = replaceWelcomeFiles;
     }
+
     /**
-     * When merging from this web.xml, should the welcome files be added to the
-     * target web.xml even if it already contains welcome file definitions.
+     * When merging from this web.xml, should the welcome files be added to the target web.xml even if it already
+     * contains welcome file definitions.
+     *
      * @param alwaysAddWelcomeFiles <code>true</code> to add welcome files
      */
     public void setAlwaysAddWelcomeFiles(boolean alwaysAddWelcomeFiles) {
@@ -402,6 +473,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     // welcome-file-list
     private final Set<String> welcomeFiles = new LinkedHashSet<>();
+
     public void addWelcomeFile(String welcomeFile) {
         if (replaceWelcomeFiles) {
             welcomeFiles.clear();
@@ -409,35 +481,47 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
         welcomeFiles.add(welcomeFile);
     }
-    public Set<String> getWelcomeFiles() { return welcomeFiles; }
+
+    public Set<String> getWelcomeFiles() {
+        return welcomeFiles;
+    }
 
     // error-page
     private final Map<String,ErrorPage> errorPages = new HashMap<>();
+
     public void addErrorPage(ErrorPage errorPage) {
         errorPage.setCharset(getCharset());
         errorPages.put(errorPage.getName(), errorPage);
     }
-    public Map<String,ErrorPage> getErrorPages() { return errorPages; }
+
+    public Map<String,ErrorPage> getErrorPages() {
+        return errorPages;
+    }
 
     // Digester will check there is only one jsp-config
     // jsp-config/taglib or taglib (2.3 and earlier)
     private final Map<String,String> taglibs = new HashMap<>();
+
     public void addTaglib(String uri, String location) {
         if (taglibs.containsKey(uri)) {
             // Taglib URIs must be unique within a web(-fragment).xml
-            throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateTaglibUri", uri));
+            throw new IllegalArgumentException(sm.getString("webXml.duplicateTaglibUri", uri));
         }
         taglibs.put(uri, location);
     }
-    public Map<String,String> getTaglibs() { return taglibs; }
+
+    public Map<String,String> getTaglibs() {
+        return taglibs;
+    }
 
     // jsp-config/jsp-property-group
     private final Set<JspPropertyGroup> jspPropertyGroups = new LinkedHashSet<>();
+
     public void addJspPropertyGroup(JspPropertyGroup propertyGroup) {
         propertyGroup.setCharset(getCharset());
         jspPropertyGroups.add(propertyGroup);
     }
+
     public Set<JspPropertyGroup> getJspPropertyGroups() {
         return jspPropertyGroups;
     }
@@ -446,10 +530,12 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple display-name elements with language
     // TODO: Should support multiple description elements with language
     private final Set<SecurityConstraint> securityConstraints = new HashSet<>();
+
     public void addSecurityConstraint(SecurityConstraint securityConstraint) {
         securityConstraint.setCharset(getCharset());
         securityConstraints.add(securityConstraint);
     }
+
     public Set<SecurityConstraint> getSecurityConstraints() {
         return securityConstraints;
     }
@@ -457,48 +543,64 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // login-config
     // Digester will check there is only one of these
     private LoginConfig loginConfig = null;
+
     public void setLoginConfig(LoginConfig loginConfig) {
         loginConfig.setCharset(getCharset());
         this.loginConfig = loginConfig;
     }
-    public LoginConfig getLoginConfig() { return loginConfig; }
+
+    public LoginConfig getLoginConfig() {
+        return loginConfig;
+    }
 
     // security-role
     // TODO: description (multiple with language) is ignored
     private final Set<String> securityRoles = new HashSet<>();
+
     public void addSecurityRole(String securityRole) {
         securityRoles.add(securityRole);
     }
-    public Set<String> getSecurityRoles() { return securityRoles; }
+
+    public Set<String> getSecurityRoles() {
+        return securityRoles;
+    }
 
     // env-entry
     // TODO: Should support multiple description elements with language
     private final Map<String,ContextEnvironment> envEntries = new HashMap<>();
+
     public void addEnvEntry(ContextEnvironment envEntry) {
         if (envEntries.containsKey(envEntry.getName())) {
             // env-entry names must be unique within a web(-fragment).xml
-            throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateEnvEntry",
-                            envEntry.getName()));
+            throw new IllegalArgumentException(sm.getString("webXml.duplicateEnvEntry", envEntry.getName()));
         }
-        envEntries.put(envEntry.getName(),envEntry);
+        envEntries.put(envEntry.getName(), envEntry);
     }
-    public Map<String,ContextEnvironment> getEnvEntries() { return envEntries; }
+
+    public Map<String,ContextEnvironment> getEnvEntries() {
+        return envEntries;
+    }
 
     // ejb-ref
     // TODO: Should support multiple description elements with language
     private final Map<String,ContextEjb> ejbRefs = new HashMap<>();
+
     public void addEjbRef(ContextEjb ejbRef) {
-        ejbRefs.put(ejbRef.getName(),ejbRef);
+        ejbRefs.put(ejbRef.getName(), ejbRef);
     }
-    public Map<String,ContextEjb> getEjbRefs() { return ejbRefs; }
+
+    public Map<String,ContextEjb> getEjbRefs() {
+        return ejbRefs;
+    }
 
     // ejb-local-ref
     // TODO: Should support multiple description elements with language
     private final Map<String,ContextLocalEjb> ejbLocalRefs = new HashMap<>();
+
     public void addEjbLocalRef(ContextLocalEjb ejbLocalRef) {
-        ejbLocalRefs.put(ejbLocalRef.getName(),ejbLocalRef);
+        ejbLocalRefs.put(ejbLocalRef.getName(), ejbLocalRef);
     }
+
     public Map<String,ContextLocalEjb> getEjbLocalRefs() {
         return ejbLocalRefs;
     }
@@ -508,23 +610,27 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple display-names elements with language
     // TODO: Should support multiple icon elements ???
     private final Map<String,ContextService> serviceRefs = new HashMap<>();
+
     public void addServiceRef(ContextService serviceRef) {
         serviceRefs.put(serviceRef.getName(), serviceRef);
     }
-    public Map<String,ContextService> getServiceRefs() { return serviceRefs; }
+
+    public Map<String,ContextService> getServiceRefs() {
+        return serviceRefs;
+    }
 
     // resource-ref
     // TODO: Should support multiple description elements with language
     private final Map<String,ContextResource> resourceRefs = new HashMap<>();
+
     public void addResourceRef(ContextResource resourceRef) {
         if (resourceRefs.containsKey(resourceRef.getName())) {
             // resource-ref names must be unique within a web(-fragment).xml
-            throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateResourceRef",
-                            resourceRef.getName()));
+            throw new IllegalArgumentException(sm.getString("webXml.duplicateResourceRef", resourceRef.getName()));
         }
         resourceRefs.put(resourceRef.getName(), resourceRef);
     }
+
     public Map<String,ContextResource> getResourceRefs() {
         return resourceRefs;
     }
@@ -532,36 +638,34 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // resource-env-ref
     // TODO: Should support multiple description elements with language
     private final Map<String,ContextResourceEnvRef> resourceEnvRefs = new HashMap<>();
+
     public void addResourceEnvRef(ContextResourceEnvRef resourceEnvRef) {
         if (resourceEnvRefs.containsKey(resourceEnvRef.getName())) {
             // resource-env-ref names must be unique within a web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateResourceEnvRef",
-                            resourceEnvRef.getName()));
+                    sm.getString("webXml.duplicateResourceEnvRef", resourceEnvRef.getName()));
         }
         resourceEnvRefs.put(resourceEnvRef.getName(), resourceEnvRef);
     }
+
     public Map<String,ContextResourceEnvRef> getResourceEnvRefs() {
         return resourceEnvRefs;
     }
 
     // message-destination-ref
     // TODO: Should support multiple description elements with language
-    private final Map<String,MessageDestinationRef> messageDestinationRefs =
-        new HashMap<>();
-    public void addMessageDestinationRef(
-            MessageDestinationRef messageDestinationRef) {
-        if (messageDestinationRefs.containsKey(
-                messageDestinationRef.getName())) {
+    private final Map<String,MessageDestinationRef> messageDestinationRefs = new HashMap<>();
+
+    public void addMessageDestinationRef(MessageDestinationRef messageDestinationRef) {
+        if (messageDestinationRefs.containsKey(messageDestinationRef.getName())) {
             // message-destination-ref names must be unique within a
             // web(-fragment).xml
-            throw new IllegalArgumentException(sm.getString(
-                    "webXml.duplicateMessageDestinationRef",
-                    messageDestinationRef.getName()));
+            throw new IllegalArgumentException(
+                    sm.getString("webXml.duplicateMessageDestinationRef", messageDestinationRef.getName()));
         }
-        messageDestinationRefs.put(messageDestinationRef.getName(),
-                messageDestinationRef);
+        messageDestinationRefs.put(messageDestinationRef.getName(), messageDestinationRef);
     }
+
     public Map<String,MessageDestinationRef> getMessageDestinationRefs() {
         return messageDestinationRefs;
     }
@@ -570,53 +674,56 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     // TODO: Should support multiple description elements with language
     // TODO: Should support multiple display-names elements with language
     // TODO: Should support multiple icon elements ???
-    private final Map<String,MessageDestination> messageDestinations =
-            new HashMap<>();
-    public void addMessageDestination(
-            MessageDestination messageDestination) {
-        if (messageDestinations.containsKey(
-                messageDestination.getName())) {
+    private final Map<String,MessageDestination> messageDestinations = new HashMap<>();
+
+    public void addMessageDestination(MessageDestination messageDestination) {
+        if (messageDestinations.containsKey(messageDestination.getName())) {
             // message-destination names must be unique within a
             // web(-fragment).xml
             throw new IllegalArgumentException(
-                    sm.getString("webXml.duplicateMessageDestination",
-                            messageDestination.getName()));
+                    sm.getString("webXml.duplicateMessageDestination", messageDestination.getName()));
         }
-        messageDestinations.put(messageDestination.getName(),
-                messageDestination);
+        messageDestinations.put(messageDestination.getName(), messageDestination);
     }
+
     public Map<String,MessageDestination> getMessageDestinations() {
         return messageDestinations;
     }
 
     // locale-encoding-mapping-list
     private final Map<String,String> localeEncodingMappings = new HashMap<>();
+
     public void addLocaleEncodingMapping(String locale, String encoding) {
         localeEncodingMappings.put(locale, encoding);
     }
+
     public Map<String,String> getLocaleEncodingMappings() {
         return localeEncodingMappings;
     }
 
     // post-construct elements
-    private final Map<String, String> postConstructMethods = new HashMap<>();
+    private final Map<String,String> postConstructMethods = new HashMap<>();
+
     public void addPostConstructMethods(String clazz, String method) {
         if (!postConstructMethods.containsKey(clazz)) {
             postConstructMethods.put(clazz, method);
         }
     }
-    public Map<String, String> getPostConstructMethods() {
+
+    public Map<String,String> getPostConstructMethods() {
         return postConstructMethods;
     }
 
     // pre-destroy elements
-    private final Map<String, String> preDestroyMethods = new HashMap<>();
+    private final Map<String,String> preDestroyMethods = new HashMap<>();
+
     public void addPreDestroyMethods(String clazz, String method) {
         if (!preDestroyMethods.containsKey(clazz)) {
             preDestroyMethods.put(clazz, method);
         }
     }
-    public Map<String, String> getPreDestroyMethods() {
+
+    public Map<String,String> getPreDestroyMethods() {
         return preDestroyMethods;
     }
 
@@ -625,28 +732,27 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             return null;
         }
 
-        Collection<JspPropertyGroupDescriptor> descriptors =
-                new ArrayList<>(jspPropertyGroups.size());
+        Collection<JspPropertyGroupDescriptor> descriptors = new ArrayList<>(jspPropertyGroups.size());
         for (JspPropertyGroup jspPropertyGroup : jspPropertyGroups) {
-            JspPropertyGroupDescriptor descriptor =
-                    new JspPropertyGroupDescriptorImpl(jspPropertyGroup);
+            JspPropertyGroupDescriptor descriptor = new JspPropertyGroupDescriptorImpl(jspPropertyGroup);
             descriptors.add(descriptor);
 
         }
 
         Collection<TaglibDescriptor> tlds = new HashSet<>(taglibs.size());
-        for (Entry<String, String> entry : taglibs.entrySet()) {
-            TaglibDescriptor descriptor = new TaglibDescriptorImpl(
-                    entry.getValue(), entry.getKey());
+        for (Entry<String,String> entry : taglibs.entrySet()) {
+            TaglibDescriptor descriptor = new TaglibDescriptorImpl(entry.getValue(), entry.getKey());
             tlds.add(descriptor);
         }
         return new JspConfigDescriptorImpl(descriptors, tlds);
     }
 
     private String requestCharacterEncoding;
+
     public String getRequestCharacterEncoding() {
         return requestCharacterEncoding;
     }
+
     public void setRequestCharacterEncoding(String requestCharacterEncoding) {
         if (requestCharacterEncoding != null) {
             try {
@@ -659,9 +765,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
     private String responseCharacterEncoding;
+
     public String getResponseCharacterEncoding() {
         return responseCharacterEncoding;
     }
+
     public void setResponseCharacterEncoding(String responseCharacterEncoding) {
         if (responseCharacterEncoding != null) {
             try {
@@ -677,24 +785,48 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
     // URL of JAR / exploded JAR for this web-fragment
     private URL uRL = null;
-    public void setURL(URL url) { this.uRL = url; }
-    public URL getURL() { return uRL; }
+
+    public void setURL(URL url) {
+        this.uRL = url;
+    }
+
+    public URL getURL() {
+        return uRL;
+    }
 
     // Name of jar file
     private String jarName = null;
-    public void setJarName(String jarName) { this.jarName = jarName; }
-    public String getJarName() { return jarName; }
+
+    public void setJarName(String jarName) {
+        this.jarName = jarName;
+    }
+
+    public String getJarName() {
+        return jarName;
+    }
 
     // Is this JAR part of the application or is it a container JAR? Assume it
     // is.
     private boolean webappJar = true;
-    public void setWebappJar(boolean webappJar) { this.webappJar = webappJar; }
-    public boolean getWebappJar() { return webappJar; }
+
+    public void setWebappJar(boolean webappJar) {
+        this.webappJar = webappJar;
+    }
+
+    public boolean getWebappJar() {
+        return webappJar;
+    }
 
     // Does this web application delegate first for class loading?
     private boolean delegate = false;
-    public boolean getDelegate() { return delegate; }
-    public void setDelegate(boolean delegate) { this.delegate = delegate; }
+
+    public boolean getDelegate() {
+        return delegate;
+    }
+
+    public void setDelegate(boolean delegate) {
+        this.delegate = delegate;
+    }
 
     @Override
     public String toString() {
@@ -711,23 +843,22 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     private static final String INDENT6 = "      ";
 
     /**
-     * Generate a web.xml in String form that matches the representation stored
-     * in this object.
+     * Generate a web.xml in String form that matches the representation stored in this object.
      *
      * @return The complete contents of web.xml as a String
      */
     public String toXml() {
         StringBuilder sb = new StringBuilder(2048);
         // TODO - Various, icon, description etc elements are skipped - mainly
-        //        because they are ignored when web.xml is parsed - see above
+        // because they are ignored when web.xml is parsed - see above
 
         // NOTE - Elements need to be written in the order defined in the 2.3
-        //        DTD else validation of the merged web.xml will fail
+        // DTD else validation of the merged web.xml will fail
 
         // NOTE - Some elements need to be skipped based on the version of the
-        //        specification being used. Version is validated and starts at
-        //        2.2. The version tests used in this method take advantage of
-        //        this.
+        // specification being used. Version is validated and starts at
+        // 2.2. The version tests used in this method take advantage of
+        // this.
 
         // Declaration
         sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
@@ -801,7 +932,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             sb.append("  <distributable/>\n\n");
         }
 
-        for (Map.Entry<String, String> entry : contextParams.entrySet()) {
+        for (Map.Entry<String,String> entry : contextParams.entrySet()) {
             sb.append("  <context-param>\n");
             appendElement(sb, INDENT4, "param-name", entry.getKey());
             appendElement(sb, INDENT4, "param-value", entry.getValue());
@@ -811,24 +942,18 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         // Filters were introduced in Servlet 2.3
         if (getMajorVersion() > 2 || getMinorVersion() > 2) {
-            for (Map.Entry<String, FilterDef> entry : filters.entrySet()) {
+            for (Map.Entry<String,FilterDef> entry : filters.entrySet()) {
                 FilterDef filterDef = entry.getValue();
                 sb.append("  <filter>\n");
-                appendElement(sb, INDENT4, "description",
-                        filterDef.getDescription());
-                appendElement(sb, INDENT4, "display-name",
-                        filterDef.getDisplayName());
-                appendElement(sb, INDENT4, "filter-name",
-                        filterDef.getFilterName());
-                appendElement(sb, INDENT4, "filter-class",
-                        filterDef.getFilterClass());
+                appendElement(sb, INDENT4, "description", filterDef.getDescription());
+                appendElement(sb, INDENT4, "display-name", filterDef.getDisplayName());
+                appendElement(sb, INDENT4, "filter-name", filterDef.getFilterName());
+                appendElement(sb, INDENT4, "filter-class", filterDef.getFilterClass());
                 // Async support was introduced for Servlet 3.0 onwards
                 if (getMajorVersion() != 2) {
-                    appendElement(sb, INDENT4, "async-supported",
-                            filterDef.getAsyncSupported());
+                    appendElement(sb, INDENT4, "async-supported", filterDef.getAsyncSupported());
                 }
-                for (Map.Entry<String, String> param :
-                        filterDef.getParameterMap().entrySet()) {
+                for (Map.Entry<String,String> param : filterDef.getParameterMap().entrySet()) {
                     sb.append("    <init-param>\n");
                     appendElement(sb, INDENT6, "param-name", param.getKey());
                     appendElement(sb, INDENT6, "param-value", param.getValue());
@@ -840,8 +965,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
             for (FilterMap filterMap : filterMaps) {
                 sb.append("  <filter-mapping>\n");
-                appendElement(sb, INDENT4, "filter-name",
-                        filterMap.getFilterName());
+                appendElement(sb, INDENT4, "filter-name", filterMap.getFilterName());
                 if (filterMap.getMatchAllServletNames()) {
                     sb.append("    <servlet-name>*</servlet-name>\n");
                 } else {
@@ -859,8 +983,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 // dispatcher was added in Servlet 2.4
                 if (getMajorVersion() > 2 || getMinorVersion() > 3) {
                     for (String dispatcher : filterMap.getDispatcherNames()) {
-                        if (getMajorVersion() == 2 &&
-                                DispatcherType.ASYNC.name().equals(dispatcher)) {
+                        if (getMajorVersion() == 2 && DispatcherType.ASYNC.name().equals(dispatcher)) {
                             continue;
                         }
                         appendElement(sb, INDENT4, "dispatcher", dispatcher);
@@ -881,31 +1004,25 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             sb.append('\n');
         }
 
-        for (Map.Entry<String, ServletDef> entry : servlets.entrySet()) {
+        for (Map.Entry<String,ServletDef> entry : servlets.entrySet()) {
             ServletDef servletDef = entry.getValue();
             sb.append("  <servlet>\n");
-            appendElement(sb, INDENT4, "description",
-                    servletDef.getDescription());
-            appendElement(sb, INDENT4, "display-name",
-                    servletDef.getDisplayName());
+            appendElement(sb, INDENT4, "description", servletDef.getDescription());
+            appendElement(sb, INDENT4, "display-name", servletDef.getDisplayName());
             appendElement(sb, INDENT4, "servlet-name", entry.getKey());
-            appendElement(sb, INDENT4, "servlet-class",
-                    servletDef.getServletClass());
+            appendElement(sb, INDENT4, "servlet-class", servletDef.getServletClass());
             appendElement(sb, INDENT4, "jsp-file", servletDef.getJspFile());
-            for (Map.Entry<String, String> param :
-                    servletDef.getParameterMap().entrySet()) {
+            for (Map.Entry<String,String> param : servletDef.getParameterMap().entrySet()) {
                 sb.append("    <init-param>\n");
                 appendElement(sb, INDENT6, "param-name", param.getKey());
                 appendElement(sb, INDENT6, "param-value", param.getValue());
                 sb.append("    </init-param>\n");
             }
-            appendElement(sb, INDENT4, "load-on-startup",
-                    servletDef.getLoadOnStartup());
+            appendElement(sb, INDENT4, "load-on-startup", servletDef.getLoadOnStartup());
             appendElement(sb, INDENT4, "enabled", servletDef.getEnabled());
             // Async support was introduced for Servlet 3.0 onwards
             if (getMajorVersion() != 2) {
-                appendElement(sb, INDENT4, "async-supported",
-                        servletDef.getAsyncSupported());
+                appendElement(sb, INDENT4, "async-supported", servletDef.getAsyncSupported());
             }
             // servlet/run-as was introduced in Servlet 2.3
             if (getMajorVersion() > 2 || getMinorVersion() > 2) {
@@ -926,14 +1043,10 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 MultipartDef multipartDef = servletDef.getMultipartDef();
                 if (multipartDef != null) {
                     sb.append("    <multipart-config>\n");
-                    appendElement(sb, INDENT6, "location",
-                            multipartDef.getLocation());
-                    appendElement(sb, INDENT6, "max-file-size",
-                            multipartDef.getMaxFileSize());
-                    appendElement(sb, INDENT6, "max-request-size",
-                            multipartDef.getMaxRequestSize());
-                    appendElement(sb, INDENT6, "file-size-threshold",
-                            multipartDef.getFileSizeThreshold());
+                    appendElement(sb, INDENT6, "location", multipartDef.getLocation());
+                    appendElement(sb, INDENT6, "max-file-size", multipartDef.getMaxFileSize());
+                    appendElement(sb, INDENT6, "max-request-size", multipartDef.getMaxRequestSize());
+                    appendElement(sb, INDENT6, "file-size-threshold", multipartDef.getFileSizeThreshold());
                     sb.append("    </multipart-config>\n");
                 }
             }
@@ -941,7 +1054,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
         sb.append('\n');
 
-        for (Map.Entry<String, String> entry : servletMappings.entrySet()) {
+        for (Map.Entry<String,String> entry : servletMappings.entrySet()) {
             sb.append("  <servlet-mapping>\n");
             appendElement(sb, INDENT4, "servlet-name", entry.getValue());
             appendElement(sb, INDENT4, "url-pattern", encodeUrl(entry.getKey()));
@@ -951,32 +1064,25 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         if (sessionConfig != null) {
             sb.append("  <session-config>\n");
-            appendElement(sb, INDENT4, "session-timeout",
-                    sessionConfig.getSessionTimeout());
+            appendElement(sb, INDENT4, "session-timeout", sessionConfig.getSessionTimeout());
             if (majorVersion >= 3) {
                 sb.append("    <cookie-config>\n");
                 appendElement(sb, INDENT6, "name", sessionConfig.getCookieName());
-                appendElement(sb, INDENT6, "domain",
-                        sessionConfig.getCookieDomain());
+                appendElement(sb, INDENT6, "domain", sessionConfig.getCookieDomain());
                 appendElement(sb, INDENT6, "path", sessionConfig.getCookiePath());
-                appendElement(sb, INDENT6, "comment",
-                        sessionConfig.getCookieComment());
-                appendElement(sb, INDENT6, "http-only",
-                        sessionConfig.getCookieHttpOnly());
-                appendElement(sb, INDENT6, "secure",
-                        sessionConfig.getCookieSecure());
-                appendElement(sb, INDENT6, "max-age",
-                        sessionConfig.getCookieMaxAge());
+                appendElement(sb, INDENT6, "comment", sessionConfig.getCookieComment());
+                appendElement(sb, INDENT6, "http-only", sessionConfig.getCookieHttpOnly());
+                appendElement(sb, INDENT6, "secure", sessionConfig.getCookieSecure());
+                appendElement(sb, INDENT6, "max-age", sessionConfig.getCookieMaxAge());
                 sb.append("    </cookie-config>\n");
-                for (SessionTrackingMode stm :
-                        sessionConfig.getSessionTrackingModes()) {
+                for (SessionTrackingMode stm : sessionConfig.getSessionTrackingModes()) {
                     appendElement(sb, INDENT4, "tracking-mode", stm.name());
                 }
             }
             sb.append("  </session-config>\n\n");
         }
 
-        for (Map.Entry<String, String> entry : mimeMappings.entrySet()) {
+        for (Map.Entry<String,String> entry : mimeMappings.entrySet()) {
             sb.append("  <mime-mapping>\n");
             appendElement(sb, INDENT4, "extension", entry.getKey());
             appendElement(sb, INDENT4, "mime-type", entry.getValue());
@@ -1004,8 +1110,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             if (errorPage.getExceptionType() != null) {
                 appendElement(sb, INDENT4, "exception-type", exceptionType);
             } else if (errorPage.getErrorCode() > 0) {
-                appendElement(sb, INDENT4, "error-code",
-                        Integer.toString(errorCode));
+                appendElement(sb, INDENT4, "error-code", Integer.toString(errorCode));
             }
             appendElement(sb, INDENT4, "location", errorPage.getLocation());
             sb.append("  </error-page>\n");
@@ -1018,7 +1123,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             if (getMajorVersion() > 2 || getMinorVersion() > 3) {
                 sb.append("  <jsp-config>\n");
             }
-            for (Map.Entry<String, String> entry : taglibs.entrySet()) {
+            for (Map.Entry<String,String> entry : taglibs.entrySet()) {
                 sb.append("    <taglib>\n");
                 appendElement(sb, INDENT6, "taglib-uri", entry.getKey());
                 appendElement(sb, INDENT6, "taglib-location", entry.getValue());
@@ -1031,10 +1136,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                         appendElement(sb, INDENT6, "url-pattern", encodeUrl(urlPattern));
                     }
                     appendElement(sb, INDENT6, "el-ignored", jpg.getElIgnored());
-                    appendElement(sb, INDENT6, "page-encoding",
-                            jpg.getPageEncoding());
-                    appendElement(sb, INDENT6, "scripting-invalid",
-                            jpg.getScriptingInvalid());
+                    appendElement(sb, INDENT6, "page-encoding", jpg.getPageEncoding());
+                    appendElement(sb, INDENT6, "scripting-invalid", jpg.getScriptingInvalid());
                     appendElement(sb, INDENT6, "is-xml", jpg.getIsXml());
                     for (String prelude : jpg.getIncludePreludes()) {
                         appendElement(sb, INDENT6, "include-prelude", prelude);
@@ -1042,15 +1145,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                     for (String coda : jpg.getIncludeCodas()) {
                         appendElement(sb, INDENT6, "include-coda", coda);
                     }
-                    appendElement(sb, INDENT6, "deferred-syntax-allowed-as-literal",
-                            jpg.getDeferredSyntax());
-                    appendElement(sb, INDENT6, "trim-directive-whitespaces",
-                            jpg.getTrimWhitespace());
-                    appendElement(sb, INDENT6, "default-content-type",
-                            jpg.getDefaultContentType());
+                    appendElement(sb, INDENT6, "deferred-syntax-allowed-as-literal", jpg.getDeferredSyntax());
+                    appendElement(sb, INDENT6, "trim-directive-whitespaces", jpg.getTrimWhitespace());
+                    appendElement(sb, INDENT6, "default-content-type", jpg.getDefaultContentType());
                     appendElement(sb, INDENT6, "buffer", jpg.getBuffer());
-                    appendElement(sb, INDENT6, "error-on-undeclared-namespace",
-                            jpg.getErrorOnUndeclaredNamespace());
+                    appendElement(sb, INDENT6, "error-on-undeclared-namespace", jpg.getErrorOnUndeclaredNamespace());
                     sb.append("    </jsp-property-group>\n");
                 }
                 sb.append("  </jsp-config>\n\n");
@@ -1061,21 +1160,14 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         if (getMajorVersion() > 2 || getMinorVersion() > 2) {
             for (ContextResourceEnvRef resourceEnvRef : resourceEnvRefs.values()) {
                 sb.append("  <resource-env-ref>\n");
-                appendElement(sb, INDENT4, "description",
-                        resourceEnvRef.getDescription());
-                appendElement(sb, INDENT4, "resource-env-ref-name",
-                        resourceEnvRef.getName());
-                appendElement(sb, INDENT4, "resource-env-ref-type",
-                        resourceEnvRef.getType());
-                appendElement(sb, INDENT4, "mapped-name",
-                        resourceEnvRef.getProperty("mappedName"));
-                for (InjectionTarget target :
-                        resourceEnvRef.getInjectionTargets()) {
+                appendElement(sb, INDENT4, "description", resourceEnvRef.getDescription());
+                appendElement(sb, INDENT4, "resource-env-ref-name", resourceEnvRef.getName());
+                appendElement(sb, INDENT4, "resource-env-ref-type", resourceEnvRef.getType());
+                appendElement(sb, INDENT4, "mapped-name", resourceEnvRef.getProperty("mappedName"));
+                for (InjectionTarget target : resourceEnvRef.getInjectionTargets()) {
                     sb.append("    <injection-target>\n");
-                    appendElement(sb, INDENT6, "injection-target-class",
-                            target.getTargetClass());
-                    appendElement(sb, INDENT6, "injection-target-name",
-                            target.getTargetName());
+                    appendElement(sb, INDENT6, "injection-target-class", target.getTargetClass());
+                    appendElement(sb, INDENT6, "injection-target-name", target.getTargetName());
                     sb.append("    </injection-target>\n");
                 }
                 appendElement(sb, INDENT4, "lookup-name", resourceEnvRef.getLookupName());
@@ -1086,8 +1178,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         for (ContextResource resourceRef : resourceRefs.values()) {
             sb.append("  <resource-ref>\n");
-            appendElement(sb, INDENT4, "description",
-                    resourceRef.getDescription());
+            appendElement(sb, INDENT4, "description", resourceRef.getDescription());
             appendElement(sb, INDENT4, "res-ref-name", resourceRef.getName());
             appendElement(sb, INDENT4, "res-type", resourceRef.getType());
             appendElement(sb, INDENT4, "res-auth", resourceRef.getAuth());
@@ -1098,10 +1189,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             appendElement(sb, INDENT4, "mapped-name", resourceRef.getProperty("mappedName"));
             for (InjectionTarget target : resourceRef.getInjectionTargets()) {
                 sb.append("    <injection-target>\n");
-                appendElement(sb, INDENT6, "injection-target-class",
-                        target.getTargetClass());
-                appendElement(sb, INDENT6, "injection-target-name",
-                        target.getTargetName());
+                appendElement(sb, INDENT6, "injection-target-class", target.getTargetClass());
+                appendElement(sb, INDENT6, "injection-target-name", target.getTargetName());
                 sb.append("    </injection-target>\n");
             }
             appendElement(sb, INDENT4, "lookup-name", resourceRef.getLookupName());
@@ -1113,15 +1202,12 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             sb.append("  <security-constraint>\n");
             // security-constraint/display-name was introduced in Servlet 2.3
             if (getMajorVersion() > 2 || getMinorVersion() > 2) {
-                appendElement(sb, INDENT4, "display-name",
-                        constraint.getDisplayName());
+                appendElement(sb, INDENT4, "display-name", constraint.getDisplayName());
             }
             for (SecurityCollection collection : constraint.findCollections()) {
                 sb.append("    <web-resource-collection>\n");
-                appendElement(sb, INDENT6, "web-resource-name",
-                        collection.getName());
-                appendElement(sb, INDENT6, "description",
-                        collection.getDescription());
+                appendElement(sb, INDENT6, "web-resource-name", collection.getName());
+                appendElement(sb, INDENT6, "description", collection.getDescription());
                 for (String urlPattern : collection.findPatterns()) {
                     appendElement(sb, INDENT6, "url-pattern", encodeUrl(urlPattern));
                 }
@@ -1142,8 +1228,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             }
             if (constraint.getUserConstraint() != null) {
                 sb.append("    <user-data-constraint>\n");
-                appendElement(sb, INDENT6, "transport-guarantee",
-                        constraint.getUserConstraint());
+                appendElement(sb, INDENT6, "transport-guarantee", constraint.getUserConstraint());
                 sb.append("    </user-data-constraint>\n");
             }
             sb.append("  </security-constraint>\n");
@@ -1152,17 +1237,12 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         if (loginConfig != null) {
             sb.append("  <login-config>\n");
-            appendElement(sb, INDENT4, "auth-method",
-                    loginConfig.getAuthMethod());
-            appendElement(sb,INDENT4, "realm-name",
-                    loginConfig.getRealmName());
-            if (loginConfig.getErrorPage() != null ||
-                        loginConfig.getLoginPage() != null) {
+            appendElement(sb, INDENT4, "auth-method", loginConfig.getAuthMethod());
+            appendElement(sb, INDENT4, "realm-name", loginConfig.getRealmName());
+            if (loginConfig.getErrorPage() != null || loginConfig.getLoginPage() != null) {
                 sb.append("    <form-login-config>\n");
-                appendElement(sb, INDENT6, "form-login-page",
-                        loginConfig.getLoginPage());
-                appendElement(sb, INDENT6, "form-error-page",
-                        loginConfig.getErrorPage());
+                appendElement(sb, INDENT6, "form-login-page", loginConfig.getLoginPage());
+                appendElement(sb, INDENT6, "form-error-page", loginConfig.getErrorPage());
                 sb.append("    </form-login-config>\n");
             }
             sb.append("  </login-config>\n\n");
@@ -1176,18 +1256,15 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         for (ContextEnvironment envEntry : envEntries.values()) {
             sb.append("  <env-entry>\n");
-            appendElement(sb, INDENT4, "description",
-                    envEntry.getDescription());
+            appendElement(sb, INDENT4, "description", envEntry.getDescription());
             appendElement(sb, INDENT4, "env-entry-name", envEntry.getName());
             appendElement(sb, INDENT4, "env-entry-type", envEntry.getType());
             appendElement(sb, INDENT4, "env-entry-value", envEntry.getValue());
             appendElement(sb, INDENT4, "mapped-name", envEntry.getProperty("mappedName"));
             for (InjectionTarget target : envEntry.getInjectionTargets()) {
                 sb.append("    <injection-target>\n");
-                appendElement(sb, INDENT6, "injection-target-class",
-                        target.getTargetClass());
-                appendElement(sb, INDENT6, "injection-target-name",
-                        target.getTargetName());
+                appendElement(sb, INDENT6, "injection-target-class", target.getTargetClass());
+                appendElement(sb, INDENT6, "injection-target-name", target.getTargetName());
                 sb.append("    </injection-target>\n");
             }
             appendElement(sb, INDENT4, "lookup-name", envEntry.getLookupName());
@@ -1206,10 +1283,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             appendElement(sb, INDENT4, "mapped-name", ejbRef.getProperty("mappedName"));
             for (InjectionTarget target : ejbRef.getInjectionTargets()) {
                 sb.append("    <injection-target>\n");
-                appendElement(sb, INDENT6, "injection-target-class",
-                        target.getTargetClass());
-                appendElement(sb, INDENT6, "injection-target-name",
-                        target.getTargetName());
+                appendElement(sb, INDENT6, "injection-target-class", target.getTargetClass());
+                appendElement(sb, INDENT6, "injection-target-name", target.getTargetName());
                 sb.append("    </injection-target>\n");
             }
             appendElement(sb, INDENT4, "lookup-name", ejbRef.getLookupName());
@@ -1221,8 +1296,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         if (getMajorVersion() > 2 || getMinorVersion() > 2) {
             for (ContextLocalEjb ejbLocalRef : ejbLocalRefs.values()) {
                 sb.append("  <ejb-local-ref>\n");
-                appendElement(sb, INDENT4, "description",
-                        ejbLocalRef.getDescription());
+                appendElement(sb, INDENT4, "description", ejbLocalRef.getDescription());
                 appendElement(sb, INDENT4, "ejb-ref-name", ejbLocalRef.getName());
                 appendElement(sb, INDENT4, "ejb-ref-type", ejbLocalRef.getType());
                 appendElement(sb, INDENT4, "local-home", ejbLocalRef.getHome());
@@ -1231,10 +1305,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 appendElement(sb, INDENT4, "mapped-name", ejbLocalRef.getProperty("mappedName"));
                 for (InjectionTarget target : ejbLocalRef.getInjectionTargets()) {
                     sb.append("    <injection-target>\n");
-                    appendElement(sb, INDENT6, "injection-target-class",
-                            target.getTargetClass());
-                    appendElement(sb, INDENT6, "injection-target-name",
-                            target.getTargetName());
+                    appendElement(sb, INDENT6, "injection-target-class", target.getTargetClass());
+                    appendElement(sb, INDENT6, "injection-target-name", target.getTargetName());
                     sb.append("    </injection-target>\n");
                 }
                 appendElement(sb, INDENT4, "lookup-name", ejbLocalRef.getLookupName());
@@ -1247,19 +1319,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         if (getMajorVersion() > 2 || getMinorVersion() > 3) {
             for (ContextService serviceRef : serviceRefs.values()) {
                 sb.append("  <service-ref>\n");
-                appendElement(sb, INDENT4, "description",
-                        serviceRef.getDescription());
-                appendElement(sb, INDENT4, "display-name",
-                        serviceRef.getDisplayname());
-                appendElement(sb, INDENT4, "service-ref-name",
-                        serviceRef.getName());
-                appendElement(sb, INDENT4, "service-interface",
-                        serviceRef.getInterface());
-                appendElement(sb, INDENT4, "service-ref-type",
-                        serviceRef.getType());
+                appendElement(sb, INDENT4, "description", serviceRef.getDescription());
+                appendElement(sb, INDENT4, "display-name", serviceRef.getDisplayname());
+                appendElement(sb, INDENT4, "service-ref-name", serviceRef.getName());
+                appendElement(sb, INDENT4, "service-interface", serviceRef.getInterface());
+                appendElement(sb, INDENT4, "service-ref-type", serviceRef.getType());
                 appendElement(sb, INDENT4, "wsdl-file", serviceRef.getWsdlfile());
-                appendElement(sb, INDENT4, "jaxrpc-mapping-file",
-                        serviceRef.getJaxrpcmappingfile());
+                appendElement(sb, INDENT4, "jaxrpc-mapping-file", serviceRef.getJaxrpcmappingfile());
                 String qname = serviceRef.getServiceqnameNamespaceURI();
                 if (qname != null) {
                     qname = qname + ":";
@@ -1270,10 +1336,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 while (endpointIter.hasNext()) {
                     String endpoint = endpointIter.next();
                     sb.append("    <port-component-ref>\n");
-                    appendElement(sb, INDENT6, "service-endpoint-interface",
-                            endpoint);
-                    appendElement(sb, INDENT6, "port-component-link",
-                            serviceRef.getProperty(endpoint));
+                    appendElement(sb, INDENT6, "service-endpoint-interface", endpoint);
+                    appendElement(sb, INDENT6, "port-component-link", serviceRef.getProperty(endpoint));
                     sb.append("    </port-component-ref>\n");
                 }
                 Iterator<String> handlerIter = serviceRef.getHandlers();
@@ -1282,18 +1346,15 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                     sb.append("    <handler>\n");
                     ContextHandler ch = serviceRef.getHandler(handler);
                     appendElement(sb, INDENT6, "handler-name", ch.getName());
-                    appendElement(sb, INDENT6, "handler-class",
-                            ch.getHandlerclass());
+                    appendElement(sb, INDENT6, "handler-class", ch.getHandlerclass());
                     sb.append("    </handler>\n");
                 }
                 // TODO handler-chains
                 appendElement(sb, INDENT4, "mapped-name", serviceRef.getProperty("mappedName"));
                 for (InjectionTarget target : serviceRef.getInjectionTargets()) {
                     sb.append("    <injection-target>\n");
-                    appendElement(sb, INDENT6, "injection-target-class",
-                            target.getTargetClass());
-                    appendElement(sb, INDENT6, "injection-target-name",
-                            target.getTargetName());
+                    appendElement(sb, INDENT6, "injection-target-class", target.getTargetClass());
+                    appendElement(sb, INDENT6, "injection-target-name", target.getTargetName());
                     sb.append("    </injection-target>\n");
                 }
                 appendElement(sb, INDENT4, "lookup-name", serviceRef.getLookupName());
@@ -1303,26 +1364,20 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
 
         if (!postConstructMethods.isEmpty()) {
-            for (Entry<String, String> entry : postConstructMethods
-                    .entrySet()) {
+            for (Entry<String,String> entry : postConstructMethods.entrySet()) {
                 sb.append("  <post-construct>\n");
-                appendElement(sb, INDENT4, "lifecycle-callback-class",
-                        entry.getKey());
-                appendElement(sb, INDENT4, "lifecycle-callback-method",
-                        entry.getValue());
+                appendElement(sb, INDENT4, "lifecycle-callback-class", entry.getKey());
+                appendElement(sb, INDENT4, "lifecycle-callback-method", entry.getValue());
                 sb.append("  </post-construct>\n");
             }
             sb.append('\n');
         }
 
         if (!preDestroyMethods.isEmpty()) {
-            for (Entry<String, String> entry : preDestroyMethods
-                    .entrySet()) {
+            for (Entry<String,String> entry : preDestroyMethods.entrySet()) {
                 sb.append("  <pre-destroy>\n");
-                appendElement(sb, INDENT4, "lifecycle-callback-class",
-                        entry.getKey());
-                appendElement(sb, INDENT4, "lifecycle-callback-method",
-                        entry.getValue());
+                appendElement(sb, INDENT4, "lifecycle-callback-class", entry.getKey());
+                appendElement(sb, INDENT4, "lifecycle-callback-method", entry.getValue());
                 sb.append("  </pre-destroy>\n");
             }
             sb.append('\n');
@@ -1334,21 +1389,15 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             for (MessageDestinationRef mdr : messageDestinationRefs.values()) {
                 sb.append("  <message-destination-ref>\n");
                 appendElement(sb, INDENT4, "description", mdr.getDescription());
-                appendElement(sb, INDENT4, "message-destination-ref-name",
-                        mdr.getName());
-                appendElement(sb, INDENT4, "message-destination-type",
-                        mdr.getType());
-                appendElement(sb, INDENT4, "message-destination-usage",
-                        mdr.getUsage());
-                appendElement(sb, INDENT4, "message-destination-link",
-                        mdr.getLink());
+                appendElement(sb, INDENT4, "message-destination-ref-name", mdr.getName());
+                appendElement(sb, INDENT4, "message-destination-type", mdr.getType());
+                appendElement(sb, INDENT4, "message-destination-usage", mdr.getUsage());
+                appendElement(sb, INDENT4, "message-destination-link", mdr.getLink());
                 appendElement(sb, INDENT4, "mapped-name", mdr.getProperty("mappedName"));
                 for (InjectionTarget target : mdr.getInjectionTargets()) {
                     sb.append("    <injection-target>\n");
-                    appendElement(sb, INDENT6, "injection-target-class",
-                            target.getTargetClass());
-                    appendElement(sb, INDENT6, "injection-target-name",
-                            target.getTargetName());
+                    appendElement(sb, INDENT6, "injection-target-class", target.getTargetClass());
+                    appendElement(sb, INDENT6, "injection-target-name", target.getTargetName());
                     sb.append("    </injection-target>\n");
                 }
                 appendElement(sb, INDENT4, "lookup-name", mdr.getLookupName());
@@ -1360,8 +1409,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 sb.append("  <message-destination>\n");
                 appendElement(sb, INDENT4, "description", md.getDescription());
                 appendElement(sb, INDENT4, "display-name", md.getDisplayName());
-                appendElement(sb, INDENT4, "message-destination-name",
-                        md.getName());
+                appendElement(sb, INDENT4, "message-destination-name", md.getName());
                 appendElement(sb, INDENT4, "mapped-name", md.getProperty("mappedName"));
                 appendElement(sb, INDENT4, "lookup-name", md.getLookupName());
                 sb.append("  </message-destination>\n");
@@ -1373,8 +1421,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         if (getMajorVersion() > 2 || getMinorVersion() > 3) {
             if (!localeEncodingMappings.isEmpty()) {
                 sb.append("  <locale-encoding-mapping-list>\n");
-                for (Map.Entry<String, String> entry :
-                        localeEncodingMappings.entrySet()) {
+                for (Map.Entry<String,String> entry : localeEncodingMappings.entrySet()) {
                     sb.append("    <locale-encoding-mapping>\n");
                     appendElement(sb, INDENT6, "locale", entry.getKey());
                     appendElement(sb, INDENT6, "encoding", entry.getValue());
@@ -1386,8 +1433,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
 
         // deny-uncovered-http-methods was introduced in Servlet 3.1
-        if (getMajorVersion() > 3 ||
-                (getMajorVersion() == 3 && getMinorVersion() > 0)) {
+        if (getMajorVersion() > 3 || (getMajorVersion() == 3 && getMinorVersion() > 0)) {
             if (denyUncoveredHttpMethods) {
                 sb.append("  <deny-uncovered-http-methods/>");
                 sb.append("\n");
@@ -1409,8 +1455,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     }
 
 
-    private static void appendElement(StringBuilder sb, String indent,
-            String elementName, String value) {
+    private static void appendElement(StringBuilder sb, String indent, String elementName, String value) {
         if (value == null) {
             return;
         }
@@ -1431,8 +1476,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
     }
 
-    private static void appendElement(StringBuilder sb, String indent,
-            String elementName, Object value) {
+    private static void appendElement(StringBuilder sb, String indent, String elementName, Object value) {
         if (value == null) {
             return;
         }
@@ -1443,9 +1487,9 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
     /**
      * Merge the supplied web fragments into this main web.xml.
      *
-     * @param fragments     The fragments to merge in
-     * @return <code>true</code> if merge is successful, else
-     *         <code>false</code>
+     * @param fragments The fragments to merge in
+     *
+     * @return <code>true</code> if merge is successful, else <code>false</code>
      */
     public boolean merge(Set<WebXml> fragments) {
         // As far as possible, process in alphabetical order so it is easy to
@@ -1456,8 +1500,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         WebXml temp = new WebXml();
 
         for (WebXml fragment : fragments) {
-            if (!mergeMap(fragment.getContextParams(), contextParams,
-                    temp.getContextParams(), fragment, "Context Parameter")) {
+            if (!mergeMap(fragment.getContextParams(), contextParams, temp.getContextParams(), fragment,
+                    "Context Parameter")) {
                 return false;
             }
         }
@@ -1470,10 +1514,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                     if (temp.getDisplayName() == null) {
                         temp.setDisplayName(value);
                     } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictDisplayName",
-                                fragment.getName(),
-                                fragment.getURL()));
+                        log.error(
+                                sm.getString("webXml.mergeConflictDisplayName", fragment.getName(), fragment.getURL()));
                         return false;
                     }
                 }
@@ -1482,7 +1524,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
 
         // Note: Not permitted in fragments, but we also use fragments for
-        //       per-Host and global defaults so they may appear there
+        // per-Host and global defaults so they may appear there
         if (!denyUncoveredHttpMethods) {
             for (WebXml fragment : fragments) {
                 if (fragment.getDenyUncoveredHttpMethods()) {
@@ -1516,32 +1558,28 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
 
         for (WebXml fragment : fragments) {
-            if (!mergeResourceMap(fragment.getEjbLocalRefs(), ejbLocalRefs,
-                    temp.getEjbLocalRefs(), fragment)) {
+            if (!mergeResourceMap(fragment.getEjbLocalRefs(), ejbLocalRefs, temp.getEjbLocalRefs(), fragment)) {
                 return false;
             }
         }
         ejbLocalRefs.putAll(temp.getEjbLocalRefs());
 
         for (WebXml fragment : fragments) {
-            if (!mergeResourceMap(fragment.getEjbRefs(), ejbRefs,
-                    temp.getEjbRefs(), fragment)) {
+            if (!mergeResourceMap(fragment.getEjbRefs(), ejbRefs, temp.getEjbRefs(), fragment)) {
                 return false;
             }
         }
         ejbRefs.putAll(temp.getEjbRefs());
 
         for (WebXml fragment : fragments) {
-            if (!mergeResourceMap(fragment.getEnvEntries(), envEntries,
-                    temp.getEnvEntries(), fragment)) {
+            if (!mergeResourceMap(fragment.getEnvEntries(), envEntries, temp.getEnvEntries(), fragment)) {
                 return false;
             }
         }
         envEntries.putAll(temp.getEnvEntries());
 
         for (WebXml fragment : fragments) {
-            if (!mergeMap(fragment.getErrorPages(), errorPages,
-                    temp.getErrorPages(), fragment, "Error Page")) {
+            if (!mergeMap(fragment.getErrorPages(), errorPages, temp.getErrorPages(), fragment, "Error Page")) {
                 return false;
             }
         }
@@ -1564,19 +1602,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
 
         for (WebXml fragment : fragments) {
-            for (Map.Entry<String,FilterDef> entry :
-                    fragment.getFilters().entrySet()) {
+            for (Map.Entry<String,FilterDef> entry : fragment.getFilters().entrySet()) {
                 if (filters.containsKey(entry.getKey())) {
-                    mergeFilter(entry.getValue(),
-                            filters.get(entry.getKey()), false);
+                    mergeFilter(entry.getValue(), filters.get(entry.getKey()), false);
                 } else {
                     if (temp.getFilters().containsKey(entry.getKey())) {
-                        if (!(mergeFilter(entry.getValue(),
-                                temp.getFilters().get(entry.getKey()), true))) {
-                            log.error(sm.getString(
-                                    "webXml.mergeConflictFilter",
-                                    entry.getKey(),
-                                    fragment.getName(),
+                        if (!(mergeFilter(entry.getValue(), temp.getFilters().get(entry.getKey()), true))) {
+                            log.error(sm.getString("webXml.mergeConflictFilter", entry.getKey(), fragment.getName(),
                                     fragment.getURL()));
 
                             return false;
@@ -1590,8 +1622,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         filters.putAll(temp.getFilters());
 
         for (WebXml fragment : fragments) {
-            for (JspPropertyGroup jspPropertyGroup :
-                    fragment.getJspPropertyGroups()) {
+            for (JspPropertyGroup jspPropertyGroup : fragment.getJspPropertyGroups()) {
                 // Always additive
                 addJspPropertyGroup(jspPropertyGroup);
             }
@@ -1605,9 +1636,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
 
         for (WebXml fragment : fragments) {
-            if (!mergeMap(fragment.getLocaleEncodingMappings(),
-                    localeEncodingMappings, temp.getLocaleEncodingMappings(),
-                    fragment, "Locale Encoding Mapping")) {
+            if (!mergeMap(fragment.getLocaleEncodingMappings(), localeEncodingMappings,
+                    temp.getLocaleEncodingMappings(), fragment, "Locale Encoding Mapping")) {
                 return false;
             }
         }
@@ -1618,14 +1648,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             for (WebXml fragment : fragments) {
                 LoginConfig fragmentLoginConfig = fragment.loginConfig;
                 if (fragmentLoginConfig != null) {
-                    if (tempLoginConfig == null ||
-                            fragmentLoginConfig.equals(tempLoginConfig)) {
+                    if (tempLoginConfig == null || fragmentLoginConfig.equals(tempLoginConfig)) {
                         tempLoginConfig = fragmentLoginConfig;
                     } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictLoginConfig",
-                                fragment.getName(),
-                                fragment.getURL()));
+                        log.error(
+                                sm.getString("webXml.mergeConflictLoginConfig", fragment.getName(), fragment.getURL()));
                     }
                 }
             }
@@ -1641,32 +1668,30 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         messageDestinationRefs.putAll(temp.getMessageDestinationRefs());
 
         for (WebXml fragment : fragments) {
-            if (!mergeResourceMap(fragment.getMessageDestinations(), messageDestinations,
-                    temp.getMessageDestinations(), fragment)) {
+            if (!mergeResourceMap(fragment.getMessageDestinations(), messageDestinations, temp.getMessageDestinations(),
+                    fragment)) {
                 return false;
             }
         }
         messageDestinations.putAll(temp.getMessageDestinations());
 
         for (WebXml fragment : fragments) {
-            if (!mergeMap(fragment.getMimeMappings(), mimeMappings,
-                    temp.getMimeMappings(), fragment, "Mime Mapping")) {
+            if (!mergeMap(fragment.getMimeMappings(), mimeMappings, temp.getMimeMappings(), fragment, "Mime Mapping")) {
                 return false;
             }
         }
         mimeMappings.putAll(temp.getMimeMappings());
 
         for (WebXml fragment : fragments) {
-            if (!mergeResourceMap(fragment.getResourceEnvRefs(), resourceEnvRefs,
-                    temp.getResourceEnvRefs(), fragment)) {
+            if (!mergeResourceMap(fragment.getResourceEnvRefs(), resourceEnvRefs, temp.getResourceEnvRefs(),
+                    fragment)) {
                 return false;
             }
         }
         resourceEnvRefs.putAll(temp.getResourceEnvRefs());
 
         for (WebXml fragment : fragments) {
-            if (!mergeResourceMap(fragment.getResourceRefs(), resourceRefs,
-                    temp.getResourceRefs(), fragment)) {
+            if (!mergeResourceMap(fragment.getResourceRefs(), resourceRefs, temp.getResourceRefs(), fragment)) {
                 return false;
             }
         }
@@ -1687,8 +1712,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
 
         for (WebXml fragment : fragments) {
-            if (!mergeResourceMap(fragment.getServiceRefs(), serviceRefs,
-                    temp.getServiceRefs(), fragment)) {
+            if (!mergeResourceMap(fragment.getServiceRefs(), serviceRefs, temp.getServiceRefs(), fragment)) {
                 return false;
             }
         }
@@ -1701,8 +1725,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         // defined in web.xml
         List<Map.Entry<String,String>> servletMappingsToAdd = new ArrayList<>();
         for (WebXml fragment : fragments) {
-            for (Map.Entry<String,String> servletMap :
-                    fragment.getServletMappings().entrySet()) {
+            for (Map.Entry<String,String> servletMap : fragment.getServletMappings().entrySet()) {
                 if (!servletMappingNames.contains(servletMap.getValue()) &&
                         !servletMappings.containsKey(servletMap.getKey())) {
                     servletMappingsToAdd.add(servletMap);
@@ -1716,19 +1739,13 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
 
         for (WebXml fragment : fragments) {
-            for (Map.Entry<String,ServletDef> entry :
-                    fragment.getServlets().entrySet()) {
+            for (Map.Entry<String,ServletDef> entry : fragment.getServlets().entrySet()) {
                 if (servlets.containsKey(entry.getKey())) {
-                    mergeServlet(entry.getValue(),
-                            servlets.get(entry.getKey()), false);
+                    mergeServlet(entry.getValue(), servlets.get(entry.getKey()), false);
                 } else {
                     if (temp.getServlets().containsKey(entry.getKey())) {
-                        if (!(mergeServlet(entry.getValue(),
-                                temp.getServlets().get(entry.getKey()), true))) {
-                            log.error(sm.getString(
-                                    "webXml.mergeConflictServlet",
-                                    entry.getKey(),
-                                    fragment.getName(),
+                        if (!(mergeServlet(entry.getValue(), temp.getServlets().get(entry.getKey()), true))) {
+                            log.error(sm.getString("webXml.mergeConflictServlet", entry.getKey(), fragment.getName(),
                                     fragment.getURL()));
 
                             return false;
@@ -1747,21 +1764,17 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 if (value != null) {
                     if (temp.getSessionConfig().getSessionTimeout() == null) {
                         temp.getSessionConfig().setSessionTimeout(value.toString());
-                    } else if (value.equals(
-                            temp.getSessionConfig().getSessionTimeout())) {
+                    } else if (value.equals(temp.getSessionConfig().getSessionTimeout())) {
                         // Fragments use same value - no conflict
                     } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictSessionTimeout",
-                                fragment.getName(),
+                        log.error(sm.getString("webXml.mergeConflictSessionTimeout", fragment.getName(),
                                 fragment.getURL()));
                         return false;
                     }
                 }
             }
             if (temp.getSessionConfig().getSessionTimeout() != null) {
-                sessionConfig.setSessionTimeout(
-                        temp.getSessionConfig().getSessionTimeout().toString());
+                sessionConfig.setSessionTimeout(temp.getSessionConfig().getSessionTimeout().toString());
             }
         }
 
@@ -1771,20 +1784,16 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 if (value != null) {
                     if (temp.getSessionConfig().getCookieName() == null) {
                         temp.getSessionConfig().setCookieName(value);
-                    } else if (value.equals(
-                            temp.getSessionConfig().getCookieName())) {
+                    } else if (value.equals(temp.getSessionConfig().getCookieName())) {
                         // Fragments use same value - no conflict
                     } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictSessionCookieName",
-                                fragment.getName(),
+                        log.error(sm.getString("webXml.mergeConflictSessionCookieName", fragment.getName(),
                                 fragment.getURL()));
                         return false;
                     }
                 }
             }
-            sessionConfig.setCookieName(
-                    temp.getSessionConfig().getCookieName());
+            sessionConfig.setCookieName(temp.getSessionConfig().getCookieName());
         }
 
         Map<String,String> mainAttributes = getSessionConfig().getCookieAttributes();
@@ -1798,9 +1807,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                         // If values are the same, NO-OP. If they are different
                         // trigger a merge error
                         if (!mergedFragmentAttributes.get(attribute.getKey()).equals(attribute.getValue())) {
-                            log.error(sm.getString(
-                                    "webXml.mergeConflictSessionCookieAttributes",
-                                    fragment.getName(),
+                            log.error(sm.getString("webXml.mergeConflictSessionCookieAttributes", fragment.getName(),
                                     fragment.getURL()));
                             return false;
                         }
@@ -1815,30 +1822,24 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         if (sessionConfig.getSessionTrackingModes().isEmpty()) {
             for (WebXml fragment : fragments) {
-                EnumSet<SessionTrackingMode> value =
-                    fragment.getSessionConfig().getSessionTrackingModes();
+                EnumSet<SessionTrackingMode> value = fragment.getSessionConfig().getSessionTrackingModes();
                 if (!value.isEmpty()) {
                     if (temp.getSessionConfig().getSessionTrackingModes().isEmpty()) {
                         temp.getSessionConfig().getSessionTrackingModes().addAll(value);
-                    } else if (value.equals(
-                            temp.getSessionConfig().getSessionTrackingModes())) {
+                    } else if (value.equals(temp.getSessionConfig().getSessionTrackingModes())) {
                         // Fragments use same value - no conflict
                     } else {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictSessionTrackingMode",
-                                fragment.getName(),
+                        log.error(sm.getString("webXml.mergeConflictSessionTrackingMode", fragment.getName(),
                                 fragment.getURL()));
                         return false;
                     }
                 }
             }
-            sessionConfig.getSessionTrackingModes().addAll(
-                    temp.getSessionConfig().getSessionTrackingModes());
+            sessionConfig.getSessionTrackingModes().addAll(temp.getSessionConfig().getSessionTrackingModes());
         }
 
         for (WebXml fragment : fragments) {
-            if (!mergeMap(fragment.getTaglibs(), taglibs,
-                    temp.getTaglibs(), fragment, "Taglibs")) {
+            if (!mergeMap(fragment.getTaglibs(), taglibs, temp.getTaglibs(), fragment, "Taglibs")) {
                 return false;
             }
         }
@@ -1854,9 +1855,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         if (postConstructMethods.isEmpty()) {
             for (WebXml fragment : fragments) {
-                if (!mergeLifecycleCallback(fragment.getPostConstructMethods(),
-                        temp.getPostConstructMethods(), fragment,
-                        "Post Construct Methods")) {
+                if (!mergeLifecycleCallback(fragment.getPostConstructMethods(), temp.getPostConstructMethods(),
+                        fragment, "Post Construct Methods")) {
                     return false;
                 }
             }
@@ -1865,8 +1865,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
         if (preDestroyMethods.isEmpty()) {
             for (WebXml fragment : fragments) {
-                if (!mergeLifecycleCallback(fragment.getPreDestroyMethods(),
-                        temp.getPreDestroyMethods(), fragment,
+                if (!mergeLifecycleCallback(fragment.getPreDestroyMethods(), temp.getPreDestroyMethods(), fragment,
                         "Pre Destroy Methods")) {
                     return false;
                 }
@@ -1877,23 +1876,18 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         return true;
     }
 
-    private <T extends ResourceBase> boolean mergeResourceMap(
-            Map<String, T> fragmentResources, Map<String, T> mainResources,
-            Map<String, T> tempResources, WebXml fragment) {
+    private <T extends ResourceBase> boolean mergeResourceMap(Map<String,T> fragmentResources,
+            Map<String,T> mainResources, Map<String,T> tempResources, WebXml fragment) {
         for (T resource : fragmentResources.values()) {
             String resourceName = resource.getName();
             if (mainResources.containsKey(resourceName)) {
-                mainResources.get(resourceName).getInjectionTargets().addAll(
-                        resource.getInjectionTargets());
+                mainResources.get(resourceName).getInjectionTargets().addAll(resource.getInjectionTargets());
             } else {
                 // Not defined in main web.xml
                 T existingResource = tempResources.get(resourceName);
                 if (existingResource != null) {
                     if (!existingResource.equals(resource)) {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictResource",
-                                resourceName,
-                                fragment.getName(),
+                        log.error(sm.getString("webXml.mergeConflictResource", resourceName, fragment.getName(),
                                 fragment.getURL()));
                         return false;
                     }
@@ -1905,22 +1899,16 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         return true;
     }
 
-    private <T> boolean mergeMap(Map<String,T> fragmentMap,
-            Map<String,T> mainMap, Map<String,T> tempMap, WebXml fragment,
-            String mapName) {
-        for (Entry<String, T> entry : fragmentMap.entrySet()) {
+    private <T> boolean mergeMap(Map<String,T> fragmentMap, Map<String,T> mainMap, Map<String,T> tempMap,
+            WebXml fragment, String mapName) {
+        for (Entry<String,T> entry : fragmentMap.entrySet()) {
             final String key = entry.getKey();
             if (!mainMap.containsKey(key)) {
                 // Not defined in main web.xml
                 T value = entry.getValue();
                 if (tempMap.containsKey(key)) {
-                    if (value != null && !value.equals(
-                            tempMap.get(key))) {
-                        log.error(sm.getString(
-                                "webXml.mergeConflictString",
-                                mapName,
-                                key,
-                                fragment.getName(),
+                    if (value != null && !value.equals(tempMap.get(key))) {
+                        log.error(sm.getString("webXml.mergeConflictString", mapName, key, fragment.getName(),
                                 fragment.getURL()));
                         return false;
                     }
@@ -1932,31 +1920,26 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         return true;
     }
 
-    private static boolean mergeFilter(FilterDef src, FilterDef dest,
-            boolean failOnConflict) {
+    private static boolean mergeFilter(FilterDef src, FilterDef dest, boolean failOnConflict) {
         if (dest.getAsyncSupported() == null) {
             dest.setAsyncSupported(src.getAsyncSupported());
         } else if (src.getAsyncSupported() != null) {
-            if (failOnConflict &&
-                    !src.getAsyncSupported().equals(dest.getAsyncSupported())) {
+            if (failOnConflict && !src.getAsyncSupported().equals(dest.getAsyncSupported())) {
                 return false;
             }
         }
 
-        if (dest.getFilterClass()  == null) {
+        if (dest.getFilterClass() == null) {
             dest.setFilterClass(src.getFilterClass());
         } else if (src.getFilterClass() != null) {
-            if (failOnConflict &&
-                    !src.getFilterClass().equals(dest.getFilterClass())) {
+            if (failOnConflict && !src.getFilterClass().equals(dest.getFilterClass())) {
                 return false;
             }
         }
 
-        for (Map.Entry<String,String> srcEntry :
-                src.getParameterMap().entrySet()) {
+        for (Map.Entry<String,String> srcEntry : src.getParameterMap().entrySet()) {
             if (dest.getParameterMap().containsKey(srcEntry.getKey())) {
-                if (failOnConflict && !dest.getParameterMap().get(
-                        srcEntry.getKey()).equals(srcEntry.getValue())) {
+                if (failOnConflict && !dest.getParameterMap().get(srcEntry.getKey()).equals(srcEntry.getValue())) {
                     return false;
                 }
             } else {
@@ -1966,8 +1949,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         return true;
     }
 
-    private static boolean mergeServlet(ServletDef src, ServletDef dest,
-            boolean failOnConflict) {
+    private static boolean mergeServlet(ServletDef src, ServletDef dest, boolean failOnConflict) {
         // These tests should be unnecessary...
         if (dest.getServletClass() != null && dest.getJspFile() != null) {
             return false;
@@ -1982,13 +1964,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             dest.setJspFile(src.getJspFile());
         } else if (failOnConflict) {
             if (src.getServletClass() != null &&
-                    (dest.getJspFile() != null ||
-                            !src.getServletClass().equals(dest.getServletClass()))) {
+                    (dest.getJspFile() != null || !src.getServletClass().equals(dest.getServletClass()))) {
                 return false;
             }
             if (src.getJspFile() != null &&
-                    (dest.getServletClass() != null ||
-                            !src.getJspFile().equals(dest.getJspFile()))) {
+                    (dest.getServletClass() != null || !src.getJspFile().equals(dest.getJspFile()))) {
                 return false;
             }
         }
@@ -2003,8 +1983,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 dest.setLoadOnStartup(src.getLoadOnStartup().toString());
             }
         } else if (src.getLoadOnStartup() != null) {
-            if (failOnConflict &&
-                    !src.getLoadOnStartup().equals(dest.getLoadOnStartup())) {
+            if (failOnConflict && !src.getLoadOnStartup().equals(dest.getLoadOnStartup())) {
                 return false;
             }
         }
@@ -2014,17 +1993,14 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 dest.setEnabled(src.getEnabled().toString());
             }
         } else if (src.getEnabled() != null) {
-            if (failOnConflict &&
-                    !src.getEnabled().equals(dest.getEnabled())) {
+            if (failOnConflict && !src.getEnabled().equals(dest.getEnabled())) {
                 return false;
             }
         }
 
-        for (Map.Entry<String,String> srcEntry :
-                src.getParameterMap().entrySet()) {
+        for (Map.Entry<String,String> srcEntry : src.getParameterMap().entrySet()) {
             if (dest.getParameterMap().containsKey(srcEntry.getKey())) {
-                if (failOnConflict && !dest.getParameterMap().get(
-                        srcEntry.getKey()).equals(srcEntry.getValue())) {
+                if (failOnConflict && !dest.getParameterMap().get(srcEntry.getKey()).equals(srcEntry.getValue())) {
                     return false;
                 }
             } else {
@@ -2035,8 +2011,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         if (dest.getMultipartDef() == null) {
             dest.setMultipartDef(src.getMultipartDef());
         } else if (src.getMultipartDef() != null) {
-            return mergeMultipartDef(src.getMultipartDef(),
-                    dest.getMultipartDef(), failOnConflict);
+            return mergeMultipartDef(src.getMultipartDef(), dest.getMultipartDef(), failOnConflict);
         }
 
         if (dest.getAsyncSupported() == null) {
@@ -2044,21 +2019,18 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 dest.setAsyncSupported(src.getAsyncSupported().toString());
             }
         } else if (src.getAsyncSupported() != null) {
-            return !failOnConflict ||
-                src.getAsyncSupported().equals(dest.getAsyncSupported());
+            return !failOnConflict || src.getAsyncSupported().equals(dest.getAsyncSupported());
         }
 
         return true;
     }
 
-    private static boolean mergeMultipartDef(MultipartDef src, MultipartDef dest,
-            boolean failOnConflict) {
+    private static boolean mergeMultipartDef(MultipartDef src, MultipartDef dest, boolean failOnConflict) {
 
         if (dest.getLocation() == null) {
             dest.setLocation(src.getLocation());
         } else if (src.getLocation() != null) {
-            if (failOnConflict &&
-                    !src.getLocation().equals(dest.getLocation())) {
+            if (failOnConflict && !src.getLocation().equals(dest.getLocation())) {
                 return false;
             }
         }
@@ -2066,9 +2038,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         if (dest.getFileSizeThreshold() == null) {
             dest.setFileSizeThreshold(src.getFileSizeThreshold());
         } else if (src.getFileSizeThreshold() != null) {
-            if (failOnConflict &&
-                    !src.getFileSizeThreshold().equals(
-                            dest.getFileSizeThreshold())) {
+            if (failOnConflict && !src.getFileSizeThreshold().equals(dest.getFileSizeThreshold())) {
                 return false;
             }
         }
@@ -2076,8 +2046,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         if (dest.getMaxFileSize() == null) {
             dest.setMaxFileSize(src.getMaxFileSize());
         } else if (src.getMaxFileSize() != null) {
-            if (failOnConflict &&
-                    !src.getMaxFileSize().equals(dest.getMaxFileSize())) {
+            if (failOnConflict && !src.getMaxFileSize().equals(dest.getMaxFileSize())) {
                 return false;
             }
         }
@@ -2085,24 +2054,22 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         if (dest.getMaxRequestSize() == null) {
             dest.setMaxRequestSize(src.getMaxRequestSize());
         } else if (src.getMaxRequestSize() != null) {
-            return !failOnConflict ||
-                src.getMaxRequestSize().equals(dest.getMaxRequestSize());
+            return !failOnConflict || src.getMaxRequestSize().equals(dest.getMaxRequestSize());
         }
 
         return true;
     }
 
 
-    private boolean mergeLifecycleCallback(
-            Map<String, String> fragmentMap, Map<String, String> tempMap,
-            WebXml fragment, String mapName) {
-        for (Entry<String, String> entry : fragmentMap.entrySet()) {
+    private boolean mergeLifecycleCallback(Map<String,String> fragmentMap, Map<String,String> tempMap, WebXml fragment,
+            String mapName) {
+        for (Entry<String,String> entry : fragmentMap.entrySet()) {
             final String key = entry.getKey();
             final String value = entry.getValue();
             if (tempMap.containsKey(key)) {
                 if (value != null && !value.equals(tempMap.get(key))) {
-                    log.error(sm.getString("webXml.mergeConflictString",
-                            mapName, key, fragment.getName(), fragment.getURL()));
+                    log.error(sm.getString("webXml.mergeConflictString", mapName, key, fragment.getName(),
+                            fragment.getURL()));
                     return false;
                 }
             } else {
@@ -2114,24 +2081,22 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
 
 
     /**
-     * Generates the sub-set of the web-fragment.xml files to be processed in
-     * the order that the fragments must be processed as per the rules in the
-     * Servlet spec.
+     * Generates the sub-set of the web-fragment.xml files to be processed in the order that the fragments must be
+     * processed as per the rules in the Servlet spec.
      *
      * @param application    The application web.xml file
      * @param fragments      The map of fragment names to web fragments
-     * @param servletContext The servlet context the fragments are associated
-     *                       with
+     * @param servletContext The servlet context the fragments are associated with
+     *
      * @return Ordered list of web-fragment.xml files to process
      */
-    public static Set<WebXml> orderWebFragments(WebXml application,
-            Map<String,WebXml> fragments, ServletContext servletContext) {
+    public static Set<WebXml> orderWebFragments(WebXml application, Map<String,WebXml> fragments,
+            ServletContext servletContext) {
         return application.orderWebFragments(fragments, servletContext);
     }
 
 
-    private Set<WebXml> orderWebFragments(Map<String,WebXml> fragments,
-            ServletContext servletContext) {
+    private Set<WebXml> orderWebFragments(Map<String,WebXml> fragments, ServletContext servletContext) {
 
         Set<WebXml> orderedFragments = new LinkedHashSet<>();
 
@@ -2146,7 +2111,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             for (String requestedName : requestedOrder) {
                 if (ORDER_OTHERS.equals(requestedName)) {
                     // Add all fragments not named explicitly at this point
-                    for (Entry<String, WebXml> entry : fragments.entrySet()) {
+                    for (Entry<String,WebXml> entry : fragments.entrySet()) {
                         if (!requestedOrder.contains(entry.getKey())) {
                             WebXml fragment = entry.getValue();
                             if (fragment != null) {
@@ -2159,7 +2124,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                     if (fragment != null) {
                         orderedFragments.add(fragment);
                     } else {
-                        log.warn(sm.getString("webXml.wrongFragmentName",requestedName));
+                        log.warn(sm.getString("webXml.wrongFragmentName", requestedName));
                     }
                 }
             }
@@ -2174,10 +2139,9 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
                 }
             }
             // Stage 1. Make all dependencies bidirectional - this makes the
-            //          next stage simpler.
+            // next stage simpler.
             for (WebXml fragment : fragments.values()) {
-                Iterator<String> before =
-                        fragment.getBeforeOrdering().iterator();
+                Iterator<String> before = fragment.getBeforeOrdering().iterator();
                 while (before.hasNext()) {
                     orderingPresent = true;
                     String beforeEntry = before.next();
@@ -2206,8 +2170,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             }
 
             // Stage 2. Make all fragments that are implicitly before/after
-            //          others explicitly so. This is iterative so the next
-            //          stage doesn't have to be.
+            // others explicitly so. This is iterative so the next
+            // stage doesn't have to be.
             for (WebXml fragment : fragments.values()) {
                 if (fragment.getBeforeOrdering().contains(ORDER_OTHERS)) {
                     makeBeforeOthersExplicit(fragment.getAfterOrdering(), fragments);
@@ -2235,18 +2199,18 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             }
 
             // Stage 4. Decouple the groups so the ordering requirements for
-            //          each fragment in the group only refer to other fragments
-            //          in the group. Ordering requirements outside the group
-            //          will be handled by processing the groups in order.
-            //          Note: Only after ordering requirements are considered.
-            //                This is OK because of the processing in stage 1.
+            // each fragment in the group only refer to other fragments
+            // in the group. Ordering requirements outside the group
+            // will be handled by processing the groups in order.
+            // Note: Only after ordering requirements are considered.
+            // This is OK because of the processing in stage 1.
             decoupleOtherGroups(beforeSet);
             decoupleOtherGroups(othersSet);
             decoupleOtherGroups(afterSet);
 
             // Stage 5. Order each group
-            //          Note: Only after ordering requirements are considered.
-            //                This is OK because of the processing in stage 1.
+            // Note: Only after ordering requirements are considered.
+            // This is OK because of the processing in stage 1.
             orderFragments(orderedFragments, beforeSet);
             orderFragments(orderedFragments, othersSet);
             orderFragments(orderedFragments, afterSet);
@@ -2270,12 +2234,11 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             List<String> orderedJarFileNames = null;
             if (orderingPresent) {
                 orderedJarFileNames = new ArrayList<>();
-                for (WebXml fragment: orderedFragments) {
+                for (WebXml fragment : orderedFragments) {
                     orderedJarFileNames.add(fragment.getJarName());
                 }
             }
-            servletContext.setAttribute(ServletContext.ORDERED_LIBS,
-                    orderedJarFileNames);
+            servletContext.setAttribute(ServletContext.ORDERED_LIBS, orderedJarFileNames);
         }
 
         // The remainder of the processing needs to know about container
@@ -2304,8 +2267,8 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             fragment.getAfterOrdering().removeIf(entry -> !names.contains(entry));
         }
     }
-    private static void orderFragments(Set<WebXml> orderedFragments,
-            Set<WebXml> unordered) {
+
+    private static void orderFragments(Set<WebXml> orderedFragments, Set<WebXml> unordered) {
         Set<WebXml> addedThisRound = new HashSet<>();
         Set<WebXml> addedLastRound = new HashSet<>();
         while (!unordered.isEmpty()) {
@@ -2323,8 +2286,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
             }
             if (addedThisRound.isEmpty()) {
                 // Circular
-                throw new IllegalArgumentException(
-                        sm.getString("webXml.mergeConflictOrder"));
+                throw new IllegalArgumentException(sm.getString("webXml.mergeConflictOrder"));
             }
             addedLastRound.clear();
             addedLastRound.addAll(addedThisRound);
@@ -2332,8 +2294,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
     }
 
-    private static void makeBeforeOthersExplicit(Set<String> beforeOrdering,
-            Map<String, WebXml> fragments) {
+    private static void makeBeforeOthersExplicit(Set<String> beforeOrdering, Map<String,WebXml> fragments) {
         for (String before : beforeOrdering) {
             if (!before.equals(ORDER_OTHERS)) {
                 WebXml webXml = fragments.get(before);
@@ -2345,8 +2306,7 @@ public class WebXml extends XmlEncodingBase implements DocumentProperties.Charse
         }
     }
 
-    private static void makeAfterOthersExplicit(Set<String> afterOrdering,
-            Map<String, WebXml> fragments) {
+    private static void makeAfterOthersExplicit(Set<String> afterOrdering, Map<String,WebXml> fragments) {
         for (String after : afterOrdering) {
             if (!after.equals(ORDER_OTHERS)) {
                 WebXml webXml = fragments.get(after);

@@ -20,9 +20,8 @@ package org.apache.tomcat.util.descriptor.web;
 import java.io.Serial;
 
 /**
- * Representation of a resource reference for a web application, as
- * represented in a <code>&lt;resource-ref&gt;</code> element in the
- * deployment descriptor.
+ * Representation of a resource reference for a web application, as represented in a <code>&lt;resource-ref&gt;</code>
+ * element in the deployment descriptor.
  *
  * @author Craig R. McClanahan
  * @author Peter Rossbach (pero@apache.org)
@@ -36,8 +35,7 @@ public class ContextResource extends ResourceBase {
 
 
     /**
-     * The authorization requirement for this resource
-     * (<code>Application</code> or <code>Container</code>).
+     * The authorization requirement for this resource (<code>Application</code> or <code>Container</code>).
      */
     private String auth = null;
 
@@ -50,8 +48,7 @@ public class ContextResource extends ResourceBase {
     }
 
     /**
-     * The sharing scope of this resource factory (<code>Shareable</code>
-     * or <code>Unshareable</code>).
+     * The sharing scope of this resource factory (<code>Shareable</code> or <code>Unshareable</code>).
      */
     private String scope = "Shareable";
 
@@ -65,9 +62,8 @@ public class ContextResource extends ResourceBase {
 
 
     /**
-     * Is this resource known to be a singleton resource. The default value is
-     * true since this is what users expect although the Jakarta EE spec implies
-     * that the default should be false.
+     * Is this resource known to be a singleton resource. The default value is true since this is what users expect
+     * although the Jakarta EE spec implies that the default should be false.
      */
     private boolean singleton = true;
 
@@ -81,10 +77,8 @@ public class ContextResource extends ResourceBase {
 
 
     /**
-     * The name of the zero argument method to be called when the resource is
-     * no longer required to clean-up resources. This method must only speed up
-     * the clean-up of resources that would otherwise happen via garbage
-     * collection.
+     * The name of the zero argument method to be called when the resource is no longer required to clean-up resources.
+     * This method must only speed up the clean-up of resources that would otherwise happen via garbage collection.
      */
     private String closeMethod = null;
     private boolean closeMethodConfigured = false;
@@ -141,8 +135,7 @@ public class ContextResource extends ResourceBase {
         final int prime = 31;
         int result = super.hashCode();
         result = prime * result + ((auth == null) ? 0 : auth.hashCode());
-        result = prime * result +
-                ((closeMethod == null) ? 0 : closeMethod.hashCode());
+        result = prime * result + ((closeMethod == null) ? 0 : closeMethod.hashCode());
         result = prime * result + ((scope == null) ? 0 : scope.hashCode());
         result = prime * result + (singleton ? 1231 : 1237);
         return result;

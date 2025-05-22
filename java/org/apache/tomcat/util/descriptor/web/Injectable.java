@@ -20,6 +20,8 @@ import java.util.List;
 
 public interface Injectable {
     String getName();
+
     void addInjectionTarget(String injectionTargetName, String jndiName);
+
     List<InjectionTarget> getInjectionTargets();
 }
