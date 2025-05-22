@@ -42,9 +42,10 @@ public class SocketProperties {
 
     /**
      * Enable/disable socket processor cache, this bounded cache stores
-     * SocketProcessor objects to reduce GC
-     * Default is 0
-     * -1 is unlimited
+     * SocketProcessor objects to reduce GC.
+     * <p>
+     * Default is 0<br>
+     * -1 is unlimited<br>
      * 0 is disabled
      */
     protected int processorCache = 0;
@@ -52,22 +53,23 @@ public class SocketProperties {
     /**
      * Enable/disable poller event cache, this bounded cache stores
      * PollerEvent objects to reduce GC for the poller
-     * Default is 0
-     * -1 is unlimited
-     * 0 is disabled
+     * <p>
+     * Default is 0<br>
+     * -1 is unlimited<br>
+     * 0 is disabled<br>
      * &gt;0 the max number of objects to keep in cache.
      */
     protected int eventCache = 0;
 
     /**
-     * Enable/disable direct buffers for the network buffers
-     * Default value is disabled
+     * Enable/disable direct buffers for the network buffers.
+     * Default value is disabled.
      */
     protected boolean directBuffer = false;
 
     /**
-     * Enable/disable direct buffers for the network buffers for SSL
-     * Default value is disabled
+     * Enable/disable direct buffers for the network buffers for SSL.
+     * Default value is disabled.
      */
     protected boolean directSslBuffer = false;
 
@@ -85,28 +87,32 @@ public class SocketProperties {
 
     /**
      * The application read buffer size in bytes.
-     * Default value is 8192
+     * Default value is 8192.
      */
     protected int appReadBufSize = 8192;
 
     /**
-     * The application write buffer size in bytes
-     * Default value is 8192
+     * The application write buffer size in bytes.
+     * Default value is 8192.
      */
     protected int appWriteBufSize = 8192;
 
     /**
      * NioChannel pool size for the endpoint,
-     * this value is how many channels
-     * -1 means unlimited cached, 0 means no cache,
-     * -2 means bufferPoolSize will be used
+     * this value is how many channels.
+     * <p>
+     * 0 means no cache<br>
+     * -1 means unlimited cached<br>
+     * -2 means bufferPoolSize will be used<br>
      * Default value is -2
      */
     protected int bufferPool = -2;
 
     /**
-     * Buffer pool size in bytes to be cached
-     * -1 means unlimited, 0 means no cache
+     * Buffer pool size in bytes to be cached.
+     * <p>
+     * -1 means unlimited<br>
+     * 0 means no cache<br>
      * Default value is based on the max memory reported by the JVM,
      * if less than 1GB, then 0, else the value divided by 32. This value
      * will then be used to compute bufferPool if its value is -2
