@@ -484,7 +484,7 @@ public class StringCache {
      * @return the corresponding value
      */
     protected static String find(ByteChunk name, CodingErrorAction malformedInputAction,
-                                 CodingErrorAction unmappableCharacterAction) {
+            CodingErrorAction unmappableCharacterAction) {
         int pos = findClosest(name, bcCache, bcCache.length);
         if ((pos < 0) || (compare(name, bcCache[pos].name) != 0) || !(name.getCharset().equals(bcCache[pos].charset)) ||
                 !malformedInputAction.equals(bcCache[pos].malformedInputAction) ||
