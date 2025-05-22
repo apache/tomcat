@@ -152,9 +152,9 @@ public class Acceptor<U> implements Runnable {
                         endpoint.destroySocket(socket);
                     }
                 } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
                     String msg = sm.getString("endpoint.accept.fail");
                     log.error(msg, t);
+                    ExceptionUtils.handleThrowable(t);
                 }
             }
         } finally {

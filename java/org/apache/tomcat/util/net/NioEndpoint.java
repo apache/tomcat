@@ -779,8 +779,8 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                         hasEvents = (hasEvents | events());
                     }
                 } catch (Throwable x) {
-                    ExceptionUtils.handleThrowable(x);
                     log.error(sm.getString("endpoint.nio.selectorLoopError"), x);
+                    ExceptionUtils.handleThrowable(x);
                     continue;
                 }
 
