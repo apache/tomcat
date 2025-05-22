@@ -45,9 +45,8 @@ import javax.management.ReflectionException;
 import javax.management.loading.ClassLoaderRepository;
 
 /**
- * An implementation of the MBean registry that effectively disables MBean
- * registration. This is typically used when low memory footprint is a primary
- * concern.
+ * An implementation of the MBean registry that effectively disables MBean registration. This is typically used when low
+ * memory footprint is a primary concern.
  */
 public class NoDescriptorRegistry extends Registry {
 
@@ -56,8 +55,7 @@ public class NoDescriptorRegistry extends Registry {
 
 
     @Override
-    public void registerComponent(final Object bean, final String oname, final String type)
-            throws Exception {
+    public void registerComponent(final Object bean, final String oname, final String type) throws Exception {
         // no-op
     }
 
@@ -69,8 +67,8 @@ public class NoDescriptorRegistry extends Registry {
 
 
     @Override
-    public void invoke(final List<ObjectName> mbeans, final String operation,
-            final boolean failFirst) throws Exception {
+    public void invoke(final List<ObjectName> mbeans, final String operation, final boolean failFirst)
+            throws Exception {
         // no-op
     }
 
@@ -107,15 +105,14 @@ public class NoDescriptorRegistry extends Registry {
 
 
     @Override
-    public ManagedBean findManagedBean(final Object bean, final Class<?> beanClass,
-            final String type) throws Exception {
+    public ManagedBean findManagedBean(final Object bean, final Class<?> beanClass, final String type)
+            throws Exception {
         return null;
     }
 
 
     @Override
-    public List<ObjectName> load(final String sourceType, final Object source, final String param)
-            throws Exception {
+    public List<ObjectName> load(final String sourceType, final Object source, final String param) throws Exception {
         return Collections.emptyList();
     }
 
@@ -127,8 +124,7 @@ public class NoDescriptorRegistry extends Registry {
 
 
     @Override
-    public void registerComponent(final Object bean, final ObjectName oname, final String type)
-            throws Exception {
+    public void registerComponent(final Object bean, final ObjectName oname, final String type) throws Exception {
         // no-op
     }
 
@@ -147,49 +143,45 @@ public class NoDescriptorRegistry extends Registry {
     private static class NoJmxMBeanServer implements MBeanServer {
 
         @Override
-        public ObjectInstance createMBean(String className, ObjectName name)
-                throws ReflectionException, InstanceAlreadyExistsException,
-                MBeanRegistrationException, NotCompliantMBeanException {
+        public ObjectInstance createMBean(String className, ObjectName name) throws ReflectionException,
+                InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
             return null;
         }
 
 
         @Override
         public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName)
-                throws ReflectionException, InstanceAlreadyExistsException,
-                MBeanRegistrationException, NotCompliantMBeanException, InstanceNotFoundException {
-            return null;
-        }
-
-
-        @Override
-        public ObjectInstance createMBean(String className, ObjectName name, Object[] params,
-                String[] signature) throws ReflectionException, InstanceAlreadyExistsException,
-                MBeanRegistrationException, NotCompliantMBeanException {
-            return null;
-        }
-
-
-        @Override
-        public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName,
-                Object[] params, String[] signature) throws ReflectionException,
-                InstanceAlreadyExistsException, MBeanRegistrationException,
+                throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException,
                 NotCompliantMBeanException, InstanceNotFoundException {
             return null;
         }
 
 
         @Override
-        public ObjectInstance registerMBean(Object object, ObjectName name)
-                throws InstanceAlreadyExistsException, MBeanRegistrationException,
+        public ObjectInstance createMBean(String className, ObjectName name, Object[] params, String[] signature)
+                throws ReflectionException, InstanceAlreadyExistsException, MBeanRegistrationException,
                 NotCompliantMBeanException {
             return null;
         }
 
 
         @Override
-        public void unregisterMBean(ObjectName name)
-                throws InstanceNotFoundException, MBeanRegistrationException {
+        public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName, Object[] params,
+                String[] signature) throws ReflectionException, InstanceAlreadyExistsException,
+                MBeanRegistrationException, NotCompliantMBeanException, InstanceNotFoundException {
+            return null;
+        }
+
+
+        @Override
+        public ObjectInstance registerMBean(Object object, ObjectName name)
+                throws InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException {
+            return null;
+        }
+
+
+        @Override
+        public void unregisterMBean(ObjectName name) throws InstanceNotFoundException, MBeanRegistrationException {
 
         }
 
@@ -225,8 +217,8 @@ public class NoDescriptorRegistry extends Registry {
 
 
         @Override
-        public Object getAttribute(ObjectName name, String attribute) throws MBeanException,
-                AttributeNotFoundException, InstanceNotFoundException, ReflectionException {
+        public Object getAttribute(ObjectName name, String attribute)
+                throws MBeanException, AttributeNotFoundException, InstanceNotFoundException, ReflectionException {
             return null;
         }
 
@@ -239,9 +231,8 @@ public class NoDescriptorRegistry extends Registry {
 
 
         @Override
-        public void setAttribute(ObjectName name, Attribute attribute)
-                throws InstanceNotFoundException, AttributeNotFoundException,
-                InvalidAttributeValueException, MBeanException, ReflectionException {
+        public void setAttribute(ObjectName name, Attribute attribute) throws InstanceNotFoundException,
+                AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException {
 
         }
 
@@ -254,8 +245,7 @@ public class NoDescriptorRegistry extends Registry {
 
 
         @Override
-        public Object invoke(ObjectName name, String operationName, Object[] params,
-                String[] signature)
+        public Object invoke(ObjectName name, String operationName, Object[] params, String[] signature)
                 throws InstanceNotFoundException, MBeanException, ReflectionException {
             return null;
         }
@@ -274,15 +264,15 @@ public class NoDescriptorRegistry extends Registry {
 
 
         @Override
-        public void addNotificationListener(ObjectName name, NotificationListener listener,
-                NotificationFilter filter, Object handback) throws InstanceNotFoundException {
+        public void addNotificationListener(ObjectName name, NotificationListener listener, NotificationFilter filter,
+                Object handback) throws InstanceNotFoundException {
 
         }
 
 
         @Override
-        public void addNotificationListener(ObjectName name, ObjectName listener,
-                NotificationFilter filter, Object handback) throws InstanceNotFoundException {
+        public void addNotificationListener(ObjectName name, ObjectName listener, NotificationFilter filter,
+                Object handback) throws InstanceNotFoundException {
 
         }
 
@@ -295,9 +285,8 @@ public class NoDescriptorRegistry extends Registry {
 
 
         @Override
-        public void removeNotificationListener(ObjectName name, ObjectName listener,
-                NotificationFilter filter, Object handback)
-                throws InstanceNotFoundException, ListenerNotFoundException {
+        public void removeNotificationListener(ObjectName name, ObjectName listener, NotificationFilter filter,
+                Object handback) throws InstanceNotFoundException, ListenerNotFoundException {
 
         }
 
@@ -325,8 +314,7 @@ public class NoDescriptorRegistry extends Registry {
 
 
         @Override
-        public boolean isInstanceOf(ObjectName name, String className)
-                throws InstanceNotFoundException {
+        public boolean isInstanceOf(ObjectName name, String className) throws InstanceNotFoundException {
             return false;
         }
 
@@ -352,8 +340,7 @@ public class NoDescriptorRegistry extends Registry {
 
 
         @Override
-        public Object instantiate(String className, ObjectName loaderName, Object[] params,
-                String[] signature)
+        public Object instantiate(String className, ObjectName loaderName, Object[] params, String[] signature)
                 throws ReflectionException, MBeanException, InstanceNotFoundException {
             return null;
         }
@@ -381,8 +368,7 @@ public class NoDescriptorRegistry extends Registry {
 
 
         @Override
-        public ClassLoader getClassLoaderFor(ObjectName mbeanName)
-                throws InstanceNotFoundException {
+        public ClassLoader getClassLoaderFor(ObjectName mbeanName) throws InstanceNotFoundException {
             return null;
         }
 

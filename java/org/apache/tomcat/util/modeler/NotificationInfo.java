@@ -23,8 +23,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import javax.management.MBeanNotificationInfo;
 
 /**
- * <p>Internal configuration information for a <code>Notification</code>
- * descriptor.</p>
+ * <p>
+ * Internal configuration information for a <code>Notification</code> descriptor.
+ * </p>
  *
  * @author Craig R. McClanahan
  */
@@ -36,8 +37,8 @@ public class NotificationInfo extends FeatureInfo {
 
 
     /**
-     * The <code>ModelMBeanNotificationInfo</code> object that corresponds
-     * to this <code>NotificationInfo</code> instance.
+     * The <code>ModelMBeanNotificationInfo</code> object that corresponds to this <code>NotificationInfo</code>
+     * instance.
      */
     transient MBeanNotificationInfo info = null;
     protected String[] notifTypes = new String[0];
@@ -110,8 +111,9 @@ public class NotificationInfo extends FeatureInfo {
 
 
     /**
-     * Create and return a <code>ModelMBeanNotificationInfo</code> object that
-     * corresponds to the attribute described by this instance.
+     * Create and return a <code>ModelMBeanNotificationInfo</code> object that corresponds to the attribute described by
+     * this instance.
+     *
      * @return the notification info
      */
     public MBeanNotificationInfo createNotificationInfo() {
@@ -122,11 +124,10 @@ public class NotificationInfo extends FeatureInfo {
         }
 
         // Create and return a new information object
-        info = new MBeanNotificationInfo
-            (getNotifTypes(), getName(), getDescription());
-        //Descriptor descriptor = info.getDescriptor();
-        //addFields(descriptor);
-        //info.setDescriptor(descriptor);
+        info = new MBeanNotificationInfo(getNotifTypes(), getName(), getDescription());
+        // Descriptor descriptor = info.getDescriptor();
+        // addFields(descriptor);
+        // info.setDescriptor(descriptor);
         return info;
 
     }
