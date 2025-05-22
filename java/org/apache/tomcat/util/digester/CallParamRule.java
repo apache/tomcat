@@ -19,15 +19,15 @@ package org.apache.tomcat.util.digester;
 import org.xml.sax.Attributes;
 
 /**
- * <p>Rule implementation that saves a parameter for use by a surrounding
- * <code>CallMethodRule</code>.</p>
- *
- * <p>This parameter may be:</p>
+ * <p>
+ * Rule implementation that saves a parameter for use by a surrounding <code>CallMethodRule</code>.
+ * </p>
+ * <p>
+ * This parameter may be:
+ * </p>
  * <ul>
- * <li>from an attribute of the current element
- * See {@link #CallParamRule(int paramIndex, String attributeName)}
- * <li>from current the element body
- * See {@link #CallParamRule(int paramIndex)}
+ * <li>from an attribute of the current element See {@link #CallParamRule(int paramIndex, String attributeName)}
+ * <li>from current the element body See {@link #CallParamRule(int paramIndex)}
  * </ul>
  */
 public class CallParamRule extends Rule {
@@ -35,8 +35,7 @@ public class CallParamRule extends Rule {
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Construct a "call parameter" rule that will save the body text of this
-     * element as the parameter value.
+     * Construct a "call parameter" rule that will save the body text of this element as the parameter value.
      *
      * @param paramIndex The zero-relative parameter number
      */
@@ -46,20 +45,17 @@ public class CallParamRule extends Rule {
 
 
     /**
-     * Construct a "call parameter" rule that will save the value of the
-     * specified attribute as the parameter value.
+     * Construct a "call parameter" rule that will save the value of the specified attribute as the parameter value.
      *
-     * @param paramIndex The zero-relative parameter number
+     * @param paramIndex    The zero-relative parameter number
      * @param attributeName The name of the attribute to save
      */
-    public CallParamRule(int paramIndex,
-                         String attributeName) {
+    public CallParamRule(int paramIndex, String attributeName) {
         this(attributeName, paramIndex, 0, false);
     }
 
 
-    private CallParamRule(String attributeName, int paramIndex, int stackIndex,
-            boolean fromStack) {
+    private CallParamRule(String attributeName, int paramIndex, int stackIndex, boolean fromStack) {
         this.attributeName = attributeName;
         this.paramIndex = paramIndex;
         this.stackIndex = stackIndex;
@@ -93,8 +89,7 @@ public class CallParamRule extends Rule {
     protected final int stackIndex;
 
     /**
-     * Stack is used to allow nested body text to be processed.
-     * Lazy creation.
+     * Stack is used to allow nested body text to be processed. Lazy creation.
      */
     protected ArrayStack<String> bodyTextStack;
 
@@ -104,16 +99,13 @@ public class CallParamRule extends Rule {
     /**
      * Process the start of this element.
      *
-     * @param namespace the namespace URI of the matching element, or an
-     *   empty string if the parser is not namespace aware or the element has
-     *   no namespace
-     * @param name the local name if the parser is namespace aware, or just
-     *   the element name otherwise
+     * @param namespace  the namespace URI of the matching element, or an empty string if the parser is not namespace
+     *                       aware or the element has no namespace
+     * @param name       the local name if the parser is namespace aware, or just the element name otherwise
      * @param attributes The attribute list for this element
      */
     @Override
-    public void begin(String namespace, String name, Attributes attributes)
-            throws Exception {
+    public void begin(String namespace, String name, Attributes attributes) throws Exception {
 
         Object param = null;
 
@@ -126,8 +118,7 @@ public class CallParamRule extends Rule {
             param = digester.peek(stackIndex);
 
             if (digester.log.isTraceEnabled()) {
-                String sb = "[CallParamRule]{" + digester.match +
-                        "} Save from stack; from stack? " + true +
+                String sb = "[CallParamRule]{" + digester.match + "} Save from stack; from stack? " + true +
                         "; object=" + param;
                 digester.log.trace(sb);
             }
@@ -139,7 +130,7 @@ public class CallParamRule extends Rule {
         // the instance variables will be overwritten
         // if this CallParamRule is reused in subsequent nesting.
 
-        if(param != null) {
+        if (param != null) {
             Object[] parameters = (Object[]) digester.peekParams();
             parameters[paramIndex] = param;
         }
@@ -149,16 +140,13 @@ public class CallParamRule extends Rule {
     /**
      * Process the body text of this element.
      *
-     * @param namespace the namespace URI of the matching element, or an
-     *   empty string if the parser is not namespace aware or the element has
-     *   no namespace
-     * @param name the local name if the parser is namespace aware, or just
-     *   the element name otherwise
-     * @param bodyText The body text of this element
+     * @param namespace the namespace URI of the matching element, or an empty string if the parser is not namespace
+     *                      aware or the element has no namespace
+     * @param name      the local name if the parser is namespace aware, or just the element name otherwise
+     * @param bodyText  The body text of this element
      */
     @Override
-    public void body(String namespace, String name, String bodyText)
-            throws Exception {
+    public void body(String namespace, String name, String bodyText) throws Exception {
 
         if (attributeName == null && !fromStack) {
             // We must wait to set the parameter until end
@@ -189,8 +177,8 @@ public class CallParamRule extends Rule {
      */
     @Override
     public String toString() {
-        return "CallParamRule[" + "paramIndex=" + paramIndex + ", attributeName=" + attributeName +
-                ", from stack=" + fromStack + ']';
+        return "CallParamRule[" + "paramIndex=" + paramIndex + ", attributeName=" + attributeName + ", from stack=" +
+                fromStack + ']';
     }
 
 

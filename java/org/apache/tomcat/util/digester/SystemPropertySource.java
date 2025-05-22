@@ -23,9 +23,8 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.security.PermissionCheck;
 
 /**
- * A {@link org.apache.tomcat.util.IntrospectionUtils.SecurePropertySource}
- * that uses system properties to resolve expressions.
- * This property source is always active by default.
+ * A {@link org.apache.tomcat.util.IntrospectionUtils.SecurePropertySource} that uses system properties to resolve
+ * expressions. This property source is always active by default.
  *
  * @see Digester
  */
