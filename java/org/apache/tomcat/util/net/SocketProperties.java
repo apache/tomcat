@@ -42,34 +42,34 @@ public class SocketProperties {
 
     /**
      * Enable/disable socket processor cache, this bounded cache stores
-     * SocketProcessor objects to reduce GC
-     * Default is 500
-     * -1 is unlimited
+     * SocketProcessor objects to reduce GC.
+     * <p>
+     * Default is 500<br>
+     * -1 is unlimited<br>
      * 0 is disabled
-     * TODO: The default will be changed to 0 in Tomcat 10
      */
     protected int processorCache = 500;
 
     /**
      * Enable/disable poller event cache, this bounded cache stores
      * PollerEvent objects to reduce GC for the poller
+     * <p>
      * Default is 500
-     * -1 is unlimited
-     * 0 is disabled
+     * -1 is unlimited<br>
+     * 0 is disabled<br>
      * &gt;0 the max number of objects to keep in cache.
-     * TODO: The default will be changed to 0 in Tomcat 10
      */
     protected int eventCache = 500;
 
     /**
-     * Enable/disable direct buffers for the network buffers
-     * Default value is disabled
+     * Enable/disable direct buffers for the network buffers.
+     * Default value is disabled.
      */
     protected boolean directBuffer = false;
 
     /**
-     * Enable/disable direct buffers for the network buffers for SSL
-     * Default value is disabled
+     * Enable/disable direct buffers for the network buffers for SSL.
+     * Default value is disabled.
      */
     protected boolean directSslBuffer = false;
 
@@ -87,40 +87,32 @@ public class SocketProperties {
 
     /**
      * The application read buffer size in bytes.
-     * Default value is rxBufSize
+     * Default value is rxBufSize.
      */
     protected int appReadBufSize = 8192;
 
     /**
-     * The application write buffer size in bytes
-     * Default value is txBufSize
+     * The application write buffer size in bytes.
+     * Default value is txBufSize.
      */
     protected int appWriteBufSize = 8192;
 
     /**
      * NioChannel pool size for the endpoint,
-     * this value is how many channels
-     * -1 means unlimited cached, 0 means no cache
-     * Default value is 500
-     * TODO: The default should be changed in Tomcat 10, actually it should be
-     *   bufferPoolSize / (appReadBufSize + appWriteBufSize), assuming the SSL
-     *   buffers are ignored (that would be logical), and the value would be 6400.
-     *   So the default value will be changed to a new default value like -2 to
-     *   set a dynamic value based on bufferPoolSize in that case.
+     * this value is how many channels.
+     * <p>
+     * Default value is 500<br>
+     * 0 means no cache<br>
+     * -1 means unlimited cached
      */
     protected int bufferPool = 500;
 
     /**
-     * Buffer pool size in bytes to be cached
-     * -1 means unlimited, 0 means no cache
-     * Default value is 100MB (1024*1024*100 bytes)
-     * TODO: The default value to be used could rather be based on the
-     *   JVM max heap, otherwise it could be a problem in some
-     *   environments. Big servers also need to use a much higher default,
-     *   while small cloud based ones should use 0 instead.
-     *   Possible default value strategy:
-     *     heap inf 1GB: 0
-     *     heap sup 1GB: heap / 32
+     * Buffer pool size in bytes to be cached.
+     * <p>
+     * Default value is 100MB (1024*1024*100 bytes)<br>
+     * -1 means unlimited<br>
+     * 0 means no cache
      */
     protected int bufferPoolSize = 1024*1024*100;
 
