@@ -19,8 +19,7 @@ package org.apache.tomcat.jni;
 import java.nio.ByteBuffer;
 
 /**
- * Provides utilities related to the use of directly allocated
- * {@link ByteBuffer} instances with native code.
+ * Provides utilities related to the use of directly allocated {@link ByteBuffer} instances with native code.
  */
 public class Buffer {
 
