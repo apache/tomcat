@@ -21,62 +21,70 @@ package org.apache.tomcat.jni;
  *
  * @author Mladen Turk
  *
- * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
- *              9.1.x / Tomcat Native 2.x and has been reduced in Tomcat
- *              10.1.x / Tomcat Native 2.x onwards to only include those
- *              components required to provide OpenSSL integration with the NIO
- *              and NIO2 connectors.
+ * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+ *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+ *                 provide OpenSSL integration with the NIO and NIO2 connectors.
  */
 @Deprecated
 public class Mmap {
     /** MMap opened for reading */
-    public static final int APR_MMAP_READ  = 1;
+    public static final int APR_MMAP_READ = 1;
     /** MMap opened for writing */
     public static final int APR_MMAP_WRITE = 2;
 
 
     /**
      * Create a new mmap'ed file out of an existing APR file.
-     * @param file The file turn into an mmap.
+     *
+     * @param file   The file turn into an mmap.
      * @param offset The offset into the file to start the data pointer at.
-     * @param size The size of the file
-     * @param flag bit-wise or of:
-     * <PRE>
+     * @param size   The size of the file
+     * @param flag   bit-wise or of:
+     *
+     *                   <PRE>
      * APR_MMAP_READ       MMap opened for reading
      * APR_MMAP_WRITE      MMap opened for writing
-     * </PRE>
-     * @param pool The pool to use when creating the mmap.
+     *                   </PRE>
+     *
+     * @param pool   The pool to use when creating the mmap.
+     *
      * @return The newly created mmap'ed file.
+     *
      * @throws Error Error creating memory mapping
      */
-    public static native long create(long file, long offset, long size, int flag, long pool)
-        throws Error;
+    public static native long create(long file, long offset, long size, int flag, long pool) throws Error;
 
     /**
      * Duplicate the specified MMAP.
+     *
      * @param mmap The mmap to duplicate.
      * @param pool The pool to use for new_mmap.
+     *
      * @return Duplicated mmap'ed file.
+     *
      * @throws Error Error duplicating memory mapping
      */
-    public static native long dup(long mmap, long pool)
-        throws Error;
+    public static native long dup(long mmap, long pool) throws Error;
 
     /**
      * Remove a mmap'ed.
+     *
      * @param mm The mmap'ed file.
+     *
      * @return the operation status
      */
     public static native int delete(long mm);
 
     /**
      * Move the pointer into the mmap'ed file to the specified offset.
-     * @param mm The mmap'ed file.
+     *
+     * @param mm     The mmap'ed file.
      * @param offset The offset to move to.
+     *
      * @return The pointer to the offset specified.
+     *
      * @throws Error Error reading file
      */
-    public static native long offset(long mm, long offset)
-        throws Error;
+    public static native long offset(long mm, long offset) throws Error;
 
 }

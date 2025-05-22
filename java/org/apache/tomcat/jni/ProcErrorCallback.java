@@ -21,22 +21,19 @@ package org.apache.tomcat.jni;
  *
  * @author Mladen Turk
  *
- * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
- *              9.1.x / Tomcat Native 2.x and has been reduced in Tomcat
- *              10.1.x / Tomcat Native 2.x onwards to only include those
- *              components required to provide OpenSSL integration with the NIO
- *              and NIO2 connectors.
+ * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+ *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+ *                 provide OpenSSL integration with the NIO and NIO2 connectors.
  */
 @Deprecated
 public interface ProcErrorCallback {
 
     /**
-     * Called in the child process if APR encounters an error
-     * in the child prior to running the specified program.
-     * @param pool Pool associated with the apr_proc_t.  If your child
-     *             error function needs user data, associate it with this
-     *             pool.
-     * @param err APR error code describing the error
+     * Called in the child process if APR encounters an error in the child prior to running the specified program.
+     *
+     * @param pool        Pool associated with the apr_proc_t. If your child error function needs user data, associate
+     *                        it with this pool.
+     * @param err         APR error code describing the error
      * @param description Text description of type of processing which failed
      */
     void callback(long pool, int err, String description);

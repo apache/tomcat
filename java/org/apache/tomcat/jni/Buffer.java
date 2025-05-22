@@ -19,14 +19,15 @@ package org.apache.tomcat.jni;
 import java.nio.ByteBuffer;
 
 /**
- * Provides utilities related to the use of directly allocated
- * {@link ByteBuffer} instances with native code.
+ * Provides utilities related to the use of directly allocated {@link ByteBuffer} instances with native code.
  */
 public class Buffer {
 
     /**
      * Allocate a new ByteBuffer from memory
+     *
      * @param size The amount of memory to allocate
+     *
      * @return The ByteBuffer with allocated memory
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
@@ -36,8 +37,10 @@ public class Buffer {
 
     /**
      * Allocate a new ByteBuffer from memory and set all of the memory to 0
-     * @param num Number of elements.
+     *
+     * @param num  Number of elements.
      * @param size Length in bytes of each element.
+     *
      * @return The ByteBuffer with allocated memory
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
@@ -47,8 +50,10 @@ public class Buffer {
 
     /**
      * Allocate a new ByteBuffer from a pool
-     * @param p The pool to allocate from
+     *
+     * @param p    The pool to allocate from
      * @param size The amount of memory to allocate
+     *
      * @return The ByteBuffer with allocated memory
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
@@ -58,8 +63,10 @@ public class Buffer {
 
     /**
      * Allocate a new ByteBuffer from a pool and set all of the memory to 0
-     * @param p The pool to allocate from
+     *
+     * @param p    The pool to allocate from
      * @param size The amount of memory to allocate
+     *
      * @return The ByteBuffer with allocated memory
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
@@ -68,11 +75,12 @@ public class Buffer {
     public static native ByteBuffer pcalloc(long p, int size);
 
     /**
-     * Allocate a new ByteBuffer from already allocated memory.
-     * <br>Allocated memory must be provided from call to the
-     * Stdlib.alloc or Stdlib.calloc methods.
-     * @param mem The memory to use
+     * Allocate a new ByteBuffer from already allocated memory. <br>
+     * Allocated memory must be provided from call to the Stdlib.alloc or Stdlib.calloc methods.
+     *
+     * @param mem  The memory to use
      * @param size The amount of memory to use
+     *
      * @return The ByteBuffer with attached memory
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
@@ -81,9 +89,9 @@ public class Buffer {
     public static native ByteBuffer create(long mem, int size);
 
     /**
-     * Deallocates or frees a memory block used by ByteBuffer
-     * <br><b>Warning :</b> Call this method only on ByteBuffers
-     * that were created by calling Buffer.alloc or Buffer.calloc.
+     * Deallocates or frees a memory block used by ByteBuffer <br>
+     * <b>Warning :</b> Call this method only on ByteBuffers that were created by calling Buffer.alloc or Buffer.calloc.
+     *
      * @param buf Previously allocated ByteBuffer to be freed.
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
@@ -102,7 +110,9 @@ public class Buffer {
 
     /**
      * Returns the allocated memory size of the ByteBuffer.
+     *
      * @param buf Previously allocated ByteBuffer.
+     *
      * @return the size
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1

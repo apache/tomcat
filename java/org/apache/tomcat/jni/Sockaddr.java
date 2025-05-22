@@ -21,16 +21,14 @@ package org.apache.tomcat.jni;
  *
  * @author Mladen Turk
  *
- * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
- *              9.1.x / Tomcat Native 2.x and has been reduced in Tomcat
- *              10.1.x / Tomcat Native 2.x onwards to only include those
- *              components required to provide OpenSSL integration with the NIO
- *              and NIO2 connectors.
+ * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+ *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+ *                 provide OpenSSL integration with the NIO and NIO2 connectors.
  */
 @Deprecated
 public class Sockaddr {
 
-   /** The pool to use... */
+    /** The pool to use... */
     public long pool;
     /** The hostname */
     public String hostname;
@@ -41,8 +39,8 @@ public class Sockaddr {
     /** The family */
     public int family;
     /**
-     * If multiple addresses were found by apr_sockaddr_info_get(), this
-     * points to a representation of the next address. */
+     * If multiple addresses were found by apr_sockaddr_info_get(), this points to a representation of the next address.
+     */
     public long next;
 
 }

@@ -19,29 +19,25 @@ package org.apache.tomcat.jni;
 import java.nio.ByteBuffer;
 
 /**
- * Provides access to APR memory pools which are used to manage memory
- * allocations for natively created instances.
+ * Provides access to APR memory pools which are used to manage memory allocations for natively created instances.
  */
 public class Pool {
 
     /**
      * Create a new pool.
      *
-     * @param parent The parent pool. If this is 0, the new pool is a root pool.
-     *               If it is non-zero, the new pool will inherit all of its
-     *               parent pool's attributes, except the apr_pool_t will be a
-     *               sub-pool.
+     * @param parent The parent pool. If this is 0, the new pool is a root pool. If it is non-zero, the new pool will
+     *                   inherit all of its parent pool's attributes, except the apr_pool_t will be a sub-pool.
      *
      * @return The pool we have just created.
-    */
+     */
     public static native long create(long parent);
 
     /**
-     * Clear all memory in the pool and run all the cleanups. This also destroys all
-     * subpools.
-     * @param pool The pool to clear
-     * This does not actually free the memory, it just allows the pool
-     *         to re-use this memory for the next allocation.
+     * Clear all memory in the pool and run all the cleanups. This also destroys all subpools.
+     *
+     * @param pool The pool to clear This does not actually free the memory, it just allows the pool to re-use this
+     *                 memory for the next allocation.
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
      */
@@ -49,8 +45,8 @@ public class Pool {
     public static native void clear(long pool);
 
     /**
-     * Destroy the pool. This takes similar action as apr_pool_clear() and then
-     * frees all the memory. This will actually free the memory.
+     * Destroy the pool. This takes similar action as apr_pool_clear() and then frees all the memory. This will actually
+     * free the memory.
      *
      * @param pool The pool to destroy
      */
@@ -58,7 +54,9 @@ public class Pool {
 
     /**
      * Get the parent pool of the specified pool.
+     *
      * @param pool The pool for retrieving the parent pool.
+     *
      * @return The parent of the given pool.
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
@@ -68,10 +66,11 @@ public class Pool {
 
     /**
      * Determine if pool a is an ancestor of pool b
+     *
      * @param a The pool to search
      * @param b The pool to search for
-     * @return True if a is an ancestor of b, NULL is considered an ancestor
-     * of all pools.
+     *
+     * @return True if a is an ancestor of b, NULL is considered an ancestor of all pools.
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
      */
@@ -82,20 +81,19 @@ public class Pool {
     /*
      * Cleanup
      *
-     * Cleanups are performed in the reverse order they were registered.  That is:
-     * Last In, First Out.  A cleanup function can safely allocate memory from
-     * the pool that is being cleaned up. It can also safely register additional
-     * cleanups which will be run LIFO, directly after the current cleanup
-     * terminates.  Cleanups have to take caution in calling functions that
-     * create subpools. Subpools, created during cleanup will NOT automatically
-     * be cleaned up.  In other words, cleanups are to clean up after themselves.
+     * Cleanups are performed in the reverse order they were registered. That is: Last In, First Out. A cleanup function
+     * can safely allocate memory from the pool that is being cleaned up. It can also safely register additional
+     * cleanups which will be run LIFO, directly after the current cleanup terminates. Cleanups have to take caution in
+     * calling functions that create subpools. Subpools, created during cleanup will NOT automatically be cleaned up. In
+     * other words, cleanups are to clean up after themselves.
      */
 
     /**
      * Register a function to be called when a pool is cleared or destroyed
+     *
      * @param pool The pool register the cleanup with
-     * @param o The object to call when the pool is cleared
-     *                      or destroyed
+     * @param o    The object to call when the pool is cleared or destroyed
+     *
      * @return The cleanup handler.
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
@@ -105,6 +103,7 @@ public class Pool {
 
     /**
      * Remove a previously registered cleanup function
+     *
      * @param pool The pool remove the cleanup from
      * @param data The cleanup handler to remove from cleanup
      *
@@ -115,16 +114,18 @@ public class Pool {
 
     /**
      * Register a process to be killed when a pool dies.
-     * @param a The pool to use to define the processes lifetime
+     *
+     * @param a    The pool to use to define the processes lifetime
      * @param proc The process to register
-     * @param how How to kill the process, one of:
-     * <PRE>
+     * @param how  How to kill the process, one of:
+     *
+     *                 <PRE>
      * APR_KILL_NEVER         -- process is never sent any signals
      * APR_KILL_ALWAYS        -- process is sent SIGKILL on apr_pool_t cleanup
      * APR_KILL_AFTER_TIMEOUT -- SIGTERM, wait 3 seconds, SIGKILL
      * APR_JUST_WAIT          -- wait forever for the process to complete
      * APR_KILL_ONLY_ONCE     -- send SIGTERM and then wait
-     * </PRE>
+     *                 </PRE>
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
      */
@@ -133,8 +134,10 @@ public class Pool {
 
     /**
      * Allocate a block of memory from a pool
-     * @param p The pool to allocate from
+     *
+     * @param p    The pool to allocate from
      * @param size The amount of memory to allocate
+     *
      * @return The ByteBuffer with allocated memory
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
@@ -144,8 +147,10 @@ public class Pool {
 
     /**
      * Allocate a block of memory from a pool and set all of the memory to 0
-     * @param p The pool to allocate from
+     *
+     * @param p    The pool to allocate from
      * @param size The amount of memory to allocate
+     *
      * @return The ByteBuffer with allocated memory
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
@@ -159,35 +164,37 @@ public class Pool {
 
     /**
      * Set the data associated with the current pool
+     *
      * @param data The user data associated with the pool.
-     * @param key The key to use for association
-     * @param pool The current pool
-     * <br><b>Warning :</b>
-     * The data to be attached to the pool should have a life span
-     * at least as long as the pool it is being attached to.
-     * Object attached to the pool will be globally referenced
-     * until the pool is cleared or dataSet is called with the null data.
+     * @param key  The key to use for association
+     * @param pool The current pool <br>
+     *                 <b>Warning :</b> The data to be attached to the pool should have a life span at least as long as
+     *                 the pool it is being attached to. Object attached to the pool will be globally referenced until
+     *                 the pool is cleared or dataSet is called with the null data.
+     *
      * @return APR Status code.
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
      */
     @Deprecated
-     public static native int dataSet(long pool, String key, Object data);
+    public static native int dataSet(long pool, String key, Object data);
 
     /**
      * Return the data associated with the current pool.
-     * @param key The key for the data to retrieve
+     *
+     * @param key  The key for the data to retrieve
      * @param pool The current pool.
+     *
      * @return the data
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
      */
     @Deprecated
-     public static native Object dataGet(long pool, String key);
+    public static native Object dataGet(long pool, String key);
 
     /**
-     * Run all of the child_cleanups, so that any unnecessary files are
-     * closed because we are about to exec a new program
+     * Run all of the child_cleanups, so that any unnecessary files are closed because we are about to exec a new
+     * program
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1
      */

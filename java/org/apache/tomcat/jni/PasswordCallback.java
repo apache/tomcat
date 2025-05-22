@@ -28,7 +28,9 @@ public interface PasswordCallback {
 
     /**
      * Called when the password is required
+     *
      * @param prompt Password prompt
+     *
      * @return Valid password or null
      */
     String callback(String prompt);

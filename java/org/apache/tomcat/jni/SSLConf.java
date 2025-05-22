@@ -21,10 +21,10 @@ public final class SSLConf {
     /**
      * Create a new SSL_CONF context.
      *
-     * @param pool The pool to use.
-     * @param flags The SSL_CONF flags to use. It can be any combination of
-     * the following:
-     * <PRE>
+     * @param pool  The pool to use.
+     * @param flags The SSL_CONF flags to use. It can be any combination of the following:
+     *
+     *                  <PRE>
      * {@link SSL#SSL_CONF_FLAG_CMDLINE}
      * {@link SSL#SSL_CONF_FLAG_FILE}
      * {@link SSL#SSL_CONF_FLAG_CLIENT}
@@ -33,13 +33,13 @@ public final class SSLConf {
      * {@link SSL#SSL_CONF_FLAG_CERTIFICATE}
      * </PRE>
      *
-     * @return The Java representation of a pointer to the newly created
-     *         SSL_CONF Context
+     * @return The Java representation of a pointer to the newly created SSL_CONF Context
      *
      * @throws Exception If the SSL_CONF context could not be created
      *
      * @see <a href="https://www.openssl.org/docs/man1.0.2/ssl/SSL_CONF_CTX_new.html">OpenSSL SSL_CONF_CTX_new</a>
-     * @see <a href="https://www.openssl.org/docs/man1.0.2/ssl/SSL_CONF_CTX_set_flags.html">OpenSSL SSL_CONF_CTX_set_flags</a>
+     * @see <a href="https://www.openssl.org/docs/man1.0.2/ssl/SSL_CONF_CTX_set_flags.html">OpenSSL
+     *          SSL_CONF_CTX_set_flags</a>
      */
     public static native long make(long pool, int flags) throws Exception;
 
@@ -55,13 +55,12 @@ public final class SSLConf {
     /**
      * Check a command with an SSL_CONF context.
      *
-     * @param cctx SSL_CONF context to use.
-     * @param name command name.
+     * @param cctx  SSL_CONF context to use.
+     * @param name  command name.
      * @param value command value.
      *
-     * @return The result of the check based on the {@code SSL_CONF_cmd_value_type}
-     * call. Unknown types will result in an exception, as well as
-     * file and directory types with invalid file or directory names.
+     * @return The result of the check based on the {@code SSL_CONF_cmd_value_type} call. Unknown types will result in
+     *             an exception, as well as file and directory types with invalid file or directory names.
      *
      * @throws Exception If the check fails.
      *
@@ -70,22 +69,22 @@ public final class SSLConf {
     public static native int check(long cctx, String name, String value) throws Exception;
 
     /**
-     * Assign an SSL context to an SSL_CONF context.
-     * All following calls to {@link #apply(long, String, String)} will be
+     * Assign an SSL context to an SSL_CONF context. All following calls to {@link #apply(long, String, String)} will be
      * applied to this SSL context.
      *
      * @param cctx SSL_CONF context to use.
-     * @param ctx SSL context to assign to the given SSL_CONF context.
+     * @param ctx  SSL context to assign to the given SSL_CONF context.
      *
-     * @see <a href="https://www.openssl.org/docs/man1.0.2/ssl/SSL_CONF_CTX_set_ssl_ctx.html">OpenSSL SSL_CONF_CTX_set_ssl_ctx</a>
+     * @see <a href="https://www.openssl.org/docs/man1.0.2/ssl/SSL_CONF_CTX_set_ssl_ctx.html">OpenSSL
+     *          SSL_CONF_CTX_set_ssl_ctx</a>
      */
     public static native void assign(long cctx, long ctx);
 
     /**
      * Apply a command to an SSL_CONF context.
      *
-     * @param cctx SSL_CONF context to use.
-     * @param name command name.
+     * @param cctx  SSL_CONF context to use.
+     * @param name  command name.
      * @param value command value.
      *
      * @return The result of the native {@code SSL_CONF_cmd} call
@@ -103,7 +102,8 @@ public final class SSLConf {
      *
      * @return The result of the native {@code SSL_CONF_CTX_finish} call
      *
-     * @see <a href="https://www.openssl.org/docs/man1.0.2/ssl/SSL_CONF_CTX_set_flags.html">OpenSSL SSL_CONF_CTX_finish</a>
+     * @see <a href="https://www.openssl.org/docs/man1.0.2/ssl/SSL_CONF_CTX_set_flags.html">OpenSSL
+     *          SSL_CONF_CTX_finish</a>
      */
     public static native int finish(long cctx);
 

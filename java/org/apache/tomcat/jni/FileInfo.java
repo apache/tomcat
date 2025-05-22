@@ -21,11 +21,9 @@ package org.apache.tomcat.jni;
  *
  * @author Mladen Turk
  *
- * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
- *              9.1.x / Tomcat Native 2.x and has been reduced in Tomcat
- *              10.1.x / Tomcat Native 2.x onwards to only include those
- *              components required to provide OpenSSL integration with the NIO
- *              and NIO2 connectors.
+ * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+ *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+ *                 provide OpenSSL integration with the NIO and NIO2 connectors.
  */
 @Deprecated
 public class FileInfo {
@@ -33,16 +31,15 @@ public class FileInfo {
     /** Allocates memory and closes lingering handles in the specified pool */
     public long pool;
     /**
-     * The bitmask describing valid fields of this apr_finfo_t structure
-     *  including all available 'wanted' fields and potentially more.
+     * The bitmask describing valid fields of this apr_finfo_t structure including all available 'wanted' fields and
+     * potentially more.
      */
     public int valid;
-    /** The access permissions of the file.  Mimics Unix access rights. */
+    /** The access permissions of the file. Mimics Unix access rights. */
     public int protection;
     /**
-     * The type of file.  One of APR_REG, APR_DIR, APR_CHR, APR_BLK, APR_PIPE,
-     * APR_LNK or APR_SOCK.  If the type is undetermined, the value is APR_NOFILE.
-     * If the type cannot be determined, the value is APR_UNKFILE.
+     * The type of file. One of APR_REG, APR_DIR, APR_CHR, APR_BLK, APR_PIPE, APR_LNK or APR_SOCK. If the type is
+     * undetermined, the value is APR_NOFILE. If the type cannot be determined, the value is APR_UNKFILE.
      */
     public int filetype;
     /** The user id that owns the file */

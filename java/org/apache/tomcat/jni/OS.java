@@ -21,78 +21,82 @@ package org.apache.tomcat.jni;
  *
  * @author Mladen Turk
  *
- * @deprecated  The scope of the APR/Native Library will be reduced in Tomcat
- *              9.1.x / Tomcat Native 2.x and has been reduced in Tomcat
- *              10.1.x / Tomcat Native 2.x onwards to only include those
- *              components required to provide OpenSSL integration with the NIO
- *              and NIO2 connectors.
+ * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
+ *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to
+ *                 provide OpenSSL integration with the NIO and NIO2 connectors.
  */
 @Deprecated
 public class OS {
 
     /* OS Enums */
-    private static final int UNIX      = 1;
-    private static final int WIN32     = 3;
-    private static final int WIN64     = 4;
-    private static final int LINUX     = 5;
-    private static final int SOLARIS   = 6;
-    private static final int BSD       = 7;
-    private static final int MACOSX    = 8;
+    private static final int UNIX = 1;
+    private static final int WIN32 = 3;
+    private static final int WIN64 = 4;
+    private static final int LINUX = 5;
+    private static final int SOLARIS = 6;
+    private static final int BSD = 7;
+    private static final int MACOSX = 8;
 
-    public static final int LOG_EMERG  = 1;
-    public static final int LOG_ERROR  = 2;
+    public static final int LOG_EMERG = 1;
+    public static final int LOG_ERROR = 2;
     public static final int LOG_NOTICE = 3;
-    public static final int LOG_WARN   = 4;
-    public static final int LOG_INFO   = 5;
-    public static final int LOG_DEBUG  = 6;
+    public static final int LOG_WARN = 4;
+    public static final int LOG_INFO = 5;
+    public static final int LOG_DEBUG = 6;
 
     /**
      * Check for OS type.
+     *
      * @param type OS type to test.
      */
     private static native boolean is(int type);
 
-    public static final boolean IS_UNIX    = is(UNIX);
+    public static final boolean IS_UNIX = is(UNIX);
     /**
-     * @deprecated Hard-coded to false since there has not been a supported
-     *             Netware platform for many years.
-     *             This will be removed in Tomcat 10 onwards
+     * @deprecated Hard-coded to false since there has not been a supported Netware platform for many years. This will
+     *                 be removed in Tomcat 10 onwards
      */
     @Deprecated
     public static final boolean IS_NETWARE = false;
-    public static final boolean IS_WIN32   = is(WIN32);
-    public static final boolean IS_WIN64   = is(WIN64);
-    public static final boolean IS_LINUX   = is(LINUX);
+    public static final boolean IS_WIN32 = is(WIN32);
+    public static final boolean IS_WIN64 = is(WIN64);
+    public static final boolean IS_LINUX = is(LINUX);
     public static final boolean IS_SOLARIS = is(SOLARIS);
-    public static final boolean IS_BSD     = is(BSD);
-    public static final boolean IS_MACOSX  = is(MACOSX);
+    public static final boolean IS_BSD = is(BSD);
+    public static final boolean IS_MACOSX = is(MACOSX);
 
     /**
      * Get the name of the system default character set.
+     *
      * @param pool the pool to allocate the name from, if needed
+     *
      * @return the encoding
      */
     public static native String defaultEncoding(long pool);
 
     /**
-     * Get the name of the current locale character set.
-     * Defers to apr_os_default_encoding if the current locale's
-     * data can't be retrieved on this system.
+     * Get the name of the current locale character set. Defers to apr_os_default_encoding if the current locale's data
+     * can't be retrieved on this system.
+     *
      * @param pool the pool to allocate the name from, if needed
+     *
      * @return the encoding
      */
     public static native String localeEncoding(long pool);
 
     /**
      * Generate random bytes.
+     *
      * @param buf Buffer to fill with random bytes
      * @param len Length of buffer in bytes
+     *
      * @return the operation status
      */
-    public static native int random(byte [] buf, int len);
+    public static native int random(byte[] buf, int len);
 
     /**
      * Gather system info.
+     *
      * <PRE>
      * On exit the inf array will be filled with:
      * inf[0]  - Total usable main memory size
@@ -115,28 +119,33 @@ public class OS {
      * inf[14] - Peak working set size.
      * inf[15] - Number of page faults.
      * </PRE>
-     * @param inf array that will be filled with system information.
-     *            Array length must be at least 16.
+     *
+     * @param inf array that will be filled with system information. Array length must be at least 16.
+     *
      * @return the operation status
      */
-    public static native int info(long [] inf);
+    public static native int info(long[] inf);
 
     /**
      * Expand environment variables.
+     *
      * @param str String to expand
+     *
      * @return Expanded string with replaced environment variables.
      */
     public static native String expand(String str);
 
     /**
      * Initialize system logging.
+     *
      * @param domain String that will be prepended to every message
      */
     public static native void sysloginit(String domain);
 
     /**
      * Log message.
-     * @param level Log message severity. See LOG_XXX enums.
+     *
+     * @param level   Log message severity. See LOG_XXX enums.
      * @param message Message to log
      */
     public static native void syslog(int level, String message);
