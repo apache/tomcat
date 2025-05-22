@@ -17,10 +17,9 @@
 package org.apache.tomcat.util.descriptor.web;
 
 
-
 /**
- * Representation of an application resource reference, as represented in
- * an <code>&lt;res-env-ref&gt;</code> element in the deployment descriptor.
+ * Representation of an application resource reference, as represented in an <code>&lt;res-env-ref&gt;</code> element in
+ * the deployment descriptor.
  *
  * @author Craig R. McClanahan
  * @author Peter Rossbach (pero@apache.org)
@@ -32,8 +31,7 @@ public class ContextResourceEnvRef extends ResourceBase {
     // ------------------------------------------------------------- Properties
 
     /**
-     * Does this environment entry allow overrides by the application
-     * deployment descriptor?
+     * Does this environment entry allow overrides by the application deployment descriptor?
      */
     private boolean override = true;
 

@@ -24,15 +24,12 @@ import org.apache.tomcat.util.buf.UDecoder;
 
 
 /**
- * Representation of a web resource collection for a web application's security
- * constraint, as represented in a <code>&lt;web-resource-collection&gt;</code>
- * element in the deployment descriptor.
+ * Representation of a web resource collection for a web application's security constraint, as represented in a
+ * <code>&lt;web-resource-collection&gt;</code> element in the deployment descriptor.
  * <p>
- * <b>WARNING</b>:  It is assumed that instances of this class will be created
- * and modified only within the context of a single thread, before the instance
- * is made visible to the remainder of the application.  After that, only read
- * access is expected.  Therefore, none of the read and write access within
- * this class is synchronized.
+ * <b>WARNING</b>: It is assumed that instances of this class will be created and modified only within the context of a
+ * single thread, before the instance is made visible to the remainder of the application. After that, only read access
+ * is expected. Therefore, none of the read and write access within this class is synchronized.
  *
  * @author Craig R. McClanahan
  */
@@ -56,7 +53,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
     /**
      * Construct a new security collection instance with specified values.
      *
-     * @param name Name of this security collection
+     * @param name        Name of this security collection
      * @param description Description of this security collection
      */
     public SecurityCollection(String name, String description) {
@@ -101,8 +98,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * This security collection was established by a deployment descriptor.
-     * Defaults to <code>true</code>.
+     * This security collection was established by a deployment descriptor. Defaults to <code>true</code>.
      */
     private boolean isFromDescriptor = true;
 
@@ -155,6 +151,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
     /**
      * Set if this constraint was defined in a deployment descriptor.
+     *
      * @param isFromDescriptor <code>true</code> was declared in a descriptor
      */
     public void setFromDescriptor(boolean isFromDescriptor) {
@@ -166,8 +163,8 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * Add an HTTP request method to be explicitly part of this web resource
-     * collection.
+     * Add an HTTP request method to be explicitly part of this web resource collection.
+     *
      * @param method The method
      */
     public void addMethod(String method) {
@@ -183,8 +180,8 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * Add an HTTP request method to the methods explicitly excluded from this
-     * web resource collection.
+     * Add an HTTP request method to the methods explicitly excluded from this web resource collection.
+     *
      * @param method The method
      */
     public void addOmittedMethod(String method) {
@@ -198,11 +195,13 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
     /**
      * Add a URL pattern to be part of this web resource collection.
+     *
      * @param pattern The pattern
      */
     public void addPattern(String pattern) {
         addPatternDecoded(UDecoder.URLDecode(pattern, StandardCharsets.UTF_8));
     }
+
     public void addPatternDecoded(String pattern) {
 
         if (pattern == null) {
@@ -218,9 +217,10 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
     /**
      * Check if the collection applies to the specified method.
+     *
      * @param method Request method to check
-     * @return <code>true</code> if the specified HTTP request method is
-     * part of this web resource collection.
+     *
+     * @return <code>true</code> if the specified HTTP request method is part of this web resource collection.
      */
     public boolean findMethod(String method) {
 
@@ -245,9 +245,8 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * @return the array of HTTP request methods that are part of this web
-     * resource collection, or a zero-length array if no methods have been
-     * explicitly included.
+     * @return the array of HTTP request methods that are part of this web resource collection, or a zero-length array
+     *             if no methods have been explicitly included.
      */
     public String[] findMethods() {
         return methods;
@@ -255,9 +254,8 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * @return the array of HTTP request methods that are explicitly excluded from
-     * this web resource collection, or a zero-length array if no request
-     * methods are excluded.
+     * @return the array of HTTP request methods that are explicitly excluded from this web resource collection, or a
+     *             zero-length array if no request methods are excluded.
      */
     public String[] findOmittedMethods() {
         return omittedMethods;
@@ -268,6 +266,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
      * Is the specified pattern part of this web resource collection?
      *
      * @param pattern Pattern to be compared
+     *
      * @return <code>true</code> if the pattern is part of the collection
      */
     public boolean findPattern(String pattern) {
@@ -281,9 +280,8 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * @return the array of URL patterns that are part of this web resource
-     * collection.  If none have been specified, a zero-length array is
-     * returned.
+     * @return the array of URL patterns that are part of this web resource collection. If none have been specified, a
+     *             zero-length array is returned.
      */
     public String[] findPatterns() {
         return patterns;
@@ -291,8 +289,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * Remove the specified HTTP request method from those that are part
-     * of this web resource collection.
+     * Remove the specified HTTP request method from those that are part of this web resource collection.
      *
      * @param method Request method to be removed
      */
@@ -323,8 +320,8 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * Remove the specified HTTP request method from those that are explicitly
-     * excluded from this web resource collection.
+     * Remove the specified HTTP request method from those that are explicitly excluded from this web resource
+     * collection.
      *
      * @param method Request method to be removed
      */
@@ -355,8 +352,7 @@ public class SecurityCollection extends XmlEncodingBase implements Serializable 
 
 
     /**
-     * Remove the specified URL pattern from those that are part of this
-     * web resource collection.
+     * Remove the specified URL pattern from those that are part of this web resource collection.
      *
      * @param pattern Pattern to be removed
      */

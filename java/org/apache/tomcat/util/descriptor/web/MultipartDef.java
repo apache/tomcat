@@ -77,16 +77,10 @@ public class MultipartDef implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime
-                * result
-                + ((fileSizeThreshold == null) ? 0 : fileSizeThreshold
-                        .hashCode());
-        result = prime * result
-                + ((location == null) ? 0 : location.hashCode());
-        result = prime * result
-                + ((maxFileSize == null) ? 0 : maxFileSize.hashCode());
-        result = prime * result
-                + ((maxRequestSize == null) ? 0 : maxRequestSize.hashCode());
+        result = prime * result + ((fileSizeThreshold == null) ? 0 : fileSizeThreshold.hashCode());
+        result = prime * result + ((location == null) ? 0 : location.hashCode());
+        result = prime * result + ((maxFileSize == null) ? 0 : maxFileSize.hashCode());
+        result = prime * result + ((maxRequestSize == null) ? 0 : maxRequestSize.hashCode());
         return result;
     }
 

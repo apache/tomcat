@@ -42,8 +42,7 @@ public class TaglibDescriptorImpl implements TaglibDescriptor {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result
-                + ((location == null) ? 0 : location.hashCode());
+        result = prime * result + ((location == null) ? 0 : location.hashCode());
         result = prime * result + ((uri == null) ? 0 : uri.hashCode());
         return result;
     }

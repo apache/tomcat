@@ -23,9 +23,8 @@ import java.util.Map;
 
 
 /**
- * Representation of a web service reference for a web application, as
- * represented in a <code>&lt;service-ref&gt;</code> element in the
- * deployment descriptor.
+ * Representation of a web service reference for a web application, as represented in a <code>&lt;service-ref&gt;</code>
+ * element in the deployment descriptor.
  *
  * @author Fabien Carrion
  */
@@ -76,8 +75,7 @@ public class ContextService extends ResourceBase {
     }
 
     /**
-     * The fully qualified class name of the JAX-WS Service interface that the
-     * client depends on.
+     * The fully qualified class name of the JAX-WS Service interface that the client depends on.
      */
     private String serviceInterface = null;
 
@@ -90,8 +88,7 @@ public class ContextService extends ResourceBase {
     }
 
     /**
-     * Contains the location (relative to the root of
-     * the module) of the web service WSDL description.
+     * Contains the location (relative to the root of the module) of the web service WSDL description.
      */
     private String wsdlfile = null;
 
@@ -104,8 +101,8 @@ public class ContextService extends ResourceBase {
     }
 
     /**
-     * A file specifying the correlation of the WSDL definition
-     * to the interfaces (Service Endpoint Interface, Service Interface).
+     * A file specifying the correlation of the WSDL definition to the interfaces (Service Endpoint Interface, Service
+     * Interface).
      */
     private String jaxrpcmappingfile = null;
 
@@ -118,15 +115,13 @@ public class ContextService extends ResourceBase {
     }
 
     /**
-     * Declares the specific WSDL service element that is being referred to.
-     * It is not specified if no wsdl-file is declared or if WSDL contains only
-     * 1 service element.
+     * Declares the specific WSDL service element that is being referred to. It is not specified if no wsdl-file is
+     * declared or if WSDL contains only 1 service element.
      * <p>
-     * A service-qname is composed by a namespaceURI and a localpart.
-     * It must be defined if more than 1 service is declared in the WSDL.
+     * A service-qname is composed by a namespaceURI and a localpart. It must be defined if more than 1 service is
+     * declared in the WSDL.
      * <p>
-     * serviceqname[0] : namespaceURI
-     * serviceqname[1] : localpart
+     * serviceqname[0] : namespaceURI serviceqname[1] : localpart
      */
     private String[] serviceqname = new String[2];
 
@@ -163,9 +158,9 @@ public class ContextService extends ResourceBase {
     }
 
     /**
-     * Declares a client dependency on the container to resolving a Service Endpoint Interface
-     * to a WSDL port. It optionally associates the Service Endpoint Interface with a
-     * particular port-component.
+     * Declares a client dependency on the container to resolving a Service Endpoint Interface to a WSDL port. It
+     * optionally associates the Service Endpoint Interface with a particular port-component.
+     *
      * @return the endpoint names
      */
     public Iterator<String> getServiceendpoints() {
@@ -184,10 +179,9 @@ public class ContextService extends ResourceBase {
     }
 
     /**
-     * A list of Handlers to use for this service-ref.
-     * The instantiation of the handler have to be done.
+     * A list of Handlers to use for this service-ref. The instantiation of the handler have to be done.
      */
-    private final Map<String, ContextHandler> handlers = new HashMap<>();
+    private final Map<String,ContextHandler> handlers = new HashMap<>();
 
     public Iterator<String> getHandlers() {
         return handlers.keySet().iterator();
@@ -267,20 +261,14 @@ public class ContextService extends ResourceBase {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result +
-                ((displayname == null) ? 0 : displayname.hashCode());
+        result = prime * result + ((displayname == null) ? 0 : displayname.hashCode());
         result = prime * result + handlers.hashCode();
-        result = prime * result +
-                ((jaxrpcmappingfile == null) ? 0 : jaxrpcmappingfile.hashCode());
-        result = prime * result +
-                ((largeIcon == null) ? 0 : largeIcon.hashCode());
-        result = prime * result +
-                ((serviceInterface == null) ? 0 : serviceInterface.hashCode());
+        result = prime * result + ((jaxrpcmappingfile == null) ? 0 : jaxrpcmappingfile.hashCode());
+        result = prime * result + ((largeIcon == null) ? 0 : largeIcon.hashCode());
+        result = prime * result + ((serviceInterface == null) ? 0 : serviceInterface.hashCode());
         result = prime * result + Arrays.hashCode(serviceqname);
-        result = prime * result +
-                ((smallIcon == null) ? 0 : smallIcon.hashCode());
-        result = prime * result +
-                ((wsdlfile == null) ? 0 : wsdlfile.hashCode());
+        result = prime * result + ((smallIcon == null) ? 0 : smallIcon.hashCode());
+        result = prime * result + ((wsdlfile == null) ? 0 : wsdlfile.hashCode());
         return result;
     }
 

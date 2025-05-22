@@ -24,9 +24,8 @@ import java.util.Map;
 
 
 /**
- * Representation of a handler reference for a web service, as
- * represented in a <code>&lt;handler&gt;</code> element in the
- * deployment descriptor.
+ * Representation of a handler reference for a web service, as represented in a <code>&lt;handler&gt;</code> element in
+ * the deployment descriptor.
  *
  * @author Fabien Carrion
  */
@@ -51,15 +50,14 @@ public class ContextHandler extends ResourceBase {
     }
 
     /**
-     * A list of QName specifying the SOAP Headers the handler will work on.
-     * -namespace and localpart values must be found inside the WSDL.
+     * A list of QName specifying the SOAP Headers the handler will work on. -namespace and localpart values must be
+     * found inside the WSDL.
      * <p>
      * A service-qname is composed by a namespaceURI and a localpart.
      * <p>
-     * soapHeader[0] : namespaceURI
-     * soapHeader[1] : localpart
+     * soapHeader[0] : namespaceURI soapHeader[1] : localpart
      */
-    private final Map<String, String> soapHeaders = new HashMap<>();
+    private final Map<String,String> soapHeaders = new HashMap<>();
 
     public Iterator<String> getLocalparts() {
         return soapHeaders.keySet().iterator();
@@ -75,7 +73,8 @@ public class ContextHandler extends ResourceBase {
 
     /**
      * Set a configured property.
-     * @param name The property name
+     *
+     * @param name  The property name
      * @param value The property value
      */
     public void setProperty(String name, String value) {
@@ -157,8 +156,7 @@ public class ContextHandler extends ResourceBase {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result +
-                ((handlerclass == null) ? 0 : handlerclass.hashCode());
+        result = prime * result + ((handlerclass == null) ? 0 : handlerclass.hashCode());
         result = prime * result + portNames.hashCode();
         result = prime * result + soapHeaders.hashCode();
         result = prime * result + soapRoles.hashCode();

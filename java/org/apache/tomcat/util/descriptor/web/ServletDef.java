@@ -26,16 +26,15 @@ import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Representation of a servlet definition for a web application, as represented
- * in a <code>&lt;servlet&gt;</code> element in the deployment descriptor.
+ * Representation of a servlet definition for a web application, as represented in a <code>&lt;servlet&gt;</code>
+ * element in the deployment descriptor.
  */
 
 public class ServletDef implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private static final StringManager sm =
-        StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
 
     // ------------------------------------------------------------- Properties
 
@@ -96,8 +95,7 @@ public class ServletDef implements Serializable {
 
 
     /**
-     * The name of this servlet, which must be unique among the servlets
-     * defined for a particular web application.
+     * The name of this servlet, which must be unique among the servlets defined for a particular web application.
      */
     private String servletName = null;
 
@@ -107,8 +105,7 @@ public class ServletDef implements Serializable {
 
     public void setServletName(String servletName) {
         if (servletName == null || servletName.isEmpty()) {
-            throw new IllegalArgumentException(
-                    sm.getString("servletDef.invalidServletName", servletName));
+            throw new IllegalArgumentException(sm.getString("servletDef.invalidServletName", servletName));
         }
         this.servletName = servletName;
     }
@@ -143,20 +140,18 @@ public class ServletDef implements Serializable {
 
 
     /**
-     * The set of initialization parameters for this servlet, keyed by
-     * parameter name.
+     * The set of initialization parameters for this servlet, keyed by parameter name.
      */
-    private final Map<String, String> parameters = new HashMap<>();
+    private final Map<String,String> parameters = new HashMap<>();
 
-    public Map<String, String> getParameterMap() {
+    public Map<String,String> getParameterMap() {
         return this.parameters;
     }
 
     /**
-     * Add an initialization parameter to the set of parameters associated
-     * with this servlet.
+     * Add an initialization parameter to the set of parameters associated with this servlet.
      *
-     * @param name The initialisation parameter name
+     * @param name  The initialisation parameter name
      * @param value The initialisation parameter value
      */
     public void addInitParameter(String name, String value) {
@@ -208,8 +203,8 @@ public class ServletDef implements Serializable {
     }
 
     /**
-     * Add a security-role-ref to the set of security-role-refs associated
-     * with this servlet.
+     * Add a security-role-ref to the set of security-role-refs associated with this servlet.
+     *
      * @param securityRoleRef The security role
      */
     public void addSecurityRoleRef(SecurityRoleRef securityRoleRef) {
