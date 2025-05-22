@@ -81,44 +81,40 @@ public final class OpenSSLSessionStats {
     }
 
     /**
-     * @return The number of successfully reused sessions. In client mode, a
-     *         session set with {@code SSL_set_session} successfully reused is
-     *         counted as a hit. In server mode, a session successfully
-     *         retrieved from internal or external cache is counted as a hit.
+     * @return The number of successfully reused sessions. In client mode, a session set with {@code SSL_set_session}
+     *             successfully reused is counted as a hit. In server mode, a session successfully retrieved from
+     *             internal or external cache is counted as a hit.
      */
     public long hits() {
         return SSLContext.sessionHits(context);
     }
 
     /**
-     * @return The number of successfully retrieved sessions from the external
-     *         session cache in server mode.
+     * @return The number of successfully retrieved sessions from the external session cache in server mode.
      */
     public long cbHits() {
         return SSLContext.sessionCbHits(context);
     }
 
     /**
-     * @return The number of sessions proposed by clients that were not found in
-     *         the internal session cache in server mode.
+     * @return The number of sessions proposed by clients that were not found in the internal session cache in server
+     *             mode.
      */
     public long misses() {
         return SSLContext.sessionMisses(context);
     }
 
     /**
-     * @return The number of sessions proposed by clients and either found in
-     *         the internal or external session cache in server mode, but that
-     *         were invalid due to timeout. These sessions are not included in
-     *         the {@link #hits()} count.
+     * @return The number of sessions proposed by clients and either found in the internal or external session cache in
+     *             server mode, but that were invalid due to timeout. These sessions are not included in the
+     *             {@link #hits()} count.
      */
     public long timeouts() {
         return SSLContext.sessionTimeouts(context);
     }
 
     /**
-     * @return The number of sessions that were removed because the maximum
-     *         session cache size was exceeded.
+     * @return The number of sessions that were removed because the maximum session cache size was exceeded.
      */
     public long cacheFull() {
         return SSLContext.sessionCacheFull(context);

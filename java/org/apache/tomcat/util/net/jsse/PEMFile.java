@@ -107,10 +107,9 @@ public class PEMFile {
     }
 
     public static String toPEM(X509Certificate certificate) throws CertificateEncodingException {
-        return Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY +
-                System.lineSeparator() +
-                Base64.getMimeEncoder().encodeToString(certificate.getEncoded()) +
-                Part.END_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY;
+        return Part.BEGIN_BOUNDARY + Part.CERTIFICATE + Part.FINISH_BOUNDARY + System.lineSeparator() +
+                Base64.getMimeEncoder().encodeToString(certificate.getEncoded()) + Part.END_BOUNDARY +
+                Part.CERTIFICATE + Part.FINISH_BOUNDARY;
     }
 
     private final List<X509Certificate> certificates = new ArrayList<>();
@@ -412,7 +411,8 @@ public class PEMFile {
                         byte[] oidPRF = p.parseOIDAsBytes();
                         prf = OID_TO_PRF.get(HexUtils.toHexString(oidPRF));
                         if (prf == null) {
-                            throw new NoSuchAlgorithmException(sm.getString("pemFile.unknownPrfAlgorithm", toDottedOidString(oidPRF)));
+                            throw new NoSuchAlgorithmException(
+                                    sm.getString("pemFile.unknownPrfAlgorithm", toDottedOidString(oidPRF)));
                         }
                         p.parseNull();
 
