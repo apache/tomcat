@@ -34,12 +34,10 @@ import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.res.StringManager;
 
 
-
 /**
- * Implementation of a global initialization of OpenSSL according to specified
- * configuration parameters.
- * Using this from a listener is completely optional, but is needed for
- * configuration and full cleanup of a few native memory allocations.
+ * Implementation of a global initialization of OpenSSL according to specified configuration parameters. Using this from
+ * a listener is completely optional, but is needed for configuration and full cleanup of a few native memory
+ * allocations.
  */
 public class OpenSSLLibrary {
 
@@ -52,20 +50,19 @@ public class OpenSSLLibrary {
 
 
     // ---------------------------------------------- Properties
-    protected static String SSLEngine = "on"; //default on
+    protected static String SSLEngine = "on"; // default on
     protected static String FIPSMode = "off"; // default off, valid only when SSLEngine="on"
     protected static String SSLRandomSeed = "builtin";
     protected static boolean fipsModeActive = false;
 
     /**
-     * The "FIPS mode" level that we use as the argument to OpenSSL method
-     * <code>FIPS_mode_set()</code> to enable FIPS mode and that we expect as
-     * the return value of <code>FIPS_mode()</code> when FIPS mode is enabled.
+     * The "FIPS mode" level that we use as the argument to OpenSSL method <code>FIPS_mode_set()</code> to enable FIPS
+     * mode and that we expect as the return value of <code>FIPS_mode()</code> when FIPS mode is enabled.
      * <p>
-     * In the future the OpenSSL library might grow support for different
-     * non-zero "FIPS" modes that specify different allowed subsets of ciphers
-     * or whatever, but nowadays only "1" is the supported value.
+     * In the future the OpenSSL library might grow support for different non-zero "FIPS" modes that specify different
+     * allowed subsets of ciphers or whatever, but nowadays only "1" is the supported value.
      * </p>
+     *
      * @see <a href="http://wiki.openssl.org/index.php/FIPS_mode_set%28%29">OpenSSL method FIPS_mode_set()</a>
      * @see <a href="http://wiki.openssl.org/index.php/FIPS_mode%28%29">OpenSSL method FIPS_mode()</a>
      */
@@ -92,21 +89,20 @@ public class OpenSSLLibrary {
     }
 
     /*
-    { BN_get_rfc3526_prime_8192, NULL, 6145 },
-    { BN_get_rfc3526_prime_6144, NULL, 4097 },
-    { BN_get_rfc3526_prime_4096, NULL, 3073 },
-    { BN_get_rfc3526_prime_3072, NULL, 2049 },
-    { BN_get_rfc3526_prime_2048, NULL, 1025 },
-    { BN_get_rfc2409_prime_1024, NULL, 0 }
+     * { BN_get_rfc3526_prime_8192, NULL, 6145 }, { BN_get_rfc3526_prime_6144, NULL, 4097 }, {
+     * BN_get_rfc3526_prime_4096, NULL, 3073 }, { BN_get_rfc3526_prime_3072, NULL, 2049 }, { BN_get_rfc3526_prime_2048,
+     * NULL, 1025 }, { BN_get_rfc2409_prime_1024, NULL, 0 }
      */
     static final class DHParam {
         final MemorySegment dh;
         final int min;
+
         private DHParam(MemorySegment dh, int min) {
             this.dh = dh;
             this.min = min;
         }
     }
+
     static final DHParam[] dhParameters = new DHParam[6];
 
     private static void initDHParameters() {
@@ -205,8 +201,9 @@ public class OpenSSLLibrary {
                         if (MemorySegment.NULL.equals(enginePointer)) {
                             enginePointer = ENGINE_by_id(memorySession.allocateFrom("dynamic"));
                             if (enginePointer != null) {
-                                if (ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateFrom("SO_PATH"), engine, 0) == 0
-                                        || ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateFrom("LOAD"),
+                                if (ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateFrom("SO_PATH"), engine,
+                                        0) == 0 ||
+                                        ENGINE_ctrl_cmd_string(enginePointer, memorySession.allocateFrom("LOAD"),
                                                 MemorySegment.NULL, 0) == 0) {
                                     // Engine load error
                                     ENGINE_free(enginePointer);
@@ -233,7 +230,8 @@ public class OpenSSLLibrary {
                     var randomSeed = memorySession.allocateFrom(SSLRandomSeed);
                     seedDone = RAND_load_file(randomSeed, 128) > 0;
                     if (!seedDone) {
-                        log.warn(sm.getString("openssllibrary.errorSettingSSLRandomSeed", SSLRandomSeed, OpenSSLLibrary.getLastError()));
+                        log.warn(sm.getString("openssllibrary.errorSettingSSLRandomSeed", SSLRandomSeed,
+                                OpenSSLLibrary.getLastError()));
                     }
                 }
                 if (!seedDone) {
@@ -252,7 +250,8 @@ public class OpenSSLLibrary {
                     final boolean enterFipsMode;
                     int fipsModeState = FIPS_OFF;
                     if (openssl_h_Compatibility.OPENSSL3) {
-                        var md = EVP_MD_fetch(MemorySegment.NULL, memorySession.allocateFrom("SHA-512"), MemorySegment.NULL);
+                        var md = EVP_MD_fetch(MemorySegment.NULL, memorySession.allocateFrom("SHA-512"),
+                                MemorySegment.NULL);
                         var provider = EVP_MD_get0_provider(md);
                         String name = OSSL_PROVIDER_get0_name(provider).getString(0);
                         EVP_MD_free(md);
@@ -263,7 +262,7 @@ public class OpenSSLLibrary {
                         fipsModeState = FIPS_mode();
                     }
 
-                    if(log.isDebugEnabled()) {
+                    if (log.isDebugEnabled()) {
                         log.debug(sm.getString("openssllibrary.currentFIPSMode", Integer.valueOf(fipsModeState)));
                     }
 
@@ -281,7 +280,8 @@ public class OpenSSLLibrary {
                             enterFipsMode = false;
                         } else {
                             if (openssl_h_Compatibility.OPENSSL3) {
-                                throw new IllegalStateException(sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
+                                throw new IllegalStateException(
+                                        sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
                             } else {
                                 enterFipsMode = true;
                             }
@@ -292,7 +292,8 @@ public class OpenSSLLibrary {
                             enterFipsMode = false;
                         } else {
                             if (openssl_h_Compatibility.OPENSSL3) {
-                                throw new IllegalStateException(sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
+                                throw new IllegalStateException(
+                                        sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
                             } else {
                                 throw new IllegalStateException(sm.getString("openssllibrary.requireNotInFIPSMode"));
                             }
@@ -300,7 +301,8 @@ public class OpenSSLLibrary {
                     } else if ("enter".equalsIgnoreCase(FIPSMode)) {
                         if (fipsModeState == FIPS_OFF) {
                             if (openssl_h_Compatibility.OPENSSL3) {
-                                throw new IllegalStateException(sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
+                                throw new IllegalStateException(
+                                        sm.getString("openssllibrary.FIPSProviderNotDefault", FIPSMode));
                             } else {
                                 enterFipsMode = true;
                             }
@@ -309,13 +311,12 @@ public class OpenSSLLibrary {
                                 fipsModeActive = true;
                                 enterFipsMode = false;
                             } else {
-                                throw new IllegalStateException(sm.getString(
-                                        "openssllibrary.enterAlreadyInFIPSMode", Integer.valueOf(fipsModeState)));
+                                throw new IllegalStateException(sm.getString("openssllibrary.enterAlreadyInFIPSMode",
+                                        Integer.valueOf(fipsModeState)));
                             }
                         }
                     } else {
-                        throw new IllegalArgumentException(sm.getString(
-                                "openssllibrary.wrongFIPSMode", FIPSMode));
+                        throw new IllegalArgumentException(sm.getString("openssllibrary.wrongFIPSMode", FIPSMode));
                     }
 
                     if (enterFipsMode) {
@@ -383,8 +384,7 @@ public class OpenSSLLibrary {
         if (!SSLEngine.equals(OpenSSLLibrary.SSLEngine)) {
             // Ensure that the SSLEngine is consistent with that used for SSL init
             if (OpenSSLStatus.isInitialized()) {
-                throw new IllegalStateException(
-                        sm.getString("openssllibrary.tooLateForSSLEngine"));
+                throw new IllegalStateException(sm.getString("openssllibrary.tooLateForSSLEngine"));
             }
 
             OpenSSLLibrary.SSLEngine = SSLEngine;
@@ -399,8 +399,7 @@ public class OpenSSLLibrary {
         if (!SSLRandomSeed.equals(OpenSSLLibrary.SSLRandomSeed)) {
             // Ensure that the random seed is consistent with that used for SSL init
             if (OpenSSLStatus.isInitialized()) {
-                throw new IllegalStateException(
-                        sm.getString("openssllibrary.tooLateForSSLRandomSeed"));
+                throw new IllegalStateException(sm.getString("openssllibrary.tooLateForSSLRandomSeed"));
             }
 
             OpenSSLLibrary.SSLRandomSeed = SSLRandomSeed;
@@ -415,8 +414,7 @@ public class OpenSSLLibrary {
         if (!FIPSMode.equals(OpenSSLLibrary.FIPSMode)) {
             // Ensure that the FIPS mode is consistent with that used for SSL init
             if (OpenSSLStatus.isInitialized()) {
-                throw new IllegalStateException(
-                        sm.getString("openssllibrary.tooLateForFIPSMode"));
+                throw new IllegalStateException(sm.getString("openssllibrary.tooLateForFIPSMode"));
             }
 
             OpenSSLLibrary.FIPSMode = FIPSMode;
@@ -475,12 +473,11 @@ public class OpenSSLLibrary {
     private static final int OPENSSL_ERROR_MESSAGE_BUFFER_SIZE = 256;
 
     /**
-     * Many calls to SSL methods do not check the last error. Those that do
-     * check the last error need to ensure that any previously ignored error is
-     * cleared prior to the method call else errors may be falsely reported.
-     * Ideally, before any SSL_read, SSL_write, clearLastError should always
-     * be called, and getLastError should be called after on any negative or
-     * zero result.
+     * Many calls to SSL methods do not check the last error. Those that do check the last error need to ensure that any
+     * previously ignored error is cleared prior to the method call else errors may be falsely reported. Ideally, before
+     * any SSL_read, SSL_write, clearLastError should always be called, and getLastError should be called after on any
+     * negative or zero result.
+     *
      * @return the first error in the stack
      */
     static String getLastError() {

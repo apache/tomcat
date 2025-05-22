@@ -30,7 +30,7 @@ import org.apache.tomcat.util.net.jsse.JSSESupport;
 public class OpenSSLImplementation extends SSLImplementation {
 
     @Override
-    public SSLSupport getSSLSupport(SSLSession session, Map<String, List<String>> additionalAttributes) {
+    public SSLSupport getSSLSupport(SSLSession session, Map<String,List<String>> additionalAttributes) {
         return new JSSESupport(session, additionalAttributes);
     }
 
