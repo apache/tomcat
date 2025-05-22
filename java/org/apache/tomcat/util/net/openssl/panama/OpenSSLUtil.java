@@ -90,8 +90,8 @@ public class OpenSSLUtil extends SSLUtilBase {
             // KeyStoreException or IOException if it doesn't understand the
             // provided file.
             if (certificate.getCertificateFile() != null) {
-                String msg = sm.getString("openssl.nonJsseCertificate",
-                        certificate.getCertificateFile(), certificate.getCertificateKeyFile());
+                String msg = sm.getString("openssl.nonJsseCertificate", certificate.getCertificateFile(),
+                        certificate.getCertificateKeyFile());
                 if (log.isDebugEnabled()) {
                     log.info(msg, e);
                 } else {
