@@ -24,8 +24,8 @@ import java.util.Map;
 
 
 /**
- * Representation of an application resource reference, as represented in
- * an <code>&lt;res-env-ref&gt;</code> element in the deployment descriptor.
+ * Representation of an application resource reference, as represented in an <code>&lt;res-env-ref&gt;</code> element in
+ * the deployment descriptor.
  *
  * @author Craig R. McClanahan
  */
@@ -40,10 +40,11 @@ public class ContextTransaction implements Serializable {
     /**
      * Holder for our configured properties.
      */
-    private final Map<String, Object> properties = new HashMap<>();
+    private final Map<String,Object> properties = new HashMap<>();
 
     /**
      * @param name The property name
+     *
      * @return a configured property.
      */
     public Object getProperty(String name) {
@@ -52,7 +53,8 @@ public class ContextTransaction implements Serializable {
 
     /**
      * Set a configured property.
-     * @param name The property name
+     *
+     * @param name  The property name
      * @param value The property value
      */
     public void setProperty(String name, Object value) {
@@ -61,6 +63,7 @@ public class ContextTransaction implements Serializable {
 
     /**
      * Remove a configured property.
+     *
      * @param name The property name
      */
     public void removeProperty(String name) {
@@ -69,6 +72,7 @@ public class ContextTransaction implements Serializable {
 
     /**
      * List properties.
+     *
      * @return the property names iterator
      */
     public Iterator<String> listProperties() {

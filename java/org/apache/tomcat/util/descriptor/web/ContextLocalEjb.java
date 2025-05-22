@@ -20,9 +20,8 @@ package org.apache.tomcat.util.descriptor.web;
 import java.io.Serial;
 
 /**
- * Representation of a local EJB resource reference for a web application, as
- * represented in a <code>&lt;ejb-local-ref&gt;</code> element in the
- * deployment descriptor.
+ * Representation of a local EJB resource reference for a web application, as represented in a
+ * <code>&lt;ejb-local-ref&gt;</code> element in the deployment descriptor.
  *
  * @author Craig R. McClanahan
  * @author Peter Rossbach (pero@apache.org)

@@ -23,8 +23,7 @@ import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
 /**
- * RulesSet for digesting implicit.tld files.
- * Only version information used and short names are allowed.
+ * RulesSet for digesting implicit.tld files. Only version information used and short names are allowed.
  */
 public class ImplicitTldRuleSet implements RuleSet {
 

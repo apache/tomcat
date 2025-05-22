@@ -29,7 +29,7 @@ public class JspConfigDescriptorImpl implements JspConfigDescriptor {
     private final Collection<TaglibDescriptor> taglibs;
 
     public JspConfigDescriptorImpl(Collection<JspPropertyGroupDescriptor> jspPropertyGroups,
-                                   Collection<TaglibDescriptor> taglibs) {
+            Collection<TaglibDescriptor> taglibs) {
         this.jspPropertyGroups = jspPropertyGroups;
         this.taglibs = taglibs;
     }

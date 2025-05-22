@@ -40,11 +40,10 @@ public class TagPluginParser {
     private final Log log = LogFactory.getLog(TagPluginParser.class); // must not be static
     private static final String PREFIX = "tag-plugins/tag-plugin";
     private final Digester digester;
-    private final Map<String, String> plugins = new HashMap<>();
+    private final Map<String,String> plugins = new HashMap<>();
 
     public TagPluginParser(ServletContext context, boolean blockExternal) {
-        digester = DigesterFactory.newDigester(
-                false, false, new TagPluginRuleSet(), blockExternal);
+        digester = DigesterFactory.newDigester(false, false, new TagPluginRuleSet(), blockExternal);
         digester.setClassLoader(context.getClassLoader());
     }
 
@@ -74,7 +73,7 @@ public class TagPluginParser {
         plugins.put(tagClass, pluginClass);
     }
 
-    public Map<String, String> getPlugins() {
+    public Map<String,String> getPlugins() {
         return plugins;
     }
 

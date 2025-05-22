@@ -20,8 +20,8 @@ package org.apache.tomcat.util.descriptor.web;
 import java.io.Serial;
 
 /**
- * Representation of an application environment entry, as represented in
- * an <code>&lt;env-entry&gt;</code> element in the deployment descriptor.
+ * Representation of an application environment entry, as represented in an <code>&lt;env-entry&gt;</code> element in
+ * the deployment descriptor.
  *
  * @author Craig R. McClanahan
  */
@@ -35,8 +35,7 @@ public class ContextEnvironment extends ResourceBase {
 
 
     /**
-     * Does this environment entry allow overrides by the application
-     * deployment descriptor?
+     * Does this environment entry allow overrides by the application deployment descriptor?
      */
     private boolean override = true;
 
