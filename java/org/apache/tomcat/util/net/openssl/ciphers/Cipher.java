@@ -44,6 +44,7 @@ import java.util.Set;
  */
 public enum Cipher {
 
+    // @formatter:off
     /* Cipher 0
      * TLS_NULL_WITH_NULL_NULL
      * Must never be negotiated. Used internally to represent the initial
@@ -4988,7 +4989,7 @@ public enum Cipher {
      256,
      256
      },*/
-
+    // @formatter:on
 
     private final int id;
     private final String openSSLAlias;
