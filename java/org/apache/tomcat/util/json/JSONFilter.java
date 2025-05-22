@@ -17,15 +17,16 @@
 package org.apache.tomcat.util.json;
 
 /**
- * Provides escaping of values so they can be included in a JSON document.
- * Escaping is based on the definition of JSON found in
- * <a href="https://www.rfc-editor.org/rfc/rfc8259.html">RFC 8259</a>.
+ * Provides escaping of values so they can be included in a JSON document. Escaping is based on the definition of JSON
+ * found in <a href="https://www.rfc-editor.org/rfc/rfc8259.html">RFC 8259</a>.
  */
 public class JSONFilter {
 
     /**
      * Escape the given char.
+     *
      * @param c the char
+     *
      * @return a char array with the escaped sequence
      */
     public static char[] escape(char c) {
@@ -48,7 +49,9 @@ public class JSONFilter {
 
     /**
      * Escape the given string.
+     *
      * @param input the string
+     *
      * @return the escaped string
      */
     public static String escape(String input) {
@@ -57,7 +60,9 @@ public class JSONFilter {
 
     /**
      * Escape the given char sequence.
+     *
      * @param input the char sequence
+     *
      * @return the escaped char sequence
      */
     public static CharSequence escape(CharSequence input) {
@@ -66,16 +71,17 @@ public class JSONFilter {
 
     /**
      * Escape the given char sequence.
-     * @param input the char sequence
-     * @param off the offset on which escaping will start
+     *
+     * @param input  the char sequence
+     * @param off    the offset on which escaping will start
      * @param length the length which should be escaped
+     *
      * @return the escaped char sequence corresponding to the specified range
      */
     public static CharSequence escape(CharSequence input, int off, int length) {
         /*
-         * While any character MAY be escaped, only U+0000 to U+001F (control
-         * characters), U+0022 (quotation mark) and U+005C (reverse solidus)
-         * MUST be escaped.
+         * While any character MAY be escaped, only U+0000 to U+001F (control characters), U+0022 (quotation mark) and
+         * U+005C (reverse solidus) MUST be escaped.
          */
         StringBuilder escaped = null;
         int lastUnescapedStart = off;
