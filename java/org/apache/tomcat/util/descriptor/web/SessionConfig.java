@@ -21,9 +21,8 @@ import java.util.EnumSet;
 import javax.servlet.SessionTrackingMode;
 
 /**
- * Representation of a session configuration element for a web application,
- * as represented in a <code>&lt;session-config&gt;</code> element in the
- * deployment descriptor.
+ * Representation of a session configuration element for a web application, as represented in a
+ * <code>&lt;session-config&gt;</code> element in the deployment descriptor.
  */
 public class SessionConfig {
     private Integer sessionTimeout;
@@ -34,12 +33,12 @@ public class SessionConfig {
     private Boolean cookieHttpOnly;
     private Boolean cookieSecure;
     private Integer cookieMaxAge;
-    private final EnumSet<SessionTrackingMode> sessionTrackingModes =
-        EnumSet.noneOf(SessionTrackingMode.class);
+    private final EnumSet<SessionTrackingMode> sessionTrackingModes = EnumSet.noneOf(SessionTrackingMode.class);
 
     public Integer getSessionTimeout() {
         return sessionTimeout;
     }
+
     public void setSessionTimeout(String sessionTimeout) {
         this.sessionTimeout = Integer.valueOf(sessionTimeout);
     }
@@ -47,6 +46,7 @@ public class SessionConfig {
     public String getCookieName() {
         return cookieName;
     }
+
     public void setCookieName(String cookieName) {
         this.cookieName = cookieName;
     }
@@ -54,6 +54,7 @@ public class SessionConfig {
     public String getCookieDomain() {
         return cookieDomain;
     }
+
     public void setCookieDomain(String cookieDomain) {
         this.cookieDomain = cookieDomain;
     }
@@ -61,6 +62,7 @@ public class SessionConfig {
     public String getCookiePath() {
         return cookiePath;
     }
+
     public void setCookiePath(String cookiePath) {
         this.cookiePath = cookiePath;
     }
@@ -68,6 +70,7 @@ public class SessionConfig {
     public String getCookieComment() {
         return cookieComment;
     }
+
     public void setCookieComment(String cookieComment) {
         this.cookieComment = cookieComment;
     }
@@ -75,6 +78,7 @@ public class SessionConfig {
     public Boolean getCookieHttpOnly() {
         return cookieHttpOnly;
     }
+
     public void setCookieHttpOnly(String cookieHttpOnly) {
         this.cookieHttpOnly = Boolean.valueOf(cookieHttpOnly);
     }
@@ -82,6 +86,7 @@ public class SessionConfig {
     public Boolean getCookieSecure() {
         return cookieSecure;
     }
+
     public void setCookieSecure(String cookieSecure) {
         this.cookieSecure = Boolean.valueOf(cookieSecure);
     }
@@ -89,6 +94,7 @@ public class SessionConfig {
     public Integer getCookieMaxAge() {
         return cookieMaxAge;
     }
+
     public void setCookieMaxAge(String cookieMaxAge) {
         this.cookieMaxAge = Integer.valueOf(cookieMaxAge);
     }
@@ -96,8 +102,8 @@ public class SessionConfig {
     public EnumSet<SessionTrackingMode> getSessionTrackingModes() {
         return sessionTrackingModes;
     }
+
     public void addSessionTrackingMode(String sessionTrackingMode) {
-        sessionTrackingModes.add(
-                SessionTrackingMode.valueOf(sessionTrackingMode));
+        sessionTrackingModes.add(SessionTrackingMode.valueOf(sessionTrackingMode));
     }
 }

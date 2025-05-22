@@ -17,11 +17,9 @@
 package org.apache.tomcat.util.descriptor.web;
 
 
-
 /**
- * Representation of an EJB resource reference for a web application, as
- * represented in a <code>&lt;ejb-ref&gt;</code> element in the
- * deployment descriptor.
+ * Representation of an EJB resource reference for a web application, as represented in a <code>&lt;ejb-ref&gt;</code>
+ * element in the deployment descriptor.
  *
  * @author Craig R. McClanahan
  * @author Peter Rossbach (pero@apache.org)

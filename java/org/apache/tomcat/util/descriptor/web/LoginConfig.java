@@ -21,9 +21,8 @@ import java.io.Serializable;
 import org.apache.tomcat.util.buf.UDecoder;
 
 /**
- * Representation of a login configuration element for a web application,
- * as represented in a <code>&lt;login-config&gt;</code> element in the
- * deployment descriptor.
+ * Representation of a login configuration element for a web application, as represented in a
+ * <code>&lt;login-config&gt;</code> element in the deployment descriptor.
  *
  * @author Craig R. McClanahan
  */
@@ -49,12 +48,11 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
      * Construct a new LoginConfig with the specified properties.
      *
      * @param authMethod The authentication method
-     * @param realmName The realm name
-     * @param loginPage The login page URI
-     * @param errorPage The error page URI
+     * @param realmName  The realm name
+     * @param loginPage  The login page URI
+     * @param errorPage  The error page URI
      */
-    public LoginConfig(String authMethod, String realmName,
-                       String loginPage, String errorPage) {
+    public LoginConfig(String authMethod, String realmName, String loginPage, String errorPage) {
 
         super();
         setAuthMethod(authMethod);
@@ -69,8 +67,7 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
 
 
     /**
-     * The authentication method to use for application login.  Must be
-     * BASIC, DIGEST, FORM, or CLIENT-CERT.
+     * The authentication method to use for application login. Must be BASIC, DIGEST, FORM, or CLIENT-CERT.
      */
     private String authMethod = null;
 
@@ -112,8 +109,7 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
 
 
     /**
-     * The realm name used when challenging the user for authentication
-     * credentials.
+     * The realm name used when challenging the user for authentication credentials.
      */
     private String realmName = null;
 
@@ -154,26 +150,26 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
     }
 
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result
-                + ((authMethod == null) ? 0 : authMethod.hashCode());
-        result = prime * result
-                + ((errorPage == null) ? 0 : errorPage.hashCode());
-        result = prime * result
-                + ((loginPage == null) ? 0 : loginPage.hashCode());
-        result = prime * result
-                + ((realmName == null) ? 0 : realmName.hashCode());
+        result = prime * result + ((authMethod == null) ? 0 : authMethod.hashCode());
+        result = prime * result + ((errorPage == null) ? 0 : errorPage.hashCode());
+        result = prime * result + ((loginPage == null) ? 0 : loginPage.hashCode());
+        result = prime * result + ((realmName == null) ? 0 : realmName.hashCode());
         return result;
     }
 
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override

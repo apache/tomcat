@@ -18,11 +18,13 @@ package org.apache.tomcat.util.descriptor.web;
 
 
 /**
- * <p>Representation of a message destination for a web application, as
- * represented in a <code>&lt;message-destination&gt;</code> element
- * in the deployment descriptor.</p>
+ * <p>
+ * Representation of a message destination for a web application, as represented in a
+ * <code>&lt;message-destination&gt;</code> element in the deployment descriptor.
+ * </p>
  *
  * @author Craig R. McClanahan
+ *
  * @since Tomcat 5.0
  */
 public class MessageDestination extends ResourceBase {
@@ -110,12 +112,9 @@ public class MessageDestination extends ResourceBase {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result +
-                ((displayName == null) ? 0 : displayName.hashCode());
-        result = prime * result +
-                ((largeIcon == null) ? 0 : largeIcon.hashCode());
-        result = prime * result +
-                ((smallIcon == null) ? 0 : smallIcon.hashCode());
+        result = prime * result + ((displayName == null) ? 0 : displayName.hashCode());
+        result = prime * result + ((largeIcon == null) ? 0 : largeIcon.hashCode());
+        result = prime * result + ((smallIcon == null) ? 0 : smallIcon.hashCode());
         return result;
     }
 

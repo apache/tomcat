@@ -18,11 +18,13 @@ package org.apache.tomcat.util.descriptor.web;
 
 
 /**
- * <p>Representation of a message destination reference for a web application,
- * as represented in a <code>&lt;message-destination-ref&gt;</code> element
- * in the deployment descriptor.</p>
+ * <p>
+ * Representation of a message destination reference for a web application, as represented in a
+ * <code>&lt;message-destination-ref&gt;</code> element in the deployment descriptor.
+ * </p>
  *
  * @author Craig R. McClanahan
+ *
  * @since Tomcat 5.0
  */
 public class MessageDestinationRef extends ResourceBase {
