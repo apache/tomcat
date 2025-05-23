@@ -57,7 +57,7 @@ public class PrivilegedSetAccessControlContext implements PrivilegedAction<Void>
     public Void run() {
         try {
             if (field != null) {
-                field.set(t,  acc);
+                field.set(t, acc);
             }
         } catch (IllegalArgumentException | IllegalAccessException e) {
             log.warn(sm.getString("privilegedSetAccessControlContext.setFailed"), e);
