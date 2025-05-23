@@ -175,7 +175,7 @@ public class StringManager {
     // STATIC SUPPORT METHODS
     // --------------------------------------------------------------
 
-    private static final Map<String, Map<Locale, StringManager>> managers = new HashMap<>();
+    private static final Map<String,Map<Locale,StringManager>> managers = new HashMap<>();
 
 
     /**
@@ -216,18 +216,18 @@ public class StringManager {
      */
     public static synchronized StringManager getManager(String packageName, Locale locale) {
 
-        Map<Locale, StringManager> map = managers.get(packageName);
+        Map<Locale,StringManager> map = managers.get(packageName);
         if (map == null) {
             /*
              * Don't want the HashMap size to exceed LOCALE_CACHE_SIZE. Expansion occurs when size() exceeds capacity.
-             * Therefore, keep size at or below capacity. removeEldestEntry() executes after insertion therefore the test
-             * for removal needs to use one less than the maximum desired size. Note this is an LRU cache.
+             * Therefore, keep size at or below capacity. removeEldestEntry() executes after insertion therefore the
+             * test for removal needs to use one less than the maximum desired size. Note this is an LRU cache.
              */
             map = new LinkedHashMap<>(LOCALE_CACHE_SIZE, 0.75f, true) {
                 private static final long serialVersionUID = 1L;
 
                 @Override
-                protected boolean removeEldestEntry(Map.Entry<Locale, StringManager> eldest) {
+                protected boolean removeEldestEntry(Map.Entry<Locale,StringManager> eldest) {
                     return size() > (LOCALE_CACHE_SIZE - 1);
                 }
             };
