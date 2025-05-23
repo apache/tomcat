@@ -16,6 +16,13 @@
  */
 package org.apache.el.parser;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jakarta.el.ELContext;
 import jakarta.el.ELManager;
 import jakarta.el.ELProcessor;
@@ -26,6 +33,99 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TestAstConcatenation {
+
+    private static final List<String> simpleList = new ArrayList<>();
+    private static final Map<String,String> simpleMap = new HashMap<>();
+    private static final Set<String> simpleSet = new HashSet<>();
+
+    static {
+        simpleList.add("a");
+        simpleList.add("b");
+        simpleList.add("c");
+        simpleList.add("b");
+        simpleList.add("c");
+
+        simpleMap.put("a", "1");
+        simpleMap.put("b", "2");
+        simpleMap.put("c", "3");
+
+        simpleSet.add("a");
+        simpleSet.add("b");
+        simpleSet.add("c");
+    }
+
+
+    @Test
+    public void testNullConcatNull() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("null += null", Integer.class);
+        Assert.assertEquals(Integer.valueOf(0), result);
+    }
+
+
+    @Test
+    public void testMapConcatMapNoConflicts() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("{'a':'1','b':'2'} += {'c':'3'}", Map.class);
+        Assert.assertEquals(simpleMap, result);
+    }
+
+
+    @Test
+    public void testMapConcatMapConflicts() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("{'a':'1','b':'3'} += {'b':'2','c':'3'}", Map.class);
+        Assert.assertEquals(simpleMap, result);
+    }
+
+
+    @Test
+    public void testSetConcatSetNoConflicts() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("{'a','b'} += {'c'}", Set.class);
+        Assert.assertEquals(simpleSet, result);
+    }
+
+
+    @Test
+    public void testSetConcatSetConflicts() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("{'a','b'} += {'b','c'}", Set.class);
+        Assert.assertEquals(simpleSet, result);
+    }
+
+
+    @Test
+    public void testSetConcatListNoConflicts() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("{'a','b'} += ['c']", Set.class);
+        Assert.assertEquals(simpleSet, result);
+    }
+
+
+    @Test
+    public void testSetConcatListConflicts() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("{'a','b'} += ['b','c','c']", Set.class);
+        Assert.assertEquals(simpleSet, result);
+    }
+
+
+    @Test
+    public void testListConcatList() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("['a','b','c'] += ['b','c']", List.class);
+        Assert.assertEquals(simpleList, result);
+    }
+
+
+    @Test
+    public void testListConcatSet() {
+        ELProcessor processor = new ELProcessor();
+        Object result = processor.getValue("['a','b','c'] += {'b','c'}", List.class);
+        Assert.assertEquals(simpleList, result);
+    }
+
 
     /**
      * Test string concatenation.
