@@ -32,23 +32,17 @@ public class KeyStoreUtil {
 
     /**
      * Loads a KeyStore from an InputStream working around the known JDK bug
-     * https://bugs.openjdk.java.net/browse/JDK-8157404.
+     * https://bugs.openjdk.java.net/browse/JDK-8157404. This code can be removed once the minimum Java version for
+     * Tomcat is 13.
      *
-     * This code can be removed once the minimum Java version for Tomcat is 13.
-     *
-     *
-     * @param keystore The KeyStore to load from the InputStream
-     * @param is The InputStream to use to populate the KeyStore
+     * @param keystore  The KeyStore to load from the InputStream
+     * @param is        The InputStream to use to populate the KeyStore
      * @param storePass The password to access the KeyStore
      *
-     * @throws IOException
-     *              If an I/O occurs reading from the given InputStream
-     * @throws CertificateException
-     *              If one or more certificates can't be loaded into the
-     *              KeyStore
-     * @throws NoSuchAlgorithmException
-     *              If the algorithm specified to validate the integrity of the
-     *              KeyStore cannot be found
+     * @throws IOException              If an I/O occurs reading from the given InputStream
+     * @throws CertificateException     If one or more certificates can't be loaded into the KeyStore
+     * @throws NoSuchAlgorithmException If the algorithm specified to validate the integrity of the KeyStore cannot be
+     *                                      found
      */
     public static void load(KeyStore keystore, InputStream is, char[] storePass)
             throws NoSuchAlgorithmException, CertificateException, IOException {
