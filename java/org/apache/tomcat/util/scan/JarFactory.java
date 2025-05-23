@@ -53,8 +53,7 @@ public class JarFactory {
     }
 
 
-    public static URL getJarEntryURL(URL baseUrl, String entryName)
-            throws MalformedURLException {
+    public static URL getJarEntryURL(URL baseUrl, String entryName) throws MalformedURLException {
 
         String baseExternal = baseUrl.toExternalForm();
 
@@ -62,8 +61,7 @@ public class JarFactory {
             // Assume this is pointing to a JAR file within a WAR. Java doesn't
             // support jar:jar:file:... so switch to Tomcat's war:file:...
             baseExternal = baseExternal.replaceFirst("^jar:", "war:");
-            baseExternal = baseExternal.replaceFirst("!/",
-                    Matcher.quoteReplacement(UriUtil.getWarSeparator()));
+            baseExternal = baseExternal.replaceFirst("!/", Matcher.quoteReplacement(UriUtil.getWarSeparator()));
         }
 
         return new URL("jar:" + baseExternal + "!/" + entryName);
