@@ -34,9 +34,8 @@ import java.util.zip.ZipFile;
 import org.apache.tomcat.Jar;
 
 /**
- * Implementation of {@link Jar} that is optimised for file based JAR URLs that
- * refer directly to a JAR file (e.g. URLs of the form jar:file: ... .jar!/ or
- * file:... .jar).
+ * Implementation of {@link Jar} that is optimised for file based JAR URLs that refer directly to a JAR file (e.g. URLs
+ * of the form jar:file: ... .jar!/ or file:... .jar).
  */
 public class JarFileUrlJar implements Jar {
 
@@ -115,7 +114,7 @@ public class JarFileUrlJar implements Jar {
 
     @Override
     public String getURL(String entry) {
-        return "jar:" + getJarFileURL().toExternalForm() + "!/" +  entry;
+        return "jar:" + getJarFileURL().toExternalForm() + "!/" + entry;
     }
 
     @Override
@@ -142,11 +141,11 @@ public class JarFileUrlJar implements Jar {
         if (multiRelease) {
             // Need to ensure that:
             // - the one, correct entry is returned where multiple versions
-            //   are available
+            // are available
             // - that the order of entries in the JAR doesn't prevent the
-            //   correct entries being returned
+            // correct entries being returned
             // - the case where an entry appears in the versions location
-            //   but not in the base location is handled correctly
+            // but not in the base location is handled correctly
 
             // Enumerate the entries until one is reached that represents an
             // entry that has not been seen before.
