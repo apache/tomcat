@@ -29,8 +29,7 @@ import org.apache.tomcat.Jar;
 import org.apache.tomcat.util.compat.JreCompat;
 
 /**
- * Base implementation of Jar for implementations that use a JarInputStream to
- * access the JAR file.
+ * Base implementation of Jar for implementations that use a JarInputStream to access the JAR file.
  */
 public abstract class AbstractInputStreamJar implements Jar {
 
@@ -67,10 +66,8 @@ public abstract class AbstractInputStreamJar implements Jar {
             if (multiRelease.booleanValue()) {
                 // Skip base entries where there is a multi-release entry
                 // Skip multi-release entries that are not being used
-                while (entry != null &&
-                        (mrMap.containsKey(entry.getName()) ||
-                                entry.getName().startsWith("META-INF/versions/") &&
-                                !mrMap.containsValue(entry.getName()))) {
+                while (entry != null && (mrMap.containsKey(entry.getName()) ||
+                        entry.getName().startsWith("META-INF/versions/") && !mrMap.containsValue(entry.getName()))) {
                     entry = jarInputStream.getNextJarEntry();
                 }
             } else {
@@ -273,8 +270,8 @@ public abstract class AbstractInputStreamJar implements Jar {
         mrMap = new HashMap<>();
 
         for (Entry<String,Integer> mrVersion : mrVersions.entrySet()) {
-            mrMap.put(mrVersion.getKey() , "META-INF/versions/" + mrVersion.getValue().toString() +
-                    "/" +  mrVersion.getKey());
+            mrMap.put(mrVersion.getKey(),
+                    "META-INF/versions/" + mrVersion.getValue().toString() + "/" + mrVersion.getKey());
         }
 
         // Reset stream back to the beginning of the JAR
