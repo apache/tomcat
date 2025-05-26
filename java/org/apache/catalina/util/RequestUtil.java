@@ -85,13 +85,16 @@ public final class RequestUtil {
             } else {
                 pos = followingSlash;
             }
-            if (request != null && nextSemiColon + 1 <pos) {
-                String pathVariable = input.substring(nextSemiColon + 1, pos);
-                int equals = pathVariable.indexOf('=');
-                if (equals > -1 && equals + 1 < pathVariable.length()) {
-                    String name = pathVariable.substring(0, equals);
-                    String value = pathVariable.substring(equals + 1);
-                    request.addPathParameter(name, value);
+            if (request != null && nextSemiColon + 1 < pos) {
+                String pathVariableString = input.substring(nextSemiColon + 1, pos);
+                String[] pathVariants = pathVariableString.split(";");
+                for (String pathVariable : pathVariants) {
+                    int equals = pathVariable.indexOf('=');
+                    if (equals > -1 && equals + 1 < pathVariable.length()) {
+                        String name = pathVariable.substring(0, equals);
+                        String value = pathVariable.substring(equals + 1);
+                        request.addPathParameter(name, value);
+                    }
                 }
             }
         }
