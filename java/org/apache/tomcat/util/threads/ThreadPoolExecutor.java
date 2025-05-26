@@ -1399,12 +1399,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
         try {
             executeInternal(command);
         } catch (RejectedExecutionException rx) {
-            if (getQueue() instanceof TaskQueue) {
+            if (getQueue() instanceof RetryableQueue) {
                 // If the Executor is close to maximum pool size, concurrent
                 // calls to execute() may result (due to Tomcat's use of
                 // TaskQueue) in some tasks being rejected rather than queued.
                 // If this happens, add them to the queue.
-                final TaskQueue queue = (TaskQueue) getQueue();
+                final RetryableQueue<Runnable> queue = (RetryableQueue<Runnable>) getQueue();
                 try {
                     if (!queue.force(command, timeout, unit)) {
                         submittedCount.decrementAndGet();
