@@ -118,6 +118,17 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <scode>
+        <pr>861</pr>: Refactor <code>TaskQueue</code> to use the new interface
+        <code>RetryableQueue</code> which enables better integration of custom
+        <code>Executor</code>s which provide their own
+        <code>BlockingQueue</code> implementation. Pull request provided by
+        Paulo Almeida. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
