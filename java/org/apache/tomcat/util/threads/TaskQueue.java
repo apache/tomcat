@@ -31,7 +31,7 @@ import org.apache.tomcat.util.res.StringManager;
  * there are idle threads and you won't be able to force items onto the queue
  * itself.
  */
-public class TaskQueue extends LinkedBlockingQueue<Runnable> {
+public class TaskQueue extends LinkedBlockingQueue<Runnable> implements RetryableQueue<Runnable>{
 
     @Serial
     private static final long serialVersionUID = 1L;
