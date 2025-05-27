@@ -21,6 +21,13 @@ import java.util.concurrent.BlockingQueue;
 
 public interface RetryableQueue<T> extends BlockingQueue<T> {
 
+    /**
+     * Used to add a task to the queue if the task has been rejected by the Executor.
+     *
+     * @param o         The task to add to the queue
+     *
+     * @return          {@code true} if the task was added to the queue,
+     *                      otherwise {@code false}
+     */
     boolean force(T o);
-
 }

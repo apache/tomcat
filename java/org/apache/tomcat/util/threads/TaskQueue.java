@@ -31,7 +31,7 @@ import org.apache.tomcat.util.res.StringManager;
  * there are idle threads and you won't be able to force items onto the queue
  * itself.
  */
-public class TaskQueue extends LinkedBlockingQueue<Runnable> implements RetryableQueue<Runnable>{
+public class TaskQueue extends LinkedBlockingQueue<Runnable> implements RetryableQueue<Runnable> {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -56,14 +56,7 @@ public class TaskQueue extends LinkedBlockingQueue<Runnable> implements Retryabl
     }
 
 
-    /**
-     * Used to add a task to the queue if the task has been rejected by the Executor.
-     *
-     * @param o         The task to add to the queue
-     *
-     * @return          {@code true} if the task was added to the queue,
-     *                      otherwise {@code false}
-     */
+    @Override
     public boolean force(Runnable o) {
         if (parent == null || parent.isShutdown()) {
             throw new RejectedExecutionException(sm.getString("taskQueue.notRunning"));
