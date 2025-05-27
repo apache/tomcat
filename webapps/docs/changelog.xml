@@ -179,6 +179,11 @@
         <code>getParts()</code> is these circumstances will trigger an
         exception. (markt)
       </fix>
+      <fix>
+        Support parsing of multiple path parameters separated by <code>;</code>
+        in a single URL segment. Based on pull request <pr>860</pr> by Chenjp.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
