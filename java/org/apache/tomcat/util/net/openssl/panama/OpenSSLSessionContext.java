@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.net.openssl.panama;
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.ValueLayout;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 

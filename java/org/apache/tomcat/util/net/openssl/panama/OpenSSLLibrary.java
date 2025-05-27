@@ -17,6 +17,9 @@
 package org.apache.tomcat.util.net.openssl.panama;
 
 
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;

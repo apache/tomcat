@@ -18,6 +18,11 @@ package org.apache.tomcat.util.net.openssl.panama;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.lang.foreign.ValueLayout;
+import java.lang.ref.Cleaner;
+import java.lang.ref.Cleaner.Cleanable;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URI;
