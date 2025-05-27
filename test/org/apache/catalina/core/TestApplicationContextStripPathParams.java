@@ -62,6 +62,10 @@ public class TestApplicationContextStripPathParams extends TomcatBaseTest {
             { ";/foo;=/bar", "/foo/bar", Boolean.FALSE },
             { ";/foo;a=/bar", "/foo/bar", Boolean.FALSE },
             { ";/foo;=1/bar", "/foo/bar", Boolean.FALSE },
+            { "/foo;a=1;b=1/bar", "/foo/bar", Boolean.TRUE },
+            { ";/foo;a=1;b=1/bar", "/foo/bar", Boolean.TRUE },
+            { "/foo;b=1;a=1/bar", "/foo/bar", Boolean.TRUE },
+            { ";/foo;b=1;a=1/bar", "/foo/bar", Boolean.TRUE },
         });
     }
 
