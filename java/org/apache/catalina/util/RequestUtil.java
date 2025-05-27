@@ -60,8 +60,10 @@ public final class RequestUtil {
 
     /**
      * Strip parameters for given path.
-     * @param input the input path
+     *
+     * @param input   the input path
      * @param request the request to add the parameters to
+     *
      * @return the cleaned path
      */
     public static String stripPathParams(String input, Request request) {
@@ -85,19 +87,20 @@ public final class RequestUtil {
             } else {
                 pos = followingSlash;
             }
-            if (request != null && nextSemiColon + 1 <pos) {
-                String pathVariable = input.substring(nextSemiColon + 1, pos);
-                int equals = pathVariable.indexOf('=');
-                if (equals > -1 && equals + 1 < pathVariable.length()) {
-                    String name = pathVariable.substring(0, equals);
-                    String value = pathVariable.substring(equals + 1);
-                    request.addPathParameter(name, value);
+            if (request != null && nextSemiColon + 1 < pos) {
+                String pathVariablesString = input.substring(nextSemiColon + 1, pos);
+                String[] pathVariables = pathVariablesString.split(";");
+                for (String pathVariable : pathVariables) {
+                    int equals = pathVariable.indexOf('=');
+                    if (equals > -1 && equals + 1 < pathVariable.length()) {
+                        String name = pathVariable.substring(0, equals);
+                        String value = pathVariable.substring(equals + 1);
+                        request.addPathParameter(name, value);
+                    }
                 }
             }
         }
 
         return sb.toString();
     }
-
-
 }
