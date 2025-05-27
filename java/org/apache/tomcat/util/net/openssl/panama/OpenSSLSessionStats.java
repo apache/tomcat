@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.net.openssl.panama;
 
+import java.lang.foreign.MemorySegment;
+
 import static org.apache.tomcat.util.openssl.openssl_h.*;
 
 /**
