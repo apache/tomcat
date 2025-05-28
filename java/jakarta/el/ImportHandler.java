@@ -138,7 +138,7 @@ public class ImportHandler {
         standardPackages.put("jakarta.servlet.jsp", servletJspClassNames);
 
         Set<String> javaLangClassNames = new HashSet<>();
-        // Based on Java 21 EA29
+        // Based on Java 25 EA16
         // Interfaces
         javaLangClassNames.add("Appendable");
         javaLangClassNames.add("AutoCloseable");
@@ -170,6 +170,7 @@ public class ImportHandler {
         javaLangClassNames.add("Enum");
         javaLangClassNames.add("Enum.EnumDesc");
         javaLangClassNames.add("Float");
+        javaLangClassNames.add("IO");
         javaLangClassNames.add("InheritableThreadLocal");
         javaLangClassNames.add("Integer");
         javaLangClassNames.add("Long");
@@ -192,6 +193,7 @@ public class ImportHandler {
         javaLangClassNames.add("ScopedValue.Carrier");
         javaLangClassNames.add("SecurityManager");
         javaLangClassNames.add("Short");
+        javaLangClassNames.add("StableValue");
         javaLangClassNames.add("StackTraceElement");
         javaLangClassNames.add("StackWalker");
         javaLangClassNames.add("StrictMath");
