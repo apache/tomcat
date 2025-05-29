@@ -741,6 +741,26 @@ public class TestRewriteValve extends TomcatBaseTest {
         doTestRewrite("RewriteRule /dummy /a\nRewriteRule /a /c [L]", "/dummy", "/c");
     }
 
+    // BZ 69699
+    @Test
+    public void testRedirectWithPathParameters01() throws Exception {
+        doTestRewrite("RewriteRule ^/b(.*) /a$1 [R]", "/b;k=1;jsessionid=0001/%255A", "/a/%255A;jsessionid=0001");
+    }
+
+    // BZ 69699
+    @Test
+    public void testRedirectWithPathParameters02() throws Exception {
+        doTestRewrite("RewriteRule ^/b(.*) /a$1 [R]", "/b/%255A;k=1;jsessionid=0002?k=v#s1", "/a/%255A;jsessionid=0002",
+                "k=v");
+    }
+
+    // BZ 69699
+    @Test
+    public void testRedirectWithPathParameters03() throws Exception {
+        doTestRewrite("RewriteRule ^/b(.*) /a$1 [R]", "/b;k=1;jsessionid=0000/%255A;jsessionid=0001",
+                "/a/%255A;jsessionid=0001");
+    }
+
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         doTestRewrite(config, request, expectedURI, null);
     }
