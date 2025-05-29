@@ -32,6 +32,7 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.SessionTrackingMode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -44,6 +45,7 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.util.SessionConfig;
 import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.juli.logging.LogFactory;
@@ -426,6 +428,22 @@ public class RewriteValve extends ValveBase {
                     StringBuilder urlStringEncoded =
                             new StringBuilder(REWRITE_DEFAULT_ENCODER.encode(urlStringRewriteEncoded, uriCharset));
 
+                    // Currently session ID is the only propagated path parameter
+                    if (request.getServletContext().getEffectiveSessionTrackingModes()
+                            .contains(SessionTrackingMode.URL)) {
+                        // Get the session ID if there was one
+                        String sessionUriParamName = SessionConfig.getSessionUriParamName(request.getContext());
+                        String sessionID = request.getPathParameter(sessionUriParamName);
+                        if (sessionID != null) {
+                            // append session id segment to url path parameter
+                            if (urlStringEncoded.charAt(urlStringEncoded.length() - 1) != ';') {
+                                urlStringEncoded.append(';');
+                            }
+                            urlStringEncoded.append(
+                                    REWRITE_DEFAULT_ENCODER.encode(sessionUriParamName + "=" + sessionID, uriCharset));
+                        }
+                    }
+
                     if (!qsd && originalQueryStringEncoded != null && !originalQueryStringEncoded.isEmpty()) {
                         if (rewrittenQueryStringRewriteEncoded == null) {
                             urlStringEncoded.append('?');
@@ -461,6 +479,7 @@ public class RewriteValve extends ValveBase {
                     if (context && urlStringEncoded.charAt(0) == '/' && !UriUtil.hasScheme(urlStringEncoded)) {
                         urlStringEncoded.insert(0, request.getContext().getEncodedPath());
                     }
+
                     if (rule.isNoescape()) {
                         response.sendRedirect(UDecoder.URLDecode(urlStringEncoded.toString(), uriCharset));
                     } else {
