@@ -132,6 +132,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                     se.getError(), se.getMessage()));
         }
 
+        // Treat a sent reset like a received reset and increment the overhead count
         increaseOverheadCount(FrameType.RST, getProtocol().getOverheadResetFactor());
 
         // Write a RST frame
