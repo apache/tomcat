@@ -160,6 +160,9 @@
         Add thread name to webappClassLoader.stackTraceRequestThread message.
         Patch provided by Felix Zhang. (schultz)
       </fix>
+      <update>
+        Update Tomcat Native to 2.0.9. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
