@@ -121,6 +121,11 @@
         the new <code>ParameterLimitValve</code>. The valve allows configurable
         URL-specific limits on the number of parameters. (dsoumis)
       </add>
+      <fix>
+        <bug>69699</bug>: Encode redirect URL used by the rewrite valve with
+        the session id if appropriate, and handle cross context with different
+        session configuration when using rewrite. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
