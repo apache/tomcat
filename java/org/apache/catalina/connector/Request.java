@@ -2382,13 +2382,29 @@ public class Request implements HttpServletRequest {
         upload.setFileItemFactory(factory);
         upload.setFileSizeMax(mce.getMaxFileSize());
         upload.setSizeMax(mce.getMaxRequestSize());
-        if (maxParameterCount > -1) {
-            // There is a limit. The limit for parts needs to be reduced by
-            // the number of parameters we have already parsed.
-            // Must be under the limit else parsing parameters would have
-            // triggered an exception.
-            upload.setFileCountMax(maxParameterCount - parameters.size());
+        upload.setPartHeaderSizeMax(connector.getMaxPartHeaderSize());
+        /*
+         * There are two independent limits on the number of parts.
+         *
+         * 1. The limit based on parameters. This is maxParameterCount less the number of parameters already processed.
+         *
+         * 2. The limit based on parts. This is maxPartCount.
+         *
+         * The lower of these two limits will be applied to this request.
+         *
+         * Note: Either of both limits may be set to -1 (unlimited).
+         */
+        int partLimit = maxParameterCount;
+        if (partLimit > -1) {
+            partLimit = partLimit - parameters.size();
         }
+        int maxPartCount = connector.getMaxPartCount();
+        if (maxPartCount > -1) {
+            if (partLimit < 0 || partLimit > maxPartCount) {
+                partLimit = maxPartCount;
+            }
+        }
+        upload.setFileCountMax(partLimit);
 
         parts = new ArrayList<>();
         try {

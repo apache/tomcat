@@ -240,6 +240,8 @@
     <li>maxHttpHeaderSize</li>
     <li>maxHttpRequestHeaderSize</li>
     <li>maxParameterCount</li>
+    <li>maxPartCount</li>
+    <li>maxPartHeaderSize</li>
     <li>maxPostSize</li>
     <li>maxSavePostSize</li>
     <li>maxTrailerSize</li>
