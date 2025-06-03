@@ -188,6 +188,21 @@
       exceed the limit.</p>
     </attribute>
 
+    <attribute name="maxPartCount" required="false">
+      <p>The maximum total number of parts permitted in a request where the
+      content type is <code>multipart/form-data</code>. This limit is in
+      addition to <code>maxParameterCount</code>. Requests that exceed this
+      limit will be rejected. A value of less than 0 means no limit. If not
+      specified, a default of 10 is used.</p>
+    </attribute>
+
+    <attribute name="maxPartHeaderSize" required="false">
+      <p>The maximum number of header bytes permitted per part in a request
+      where the content type is <code>multipart/form-data</code>. Requests that
+      exceed this limit will be rejected. A value of less than 0 means no limit.
+      If not specified, a default of 512 is used.</p>
+    </attribute>
+
     <attribute name="maxPostSize" required="false">
       <p>The maximum size in bytes of the POST which will be handled by
       the container FORM URL parameter parsing. The limit can be disabled by
