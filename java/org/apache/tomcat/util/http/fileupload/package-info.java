@@ -16,8 +16,8 @@
  */
 
 /**
- * <p><b>NOTE:</b> This code has been copied from commons-fileupload trunk
- * 1.3 and commons-io 1.4 and package renamed to avoid clashes with
+ * <p><b>NOTE:</b> This code has been copied from commons-fileupload
+ * 1.x and commons-io 1.4 and package renamed to avoid clashes with
  * any web apps that may wish to use these libraries.
  * </p>
  * <p>

@@ -45,25 +45,13 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
      * Creates a new instance.
      *
      * @param inputStream The input stream, which shall be limited.
-     * @param pSizeMax The limit; no more than this number of bytes
+     * @param sizeMax The limit; no more than this number of bytes
      *   shall be returned by the source stream.
      */
-    public LimitedInputStream(final InputStream inputStream, final long pSizeMax) {
+    public LimitedInputStream(final InputStream inputStream, final long sizeMax) {
         super(inputStream);
-        sizeMax = pSizeMax;
+        this.sizeMax = sizeMax;
     }
-
-    /**
-     * Called to indicate, that the input streams limit has
-     * been exceeded.
-     *
-     * @param pSizeMax The input streams limit, in bytes.
-     * @param pCount The actual number of bytes.
-     * @throws IOException The called method is expected
-     *   to raise an IOException.
-     */
-    protected abstract void raiseError(long pSizeMax, long pCount)
-            throws IOException;
 
     /**
      * Called to check, whether the input streams
@@ -76,6 +64,43 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
             raiseError(sizeMax, count);
         }
     }
+
+    /**
+     * Closes this input stream and releases any system resources
+     * associated with the stream.
+     * This
+     * method simply performs {@code in.close()}.
+     *
+     * @throws  IOException  if an I/O error occurs.
+     * @see        java.io.FilterInputStream#in
+     */
+    @Override
+    public void close() throws IOException {
+        closed = true;
+        super.close();
+    }
+
+    /**
+     * Returns, whether this stream is already closed.
+     *
+     * @return True, if the stream is closed, otherwise false.
+     * @throws IOException An I/O error occurred.
+     */
+    @Override
+    public boolean isClosed() throws IOException {
+        return closed;
+    }
+
+    /**
+     * Called to indicate, that the input streams limit has
+     * been exceeded.
+     *
+     * @param sizeMax The input streams limit, in bytes.
+     * @param count The actual number of bytes.
+     * @throws IOException The called method is expected
+     *   to raise an IOException.
+     */
+    protected abstract void raiseError(long sizeMax, long count) throws IOException;
 
     /**
      * Reads the next byte of data from this input stream. The value
@@ -135,32 +160,6 @@ public abstract class LimitedInputStream extends FilterInputStream implements Cl
             checkLimit();
         }
         return res;
-    }
-
-    /**
-     * Returns, whether this stream is already closed.
-     *
-     * @return True, if the stream is closed, otherwise false.
-     * @throws IOException An I/O error occurred.
-     */
-    @Override
-    public boolean isClosed() throws IOException {
-        return closed;
-    }
-
-    /**
-     * Closes this input stream and releases any system resources
-     * associated with the stream.
-     * This
-     * method simply performs {@code in.close()}.
-     *
-     * @throws  IOException  if an I/O error occurs.
-     * @see        java.io.FilterInputStream#in
-     */
-    @Override
-    public void close() throws IOException {
-        closed = true;
-        super.close();
     }
 
 }
