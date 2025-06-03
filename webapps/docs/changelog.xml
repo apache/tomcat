@@ -125,6 +125,11 @@
         in a single URL segment. Based on pull request <pr>860</pr> by Chenjp.
         (markt)
       </fix>
+      <fix>
+        <bug>69699</bug>: Encode redirect URL used by the rewrite valve with
+        the session id if appropriate, and handle cross context with different
+        session configuration when using rewrite. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
