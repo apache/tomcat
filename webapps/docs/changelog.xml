@@ -278,7 +278,7 @@
         Update Tomcat Native to 2.0.9. (markt)
       </update>
       <update>
-        Update the internal fork of Apache Commons FileUpload to 7a8c324
+        Update the internal fork of Apache Commons FileUpload to abe5d94
         (2023-06-03, 1.x-SNAPSHOT). (markt)
       </update>
     </changelog>
