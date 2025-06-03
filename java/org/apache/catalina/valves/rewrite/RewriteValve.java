@@ -461,11 +461,13 @@ public class RewriteValve extends ValveBase {
                     if (context && urlStringEncoded.charAt(0) == '/' && !UriUtil.hasScheme(urlStringEncoded)) {
                         urlStringEncoded.insert(0, request.getContext().getEncodedPath());
                     }
+                    String redirectPath;
                     if (rule.isNoescape()) {
-                        response.sendRedirect(UDecoder.URLDecode(urlStringEncoded.toString(), uriCharset));
+                        redirectPath = UDecoder.URLDecode(urlStringEncoded.toString(), uriCharset);
                     } else {
-                        response.sendRedirect(urlStringEncoded.toString());
+                        redirectPath = urlStringEncoded.toString();
                     }
+                    response.sendRedirect(response.encodeRedirectURL(redirectPath));
                     response.setStatus(rule.getRedirectCode());
                     done = true;
                     break;
@@ -577,6 +579,7 @@ public class RewriteValve extends ValveBase {
                         chunk.append(host.toString());
                     }
                     request.getMappingData().recycle();
+                    request.recycleSessionInfo();
                     // Reinvoke the whole request recursively
                     Connector connector = request.getConnector();
                     try {
