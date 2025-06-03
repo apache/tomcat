@@ -317,6 +317,8 @@
   <ul>
     <li>maxCookieCount</li>
     <li>maxParameterCount</li>
+    <li>maxPartCount</li>
+    <li>maxPartHeaderSize</li>
     <li>maxPostSize</li>
     <li>maxSavePostSize</li>
     <li>server</li>
