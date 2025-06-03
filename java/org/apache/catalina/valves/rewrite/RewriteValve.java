@@ -428,19 +428,29 @@ public class RewriteValve extends ValveBase {
                     StringBuilder urlStringEncoded =
                             new StringBuilder(REWRITE_DEFAULT_ENCODER.encode(urlStringRewriteEncoded, uriCharset));
 
-                    // Currently session ID is the only propagated path parameter
+                    // Per servlet spec#url-rewriting, when a client will not accept a cookie, URL rewriting may be used
+                    // by the server as the basis for session tracking.
                     if (request.getServletContext().getEffectiveSessionTrackingModes()
                             .contains(SessionTrackingMode.URL)) {
-                        // Get the session ID if there was one
-                        String sessionUriParamName = SessionConfig.getSessionUriParamName(request.getContext());
-                        String sessionID = request.getPathParameter(sessionUriParamName);
-                        if (sessionID != null) {
-                            // append session id segment to url path parameter
-                            if (urlStringEncoded.charAt(urlStringEncoded.length() - 1) != ';') {
-                                urlStringEncoded.append(';');
+                        // SessionTrackingMode SSL is not supported implicitly.
+                        // in a particular circumstance, we have to propagate the session id parsed from original
+                        // request path parameter to target URL's path parameter.
+                        boolean serverSupportCookieSession = request.getServletContext()
+                                .getEffectiveSessionTrackingModes().contains(SessionTrackingMode.COOKIE);
+                        boolean hasCookieFromClient = (request.getCookies() != null && request.getCookies().length > 0);
+                        if (!serverSupportCookieSession || !hasCookieFromClient) {
+                            // Server does not support cookie, or no cookie is sent from client.
+                            // Try to get the session ID from path parameter of original request.
+                            String sessionUriParamName = SessionConfig.getSessionUriParamName(request.getContext());
+                            String sessionID = request.getPathParameter(sessionUriParamName);
+                            if (sessionID != null) {
+                                // append session id segment to url path parameter
+                                if (urlStringEncoded.charAt(urlStringEncoded.length() - 1) != ';') {
+                                    urlStringEncoded.append(';');
+                                }
+                                urlStringEncoded.append(REWRITE_DEFAULT_ENCODER
+                                        .encode(sessionUriParamName + "=" + sessionID, uriCharset));
                             }
-                            urlStringEncoded.append(
-                                    REWRITE_DEFAULT_ENCODER.encode(sessionUriParamName + "=" + sessionID, uriCharset));
                         }
                     }
 
