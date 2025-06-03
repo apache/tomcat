@@ -30,6 +30,12 @@ import java.io.UnsupportedEncodingException;
  * @see <a href="https://tools.ietf.org/html/rfc5987">RFC 5987</a>
  */
 public final class RFC2231Utility {
+
+    /**
+     * Percent character '{@value}'.
+     */
+    private static final char PERCENT = '%';
+
     /**
      * The Hexadecimal values char array.
      */
@@ -56,53 +62,18 @@ public final class RFC2231Utility {
     }
 
     /**
-     * Private constructor so that no instances can be created. This class
-     * contains only static utility methods.
-     */
-    private RFC2231Utility() {
-    }
-
-    /**
-     * Checks if Asterisk (*) at the end of parameter name to indicate,
-     * if it has charset and language information to decode the value.
-     * @param paramName The parameter, which is being checked.
-     * @return {@code true}, if encoded as per RFC 2231, {@code false} otherwise
-     */
-    public static boolean hasEncodedValue(final String paramName) {
-        if (paramName != null) {
-            return paramName.lastIndexOf('*') == (paramName.length() - 1);
-        }
-        return false;
-    }
-
-    /**
-     * If {@code paramName} has Asterisk (*) at the end, it will be stripped off,
-     * else the passed value will be returned.
-     * @param paramName The parameter, which is being inspected.
-     * @return stripped {@code paramName} of Asterisk (*), if RFC2231 encoded
-     */
-    public static String stripDelimiter(final String paramName) {
-        if (hasEncodedValue(paramName)) {
-            final StringBuilder paramBuilder = new StringBuilder(paramName);
-            paramBuilder.deleteCharAt(paramName.lastIndexOf('*'));
-            return paramBuilder.toString();
-        }
-        return paramName;
-    }
-
-    /**
      * Decode a string of text obtained from a HTTP header as per RFC 2231
      * <p>
-     * <b>Eg 1.</b> {@code us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A}
+     * <strong>Eg 1.</strong> {@code us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A}
      * will be decoded to {@code This is ***fun***}
      * <p>
-     * <b>Eg 2.</b> {@code iso-8859-1'en'%A3%20rate}
+     * <strong>Eg 2.</strong> {@code iso-8859-1'en'%A3%20rate}
      * will be decoded to {@code £ rate}
      * <p>
-     * <b>Eg 3.</b> {@code UTF-8''%c2%a3%20and%20%e2%82%ac%20rates}
+     * <strong>Eg 3.</strong> {@code UTF-8''%c2%a3%20and%20%e2%82%ac%20rates}
      * will be decoded to {@code £ and € rates}
      *
-     * @param encodedText - Text to be decoded has a format of {@code <charset>'<language>'<encoded_value>}
+     * @param encodedText   Text to be decoded has a format of {@code <charset>'<language>'<encoded_value>}
      * and ASCII only
      * @return Decoded text based on charset encoding
      * @throws UnsupportedEncodingException The requested character set wasn't found.
@@ -124,8 +95,9 @@ public final class RFC2231Utility {
     }
 
     /**
-     * Convert {@code text} to their corresponding Hex value.
-     * @param text - ASCII text input
+     * Converts {@code text} to their corresponding Hex value.
+     *
+     * @param text ASCII text input
      * @return Byte array of characters decoded from ASCII table
      */
     private static byte[] fromHex(final String text) {
@@ -133,13 +105,13 @@ public final class RFC2231Utility {
         final ByteArrayOutputStream out = new ByteArrayOutputStream(text.length());
         for (int i = 0; i < text.length();) {
             final char c = text.charAt(i++);
-            if (c == '%') {
+            if (c == PERCENT) {
                 if (i > text.length() - 2) {
                     break; // unterminated sequence
                 }
                 final byte b1 = HEX_DECODE[text.charAt(i++) & MASK];
                 final byte b2 = HEX_DECODE[text.charAt(i++) & MASK];
-                out.write((b1 << shift) | b2);
+                out.write(b1 << shift | b2);
             } else {
                 out.write((byte) c);
             }
@@ -150,5 +122,40 @@ public final class RFC2231Utility {
     private static String getJavaCharset(final String mimeCharset) {
         // good enough for standard values
         return mimeCharset;
+    }
+
+    /**
+     * Checks if Asterisk (*) at the end of parameter name to indicate,
+     * if it has charset and language information to decode the value.
+     * @param paramName The parameter, which is being checked.
+     * @return {@code true}, if encoded as per RFC 2231, {@code false} otherwise
+     */
+    public static boolean hasEncodedValue(final String paramName) {
+        if (paramName != null) {
+            return paramName.lastIndexOf('*') == paramName.length() - 1;
+        }
+        return false;
+    }
+
+    /**
+     * If {@code paramName} has Asterisk (*) at the end, it will be stripped off,
+     * else the passed value will be returned.
+     * @param paramName The parameter, which is being inspected.
+     * @return stripped {@code paramName} of Asterisk (*), if RFC2231 encoded
+     */
+    public static String stripDelimiter(final String paramName) {
+        if (hasEncodedValue(paramName)) {
+            final StringBuilder paramBuilder = new StringBuilder(paramName);
+            paramBuilder.deleteCharAt(paramName.lastIndexOf('*'));
+            return paramBuilder.toString();
+        }
+        return paramName;
+    }
+
+    /**
+     * Private constructor so that no instances can be created. This class
+     * contains only static utility methods.
+     */
+    private RFC2231Utility() {
     }
 }

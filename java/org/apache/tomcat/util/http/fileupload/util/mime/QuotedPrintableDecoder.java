@@ -25,17 +25,35 @@ import java.io.OutputStream;
 final class QuotedPrintableDecoder {
 
     /**
-     * The shift value required to create the upper nibble
-     * from the first of 2 byte values converted from ascii hex.
+     * Carriage return character '{@value}'.
      */
-    private static final int UPPER_NIBBLE_SHIFT = Byte.SIZE / 2;
+    private static final char CR = '\r';
 
     /**
-     * Hidden constructor, this class must not be instantiated.
+     * Equal character '{@value}'.
      */
-    private QuotedPrintableDecoder() {
-        // do nothing
-    }
+    private static final char EQUAL = '=';
+
+    /**
+     * Line feed character '{@value}'.
+     */
+    private static final char LF = '\n';
+
+    /**
+     * Space character '{@value}'.
+     */
+    private static final char SP = ' ';
+
+    /**
+     * Underscore character '{@value}'.
+     */
+    private static final char UNDERSCORE = '_';
+
+    /**
+     * The shift value required to create the upper nibble
+     * from the first of 2 byte values converted from ASCII hex.
+     */
+    private static final int UPPER_NIBBLE_SHIFT = Byte.SIZE / 2;
 
     /**
      * Decode the encoded byte data writing it to the given output stream.
@@ -56,9 +74,9 @@ final class QuotedPrintableDecoder {
             final byte ch = data[off++];
 
             // space characters were translated to '_' on encode, so we need to translate them back.
-            if (ch == '_') {
-                out.write(' ');
-            } else if (ch == '=') {
+            if (ch == UNDERSCORE) {
+                out.write(SP);
+            } else if (ch == EQUAL) {
                 // we found an encoded character.  Reduce the 3 char sequence to one.
                 // but first, make sure we have two characters to work with.
                 if (off + 1 >= endOffset) {
@@ -69,8 +87,8 @@ final class QuotedPrintableDecoder {
                 final byte b2 = data[off++];
 
                 // we've found an encoded carriage return.  The next char needs to be a newline
-                if (b1 == '\r') {
-                    if (b2 != '\n') {
+                if (b1 == CR) {
+                    if (b2 != LF) {
                         throw new IOException("Invalid quoted printable encoding; CR must be followed by LF");
                     }
                     // this was a soft linebreak inserted by the encoding.  We just toss this away
@@ -79,7 +97,7 @@ final class QuotedPrintableDecoder {
                     // this is a hex pair we need to convert back to a single byte.
                     final int c1 = hexToBinary(b1);
                     final int c2 = hexToBinary(b2);
-                    out.write((c1 << UPPER_NIBBLE_SHIFT) | c2);
+                    out.write(c1 << UPPER_NIBBLE_SHIFT | c2);
                     // 3 bytes in, one byte out
                     bytesWritten++;
                 }
@@ -96,7 +114,7 @@ final class QuotedPrintableDecoder {
     /**
      * Convert a hex digit to the binary value it represents.
      *
-     * @param b the ascii hex byte to convert (0-0, A-F, a-f)
+     * @param b the ASCII hex byte to convert (0-0, A-F, a-f)
      * @return the int value of the hex byte, 0-15
      * @throws IOException if the byte is not a valid hex digit.
      */
@@ -107,6 +125,13 @@ final class QuotedPrintableDecoder {
             throw new IOException("Invalid quoted printable encoding: not a valid hex digit: " + b);
         }
         return i;
+    }
+
+    /**
+     * Hidden constructor, this class must not be instantiated.
+     */
+    private QuotedPrintableDecoder() {
+        // do nothing
     }
 
 }

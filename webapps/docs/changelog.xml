@@ -161,6 +161,10 @@
         Add thread name to webappClassLoader.stackTraceRequestThread message.
         Patch provided by Felix Zhang. (schultz)
       </fix>
+      <update>
+        Update the internal fork of Apache Commons FileUpload to abe5d94
+        (2023-06-03, 1.x-SNAPSHOT). (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
