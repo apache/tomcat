@@ -45,9 +45,29 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
      */
     private final Map<String, List<String>> headerNameToValueListMap = new LinkedHashMap<>();
 
+    /**
+     * Constructs a new instance.
+     */
+    public FileItemHeadersImpl() {
+        // empty
+    }
+
+    /**
+     * Method to add header values to this instance.
+     *
+     * @param name name of this header
+     * @param value value of this header
+     */
+    public synchronized void addHeader(final String name, final String value) {
+        final String nameLower = name.toLowerCase(Locale.ROOT);
+        final List<String> headerValueList = headerNameToValueListMap.
+                computeIfAbsent(nameLower, k -> new ArrayList<>());
+        headerValueList.add(value);
+    }
+
     @Override
     public String getHeader(final String name) {
-        final String nameLower = name.toLowerCase(Locale.ENGLISH);
+        final String nameLower = name.toLowerCase(Locale.ROOT);
         final List<String> headerValueList = headerNameToValueListMap.get(nameLower);
         if (null == headerValueList) {
             return null;
@@ -62,25 +82,12 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
 
     @Override
     public Iterator<String> getHeaders(final String name) {
-        final String nameLower = name.toLowerCase(Locale.ENGLISH);
+        final String nameLower = name.toLowerCase(Locale.ROOT);
         List<String> headerValueList = headerNameToValueListMap.get(nameLower);
         if (null == headerValueList) {
             headerValueList = Collections.emptyList();
         }
         return headerValueList.iterator();
-    }
-
-    /**
-     * Method to add header values to this instance.
-     *
-     * @param name name of this header
-     * @param value value of this header
-     */
-    public synchronized void addHeader(final String name, final String value) {
-        final String nameLower = name.toLowerCase(Locale.ENGLISH);
-        final List<String> headerValueList = headerNameToValueListMap.
-                computeIfAbsent(nameLower, k -> new ArrayList<>());
-        headerValueList.add(value);
     }
 
 }

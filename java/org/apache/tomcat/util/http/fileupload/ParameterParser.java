@@ -40,47 +40,37 @@ public class ParameterParser {
     /**
      * String to be parsed.
      */
-    private char[] chars = null;
+    private char[] chars;
 
     /**
      * Current position in the string.
      */
-    private int pos = 0;
+    private int pos;
 
     /**
      * Maximum position in the string.
      */
-    private int len = 0;
+    private int len;
 
     /**
      * Start of a token.
      */
-    private int i1 = 0;
+    private int i1;
 
     /**
      * End of a token.
      */
-    private int i2 = 0;
+    private int i2;
 
     /**
      * Whether names stored in the map should be converted to lower case.
      */
-    private boolean lowerCaseNames = false;
+    private boolean lowerCaseNames;
 
     /**
      * Default ParameterParser constructor.
      */
     public ParameterParser() {
-    }
-
-    /**
-     * Are there any characters left to parse?
-     *
-     * @return {@code true} if there are unparsed characters,
-     *         {@code false} otherwise.
-     */
-    private boolean hasChar() {
-        return this.pos < this.len;
     }
 
     /**
@@ -94,18 +84,18 @@ public class ParameterParser {
      */
     private String getToken(final boolean quoted) {
         // Trim leading white spaces
-        while ((i1 < i2) && (Character.isWhitespace(chars[i1]))) {
+        while (i1 < i2 && Character.isWhitespace(chars[i1])) {
             i1++;
         }
         // Trim trailing white spaces
-        while ((i2 > i1) && (Character.isWhitespace(chars[i2 - 1]))) {
+        while (i2 > i1 && Character.isWhitespace(chars[i2 - 1])) {
             i2--;
         }
         // Strip away quotation marks if necessary
         if (quoted
-            && ((i2 - i1) >= 2)
-            && (chars[i1] == '"')
-            && (chars[i2 - 1] == '"')) {
+            && i2 - i1 >= 2
+            && chars[i1] == '"'
+            && chars[i2 - 1] == '"') {
             i1++;
             i2--;
         }
@@ -114,6 +104,28 @@ public class ParameterParser {
             result = new String(chars, i1, i2 - i1);
         }
         return result;
+    }
+
+    /**
+     * Are there any characters left to parse?
+     *
+     * @return {@code true} if there are unparsed characters,
+     *         {@code false} otherwise.
+     */
+    private boolean hasChar() {
+        return pos < len;
+    }
+
+    /**
+     * Returns {@code true} if parameter names are to be converted to lower
+     * case when name/value pairs are parsed.
+     *
+     * @return {@code true} if parameter names are to be
+     * converted to lower case when name/value pairs are parsed.
+     * Otherwise returns {@code false}
+     */
+    public boolean isLowerCaseNames() {
+        return lowerCaseNames;
     }
 
     /**
@@ -137,83 +149,83 @@ public class ParameterParser {
     }
 
     /**
-     * Parses out a token until any of the given terminators
-     * is encountered.
+     * Extracts a map of name/value pairs from the given array of
+     * characters. Names are expected to be unique.
      *
-     * @param terminators the array of terminating characters. Any of these
-     * characters when encountered signify the end of the token
+     * @param charArray the array of characters that contains a sequence of
+     * name/value pairs
+     * @param separator the name/value pairs separator
      *
-     * @return the token
+     * @return a map of name/value pairs
      */
-    private String parseToken(final char[] terminators) {
-        char ch;
-        i1 = pos;
-        i2 = pos;
-        while (hasChar()) {
-            ch = chars[pos];
-            if (isOneOf(ch, terminators)) {
-                break;
-            }
-            i2++;
-            pos++;
+    public Map<String, String> parse(final char[] charArray, final char separator) {
+        if (charArray == null) {
+            return new HashMap<>();
         }
-        return getToken(false);
+        return parse(charArray, 0, charArray.length, separator);
     }
 
     /**
-     * Parses out a token until any of the given terminators
-     * is encountered outside the quotation marks.
+     * Extracts a map of name/value pairs from the given array of characters. Names are expected to be unique.
      *
-     * @param terminators the array of terminating characters. Any of these
-     * characters when encountered outside the quotation marks signify the end
-     * of the token
+     * @param charArray the array of characters that contains a sequence of name/value pairs
+     * @param offset    the initial offset.
+     * @param length    the length.
+     * @param separator the name/value pairs separator
      *
-     * @return the token
+     * @return a map of name/value pairs
      */
-    private String parseQuotedToken(final char[] terminators) {
-        char ch;
-        i1 = pos;
-        i2 = pos;
-        boolean quoted = false;
-        boolean charEscaped = false;
-        while (hasChar()) {
-            ch = chars[pos];
-            if (!quoted && isOneOf(ch, terminators)) {
-                break;
-            }
-            if (!charEscaped && ch == '"') {
-                quoted = !quoted;
-            }
-            charEscaped = (!charEscaped && ch == '\\');
-            i2++;
-            pos++;
-
+    public Map<String, String> parse(final char[] charArray, final int offset, final int length, final char separator) {
+        if (charArray == null) {
+            return new HashMap<>();
         }
-        return getToken(true);
+        final HashMap<String, String> params = new HashMap<>();
+        chars = charArray.clone();
+        pos = offset;
+        len = length;
+        while (hasChar()) {
+            String paramName = parseToken(new char[] { '=', separator });
+            String paramValue = null;
+            if (hasChar() && charArray[pos] == '=') {
+                pos++; // skip '='
+                paramValue = parseQuotedToken(new char[] { separator });
+                if (paramValue != null) {
+                    try {
+                        paramValue = RFC2231Utility.hasEncodedValue(paramName) ? RFC2231Utility.decodeText(paramValue)
+                                : MimeUtility.decodeText(paramValue);
+                    } catch (final UnsupportedEncodingException e) {
+                        // let's keep the original value in this case
+                    }
+                }
+            }
+            if (hasChar() && charArray[pos] == separator) {
+                pos++; // skip separator
+            }
+            if (paramName != null && !paramName.isEmpty()) {
+                paramName = RFC2231Utility.stripDelimiter(paramName);
+                if (lowerCaseNames) {
+                    paramName = paramName.toLowerCase(Locale.ROOT);
+                }
+                params.put(paramName, paramValue);
+            }
+        }
+        return params;
     }
 
     /**
-     * Returns {@code true} if parameter names are to be converted to lower
-     * case when name/value pairs are parsed.
+     * Extracts a map of name/value pairs from the given string. Names are
+     * expected to be unique.
      *
-     * @return {@code true} if parameter names are to be
-     * converted to lower case when name/value pairs are parsed.
-     * Otherwise returns {@code false}
-     */
-    public boolean isLowerCaseNames() {
-        return this.lowerCaseNames;
-    }
-
-    /**
-     * Sets the flag if parameter names are to be converted to lower case when
-     * name/value pairs are parsed.
+     * @param str the string that contains a sequence of name/value pairs
+     * @param separator the name/value pairs separator
      *
-     * @param b {@code true} if parameter names are to be
-     * converted to lower case when name/value pairs are parsed.
-     * {@code false} otherwise.
+     * @return a map of name/value pairs
      */
-    public void setLowerCaseNames(final boolean b) {
-        this.lowerCaseNames = b;
+    public Map<String, String> parse(final String str, final char separator) {
+        if (str == null) {
+            return new HashMap<>();
+        }
+        return parse(str.toCharArray(), separator);
     }
 
     /**
@@ -245,96 +257,71 @@ public class ParameterParser {
     }
 
     /**
-     * Extracts a map of name/value pairs from the given string. Names are
-     * expected to be unique.
+     * Parses out a token until any of the given terminators
+     * is encountered outside the quotation marks.
      *
-     * @param str the string that contains a sequence of name/value pairs
-     * @param separator the name/value pairs separator
+     * @param terminators the array of terminating characters. Any of these
+     * characters when encountered outside the quotation marks signify the end
+     * of the token
      *
-     * @return a map of name/value pairs
+     * @return the token
      */
-    public Map<String, String> parse(final String str, final char separator) {
-        if (str == null) {
-            return new HashMap<>();
-        }
-        return parse(str.toCharArray(), separator);
-    }
-
-    /**
-     * Extracts a map of name/value pairs from the given array of
-     * characters. Names are expected to be unique.
-     *
-     * @param charArray the array of characters that contains a sequence of
-     * name/value pairs
-     * @param separator the name/value pairs separator
-     *
-     * @return a map of name/value pairs
-     */
-    public Map<String, String> parse(final char[] charArray, final char separator) {
-        if (charArray == null) {
-            return new HashMap<>();
-        }
-        return parse(charArray, 0, charArray.length, separator);
-    }
-
-    /**
-     * Extracts a map of name/value pairs from the given array of
-     * characters. Names are expected to be unique.
-     *
-     * @param charArray the array of characters that contains a sequence of
-     * name/value pairs
-     * @param offset - the initial offset.
-     * @param length - the length.
-     * @param separator the name/value pairs separator
-     *
-     * @return a map of name/value pairs
-     */
-    public Map<String, String> parse(
-        final char[] charArray,
-        final int offset,
-        final int length,
-        final char separator) {
-
-        if (charArray == null) {
-            return new HashMap<>();
-        }
-        final HashMap<String, String> params = new HashMap<>();
-        this.chars = charArray.clone();
-        this.pos = offset;
-        this.len = length;
-
-        String paramName;
-        String paramValue;
+    private String parseQuotedToken(final char[] terminators) {
+        char ch;
+        i1 = pos;
+        i2 = pos;
+        boolean quoted = false;
+        boolean charEscaped = false;
         while (hasChar()) {
-            paramName = parseToken(new char[] {
-                    '=', separator });
-            paramValue = null;
-            if (hasChar() && (charArray[pos] == '=')) {
-                pos++; // skip '='
-                paramValue = parseQuotedToken(new char[] {
-                        separator });
+            ch = chars[pos];
+            if (!quoted && isOneOf(ch, terminators)) {
+                break;
+            }
+            if (!charEscaped && ch == '"') {
+                quoted = !quoted;
+            }
+            charEscaped = !charEscaped && ch == '\\';
+            i2++;
+            pos++;
 
-                if (paramValue != null) {
-                    try {
-                        paramValue = RFC2231Utility.hasEncodedValue(paramName) ? RFC2231Utility.decodeText(paramValue)
-                                : MimeUtility.decodeText(paramValue);
-                    } catch (final UnsupportedEncodingException e) {
-                        // let's keep the original value in this case
-                    }
-                }
-            }
-            if (hasChar() && (charArray[pos] == separator)) {
-                pos++; // skip separator
-            }
-            if ((paramName != null) && !paramName.isEmpty()) {
-                paramName = RFC2231Utility.stripDelimiter(paramName);
-                if (this.lowerCaseNames) {
-                    paramName = paramName.toLowerCase(Locale.ENGLISH);
-                }
-                params.put(paramName, paramValue);
-            }
         }
-        return params;
+        return getToken(true);
+    }
+
+    /**
+     * Parses out a token until any of the given terminators
+     * is encountered.
+     *
+     * @param terminators the array of terminating characters. Any of these
+     * characters when encountered signify the end of the token
+     *
+     * @return the token
+     */
+    private String parseToken(final char[] terminators) {
+        char ch;
+        i1 = pos;
+        i2 = pos;
+        while (hasChar()) {
+            ch = chars[pos];
+            if (isOneOf(ch, terminators)) {
+                break;
+            }
+            i2++;
+            pos++;
+        }
+        return getToken(false);
+    }
+
+    /**
+     * Sets the flag if parameter names are to be converted to lower case when
+     * name/value pairs are parsed.
+     *
+     * @param b {@code true} if parameter names are to be
+     * converted to lower case when name/value pairs are parsed.
+     * {@code false} otherwise.
+     */
+    public void setLowerCaseNames(final boolean b) {
+        lowerCaseNames = b;
     }
 
 }

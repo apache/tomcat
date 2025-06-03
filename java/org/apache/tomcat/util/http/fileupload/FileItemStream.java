@@ -48,7 +48,50 @@ public interface FileItemStream extends FileItemHeadersSupport {
          */
         private static final long serialVersionUID = -7280778431581963740L;
 
+        /**
+         * Constructs a new instance.
+         */
+        public ItemSkippedException() {
+            // empty
+        }
+
     }
+
+    /**
+     * Returns the content type passed by the browser or {@code null} if
+     * not defined.
+     *
+     * @return The content type passed by the browser or {@code null} if
+     *         not defined.
+     */
+    String getContentType();
+
+    /**
+     * Returns the name of the field in the multipart form corresponding to
+     * this file item.
+     *
+     * @return The name of the form field.
+     */
+    String getFieldName();
+
+    /**
+     * Returns the original file name in the client's file system, as provided by
+     * the browser (or other client software). In most cases, this will be the
+     * base file name, without path information. However, some clients, such as
+     * the Opera browser, do include path information.
+     *
+     * @return The original file name in the client's file system.
+     */
+    String getName();
+
+    /**
+     * Determines whether or not a {@code FileItem} instance represents
+     * a simple form field.
+     *
+     * @return {@code true} if the instance represents a simple form
+     *         field; {@code false} if it represents an uploaded file.
+     */
+    boolean isFormField();
 
     /**
      * Creates an {@link InputStream}, which allows to read the
@@ -62,41 +105,5 @@ public interface FileItemStream extends FileItemHeadersSupport {
      * @see ItemSkippedException
      */
     InputStream openStream() throws IOException;
-
-    /**
-     * Returns the content type passed by the browser or {@code null} if
-     * not defined.
-     *
-     * @return The content type passed by the browser or {@code null} if
-     *         not defined.
-     */
-    String getContentType();
-
-    /**
-     * Returns the original file name in the client's file system, as provided by
-     * the browser (or other client software). In most cases, this will be the
-     * base file name, without path information. However, some clients, such as
-     * the Opera browser, do include path information.
-     *
-     * @return The original file name in the client's file system.
-     */
-    String getName();
-
-    /**
-     * Returns the name of the field in the multipart form corresponding to
-     * this file item.
-     *
-     * @return The name of the form field.
-     */
-    String getFieldName();
-
-    /**
-     * Determines whether or not a {@code FileItem} instance represents
-     * a simple form field.
-     *
-     * @return {@code true} if the instance represents a simple form
-     *         field; {@code false} if it represents an uploaded file.
-     */
-    boolean isFormField();
 
 }

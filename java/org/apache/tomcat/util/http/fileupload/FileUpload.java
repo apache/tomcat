@@ -33,14 +33,10 @@ package org.apache.tomcat.util.http.fileupload;
 public class FileUpload
     extends FileUploadBase {
 
-    // ----------------------------------------------------------- Data members
-
     /**
      * The factory to use to create new form items.
      */
     private FileItemFactory fileItemFactory;
-
-    // ----------------------------------------------------------- Constructors
 
     /**
      * Constructs an uninitialized instance of this class.
@@ -51,8 +47,6 @@ public class FileUpload
      */
     public FileUpload() {
     }
-
-    // ----------------------------------------------------- Property accessors
 
     /**
      * Returns the factory class used when creating file items.
@@ -67,11 +61,11 @@ public class FileUpload
     /**
      * Sets the factory class to use when creating file items.
      *
-     * @param factory The factory class for new file items.
+     * @param fileItemFactory The factory class for new file items.
      */
     @Override
-    public void setFileItemFactory(final FileItemFactory factory) {
-        this.fileItemFactory = factory;
+    public void setFileItemFactory(final FileItemFactory fileItemFactory) {
+        this.fileItemFactory = fileItemFactory;
     }
 
 }
