@@ -228,7 +228,8 @@
         new attributes on the <code>Connector</code> element.
         <code>maxPartCount</code> limits the total number of parts in a
         multi-part request and <code>maxPartHeaderSize</code> limits the size of
-        the headers provided with each part. (markt)
+        the headers provided with each part. Add support for these new
+        attributes to the <code>ParameterLimitValve</code>. (markt)
       </add>
     </changelog>
   </subsection>

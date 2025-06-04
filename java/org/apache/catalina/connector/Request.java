@@ -145,7 +145,9 @@ public class Request implements HttpServletRequest {
     public Request(Connector connector, org.apache.coyote.Request coyoteRequest) {
         this.connector = connector;
         if (connector != null) {
-            this.maxParameterCount = connector.getMaxParameterCount();
+            maxParameterCount = connector.getMaxParameterCount();
+            maxPartCount = connector.getMaxPartCount();
+            maxPartHeaderSize = connector.getMaxPartHeaderSize();
         }
         this.coyoteRequest = coyoteRequest;
         inputBuffer = new InputBuffer(coyoteRequest);
@@ -418,6 +420,10 @@ public class Request implements HttpServletRequest {
      */
     private int maxParameterCount = -1;
 
+    private int maxPartCount = -1;
+
+    private int maxPartHeaderSize = -1;
+
     // --------------------------------------------------------- Public Methods
 
     public void addPathParameter(String name, String value) {
@@ -449,8 +455,12 @@ public class Request implements HttpServletRequest {
         parametersParsed = false;
         if (connector != null) {
             maxParameterCount = connector.getMaxParameterCount();
+            maxPartCount = connector.getMaxPartCount();
+            maxPartHeaderSize = connector.getMaxPartHeaderSize();
         } else {
             maxParameterCount = -1;
+            maxPartCount = -1;
+            maxPartHeaderSize = -1;
         }
         if (parts != null) {
             for (Part part : parts) {
@@ -840,14 +850,36 @@ public class Request implements HttpServletRequest {
         coyoteRequest.setServerPort(port);
     }
 
+
     /**
-     * Set the maximum number of request parameters (GET plus POST) for a single request
+     * Set the maximum number of request parameters (GET plus POST including multipart) for a single request.
      *
      * @param maxParameterCount The maximum number of request parameters
      */
     public void setMaxParameterCount(int maxParameterCount) {
         this.maxParameterCount = maxParameterCount;
     }
+
+
+    /**
+     * Set the maximum number of parts for a single multipart request.
+     *
+     * @param maxPartCount The maximum number of request parts
+     */
+    public void setMaxPartCount(int maxPartCount) {
+        this.maxPartCount = maxPartCount;
+    }
+
+
+    /**
+     * Set the maximum header size per part for a single multipart request.
+     *
+     * @param maxPartHeaderSize The maximum size of the headers for one part
+     */
+    public void setMaxPartHeaderSize(int maxPartHeaderSize) {
+        this.maxPartHeaderSize = maxPartHeaderSize;
+    }
+
 
     // ------------------------------------------------- ServletRequest Methods
 
@@ -2382,7 +2414,7 @@ public class Request implements HttpServletRequest {
         upload.setFileItemFactory(factory);
         upload.setFileSizeMax(mce.getMaxFileSize());
         upload.setSizeMax(mce.getMaxRequestSize());
-        upload.setPartHeaderSizeMax(connector.getMaxPartHeaderSize());
+        upload.setPartHeaderSizeMax(maxPartHeaderSize);
         /*
          * There are two independent limits on the number of parts.
          *
@@ -2398,7 +2430,7 @@ public class Request implements HttpServletRequest {
         if (partLimit > -1) {
             partLimit = partLimit - parameters.size();
         }
-        int maxPartCount = connector.getMaxPartCount();
+        int maxPartCount = this.maxPartCount;
         if (maxPartCount > -1) {
             if (partLimit < 0 || partLimit > maxPartCount) {
                 partLimit = maxPartCount;
