@@ -172,6 +172,9 @@
         Update the internal fork of Apache Commons FileUpload to abe5d94
         (2023-06-03, 1.x-SNAPSHOT). (markt)
       </update>
+      <update>
+        Update EasyMock to 5.6.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
