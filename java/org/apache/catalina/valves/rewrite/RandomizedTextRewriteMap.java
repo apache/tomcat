@@ -53,7 +53,7 @@ public class RandomizedTextRewriteMap implements RewriteMap {
                     // Ignore comment line or empty lines
                     continue;
                 } else if (line.indexOf('#') > 0) {
-                    // comment characters after '#'
+                    // Ignore comment characters after '#'
                     line = line.substring(0, line.indexOf('#')).trim();
                 }
                 String[] keyValuePair = line.split(" ", 2);
