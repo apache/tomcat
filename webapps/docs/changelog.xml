@@ -195,6 +195,10 @@
       <update>
         Update Checkstyle to 10.25.0. (markt)
       </update>
+      <fix>
+        Use the full path when the installer for Windows sets calls
+        <code>icacls.exe</code> to set file permissions. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
