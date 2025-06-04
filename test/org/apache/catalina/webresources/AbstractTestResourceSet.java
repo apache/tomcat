@@ -97,7 +97,7 @@ public abstract class AbstractTestResourceSet {
     }
 
     @Test
-    public final void testGetResourceDirA() {
+    public final void testGetResourceDirWithoutTrailingFileSeperator() {
         WebResource webResource = resourceRoot.getResource(getMount() + "/d1");
         Assert.assertTrue(webResource.isDirectory());
         Assert.assertEquals("d1", webResource.getName());
@@ -108,7 +108,7 @@ public abstract class AbstractTestResourceSet {
     }
 
     @Test
-    public final void testGetResourceDirB() {
+    public final void testGetResourceDirWithTrailingFileSeperator() {
         WebResource webResource = resourceRoot.getResource(getMount() + "/d1/");
         Assert.assertTrue(webResource.isDirectory());
         Assert.assertEquals("d1", webResource.getName());
@@ -116,6 +116,18 @@ public abstract class AbstractTestResourceSet {
         Assert.assertEquals(-1, webResource.getContentLength());
         Assert.assertNull(webResource.getContent());
         Assert.assertNull(webResource.getInputStream());
+    }
+
+    @Test
+    public final void testGetResourceDirWithoutLeadingFileSeperator() {
+        String mount = getMount();
+        if (mount.isEmpty()) {
+            // Test is only meaningful when resource is mounted below web application root.
+            return;
+        }
+        WebResource webResource = resourceRoot.getResource(mount + "d1");
+        Assert.assertFalse(webResource.exists());
+        Assert.assertEquals(mount + "d1", webResource.getWebappPath());
     }
 
     @Test
