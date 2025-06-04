@@ -2714,9 +2714,14 @@
           <code>
             /api/.*=100
             /admin/.*=50
+            /upload/.*=30,5,1024
           </code>
         Default value: <code>parameter_limit.config</code>.
         It must be placed in the Host configuration folder or in the WEB-INF folder of the web application.
+        </p>
+        <p>If a single integer is provided, it is used for <code>maxParameterCount</code>. If three integers are
+        provided, they are applied to <code>maxParameterCount</code>, <code>maxPartCount</code> and
+        <code>maxPartHeaderSize</code> respectively.
         </p>
       </attribute>
 
