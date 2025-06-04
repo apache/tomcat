@@ -404,7 +404,12 @@ public class JspCServletContext implements ServletContext {
                             int sep = entryName.indexOf('/', jarPath.length());
                             if (sep < 0) {
                                 // This is a file - strip leading "META-INF/resources"
-                                thePaths.add(entryName.substring(18));
+                                String sanitizedEntryName = entryName.substring(18);
+                                File testFile = new File(basePath, sanitizedEntryName);
+                                if (!testFile.toPath().normalize().startsWith(new File(basePath).toPath())) {
+                                    throw new IOException("Invalid entry path: " + sanitizedEntryName);
+                                }
+                                thePaths.add(sanitizedEntryName);
                             } else {
                                 // This is a directory - strip leading "META-INF/resources"
                                 thePaths.add(entryName.substring(18, sep + 1));

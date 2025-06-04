@@ -189,7 +189,11 @@ public class JarFileUrlJar implements Jar {
         if (entry == null) {
             return null;
         } else {
-            return entry.getName();
+            String sanitizedName = entry.getName();
+            if (sanitizedName.contains("..") || sanitizedName.startsWith("/") || sanitizedName.startsWith("\\")) {
+                throw new IOException("Invalid entry name: " + sanitizedName);
+            }
+            return sanitizedName;
         }
     }
 
