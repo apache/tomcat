@@ -207,6 +207,7 @@ set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.io=ALL-UNNAMED"
 set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.util=ALL-UNNAMED"
 set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
 set "JVM9_OPTIONS=%JVM9_OPTIONS%;--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"
+set "JVM9_OPTIONS=%JVM9_OPTIONS%;--enable-native-access=ALL-UNNAMED"
 
 "%EXECUTABLE%" //IS//%SERVICE_NAME% ^
     --Description "Apache Tomcat @VERSION@ Server - https://tomcat.apache.org/" ^
