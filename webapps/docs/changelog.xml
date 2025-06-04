@@ -176,6 +176,11 @@
       <update>
         Update Checkstyle to 10.25.0. (markt)
       </update>
+      <add>
+        <pr>858</pr>: Extend improvements to CVE-2024-56337 protection to
+        <code>service.bat</code>. Pull request provided by Markus Hoffrogge.
+        (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
