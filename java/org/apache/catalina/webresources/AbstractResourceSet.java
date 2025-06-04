@@ -83,6 +83,18 @@ public abstract class AbstractResourceSet extends LifecycleBase implements WebRe
         return webAppMount;
     }
 
+    protected boolean isPathMounted(String path, String webAppMount) {
+        // Doesn't call getWebAppMount() as value might have changed
+        if (path.startsWith(webAppMount)) {
+            if (path.length() != webAppMount.length() && path.charAt(webAppMount.length()) != '/') {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+
     public final void setBase(String base) {
         this.base = base;
     }
