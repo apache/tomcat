@@ -193,6 +193,10 @@
         <code>service.bat</code>. Pull request provided by Markus Hoffrogge.
         (markt)
       </add>
+      <fix>
+        Use the full path when the installer for Windows sets calls
+        <code>icacls.exe</code> to set file permissions. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
