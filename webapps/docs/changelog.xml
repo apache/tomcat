@@ -192,7 +192,7 @@
       <add>
         <pr>863</pr>: Add support for comments at the end of lines in text
         rewrite map files to align behaviour with Apache httpd. Pull request
-        provided by Chenjp. (markt)  
+        provided by Chenjp. (markt)
       </add>
     </changelog>
   </subsection>
