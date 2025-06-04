@@ -379,7 +379,7 @@ Section -post
   ; S-1-5-11     Authenticated users
   ;
   ; Grant admins, LocalService and Local System full control full control
-  nsExec::ExecToStack 'icacls "$INSTDIR" /inheritance:r /grant *S-1-5-19:(OI)(CI)(F) /grant *S-1-5-32-544:(OI)(CI)(F) /grant *S-1-5-18:(OI)(CI)(F)'
+  nsExec::ExecToStack '$SYSDIR\icacls "$INSTDIR" /inheritance:r /grant *S-1-5-19:(OI)(CI)(F) /grant *S-1-5-32-544:(OI)(CI)(F) /grant *S-1-5-18:(OI)(CI)(F)'
   Pop $0
   Pop $1
   StrCmp $0 "0" SetGroupPermissionsOk
@@ -392,7 +392,7 @@ Section -post
   ClearErrors
 
   ; Make the icon readable to all authenticated users so it appears correctly in the uninstall UI
-  nsExec::ExecToStack 'icacls "$INSTDIR\tomcat.ico" /inheritance:e /grant *S-1-5-11:(R)'
+  nsExec::ExecToStack '$SYSDIR\icacls "$INSTDIR\tomcat.ico" /inheritance:e /grant *S-1-5-11:(R)'
   Pop $0
   Pop $1
   StrCmp $0 "0" SetIconPermissionsOk
@@ -405,7 +405,7 @@ Section -post
   ClearErrors
 
   ; Make the uninstaller readable and executable to all authenticated users so the user that installed Tomcat can also uninstall it
-  nsExec::ExecToStack 'icacls "$INSTDIR\Uninstall.exe" /inheritance:e /grant *S-1-5-11:(RX)'
+  nsExec::ExecToStack '$SYSDIR\icacls "$INSTDIR\Uninstall.exe" /inheritance:e /grant *S-1-5-11:(RX)'
   Pop $0
   Pop $1
   StrCmp $0 "0" SetUninstallerPermissionsOk
