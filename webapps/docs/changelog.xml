@@ -198,6 +198,10 @@
         <bug>69706</bug>: Fix saved request serialization issue in FORM
         introduced when allowing infinite session timeouts. (remm)
       </fix>
+      <fix>
+        Expand the path checks for Pre-Resources and Post-Resources mounted at a
+        path within the web application. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
