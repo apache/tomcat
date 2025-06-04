@@ -38,10 +38,10 @@ import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.file.ConfigurationSource;
 
-
 /**
- * This is a concrete implementation of {@link ValveBase} that enforces a limit on the number of HTTP request
- * parameters. The features of this implementation include:
+ * This is a concrete implementation of {@link ValveBase} that allows alternative values for the
+ * <strong>Connector</strong> attributes {@code maxParameterCount}, {@code maxPartCount} and {@code maxPartHeaderSize}
+ * to be applied to a request. The features of this implementation include:
  * <ul>
  * <li>URL-specific parameter limits that can be defined using regular expressions</li>
  * <li>Configurable through Tomcat's <code>server.xml</code> or <code>context.xml</code></li>
@@ -52,11 +52,9 @@ import org.apache.tomcat.util.file.ConfigurationSource;
  * The default limit, specified by Connector's value, applies to all requests unless a more specific URL pattern is
  * matched. URL patterns and their corresponding limits can be configured via a regular expression mapping through the
  * <code>urlPatternLimits</code> attribute.
- * </p>
  * <p>
  * The Valve checks each incoming request and enforces the appropriate limit. If a request exceeds the allowed number of
  * parameters, a <code>400 Bad Request</code> response is returned.
- * </p>
  * <p>
  * Example, configuration in <code>context.xml</code>:
  *
@@ -73,33 +71,36 @@ import org.apache.tomcat.util.file.ConfigurationSource;
  * {@code
  * /api/.*=150
  * /admin/.*=50
+ * /upload/.*=30,5,1024
  * }
  * </pre>
  * <p>
  * The configuration allows for flexible control over different sections of your application, such as applying higher
  * limits for API endpoints and stricter limits for admin areas.
- * </p>
- *
- * @author Dimitris Soumis
+ * <p>
+ * If a single integer is provided, it is used for {@code maxParameterCount}.
+ * <p>
+ * If three integers are provided, they are applied to {@code maxParameterCount}, {@code maxPartCount} and
+ * {@code maxPartHeaderSize} respectively.
  */
 
 public class ParameterLimitValve extends ValveBase {
 
     /**
-     * Map for URL-specific limits
+     * Map for URL-specific limits.
      */
-    protected Map<Pattern,Integer> urlPatternLimits = new ConcurrentHashMap<>();
+    private Map<Pattern,Integer[]> urlPatternLimits = new ConcurrentHashMap<>();
 
     /**
      * Relative path to the configuration file. Note: If the valve's container is a context, this will be relative to
      * /WEB-INF/.
      */
-    protected String resourcePath = "parameter_limit.config";
+    private String resourcePath = "parameter_limit.config";
 
     /**
      * Will be set to true if the valve is associated with a context.
      */
-    protected boolean context = false;
+    private boolean context = false;
 
     public ParameterLimitValve() {
         super(true);
@@ -211,14 +212,22 @@ public class ParameterLimitValve extends ValveBase {
                 }
 
                 String patternString = line.substring(0, lastEqualsIndex).trim();
-                String limitString = line.substring(lastEqualsIndex + 1).trim();
+                String limitsString = line.substring(lastEqualsIndex + 1).trim();
 
                 Pattern pattern = Pattern.compile(UDecoder.URLDecode(patternString, StandardCharsets.UTF_8));
-                int limit = Integer.parseInt(limitString);
-                if (containerLog != null && containerLog.isTraceEnabled()) {
-                    containerLog.trace("Add pattern " + pattern + " and limit " + limit);
+                String[] limits = limitsString.split(",");
+                if (limits.length == 1) {
+                    urlPatternLimits.put(pattern, new Integer[] { Integer.valueOf(limits[0]), null, null});
+                } else if (limits.length == 3) {
+                    urlPatternLimits.put(pattern, new Integer[] {
+                            Integer.valueOf(limits[0]), Integer.valueOf(limits[1]), Integer.valueOf(limits[2])});
+                } else {
+                    throw new IllegalArgumentException(
+                            sm.getString("parameterLimitValve.invalidLimitsString", limitsString));
                 }
-                urlPatternLimits.put(pattern, Integer.valueOf(limit));
+                if (containerLog != null && containerLog.isTraceEnabled()) {
+                    containerLog.trace("Add pattern " + pattern + " and limit(s) " + limitsString);
+                }
             }
         } catch (IOException e) {
             containerLog.error(sm.getString("parameterLimitValve.readError"), e);
@@ -244,7 +253,7 @@ public class ParameterLimitValve extends ValveBase {
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
-        if (urlPatternLimits == null || urlPatternLimits.isEmpty()) {
+        if (urlPatternLimits.isEmpty()) {
             getNext().invoke(request, response);
             return;
         }
@@ -252,12 +261,15 @@ public class ParameterLimitValve extends ValveBase {
         String requestURI = context ? request.getRequestPathMB().toString() : request.getDecodedRequestURI();
 
         // Iterate over the URL patterns and apply corresponding limits
-        for (Map.Entry<Pattern,Integer> entry : urlPatternLimits.entrySet()) {
-            Pattern pattern = entry.getKey();
-            int limit = entry.getValue().intValue();
-
-            if (pattern.matcher(requestURI).matches()) {
-                request.setMaxParameterCount(limit);
+        for (Map.Entry<Pattern,Integer[]> entry : urlPatternLimits.entrySet()) {
+            if (entry.getKey().matcher(requestURI).matches()) {
+                Integer[] limits = entry.getValue();
+                // maxParameterCount should always be present
+                request.setMaxParameterCount(limits[0].intValue());
+                if (limits[1] != null) {
+                    request.setMaxPartCount(limits[1].intValue());
+                    request.setMaxPartHeaderSize(limits[2].intValue());
+                }
                 break;
             }
         }
@@ -265,5 +277,4 @@ public class ParameterLimitValve extends ValveBase {
         // Invoke the next valve to continue processing the request
         getNext().invoke(request, response);
     }
-
 }

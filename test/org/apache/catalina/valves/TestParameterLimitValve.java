@@ -20,26 +20,37 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import javax.servlet.ServletRequestParametersBaseTest;
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.filters.FailedRequestFilter;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
 
-public class TestParameterLimitValve extends ServletRequestParametersBaseTest {
+public class TestParameterLimitValve extends TomcatBaseTest {
 
     @Test
     public void testSpecificUrlPatternLimit() throws Exception {
@@ -236,7 +247,8 @@ public class TestParameterLimitValve extends ServletRequestParametersBaseTest {
     public void testUrlPatternLimitsFromFile() throws Exception {
         File configFile = File.createTempFile("parameter_limit", ".config");
         try (PrintWriter writer = new PrintWriter(new FileWriter(configFile))) {
-            writer.println("# Commented line");
+            writer.println("# Commented line - empty line follows");
+            writer.println("");
             writer.println("/api/.*=2");
             writer.println("# Commented line");
         }
@@ -421,6 +433,95 @@ public class TestParameterLimitValve extends ServletRequestParametersBaseTest {
                 new ByteChunk(), null);
 
         Assert.assertEquals(400, rc);
+    }
+
+
+    @Test
+    public void testMultipart() throws Exception {
+        doTestMultipart(50,  10,  512, true);
+    }
+
+
+    @Test
+    public void testMultipartParameterLimitExceeded01() throws Exception {
+        doTestMultipart(1,  10,  512, false);
+    }
+
+
+    @Test
+    public void testMultipartParameterLimitExceeded02() throws Exception {
+        doTestMultipart(5,  10,  512, false);
+    }
+
+
+    @Test
+    public void testMultipartPartLimitExceeded() throws Exception {
+        doTestMultipart(50,  1,  512, false);
+    }
+
+
+    @Test
+    public void testMultipartPartHeaderSizeLimitExceeded() throws Exception {
+        doTestMultipart(50,  10,  1, false);
+    }
+
+
+    private void doTestMultipart(int maxParameterCount, int maxPartCount, int maxPartHeaderSize, boolean okExpected) throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        ctx.getPipeline().addValve(parameterLimitValve);
+        parameterLimitValve.setUrlPatternLimits("/upload/.*=" + Integer.toString(maxParameterCount) + "," +
+                Integer.toString(maxPartCount) + "," + Integer.toString(maxPartHeaderSize));
+
+        Wrapper w = Tomcat.addServlet(ctx, "multipart", new MultipartServlet());
+        // Use defaults for Multipart
+        w.setMultipartConfigElement(new MultipartConfigElement(""));
+        ctx.addServletMappingDecoded("/upload/*", "multipart");
+
+        tomcat.start();
+
+        // Construct a simple multipart body with two parts
+        String boundary = "--simpleBoundary";
+
+        String content = "--" + boundary + CRLF +
+                "Content-Disposition: form-data; name=\"part1\"" + CRLF + CRLF +
+                "part value 1" + CRLF +
+                "--" + boundary + CRLF +
+                "Content-Disposition: form-data; name=\"part2\"" + CRLF + CRLF +
+                "part value 2" + CRLF +                "--" + boundary + "--" + CRLF;
+
+        Map<String,List<String>> reqHeaders = new HashMap<>();
+        reqHeaders.put("Content-Type", Arrays.asList(new String[] { "multipart/form-data; boundary=" + boundary }));
+        reqHeaders.put("Content-Length", Arrays.asList(new String[] { Integer.toString(content.length())}));
+
+        int rc = postUrl(content.getBytes(), "http://localhost:" + getPort() + "/upload/endpoint?" +
+                "param1=value1&param2=value2&param3=value3&param4=value4",
+                new ByteChunk(), reqHeaders, null);
+
+        if (okExpected) {
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        } else {
+            Assert.assertTrue(Integer.toString(rc),
+                    rc == HttpServletResponse.SC_BAD_REQUEST || rc == HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        }
+    }
+
+
+    private static class MultipartServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+            PrintWriter pw = resp.getWriter();
+            pw.println("Parameters: " + req.getParameterMap().size());
+            pw.println("Parts: " + req.getParts().size());
+        }
     }
 
 
