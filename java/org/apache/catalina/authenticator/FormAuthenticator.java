@@ -646,8 +646,8 @@ public class FormAuthenticator extends AuthenticatorBase {
         request.getCoyoteRequest().queryString().toStringType();
         request.getCoyoteRequest().protocol().toStringType();
 
-        if (saved.getOriginalMaxInactiveIntervalOptional().isPresent()) {
-            session.setMaxInactiveInterval(saved.getOriginalMaxInactiveIntervalOptional().getAsInt());
+        if (saved.getOriginalMaxInactiveIntervalOptional() != null) {
+            session.setMaxInactiveInterval(saved.getOriginalMaxInactiveIntervalOptional().intValue());
         }
 
         return true;
@@ -724,14 +724,14 @@ public class FormAuthenticator extends AuthenticatorBase {
                     session.setMaxInactiveInterval(getAuthenticationSessionTimeout());
                 }
             } else if (previousSavedRequest != null &&
-                    previousSavedRequest.getOriginalMaxInactiveIntervalOptional().isPresent()) {
+                    previousSavedRequest.getOriginalMaxInactiveIntervalOptional() != null) {
                 /*
                  * The user may have refreshed the browser page during authentication. Transfer the original max inactive
                  * interval from previous saved request to current one else, once authentication is completed, the session
                  * will retain the shorter authentication session timeout
                  */
                 saved.setOriginalMaxInactiveInterval(
-                        previousSavedRequest.getOriginalMaxInactiveIntervalOptional().getAsInt());
+                        previousSavedRequest.getOriginalMaxInactiveIntervalOptional().intValue());
             }
         }
 

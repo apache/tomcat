@@ -131,6 +131,10 @@
         rewrite map files to align behaviour with Apache httpd. Pull request
         provided by Chenjp. (markt)
       </add>
+      <fix>
+        <bug>69706</bug>: Fix saved request serialization issue in FORM
+        introduced when allowing infinite session timeouts. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
