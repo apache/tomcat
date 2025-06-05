@@ -46,7 +46,7 @@ Branch: 1.x
 Sub-tree:
 src/main/java/org/apache/commons/fileupload
 The SHA1 ID / tag for the most recent commit to be merged to Tomcat is:
-f1028401e3d59bd42aee9ab4d26995991db1aadc (2025-06-05)
+commons-fileupload-1.6.0-RC1 (2025-06-05)
 
 Note: Tomcat's copy of fileupload also includes classes copied manually from
       Commons IO.
