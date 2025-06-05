@@ -22,7 +22,6 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.tomcat.util.http.fileupload.util.mime.MimeUtility;
-import org.apache.tomcat.util.http.fileupload.util.mime.RFC2231Utility;
 
 /**
  * A simple parser intended to parse sequences of name/value pairs.
