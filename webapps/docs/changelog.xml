@@ -179,8 +179,8 @@
         Patch provided by Felix Zhang. (schultz)
       </fix>
       <update>
-        Update the internal fork of Apache Commons FileUpload to f102840
-        (2023-06-05, 1.x-SNAPSHOT). (markt)
+        Update the internal fork of Apache Commons FileUpload to 1.6.0-RC1
+        (2025-06-05). (markt)
       </update>
       <update>
         Update EasyMock to 5.6.0. (markt)
