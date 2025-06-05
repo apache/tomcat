@@ -146,7 +146,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
         lastActiveFilter = -1;
 
         parsingRequestLine = true;
-        parsingRequestLinePhase = RequestLineParsePhase.NEW;;
+        parsingRequestLinePhase = RequestLineParsePhase.PHASE_1_NEW;;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
@@ -253,7 +253,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
 
         chr = 0;
         prevChr = 0;
-        parsingRequestLinePhase = RequestLineParsePhase.NEW;;
+        parsingRequestLinePhase = RequestLineParsePhase.PHASE_1_NEW;;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
@@ -296,7 +296,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
         swallowInput = true;
 
         parsingRequestLine = true;
-        parsingRequestLinePhase = RequestLineParsePhase.NEW;
+        parsingRequestLinePhase = RequestLineParsePhase.PHASE_1_NEW;
         parsingRequestLineEol = false;
         parsingRequestLineStart = 0;
         parsingRequestLineQPos = -1;
@@ -322,9 +322,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
         //
         // Skipping blank lines
         //
-        if (parsingRequestLinePhase == RequestLineParsePhase.HTTP2_PREFACE_MATCHED ||
-            parsingRequestLinePhase == RequestLineParsePhase.NEW ||
-            parsingRequestLinePhase == RequestLineParsePhase.SKIP_BLANK_LINES) {
+        if (parsingRequestLinePhase == RequestLineParsePhase.PHASE_0_HTTP2_PREFACE_MATCHED ||
+            parsingRequestLinePhase == RequestLineParsePhase.PHASE_1_NEW ||
+            parsingRequestLinePhase == RequestLineParsePhase.PHASE_2_SKIP_BLANK_LINES) {
             do {
                 // Read new bytes if needed
                 if (byteBuffer.position() >= byteBuffer.limit()) {
@@ -349,14 +349,14 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                     }
                     if (prefaceMatch) {
                         // HTTP/2 preface matched
-                        parsingRequestLinePhase = RequestLineParsePhase.HTTP2_PREFACE_MATCHED;
+                        parsingRequestLinePhase = RequestLineParsePhase.PHASE_0_HTTP2_PREFACE_MATCHED;
                         return false;
                     }
                 }
                 // Set the start time once we start reading data (even if it is
                 // just skipping blank lines)
-                if (parsingRequestLinePhase == RequestLineParsePhase.NEW) {
-                    parsingRequestLinePhase = RequestLineParsePhase.SKIP_BLANK_LINES;
+                if (parsingRequestLinePhase == RequestLineParsePhase.PHASE_1_NEW) {
+                    parsingRequestLinePhase = RequestLineParsePhase.PHASE_2_SKIP_BLANK_LINES;
                     request.setStartTimeNanos(System.nanoTime());
                 }
                 chr = byteBuffer.get();
@@ -364,9 +364,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
             byteBuffer.position(byteBuffer.position() - 1);
 
             parsingRequestLineStart = byteBuffer.position();
-            parsingRequestLinePhase = RequestLineParsePhase.METHOD;
+            parsingRequestLinePhase = RequestLineParsePhase.PHASE_3_METHOD;
         }
-        if (parsingRequestLinePhase == RequestLineParsePhase.METHOD) {
+        if (parsingRequestLinePhase == RequestLineParsePhase.PHASE_3_METHOD) {
             //
             // Reading the method name
             // Method name is a token
@@ -394,9 +394,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                     throw new IllegalArgumentException(sm.getString("iib.invalidmethod", invalidMethodValue));
                 }
             }
-            parsingRequestLinePhase = RequestLineParsePhase.AFTER_METHOD;
+            parsingRequestLinePhase = RequestLineParsePhase.PHASE_4_AFTER_METHOD;
         }
-        if (parsingRequestLinePhase == RequestLineParsePhase.AFTER_METHOD) {
+        if (parsingRequestLinePhase == RequestLineParsePhase.PHASE_4_AFTER_METHOD) {
             // Spec says single SP but also be tolerant of multiple SP and/or HT
             boolean space = true;
             while (space) {
@@ -413,9 +413,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                 }
             }
             parsingRequestLineStart = byteBuffer.position();
-            parsingRequestLinePhase = RequestLineParsePhase.URI;
+            parsingRequestLinePhase = RequestLineParsePhase.PHASE_5_URI;
         }
-        if (parsingRequestLinePhase == RequestLineParsePhase.URI) {
+        if (parsingRequestLinePhase == RequestLineParsePhase.PHASE_5_URI) {
             // Mark the current buffer position
 
             int end = 0;
@@ -453,7 +453,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                     // Set blank protocol (indicates HTTP/0.9)
                     request.protocol().setString("");
                     // Skip the protocol processing
-                    parsingRequestLinePhase = RequestLineParsePhase.COMPLETE;
+                    parsingRequestLinePhase = RequestLineParsePhase.PHASE_8_COMPLETE;
                     if (prevChr == Constants.CR) {
                         end = pos - 1;
                     } else {
@@ -488,11 +488,11 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
             }
             // HTTP/0.9 processing jumps to stage 7.
             // Don't want to overwrite that here.
-            if (parsingRequestLinePhase == RequestLineParsePhase.URI) {
-                parsingRequestLinePhase = RequestLineParsePhase.AFTER_URI;
+            if (parsingRequestLinePhase == RequestLineParsePhase.PHASE_5_URI) {
+                parsingRequestLinePhase = RequestLineParsePhase.PHASE_6_AFTER_URI;
             }
         }
-        if (parsingRequestLinePhase == RequestLineParsePhase.AFTER_URI) {
+        if (parsingRequestLinePhase == RequestLineParsePhase.PHASE_6_AFTER_URI) {
             // Spec says single SP but also be tolerant of multiple and/or HT
             boolean space = true;
             while (space) {
@@ -509,12 +509,12 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
                 }
             }
             parsingRequestLineStart = byteBuffer.position();
-            parsingRequestLinePhase = RequestLineParsePhase.PROTOCOL;
+            parsingRequestLinePhase = RequestLineParsePhase.PHASE_7_PROTOCOL;
 
             // Mark the current buffer position
             end = 0;
         }
-        if (parsingRequestLinePhase == RequestLineParsePhase.PROTOCOL) {
+        if (parsingRequestLinePhase == RequestLineParsePhase.PHASE_7_PROTOCOL) {
             //
             // Reading the protocol
             // Protocol is always "HTTP/" DIGIT "." DIGIT
@@ -548,14 +548,14 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
 
             if (end - parsingRequestLineStart > 0) {
                 request.protocol().setBytes(byteBuffer.array(), parsingRequestLineStart, end - parsingRequestLineStart);
-                parsingRequestLinePhase = RequestLineParsePhase.COMPLETE;
+                parsingRequestLinePhase = RequestLineParsePhase.PHASE_8_COMPLETE;
             }
             // If no protocol is found, the ISE below will be triggered.
         }
-        if (parsingRequestLinePhase == RequestLineParsePhase.COMPLETE) {
+        if (parsingRequestLinePhase == RequestLineParsePhase.PHASE_8_COMPLETE) {
             // Parsing is complete. Return and clean-up.
             parsingRequestLine = false;
-            parsingRequestLinePhase = RequestLineParsePhase.NEW;
+            parsingRequestLinePhase = RequestLineParsePhase.PHASE_1_NEW;
             parsingRequestLineEol = false;
             parsingRequestLineStart = 0;
             return true;
@@ -822,55 +822,55 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler,
          * Indicates that the HTTP/2 client preface has been detected.
          * Used when the special sequence sent by clients at the start of an HTTP/2 connection is matched.
          */
-        HTTP2_PREFACE_MATCHED(-1),
+        PHASE_0_HTTP2_PREFACE_MATCHED(-1),
 
         /**
-         * Initial parsing state. Represents the state when starting to process a new request.
+         * Phase 0: Initial parsing state. Represents the state when starting to process a new request.
          */
-        NEW(0),
+        PHASE_1_NEW(0),
 
         /**
-         * Phase for skipping blank lines before the start of the request.
+         * Phase 1: Skipping blank lines before the start of the request.
          * According to HTTP spec, there might be blank lines before the request line.
          */
-        SKIP_BLANK_LINES(1),
+        PHASE_2_SKIP_BLANK_LINES(1),
 
         /**
-         * Phase for parsing the HTTP method (GET, POST, etc.).
+         * Phase 2: Parsing the HTTP method (GET, POST, etc.).
          * Processes the first token of the request line during this phase.
          */
-        METHOD(2),
+        PHASE_3_METHOD(2),
 
         /**
-         * Phase for handling whitespace after the HTTP method and before the URI.
+         * Phase 3: Handling whitespace after the HTTP method and before the URI.
          * There must be a whitespace character (SP or HT) between the method and URI.
          */
-        AFTER_METHOD(3),
+        PHASE_4_AFTER_METHOD(3),
 
         /**
-         * Phase for parsing the request URI.
+         * Phase 4: Parsing the request URI.
          * Processes the resource path and query string of the request during this phase.
          */
-        URI(4),
+        PHASE_5_URI(4),
 
         /**
-         * Phase for handling whitespace after the URI and before the protocol version.
+         * Phase 5: Handling whitespace after the URI and before the protocol version.
          * There must be a whitespace character (SP or HT) between the URI and protocol version.
          */
-        AFTER_URI(5),
+        PHASE_6_AFTER_URI(5),
 
         /**
-         * Phase for parsing the HTTP protocol version (e.g., HTTP/1.1).
+         * Phase 6: Parsing the HTTP protocol version (e.g., HTTP/1.1).
          * Processes the last part of the request line during this phase.
          */
-        PROTOCOL(6),
+        PHASE_7_PROTOCOL(6),
 
         /**
-         * Indicates that the request line parsing is complete.
+         * Phase 7: Request line parsing is complete.
          * Reaching this state means all essential components of the request line
          * (method, URI, protocol) have been successfully parsed.
          */
-        COMPLETE(7);
+        PHASE_8_COMPLETE(7);
 
         private final int phase;
 
