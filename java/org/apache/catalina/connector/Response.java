@@ -1237,7 +1237,8 @@ public class Response implements HttpServletResponse {
      * all of the following conditions are met:
      * <ul>
      * <li>The request we are responding to asked for a valid session
-     * <li>The requested session ID was not received via a cookie
+     * <li>The web application enables session tracking by URL
+     * <li>The web application does not support session tracking by COOKIE, or the request does not contain any cookie
      * <li>The specified URL points back to somewhere within the web application that is responding to this request
      * </ul>
      *
@@ -1268,6 +1269,12 @@ public class Response implements HttpServletResponse {
 
         // Is URL encoding permitted
         if (!hreq.getServletContext().getEffectiveSessionTrackingModes().contains(SessionTrackingMode.URL)) {
+            return false;
+        }
+
+        if (hreq.getServletContext().getEffectiveSessionTrackingModes().contains(SessionTrackingMode.COOKIE) &&
+                hreq.getCookies() != null && hreq.getCookies().length > 0) {
+            // Client sends cookies, does support cookie obviously. It is not suitable to encode session id in URL.
             return false;
         }
 
