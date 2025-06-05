@@ -480,15 +480,6 @@ public class MultipartStream {
     public static final byte DASH = 0x2D;
 
     /**
-     * The maximum length of {@code header-part} that will be
-     * processed (10 kilobytes = 10240 bytes.).
-     *
-     * @deprecated Unused. Replaced by {@link #getPartHeaderSizeMax()}.
-     */
-    @Deprecated
-    public static final int HEADER_PART_SIZE_MAX = 10240;
-
-    /**
      * The default length of the buffer used for processing a request.
      */
     protected static final int DEFAULT_BUFSIZE = 4096;
