@@ -504,8 +504,7 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         if (okExpected) {
             Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         } else {
-            Assert.assertTrue(Integer.toString(rc),
-                    rc == HttpServletResponse.SC_BAD_REQUEST || rc == HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+            Assert.assertTrue(Integer.toString(rc), rc == HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
