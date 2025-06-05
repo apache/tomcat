@@ -100,6 +100,13 @@ public abstract class FileUploadBase {
     public static final String MULTIPART_MIXED = "multipart/mixed";
 
     /**
+     * Default per part header size limit in bytes.
+     *
+     * @since FileUpload 1.6.0
+     */
+    public static final int DEFAULT_PART_HEADER_SIZE_MAX = 512;
+
+    /**
      * The maximum size permitted for the complete request, as opposed to
      * {@link #fileSizeMax}. A value of -1 indicates no maximum.
      */
@@ -116,6 +123,11 @@ public abstract class FileUploadBase {
      * request. A value of -1 indicates no maximum.
      */
     private long fileCountMax = -1;
+
+    /**
+     * The maximum permitted size of the headers provided with a single part in bytes.
+     */
+    private int partHeaderSizeMax = DEFAULT_PART_HEADER_SIZE_MAX;
 
     /**
      * The content encoding to use when reading part headers.
@@ -341,6 +353,17 @@ public abstract class FileUploadBase {
     }
 
     /**
+     * Obtain the per part size limit for headers.
+     *
+     * @return The maximum size of the headers for a single part in bytes.
+     *
+     * @since FileUpload 1.6.0
+     */
+    public int getPartHeaderSizeMax() {
+        return partHeaderSizeMax;
+    }
+
+    /**
      * Returns the progress listener.
      *
      * @return The progress listener, if any, or null.
@@ -427,8 +450,8 @@ public abstract class FileUploadBase {
         boolean successful = false;
         try {
             final FileItemIterator iter = getItemIterator(ctx);
-            final FileItemFactory fileItemFactory = Objects.requireNonNull(getFileItemFactory(),
-                    "No FileItemFactory has been set.");
+            final FileItemFactory fileItemFactory = getFileItemFactory();
+            Objects.requireNonNull(fileItemFactory, "getFileItemFactory()");
             final byte[] buffer = new byte[Streams.DEFAULT_BUFFER_SIZE];
             while (iter.hasNext()) {
                 if (items.size() == fileCountMax) {
@@ -508,6 +531,17 @@ public abstract class FileUploadBase {
      */
     public void setHeaderEncoding(final String encoding) {
         headerEncoding = encoding;
+    }
+
+    /**
+     * Sets the per part size limit for headers.
+     *
+     * @param partHeaderSizeMax The maximum size of the headers in bytes.
+     *
+     * @since FileUpload 1.6.0
+     */
+    public void setPartHeaderSizeMax(final int partHeaderSizeMax) {
+        this.partHeaderSizeMax = partHeaderSizeMax;
     }
 
     /**

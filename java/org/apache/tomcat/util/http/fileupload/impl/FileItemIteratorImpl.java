@@ -198,6 +198,7 @@ public class FileItemIteratorImpl implements FileItemIterator {
                     String.format("The boundary specified in the %s header is too long", FileUploadBase.CONTENT_TYPE), iae);
         }
         multiPartStream.setHeaderEncoding(charEncoding);
+        multiPartStream.setPartHeaderSizeMax(fileUploadBase.getPartHeaderSizeMax());
     }
 
     public MultipartStream getMultiPartStream() throws FileUploadException, IOException {
