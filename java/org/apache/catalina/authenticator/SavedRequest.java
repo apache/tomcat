@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.OptionalInt;
 
 import jakarta.servlet.http.Cookie;
 
@@ -184,13 +183,13 @@ public final class SavedRequest implements Serializable {
     /**
      * The original maxInactiveInterval for the session.
      */
-    private OptionalInt originalMaxInactiveInterval = OptionalInt.empty();
+    private Integer originalMaxInactiveInterval = null;
 
-    public OptionalInt getOriginalMaxInactiveIntervalOptional() {
+    public Integer getOriginalMaxInactiveIntervalOptional() {
         return originalMaxInactiveInterval;
     }
 
     public void setOriginalMaxInactiveInterval(int originalMaxInactiveInterval) {
-        this.originalMaxInactiveInterval = OptionalInt.of(originalMaxInactiveInterval);
+        this.originalMaxInactiveInterval = Integer.valueOf(originalMaxInactiveInterval);
     }
 }
