@@ -199,7 +199,7 @@ public final class SavedRequest implements Serializable {
      */
     @Deprecated
     public int getOriginalMaxInactiveInterval() {
-        return originalMaxInactiveInterval.orElse(-1);
+        return (originalMaxInactiveInterval == null) ? -1 : originalMaxInactiveInterval.intValue();
     }
 
     public void setOriginalMaxInactiveInterval(int originalMaxInactiveInterval) {
