@@ -14,28 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.tomcat.util.http.fileupload.util.mime;
+package org.apache.tomcat.util.http.fileupload;
 
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
+
 /**
- * Utility class to decode/encode character set on HTTP Header fields based on RFC 2231.
- * This implementation adheres to RFC 5987 in particular, which was defined for HTTP headers.
+ * Utility class to decode/encode character set on HTTP Header fields based on RFC 2231. This implementation adheres to RFC 5987 in particular, which was
+ * defined for HTTP headers.
  * <p>
- * RFC 5987 builds on RFC 2231, but has lesser scope like
- * <a href="https://tools.ietf.org/html/rfc5987#section-3.2">mandatory charset definition</a>
- * and <a href="https://tools.ietf.org/html/rfc5987#section-4">no parameter continuation</a>
+ * RFC 5987 builds on RFC 2231, but has lesser scope like <a href="https://tools.ietf.org/html/rfc5987#section-3.2">mandatory charset definition</a> and
+ * <a href="https://tools.ietf.org/html/rfc5987#section-4">no parameter continuation</a>
+ * </p>
  *
  * @see <a href="https://tools.ietf.org/html/rfc2231">RFC 2231</a>
  * @see <a href="https://tools.ietf.org/html/rfc5987">RFC 5987</a>
  */
-public final class RFC2231Utility {
+final class RFC2231Utility {
 
     /**
      * Percent character '{@value}'.
      */
     private static final char PERCENT = '%';
-
     /**
      * The Hexadecimal values char array.
      */
@@ -52,7 +52,6 @@ public final class RFC2231Utility {
      * The Hexadecimal decode value.
      */
     private static final byte[] HEX_DECODE = new byte[MASK_128];
-
     // create a ASCII decoded array of Hexadecimal values
     static {
         for (int i = 0; i < HEX_DIGITS.length; i++) {
@@ -62,23 +61,22 @@ public final class RFC2231Utility {
     }
 
     /**
-     * Decode a string of text obtained from a HTTP header as per RFC 2231
+     * Decodes a string of text obtained from a HTTP header as per RFC 2231
      * <p>
-     * <strong>Eg 1.</strong> {@code us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A}
-     * will be decoded to {@code This is ***fun***}
+     * <strong>Eg 1.</strong> {@code us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A} will be decoded to {@code This is ***fun***}
+     * </p>
      * <p>
-     * <strong>Eg 2.</strong> {@code iso-8859-1'en'%A3%20rate}
-     * will be decoded to {@code £ rate}
+     * <strong>Eg 2.</strong> {@code iso-8859-1'en'%A3%20rate} will be decoded to {@code £ rate}
+     * </p>
      * <p>
-     * <strong>Eg 3.</strong> {@code UTF-8''%c2%a3%20and%20%e2%82%ac%20rates}
-     * will be decoded to {@code £ and € rates}
+     * <strong>Eg 3.</strong> {@code UTF-8''%c2%a3%20and%20%e2%82%ac%20rates} will be decoded to {@code £ and € rates}
+     * </p>
      *
-     * @param encodedText   Text to be decoded has a format of {@code <charset>'<language>'<encoded_value>}
-     * and ASCII only
+     * @param encodedText Text to be decoded has a format of {@code <charset>'<language>'<encoded_value>} and ASCII only
      * @return Decoded text based on charset encoding
      * @throws UnsupportedEncodingException The requested character set wasn't found.
      */
-    public static String decodeText(final String encodedText) throws UnsupportedEncodingException {
+    static String decodeText(final String encodedText) throws UnsupportedEncodingException {
         final int langDelimitStart = encodedText.indexOf('\'');
         if (langDelimitStart == -1) {
             // missing charset
@@ -125,12 +123,12 @@ public final class RFC2231Utility {
     }
 
     /**
-     * Checks if Asterisk (*) at the end of parameter name to indicate,
-     * if it has charset and language information to decode the value.
+     * Checks if Asterisk (*) at the end of parameter name to indicate, if it has charset and language information to decode the value.
+     *
      * @param paramName The parameter, which is being checked.
      * @return {@code true}, if encoded as per RFC 2231, {@code false} otherwise
      */
-    public static boolean hasEncodedValue(final String paramName) {
+    static boolean hasEncodedValue(final String paramName) {
         if (paramName != null) {
             return paramName.lastIndexOf('*') == paramName.length() - 1;
         }
@@ -138,12 +136,12 @@ public final class RFC2231Utility {
     }
 
     /**
-     * If {@code paramName} has Asterisk (*) at the end, it will be stripped off,
-     * else the passed value will be returned.
+     * If {@code paramName} has Asterisk (*) at the end, it will be stripped off, else the passed value will be returned.
+     *
      * @param paramName The parameter, which is being inspected.
      * @return stripped {@code paramName} of Asterisk (*), if RFC2231 encoded
      */
-    public static String stripDelimiter(final String paramName) {
+    static String stripDelimiter(final String paramName) {
         if (hasEncodedValue(paramName)) {
             final StringBuilder paramBuilder = new StringBuilder(paramName);
             paramBuilder.deleteCharAt(paramName.lastIndexOf('*'));
@@ -153,8 +151,7 @@ public final class RFC2231Utility {
     }
 
     /**
-     * Private constructor so that no instances can be created. This class
-     * contains only static utility methods.
+     * Private constructor so that no instances can be created. This class contains only static utility methods.
      */
     private RFC2231Utility() {
     }
