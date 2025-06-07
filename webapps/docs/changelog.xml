@@ -197,7 +197,7 @@
         Update Tomcat Native to 2.0.9. (markt)
       </update>
       <update>
-        Update the internal fork of Apache Commons FileUpload to 1.6.0-RC1
+        Update the internal fork of Apache Commons FileUpload to 1.6.0
         (2025-06-05). (markt)
       </update>
       <update>
