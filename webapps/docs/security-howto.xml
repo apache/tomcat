@@ -178,6 +178,19 @@
    </subsection>
   </section>
 
+  <section name="User web applications">
+    <p>Web applications are assumed to be trusted. It is not safe to deploy web
+    applications from untrusted sources.</p>
+
+    <p>Any application functionality that permits the modification of a web
+    application (WebDAV, HTTP PUT requests etc.) may impact the security of
+    either the web application or the Tomcat instance on which it is running.
+    Such functionality should either be restricted to trusted users or
+    limited in scope (e.g. via security constraints) such that users with access
+    to the functionality are unable to imapct the security of either the web
+    application or the Tomcat instance on which it is running.</p>
+  </section>
+
   <section name="Security manager">
     <p>Enabling the security manager causes web applications to be run in a
     sandbox, significantly limiting a web application's ability to perform
