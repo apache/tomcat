@@ -194,7 +194,7 @@
         Patch provided by Felix Zhang. (schultz)
       </fix>
       <update>
-        Update the internal fork of Apache Commons FileUpload to 1.6.0-RC1
+        Update the internal fork of Apache Commons FileUpload to 1.6.0
         (2025-06-05). (markt)
       </update>
       <update>
