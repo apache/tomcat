@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.107 (remm)" rtext="in development">
+  <subsection name="Web applications">
+    <changelog>
+      <add>
+        Documentation. Provide more explicit guidance regarding the security
+        considerations for enabling write access to the web application via
+        WebDAV, HTTP PUT requests or similar. (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.106 (remm)" rtext="release in progress">
   <subsection name="Catalina">
