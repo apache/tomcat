@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.7 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.8 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -166,42 +166,6 @@
         path. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Add support for the <code>java:module</code> namespace which mirrors
-        the <code>java:comp</code> namespace. (markt)
-      </fix>
-      <fix>
-        <bug>69690</bug>: Calling <code>HttpServletRequest.getParameter()</code>
-        and related methods for a request with content type
-        <code>multipart/form-data</code> when the mapped servlet does not have a
-        <code>@MultipartConfig</code> or equivalent should not trigger an
-        exception. Note that calling <code>getPart()</code> or
-        <code>getParts()</code> is these circumstances will trigger an
-        exception. (markt)
-      </fix>
-      <fix>
-        Support parsing of multiple path parameters separated by <code>;</code>
-        in a single URL segment. Based on pull request <pr>860</pr> by Chenjp.
-        (markt)
-      </fix>
-      <fix>
-        <bug>69699</bug>: Encode redirect URL used by the rewrite valve with
-        the session id if appropriate, and handle cross context with different
-        session configuration when using rewrite. (remm)
-      </fix>
-      <add>
-        <pr>863</pr>: Add support for comments at the end of lines in text
-        rewrite map files to align behaviour with Apache httpd. Pull request
-        provided by Chenjp. (markt)
-      </add>
-      <fix>
-        <bug>69706</bug>: Fix saved request serialization issue in FORM
-        introduced when allowing infinite session timeouts. (remm)
-      </fix>
-      <fix>
-        Expand the path checks for Pre-Resources and Post-Resources mounted at a
-        path within the web application. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -220,21 +184,6 @@
         Remove NIO2 connector. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <scode>
-        <pr>861</pr>: Refactor <code>TaskQueue</code> to use the new interface
-        <code>RetryableQueue</code> which enables better integration of custom
-        <code>Executor</code>s which provide their own
-        <code>BlockingQueue</code> implementation. Pull request provided by
-        Paulo Almeida. (markt)
-      </scode>
-      <add>
-        Provide finer grained control of multi-part request processing via two
-        new attributes on the <code>Connector</code> element.
-        <code>maxPartCount</code> limits the total number of parts in a
-        multi-part request and <code>maxPartHeaderSize</code> limits the size of
-        the headers provided with each part. Add support for these new
-        attributes to the <code>ParameterLimitValve</code>. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -260,10 +209,6 @@
         <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69696</bug>: Mark the JSP wrapper for reload after a failed
-        compilation. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
@@ -283,10 +228,6 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69694</bug>: Improve error reporting of deployment tasks done
-        using the manager webapp when a copy operation fails. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -295,26 +236,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update Tomcat Native to 2.0.9. (markt)
-      </update>
-      <update>
-        Update the internal fork of Apache Commons FileUpload to 1.6.0-RC1
-        (2025-06-05). (markt)
-      </update>
-      <update>
-        Update EasyMock to 5.6.0. (markt)
-      </update>
-      <update>
-        Update Checkstyle to 10.25.0. (markt)
-      </update>
-      <fix>
-        Use the full path when the installer for Windows sets calls
-        <code>icacls.exe</code> to set file permissions. (markt)
-      </fix>
-      <update>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
