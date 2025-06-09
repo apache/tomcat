@@ -66,6 +66,13 @@ public interface ProtocolHandler {
 
 
     /**
+     * Set the virtual threads usage by the connector.
+     *
+     * @param useVirtualThreads if true, use virtual threads
+     */
+    void setUseVirtualThreads(boolean useVirtualThreads);
+
+    /**
      * Get the utility executor that should be used by the protocol handler.
      *
      * @return the executor

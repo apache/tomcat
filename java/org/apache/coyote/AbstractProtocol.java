@@ -228,6 +228,10 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
         endpoint.setExecutor(executor);
     }
 
+    @Override
+    public void setUseVirtualThreads(boolean useVirtualThreads) {
+        endpoint.setUseVirtualThreads(useVirtualThreads);
+    }
 
     @Override
     public ScheduledExecutorService getUtilityExecutor() {
