@@ -399,9 +399,9 @@ public final class Request {
     public void setCharsetHolder(CharsetHolder charsetHolder) {
         if (charsetHolder == null || charsetHolder.getName() == null) {
             this.charsetHolder = null;
-            return;
+        } else {
+            this.charsetHolder = charsetHolder;
         }
-        this.charsetHolder = charsetHolder;
     }
 
 
