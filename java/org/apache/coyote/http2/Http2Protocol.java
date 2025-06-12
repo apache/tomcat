@@ -532,6 +532,8 @@ public class Http2Protocol implements UpgradeProtocol {
             requestAndResponse = new Request();
             Response response = new Response();
             requestAndResponse.setResponse(response);
+        } else {
+            requestAndResponse.getRequestProcessor().recycle();
         }
         return requestAndResponse;
     }
