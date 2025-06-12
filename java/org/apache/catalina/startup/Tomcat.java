@@ -1038,8 +1038,8 @@ public class Tomcat {
         ctx.addWelcomeFile("index.htm");
         ctx.addWelcomeFile("index.jsp");
         // Any application configured welcome files should override the defaults.
-        if (ctx instanceof StandardContext stdCtx) {
-            stdCtx.setReplaceWelcomeFiles(true);
+        if (ctx instanceof StandardContext) {
+            ((StandardContext) ctx).setReplaceWelcomeFiles(true);
         }
     }
 
