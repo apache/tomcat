@@ -166,6 +166,10 @@
         path. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Ensure application configured welcome files override the defaults when
+        configuring an embedded web application programmatically. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
