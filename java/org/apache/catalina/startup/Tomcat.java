@@ -992,7 +992,6 @@ public class Tomcat {
      * <li>MIME mappings (subset of those in conf/web.xml)</li>
      * <li>Welcome files</li>
      * </ul>
-     * TODO: Align the MIME mappings with conf/web.xml - possibly via a common file.
      *
      * @param contextPath The path of the context to set the defaults for
      */
@@ -1034,11 +1033,15 @@ public class Tomcat {
         ctx.addWelcomeFile("index.html");
         ctx.addWelcomeFile("index.htm");
         ctx.addWelcomeFile("index.jsp");
+        // Any application configured welcome files should override the defaults.
+        if (ctx instanceof StandardContext stdCtx) {
+            stdCtx.setReplaceWelcomeFiles(true);
+        }
     }
 
 
     /**
-     * Add the default MIME type mappings to the provide Context.
+     * Add the default MIME type mappings to the provided Context.
      *
      * @param context The web application to which the default MIME type mappings should be added.
      */
