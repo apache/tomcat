@@ -187,6 +187,10 @@
       <update>
         Remove NIO2 connector. (remm)
       </update>
+      <update>
+        Optimize <code>Request#getCharsetHolder</code> to avoid repeated parsing
+        when charset is null. Patch provided by morning-gu. (schultz)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>

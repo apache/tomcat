@@ -139,7 +139,7 @@ public final class Request {
      */
     private long contentLength = -1;
     private MessageBytes contentTypeMB = null;
-    private CharsetHolder charsetHolder = CharsetHolder.EMPTY;
+    private CharsetHolder charsetHolder = null;
 
     /**
      * Is there an expectation ?
@@ -389,7 +389,7 @@ public final class Request {
     // -------------------- encoding/type --------------------
 
     public CharsetHolder getCharsetHolder() {
-        if (charsetHolder.getName() == null) {
+        if (charsetHolder == null) {
             charsetHolder = CharsetHolder.getInstance(getCharsetFromContentType(getContentType()));
         }
         return charsetHolder;
@@ -397,7 +397,11 @@ public final class Request {
 
 
     public void setCharsetHolder(CharsetHolder charsetHolder) {
-        this.charsetHolder = charsetHolder;
+        if (charsetHolder == null || charsetHolder.getName() == null) {
+            this.charsetHolder = null;
+        } else {
+            this.charsetHolder = charsetHolder;
+        }
     }
 
 
@@ -724,7 +728,7 @@ public final class Request {
 
         contentLength = -1;
         contentTypeMB = null;
-        charsetHolder = CharsetHolder.EMPTY;
+        charsetHolder = null;
         expectation = false;
         headers.recycle();
         trailerFields.recycle();
