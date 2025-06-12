@@ -111,6 +111,10 @@
         Ensure application configured welcome files override the defaults when
         configuring an embedded web application programmatically. (markt)
       </fix>
+      <update>
+        Optimize <code>Request#getCharsetHolder</code> to avoid repeated parsing
+        when charset is null. Patch provided by morning-gu. (schultz)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Web applications">
