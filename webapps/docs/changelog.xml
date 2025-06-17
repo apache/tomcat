@@ -170,6 +170,11 @@
         Ensure application configured welcome files override the defaults when
         configuring an embedded web application programmatically. (markt)
       </fix>
+      <fix>
+        Allow the default servlet to set the content length when the content
+        length is known, no content has been written and a <code>Writer</code>
+        is being used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
