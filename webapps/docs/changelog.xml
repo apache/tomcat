@@ -122,6 +122,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>69713</bug>: Correctly handle an HTTP/2 data frame that includes
+        padding when the headers include a content-length. (remm/markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
