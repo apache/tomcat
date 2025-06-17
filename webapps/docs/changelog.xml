@@ -193,6 +193,10 @@
         Remove NIO2 connector. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69713</bug>: Correctly handle an HTTP/2 data frame that includes
+        padding when the headers include a content-length. (remm/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

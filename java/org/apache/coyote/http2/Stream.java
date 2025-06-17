@@ -670,8 +670,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     @Override
-    final void receivedData(int payloadSize) throws Http2Exception {
-        contentLengthReceived += payloadSize;
+    final void receivedData(int dataLength) throws Http2Exception {
+        contentLengthReceived += dataLength;
         long contentLengthHeader = coyoteRequest.getContentLengthLong();
         if (contentLengthHeader > -1 && contentLengthReceived > contentLengthHeader) {
             throw new ConnectionException(
