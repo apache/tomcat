@@ -47,8 +47,8 @@ class RecycledStream extends AbstractNonZeroStream {
 
 
     @Override
-    void receivedData(int payloadSize) throws ConnectionException {
-        remainingFlowControlWindow -= payloadSize;
+    void receivedData(int dataLength) throws ConnectionException {
+        remainingFlowControlWindow -= dataLength;
     }
 
 

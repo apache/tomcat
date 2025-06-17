@@ -1523,7 +1523,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
 
     @Override
-    public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) throws Http2Exception {
+    public ByteBuffer startRequestBodyFrame(int streamId, int dataLength, boolean endOfStream) throws Http2Exception {
         // DATA frames reduce the overhead count ...
         reduceOverheadCount(FrameType.DATA);
 
@@ -1537,8 +1537,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         // average over two frames to avoid false positives.
         if (!endOfStream) {
             int overheadThreshold = protocol.getOverheadDataThreshold();
-            int average = (lastNonFinalDataPayload >> 1) + (payloadSize >> 1);
-            lastNonFinalDataPayload = payloadSize;
+            int average = (lastNonFinalDataPayload >> 1) + (dataLength >> 1);
+            lastNonFinalDataPayload = dataLength;
             // Avoid division by zero
             if (average == 0) {
                 average = 1;
@@ -1550,7 +1550,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
         AbstractNonZeroStream abstractNonZeroStream = getAbstractNonZeroStream(streamId, true);
         abstractNonZeroStream.checkState(FrameType.DATA);
-        abstractNonZeroStream.receivedData(payloadSize);
+        abstractNonZeroStream.receivedData(dataLength);
         ByteBuffer result = abstractNonZeroStream.getInputByteBuffer(true);
 
         if (log.isTraceEnabled()) {
