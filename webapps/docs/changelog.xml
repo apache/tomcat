@@ -115,6 +115,11 @@
         Optimize <code>Request#getCharsetHolder</code> to avoid repeated parsing
         when charset is null. Patch provided by morning-gu. (schultz)
       </update>
+      <fix>
+        Allow the default servlet to set the content length when the content
+        length is known, no content has been written and a <code>Writer</code>
+        is being used. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
