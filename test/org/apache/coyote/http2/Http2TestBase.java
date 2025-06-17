@@ -1089,14 +1089,14 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) {
+        public ByteBuffer startRequestBodyFrame(int streamId, int dataLength, boolean endOfStream) {
             lastStreamId = Integer.toString(streamId);
-            bytesRead += payloadSize;
+            bytesRead += dataLength;
             if (traceBody) {
-                bodyBuffer = ByteBuffer.allocate(payloadSize);
+                bodyBuffer = ByteBuffer.allocate(dataLength);
                 return bodyBuffer;
             } else {
-                trace.append(lastStreamId + "-Body-" + payloadSize + "\n");
+                trace.append(lastStreamId + "-Body-" + dataLength + "\n");
                 return null;
             }
         }

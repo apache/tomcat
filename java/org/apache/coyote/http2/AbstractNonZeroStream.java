@@ -85,9 +85,9 @@ abstract class AbstractNonZeroStream extends AbstractStream {
     /**
      * Notify that some data has been received.
      *
-     * @param payloadSize the byte count
+     * @param dataLength the byte count
      *
      * @throws Http2Exception if an error is detected
      */
-    abstract void receivedData(int payloadSize) throws Http2Exception;
+    abstract void receivedData(int dataLength) throws Http2Exception;
 }
