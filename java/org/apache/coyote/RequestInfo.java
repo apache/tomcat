@@ -261,4 +261,23 @@ public class RequestInfo {
     public void setLastRequestProcessingTime(long lastRequestProcessingTime) {
         this.lastRequestProcessingTime = lastRequestProcessingTime;
     }
+
+    public void recycle() {
+        this.bytesSent = 0;
+        this.bytesReceived = 0;
+
+        // Total time = divide by requestCount to get average.
+        this.processingTime = 0;
+        // The longest response time for a request
+        this.maxTime = 0;
+        // URI of the request that took maxTime
+        this.maxRequestUri = null;
+
+        this.requestCount = 0;
+        // number of response codes >= 400
+        this.errorCount = 0;
+
+        // the time of the last request
+        this.lastRequestProcessingTime = 0;
+    }
 }
