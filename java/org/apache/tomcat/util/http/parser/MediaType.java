@@ -17,7 +17,7 @@
 package org.apache.tomcat.util.http.parser;
 
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.Reader;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -124,7 +124,7 @@ public class MediaType {
      *
      * @throws IOException if there was a problem reading the input
      */
-    public static MediaType parseMediaType(StringReader input) throws IOException {
+    public static MediaType parseMediaType(Reader input) throws IOException {
 
         // Type (required)
         String type = HttpParser.readToken(input);
@@ -151,9 +151,11 @@ public class MediaType {
         while (lookForSemiColon == SkipResult.FOUND) {
             String attribute = HttpParser.readToken(input);
 
-            String value = "";
+            String value;
             if (HttpParser.skipConstant(input, "=") == SkipResult.FOUND) {
                 value = HttpParser.readTokenOrQuotedString(input, true);
+            } else {
+                value = "";
             }
 
             if (attribute != null) {
