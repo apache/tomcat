@@ -147,8 +147,14 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                     state = SocketState.CLOSED;
                 } finally {
                     if (state == SocketState.CLOSED) {
-                        stream.recycle();
+                        /*
+                         * Recycle this processor before the stream is recycled as recycling the stream will add the
+                         * request and the response to the pool for re-use (if re-use is enabled) and the request
+                         * statistics updating in StreamProcessor.recycle() needs to happen before the request and
+                         * response are added to the pool to avoid concurrency issues corrupting the statistics.
+                         */
                         recycle();
+                        stream.recycle();
                     }
                 }
             } finally {
@@ -432,6 +438,12 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         if (global != null) {
             global.removeRequestProcessor(request.getRequestProcessor());
         }
+
+        /*
+         * Clear the statistics ready for re-use of the request. If we don't clear the statistics, the statistics for
+         * the current request will be included in the statistics for all future requests.
+         */
+        request.getRequestProcessor().recycleStatistcs();
 
         // Clear fields that can be cleared to aid GC and trigger NPEs if this
         // is reused
