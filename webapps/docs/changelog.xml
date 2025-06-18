@@ -197,6 +197,11 @@
         <bug>69713</bug>: Correctly handle an HTTP/2 data frame that includes
         padding when the headers include a content-length. (remm/markt)
       </fix>
+      <fix>
+        Correctly collect statistics for HTTP/2 requests and avoid counting one
+        request multiple times. Based on pull request <pr>868</pr> by
+        qingdaoheze. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
