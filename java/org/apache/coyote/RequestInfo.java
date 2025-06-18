@@ -261,4 +261,18 @@ public class RequestInfo {
     public void setLastRequestProcessingTime(long lastRequestProcessingTime) {
         this.lastRequestProcessingTime = lastRequestProcessingTime;
     }
+
+    public void recycleStatistcs() {
+        this.bytesSent = 0;
+        this.bytesReceived = 0;
+
+        this.processingTime = 0;
+        this.maxTime = 0;
+        this.maxRequestUri = null;
+
+        this.requestCount = 0;
+        this.errorCount = 0;
+
+        this.lastRequestProcessingTime = 0;
+    }
 }
