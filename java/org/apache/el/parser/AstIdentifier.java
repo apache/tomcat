@@ -79,8 +79,8 @@ public final class AstIdentifier extends SimpleNode {
         ctx.setPropertyResolved(false);
         Object result;
         /*
-         * Putting the Boolean into the ELContext is part of a performance optimisation for ImportELResolver.
-         * When looking up "foo", the resolver can't differentiate between ${ foo } and ${ foo.bar }. This is important
+         * Putting the Boolean into the ELContext is part of a performance optimisation for ImportELResolver. When
+         * looking up "foo", the resolver can't differentiate between ${ foo } and ${ foo.bar }. This is important
          * because the expensive class lookup only needs to be performed in the later case. This flag tells the resolver
          * if the lookup can be skipped.
          */
