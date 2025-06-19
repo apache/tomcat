@@ -148,7 +148,7 @@ void LambdaExpressionOrInvocation() #LambdaExpression : {}
 
 /*
  * Ternary
- * For '?:' '? :', then Or
+ * For '??' '?:' '? :', then Or
  */
 void Ternary() : {}
 {
