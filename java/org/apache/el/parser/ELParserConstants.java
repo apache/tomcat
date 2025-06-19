@@ -116,13 +116,11 @@ public interface ELParserConstants {
     /** RegularExpression Id. */
     int FUNCTIONSUFFIX = 57;
     /** RegularExpression Id. */
-    int IMPL_OBJ_START = 58;
+    int JAVALETTER = 58;
     /** RegularExpression Id. */
-    int JAVALETTER = 59;
+    int JAVADIGIT = 59;
     /** RegularExpression Id. */
-    int JAVADIGIT = 60;
-    /** RegularExpression Id. */
-    int ILLEGAL_CHARACTER = 61;
+    int ILLEGAL_CHARACTER = 60;
 
     /** Lexical state. */
     int DEFAULT = 0;
@@ -138,7 +136,7 @@ public interface ELParserConstants {
             "\":\"", "\";\"", "\",\"", "\">\"", "\"gt\"", "\"<\"", "\"lt\"", "\">=\"", "\"ge\"", "\"<=\"", "\"le\"",
             "\"==\"", "\"eq\"", "\"!=\"", "\"ne\"", "\"!\"", "\"not\"", "\"&&\"", "\"and\"", "\"||\"", "\"or\"",
             "\"empty\"", "\"instanceof\"", "\"*\"", "\"+\"", "\"-\"", "\"?\"", "\"/\"", "\"div\"", "\"%\"", "\"mod\"",
-            "\"+=\"", "\"=\"", "\"->\"", "<IDENTIFIER>", "<FUNCTIONSUFFIX>", "\"#\"", "<JAVALETTER>", "<JAVADIGIT>",
+            "\"+=\"", "\"=\"", "\"->\"", "<IDENTIFIER>", "<FUNCTIONSUFFIX>", "<JAVALETTER>", "<JAVADIGIT>",
             "<ILLEGAL_CHARACTER>", };
 
 }
