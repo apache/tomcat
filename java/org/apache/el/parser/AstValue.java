@@ -264,8 +264,8 @@ public final class AstValue extends SimpleNode {
 
         int paramCount = types.length;
 
-        if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount > src.length) || !m.isVarArgs() &&
-            (src == null || src.length != paramCount)) {
+        if (m.isVarArgs() && paramCount > 1 && (src == null || paramCount > src.length) ||
+                !m.isVarArgs() && (src == null || src.length != paramCount)) {
             String srcCount = null;
             if (src != null) {
                 srcCount = Integer.toString(src.length);
