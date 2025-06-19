@@ -70,6 +70,13 @@ public abstract class FileUploadBase {
     public static final String CONTENT_DISPOSITION = "Content-disposition";
 
     /**
+     * HTTP content transfer encoding header name.
+     * @deprecated per rfc7578 Section 4.7
+     */
+    @Deprecated
+    public static final String CONTENT_TRANSFER_ENCODING="Content-Transfer-Encoding";
+
+    /**
      * HTTP content length header name.
      */
     public static final String CONTENT_LENGTH = "Content-length";
@@ -418,9 +425,11 @@ public abstract class FileUploadBase {
     }
 
     /**
-     * Reads the next header line.
+     * Reads the next header line. Per <a href="https://www.ietf.org/rfc/rfc7578.txt">RFC 7578</a>, only listed part
+     * header fields are supported, others MUST be ignored.
+     *
      * @param headers String with all headers.
-     * @param header Map where to store the current header.
+     * @param header  Map where to store the current header.
      */
     private void parseHeaderLine(final FileItemHeadersImpl headers, final String header) {
         final int colonOffset = header.indexOf(':');
@@ -430,7 +439,13 @@ public abstract class FileUploadBase {
         }
         final String headerName = header.substring(0, colonOffset).trim();
         final String headerValue = header.substring(colonOffset + 1).trim();
-        headers.addHeader(headerName, headerValue);
+        // see rfc7578 section 4.8
+        if (CONTENT_DISPOSITION.equalsIgnoreCase(headerName) || CONTENT_TYPE.equalsIgnoreCase(headerName) ||
+                CONTENT_TRANSFER_ENCODING.equalsIgnoreCase(headerName)) {
+            // Only listed part header fields are supported
+            // Other header fields MUST be ignored.
+            headers.addHeader(headerName, headerValue);
+        }
     }
 
     /**
