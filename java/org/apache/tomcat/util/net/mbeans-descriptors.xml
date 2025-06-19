@@ -162,6 +162,9 @@
     <attribute   name="useSendfile"
                  type="boolean"/>
 
+    <attribute   name="useVirtualThreads"
+                 type="boolean"/>
+
     <operation       name="addNegotiatedProtocol"
                returnType="void">
       <parameter name="param0"

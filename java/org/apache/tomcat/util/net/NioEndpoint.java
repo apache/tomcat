@@ -660,7 +660,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
         }
 
         public int getKeyCount() {
-            return keyCount;
+            return selector.keys().size();
         }
 
         public Selector getSelector() {
