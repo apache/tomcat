@@ -227,6 +227,10 @@
         <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <scode>
+        Remove <code>IMPL_OBJ_START</code> from EL grammar for
+        <code>IDENTIFIER</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Cluster">
