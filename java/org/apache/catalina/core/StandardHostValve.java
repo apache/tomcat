@@ -276,7 +276,7 @@ final class StandardHostValve extends ValveBase {
              * the status to 500 if an error status has not already been set and check for custom error-page for the
              * status.
              */
-            if (response.getStatus() < HttpServletResponse.SC_BAD_REQUEST) {
+            if (response.getStatus() < HttpServletResponse.SC_BAD_REQUEST && !response.isCommitted()) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             }
             // The response is an error
