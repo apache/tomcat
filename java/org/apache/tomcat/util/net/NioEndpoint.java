@@ -634,7 +634,7 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
         }
 
         public int getKeyCount() {
-            return keyCount;
+            return selector.keys().size();
         }
 
         public Selector getSelector() {

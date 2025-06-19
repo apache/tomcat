@@ -202,6 +202,10 @@
         request multiple times. Based on pull request <pr>868</pr> by
         qingdaoheze. (markt)
       </fix>
+      <fix>
+        Fix JMX value for <code>keepAliveCount</code> on the endpoint. Also add
+        the value of <code>useVirtualThreads</code> in JMX. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
