@@ -542,7 +542,6 @@ java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
 |    < OR0 : "||" >
 |    < OR1 : "or" >
 |    < EMPTY : "empty" >
-|    < INSTANCEOF : "instanceof" >
 |    < MULT : "*" >
 |    < PLUS : "+" >
 |    < MINUS : "-" >
@@ -555,7 +554,6 @@ java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
 |    < ASSIGN : "=" >
 |    < ARROW : "->" >
 |    < IDENTIFIER : <JAVALETTER> (<JAVALETTER>|<JAVADIGIT>)* >
-|    < FUNCTIONSUFFIX : (<IDENTIFIER>) >
 |    < #JAVALETTER:
         [
         "\u0024",

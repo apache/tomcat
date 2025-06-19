@@ -235,6 +235,10 @@
         Remove <code>IMPL_OBJ_START</code> from EL grammar for
         <code>IDENTIFIER</code>. (markt)
       </scode>
+      <scode>
+        Remove the <code>INSTANCEOF</code> and <code>FUNCTIONSUFFIX</code>
+        definitions from the EL grammar as both are unused. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Cluster">
