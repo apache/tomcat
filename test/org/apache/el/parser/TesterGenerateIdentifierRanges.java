@@ -59,11 +59,11 @@ public class TesterGenerateIdentifierRanges {
 
 
     /*
-     * Java Digit is all characters where Character.isJavaIdentifierPart(0 returns true that aren't included in Java
+     * Java Digit is all characters where Character.isJavaIdentifierPart() returns true that aren't included in Java
      * Letter.
      */
     @Test
-    public void testJavaDigitRanges() {
+    public void testGenerateJavaDigitRanges() {
         int start = 0;
         int end = 0;
         boolean inRange = false;
