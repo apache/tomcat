@@ -2473,7 +2473,8 @@ public class ELParserTokenManager implements ELParserConstants {
         Token matchedToken;
         int curPos = 0;
 
-        EOFLoop: for (;;) {
+        EOFLoop:
+        for (;;) {
             try {
                 curChar = input_stream.BeginToken();
             } catch (Exception e) {
