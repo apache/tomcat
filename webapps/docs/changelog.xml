@@ -131,6 +131,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <scode>
+        Remove <code>IMPL_OBJ_START</code> from EL grammar for
+        <code>IDENTIFIER</code>. (markt)
+      </scode>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <add>
