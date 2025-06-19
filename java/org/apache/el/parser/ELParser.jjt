@@ -547,9 +547,8 @@ java.util.Deque<Integer> deque = new java.util.ArrayDeque<Integer>();
 |    < CONCAT : "+=" >
 |    < ASSIGN : "=" >
 |    < ARROW : "->" >
-|    < IDENTIFIER : (<JAVALETTER>|<IMPL_OBJ_START>) (<JAVALETTER>|<JAVADIGIT>)* >
+|    < IDENTIFIER : <JAVALETTER> (<JAVALETTER>|<JAVADIGIT>)* >
 |    < FUNCTIONSUFFIX : (<IDENTIFIER>) >
-|    < #IMPL_OBJ_START: "#" >
 |    < #JAVALETTER:
         [
         "\u0024",

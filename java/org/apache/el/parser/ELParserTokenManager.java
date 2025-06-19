@@ -901,7 +901,7 @@ public class ELParserTokenManager implements ELParserConstants {
                                 {
                                     jjCheckNAddStates(18, 22);
                                 }
-                            } else if ((0x1800000000L & l) != 0L) {
+                            } else if (curChar == 36) {
                                 if (kind > 56) {
                                     kind = 56;
                                 }
@@ -1080,7 +1080,7 @@ public class ELParserTokenManager implements ELParserConstants {
                         }
                             break;
                         case 27:
-                            if ((0x1800000000L & l) == 0L) {
+                            if (curChar != 36) {
                                 break;
                             }
                             if (kind > 56) {
@@ -1786,7 +1786,7 @@ public class ELParserTokenManager implements ELParserConstants {
                                 {
                                     jjCheckNAddStates(18, 22);
                                 }
-                            } else if ((0x1800000000L & l) != 0L) {
+                            } else if (curChar == 36) {
                                 if (kind > 56) {
                                     kind = 56;
                                 }
@@ -1965,7 +1965,7 @@ public class ELParserTokenManager implements ELParserConstants {
                         }
                             break;
                         case 27:
-                            if ((0x1800000000L & l) == 0L) {
+                            if (curChar != 36) {
                                 break;
                             }
                             if (kind > 56) {
@@ -2198,7 +2198,7 @@ public class ELParserTokenManager implements ELParserConstants {
             "\147\145", "\74\75", "\154\145", "\75\75", "\145\161", "\41\75", "\156\145", "\41", "\156\157\164",
             "\46\46", "\141\156\144", "\174\174", "\157\162", "\145\155\160\164\171",
             "\151\156\163\164\141\156\143\145\157\146", "\52", "\53", "\55", "\77", "\57", "\144\151\166", "\45",
-            "\155\157\144", "\53\75", "\75", "\55\76", null, null, null, null, null, null, };
+            "\155\157\144", "\53\75", "\75", "\55\76", null, null, null, null, null, };
 
     protected Token jjFillToken() {
         final Token t;
@@ -2505,8 +2505,8 @@ public class ELParserTokenManager implements ELParserConstants {
                     jjmatchedKind = 0x7fffffff;
                     jjmatchedPos = 0;
                     curPos = jjMoveStringLiteralDfa0_1();
-                    if (jjmatchedPos == 0 && jjmatchedKind > 61) {
-                        jjmatchedKind = 61;
+                    if (jjmatchedPos == 0 && jjmatchedKind > 60) {
+                        jjmatchedKind = 60;
                     }
                     break;
                 case 2:
@@ -2521,8 +2521,8 @@ public class ELParserTokenManager implements ELParserConstants {
                     jjmatchedKind = 0x7fffffff;
                     jjmatchedPos = 0;
                     curPos = jjMoveStringLiteralDfa0_2();
-                    if (jjmatchedPos == 0 && jjmatchedKind > 61) {
-                        jjmatchedKind = 61;
+                    if (jjmatchedPos == 0 && jjmatchedKind > 60) {
+                        jjmatchedKind = 60;
                     }
                     break;
             }
@@ -2696,8 +2696,8 @@ public class ELParserTokenManager implements ELParserConstants {
     /** Lex State array. */
     public static final int[] jjnewLexState = { -1, -1, 1, 1, -1, -1, -1, -1, 2, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, };
-    static final long[] jjtoToken = { 0x23ffffffffffef0fL, };
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, };
+    static final long[] jjtoToken = { 0x13ffffffffffef0fL, };
     static final long[] jjtoSkip = { 0xf0L, };
     static final long[] jjtoSpecial = { 0x0L, };
     static final long[] jjtoMore = { 0x0L, };
