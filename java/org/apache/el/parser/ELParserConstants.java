@@ -88,39 +88,35 @@ public interface ELParserConstants {
     /** RegularExpression Id. */
     int EMPTY = 43;
     /** RegularExpression Id. */
-    int INSTANCEOF = 44;
+    int MULT = 44;
     /** RegularExpression Id. */
-    int MULT = 45;
+    int PLUS = 45;
     /** RegularExpression Id. */
-    int PLUS = 46;
+    int MINUS = 46;
     /** RegularExpression Id. */
-    int MINUS = 47;
+    int QUESTIONMARK = 47;
     /** RegularExpression Id. */
-    int QUESTIONMARK = 48;
+    int DIV0 = 48;
     /** RegularExpression Id. */
-    int DIV0 = 49;
+    int DIV1 = 49;
     /** RegularExpression Id. */
-    int DIV1 = 50;
+    int MOD0 = 50;
     /** RegularExpression Id. */
-    int MOD0 = 51;
+    int MOD1 = 51;
     /** RegularExpression Id. */
-    int MOD1 = 52;
+    int CONCAT = 52;
     /** RegularExpression Id. */
-    int CONCAT = 53;
+    int ASSIGN = 53;
     /** RegularExpression Id. */
-    int ASSIGN = 54;
+    int ARROW = 54;
     /** RegularExpression Id. */
-    int ARROW = 55;
+    int IDENTIFIER = 55;
     /** RegularExpression Id. */
-    int IDENTIFIER = 56;
+    int JAVALETTER = 56;
     /** RegularExpression Id. */
-    int FUNCTIONSUFFIX = 57;
+    int JAVADIGIT = 57;
     /** RegularExpression Id. */
-    int JAVALETTER = 58;
-    /** RegularExpression Id. */
-    int JAVADIGIT = 59;
-    /** RegularExpression Id. */
-    int ILLEGAL_CHARACTER = 60;
+    int ILLEGAL_CHARACTER = 58;
 
     /** Lexical state. */
     int DEFAULT = 0;
@@ -135,8 +131,7 @@ public interface ELParserConstants {
             "<STRING_LITERAL>", "\"true\"", "\"false\"", "\"null\"", "\".\"", "\"(\"", "\")\"", "\"[\"", "\"]\"",
             "\":\"", "\";\"", "\",\"", "\">\"", "\"gt\"", "\"<\"", "\"lt\"", "\">=\"", "\"ge\"", "\"<=\"", "\"le\"",
             "\"==\"", "\"eq\"", "\"!=\"", "\"ne\"", "\"!\"", "\"not\"", "\"&&\"", "\"and\"", "\"||\"", "\"or\"",
-            "\"empty\"", "\"instanceof\"", "\"*\"", "\"+\"", "\"-\"", "\"?\"", "\"/\"", "\"div\"", "\"%\"", "\"mod\"",
-            "\"+=\"", "\"=\"", "\"->\"", "<IDENTIFIER>", "<FUNCTIONSUFFIX>", "<JAVALETTER>", "<JAVADIGIT>",
-            "<ILLEGAL_CHARACTER>", };
+            "\"empty\"", "\"*\"", "\"+\"", "\"-\"", "\"?\"", "\"/\"", "\"div\"", "\"%\"", "\"mod\"", "\"+=\"", "\"=\"",
+            "\"->\"", "<IDENTIFIER>", "<JAVALETTER>", "<JAVADIGIT>", "<ILLEGAL_CHARACTER>", };
 
 }
