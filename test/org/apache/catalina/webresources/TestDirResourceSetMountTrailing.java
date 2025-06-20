@@ -30,7 +30,7 @@ import org.apache.catalina.WebResourceSet;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.TomcatBaseTest;
 
-public class TestDirResourceSetMount extends AbstractTestResourceSetMount {
+public class TestDirResourceSetMountTrailing extends AbstractTestResourceSetMountTrailing {
 
     private static Path tempDir;
     private static File dir1;

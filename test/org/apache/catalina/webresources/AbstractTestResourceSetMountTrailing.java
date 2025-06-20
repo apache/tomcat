@@ -25,12 +25,12 @@ import org.junit.Test;
 
 import org.apache.catalina.WebResource;
 
-public abstract class AbstractTestResourceSetMount
+public abstract class AbstractTestResourceSetMountTrailing
         extends AbstractTestResourceSet {
 
     @Override
     public final String getMount() {
-        return "/mount";
+        return "/mount/";
     }
 
     @Override
@@ -50,7 +50,7 @@ public abstract class AbstractTestResourceSetMount
 
         Assert.assertNotNull(results);
         Assert.assertEquals(1, results.length);
-        Assert.assertEquals(getMount().substring(1), results[0]);
+        Assert.assertEquals(getMountPath().substring(1), results[0]);
     }
 
     @Test
@@ -59,7 +59,7 @@ public abstract class AbstractTestResourceSetMount
 
         Assert.assertNotNull(results);
         Assert.assertEquals(1, results.size());
-        Assert.assertTrue(results.contains(getMount() + "/"));
+        Assert.assertTrue(results.contains(getMountPath() + "/"));
     }
 
     @Test
