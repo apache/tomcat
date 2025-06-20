@@ -175,6 +175,12 @@
         length is known, no content has been written and a <code>Writer</code>
         is being used. (markt)
       </fix>
+      <fix>
+        <bug>69717</bug>: Correct a regression in the fix for CVE-2025-49125
+        that prevented access to PreResources and PostResources when mounted
+        below the web application root with a path that was terminated with a
+        file separator. (remm/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -205,10 +211,6 @@
       <fix>
         Fix JMX value for <code>keepAliveCount</code> on the endpoint. Also add
         the value of <code>useVirtualThreads</code> in JMX. (remm)
-      </fix>
-      <fix>
-        <bug>69717</bug>: Allow trailing slash for <code>webAppMount</code>
-        path in <code>Resources</code>, for compatibility reasons. (remm)
       </fix>
     </changelog>
   </subsection>
