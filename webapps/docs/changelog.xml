@@ -206,6 +206,10 @@
         Fix JMX value for <code>keepAliveCount</code> on the endpoint. Also add
         the value of <code>useVirtualThreads</code> in JMX. (remm)
       </fix>
+      <fix>
+        <bug>69717</bug>: Allow trailing slash for <code>webAppMount</code>
+        path in <code>Resources</code>, for compatibility reasons. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

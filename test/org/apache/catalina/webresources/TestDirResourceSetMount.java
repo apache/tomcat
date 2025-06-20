@@ -52,7 +52,7 @@ public class TestDirResourceSetMount extends AbstractTestResourceSetMount {
     public WebResourceRoot getWebResourceRoot() {
         TesterWebResourceRoot root = new TesterWebResourceRoot();
         WebResourceSet webResourceSet =
-                new DirResourceSet(new TesterWebResourceRoot(), getMount(),
+                new DirResourceSet(new TesterWebResourceRoot(), getMount() + "/",
                         getBaseDir().getAbsolutePath(), "/");
         root.setMainResources(webResourceSet);
         return root;
