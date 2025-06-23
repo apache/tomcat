@@ -263,6 +263,12 @@
         <code>getUserX509CertificateChain()</code> that provides the client
         certificate chain, if present, during the WebSocket handshake. (markt)
       </add>
+      <fix>
+        Implement the clarification in WebSocket 2.3 that the method
+        <code>ClientEndpointConfig.Configurator.afterResponse()</code> must be
+        called after every WebSocket handshake regardless of whether the
+        handshake is successful or not. (markt)
+      </fix>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>

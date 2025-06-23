@@ -80,6 +80,8 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
     private static final byte[] ROOT_URI_BYTES = "/".getBytes(StandardCharsets.ISO_8859_1);
     private static final byte[] HTTP_VERSION_BYTES = " HTTP/1.1\r\n".getBytes(StandardCharsets.ISO_8859_1);
 
+    private static final HandshakeResponse EMPTY_HANDSHAKE_RESPONSE = new WsHandshakeResponse();
+
     private volatile AsynchronousChannelGroup asynchronousChannelGroup = null;
     private final Object asynchronousChannelGroupLock = new Object();
 
@@ -275,6 +277,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         Transformation transformation = null;
         AsyncChannelWrapper channel = null;
 
+        HandshakeResponse handshakeResponse = EMPTY_HANDSHAKE_RESPONSE;
         try {
             // Open the connection
             Future<Void> fConnect = socketChannel.connect(sa);
@@ -375,8 +378,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                             sm.getString("wsWebSocketContainer.invalidStatus", Integer.toString(httpResponse.status)));
                 }
             }
-            HandshakeResponse handshakeResponse = httpResponse.handshakeResponse();
-            clientEndpointConfiguration.getConfigurator().afterResponse(handshakeResponse);
+            handshakeResponse = httpResponse.handshakeResponse();
 
             // Sub-protocol
             List<String> protocolHeaders = handshakeResponse.getHeaders().get(Constants.WS_PROTOCOL_HEADER_NAME);
@@ -419,6 +421,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
                 | URISyntaxException | AuthenticationException e) {
             throw new DeploymentException(sm.getString("wsWebSocketContainer.httpRequestFailed", path), e);
         } finally {
+            clientEndpointConfiguration.getConfigurator().afterResponse(handshakeResponse);
             if (!success) {
                 if (channel != null) {
                     channel.close();
