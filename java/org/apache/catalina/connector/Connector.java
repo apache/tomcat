@@ -210,7 +210,7 @@ public class Connector extends LifecycleMBeanBase {
      */
     protected int maxParameterCount = 1000;
 
-    private int maxPartCount = 10;
+    private int maxPartCount = 50;
 
     private int maxPartHeaderSize = 512;
 
