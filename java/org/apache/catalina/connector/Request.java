@@ -2536,6 +2536,10 @@ public class Request implements HttpServletRequest {
         parseParts(true);
 
         if (partsParseException != null) {
+            Context context = getContext();
+            if (context != null && context.getLogger().isDebugEnabled()) {
+                context.getLogger().debug(sm.getString("coyoteRequest.partsParseException", partsParseException.getMessage()));
+            }
             if (partsParseException instanceof IOException) {
                 throw (IOException) partsParseException;
             } else if (partsParseException instanceof IllegalStateException) {
