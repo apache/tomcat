@@ -190,7 +190,15 @@
       content type is <code>multipart/form-data</code>. This limit is in
       addition to <code>maxParameterCount</code>. Requests that exceed this
       limit will be rejected. A value of less than 0 means no limit. If not
-      specified, a default of 10 is used.</p>
+      specified, a default of 50 is used.</p>
+      <p>The nature of multipart requests and the associated Servlet API
+      requirements for processing them is such that they can place a significant
+      demand on memory. Applications utilising multipart requests need to ensure
+      sufficient memory is available to avoid a potential denial of service. As
+      a guide, the memory required is <code>maxPartHeaderSize</code> x
+      <code>maxPartCount</code> x <code>maxConnections</code> x 2 (due to the
+      implementation). For the defaults that is <code>512 x 50 x 8192 x 2</code>
+      which is 400MB.</p>
     </attribute>
 
     <attribute name="maxPartHeaderSize" required="false">
