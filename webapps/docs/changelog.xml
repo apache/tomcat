@@ -168,6 +168,13 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update UnboundID to 7.0.3. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.42 (schultz)" rtext="2025-06-09">
   <subsection name="Catalina">
