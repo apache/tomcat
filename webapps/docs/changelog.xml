@@ -300,6 +300,9 @@
       <update>
         Update UnboundID to 7.0.3. (markt)
       </update>
+      <update>
+        Update Checkstyle to 10.25.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
