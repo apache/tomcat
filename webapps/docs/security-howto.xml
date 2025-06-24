@@ -292,10 +292,19 @@
       non-default value when behind a reverse proxy may enable an attacker to
       bypass any security constraints enforced by the proxy.</p>
 
+      <p>The <strong>maxPartCount</strong> attribute controls the maximum number
+      of parts supported for a multipart request. This is limited to 50 by
+      default to reduce exposure to a DoS attack. The documentation for
+      <strong>maxPartCount</strong> provides more details on the memory
+      requirements for processing multipart requests. Excessive parts mmay be
+      ignored depending on how the application processes the request. If you
+      want to always reject such requests, configure a
+      <a href="config/filter.html">FailedRequestFilter</a>.</p>
+
       <p>The <strong>maxPostSize</strong> attribute controls the maximum size
       of a POST request that will be parsed for parameters. The parameters are
       cached for the duration of the request so this is limited to 2 MiB by
-      default to reduce exposure to a DOS attack.</p>
+      default to reduce exposure to a DoS attack.</p>
 
       <p>The <strong>maxSavePostSize</strong> attribute controls the saving of
       the request body during FORM and CLIENT-CERT authentication and HTTP/1.1

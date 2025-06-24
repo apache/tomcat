@@ -168,7 +168,7 @@
       <code>application/x-www-form-urlencoded</code> or
       <code>multipart/form-data</code>. Request parameters beyond this limit
       will be ignored. A value of less than 0 means no limit. If not specified,
-      a default of 10000 is used. Note that <code>FailedRequestFilter</code>
+      a default of 10000 is used. The <code>FailedRequestFilter</code>
       <a href="filter.html">filter</a> can be used to reject requests that
       exceed the limit.</p>
     </attribute>
@@ -176,9 +176,12 @@
     <attribute name="maxPartCount" required="false">
       <p>The maximum total number of parts permitted in a request where the
       content type is <code>multipart/form-data</code>. This limit is in
-      addition to <code>maxParameterCount</code>. Requests that exceed this
-      limit will be rejected. A value of less than 0 means no limit. If not
-      specified, a default of 50 is used.</p>
+      addition to <code>maxParameterCount</code>. A value of less than 0 means
+      no limit. If not specified, a default of 50 is used. Requests that exceed
+      this limit may be ignored depending on how the application processes the
+      request. The <code>FailedRequestFilter</code>
+      <a href="filter.html">filter</a> can be used to always reject requests
+      that exceed the limit.</p>
       <p>The nature of multipart requests and the associated Servlet API
       requirements for processing them is such that they can place a significant
       demand on memory. Applications utilising multipart requests need to ensure
