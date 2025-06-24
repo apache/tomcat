@@ -2333,6 +2333,10 @@ public class Request implements HttpServletRequest {
         parseParts(true);
 
         if (partsParseException != null) {
+            Context context = getContext();
+            if (context != null && context.getLogger().isDebugEnabled()) {
+                context.getLogger().debug(sm.getString("coyoteRequest.partsParseException", partsParseException.getMessage()));
+            }
             switch (partsParseException) {
                 case IOException ioException -> throw ioException;
                 case IllegalStateException illegalStateException -> throw illegalStateException;
@@ -2707,6 +2711,10 @@ public class Request implements HttpServletRequest {
         doParseParameters();
 
         if (parametersParseException != null) {
+            Context context = getContext();
+            if (context != null && context.getLogger().isDebugEnabled()) {
+                context.getLogger().debug(sm.getString("coyoteRequest.parametersParseException", parametersParseException.getMessage()));
+            }
             throw parametersParseException;
         }
     }
