@@ -308,7 +308,7 @@
       of parts supported for a multipart request. This is limited to 50 by
       default to reduce exposure to a DoS attack. The documentation for
       <strong>maxPartCount</strong> provides more details on the memory
-      requirements for processing multipart requests. Excessive parts mmay be
+      requirements for processing multipart requests. Excessive parts may be
       ignored depending on how the application processes the request. If you
       want to always reject such requests, configure a
       <a href="config/filter.html">FailedRequestFilter</a>.</p>
