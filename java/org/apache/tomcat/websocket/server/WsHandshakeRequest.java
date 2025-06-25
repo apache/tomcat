@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -182,5 +183,40 @@ public class WsHandshakeRequest implements HandshakeRequest {
     @Override
     public X509Certificate[] getUserX509CertificateChain() {
         return (X509Certificate[]) request.getAttribute(Constants.CERTIFICATE_SERVLET_REQUEST_ATTRIBUTE);
+    }
+
+    @Override
+    public String getLocalAddress() {
+        return request.getLocalAddr();
+    }
+
+    @Override
+    public String getLocalHostName() {
+        return request.getLocalName();
+    }
+
+    @Override
+    public int getLocalPort() {
+        return request.getLocalPort();
+    }
+
+    @Override
+    public String getRemoteAddress() {
+        return request.getRemoteAddr();
+    }
+
+    @Override
+    public String getRemoteHostName() {
+        return request.getRemoteHost();
+    }
+
+    @Override
+    public int getRemotePort() {
+        return request.getRemotePort();
+    }
+
+    @Override
+    public Locale getPreferredLocale() {
+        return request.getLocale();
     }
 }

@@ -281,6 +281,11 @@
         called after every WebSocket handshake regardless of whether the
         handshake is successful or not. (markt)
       </fix>
+      <add>
+        Implement the new <code>HandshakeRequest</code> methods that expose the
+        client's preferred local and the local and remote host name, address and
+        port information. (markt) 
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
