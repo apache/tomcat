@@ -83,12 +83,6 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
     @Override
     protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
 
-        // HTTP/2 does not permit optional certificate authentication with any
-        // version of TLS.
-        if (sslHostConfig.getCertificateVerification().isOptional() && negotiableProtocols.contains("h2")) {
-            getLog().warn(sm.getString("sslHostConfig.certificateVerificationWithHttp2", sslHostConfig.getHostName()));
-        }
-
         boolean firstCertificate = true;
         for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
             SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
