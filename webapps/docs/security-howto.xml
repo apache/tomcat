@@ -594,6 +594,23 @@
     </ul>
   </section>
 
+  <section name="Reverse Proxies">
+    <p>All clients, including reverse proxies, are responsible for the
+    consequences of the data they present to Tomcat.</p>
+
+    <p>The servlet specification removes path parameters when normalizing
+    requests. HTTP servers do not normally do this. This creates the possibility
+    of a client using a <code>/..;a=b/</code> type sequence in a URI to bypass a
+    security constraint implemented in the reverse proxy. This possibility can
+    be avoided with appropriate configuration such as using the setting
+    <code>mapping=servlet</code> with httpd's mod_proxy.</p>
+
+    <p>If Tomcat is deployed behind a reverse proxy and that reverse proxy
+    implements one or more security constraints, it is recommended a defense in
+    depth approach is taken and Tomcat is secured as if the reverse proxy was
+    not in use.</p>
+  </section>
+
   <section name="General">
     <p>BASIC and FORM authentication pass user names and passwords in clear
     text. Web applications using these authentication mechanisms with clients
