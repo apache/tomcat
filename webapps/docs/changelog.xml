@@ -166,6 +166,10 @@
         considerations for enabling write access to the web application via
         WebDAV, HTTP PUT requests or similar. (markt)
       </add>
+      <add>
+        Documentation. Add a section on reverse proxies to the security
+        considerations page. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
