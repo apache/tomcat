@@ -148,6 +148,12 @@
       <fix>
         Improve stability of APR/native connector. (markt)
       </fix>
+      <fix>
+        <bug>69728</bug>: Remove incorrect warning when HTTP/2 is used with
+        optional certificate verification and improve the warnings when a web
+        application tries to use CLIENT-CERT with either HTTP/2 or a JSSE
+        implementation of TLS 1.3. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
