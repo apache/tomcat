@@ -1,0 +1,102 @@
+# -----------------------------------------------------------------------------
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# -----------------------------------------------------------------------------
+# https://jakarta.ee/specifications/servlet/6.1/jakarta-servlet-spec-6.1#example-uris
+# Index Encoded URI path Decoded Path Rejected
+0 foo/bar /foo/bar 400 must start with /
+1 /foo/bar /foo/bar
+2 /foo/bar;jsessionid=1234 /foo/bar
+3 /foo/bar/ /foo/bar/
+4 /foo/bar/;jsessionid=1234 /foo/bar/
+5 /foo;/bar; /foo/bar
+6 /foo;/bar;/; /foo/bar/
+7 /foo%00/bar/ /foo[NUL]/bar/ 400 control character
+8 /foo%7Fbar /foo[DEL]bar 400 control character
+9 /foo%2Fbar /foo%2Fbar 400 encoded /
+10 /foo%2Fb%25r /foo%2Fb%25r 400 encoded /
+11 /foo/b%25r /foo/b%r
+12 /foo\bar /foo\bar 400 backslash character
+13 /foo%5Cbar /foo\bar 400 backslash character
+14 /foo;%2F/bar /foo/bar 400 encoded /
+15 /foo/./bar /foo/bar
+16 /foo/././bar /foo/bar
+17 /./foo/bar /foo/bar
+18 /foo/%2e/bar /foo/bar 400 encoded dot segment
+19 /foo/.;/bar /foo/bar 400 dot segment with parameter
+20 /foo/%2e;/bar /foo/bar 400 encoded dot segment
+21 /foo/.%2Fbar /foo/.%2Fbar 400 encoded /
+22 /foo/.%5Cbar /foo/.\bar 400 backslash character
+23 /foo/bar/. /foo/bar
+24 /foo/bar/./ /foo/bar/
+25 /foo/bar/.; /foo/bar 400 dot segment with parameter
+26 /foo/bar/./; /foo/bar/
+27 /foo/.bar /foo/.bar
+28 /foo/../bar /bar
+29 /foo/../../bar /../bar 400 leading dot-dot-segment
+30 /../foo/bar /../foo/bar 400 leading dot-dot-segment
+31 /foo/%2e%2E/bar /bar 400 encoded dot segment
+32 /foo/%2e%2e/%2E%2E/bar /../bar 400 leading dot-dot-segment & encoded dot segment
+33 /foo/./../bar /bar
+34 /foo/..;/bar /bar 400 dot segment with parameter
+35 /foo/%2e%2E;/bar /bar 400 encoded dot segment
+36 /foo/..%2Fbar /foo/..%2Fbar 400 encoded /
+37 /foo/..%5Cbar /foo/..\bar 400 backslash character
+38 /foo/bar/.. /foo
+39 /foo/bar/../ /foo/
+40 /foo/bar/..; /foo 400 dot segment with parameter
+41 /foo/bar/../; /foo/
+42 /foo/..bar /foo/..bar
+43 /foo/.../bar /foo/.../bar
+44 /foo//bar /foo/bar
+45 //foo//bar// /foo/bar/
+46 /;/foo;/;/bar/;/; /foo/bar/ 400 empty segment with parameters
+47 /foo//../bar /bar
+48 /foo/;/../bar /bar 400 empty segment with parameters
+49 /foo%E2%82%ACbar /foo€bar
+50 /foo%20bar /foo bar
+51 /foo%E2%82 /foo%E2%82 400 decode error
+52 /foo%E2%82bar /foo%E2%82bar 400 decode error
+53 /foo%-1/bar /foo%-1/bar 400 decode error
+54 /foo%XX/bar /foo%XX/bar 400 decode error
+55 /foo%/bar /foo%/bar 400 decode error
+56 /foo/bar%0 /foo/bar%0 400 decode error
+57 /good%20/bad%/%20mix% /good /bad%/%20mix% 400 decode error
+58 /foo/bar?q /foo/bar
+59 /foo/bar#f /foo/bar 400 fragment
+60 /foo/bar?q#f /foo/bar 400 fragment
+61 /foo/bar/?q /foo/bar/
+62 /foo/bar/#f /foo/bar/ 400 fragment
+63 /foo/bar/?q#f /foo/bar/ 400 fragment
+64 /foo/bar;?q /foo/bar
+65 /foo/bar;#f /foo/bar 400 fragment
+66 /foo/bar;?q#f /foo/bar 400 fragment
+67 / /
+68 // /
+69 /;/ / 400 empty segment with parameters
+70 /. /
+71 /.. /.. 400 leading dot-dot-segment
+72 /./ /
+73 /../ /../ 400 leading dot-dot-segment
+74 foo/bar/ /foo/bar/ 400 must start with /
+75 ./foo/bar/ /foo/bar/ 400 must start with /
+76 %2e/foo/bar/ /foo/bar/ 400 must start with / & encoded dot segment
+77 ../foo/bar/ /../foo/bar/ 400 must start with / & leading dot-dot-segment
+78 .%2e/foo/bar/ /../foo/bar/ 400 must start with / & leading dot-dot-segment & encoded dot segment
+79 ;/foo/bar/ /foo/bar/ 400 must start with / & empty segment with parameters
+80 /#f / 400 fragment
+81 #f / 400 fragment & must start with /
+82 /?q /
+83 ?q / 400 must start with /

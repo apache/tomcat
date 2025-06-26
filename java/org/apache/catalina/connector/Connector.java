@@ -291,7 +291,7 @@ public class Connector extends LifecycleMBeanBase {
     protected boolean useBodyEncodingForURI = false;
 
 
-    private boolean rejectSuspiciousURIs;
+    private boolean rejectSuspiciousURIs = true;
 
 
     // ------------------------------------------------------------- Properties
