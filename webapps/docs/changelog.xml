@@ -145,6 +145,9 @@
         Fix JMX value for <code>keepAliveCount</code> on the endpoint. Also add
         the value of <code>useVirtualThreads</code> in JMX. (remm)
       </fix>
+      <fix>
+        Improve stability of APR/native connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

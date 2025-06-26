@@ -651,17 +651,8 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
             // Close the SocketWrapper for each open connection - this should
             // trigger a IOException when the app (or container) tries to write.
-            // Use the blocking status write lock as a proxy for a lock on
-            // writing to the socket. Don't want to close it while another
-            // thread is writing as that could trigger a JVM crash.
             for (SocketWrapperBase<Long> socketWrapper : connections.values()) {
-                WriteLock wl = ((AprSocketWrapper) socketWrapper).getBlockingStatusWriteLock();
-                wl.lock();
-                try {
-                    socketWrapper.close();
-                } finally {
-                    wl.unlock();
-                }
+                socketWrapper.close();
             }
 
             for (Long socket : connections.keySet()) {
@@ -2383,6 +2374,17 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
 
         @Override
+        public void close() {
+            Lock lock = getLock();
+            lock.lock();
+            try {
+                super.close();
+            } finally {
+                lock.unlock();
+            }
+        }
+
+        @Override
         protected void doClose() {
             if (log.isDebugEnabled()) {
                 log.debug("Calling [" + getEndpoint() + "].closeSocket([" + this + "])");
@@ -2585,25 +2587,31 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
 
         @Override
         protected void populateRemoteAddr() {
-            if (isClosed()) {
-                return;
-            }
+            Lock lock = getLock();
+            lock.lock();
             try {
+                if (isClosed()) {
+                    return;
+                }
                 long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_REMOTE, socket);
                 remoteAddr = Address.getip(sa);
             } catch (Exception e) {
                 log.warn(sm.getString("endpoint.warn.noRemoteAddr", getSocket()), e);
+            } finally {
+                lock.unlock();
             }
         }
 
 
         @Override
         protected void populateRemoteHost() {
-            if (isClosed()) {
-                return;
-            }
+            Lock lock = getLock();
+            lock.lock();
             try {
+                if (isClosed()) {
+                    return;
+                }
                 long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_REMOTE, socket);
                 remoteHost = Address.getnameinfo(sa, 0);
@@ -2612,68 +2620,86 @@ public class AprEndpoint extends AbstractEndpoint<Long,Long> implements SNICallB
                 }
             } catch (Exception e) {
                 log.warn(sm.getString("endpoint.warn.noRemoteHost", getSocket()), e);
+            } finally {
+                lock.unlock();
             }
         }
 
 
         @Override
         protected void populateRemotePort() {
-            if (isClosed()) {
-                return;
-            }
+            Lock lock = getLock();
+            lock.lock();
             try {
+                if (isClosed()) {
+                    return;
+                }
                 long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_REMOTE, socket);
                 Sockaddr addr = Address.getInfo(sa);
                 remotePort = addr.port;
             } catch (Exception e) {
                 log.warn(sm.getString("endpoint.warn.noRemotePort", getSocket()), e);
+            } finally {
+                lock.unlock();
             }
         }
 
 
         @Override
         protected void populateLocalName() {
-            if (isClosed()) {
-                return;
-            }
+            Lock lock = getLock();
+            lock.lock();
             try {
+                if (isClosed()) {
+                    return;
+                }
                 long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_LOCAL, socket);
                 localName = Address.getnameinfo(sa, 0);
             } catch (Exception e) {
                 log.warn(sm.getString("endpoint.warn.noLocalName"), e);
+            } finally {
+                lock.unlock();
             }
         }
 
 
         @Override
         protected void populateLocalAddr() {
-            if (isClosed()) {
-                return;
-            }
+            Lock lock = getLock();
+            lock.lock();
             try {
+                if (isClosed()) {
+                    return;
+                }
                 long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_LOCAL, socket);
                 localAddr = Address.getip(sa);
             } catch (Exception e) {
                 log.warn(sm.getString("endpoint.warn.noLocalAddr"), e);
+            } finally {
+                lock.unlock();
             }
         }
 
 
         @Override
         protected void populateLocalPort() {
-            if (isClosed()) {
-                return;
-            }
+            Lock lock = getLock();
+            lock.lock();
             try {
+                if (isClosed()) {
+                    return;
+                }
                 long socket = getSocket().longValue();
                 long sa = Address.get(Socket.APR_LOCAL, socket);
                 Sockaddr addr = Address.getInfo(sa);
                 localPort = addr.port;
             } catch (Exception e) {
                 log.warn(sm.getString("endpoint.warn.noLocalPort"), e);
+            } finally {
+                lock.unlock();
             }
         }
 
