@@ -456,7 +456,9 @@ public abstract class FileUploadBase {
             while (iter.hasNext()) {
                 if (items.size() == fileCountMax) {
                     // The next item will exceed the limit.
-                    throw new FileCountLimitExceededException(ATTACHMENT, getFileCountMax());
+                    throw new FileCountLimitExceededException(String.format(
+                            "Processing of %s request failed because the number of files exceeds the maximum permitted (%s)",
+                            MULTIPART_FORM_DATA, Long.valueOf(fileCountMax)), fileCountMax);
                 }
                 final FileItemStream item = iter.next();
                 // Don't use getName() here to prevent an InvalidFileNameException.
