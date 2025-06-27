@@ -301,8 +301,8 @@ public interface HttpServletRequest extends ServletRequest {
     String getRequestedSessionId();
 
     /**
-     * Returns the URI path part of this request's URL which starts after the authority (if any) and ends before the query
-     * string delimiter ({@code ?}), if any. The web container does not decode this String. For example:
+     * Returns the URI path part of this request's URL which starts after the authority (if any) and ends before the
+     * query string delimiter ({@code ?}), if any. The web container does not decode this String. For example:
      * <table>
      * <caption>Examples of Returned Values</caption>
      * <tr>
@@ -324,7 +324,8 @@ public interface HttpServletRequest extends ServletRequest {
      * <p>
      * To reconstruct a URL with a scheme and host, use {@link #getRequestURL}.
      *
-     * @return a <code>String</code> containing the path part of the URL from after the authority to before the query string
+     * @return a <code>String</code> containing the path part of the URL from after the authority to before the query
+     *             string
      *
      * @see #getRequestURL
      */
