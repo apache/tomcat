@@ -189,6 +189,9 @@
       <update>
         Update Checkstyle to 10.25.1. (markt)
       </update>
+      <update>
+        Improvements to French translations. (remm)
+      </update>
     </changelog>
   </subsection>
 </section>
