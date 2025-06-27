@@ -1991,6 +1991,40 @@ org.apache.catalina.filters.RequestDumperFilter.handlers = \
 
 </section>
 
+
+<section name="Ranged Put Request Bounds Limit Filter">
+
+  <subsection name="Introduction">
+
+    <p>The filter can help mitigate Denial of Service (DoS) by limiting
+     the maximum file size of a partial PUT request that is allowed.</p>
+
+  </subsection>
+
+  <subsection name="Filter Class Name">
+
+    <p>The filter class name for the Ranged Put Request Bounds Limit Filter is
+    <strong><code>org.apache.catalina.filters.RangedPutRequestBoundsFilter</code>
+    </strong>.</p>
+
+  </subsection>
+
+  <subsection name="Initialisation parameters">
+
+    <p>The Ranged Put Request Bounds Limit Filter supports the following initialization
+    parameters:</p>
+
+    <attributes>
+
+      <attribute name="maxSize" required="false">
+        <p>Maximum file size of a partial PUT request that is allowed. Default is 4GB.</p>
+      </attribute>
+
+    </attributes>
+
+  </subsection>
+
+</section>
 </body>
 
 </document>
