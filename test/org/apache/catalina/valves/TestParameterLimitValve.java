@@ -633,8 +633,8 @@ public class TestParameterLimitValve extends TomcatBaseTest {
 
 
         Map<String,List<String>> reqHeaders = new HashMap<>();
-        reqHeaders.put("Content-Type", List.of("multipart/form-data; boundary=" + boundary));
-        reqHeaders.put("Content-Length", List.of(Integer.toString(content.length())));
+        reqHeaders.put("Content-Type", Arrays.asList("multipart/form-data; boundary=" + boundary));
+        reqHeaders.put("Content-Length", Arrays.asList(Integer.toString(content.length())));
 
         int rc = postUrl(content.toString().getBytes(), "http://localhost:" + getPort() + "/upload/endpoint?" +
                 queryString.toString(), new ByteChunk(), reqHeaders, null);
