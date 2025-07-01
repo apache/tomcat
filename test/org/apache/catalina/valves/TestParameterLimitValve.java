@@ -481,6 +481,8 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         w.setMultipartConfigElement(new MultipartConfigElement(""));
         ctx.addServletMappingDecoded("/upload/*", "multipart");
 
+        addFailedRequestFilter(ctx);
+
         tomcat.start();
 
         // Construct a simple multipart body with two parts
@@ -504,10 +506,147 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         if (okExpected) {
             Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         } else {
-            Assert.assertTrue(Integer.toString(rc), rc == HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            Assert.assertTrue(Integer.toString(rc),
+                    rc == HttpServletResponse.SC_BAD_REQUEST || rc == HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE ||
+                    rc == HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
+
+    @Test
+    public void testMaxParameterCountLimitExceeded01_02_00_00() throws Exception {
+        doTestMaxParameterCountLimitExceeded(1, 2, 0, 0, false);
+    }
+
+
+    @Test
+    public void testMaxParameterCountLimitExceeded01_00_02_00() throws Exception {
+        doTestMaxParameterCountLimitExceeded(1, 0, 2, 0, false);
+    }
+
+
+    @Test
+    public void testMaxParameterCountLimitExceeded01_00_00_02() throws Exception {
+        doTestMaxParameterCountLimitExceeded(1, 0, 0, 2, false);
+    }
+
+
+    @Test
+    public void testMaxParameterCountLimitExceeded01_01_00_00() throws Exception {
+        doTestMaxParameterCountLimitExceeded(1, 1, 0, 0, true);
+    }
+
+
+    @Test
+    public void testMaxParameterCountLimitExceeded01_00_01_00() throws Exception {
+        doTestMaxParameterCountLimitExceeded(1, 0, 1, 0, true);
+    }
+
+
+    @Test
+    public void testMaxParameterCountLimitExceeded01_00_00_01() throws Exception {
+        doTestMaxParameterCountLimitExceeded(1, 0, 0, 1, true);
+    }
+
+
+    @Test
+    public void testMaxParameterCountLimitExceeded02_01_01_00() throws Exception {
+        doTestMaxParameterCountLimitExceeded(2, 1, 1, 0, true);
+    }
+
+
+    @Test
+    public void testMaxParameterCountLimitExceeded02_01_0_01() throws Exception {
+        doTestMaxParameterCountLimitExceeded(2, 1, 0, 1, true);
+    }
+
+
+    @Test
+    public void testMaxParameterCountLimitExceeded02_00_01_01() throws Exception {
+        doTestMaxParameterCountLimitExceeded(2, 0, 1, 1, true);
+    }
+
+
+    @Test
+    public void testMaxParameterCountLimitExceeded03_01_01_01() throws Exception {
+        doTestMaxParameterCountLimitExceeded(3, 1, 1, 1, true);
+    }
+
+
+    private void doTestMaxParameterCountLimitExceeded(int maxParameterCount, int textPartCount, int filePartCount,
+            int queryStringCount, boolean okExpected) throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
+
+        ParameterLimitValve parameterLimitValve = new ParameterLimitValve();
+        ctx.getPipeline().addValve(parameterLimitValve);
+        // Only looking to test maxParameterCount
+        parameterLimitValve.setUrlPatternLimits("/upload/.*=" + Integer.toString(maxParameterCount) + ",-1,-1");
+
+        Wrapper w = Tomcat.addServlet(ctx, "multipart", new MultipartServlet());
+        // Use defaults for Multipart
+        w.setMultipartConfigElement(new MultipartConfigElement(""));
+        ctx.addServletMappingDecoded("/upload/*", "multipart");
+
+        addFailedRequestFilter(ctx);
+
+        tomcat.start();
+
+        // Construct a simple multi-part body
+        String boundary = "--simpleBoundary";
+
+        StringBuilder content = new StringBuilder();
+        int part = 1;
+
+        for (int i = 0; i < textPartCount; i++) {
+            content.append("--").append(boundary).append(CRLF);
+            content.append("Content-Disposition: form-data; name=\"part").append(part).append("\"").append(CRLF);
+            content.append(CRLF);
+            content.append("part value ").append(part).append(CRLF);
+            part++;
+        }
+
+        for (int i = 0; i < filePartCount; i++) {
+            content.append("--").append(boundary).append(CRLF);
+            content.append("Content-Disposition: form-data; name=\"part").append(part).append("\"; filename=\"part")
+                    .append(part).append("\"").append(CRLF);
+            content.append("Content-Type: text/plain").append(CRLF);
+            content.append(CRLF);
+            content.append("part value ").append(part).append(CRLF);
+            part++;
+        }
+
+        content.append("--").append(boundary).append("--").append(CRLF);
+
+        StringBuilder queryString = new StringBuilder();
+        for (int i = 0; i < queryStringCount; i++) {
+            if (i > 0) {
+                queryString.append("&");
+            }
+            queryString.append("param");
+            queryString.append(part);
+            queryString.append("=value");
+            queryString.append(part);
+            part++;
+        }
+
+
+        Map<String,List<String>> reqHeaders = new HashMap<>();
+        reqHeaders.put("Content-Type", List.of("multipart/form-data; boundary=" + boundary));
+        reqHeaders.put("Content-Length", List.of(Integer.toString(content.length())));
+
+        int rc = postUrl(content.toString().getBytes(), "http://localhost:" + getPort() + "/upload/endpoint?" +
+                queryString.toString(), new ByteChunk(), reqHeaders, null);
+
+        if (okExpected) {
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        } else {
+            Assert.assertTrue(Integer.toString(rc),
+                    rc == HttpServletResponse.SC_BAD_REQUEST || rc == HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE ||
+                    rc == HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
 
     private static class MultipartServlet extends HttpServlet {
 
@@ -518,8 +657,8 @@ public class TestParameterLimitValve extends TomcatBaseTest {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
-            pw.println("Parameters: " + req.getParameterMap().size());
             pw.println("Parts: " + req.getParts().size());
+            pw.println("Parameters: " + req.getParameterMap().size());
         }
     }
 
