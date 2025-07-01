@@ -40,12 +40,15 @@ class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgumentExce
 
 
     @Override
-    final synchronized void set(Setting setting, Long value) {
+    final synchronized void set(Setting setting, Long value, boolean force) {
         checkSend();
         if (current.get(setting).longValue() == value.longValue()) {
             pending.remove(setting);
         } else {
             pending.put(setting, value);
+            if (force) {
+                current.put(setting, value);
+            }
         }
     }
 
