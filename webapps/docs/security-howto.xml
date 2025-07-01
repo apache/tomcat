@@ -302,6 +302,12 @@
       the <a href="config/valve.html#Form_Authenticator_Valve">FORM
       authenticator</a>.</p>
 
+      <p>The <strong>rejectSuspiciousURIs</strong> attribute can be used to
+      reject valid URIs that contain patterns that are often used by malicious
+      clients to mount attacks using techniques such as directory traversal.
+      Note that this attribute is <code>false</code> by default as there is some
+      overlap betweeen suspicious URIs and legitimate usage.</p>
+
       <p>The <strong>requiredSecret</strong> attribute in AJP connectors
       configures shared secret between Tomcat and reverse proxy in front of
       Tomcat. It is used to prevent unauthorized connections over AJP protocol.</p>
