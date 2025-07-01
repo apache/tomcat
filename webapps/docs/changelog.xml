@@ -128,6 +128,10 @@
         multipart uploads with non-file parts when the parts were processed
         before query string parameters. (markt)
       </fix>
+      <fix>
+        Align size tracking for multipart requests with FileUpload's use of
+        <code>long</code>. (schultz)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

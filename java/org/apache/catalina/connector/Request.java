@@ -2674,23 +2674,23 @@ public class Request implements HttpServletRequest {
             try {
                 List<FileItem> items = upload.parseRequest(new ServletRequestContext(this));
                 int maxPostSize = getConnector().getMaxPostSize();
-                int postSize = 0;
+                long postSize = 0;
                 Charset charset = getCharset();
                 for (FileItem item : items) {
                     ApplicationPart part = new ApplicationPart(item, location);
-                    parts.add(part);
                     if (part.getSubmittedFileName() == null) {
                         String name = part.getName();
                         if (maxPostSize >= 0) {
                             // Have to calculate equivalent size. Not completely
                             // accurate but close enough.
-                            postSize += name.getBytes(charset).length;
+                            // Name
+                            postSize = Math.addExact(postSize, name.getBytes(charset).length);
                             // Equals sign
-                            postSize++;
+                            postSize = Math.addExact(postSize, 1);
                             // Value length
-                            postSize += part.getSize();
+                            postSize = Math.addExact(postSize, part.getSize());
                             // Value separator
-                            postSize++;
+                            postSize = Math.addExact(postSize, 1);
                             if (postSize > maxPostSize) {
                                 parameters.setParseFailedReason(FailReason.POST_TOO_LARGE);
                                 throw new IllegalStateException(sm.getString("coyoteRequest.maxPostSizeExceeded"));
@@ -2707,6 +2707,7 @@ public class Request implements HttpServletRequest {
                         // Adjust the limit to account for a file part which is not added to the parameter map.
                         maxParameterCount--;
                     }
+                    parts.add(part);
                 }
 
                 success = true;
