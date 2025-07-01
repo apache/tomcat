@@ -66,6 +66,11 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     final void set(Setting setting, long value) throws T {
+        set(setting,  value, false);
+    }
+
+
+    final void set(Setting setting, long value, boolean force) throws T {
         if (log.isTraceEnabled()) {
             log.trace(sm.getString("connectionSettings.debug", connectionId, getEndpointName(), setting,
                     Long.toString(value)));
@@ -102,11 +107,21 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
                 return;
         }
 
-        set(setting, Long.valueOf(value));
+        set(setting, Long.valueOf(value), force);
     }
 
 
-    synchronized void set(Setting setting, Long value) {
+    /**
+     * Specify a new value for setting with the option to force the change to take effect immediately rather than
+     * waiting until an {@code ACK} is received.
+     *
+     * @param setting The setting to update
+     * @param value   The new value for the setting
+     * @param force   {@code false} if an {@code ACK} must be received before the setting takes effect or {@code true}
+     *                    if the setting to take effect immediately. Even if the setting takes effect immediately, it
+     *                    will still be included in the next {@code SETTINGS} frame and an {@code ACK} will be expected.
+     */
+    synchronized void set(Setting setting, Long value, boolean force) {
         current.put(setting, value);
     }
 

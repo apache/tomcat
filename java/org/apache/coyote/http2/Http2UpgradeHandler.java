@@ -164,8 +164,12 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         remoteSettings = new ConnectionSettingsRemote(connectionId);
         localSettings = new ConnectionSettingsLocal(connectionId);
 
-        localSettings.set(Setting.MAX_CONCURRENT_STREAMS, protocol.getMaxConcurrentStreams());
-        localSettings.set(Setting.INITIAL_WINDOW_SIZE, protocol.getInitialWindowSize());
+        /*
+         * Force set these initial limits. A well-behaved client should ACK the settings and adhere to them before it
+         * reaches the limits anyway.
+         */
+        localSettings.set(Setting.MAX_CONCURRENT_STREAMS, protocol.getMaxConcurrentStreams(), true);
+        localSettings.set(Setting.INITIAL_WINDOW_SIZE, protocol.getInitialWindowSize(), true);
 
         pingManager.initiateDisabled = protocol.getInitiatePingDisabled();
 
