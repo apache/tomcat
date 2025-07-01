@@ -109,6 +109,7 @@ import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.http.fileupload.FileItem;
 import org.apache.tomcat.util.http.fileupload.FileUpload;
 import org.apache.tomcat.util.http.fileupload.disk.DiskFileItemFactory;
+import org.apache.tomcat.util.http.fileupload.impl.FileCountLimitExceededException;
 import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
 import org.apache.tomcat.util.http.fileupload.impl.SizeException;
 import org.apache.tomcat.util.http.fileupload.servlet.ServletRequestContext;
@@ -2374,6 +2375,26 @@ public class Request implements HttpServletRequest {
             }
         }
 
+        /*
+         * When the request body is multipart/form-data, both the parts and the query string count towards
+         * maxParameterCount. If parseParts() is called before getParameterXXX() then the parts will be parsed before
+         * the query string. Otherwise, the query string will be parsed first.
+         *
+         * maxParameterCount must be respected regardless of which is parsed first.
+         *
+         * maxParameterCount is reset from the Connector at the start of every request.
+         *
+         * If parts are parsed first, non-file parts will be added to the parameter map and any files will reduce
+         * maxParameterCount by 1 so that when the query string is parsed the difference between the size of the
+         * parameter map and maxParameterCount will be the original maxParameterCount less the number of parts. i.e. the
+         * maxParameterCount applied to the query string will be the original maxParameterCount less the number of
+         * parts.
+         *
+         * If the query string is parsed first, all parameters will be added to the parameter map and, ignoring
+         * maxPartCount, the part limit will be set to the original maxParameterCount less the size of the parameter
+         * map. i.e. the maxParameterCount applied to the parts will be the original maxParameterCount less the number
+         * of query parameters.
+         */
         Parameters parameters = coyoteRequest.getParameters();
         parameters.setLimit(maxParameterCount);
 
@@ -2474,11 +2495,14 @@ public class Request implements HttpServletRequest {
                         // Not possible
                     }
                     parameters.addParameter(name, value);
+                } else {
+                    // Adjust the limit to account for a file part which is not added to the parameter map.
+                    maxParameterCount--;
                 }
             }
         } catch (InvalidContentTypeException e) {
             partsParseException = new ServletException(e);
-        } catch (SizeException e) {
+        } catch (SizeException | FileCountLimitExceededException e) {
             checkSwallowInput();
             partsParseException = new InvalidParameterException(e, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
         } catch (IOException e) {
@@ -2726,11 +2750,27 @@ public class Request implements HttpServletRequest {
         }
         parametersParsed = true;
 
+        /*
+         * When the request body is multipart/form-data, both the parts and the query string count towards
+         * maxParameterCount. If parseParts() is called before getParameterXXX() then the parts will be parsed before
+         * the query string. Otherwise, the query string will be parsed first.
+         *
+         * maxParameterCount must be respected regardless of which is parsed first.
+         *
+         * maxParameterCount is reset from the Connector at the start of every request.
+         *
+         * If parts are parsed first, non-file parts will be added to the parameter map and any files will reduce
+         * maxParameterCount by 1 so that when the query string is parsed the difference between the size of the
+         * parameter map and maxParameterCount will be the original maxParameterCount less the number of parts. i.e. the
+         * maxParameterCount applied to the query string will be the original maxParameterCount less the number of
+         * parts.
+         *
+         * If the query string is parsed first, all parameters will be added to the parameter map and, ignoring
+         * maxPartCount, the part limit will be set to the original maxParameterCount less the size of the parameter
+         * map. i.e. the maxParameterCount applied to the parts will be the original maxParameterCount less the number
+         * of query parameters.
+         */
         Parameters parameters = coyoteRequest.getParameters();
-
-        if (parts != null && maxParameterCount > 0) {
-            maxParameterCount -= parts.size();
-        }
         parameters.setLimit(maxParameterCount);
 
         // getCharacterEncoding() may have been overridden to search for
