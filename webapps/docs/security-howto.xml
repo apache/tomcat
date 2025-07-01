@@ -304,6 +304,14 @@
       will interpret as UTF-7 a response containing characters that are safe for
       ISO-8859-1 but trigger an XSS vulnerability if interpreted as UTF-7.</p>
 
+      <p>The <strong>maxParameterCount</strong> attribute controls the maximum
+      total number of request parameters (including uploaded files) obtained
+      from the query string and, for POST requests, the request body if the
+      content type is <code>application/x-www-form-urlencoded</code> or
+      <code>multipart/form-data</code>. Excessive parameters are ignored. If you
+      want to reject such requests, configure a
+      <a href="config/filter.html">FailedRequestFilter</a>.</p>
+
       <p>The <strong>maxPartCount</strong> attribute controls the maximum number
       of parts supported for a multipart request. This is limited to 50 by
       default to reduce exposure to a DoS attack. The documentation for
@@ -330,22 +338,9 @@
       the <a href="config/valve.html#Form_Authenticator_Valve">FORM
       authenticator</a>.</p>
 
-      <p>The <strong>maxParameterCount</strong> attribute controls the maximum
-      total number of request parameters (including uploaded files) obtained
-      from the query string and, for POST requests, the request body if the
-      content type is <code>application/x-www-form-urlencoded</code> or
-      <code>multipart/form-data</code>. Excessive parameters are ignored. If you
-      want to reject such requests, configure a
-      <a href="config/filter.html">FailedRequestFilter</a>.</p>
-
-      <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
-      X-Powered-By HTTP header is sent with each request. If sent, the value of
-      the header contains the Servlet and JSP specification versions, the full
-      Tomcat version (e.g. Apache Tomcat/<version-major-minor/>), the name of
-      the JVM vendor and
-      the version of the JVM. This header is disabled by default. This header
-      can provide useful information to both legitimate clients and attackers.
-      </p>
+      <p>The <strong>requiredSecret</strong> attribute in AJP connectors
+      configures shared secret between Tomcat and reverse proxy in front of
+      Tomcat. It is used to prevent unauthorized connections over AJP protocol.</p>
 
       <p>The <strong>server</strong> attribute controls the value of the Server
       HTTP header. The default value of this header for Tomcat 4.1.x to
@@ -373,9 +368,14 @@
       proxy (the authenticated user name is passed to Tomcat as part of the AJP
       protocol) with the option for Tomcat to still perform authorization.</p>
 
-      <p>The <strong>requiredSecret</strong> attribute in AJP connectors
-      configures shared secret between Tomcat and reverse proxy in front of
-      Tomcat. It is used to prevent unauthorized connections over AJP protocol.</p>
+      <p>The <strong>xpoweredBy</strong> attribute controls whether or not the
+      X-Powered-By HTTP header is sent with each request. If sent, the value of
+      the header contains the Servlet and JSP specification versions, the full
+      Tomcat version (e.g. Apache Tomcat/<version-major-minor/>), the name of
+      the JVM vendor and
+      the version of the JVM. This header is disabled by default. This header
+      can provide useful information to both legitimate clients and attackers.
+      </p>
     </subsection>
 
     <subsection name="Host">
