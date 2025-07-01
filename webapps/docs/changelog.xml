@@ -126,6 +126,12 @@
         below the web application root with a path that was terminated with a
         file separator. (remm/markt)
       </fix>
+      <fix>
+        <bug>69731</bug>: Fix an issue that meant that the value of
+        <code>maxParameterCount</code> applied was smaller than intended for
+        multipart uploads with non-file parts when the parts were processed
+        before query string parameters. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
