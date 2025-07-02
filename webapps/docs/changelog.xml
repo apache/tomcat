@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.8 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.9 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -166,31 +166,6 @@
         path. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Ensure application configured welcome files override the defaults when
-        configuring an embedded web application programmatically. (markt)
-      </fix>
-      <fix>
-        Allow the default servlet to set the content length when the content
-        length is known, no content has been written and a <code>Writer</code>
-        is being used. (markt)
-      </fix>
-      <fix>
-        <bug>69717</bug>: Correct a regression in the fix for CVE-2025-49125
-        that prevented access to PreResources and PostResources when mounted
-        below the web application root with a path that was terminated with a
-        file separator. (remm/markt)
-      </fix>
-      <fix>
-        <bug>69731</bug>: Fix an issue that meant that the value of
-        <code>maxParameterCount</code> applied was smaller than intended for
-        multipart uploads with non-file parts when the parts were processed
-        before query string parameters. (markt)
-      </fix>
-      <fix>
-        Align size tracking for multipart requests with FileUpload's use of
-        <code>long</code>. (schultz)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -209,35 +184,6 @@
         Remove NIO2 connector. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69710</bug>: Increase the default for <code>maxPartCount</code>
-        from <code>10</code> to <code>50</code>. Update the documentation to
-        provide more details on the memory requirements to support multi-part
-        uploads while avoiding a denial of service risk. (markt)
-      </fix>
-      <fix>
-        <bug>69713</bug>: Correctly handle an HTTP/2 data frame that includes
-        padding when the headers include a content-length. (remm/markt)
-      </fix>
-      <fix>
-        Correctly collect statistics for HTTP/2 requests and avoid counting one
-        request multiple times. Based on pull request <pr>868</pr> by
-        qingdaoheze. (markt)
-      </fix>
-      <fix>
-        Fix JMX value for <code>keepAliveCount</code> on the endpoint. Also add
-        the value of <code>useVirtualThreads</code> in JMX. (remm)
-      </fix>
-      <fix>
-        <bug>69728</bug>: Remove incorrect warning when HTTP/2 is used with
-        optional certificate verification and improve the warnings when a web
-        application tries to use CLIENT-CERT with either HTTP/2 or a JSSE
-        implementation of TLS 1.3. (markt)
-      </fix>
-      <fix>
-        When setting the initial HTTP/2 connection limit, apply those limits
-        earlier. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -263,14 +209,6 @@
         <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. (markt)
       </scode>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <scode>
-        Remove <code>IMPL_OBJ_START</code> from EL grammar for
-        <code>IDENTIFIER</code>. (markt)
-      </scode>
-      <scode>
-        Remove the <code>INSTANCEOF</code> and <code>FUNCTIONSUFFIX</code>
-        definitions from the EL grammar as both are unused. (markt)
-      </scode>
     </changelog>
   </subsection>
   <subsection name="Cluster">
@@ -306,15 +244,6 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        Documentation. Provide more explicit guidance regarding the security
-        considerations for enabling write access to the web application via
-        WebDAV, HTTP PUT requests or similar. (markt)
-      </add>
-      <add>
-        Documentation. Add a section on reverse proxies to the security
-        considerations page. (markt)
-      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -323,21 +252,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update to the Eclipse JDT compiler 4.36. (markt)
-      </update>
-      <update>
-        Update UnboundID to 7.0.3. (markt)
-      </update>
-      <update>
-        Update Checkstyle to 10.25.1. (markt)
-      </update>
-      <update>
-        Improvements to French translations. (remm)
-      </update>
-      <update>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
