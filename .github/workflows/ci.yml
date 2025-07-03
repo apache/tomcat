@@ -43,7 +43,7 @@ jobs:
           - os: windows-latest
             java: 24
           - os: macos-latest
-            java: 24
+            java: 25-ea
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
