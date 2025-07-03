@@ -41,9 +41,9 @@ jobs:
           - os: macos-latest
             java: 21
           - os: windows-latest
-            java: 25-ea
+            java: 24
           - os: macos-latest
-            java: 25-ea
+            java: 24
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
