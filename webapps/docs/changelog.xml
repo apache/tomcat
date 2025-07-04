@@ -208,6 +208,11 @@
         marker class,
         <code>jakarta.el.ELResolver.StandaloneIdentifierMarker</code>. (markt)
       </scode>
+      <add>
+        Extend the support for relational operators to include
+        <code>TemporalAccessor</code>, <code>Clock</code> and <code>Date</code>.
+        (markt)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>
