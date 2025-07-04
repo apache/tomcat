@@ -213,6 +213,10 @@
         <code>TemporalAccessor</code>, <code>Clock</code> and <code>Date</code>.
         (markt)
       </add>
+      <add>
+        Add support for coercion to <code>java.time.Instant</code> and
+        <code>java.util.Date</code>. (markt)
+      </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
     </changelog>
   </subsection>

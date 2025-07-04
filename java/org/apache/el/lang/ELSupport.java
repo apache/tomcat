@@ -575,6 +575,18 @@ public class ELSupport {
         if (obj == null) {
             return null;
         }
+
+        if (Instant.class.equals(type)) {
+            @SuppressWarnings("unchecked")
+            T result = (T) coerceToInstant(ctx, obj);
+            return result;
+        }
+        if (Date.class.equals(type)) {
+            @SuppressWarnings("unchecked")
+            T result = (T) Date.from(coerceToInstant(ctx, obj));
+            return result;
+        }
+
         if (obj instanceof String str) {
             PropertyEditor editor = PropertyEditorManager.findEditor(type);
             if (editor == null) {
