@@ -39,7 +39,7 @@ import org.apache.tomcat.util.res.StringManager;
  * request's Content-Range header that are allowed.
  */
 public class RangedPutRequestBoundsFilter extends FilterBase {
-    protected static final StringManager sm = StringManager.getManager(FilterBase.class);
+    protected static final StringManager sm = StringManager.getManager(RangedPutRequestBoundsFilter.class);
 
     /**
      * default value for maximum size of a ranged PUT target resource.
@@ -148,4 +148,8 @@ public class RangedPutRequestBoundsFilter extends FilterBase {
         return log;
     }
 
+    @Override
+    protected boolean isConfigProblemFatal() {
+        return true;
+    }
 }
