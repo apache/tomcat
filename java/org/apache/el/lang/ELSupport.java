@@ -31,6 +31,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -60,24 +61,19 @@ public class ELSupport {
      * If the objects are identical, or they are equal according to {@link #equals(ELContext, Object, Object)} then
      * return 0.
      * <p>
+     * If either object is null, error
+     * <p>
      * If either object is a BigDecimal, then coerce both to BigDecimal first. Similarly for Double(Float), BigInteger,
      * and Long(Integer, Char, Short, Byte).
      * <p>
      * If either object is TemporalAccessor, Clock, java.util.Date or java.sql.Timestamp, coerce both to Instant and
      * then compare.
-     *
-     * Otherwise, check that the first object is an instance of Comparable, and compare against the second object. If
-     * that is null, return 1, otherwise return the result of comparing against the second object.
      * <p>
-     * Similarly, if the second object is Comparable, if the first is null, return -1, else return the result of
-     * comparing against the first object.
+     * If the first object is an instance of Comparable, return the result of comparing against the second object.
      * <p>
-     * A null object is considered as:
-     * <ul>
-     * <li>ZERO when compared with Numbers</li>
-     * <li>the empty string for String compares</li>
-     * <li>Otherwise null is considered to be lower than anything else.</li>
-     * </ul>
+     * If the second object is an instance of Comparable, return -1 * the result of comparing against the first object.
+     * <p>
+     * Otherwise, error.
      *
      * @param ctx  the context in which this comparison is taking place
      * @param obj0 first object
@@ -92,6 +88,9 @@ public class ELSupport {
         if (obj0 == obj1 || equals(ctx, obj0, obj1)) {
             return 0;
         }
+        Objects.requireNonNull(obj0, MessageFactory.get("error.compare.null"));
+        Objects.requireNonNull(obj1, MessageFactory.get("error.compare.null"));
+
         if (isBigDecimalOp(obj0, obj1)) {
             BigDecimal bd0 = (BigDecimal) coerceToNumber(ctx, obj0, BigDecimal.class);
             BigDecimal bd1 = (BigDecimal) coerceToNumber(ctx, obj1, BigDecimal.class);
@@ -123,12 +122,12 @@ public class ELSupport {
         if (obj0 instanceof Comparable<?>) {
             @SuppressWarnings("unchecked") // checked above
             final Comparable<Object> comparable = (Comparable<Object>) obj0;
-            return (obj1 != null) ? comparable.compareTo(obj1) : 1;
+            return comparable.compareTo(obj1);
         }
         if (obj1 instanceof Comparable<?>) {
             @SuppressWarnings("unchecked") // checked above
             final Comparable<Object> comparable = (Comparable<Object>) obj1;
-            return (obj0 != null) ? -comparable.compareTo(obj0) : -1;
+            return -comparable.compareTo(obj0);
         }
         throw new ELException(MessageFactory.get("error.compare", obj0, obj1));
     }

@@ -160,24 +160,28 @@ public class TestELEvaluation {
     private void compareBoth(String msg, int expected, Object o1, Object o2) {
         int i1 = ELSupport.compare(null, o1, o2);
         int i2 = ELSupport.compare(null, o2, o1);
-        Assert.assertEquals(msg, expected, i1);
-        Assert.assertEquals(msg, expected, -i2);
+        if (expected == -1) {
+            Assert.assertTrue(msg, i1 < 0);
+            Assert.assertTrue(msg, i2 > 0);
+        } else if (expected == 0) {
+            Assert.assertTrue(msg, i1 == 0);
+            Assert.assertTrue(msg, i2 == 0);
+        } else {
+            Assert.assertTrue(msg, i1 > 0);
+            Assert.assertTrue(msg, i2 < 0);
+         }
     }
 
     @Test
     public void testElSupportCompare() {
         compareBoth("Nulls should compare equal", 0, null, null);
-        compareBoth("Null should compare equal to \"\"", 0, "", null);
-        compareBoth("Null should be less than File()", -1, null, new File(""));
-        compareBoth("Null should be less than Date()", -1, null, new Date());
         compareBoth("Date(0) should be less than Date(1)", -1, new Date(0), new Date(1));
         try {
             compareBoth("Should not compare", 0, new Date(), new File(""));
             Assert.fail("Expecting ClassCastException");
-        } catch (ClassCastException expected) {
+        } catch (ELException expected) {
             // Expected
         }
-        Assert.assertTrue(null == null);
     }
 
     /**
