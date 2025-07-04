@@ -230,7 +230,9 @@ public class ParameterLimitValve extends ValveBase {
                 }
             }
         } catch (IOException e) {
-            containerLog.error(sm.getString("parameterLimitValve.readError"), e);
+            if (containerLog != null) {
+                containerLog.error(sm.getString("parameterLimitValve.readError"), e);
+            }
         }
     }
 
