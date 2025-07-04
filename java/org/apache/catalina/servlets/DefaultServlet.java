@@ -2000,7 +2000,7 @@ public class DefaultServlet extends HttpServlet {
                     }
                     IOException e = copyRange(reader, new PrintWriter(buffer));
                     if (debug > 10) {
-                        log("readme '" + readmeFile + "' output error: " + e.getMessage());
+                        log("readme '" + readmeFile + "' output error: " + ((e != null) ? e.getMessage() : ""));
                     }
                 } catch (IOException e) {
                     log(sm.getString("defaultServlet.readerCloseFailed"), e);
