@@ -680,6 +680,10 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 if (hrefs.hasNext()) {
                     currentHref = hrefs.next();
                     currentPath = getPathFromHref(currentHref, request);
+                    if (currentPath == null) {
+                        // The path was invalid
+                        return false;
+                    }
                     currentWebResource = resources.getResource(currentPath);
                 } else {
                     break;
