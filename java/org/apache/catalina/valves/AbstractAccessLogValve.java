@@ -1691,7 +1691,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
         private final IdentifierType identifierType;
 
         public IdentifierElement() {
-            this(null);
+            this("");
         }
 
 
