@@ -105,6 +105,14 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.44 (schultz)" rtext="in development">
+  <subsection name="Cluster">
+    <changelog>
+      <update>
+        Add <code>enableStatistics</code> configuration attribute for the
+        <code>DeltaManager</code>, defaulting to <code>true</code>. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.43 (schultz)" rtext="2025-07-04">
   <subsection name="Catalina">

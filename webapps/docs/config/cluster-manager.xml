@@ -119,6 +119,10 @@
   </subsection>
   <subsection name="org.apache.catalina.ha.session.DeltaManager Attributes">
     <attributes>
+      <attribute name="enableStatistics" required="false">
+        Tracks statistics for the session and events of the cluster.
+        Default value is <code>true</code>.
+      </attribute>
       <attribute name="expireSessionsOnShutdown" required="false">
         When a web application is being shutdown, Tomcat issues an expire call
         to each session to notify all the listeners. If you wish for all
