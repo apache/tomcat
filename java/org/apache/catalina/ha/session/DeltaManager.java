@@ -23,6 +23,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
@@ -76,6 +78,7 @@ public class DeltaManager extends ClusterManagerBase {
     private int stateTransferTimeout = 60;
     private boolean sendAllSessions = true;
     private int sendAllSessionsSize = 1000;
+    private boolean enableStatistics = true;
 
     /**
      * wait time between send session block (default 2 sec)
@@ -88,25 +91,25 @@ public class DeltaManager extends ClusterManagerBase {
 
     // -------------------------------------------------------- stats attributes
 
-    private volatile long sessionReplaceCounter = 0;
-    private volatile long counterReceive_EVT_GET_ALL_SESSIONS = 0;
-    private volatile long counterReceive_EVT_ALL_SESSION_DATA = 0;
-    private volatile long counterReceive_EVT_SESSION_CREATED = 0;
-    private volatile long counterReceive_EVT_SESSION_EXPIRED = 0;
-    private volatile long counterReceive_EVT_SESSION_ACCESSED = 0;
-    private volatile long counterReceive_EVT_SESSION_DELTA = 0;
-    private volatile int counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE = 0;
-    private volatile long counterReceive_EVT_CHANGE_SESSION_ID = 0;
-    private volatile long counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER = 0;
-    private volatile long counterSend_EVT_GET_ALL_SESSIONS = 0;
-    private volatile long counterSend_EVT_ALL_SESSION_DATA = 0;
-    private volatile long counterSend_EVT_SESSION_CREATED = 0;
-    private volatile long counterSend_EVT_SESSION_DELTA = 0;
-    private volatile long counterSend_EVT_SESSION_ACCESSED = 0;
-    private volatile long counterSend_EVT_SESSION_EXPIRED = 0;
-    private volatile int counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE = 0;
-    private volatile long counterSend_EVT_CHANGE_SESSION_ID = 0;
-    private volatile int counterNoStateTransferred = 0;
+    private final AtomicLong sessionReplaceCounter = new AtomicLong(0);
+    private final AtomicLong counterReceive_EVT_GET_ALL_SESSIONS = new AtomicLong(0);
+    private final AtomicLong counterReceive_EVT_ALL_SESSION_DATA = new AtomicLong(0);
+    private final AtomicLong counterReceive_EVT_SESSION_CREATED = new AtomicLong(0);
+    private final AtomicLong counterReceive_EVT_SESSION_EXPIRED = new AtomicLong(0);
+    private final AtomicLong counterReceive_EVT_SESSION_ACCESSED = new AtomicLong(0);
+    private final AtomicLong counterReceive_EVT_SESSION_DELTA = new AtomicLong(0);
+    private final AtomicInteger counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE = new AtomicInteger(0);
+    private final AtomicLong counterReceive_EVT_CHANGE_SESSION_ID = new AtomicLong(0);
+    private final AtomicLong counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER = new AtomicLong(0);
+    private final AtomicLong counterSend_EVT_GET_ALL_SESSIONS = new AtomicLong(0);
+    private final AtomicLong counterSend_EVT_ALL_SESSION_DATA = new AtomicLong(0);
+    private final AtomicLong counterSend_EVT_SESSION_CREATED = new AtomicLong(0);
+    private final AtomicLong counterSend_EVT_SESSION_DELTA = new AtomicLong(0);
+    private final AtomicLong counterSend_EVT_SESSION_ACCESSED = new AtomicLong(0);
+    private final AtomicLong counterSend_EVT_SESSION_EXPIRED = new AtomicLong(0);
+    private final AtomicInteger counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE = new AtomicInteger(0);
+    private final AtomicLong counterSend_EVT_CHANGE_SESSION_ID = new AtomicLong(0);
+    private final AtomicInteger counterNoStateTransferred = new AtomicInteger(0);
 
 
     // ------------------------------------------------------------- Constructor
@@ -130,98 +133,98 @@ public class DeltaManager extends ClusterManagerBase {
      * @return Returns the counterSend_EVT_GET_ALL_SESSIONS.
      */
     public long getCounterSend_EVT_GET_ALL_SESSIONS() {
-        return counterSend_EVT_GET_ALL_SESSIONS;
+        return counterSend_EVT_GET_ALL_SESSIONS.get();
     }
 
     /**
      * @return Returns the counterSend_EVT_SESSION_ACCESSED.
      */
     public long getCounterSend_EVT_SESSION_ACCESSED() {
-        return counterSend_EVT_SESSION_ACCESSED;
+        return counterSend_EVT_SESSION_ACCESSED.get();
     }
 
     /**
      * @return Returns the counterSend_EVT_SESSION_CREATED.
      */
     public long getCounterSend_EVT_SESSION_CREATED() {
-        return counterSend_EVT_SESSION_CREATED;
+        return counterSend_EVT_SESSION_CREATED.get();
     }
 
     /**
      * @return Returns the counterSend_EVT_SESSION_DELTA.
      */
     public long getCounterSend_EVT_SESSION_DELTA() {
-        return counterSend_EVT_SESSION_DELTA;
+        return counterSend_EVT_SESSION_DELTA.get();
     }
 
     /**
      * @return Returns the counterSend_EVT_SESSION_EXPIRED.
      */
     public long getCounterSend_EVT_SESSION_EXPIRED() {
-        return counterSend_EVT_SESSION_EXPIRED;
+        return counterSend_EVT_SESSION_EXPIRED.get();
     }
 
     /**
      * @return Returns the counterSend_EVT_ALL_SESSION_DATA.
      */
     public long getCounterSend_EVT_ALL_SESSION_DATA() {
-        return counterSend_EVT_ALL_SESSION_DATA;
+        return counterSend_EVT_ALL_SESSION_DATA.get();
     }
 
     /**
      * @return Returns the counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE.
      */
     public int getCounterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE() {
-        return counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE;
+        return counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE.get();
     }
 
     /**
      * @return Returns the counterSend_EVT_CHANGE_SESSION_ID.
      */
     public long getCounterSend_EVT_CHANGE_SESSION_ID() {
-        return counterSend_EVT_CHANGE_SESSION_ID;
+        return counterSend_EVT_CHANGE_SESSION_ID.get();
     }
 
     /**
      * @return Returns the counterReceive_EVT_ALL_SESSION_DATA.
      */
     public long getCounterReceive_EVT_ALL_SESSION_DATA() {
-        return counterReceive_EVT_ALL_SESSION_DATA;
+        return counterReceive_EVT_ALL_SESSION_DATA.get();
     }
 
     /**
      * @return Returns the counterReceive_EVT_GET_ALL_SESSIONS.
      */
     public long getCounterReceive_EVT_GET_ALL_SESSIONS() {
-        return counterReceive_EVT_GET_ALL_SESSIONS;
+        return counterReceive_EVT_GET_ALL_SESSIONS.get();
     }
 
     /**
      * @return Returns the counterReceive_EVT_SESSION_ACCESSED.
      */
     public long getCounterReceive_EVT_SESSION_ACCESSED() {
-        return counterReceive_EVT_SESSION_ACCESSED;
+        return counterReceive_EVT_SESSION_ACCESSED.get();
     }
 
     /**
      * @return Returns the counterReceive_EVT_SESSION_CREATED.
      */
     public long getCounterReceive_EVT_SESSION_CREATED() {
-        return counterReceive_EVT_SESSION_CREATED;
+        return counterReceive_EVT_SESSION_CREATED.get();
     }
 
     /**
      * @return Returns the counterReceive_EVT_SESSION_DELTA.
      */
     public long getCounterReceive_EVT_SESSION_DELTA() {
-        return counterReceive_EVT_SESSION_DELTA;
+        return counterReceive_EVT_SESSION_DELTA.get();
     }
 
     /**
      * @return Returns the counterReceive_EVT_SESSION_EXPIRED.
      */
     public long getCounterReceive_EVT_SESSION_EXPIRED() {
-        return counterReceive_EVT_SESSION_EXPIRED;
+        return counterReceive_EVT_SESSION_EXPIRED.get();
     }
 
 
@@ -229,28 +232,28 @@ public class DeltaManager extends ClusterManagerBase {
      * @return Returns the counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE.
      */
     public int getCounterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE() {
-        return counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE;
+        return counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE.get();
     }
 
     /**
      * @return Returns the counterReceive_EVT_CHANGE_SESSION_ID.
      */
     public long getCounterReceive_EVT_CHANGE_SESSION_ID() {
-        return counterReceive_EVT_CHANGE_SESSION_ID;
+        return counterReceive_EVT_CHANGE_SESSION_ID.get();
     }
 
     /**
      * @return Returns the counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER.
      */
     public long getCounterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER() {
-        return counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER;
+        return counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER.get();
     }
 
     /**
      * @return Returns the sessionReplaceCounter.
      */
     public long getSessionReplaceCounter() {
-        return sessionReplaceCounter;
+        return sessionReplaceCounter.get();
     }
 
     /**
@@ -267,7 +270,7 @@ public class DeltaManager extends ClusterManagerBase {
      * @return Returns the counterNoStateTransferred.
      */
     public int getCounterNoStateTransferred() {
-        return counterNoStateTransferred;
+        return counterNoStateTransferred.get();
     }
 
     public int getReceivedQueueSize() {
@@ -423,6 +426,19 @@ public class DeltaManager extends ClusterManagerBase {
         this.notifyContainerListenersOnReplication = notifyContainerListenersOnReplication;
     }
 
+    /**
+     * @return the enableStatistics
+     */
+    public boolean getEnableStatistics() {
+        return this.enableStatistics;
+    }
+
+    /**
+     * @param enableStatistics the enableStatistics to set
+     */
+    public void setEnableStatistics(boolean enableStatistics) {
+        this.enableStatistics = enableStatistics;
+    }
 
     // --------------------------------------------------------- Public Methods
 
@@ -465,7 +481,9 @@ public class DeltaManager extends ClusterManagerBase {
                 log.trace(sm.getString("deltaManager.sendMessage.newSession", name, sessionId));
             }
             msg.setTimestamp(session.getCreationTime());
-            counterSend_EVT_SESSION_CREATED++;
+            if (enableStatistics) {
+                counterSend_EVT_SESSION_CREATED.incrementAndGet();
+            }
             send(msg);
         }
     }
@@ -559,7 +577,9 @@ public class DeltaManager extends ClusterManagerBase {
                 SessionMessage msg = new SessionMessageImpl(getName(), SessionMessage.EVT_CHANGE_SESSION_ID, data,
                         orgSessionID, orgSessionID + "-" + System.currentTimeMillis());
                 msg.setTimestamp(System.currentTimeMillis());
-                counterSend_EVT_CHANGE_SESSION_ID++;
+                if (enableStatistics) {
+                    counterSend_EVT_CHANGE_SESSION_ID.incrementAndGet();
+                }
                 send(msg);
             } catch (IOException e) {
                 log.error(sm.getString("deltaManager.unableSerializeSessionID", newSessionID), e);
@@ -692,7 +712,9 @@ public class DeltaManager extends ClusterManagerBase {
                 session.resetDeltaRequest();
                 // FIXME How inform other session id cache like SingleSignOn
                 if (findSession(session.getIdInternal()) != null) {
-                    sessionReplaceCounter++;
+                    if (enableStatistics) {
+                        sessionReplaceCounter.incrementAndGet();
+                    }
                     // FIXME better is to grap this sessions again !
                     if (log.isWarnEnabled()) {
                         log.warn(sm.getString("deltaManager.loading.existing.session", session.getIdInternal()));
@@ -803,7 +825,9 @@ public class DeltaManager extends ClusterManagerBase {
             // set reference time
             stateTransferCreateSendTime = beforeSendTime;
             // request session state
-            counterSend_EVT_GET_ALL_SESSIONS++;
+            if (enableStatistics) {
+                counterSend_EVT_GET_ALL_SESSIONS.incrementAndGet();
+            }
             stateTransferred = false;
             // FIXME This send call block the deploy thread, when sender waitForAck is enabled
             try {
@@ -903,7 +927,9 @@ public class DeltaManager extends ClusterManagerBase {
             }
         }
         if (isTimeout) {
-            counterNoStateTransferred++;
+            if (enableStatistics) {
+                counterNoStateTransferred.incrementAndGet();
+            }
             log.error(sm.getString("deltaManager.noSessionState", getName(), new Date(beforeSendTime),
                     Long.valueOf(reqNow - beforeSendTime)));
         } else if (isNoContextManagerReceived()) {
@@ -1013,7 +1039,9 @@ public class DeltaManager extends ClusterManagerBase {
                 return null;
             }
             if (session.isDirty()) {
-                counterSend_EVT_SESSION_DELTA++;
+                if (enableStatistics) {
+                    counterSend_EVT_SESSION_DELTA.incrementAndGet();
+                }
                 msg = new SessionMessageImpl(getName(), SessionMessage.EVT_SESSION_DELTA, session.getDiff(), sessionId,
                         sessionId + "-" + System.currentTimeMillis());
             }
@@ -1023,7 +1051,9 @@ public class DeltaManager extends ClusterManagerBase {
         }
         if (msg == null) {
             if (!expires && !session.isPrimarySession()) {
-                counterSend_EVT_SESSION_ACCESSED++;
+                if (enableStatistics) {
+                    counterSend_EVT_SESSION_ACCESSED.incrementAndGet();
+                }
                 msg = new SessionMessageImpl(getName(), SessionMessage.EVT_SESSION_ACCESSED, null, sessionId,
                         sessionId + "-" + System.currentTimeMillis());
                 if (log.isDebugEnabled()) {
@@ -1042,7 +1072,9 @@ public class DeltaManager extends ClusterManagerBase {
         if (!expires && (msg == null)) {
             long replDelta = System.currentTimeMillis() - session.getLastTimeReplicated();
             if (session.getMaxInactiveInterval() >= 0 && replDelta > (session.getMaxInactiveInterval() * 1000L)) {
-                counterSend_EVT_SESSION_ACCESSED++;
+                if (enableStatistics) {
+                    counterSend_EVT_SESSION_ACCESSED.incrementAndGet();
+                }
                 msg = new SessionMessageImpl(getName(), SessionMessage.EVT_SESSION_ACCESSED, null, sessionId,
                         sessionId + "-" + System.currentTimeMillis());
                 if (log.isDebugEnabled()) {
@@ -1078,25 +1110,25 @@ public class DeltaManager extends ClusterManagerBase {
             }
         }
         rejectedSessions = 0;
-        sessionReplaceCounter = 0;
-        counterNoStateTransferred = 0;
+        sessionReplaceCounter.set(0);
+        counterNoStateTransferred.set(0);
         setMaxActive(getActiveSessions());
-        counterReceive_EVT_ALL_SESSION_DATA = 0;
-        counterReceive_EVT_GET_ALL_SESSIONS = 0;
-        counterReceive_EVT_SESSION_ACCESSED = 0;
-        counterReceive_EVT_SESSION_CREATED = 0;
-        counterReceive_EVT_SESSION_DELTA = 0;
-        counterReceive_EVT_SESSION_EXPIRED = 0;
-        counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE = 0;
-        counterReceive_EVT_CHANGE_SESSION_ID = 0;
-        counterSend_EVT_ALL_SESSION_DATA = 0;
-        counterSend_EVT_GET_ALL_SESSIONS = 0;
-        counterSend_EVT_SESSION_ACCESSED = 0;
-        counterSend_EVT_SESSION_CREATED = 0;
-        counterSend_EVT_SESSION_DELTA = 0;
-        counterSend_EVT_SESSION_EXPIRED = 0;
-        counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE = 0;
-        counterSend_EVT_CHANGE_SESSION_ID = 0;
+        counterReceive_EVT_ALL_SESSION_DATA.set(0);
+        counterReceive_EVT_GET_ALL_SESSIONS.set(0);
+        counterReceive_EVT_SESSION_ACCESSED.set(0);
+        counterReceive_EVT_SESSION_CREATED.set(0);
+        counterReceive_EVT_SESSION_DELTA.set(0);
+        counterReceive_EVT_SESSION_EXPIRED.set(0);
+        counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE.set(0);
+        counterReceive_EVT_CHANGE_SESSION_ID.set(0);
+        counterSend_EVT_ALL_SESSION_DATA.set(0);
+        counterSend_EVT_GET_ALL_SESSIONS.set(0);
+        counterSend_EVT_SESSION_ACCESSED.set(0);
+        counterSend_EVT_SESSION_CREATED.set(0);
+        counterSend_EVT_SESSION_DELTA.set(0);
+        counterSend_EVT_SESSION_EXPIRED.set(0);
+        counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE.set(0);
+        counterSend_EVT_CHANGE_SESSION_ID.set(0);
 
     }
 
@@ -1109,7 +1141,9 @@ public class DeltaManager extends ClusterManagerBase {
      */
     protected void sessionExpired(String id) {
         if (cluster.getMembers().length > 0) {
-            counterSend_EVT_SESSION_EXPIRED++;
+            if (enableStatistics) {
+                counterSend_EVT_SESSION_EXPIRED.incrementAndGet();
+            }
             SessionMessage msg = new SessionMessageImpl(getName(), SessionMessage.EVT_SESSION_EXPIRED, null, id,
                     id + "-EXPIRED-MSG");
             msg.setTimestamp(System.currentTimeMillis());
@@ -1229,7 +1263,9 @@ public class DeltaManager extends ClusterManagerBase {
      * @param sender Member which sent the message
      */
     protected void handleALL_SESSION_TRANSFERCOMPLETE(SessionMessage msg, Member sender) {
-        counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE++;
+        if (enableStatistics) {
+            counterReceive_EVT_ALL_SESSION_TRANSFERCOMPLETE.incrementAndGet();
+        }
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.receiveMessage.transfercomplete", getName(), sender.getHost(),
                     Integer.valueOf(sender.getPort())));
@@ -1248,7 +1284,9 @@ public class DeltaManager extends ClusterManagerBase {
      * @throws ClassNotFoundException Serialization error
      */
     protected void handleSESSION_DELTA(SessionMessage msg, Member sender) throws IOException, ClassNotFoundException {
-        counterReceive_EVT_SESSION_DELTA++;
+        if (enableStatistics) {
+            counterReceive_EVT_SESSION_DELTA.incrementAndGet();
+        }
         byte[] delta = msg.getSession();
         DeltaSession session = (DeltaSession) findSession(msg.getSessionID());
         if (session == null) {
@@ -1273,7 +1311,9 @@ public class DeltaManager extends ClusterManagerBase {
      * @throws IOException Propagated IO error
      */
     protected void handleSESSION_ACCESSED(SessionMessage msg, Member sender) throws IOException {
-        counterReceive_EVT_SESSION_ACCESSED++;
+        if (enableStatistics) {
+            counterReceive_EVT_SESSION_ACCESSED.incrementAndGet();
+        }
         DeltaSession session = (DeltaSession) findSession(msg.getSessionID());
         if (session != null) {
             if (log.isDebugEnabled()) {
@@ -1294,7 +1334,9 @@ public class DeltaManager extends ClusterManagerBase {
      * @throws IOException Propagated IO error
      */
     protected void handleSESSION_EXPIRED(SessionMessage msg, Member sender) throws IOException {
-        counterReceive_EVT_SESSION_EXPIRED++;
+        if (enableStatistics) {
+            counterReceive_EVT_SESSION_EXPIRED.incrementAndGet();
+        }
         DeltaSession session = (DeltaSession) findSession(msg.getSessionID());
         if (session != null) {
             if (log.isDebugEnabled()) {
@@ -1311,7 +1353,9 @@ public class DeltaManager extends ClusterManagerBase {
      * @param sender Member which sent the message
      */
     protected void handleSESSION_CREATED(SessionMessage msg, Member sender) {
-        counterReceive_EVT_SESSION_CREATED++;
+        if (enableStatistics) {
+            counterReceive_EVT_SESSION_CREATED.incrementAndGet();
+        }
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.receiveMessage.createNewSession", getName(), msg.getSessionID()));
         }
@@ -1339,7 +1383,9 @@ public class DeltaManager extends ClusterManagerBase {
      */
     protected void handleALL_SESSION_DATA(SessionMessage msg, Member sender)
             throws ClassNotFoundException, IOException {
-        counterReceive_EVT_ALL_SESSION_DATA++;
+        if (enableStatistics) {
+            counterReceive_EVT_ALL_SESSION_DATA.incrementAndGet();
+        }
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.receiveMessage.allSessionDataBegin", getName()));
         }
@@ -1361,7 +1407,9 @@ public class DeltaManager extends ClusterManagerBase {
      * @throws IOException IO error sending messages
      */
     protected void handleGET_ALL_SESSIONS(SessionMessage msg, Member sender) throws IOException {
-        counterReceive_EVT_GET_ALL_SESSIONS++;
+        if (enableStatistics) {
+            counterReceive_EVT_GET_ALL_SESSIONS.incrementAndGet();
+        }
         // get a list of all the session from this manager
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.receiveMessage.unloadingBegin", getName()));
@@ -1398,7 +1446,9 @@ public class DeltaManager extends ClusterManagerBase {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.createMessage.allSessionTransferred", getName()));
         }
-        counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE++;
+        if (enableStatistics) {
+            counterSend_EVT_ALL_SESSION_TRANSFERCOMPLETE.incrementAndGet();
+        }
         cluster.send(newmsg, sender);
     }
 
@@ -1411,7 +1461,9 @@ public class DeltaManager extends ClusterManagerBase {
      * @throws IOException IO error with serialization
      */
     protected void handleCHANGE_SESSION_ID(SessionMessage msg, Member sender) throws IOException {
-        counterReceive_EVT_CHANGE_SESSION_ID++;
+        if (enableStatistics) {
+            counterReceive_EVT_CHANGE_SESSION_ID.incrementAndGet();
+        }
         DeltaSession session = (DeltaSession) findSession(msg.getSessionID());
         if (session != null) {
             String newSessionID = deserializeSessionId(msg.getSession());
@@ -1429,7 +1481,9 @@ public class DeltaManager extends ClusterManagerBase {
      * @param sender Member which sent the message
      */
     protected void handleALL_SESSION_NOCONTEXTMANAGER(SessionMessage msg, Member sender) {
-        counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER++;
+        if (enableStatistics) {
+            counterReceive_EVT_ALL_SESSION_NOCONTEXTMANAGER.incrementAndGet();
+        }
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.receiveMessage.noContextManager", getName(), sender.getHost(),
                     Integer.valueOf(sender.getPort())));
@@ -1457,7 +1511,9 @@ public class DeltaManager extends ClusterManagerBase {
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("deltaManager.createMessage.allSessionData", getName()));
         }
-        counterSend_EVT_ALL_SESSION_DATA++;
+        if (enableStatistics) {
+            counterSend_EVT_ALL_SESSION_DATA.incrementAndGet();
+        }
         int sendOptions = Channel.SEND_OPTIONS_SYNCHRONIZED_ACK | Channel.SEND_OPTIONS_USE_ACK;
         cluster.send(newmsg, sender, sendOptions);
     }
