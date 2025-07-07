@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.coyote.ActionCode;
 import org.apache.coyote.BadRequestException;
@@ -108,7 +109,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
     private volatile boolean crFound = false;
     private volatile int chunkSizeDigitsRead = 0;
     private volatile boolean parsingExtension = false;
-    private volatile long extensionSize;
+    private final AtomicLong extensionSize = new AtomicLong(0);
     private final HttpHeaderParser httpHeaderParser;
 
     // ----------------------------------------------------------- Constructors
@@ -253,7 +254,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
         crFound = false;
         chunkSizeDigitsRead = 0;
         parsingExtension = false;
-        extensionSize = 0;
+        extensionSize.set(0);
         httpHeaderParser.recycle();
     }
 
@@ -367,7 +368,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 // semicolons may appear to separate multiple chunk-extensions.
                 // These need to be processed as part of parsing the extensions.
                 parsingExtension = true;
-                extensionSize++;
+                extensionSize.incrementAndGet();
             } else if (!parsingExtension) {
                 int charValue = HexUtils.getDec(chr);
                 if (charValue != -1 && chunkSizeDigitsRead < 8) {
@@ -381,8 +382,8 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 // Extension 'parsing'
                 // Note that the chunk-extension is neither parsed nor
                 // validated. Currently it is simply ignored.
-                extensionSize++;
-                if (maxExtensionSize > -1 && extensionSize > maxExtensionSize) {
+                long extSize = extensionSize.incrementAndGet();
+                if (maxExtensionSize > -1 && extSize > maxExtensionSize) {
                     throwBadRequestException(sm.getString("chunkedInputFilter.maxExtension"));
                 }
             }
@@ -430,7 +431,7 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 // semicolons may appear to separate multiple chunk-extensions.
                 // These need to be processed as part of parsing the extensions.
                 parsingExtension = true;
-                extensionSize++;
+                extensionSize.incrementAndGet();
             } else if (!parsingExtension) {
                 int charValue = HexUtils.getDec(chr);
                 if (charValue != -1 && chunkSizeDigitsRead < 8) {
@@ -444,8 +445,8 @@ public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler
                 // Extension 'parsing'
                 // Note that the chunk-extension is neither parsed nor
                 // validated. Currently it is simply ignored.
-                extensionSize++;
-                if (maxExtensionSize > -1 && extensionSize > maxExtensionSize) {
+                long extSize = extensionSize.incrementAndGet();
+                if (maxExtensionSize > -1 && extSize > maxExtensionSize) {
                     return false;
                 }
             }
