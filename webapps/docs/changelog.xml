@@ -223,6 +223,10 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Add <code>enableStatistics</code> configuration attribute for the
+        <code>DeltaManager</code>, defaulting to <code>true</code>. (remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
