@@ -153,12 +153,20 @@ public class ReflectionUtil {
 
         // Fast path: when no arguments exist, there can only be one matching method and no need for coercion.
         if (paramCount == 0) {
+            Method result = null;
+            Throwable t = null;
             try {
                 Method method = clazz.getMethod(methodName, paramTypes);
-                return getMethod(clazz, base, method);
+                result = getMethod(clazz, base, method);
             } catch (NoSuchMethodException | SecurityException e) {
-                // Fall through to broader, slower logic
+                // Fall through
+                t = e;
             }
+            if (result == null) {
+                throw new MethodNotFoundException(
+                        MessageFactory.get("error.method.notfound", base, property, paramString(paramTypes)), t);
+            }
+            return result;
         }
 
         Method[] methods = clazz.getMethods();
