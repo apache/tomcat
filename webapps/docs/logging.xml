@@ -354,7 +354,7 @@ java.util.logging.ConsoleHandler.level=ALL</source>
 3manager.org.apache.juli.AsyncFileHandler.encoding = UTF-8
 
 java.util.logging.ConsoleHandler.level = ALL
-java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter
+java.util.logging.ConsoleHandler.formatter = org.apache.juli.OneLineFormatter
 java.util.logging.ConsoleHandler.encoding = UTF-8
 
 ############################################################
@@ -391,7 +391,7 @@ org.apache.juli.AsyncFileHandler.prefix = ${classloader.webappName}.
 org.apache.juli.AsyncFileHandler.encoding = UTF-8
 
 java.util.logging.ConsoleHandler.level = ALL
-java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter
+java.util.logging.ConsoleHandler.formatter = org.apache.juli.OneLineFormatter
 java.util.logging.ConsoleHandler.encoding = UTF-8]]></source>
 
 
