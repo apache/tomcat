@@ -1163,6 +1163,8 @@ public class Http11Processor extends AbstractProcessor {
             endRequest();
             inputBuffer.nextRequest();
             outputBuffer.nextRequest();
+            // Set keep alive timeout for next request
+            socketWrapper.setReadTimeout(protocol.getKeepAliveTimeout());
             if (socketWrapper.isReadPending()) {
                 return SocketState.LONG;
             } else {
