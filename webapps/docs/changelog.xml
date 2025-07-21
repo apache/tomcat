@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 9.0.108 (remm)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>69748</bug>: Add missing call to set keep-alive timeout when using
+        HTTP/1.1 following an async request, which was present for AJP.
+        (remm/markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Cluster">
     <changelog>
       <update>
