@@ -173,7 +173,7 @@
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        Fix bloom filter population for archive indexing when using an unpacked
+        Fix bloom filter population for archive indexing when using an packed
         WAR containing one or more JAR files. (markt)
       </fix>
     </changelog>
