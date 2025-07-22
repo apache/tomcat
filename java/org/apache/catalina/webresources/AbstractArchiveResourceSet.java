@@ -36,12 +36,12 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
 
     private URL baseUrl;
     private String baseUrlString;
-    private JarFile archive = null;
+    protected JarFile archive = null;
     protected Map<String,JarEntry> archiveEntries = null;
     protected final Object archiveLock = new Object();
-    private long archiveUseCount = 0;
-    private JarContents jarContents;
-    private boolean retainBloomFilterForArchives = false;
+    protected long archiveUseCount = 0;
+    protected JarContents jarContents;
+    protected boolean retainBloomFilterForArchives = false;
 
     protected final void setBaseUrl(URL baseUrl) {
         this.baseUrl = baseUrl;
