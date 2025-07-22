@@ -108,7 +108,7 @@
   <subsection name="Catalina">
     <changelog>
       <fix>
-        Fix bloom filter population for archive indexing when using an packed
+        Fix bloom filter population for archive indexing when using a packed
         WAR containing one or more JAR files. (markt)
       </fix>
     </changelog>
