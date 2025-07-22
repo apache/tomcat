@@ -28,6 +28,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
+import java.util.zip.ZipFile;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
@@ -147,7 +148,30 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                     }
                 }
             }
+            WebResourceRoot root = getRoot();
+            if (root.getArchiveIndexStrategyEnum().getUsesBloom()) {
+                jarContents = new JarContents(archiveEntries.values());
+                retainBloomFilterForArchives = root.getArchiveIndexStrategyEnum().getRetain();
+            }
             return archiveEntries;
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * JarWar needs to generate jarContents for the inner JAR, not the outer WAR.
+     */
+    @Override
+    protected JarFile openJarFile() throws IOException {
+        synchronized (archiveLock) {
+            if (archive == null) {
+                archive = new JarFile(new File(getBase()), true, ZipFile.OPEN_READ, Runtime.version());
+                // Don't populate JarContents here. Populate at the end of getArchiveEntries()
+            }
+            archiveUseCount++;
+            return archive;
         }
     }
 

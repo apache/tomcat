@@ -17,6 +17,7 @@
 package org.apache.catalina.webresources;
 
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -27,8 +28,7 @@ import java.util.jar.JarFile;
  * from the beginning of the key. The hash methods are simple but good enough for this purpose.
  */
 public final class JarContents {
-    private final BitSet bits1;
-    private final BitSet bits2;
+
     /**
      * Constant used by a typical hashing method.
      */
@@ -44,6 +44,10 @@ public final class JarContents {
      */
     private static final int TABLE_SIZE = 2048;
 
+    private final BitSet bits1 = new BitSet(TABLE_SIZE);
+    private final BitSet bits2 = new BitSet(TABLE_SIZE);
+
+
     /**
      * Parses the passed-in jar and populates the bit array.
      *
@@ -51,52 +55,66 @@ public final class JarContents {
      */
     public JarContents(JarFile jar) {
         Enumeration<JarEntry> entries = jar.entries();
-        bits1 = new BitSet(TABLE_SIZE);
-        bits2 = new BitSet(TABLE_SIZE);
-
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
-            String name = entry.getName();
-            int startPos = 0;
+            processEntry(entry);
+        }
+    }
 
-            // If the path starts with a slash, that's not useful information.
-            // Skipping it increases the significance of our key by
-            // removing an insignificant character.
-            boolean precedingSlash = name.charAt(0) == '/';
-            if (precedingSlash) {
-                startPos = 1;
-            }
 
-            // Versioned entries should be added to the table according to their real name
-            if (name.startsWith("META-INF/versions/", startPos)) {
-                int i = name.indexOf('/', 18 + startPos);
-                if (i > 0) {
-                    int version = Integer.parseInt(name.substring(18 + startPos, i));
-                    if (version <= Runtime.version().feature()) {
-                        startPos = i + 1;
-                    }
+    /**
+     * Populates the bit array from the provided set of JAR entries.
+     *
+     * @param entries The set of entries for the JAR file being processed
+     */
+    public JarContents(Collection<JarEntry> entries) {
+        for (JarEntry entry : entries) {
+            processEntry(entry);
+        }
+    }
+
+
+    private void processEntry(JarEntry entry) {
+        String name = entry.getName();
+        int startPos = 0;
+
+        // If the path starts with a slash, that's not useful information.
+        // Skipping it increases the significance of our key by
+        // removing an insignificant character.
+        boolean precedingSlash = name.charAt(0) == '/';
+        if (precedingSlash) {
+            startPos = 1;
+        }
+
+        // Versioned entries should be added to the table according to their real name
+        if (name.startsWith("META-INF/versions/", startPos)) {
+            int i = name.indexOf('/', 18 + startPos);
+            if (i > 0) {
+                int version = Integer.parseInt(name.substring(18 + startPos, i));
+                if (version <= Runtime.version().feature()) {
+                    startPos = i + 1;
                 }
-                if (startPos == name.length()) {
-                    continue;
-                }
             }
+            if (startPos == name.length()) {
+                return;
+            }
+        }
 
-            // Find the correct table slot
-            int pathHash1 = hashcode(name, startPos, HASH_PRIME_1);
-            int pathHash2 = hashcode(name, startPos, HASH_PRIME_2);
+        // Find the correct table slot
+        int pathHash1 = hashcode(name, startPos, HASH_PRIME_1);
+        int pathHash2 = hashcode(name, startPos, HASH_PRIME_2);
+
+        bits1.set(pathHash1 % TABLE_SIZE);
+        bits2.set(pathHash2 % TABLE_SIZE);
+
+        // While directory entry names always end in "/", application code
+        // may look them up without the trailing "/". Add this second form.
+        if (entry.isDirectory()) {
+            pathHash1 = hashcode(name, startPos, name.length() - 1, HASH_PRIME_1);
+            pathHash2 = hashcode(name, startPos, name.length() - 1, HASH_PRIME_2);
 
             bits1.set(pathHash1 % TABLE_SIZE);
             bits2.set(pathHash2 % TABLE_SIZE);
-
-            // While directory entry names always end in "/", application code
-            // may look them up without the trailing "/". Add this second form.
-            if (entry.isDirectory()) {
-                pathHash1 = hashcode(name, startPos, name.length() - 1, HASH_PRIME_1);
-                pathHash2 = hashcode(name, startPos, name.length() - 1, HASH_PRIME_2);
-
-                bits1.set(pathHash1 % TABLE_SIZE);
-                bits2.set(pathHash2 % TABLE_SIZE);
-            }
         }
     }
 
