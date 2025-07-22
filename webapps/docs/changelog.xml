@@ -113,6 +113,23 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        <bug>69748</bug>: Add missing call to set keep-alive timeout when using
+        HTTP/1.1 following an async request, which was present for AJP.
+        (remm/markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <update>
+        Add <code>enableStatistics</code> configuration attribute for the
+        <code>DeltaManager</code>, defaulting to <code>true</code>. (remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.43 (schultz)" rtext="2025-07-04">
   <subsection name="Catalina">
