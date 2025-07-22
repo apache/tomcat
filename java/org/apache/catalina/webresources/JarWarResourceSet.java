@@ -86,6 +86,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
      * <p>
      * JarWar can't optimise for a single resource so the Map is always returned.
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected Map<String,JarEntry> getArchiveEntries(boolean single) {
         synchronized (archiveLock) {
@@ -148,7 +149,31 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                     }
                 }
             }
+            WebResourceRoot root = getRoot();
+            if (root.getArchiveIndexStrategyEnum().getUsesBloom() ||
+                    root.getContext() != null && root.getContext().getUseBloomFilterForArchives()) {
+                jarContents = new JarContents(archiveEntries.values());
+                retainBloomFilterForArchives = root.getArchiveIndexStrategyEnum().getRetain();
+            }
             return archiveEntries;
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * JarWar needs to generate jarContents for the inner JAR, not the outer WAR.
+     */
+    @Override
+    protected JarFile openJarFile() throws IOException {
+        synchronized (archiveLock) {
+            if (archive == null) {
+                archive = JreCompat.getInstance().jarFileNewInstance(getBase());
+                // Don't populate JarContents here. Populate at the end of getArchiveEntries()
+            }
+            archiveUseCount++;
+            return archive;
         }
     }
 
