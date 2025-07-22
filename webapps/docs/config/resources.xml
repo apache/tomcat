@@ -86,7 +86,7 @@
         <p>If this is <code>purged</code> then a bloom filter will be used to
         speed up archive lookups, but can be purged at runtime. It is recommended
         to use <code>bloom</code> to avoid reinitializing the bloom filters.</p>
-        <p>If not specified, the default value of <code>simple</code> will be
+        <p>If not specified, the default value of <code>bloom</code> will be
         used.</p>
       </attribute>
 
