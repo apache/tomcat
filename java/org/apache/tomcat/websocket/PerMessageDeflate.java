@@ -61,7 +61,7 @@ public class PerMessageDeflate implements Transformation {
     // Flag to track if a message is completely empty
     private volatile boolean emptyMessage = true;
 
-    static PerMessageDeflate negotiate(List<List<Parameter>> preferences, boolean isServer) {
+    static PerMessageDeflate build(List<List<Parameter>> preferences, boolean isServer) {
         // Accept the first preference that the endpoint is able to support
         for (List<Parameter> preference : preferences) {
             boolean ok = true;
