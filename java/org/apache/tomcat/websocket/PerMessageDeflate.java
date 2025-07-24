@@ -44,6 +44,13 @@ public class PerMessageDeflate implements Transformation {
 
     public static final String NAME = "permessage-deflate";
 
+    public static final TransformationBuilder BUILDER = new TransformationBuilder() {
+        @Override
+        public Transformation build(List<List<Parameter>> preferences, boolean isServer) {
+            return PerMessageDeflate.build(preferences, isServer);
+        }
+    };
+
     private final boolean serverContextTakeover;
     private final int serverMaxWindowBits;
     private final boolean clientContextTakeover;
