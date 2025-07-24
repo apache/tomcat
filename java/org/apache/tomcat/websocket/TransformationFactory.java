@@ -16,7 +16,9 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.websocket.Extension;
 
@@ -24,18 +26,32 @@ public class TransformationFactory {
 
     private static final TransformationFactory factory = new TransformationFactory();
 
+    private Map<String,TransformationBuilder> builders = new HashMap<>();
+
+
     private TransformationFactory() {
         // Hide default constructor
+
+        // Configure the built-in transformations
+        builders.put(PerMessageDeflate.NAME, PerMessageDeflate.BUILDER);
     }
+
 
     public static TransformationFactory getInstance() {
         return factory;
     }
 
+
     public Transformation create(String name, List<List<Extension.Parameter>> preferences, boolean isServer) {
-        if (PerMessageDeflate.NAME.equals(name)) {
-            return PerMessageDeflate.build(preferences, isServer);
+        TransformationBuilder builder = builders.get(name);
+        if (builder != null) {
+            return builder.build(preferences, isServer);
         }
         return null;
+    }
+
+
+    public void registerExtension(String name, TransformationBuilder builder) {
+        builders.put(name, builder);
     }
 }
