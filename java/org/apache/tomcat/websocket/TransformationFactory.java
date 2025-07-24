@@ -34,7 +34,7 @@ public class TransformationFactory {
 
     public Transformation create(String name, List<List<Extension.Parameter>> preferences, boolean isServer) {
         if (PerMessageDeflate.NAME.equals(name)) {
-            return PerMessageDeflate.negotiate(preferences, isServer);
+            return PerMessageDeflate.build(preferences, isServer);
         }
         return null;
     }
