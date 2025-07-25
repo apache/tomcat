@@ -50,7 +50,9 @@
     (*.gif, *.jpg are also binary, but are automatically detected by RAT as
     ones, so no explicit configuration is needed)
 
-  - Markdown files for display in their GitHub UI
+  - IDE configuration files that can't contain headers
+
+  - Markdown files for display in the GitHub UI
 
   - Temporary cache files used by Checkstyle
 
@@ -282,10 +284,12 @@ res/checkstyle/header-al2.txt
 
 output/dist/temp/safeToDelete.tmp
 
-
 **/*.bmp
 **/*.dia
 **/*.vpd
+
+res/ide-support/idea/.name
+output/dist/src/res/ide-support/idea/.name
 
 **/*.md
 
