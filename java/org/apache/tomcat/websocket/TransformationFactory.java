@@ -16,9 +16,12 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.websocket.Extension;
 
@@ -53,5 +56,19 @@ public class TransformationFactory {
 
     public void registerExtension(String name, TransformationBuilder builder) {
         builders.put(name, builder);
+    }
+
+
+    public Set<String> getInstalledExtensionNames() {
+        return new HashSet<>(builders.keySet());
+    }
+
+
+    public Set<Extension> getInstalledExtensions() {
+        Set<Extension> result = new HashSet<>();
+        for (String extensionName : builders.keySet()) {
+            result.add(new WsExtension(extensionName));
+        }
+        return Collections.unmodifiableSet(result);
     }
 }
