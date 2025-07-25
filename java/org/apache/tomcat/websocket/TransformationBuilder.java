@@ -18,7 +18,7 @@ package org.apache.tomcat.websocket;
 
 import java.util.List;
 
-import jakarta.websocket.Extension;
+import javax.websocket.Extension;
 
 public interface TransformationBuilder {
 
