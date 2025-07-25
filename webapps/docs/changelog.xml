@@ -130,6 +130,16 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        Align the WebSocket extension handling for WebSocket client connections
+        with WebSocket server connections. The WebSocket client now only
+        includes an extension requested by an endpoint in the opening handshake
+        if the WebSocket client supports that extension. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.9 (markt)" rtext="2025-07-04">
   <subsection name="Catalina">
