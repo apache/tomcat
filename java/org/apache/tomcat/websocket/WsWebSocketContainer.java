@@ -34,6 +34,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -666,8 +667,20 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
         }
 
         // WebSocket extensions
-        if (extensions != null && !extensions.isEmpty()) {
-            headers.put(Constants.WS_EXTENSIONS_HEADER_NAME, generateExtensionHeaders(extensions));
+        if (extensions != null) {
+            // Filter the requested extensions to remove any that are not supported by the client container.
+            Set<String> installed = TransformationFactory.getInstance().getInstalledExtensionNames();
+            List<Extension> availableExtensions = new ArrayList<>(extensions);
+            Iterator<Extension> availableExtensionsIter = availableExtensions.iterator();
+            while (availableExtensionsIter.hasNext()) {
+                Extension e = availableExtensionsIter.next();
+                if (!installed.contains(e.getName())) {
+                    availableExtensionsIter.remove();
+                }
+            }
+            if (!availableExtensions.isEmpty()) {
+                headers.put(Constants.WS_EXTENSIONS_HEADER_NAME, generateExtensionHeaders(availableExtensions));
+            }
         }
 
         return headers;
@@ -949,7 +962,7 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
      */
     @Override
     public Set<Extension> getInstalledExtensions() {
-        return Collections.emptySet();
+        return TransformationFactory.getInstance().getInstalledExtensions();
     }
 
 

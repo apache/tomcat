@@ -267,6 +267,12 @@
         port information. (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Align the WebSocket extension handling for WebSocket client connections
+        with WebSocket server connections. The WebSocket client now only
+        includes an extension requested by an endpoint in the opening handshake
+        if the WebSocket client supports that extension. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
