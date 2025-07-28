@@ -278,6 +278,12 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Manager. Provide the Manager web application with a dedicated favicon
+        file rather than using the one from the ROOT web application which might
+        not be present or may represent something entirely different. Pull
+        request <pr>876</pr> by Simon Arame.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
