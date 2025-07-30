@@ -199,6 +199,11 @@
         HTTP/1.1 following an async request, which was present for AJP.
         (remm/markt)
       </fix>
+      <fix>
+        <bug>69762</bug>: Fix possible overflow during HPACK decoding of
+        integers. Note that the maximum permitted value of an HPACK decoded
+        integer is <code>Integer.MAX_VALUE</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
