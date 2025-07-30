@@ -165,6 +165,19 @@ On *nix, $CATALINA_BASE/bin/setenv.sh:
   JRE_HOME=/usr/java/latest
   CATALINA_PID="/run/tomcat.pid"
 
+(3.5) Configuring JVM Memory Options with CATALINA_OPTS
+
+To optimize Tomcat's memory usage, you can set JVM options like initial and maximum heap sizes using the CATALINA_OPTS environment variable in the setenv script. This is particularly useful for production environments to ensure Tomcat has sufficient memory.
+
+For example, to set the initial heap size to 512MB and the maximum heap size to 2GB:
+
+On Windows, in %CATALINA_BASE%\bin\setenv.bat:
+  set "CATALINA_OPTS=-Xms512m -Xmx2048m"
+
+On *nix, in $CATALINA_BASE/bin/setenv.sh:
+  export CATALINA_OPTS="-Xms512m -Xmx2048m"
+
+Ensure these values are appropriate for your system's available memory to avoid OutOfMemory errors or excessive resource consumption. Consult the Java documentation for additional JVM options, such as garbage collector settings (e.g., -XX:+UseG1GC).
 
 The CATALINA_HOME and CATALINA_BASE variables cannot be configured in the
 setenv script, because they are used to locate that file.
