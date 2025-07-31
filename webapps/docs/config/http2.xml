@@ -158,8 +158,9 @@
     <attribute name="overheadResetFactor" required="false">
       <p>The amount by which the overhead count (see
       <strong>overheadCountFactor</strong>) will be increased for each reset
-      frame received. If not specified, a default value of <code>50</code> will
-      be used. A value of less than zero will be treated as zero.</p>
+      frame received or sent. If not specified, a default value of
+      <code>50</code> will be used. A value of less than zero will be treated as
+      zero.</p>
     </attribute>
 
     <attribute name="overheadDataThreshold" required="false">
