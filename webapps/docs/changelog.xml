@@ -307,6 +307,9 @@
       <update>
         Update Checkstyle to 10.26.1. (markt)
       </update>
+      <add>
+        Improvements to French translations. (remm)
+      </add>
     </changelog>
   </subsection>
 </section>
