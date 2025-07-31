@@ -45,6 +45,7 @@
     <meta name="copyright" content="copyright 2005-2025 the Apache Software Foundation"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Sessions Administration for <%= JspHelper.escapeXml(cn.getDisplayName()) %></title>
+    <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
 </head>
 <body>
 <h1>Sessions Administration for <%= JspHelper.escapeXml(cn.getDisplayName()) %></h1>
