@@ -36,7 +36,7 @@ public class Constants {
         HTML_HEADER_SECTION =
                 "<html>\n" +
                 "<head>\n" +
-                "<link href=\"{0}/favicon.ico\" rel=\"icon\" type=\"image/x-icon\" />\n" +
+                "<link href=\"{0}/images/favicon.ico\" rel=\"icon\" type=\"image/x-icon\" />\n" +
                 "<link rel=\"stylesheet\" href=\"{0}/css/manager.css\">\n";
 
         BODY_HEADER_SECTION =
