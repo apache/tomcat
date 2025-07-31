@@ -131,6 +131,9 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
             log.trace(sm.getString("upgradeHandler.rst.debug", connectionId, Integer.toString(se.getStreamId()),
                     se.getError(), se.getMessage()));
         }
+
+        increaseOverheadCount(FrameType.RST, getProtocol().getOverheadResetFactor());
+
         // Write a RST frame
         byte[] rstFrame = new byte[13];
         // Length
