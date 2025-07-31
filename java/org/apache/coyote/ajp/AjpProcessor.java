@@ -128,20 +128,19 @@ public class AjpProcessor extends AbstractProcessor {
         System.arraycopy(pongMessage.getBuffer(), 0, pongMessageArray, 0, pongMessage.getLen());
 
         // Build Map of Java Servlet to Jakarta Servlet attribute names
-        jakartaAttributeMapping = Map.of(
-            "jakarta.servlet.request.secure_protocol", "jakarta.servlet.request.secure_protocol",
-            "jakarta.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite",
-            "jakarta.servlet.request.key_size", "jakarta.servlet.request.key_size",
-            "jakarta.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session",
-            "jakarta.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate",
-            "javax.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite",
-            "javax.servlet.request.key_size", "jakarta.servlet.request.key_size",
-            "javax.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session",
-            "javax.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate");
+        jakartaAttributeMapping =
+                Map.of("jakarta.servlet.request.secure_protocol", "jakarta.servlet.request.secure_protocol",
+                        "jakarta.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite",
+                        "jakarta.servlet.request.key_size", "jakarta.servlet.request.key_size",
+                        "jakarta.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session",
+                        "jakarta.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate",
+                        "javax.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite",
+                        "javax.servlet.request.key_size", "jakarta.servlet.request.key_size",
+                        "javax.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session",
+                        "javax.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate");
 
-        iisTlsAttributes = Set.of(
-            "CERT_ISSUER", "CERT_SUBJECT", "CERT_COOKIE", "HTTPS_SERVER_SUBJECT", "CERT_FLAGS", "HTTPS_SECRETKEYSIZE",
-            "CERT_SERIALNUMBER", "HTTPS_SERVER_ISSUER", "HTTPS_KEYSIZE");
+        iisTlsAttributes = Set.of("CERT_ISSUER", "CERT_SUBJECT", "CERT_COOKIE", "HTTPS_SERVER_SUBJECT", "CERT_FLAGS",
+                "HTTPS_SECRETKEYSIZE", "CERT_SERIALNUMBER", "HTTPS_SERVER_ISSUER", "HTTPS_KEYSIZE");
     }
 
 
