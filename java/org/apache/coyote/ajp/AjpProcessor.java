@@ -128,19 +128,17 @@ public class AjpProcessor extends AbstractProcessor {
         System.arraycopy(pongMessage.getBuffer(), 0, pongMessageArray, 0, pongMessage.getLen());
 
         // Build Map of Java Servlet to Jakarta Servlet attribute names
-        jakartaAttributeMapping = Map.of(
-            "jakarta.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite",
-            "jakarta.servlet.request.key_size", "jakarta.servlet.request.key_size",
-            "jakarta.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session",
-            "jakarta.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate",
-            "javax.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite",
-            "javax.servlet.request.key_size", "jakarta.servlet.request.key_size",
-            "javax.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session",
-            "javax.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate");
+        jakartaAttributeMapping = Map.of("jakarta.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite",
+                "jakarta.servlet.request.key_size", "jakarta.servlet.request.key_size",
+                "jakarta.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session",
+                "jakarta.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate",
+                "javax.servlet.request.cipher_suite", "jakarta.servlet.request.cipher_suite",
+                "javax.servlet.request.key_size", "jakarta.servlet.request.key_size",
+                "javax.servlet.request.ssl_session", "jakarta.servlet.request.ssl_session",
+                "javax.servlet.request.X509Certificate", "jakarta.servlet.request.X509Certificate");
 
-        iisTlsAttributes = Set.of(
-            "CERT_ISSUER", "CERT_SUBJECT", "CERT_COOKIE", "HTTPS_SERVER_SUBJECT", "CERT_FLAGS", "HTTPS_SECRETKEYSIZE",
-            "CERT_SERIALNUMBER", "HTTPS_SERVER_ISSUER", "HTTPS_KEYSIZE");
+        iisTlsAttributes = Set.of("CERT_ISSUER", "CERT_SUBJECT", "CERT_COOKIE", "HTTPS_SERVER_SUBJECT", "CERT_FLAGS",
+                "HTTPS_SECRETKEYSIZE", "CERT_SERIALNUMBER", "HTTPS_SERVER_ISSUER", "HTTPS_KEYSIZE");
     }
 
 
@@ -765,12 +763,12 @@ public class AjpProcessor extends AbstractProcessor {
 
                 case Constants.SC_A_CONTEXT:
                     requestHeaderMessage.getBytes(tmpMB);
-                // nothing
+                    // nothing
                     break;
 
                 case Constants.SC_A_SERVLET_PATH:
                     requestHeaderMessage.getBytes(tmpMB);
-                // nothing
+                    // nothing
                     break;
 
                 case Constants.SC_A_REMOTE_USER:
@@ -801,7 +799,7 @@ public class AjpProcessor extends AbstractProcessor {
 
                 case Constants.SC_A_JVM_ROUTE:
                     requestHeaderMessage.getBytes(tmpMB);
-                // nothing
+                    // nothing
                     break;
 
                 case Constants.SC_A_SSL_CERT:
@@ -839,7 +837,7 @@ public class AjpProcessor extends AbstractProcessor {
                     break;
 
                 default:
-                // Ignore unknown attribute for backward compatibility
+                    // Ignore unknown attribute for backward compatibility
                     break;
 
             }
