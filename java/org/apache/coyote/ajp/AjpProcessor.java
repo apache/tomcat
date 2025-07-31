@@ -768,12 +768,12 @@ public class AjpProcessor extends AbstractProcessor {
 
                 case Constants.SC_A_CONTEXT:
                     requestHeaderMessage.getBytes(tmpMB);
-                // nothing
+                    // nothing
                     break;
 
                 case Constants.SC_A_SERVLET_PATH:
                     requestHeaderMessage.getBytes(tmpMB);
-                // nothing
+                    // nothing
                     break;
 
                 case Constants.SC_A_REMOTE_USER:
@@ -804,7 +804,7 @@ public class AjpProcessor extends AbstractProcessor {
 
                 case Constants.SC_A_JVM_ROUTE:
                     requestHeaderMessage.getBytes(tmpMB);
-                // nothing
+                    // nothing
                     break;
 
                 case Constants.SC_A_SSL_CERT:
@@ -842,7 +842,7 @@ public class AjpProcessor extends AbstractProcessor {
                     break;
 
                 default:
-                // Ignore unknown attribute for backward compatibility
+                    // Ignore unknown attribute for backward compatibility
                     break;
 
             }
