@@ -948,8 +948,8 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                 } else if (windowSize < 1) {
                     /*
                      * The connection window has no capacity. If the stream has not been granted an allocation, and the
-                     * stream was not already added to the backlog due to a partial reservation (see next else if
-                     * block) add it to the backlog so it can obtain an allocation when capacity is available.
+                     * stream was not already added to the backlog due to a partial reservation (see next else if block)
+                     * add it to the backlog so it can obtain an allocation when capacity is available.
                      */
                     if (stream.getConnectionAllocationMade() == 0 && stream.getConnectionAllocationRequested() == 0) {
                         stream.setConnectionAllocationRequested(reservation);
