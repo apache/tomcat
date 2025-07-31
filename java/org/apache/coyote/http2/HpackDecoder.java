@@ -380,10 +380,9 @@ public class HpackDecoder {
 
         /**
          * Are the headers pass to the recipient so far valid? The decoder needs to process all the headers to maintain
-         * state even if there is a problem. In addition, it is easy for the intended recipient to track if the
-         * complete set of headers is valid since to do that state needs to be maintained between the parsing of the
-         * initial headers and the parsing of any trailer headers. The recipient is the best place to maintain that
-         * state.
+         * state even if there is a problem. In addition, it is easy for the intended recipient to track if the complete
+         * set of headers is valid since to do that state needs to be maintained between the parsing of the initial
+         * headers and the parsing of any trailer headers. The recipient is the best place to maintain that state.
          *
          * @throws StreamException If the headers received to date are not valid
          */
