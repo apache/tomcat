@@ -74,7 +74,8 @@ class Validator {
                         new JspUtil.ValidAttribute("isThreadSafe"), new JspUtil.ValidAttribute("info"),
                         new JspUtil.ValidAttribute("errorPage"), new JspUtil.ValidAttribute("isErrorPage"),
                         new JspUtil.ValidAttribute("contentType"), new JspUtil.ValidAttribute("pageEncoding"),
-                        new JspUtil.ValidAttribute("isELIgnored"), new JspUtil.ValidAttribute("errorOnELNotFound"),
+                        new JspUtil.ValidAttribute("isELIgnored"), new JspUtil.ValidAttribute("isEscapePageEL"), 
+                        new JspUtil.ValidAttribute("errorOnELNotFound"),
                         new JspUtil.ValidAttribute("deferredSyntaxAllowedAsLiteral"),
                         new JspUtil.ValidAttribute("trimDirectiveWhitespaces") };
 
@@ -156,6 +157,12 @@ class Validator {
                         pageInfo.setIsELIgnored(value, n, err, true);
                     } else if (!pageInfo.getIsELIgnored().equals(value)) {
                         err.jspError(n, "jsp.error.page.conflict.iselignored", pageInfo.getIsELIgnored(), value);
+                    }
+                } else if ("isEscapePageEL".equals(attr)) {
+                    if (pageInfo.getIsEscapePageEL() == null) {
+                        pageInfo.setIsEscapePageEL(value, n, err, true);
+                    } else if (!pageInfo.getIsEscapePageEL().equals(value)) {
+                        err.jspError(n, "jsp.error.page.conflict.escapepageel", pageInfo.getIsEscapePageEL(), value);
                     }
                 } else if ("errorOnELNotFound".equals(attr)) {
                     if (pageInfo.getErrorOnELNotFound() == null) {
@@ -241,6 +248,12 @@ class Validator {
                         pageInfo.setIsELIgnored(value, n, err, false);
                     } else if (!pageInfo.getIsELIgnored().equals(value)) {
                         err.jspError(n, "jsp.error.tag.conflict.iselignored", pageInfo.getIsELIgnored(), value);
+                    }
+                } else if ("isEscapePageEL".equals(attr)) {
+                    if (pageInfo.getIsEscapePageEL() == null) {
+                        pageInfo.setIsEscapePageEL(value, n, err, false);
+                    } else if (!pageInfo.getIsEscapePageEL().equals(value)) {
+                        err.jspError(n, "jsp.error.tag.conflict.escapepageel", pageInfo.getIsEscapePageEL(), value);
                     }
                 } else if ("errorOnELNotFound".equals(attr)) {
                     if (pageInfo.getErrorOnELNotFound() == null) {
@@ -670,7 +683,13 @@ class Validator {
 
             // build expression
             StringBuilder expr = this.getBuffer();
-            expr.append(n.getType()).append('{').append(n.getText()).append('}');
+            expr.append(n.getType()).append('{');
+			if (pageInfo.isEscapePageEL()) {
+				expr.append("fn:escapeXml(").append(n.getText()).append(")");
+			} else {
+				expr.append(n.getText());
+			}
+            expr.append('}');
             ELNode.Nodes el = ELParser.parse(expr.toString(), pageInfo.isDeferredSyntaxAllowedAsLiteral());
 
             // validate/prepare expression
