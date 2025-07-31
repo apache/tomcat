@@ -120,6 +120,11 @@
         HTTP/1.1 following an async request, which was present for AJP.
         (remm/markt)
       </fix>
+      <fix>
+        <bug>69762</bug>: Fix possible overflow during HPACK decoding of
+        integers. Note that the maximum permitted value of an HPACK decoded
+        integer is <code>Integer.MAX_VALUE</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
@@ -128,6 +133,16 @@
         Add <code>enableStatistics</code> configuration attribute for the
         <code>DeltaManager</code>, defaulting to <code>true</code>. (remm)
       </update>
+    </changelog>
+  </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Manager. Provide the Manager web application with a dedicated favicon
+        file rather than using the one from the ROOT web application which might
+        not be present or may represent something entirely different. Pull
+        request <pr>876</pr> by Simon Arame.
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
