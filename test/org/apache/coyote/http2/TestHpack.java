@@ -178,6 +178,19 @@ public class TestHpack {
         Hpack.decodeInteger(bb, 1);
     }
 
+    @Test(expected = HpackException.class)
+    public void testDecodeIntegerOverflow() throws HpackException {
+        ByteBuffer bb = ByteBuffer.allocate(9);
+        bb.put((byte) 255);
+        bb.put((byte) 254);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 15);
+        bb.position(0);
+
+        Hpack.decodeInteger(bb, 1);
+    }
 
     @Test(expected = HpackException.class)
     public void testDecodeIntegerZeroValues() throws HpackException {
