@@ -179,7 +179,7 @@ final class Hpack {
                     return -1;
                 }
                 b = source.get();
-                result = result + (b & 127) * (PREFIX_TABLE[m] + 1);
+                result = result + (b & 127) * (PREFIX_TABLE[m] + 1L);
                 if (result > Integer.MAX_VALUE) {
                     throw new HpackException(sm.getString("hpack.integerEncodedTooBig"));
                 }
