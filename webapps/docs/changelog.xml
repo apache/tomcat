@@ -131,6 +131,10 @@
         and clarify that a stream reset always triggers an overhead increase.
         (markt)
       </fix>
+      <fix>
+        <bug>69762</bug>: Additional overflow fix for HPACK decoding of
+        integers. Pull request <pr>880</pr> by Chenjp. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
