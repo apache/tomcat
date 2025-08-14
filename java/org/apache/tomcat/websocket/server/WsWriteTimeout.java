@@ -72,7 +72,9 @@ public class WsWriteTimeout implements BackgroundProcess {
 
 
     /**
-     * {@inheritDoc} The default value is 1 which means asynchronous write timeouts are processed every 1 second.
+     * {@inheritDoc}
+     * <p>
+     * The default value is 1 which means asynchronous write timeouts are processed every 1 second.
      */
     @Override
     public int getProcessPeriod() {

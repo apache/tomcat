@@ -313,6 +313,14 @@ public abstract class AbstractArchiveResourceSet extends AbstractResourceSet {
         return false;
     }
 
+    /**
+     * Create a JarFile for accessing the elements of the resource set. Depending on the
+     * {@link WebResourceRoot#getArchiveIndexStrategy()}, it may also index the elements for faster lookups.
+     *
+     * @return A JarFile to use to access the elements of the resource set
+     *
+     * @throws IOException If an error occurs creating the JarFile
+     */
     protected JarFile openJarFile() throws IOException {
         synchronized (archiveLock) {
             if (archive == null) {

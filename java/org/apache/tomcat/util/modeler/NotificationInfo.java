@@ -46,14 +46,9 @@ public class NotificationInfo extends FeatureInfo {
     protected String[] notifTypes = new String[0];
     protected final ReadWriteLock notifTypesLock = new ReentrantReadWriteLock();
 
+
     // ------------------------------------------------------------- Properties
 
-
-    /**
-     * Override the <code>description</code> property setter.
-     *
-     * @param description The new description
-     */
     @Override
     public void setDescription(String description) {
         super.setDescription(description);
@@ -61,11 +56,6 @@ public class NotificationInfo extends FeatureInfo {
     }
 
 
-    /**
-     * Override the <code>name</code> property setter.
-     *
-     * @param name The new name
-     */
     @Override
     public void setName(String name) {
         super.setName(name);

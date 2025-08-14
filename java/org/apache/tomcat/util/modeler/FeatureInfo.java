@@ -16,12 +16,10 @@
  */
 package org.apache.tomcat.util.modeler;
 
-
 import java.io.Serial;
 import java.io.Serializable;
 
 import javax.management.MBeanFeatureInfo;
-
 
 /**
  * <p>
@@ -52,6 +50,11 @@ public class FeatureInfo implements Serializable {
         return this.description;
     }
 
+    /**
+     * Set the human-readable description of this feature.
+     *
+     * @param description The new description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
@@ -64,9 +67,15 @@ public class FeatureInfo implements Serializable {
         return this.name;
     }
 
+    /**
+     * Set the name of this feature, which must be unique among features in the same collection.
+     *
+     * @param name The new name
+     */
     public void setName(String name) {
         this.name = name;
     }
+
 
     /**
      * @return the fully qualified Java class name of this element.
@@ -75,9 +84,12 @@ public class FeatureInfo implements Serializable {
         return this.type;
     }
 
+    /**
+     * Set the fully qualified Java class name of this element.
+     *
+     * @param type The new fully qualified Java class name
+     */
     public void setType(String type) {
         this.type = type;
     }
-
-
 }

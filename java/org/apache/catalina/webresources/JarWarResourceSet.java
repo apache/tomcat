@@ -160,7 +160,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
     /**
      * {@inheritDoc}
      * <p>
-     * JarWar needs to generate jarContents for the inner JAR, not the outer WAR.
+     * JarWar needs to generate the index (jarContents) for the inner JAR, not the outer WAR.
      */
     @Override
     protected JarFile openJarFile() throws IOException {

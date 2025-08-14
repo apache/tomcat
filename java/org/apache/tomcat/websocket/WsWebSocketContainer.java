@@ -1054,7 +1054,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
 
 
     /**
-     * {@inheritDoc} The default value is 10 which means session expirations are processed every 10 seconds.
+     * {@inheritDoc}
+     * <p>
+     * The default value is 10 which means session expirations are processed every 10 seconds.
      */
     @Override
     public int getProcessPeriod() {
