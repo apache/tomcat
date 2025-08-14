@@ -36,6 +36,7 @@
     <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Configured certificate chains per Connector</title>
+    <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
 </head>
 <body>
 <h1>Configured certificate chains per Connector</h1>

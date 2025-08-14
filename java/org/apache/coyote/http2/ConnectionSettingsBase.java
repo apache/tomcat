@@ -65,7 +65,7 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     final void set(Setting setting, long value) throws T {
-        set(setting,  value, false);
+        set(setting, value, false);
     }
 
 

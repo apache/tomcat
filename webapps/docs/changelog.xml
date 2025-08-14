@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.9 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.10 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -172,10 +172,6 @@
         performance. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Fix bloom filter population for archive indexing when using a packed
-        WAR containing one or more JAR files. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -195,9 +191,8 @@
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
-        <bug>69748</bug>: Add missing call to set keep-alive timeout when using
-        HTTP/1.1 following an async request, which was present for AJP.
-        (remm/markt)
+        <bug>69762</bug>: Additional overflow fix for HPACK decoding of
+        integers. Pull request <pr>880</pr> by Chenjp. (markt)
       </fix>
     </changelog>
   </subsection>
@@ -238,10 +233,6 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Add <code>enableStatistics</code> configuration attribute for the
-        <code>DeltaManager</code>, defaulting to <code>true</code>. (remm)
-      </update>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -267,23 +258,11 @@
         port information. (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Align the WebSocket extension handling for WebSocket client connections
-        with WebSocket server connections. The WebSocket client now only
-        includes an extension requested by an endpoint in the opening handshake
-        if the WebSocket client supports that extension. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Manager. Provide the Manager web application with a dedicated favicon
-        file rather than using the one from the ROOT web application which might
-        not be present or may represent something entirely different. Pull
-        request <pr>876</pr> by Simon Arame.
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -292,9 +271,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update Checkstyle to 10.26.1. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>

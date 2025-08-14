@@ -147,4 +147,68 @@ public class TestHpack {
         decoder.decode(output);
         Assert.assertEquals(headerValue, headers2.getHeader(headerName));
     }
+
+
+    @Test
+    public void testDecodeIntegerMaxValue() throws HpackException {
+        ByteBuffer bb = ByteBuffer.allocate(9);
+        bb.put((byte) 255);
+        bb.put((byte) 254);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 7);
+        bb.position(0);
+
+        Assert.assertEquals(Integer.MAX_VALUE,Hpack.decodeInteger(bb, 1));
+    }
+
+
+    @Test(expected = HpackException.class)
+    public void testDecodeIntegerMaxValuePlus1() throws HpackException {
+        ByteBuffer bb = ByteBuffer.allocate(9);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 7);
+        bb.position(0);
+
+        Hpack.decodeInteger(bb, 1);
+    }
+
+    @Test(expected = HpackException.class)
+    public void testDecodeIntegerOverflow() throws HpackException {
+        ByteBuffer bb = ByteBuffer.allocate(9);
+        bb.put((byte) 255);
+        bb.put((byte) 254);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 15);
+        bb.position(0);
+
+        Hpack.decodeInteger(bb, 1);
+    }
+
+    @Test(expected = HpackException.class)
+    public void testDecodeIntegerZeroValues() throws HpackException {
+        ByteBuffer bb = ByteBuffer.allocate(12);
+        bb.put((byte) 255);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.position(0);
+
+        Hpack.decodeInteger(bb, 1);
+    }
 }

@@ -36,6 +36,7 @@
     <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Trusted certificates per Connector</title>
+    <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
 </head>
 <body>
 <h1>Trusted certificates per Connector</h1>

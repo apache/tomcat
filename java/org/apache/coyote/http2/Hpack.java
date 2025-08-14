@@ -26,8 +26,16 @@ final class Hpack {
 
     private static final byte LOWER_DIFF = 'a' - 'A';
     static final int DEFAULT_TABLE_SIZE = 4096;
-    private static final int MAX_INTEGER_OCTETS = 8; // not sure what a good value for this is, but the spec says we
-                                                     // need to provide an upper bound
+    /*
+     * The HPack specification says there SHOULD be an upper bound on this.
+     *
+     * Tomcat has opted to limit values to INTEGER.MAX_VALUE. Give that there is the prefix byte and then each octet
+     * provides up to 7-bits, a total a 5 octets plus the prefix may be required.
+     *
+     * Note: The maximum value represented by 5 octets is greater than INTEGER.MAX_VALUE.
+     *
+     */
+    private static final int MAX_INTEGER_OCTETS = 5;
 
     /**
      * table that contains powers of two, used as both bitmask and to quickly calculate 2^n
@@ -151,10 +159,12 @@ final class Hpack {
         int sp = source.position();
         int mask = PREFIX_TABLE[n];
 
-        int i = mask & source.get();
+        // Use long internally as the value may exceed Integer.MAX_VALUE
+        long result = mask & source.get();
         int b;
-        if (i < PREFIX_TABLE[n]) {
-            return i;
+        if (result < PREFIX_TABLE[n]) {
+            // Casting is safe as result must be less than 255 at this point.
+            return (int) result;
         } else {
             int m = 0;
             do {
@@ -169,11 +179,15 @@ final class Hpack {
                     return -1;
                 }
                 b = source.get();
-                i = i + (b & 127) * (PREFIX_TABLE[m] + 1);
+                result = result + (b & 127) * (PREFIX_TABLE[m] + 1L);
+                if (result > Integer.MAX_VALUE) {
+                    throw new HpackException(sm.getString("hpack.integerEncodedTooBig"));
+                }
                 m += 7;
             } while ((b & 128) == 128);
         }
-        return i;
+        // Casting is safe as result must be less than Integer.MAX_VALUE at this point
+        return (int) result;
     }
 
     /**

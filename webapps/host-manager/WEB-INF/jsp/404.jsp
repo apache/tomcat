@@ -28,6 +28,7 @@
     A {color : black;}A.name {color : black;}
     -->
   </style>
+  <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
  </head>
  <body>
    <h1>404 Not found</h1>
