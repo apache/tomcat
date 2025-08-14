@@ -290,15 +290,9 @@ public final class CGIServlet extends HttpServlet {
 
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Sets instance variables.
-     * <P>
-     * Modified from Craig R. McClanahan's InvokerServlet
-     * </P>
-     *
-     * @param config a <code>ServletConfig</code> object containing the servlet's configuration and initialization
-     *                   parameters
-     *
-     * @exception ServletException if an exception has occurred that interferes with the servlet's normal operation
      */
     @Override
     public void init(ServletConfig config) throws ServletException {

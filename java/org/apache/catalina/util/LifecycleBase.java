@@ -184,11 +184,11 @@ public abstract class LifecycleBase implements Lifecycle {
     /**
      * Subclasses must ensure that the state is changed to {@link LifecycleState#STARTING} during the execution of this
      * method. Changing state will trigger the {@link Lifecycle#START_EVENT} event. If a component fails to start it may
-     * either throw a {@link LifecycleException} which will cause it's parent to fail to start, or it can place itself in
-     * the error state in which case {@link #stop()} will be called on the failed component but the parent component
+     * either throw a {@link LifecycleException} which will cause it's parent to fail to start, or it can place itself
+     * in the error state in which case {@link #stop()} will be called on the failed component but the parent component
      * will continue to start normally.
      *
-     * @throws LifecycleException Start error occurred
+     * @exception LifecycleException if this component detects an error that prevents this component from being started
      */
     protected abstract void startInternal() throws LifecycleException;
 
@@ -257,7 +257,8 @@ public abstract class LifecycleBase implements Lifecycle {
      * Subclasses must ensure that the state is changed to {@link LifecycleState#STOPPING} during the execution of this
      * method. Changing state will trigger the {@link Lifecycle#STOP_EVENT} event.
      *
-     * @throws LifecycleException Stop error occurred
+     * @exception LifecycleException if this component detects an error that prevents this component from being stopped
+     *                                   cleanly
      */
     protected abstract void stopInternal() throws LifecycleException;
 

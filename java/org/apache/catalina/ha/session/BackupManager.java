@@ -122,13 +122,10 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
 
 
     /**
-     * Start this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}. Starts the cluster communication channel, this
-     * will connect with the other nodes in the cluster, and request the current session state to be transferred to this
-     * node.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
+     * {@inheritDoc}
+     * <p>
+     * Starts the cluster communication channel, this will connect with the other nodes in the cluster, and request the
+     * current session state to be transferred to this node.
      */
     @Override
     protected void startInternal() throws LifecycleException {
@@ -161,12 +158,9 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
 
 
     /**
-     * Stop this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}. This will disconnect the cluster communication
-     * channel and stop the listener thread.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
+     * {@inheritDoc}
+     * <p>
+     * This will disconnect the cluster communication channel and stop the listener thread.
      */
     @Override
     protected void stopInternal() throws LifecycleException {

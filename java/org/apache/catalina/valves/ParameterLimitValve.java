@@ -243,14 +243,10 @@ public class ParameterLimitValve extends ValveBase {
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Checks if any of the defined patterns matches the URI of the request and if it does, enforces the corresponding
      * parameter limit for the request. Then invoke the next Valve in the sequence.
-     *
-     * @param request  The servlet request to be processed
-     * @param response The servlet response to be created
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet error occurs
      */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {

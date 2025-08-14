@@ -77,14 +77,10 @@ public class ErrorReportValve extends ValveBase {
     // --------------------------------------------------------- Public Methods
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Invoke the next Valve in the sequence. When the invoke returns, check the response state. If the status code is
      * greater than or equal to 400 or an uncaught exception was thrown then the error handling will be triggered.
-     *
-     * @param request  The servlet request to be processed
-     * @param response The servlet response to be created
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet error occurs
      */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {

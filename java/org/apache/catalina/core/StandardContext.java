@@ -4741,6 +4741,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     }
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Destroy needs to clean up the context completely. The problem is that undoing all the config in start() and
      * restoring a 'fresh' state is impossible. After stop()/destroy()/init()/start() we should have the same state as
      * if a fresh start was done - i.e. read modified web.xml, etc. This can only be done by completely removing the
