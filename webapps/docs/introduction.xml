@@ -115,7 +115,7 @@ do let us know.</p>
         instances with single CATALINA_HOME location share one set of
         <code>.jar</code> files and binary files, you can easily upgrade the files
         to newer version and have the change propagated to all Tomcat instances
-        using the same CATALIA_HOME directory.
+        using the same CATALINA_HOME directory.
       </li>
       <li>
         Avoiding duplication of the same static <code>.jar</code> files.
