@@ -147,7 +147,7 @@ public class TestDataSourceRealm extends LoggingBaseTest {
         Assert.assertFalse(gp.hasRole("manager"));
 
         String pass = db.getPassword("tomcat");
-        Assert.assertEquals(pass, "password");
+        Assert.assertEquals("password", pass);
 
         List<String> roles = db.getRoles("tomcat");
         Assert.assertEquals(2, roles.size());
