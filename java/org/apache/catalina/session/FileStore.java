@@ -26,6 +26,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import jakarta.servlet.ServletContext;
 
@@ -69,6 +72,12 @@ public final class FileStore extends StoreBase {
      * A File representing the directory in which Sessions are stored.
      */
     private File directoryFile = null;
+
+
+    /**
+     * A map of potential locks to control concurrent read/writes of a session's persistence file.
+     */
+    private final ConcurrentHashMap<String, UsageCountingReadWriteLock> idLocks = new ConcurrentHashMap();
 
 
     /**
@@ -196,19 +205,26 @@ public final class FileStore extends StoreBase {
 
         ClassLoader oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
 
-        try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-                ObjectInputStream ois = getObjectInputStream(fis)) {
-
-            StandardSession session = (StandardSession) manager.createEmptySession();
-            session.readObjectData(ois);
-            session.setManager(manager);
-            return session;
-        } catch (FileNotFoundException e) {
-            if (contextLog.isDebugEnabled()) {
-                contextLog.debug(sm.getString("fileStore.noFile", id, file.getAbsolutePath()));
+        try {
+            acquireIdReadLock(id);
+            if (!file.exists()) {
+                return null;
             }
-            return null;
+
+            try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+                    ObjectInputStream ois = getObjectInputStream(fis)) {
+                StandardSession session = (StandardSession) manager.createEmptySession();
+                session.readObjectData(ois);
+                session.setManager(manager);
+                return session;
+            } catch (FileNotFoundException e) {
+                if (contextLog.isDebugEnabled()) {
+                    contextLog.debug(sm.getString("fileStore.noFile", id, file.getAbsolutePath()));
+                }
+                return null;
+            }
         } finally {
+            releaseIdReadLock(id);
             context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
         }
     }
@@ -217,7 +233,7 @@ public final class FileStore extends StoreBase {
     @Override
     public void remove(String id) throws IOException {
         File file = file(id);
-        if (file == null) {
+        if (file == null || !file.exists()) {
             return;
         }
         if (manager.getContext().getLogger().isTraceEnabled()) {
@@ -225,8 +241,13 @@ public final class FileStore extends StoreBase {
                     .trace(sm.getString(getStoreName() + ".removing", id, file.getAbsolutePath()));
         }
 
-        if (file.exists() && !file.delete()) {
-            throw new IOException(sm.getString("fileStore.deleteSessionFailed", file));
+        try{
+            acquireIdWriteLock(id);
+            if (file.exists() && !file.delete()) {
+                throw new IOException(sm.getString("fileStore.deleteSessionFailed", file));
+            }
+        } finally {
+            releaseIdWriteLock(id);
         }
     }
 
@@ -243,9 +264,14 @@ public final class FileStore extends StoreBase {
                     .trace(sm.getString(getStoreName() + ".saving", session.getIdInternal(), file.getAbsolutePath()));
         }
 
-        try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
-                ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
-            ((StandardSession) session).writeObjectData(oos);
+        try {
+            acquireIdWriteLock(session.getIdInternal());
+            try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
+                    ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
+                ((StandardSession) session).writeObjectData(oos);
+            }
+        } finally {
+            releaseIdWriteLock(session.getIdInternal());
         }
     }
 
@@ -306,5 +332,86 @@ public final class FileStore extends StoreBase {
         }
 
         return canonicalFile;
+    }
+
+
+    /**
+     * Acquire and create if necessary a readlock for a given session id.
+     *
+     * @param id The ID of the Session.
+     */
+    private void acquireIdReadLock(String id) {
+        idLocks.compute(id,
+                (k, v) -> v == null ? new UsageCountingReadWriteLock() : v).lockRead();
+    }
+
+
+    /**
+     * Release a readlock for a given session id.
+     *
+     * @param id The ID of the Session.
+     */
+    private void releaseIdReadLock(String id) {
+        idLocks.computeIfPresent(id,
+                (k, v) -> v.releaseRead() == 0 ? null : v);
+    }
+
+
+    /**
+     * Acquire and create if necessary a writelock for a given session id.
+     *
+     * @param id The ID of the Session.
+     */
+    private void acquireIdWriteLock(String id) {
+        idLocks.compute(id,
+                (k, v) -> v == null ? new UsageCountingReadWriteLock() : v).lockWrite();
+    }
+
+
+    /**
+     * Release a writelock for a given session id.
+     *
+     * @param id The ID of the Session.
+     */
+    private void releaseIdWriteLock(String id) {
+        idLocks.computeIfPresent(id,
+                (k, v) -> v.releaseWrite() == 0 ? null : v);
+    }
+
+
+    /*
+     * The FileStore uses a per session ReentrantReadWriteLock to ensure that only one write (from a remove or save)
+     * occurs to a session persistence file at a time and not during any reads of the file (from a load call).  This
+     * is to protect from concurrency issues that may arise, particularly if using a PersistentValve. To limit the
+     * size of the session ID to lock map, the locks are created when required and destroyed (made eligible for GC)
+     * as soon as they are not required.
+     */
+    private static class UsageCountingReadWriteLock {
+        private final AtomicLong usageCount = new AtomicLong(0);
+        private final ReentrantReadWriteLock lock;
+
+        private UsageCountingReadWriteLock() {
+            lock = new ReentrantReadWriteLock();
+        }
+
+        private void lockRead() {
+            usageCount.incrementAndGet();
+            lock.readLock().lock();
+        }
+
+        private long releaseRead() {
+            lock.readLock().unlock();
+            return usageCount.decrementAndGet();
+        }
+
+        private void lockWrite() {
+            usageCount.incrementAndGet();
+            lock.writeLock().lock();
+        }
+
+        private long releaseWrite() {
+            lock.writeLock().unlock();
+            return usageCount.decrementAndGet();
+        }
     }
 }
