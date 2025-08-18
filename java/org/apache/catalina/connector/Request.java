@@ -2581,7 +2581,8 @@ public class Request implements HttpServletRequest {
         if (partsParseException != null) {
             Context context = getContext();
             if (context != null && context.getLogger().isDebugEnabled()) {
-                context.getLogger().debug(sm.getString("coyoteRequest.partsParseException", partsParseException.getMessage()));
+                context.getLogger()
+                        .debug(sm.getString("coyoteRequest.partsParseException", partsParseException.getMessage()));
             }
             if (partsParseException instanceof IOException) {
                 throw (IOException) partsParseException;
@@ -2691,7 +2692,8 @@ public class Request implements HttpServletRequest {
             /*
              * There are two independent limits on the number of parts.
              *
-             * 1. The limit based on parameters. This is maxParameterCount less the number of parameters already processed.
+             * 1. The limit based on parameters. This is maxParameterCount less the number of parameters already
+             * processed.
              *
              * 2. The limit based on parts. This is maxPartCount.
              *
