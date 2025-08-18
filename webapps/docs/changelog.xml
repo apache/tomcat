@@ -120,6 +120,9 @@
         by default rather then just the exception message when logging an error
         or warning in response to an exception. (markt)
       </scode>
+      <add>
+        Add escaping to log formatters to align with JSON formatter. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
