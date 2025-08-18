@@ -192,7 +192,7 @@ public final class FileStore extends StoreBase {
     public Session load(String id) throws ClassNotFoundException, IOException {
         // Open an input stream to the specified pathname, if any
         File file = file(id);
-        if (file == null || !file.exists()) {
+        if (file == null) {
             return null;
         }
 
@@ -233,7 +233,7 @@ public final class FileStore extends StoreBase {
     @Override
     public void remove(String id) throws IOException {
         File file = file(id);
-        if (file == null || !file.exists()) {
+        if (file == null) {
             return;
         }
         if (manager.getContext().getLogger().isTraceEnabled()) {
