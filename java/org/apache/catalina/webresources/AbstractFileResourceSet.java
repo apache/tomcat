@@ -164,12 +164,11 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
 
     protected void logIgnoredSymlink(String contextPath, String absPath, String canPath) {
-        String msg = sm.getString("abstractFileResourceSet.canonicalfileCheckFailed", contextPath, absPath, canPath);
         // Log issues with configuration files at a higher level
         if (absPath.startsWith("/META-INF/") || absPath.startsWith("/WEB-INF/")) {
-            log.error(msg);
+            log.error(sm.getString("abstractFileResourceSet.canonicalfileCheckFailed", contextPath, absPath, canPath));
         } else {
-            log.warn(msg);
+            log.warn(sm.getString("abstractFileResourceSet.canonicalfileCheckFailed", contextPath, absPath, canPath));
         }
     }
 
