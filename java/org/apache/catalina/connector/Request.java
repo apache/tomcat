@@ -953,8 +953,8 @@ public class Request implements HttpServletRequest {
      * {@inheritDoc}
      * <p>
      * The attribute names returned will only be those for the attributes set via {@link #setAttribute(String, Object)}.
-     * Tomcat internal attributes will not be included even though they are accessible via {@link #getAttribute(String)}.
-     * The Tomcat internal attributes include:
+     * Tomcat internal attributes will not be included even though they are accessible via
+     * {@link #getAttribute(String)}. The Tomcat internal attributes include:
      * <ul>
      * <li>{@link Globals#DISPATCHER_TYPE_ATTR}</li>
      * <li>{@link Globals#DISPATCHER_REQUEST_PATH_ATTR}</li>
@@ -2336,7 +2336,8 @@ public class Request implements HttpServletRequest {
         if (partsParseException != null) {
             Context context = getContext();
             if (context != null && context.getLogger().isDebugEnabled()) {
-                context.getLogger().debug(sm.getString("coyoteRequest.partsParseException", partsParseException.getMessage()));
+                context.getLogger()
+                        .debug(sm.getString("coyoteRequest.partsParseException", partsParseException.getMessage()));
             }
             switch (partsParseException) {
                 case IOException ioException -> throw ioException;
@@ -2738,7 +2739,8 @@ public class Request implements HttpServletRequest {
         if (parametersParseException != null) {
             Context context = getContext();
             if (context != null && context.getLogger().isDebugEnabled()) {
-                context.getLogger().debug(sm.getString("coyoteRequest.parametersParseException", parametersParseException.getMessage()));
+                context.getLogger().debug(
+                        sm.getString("coyoteRequest.parametersParseException", parametersParseException.getMessage()));
             }
             throw parametersParseException;
         }
