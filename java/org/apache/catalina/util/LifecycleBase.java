@@ -393,22 +393,20 @@ public abstract class LifecycleBase implements Lifecycle {
 
 
     private void invalidTransition(String type) throws LifecycleException {
-        String msg = sm.getString("lifecycleBase.invalidTransition", type, toString(), state);
-        throw new LifecycleException(msg);
+        throw new LifecycleException(sm.getString("lifecycleBase.invalidTransition", type, toString(), state));
     }
 
 
     private void handleSubClassException(Throwable t, String key, Object... args) throws LifecycleException {
         setStateInternal(LifecycleState.FAILED, null, false);
         ExceptionUtils.handleThrowable(t);
-        String msg = sm.getString(key, args);
         if (getThrowOnFailure()) {
             if (!(t instanceof LifecycleException)) {
-                t = new LifecycleException(msg, t);
+                t = new LifecycleException(sm.getString(key, args), t);
             }
             throw (LifecycleException) t;
         } else {
-            log.error(msg, t);
+            log.error(sm.getString(key, args), t);
         }
     }
 }
