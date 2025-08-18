@@ -156,10 +156,9 @@ public class AprLifecycleListener implements LifecycleListener {
                 }
                 // Failure to initialize FIPS mode is fatal
                 if (!(null == FIPSMode || "off".equalsIgnoreCase(FIPSMode)) && !isFIPSModeActive()) {
-                    String errorMessage = sm.getString("aprListener.initializeFIPSFailed");
-                    Error e = new Error(errorMessage);
+                    Error e = new Error(sm.getString("aprListener.initializeFIPSFailed"));
                     // Log here, because thrown error might be not logged
-                    log.fatal(errorMessage, e);
+                    log.fatal(e.getMessage(), e);
                     throw e;
                 }
             }
