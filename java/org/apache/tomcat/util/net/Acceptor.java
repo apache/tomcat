@@ -152,8 +152,7 @@ public class Acceptor<U> implements Runnable {
                     }
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    String msg = sm.getString("endpoint.accept.fail");
-                    log.error(msg, t);
+                    log.error(sm.getString("endpoint.accept.fail"), t);
                 }
             }
         } finally {
