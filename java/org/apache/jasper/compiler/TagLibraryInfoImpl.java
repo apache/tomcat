@@ -275,8 +275,8 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
             if (url.getProtocol().equals("war") && uri.endsWith(".jar")) {
                 url = UriUtil.warToJar(url);
             }
-        } catch (Exception ex) {
-            err.jspError("jsp.error.tld.unable_to_get_jar", uri, ex.toString());
+        } catch (Exception e) {
+            err.jspError("jsp.error.tld.unable_to_get_jar", uri, e.toString());
         }
         if (uri.endsWith(".jar")) {
             if (url == null) {

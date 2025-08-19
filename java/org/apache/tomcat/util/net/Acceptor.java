@@ -126,14 +126,14 @@ public class Acceptor<U> implements Runnable {
                         // Accept the next incoming connection from the server
                         // socket
                         socket = endpoint.serverSocketAccept();
-                    } catch (Exception ioe) {
+                    } catch (Exception e) {
                         // We didn't get a socket
                         endpoint.countDownConnection();
                         if (endpoint.isRunning()) {
                             // Introduce delay if necessary
                             errorDelay = handleExceptionWithDelay(errorDelay);
                             // re-throw
-                            throw ioe;
+                            throw e;
                         } else {
                             break;
                         }

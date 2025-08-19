@@ -395,9 +395,9 @@ public class SecureNioChannel extends NioChannel {
         } catch (IOException x) {
             closeSilently();
             throw x;
-        } catch (Exception cx) {
+        } catch (Exception e) {
             closeSilently();
-            throw new IOException(cx);
+            throw new IOException(e);
         } finally {
             if (key != null) {
                 try {

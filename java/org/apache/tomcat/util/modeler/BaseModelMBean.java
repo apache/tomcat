@@ -372,8 +372,8 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
         }
         try {
             sendAttributeChangeNotification(new Attribute(name, oldValue), attribute);
-        } catch (Exception ex) {
-            log.error(sm.getString("baseModelMBean.notificationError", name), ex);
+        } catch (Exception e) {
+            log.error(sm.getString("baseModelMBean.notificationError", name), e);
         }
         // attributes.put( name, value );
         // if( source != null ) {

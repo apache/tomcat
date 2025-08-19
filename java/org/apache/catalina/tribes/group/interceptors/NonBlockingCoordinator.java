@@ -323,8 +323,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
             return true;
         } catch (SocketTimeoutException | ConnectException x) {
             // do nothing, we couldn't connect
-        } catch (Exception x) {
-            log.error(sm.getString("nonBlockingCoordinator.memberAlive.failed"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("nonBlockingCoordinator.memberAlive.failed"), e);
         }
         return false;
     }
@@ -626,8 +626,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                     startElection(true);
                 }
             }
-        } catch (Exception x) {
-            log.error(sm.getString("nonBlockingCoordinator.heartbeat.failed"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("nonBlockingCoordinator.heartbeat.failed"), e);
         } finally {
             super.heartbeat();
         }

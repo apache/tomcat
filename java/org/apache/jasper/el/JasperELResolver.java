@@ -198,8 +198,8 @@ public class JasperELResolver extends CompositeELResolver {
                 try {
                     method.setAccessible(true);
                     value = method.invoke(base, (Object[]) null);
-                } catch (Exception ex) {
-                    Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+                } catch (Exception e) {
+                    Throwable thr = ExceptionUtils.unwrapInvocationTargetException(e);
                     ExceptionUtils.handleThrowable(thr);
                 }
             }
@@ -217,8 +217,8 @@ public class JasperELResolver extends CompositeELResolver {
                 context.setPropertyResolved(base, property);
                 try {
                     method.invoke(base, value);
-                } catch (Exception ex) {
-                    Throwable thr = ExceptionUtils.unwrapInvocationTargetException(ex);
+                } catch (Exception e) {
+                    Throwable thr = ExceptionUtils.unwrapInvocationTargetException(e);
                     ExceptionUtils.handleThrowable(thr);
                 }
             }

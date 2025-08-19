@@ -641,9 +641,9 @@ public class Registry implements RegistryMBean, MBeanRegistration {
             }
 
             getMBeanServer().registerMBean(mbean, oname);
-        } catch (Exception ex) {
-            log.error(sm.getString("registry.registerError", oname), ex);
-            throw ex;
+        } catch (Exception e) {
+            log.error(sm.getString("registry.registerError", oname), e);
+            throw e;
         }
     }
 
@@ -678,7 +678,7 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         searchedPaths.put(packageName, dURL);
         try {
             load("MbeansDescriptorsDigesterSource", dURL, null);
-        } catch (Exception ex) {
+        } catch (Exception e) {
             log.error(sm.getString("registry.loadError", dURL));
         }
     }

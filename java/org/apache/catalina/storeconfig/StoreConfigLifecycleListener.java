@@ -97,8 +97,8 @@ public class StoreConfigLifecycleListener implements LifecycleListener {
             // Note: Hard-coded domain used since this object is per Server/JVM
             oname = new ObjectName("Catalina:type=StoreConfig");
             registry.registerComponent(storeConfig, oname, "StoreConfig");
-        } catch (Exception ex) {
-            log.error(sm.getString("storeConfigListener.registerError"), ex);
+        } catch (Exception e) {
+            log.error(sm.getString("storeConfigListener.registerError"), e);
         }
     }
 

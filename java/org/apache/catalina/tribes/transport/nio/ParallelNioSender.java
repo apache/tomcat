@@ -83,20 +83,20 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                             cx.addFaultyMember(result.getFailed().getFaultyMembers());
                         }
                     }
-                } catch (Exception x) {
+                } catch (Exception e) {
                     if (log.isTraceEnabled()) {
-                        log.trace("Error sending message", x);
+                        log.trace("Error sending message", e);
                     }
                     if (cx == null) {
-                        if (x instanceof ChannelException) {
-                            cx = (ChannelException) x;
+                        if (e instanceof ChannelException) {
+                            cx = (ChannelException) e;
                         } else {
-                            cx = new ChannelException(sm.getString("parallelNioSender.send.failed"), x);
+                            cx = new ChannelException(sm.getString("parallelNioSender.send.failed"), e);
                         }
                     }
                     for (NioSender sender : senders) {
                         if (!sender.isComplete()) {
-                            cx.addFaultyMember(sender.getDestination(), x);
+                            cx.addFaultyMember(sender.getDestination(), e);
                         }
                     }
                     throw cx;
@@ -121,16 +121,16 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                 // there was an error
                 throw cx;
             }
-        } catch (Exception x) {
+        } catch (Exception e) {
             try {
                 this.disconnect();
-            } catch (Exception e) {
+            } catch (Exception ignore) {
                 // Ignore
             }
-            if (x instanceof ChannelException) {
-                throw (ChannelException) x;
+            if (e instanceof ChannelException) {
+                throw (ChannelException) e;
             } else {
-                throw new ChannelException(x);
+                throw new ChannelException(e);
             }
         }
 
@@ -168,9 +168,9 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                     }
                     SenderState.getSenderState(sender.getDestination()).setReady();
                 } // end if
-            } catch (Exception x) {
+            } catch (Exception e) {
                 if (log.isTraceEnabled()) {
-                    log.trace("Error while processing send to " + sender.getDestination().getName(), x);
+                    log.trace("Error while processing send to " + sender.getDestination().getName(), e);
                 }
                 SenderState state = SenderState.getSenderState(sender.getDestination());
                 int attempt = sender.getAttempt() + 1;
@@ -187,7 +187,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                             log.warn(sm.getString("parallelNioSender.send.fail.retrying",
                                     sender.getDestination().getName()));
                         } else {
-                            log.warn(sm.getString("parallelNioSender.send.fail", sender.getDestination().getName()), x);
+                            log.warn(sm.getString("parallelNioSender.send.fail", sender.getDestination().getName()), e);
                         }
                     }
                 }
@@ -195,8 +195,8 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                     log.warn(sm.getString("parallelNioSender.sender.disconnected.notRetry",
                             sender.getDestination().getName()));
                     ChannelException cx =
-                            new ChannelException(sm.getString("parallelNioSender.sender.disconnected.sendFailed"), x);
-                    cx.addFaultyMember(sender.getDestination(), x);
+                            new ChannelException(sm.getString("parallelNioSender.sender.disconnected.sendFailed"), e);
+                    cx.addFaultyMember(sender.getDestination(), e);
                     result.failed(cx);
                     break;
                 }
@@ -213,8 +213,8 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                     }
                 } else {
                     ChannelException cx = new ChannelException(sm.getString("parallelNioSender.sendFailed.attempt",
-                            Integer.toString(sender.getAttempt()), Integer.toString(maxAttempts)), x);
-                    cx.addFaultyMember(sender.getDestination(), x);
+                            Integer.toString(sender.getAttempt()), Integer.toString(maxAttempts)), e);
+                    cx.addFaultyMember(sender.getDestination(), e);
                     result.failed(cx);
                 } // end if
             }
@@ -362,7 +362,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
         setConnected(false);
         try {
             close();
-        } catch (Exception x) {
+        } catch (Exception e) {
             // Ignore
         }
     }
@@ -402,8 +402,8 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
                     // nioSenders.remove(entry.getKey());
                     i.remove();
                     result = true;
-                } catch (Exception x) {
-                    log.warn(sm.getString("parallelNioSender.error.keepalive", sender), x);
+                } catch (Exception e) {
+                    log.warn(sm.getString("parallelNioSender.error.keepalive", sender), e);
                 }
             }
         }

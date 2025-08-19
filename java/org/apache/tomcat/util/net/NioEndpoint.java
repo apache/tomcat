@@ -736,8 +736,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 } else if (interestOps == OP_REGISTER) {
                     try {
                         sc.register(getSelector(), SelectionKey.OP_READ, socketWrapper);
-                    } catch (Exception x) {
-                        log.error(sm.getString("endpoint.nio.registerFail"), x);
+                    } catch (Exception e) {
+                        log.error(sm.getString("endpoint.nio.registerFail"), e);
                     }
                 } else {
                     final SelectionKey key = sc.keyFor(getSelector());

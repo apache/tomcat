@@ -277,8 +277,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             } else {
                 try {
                     fwd = XByteBuffer.deserialize(msg.getMessage().getBytesDirect(), 0, msg.getMessage().getLength());
-                } catch (Exception sx) {
-                    log.error(sm.getString("groupChannel.unable.deserialize", msg), sx);
+                } catch (Exception e) {
+                    log.error(sm.getString("groupChannel.unable.deserialize", msg), e);
                     return;
                 }
             }
@@ -310,13 +310,13 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
                 Logs.MESSAGES.trace("GroupChannel delivered[" + delivered + "] id:" + new UniqueId(msg.getUniqueId()));
             }
 
-        } catch (Exception x) {
+        } catch (Exception e) {
             // this could be the channel listener throwing an exception, we should log it
             // as a warning.
             if (log.isWarnEnabled()) {
-                log.warn(sm.getString("groupChannel.receiving.error"), x);
+                log.warn(sm.getString("groupChannel.receiving.error"), e);
             }
-            throw new RemoteProcessException(sm.getString("groupChannel.receiving.error"), x);
+            throw new RemoteProcessException(sm.getString("groupChannel.receiving.error"), e);
         }
     }
 
@@ -336,8 +336,8 @@ public class GroupChannel extends ChannelInterceptorBase implements ManagedChann
             }
             RpcMessage.NoRpcChannelReply reply = new RpcMessage.NoRpcChannelReply(msg.rpcId, msg.uuid);
             send(new Member[] { destination }, reply, SEND_OPTIONS_ASYNCHRONOUS);
-        } catch (Exception x) {
-            log.error(sm.getString("groupChannel.sendFail.noRpcChannelReply"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("groupChannel.sendFail.noRpcChannelReply"), e);
         }
     }
 

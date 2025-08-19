@@ -175,8 +175,8 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
             startLevel = (startLevel | svc);
         } catch (ChannelException cx) {
             throw cx;
-        } catch (Exception x) {
-            throw new ChannelException(x);
+        } catch (Exception e) {
+            throw new ChannelException(e);
         }
     }
 
@@ -231,8 +231,8 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
 
             startLevel = (startLevel & (~svc));
             setChannel(null);
-        } catch (Exception x) {
-            throw new ChannelException(x);
+        } catch (Exception e) {
+            throw new ChannelException(e);
         }
     }
 
