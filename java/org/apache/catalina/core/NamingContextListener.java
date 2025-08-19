@@ -235,7 +235,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 try {
                     createNamingContext();
                 } catch (NamingException e) {
-                    log.error(sm.getString("naming.namingContextCreationFailed", e));
+                    log.error(sm.getString("naming.namingContextCreationFailed", container), e);
                 }
 
                 namingResources.addPropertyChangeListener(this);
@@ -248,7 +248,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                         ContextBindings.bindClassLoader(container, token,
                                 ((Context) container).getLoader().getClassLoader());
                     } catch (NamingException e) {
-                        log.error(sm.getString("naming.bindFailed", e));
+                        log.error(sm.getString("naming.bindFailed", container), e);
                     }
                 }
 
@@ -257,7 +257,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                     try {
                         ContextBindings.bindClassLoader(container, token, this.getClass().getClassLoader());
                     } catch (NamingException e) {
-                        log.error(sm.getString("naming.bindFailed", e));
+                        log.error(sm.getString("naming.bindFailed", container), e);
                     }
                     if (container instanceof StandardServer) {
                         ((StandardServer) container).setGlobalNamingContext(namingContext);
@@ -572,7 +572,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 // Ignore because UserTransaction was obviously
                 // added via ResourceLink
             } catch (NamingException e) {
-                log.error(sm.getString("naming.bindFailed", e));
+                log.error(sm.getString("naming.bindFailed", "UserTransaction"), e);
             }
         }
 
@@ -581,7 +581,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             try {
                 compCtx.bind("Resources", ((Context) container).getResources());
             } catch (NamingException e) {
-                log.error(sm.getString("naming.bindFailed", e));
+                log.error(sm.getString("naming.bindFailed", "Resources"), e);
             }
         }
 
@@ -655,7 +655,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             createSubcontexts(envCtx, ejb.getName());
             envCtx.bind(ejb.getName(), ref);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.bindFailed", e));
+            log.error(sm.getString("naming.bindFailed", ejb.getName()), e);
         }
     }
 
@@ -755,7 +755,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 createSubcontexts(envCtx, env.getName());
                 envCtx.bind(env.getName(), value);
             } catch (NamingException e) {
-                log.error(sm.getString("naming.invalidEnvEntryValue", e));
+                log.error(sm.getString("naming.invalidEnvEntryValue", env.getName()), e);
             }
         }
     }
@@ -846,7 +846,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                             log.debug(sm.getString("naming.addSlash", service.getWsdlfile()));
                         }
                     } catch (MalformedURLException e) {
-                        log.error(sm.getString("naming.wsdlFailed", e));
+                        log.error(sm.getString("naming.wsdlFailed", service.getWsdlfile()), e);
                     }
                 }
                 if (wsdlURL == null) {
@@ -881,7 +881,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                             log.debug(sm.getString("naming.addSlash", service.getJaxrpcmappingfile()));
                         }
                     } catch (MalformedURLException e) {
-                        log.error(sm.getString("naming.wsdlFailed", e));
+                        log.error(sm.getString("naming.wsdlFailed", service.getJaxrpcmappingfile()), e);
                     }
                 }
                 if (jaxrpcURL == null) {
@@ -942,7 +942,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             createSubcontexts(envCtx, service.getName());
             envCtx.bind(service.getName(), ref);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.bindFailed", e));
+            log.error(sm.getString("naming.bindFailed", service.getName()), e);
         }
     }
 
@@ -977,7 +977,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             createSubcontexts(envCtx, resource.getName());
             envCtx.bind(resource.getName(), ref);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.bindFailed", e));
+            log.error(sm.getString("naming.bindFailed", resource.getName()), e);
         }
 
         if (("javax.sql.DataSource".equals(ref.getClassName()) ||
@@ -1029,7 +1029,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             createSubcontexts(envCtx, resourceEnvRef.getName());
             envCtx.bind(resourceEnvRef.getName(), ref);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.bindFailed", e));
+            log.error(sm.getString("naming.bindFailed", resourceEnvRef.getName()), e);
         }
     }
 
@@ -1061,7 +1061,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
             createSubcontexts(envCtx, resourceLink.getName());
             ctx.bind(resourceLink.getName(), ref);
         } catch (NamingException e) {
-            log.error(sm.getString("naming.bindFailed", e));
+            log.error(sm.getString("naming.bindFailed", resourceLink.getName()), e);
         }
 
         ResourceLinkFactory.registerGlobalResourceAccess(getGlobalNamingContext(), resourceLink.getName(),

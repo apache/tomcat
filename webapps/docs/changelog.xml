@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.45 (schultz)" rtext="in development">
+  <subsection name = "Other">
+    <changelog>
+      <scode>
+        Review logging and include the full stack trace and exception message
+        by default rather then just the exception message when logging an error
+        in response to an exception. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.44 (schultz)" rtext="2025-08-07">
   <subsection name="Catalina">

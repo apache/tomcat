@@ -365,7 +365,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     }
                 }
             } catch (Exception e) {
-                log.error(sm.getString("opensslconf.checkFailed", e.getLocalizedMessage()));
+                log.error(sm.getString("opensslconf.checkFailed", e.getLocalizedMessage()), e);
                 return false;
             }
             if (!ok) {
@@ -414,7 +414,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     }
                 }
             } catch (Exception e) {
-                log.error(sm.getString("opensslconf.applyFailed"));
+                log.error(sm.getString("opensslconf.applyFailed"), e);
                 return false;
             }
             if (rc <= 0) {
