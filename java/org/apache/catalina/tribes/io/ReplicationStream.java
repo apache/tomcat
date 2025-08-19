@@ -83,7 +83,7 @@ public final class ReplicationStream extends ObjectInputStream {
             } else {
                 return findExternalClass(name);
             }
-        } catch (Exception x) {
+        } catch (Exception e) {
             if (tryRepFirst) {
                 return findExternalClass(name);
             } else {

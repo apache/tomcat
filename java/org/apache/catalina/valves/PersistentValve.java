@@ -198,7 +198,7 @@ public class PersistentValve extends ValveBase {
                 Session hsess;
                 try {
                     hsess = request.getSessionInternal(false);
-                } catch (Exception ex) {
+                } catch (Exception e) {
                     hsess = null;
                 }
                 String newsessionId = null;

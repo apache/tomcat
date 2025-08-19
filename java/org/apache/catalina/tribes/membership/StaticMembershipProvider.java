@@ -397,8 +397,8 @@ public class StaticMembershipProvider extends MembershipProviderBase
                     ping();
                 } catch (InterruptedException ix) {
                     // Ignore
-                } catch (Exception x) {
-                    log.warn(sm.getString("staticMembershipProvider.pingThread.failed"), x);
+                } catch (Exception e) {
+                    log.warn(sm.getString("staticMembershipProvider.pingThread.failed"), e);
                 }
             }
         }

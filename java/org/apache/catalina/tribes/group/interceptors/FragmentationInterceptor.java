@@ -148,9 +148,9 @@ public class FragmentationInterceptor extends ChannelInterceptorBase implements 
                     removeFragCollection(key);
                 }
             }
-        } catch (Exception x) {
+        } catch (Exception e) {
             if (log.isErrorEnabled()) {
-                log.error(sm.getString("fragmentationInterceptor.heartbeat.failed"), x);
+                log.error(sm.getString("fragmentationInterceptor.heartbeat.failed"), e);
             }
         }
         super.heartbeat();

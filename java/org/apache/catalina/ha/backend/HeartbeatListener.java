@@ -199,8 +199,8 @@ public class HeartbeatListener implements LifecycleListener {
                     coll = new CollectedInfo(host, port);
                     this.port = coll.port;
                     this.host = coll.host;
-                } catch (Exception ex) {
-                    log.error(sm.getString("heartbeatListener.errorCollectingInfo"), ex);
+                } catch (Exception e) {
+                    log.error(sm.getString("heartbeatListener.errorCollectingInfo"), e);
                     coll = null;
                     return;
                 }
@@ -209,8 +209,8 @@ public class HeartbeatListener implements LifecycleListener {
             /* Start or restart sender */
             try {
                 sender.init(this);
-            } catch (Exception ex) {
-                log.error(sm.getString("heartbeatListener.senderInitError"), ex);
+            } catch (Exception e) {
+                log.error(sm.getString("heartbeatListener.senderInitError"), e);
                 sender = null;
                 return;
             }
@@ -218,16 +218,16 @@ public class HeartbeatListener implements LifecycleListener {
             /* refresh the connector information and send it */
             try {
                 coll.refresh();
-            } catch (Exception ex) {
-                log.error(sm.getString("heartbeatListener.refreshError"), ex);
+            } catch (Exception e) {
+                log.error(sm.getString("heartbeatListener.refreshError"), e);
                 coll = null;
                 return;
             }
             String output = "v=1&ready=" + coll.ready + "&busy=" + coll.busy + "&port=" + port;
             try {
                 sender.send(output);
-            } catch (Exception ex) {
-                log.error(sm.getString("heartbeatListener.sendError"), ex);
+            } catch (Exception e) {
+                log.error(sm.getString("heartbeatListener.sendError"), e);
             }
         }
     }

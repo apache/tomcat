@@ -309,8 +309,8 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
         try {
             oname = new ObjectName(onameStr);
             Registry.getRegistry(null).registerComponent(this, oname, null);
-        } catch (Exception ex) {
-            log.warn(sm.getString("applicationFilterConfig.jmxRegisterFail", getFilterClass(), getFilterName()), ex);
+        } catch (Exception e) {
+            log.warn(sm.getString("applicationFilterConfig.jmxRegisterFail", getFilterClass(), getFilterName()), e);
         }
     }
 
@@ -323,9 +323,9 @@ public final class ApplicationFilterConfig implements FilterConfig, Serializable
                 if (log.isDebugEnabled()) {
                     log.debug(sm.getString("applicationFilterConfig.jmxUnregister", getFilterClass(), getFilterName()));
                 }
-            } catch (Exception ex) {
+            } catch (Exception e) {
                 log.warn(sm.getString("applicationFilterConfig.jmxUnregisterFail", getFilterClass(), getFilterName()),
-                        ex);
+                        e);
             }
         }
     }

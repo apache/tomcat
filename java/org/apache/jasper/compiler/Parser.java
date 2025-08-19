@@ -328,8 +328,8 @@ class Parser implements TagConstants {
             }
         } catch (FileNotFoundException ex) {
             err.jspError(start, "jsp.error.file.not.found", file);
-        } catch (Exception ex) {
-            err.jspError(start, ex.getMessage());
+        } catch (Exception e) {
+            err.jspError(start, e.getMessage());
         }
     }
 

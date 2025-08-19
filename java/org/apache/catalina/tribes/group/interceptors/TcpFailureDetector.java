@@ -250,8 +250,8 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
                     performForcedCheck();
                 }
             }
-        } catch (Exception x) {
-            log.warn(sm.getString("tcpFailureDetector.heartbeat.failed"), x);
+        } catch (Exception e) {
+            log.warn(sm.getString("tcpFailureDetector.heartbeat.failed"), e);
         }
     }
 
@@ -383,8 +383,8 @@ public class TcpFailureDetector extends ChannelInterceptorBase implements TcpFai
             return true;
         } catch (SocketTimeoutException | ConnectException | NoRouteToHostException noop) {
             // do nothing, we couldn't connect
-        } catch (Exception x) {
-            log.error(sm.getString("tcpFailureDetector.failureDetection.failed", mbr), x);
+        } catch (Exception e) {
+            log.error(sm.getString("tcpFailureDetector.failureDetection.failed", mbr), e);
         }
         return false;
     }

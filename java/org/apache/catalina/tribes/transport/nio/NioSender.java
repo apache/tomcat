@@ -276,13 +276,13 @@ public class NioSender extends AbstractSender {
                 try {
                     try {
                         socketChannel.socket().close();
-                    } catch (Exception x) {
+                    } catch (Exception e) {
                         // Ignore
                     }
                     // error free close, all the way
                     try {
                         socketChannel.close();
-                    } catch (Exception x) {
+                    } catch (Exception e) {
                         // Ignore
                     }
                 } finally {
@@ -293,23 +293,23 @@ public class NioSender extends AbstractSender {
                 try {
                     try {
                         dataChannel.socket().close();
-                    } catch (Exception x) {
+                    } catch (Exception e) {
                         // Ignore
                     }
                     // error free close, all the way
                     try {
                         dataChannel.close();
-                    } catch (Exception x) {
+                    } catch (Exception e) {
                         // Ignore
                     }
                 } finally {
                     dataChannel = null;
                 }
             }
-        } catch (Exception x) {
-            log.error(sm.getString("nioSender.unable.disconnect", x.getMessage()));
+        } catch (Exception e) {
+            log.error(sm.getString("nioSender.unable.disconnect", e.getMessage()));
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("nioSender.unable.disconnect", x.getMessage()), x);
+                log.debug(sm.getString("nioSender.unable.disconnect", e.getMessage()), e);
             }
         }
     }

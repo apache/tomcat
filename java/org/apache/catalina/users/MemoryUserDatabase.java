@@ -630,8 +630,8 @@ public class MemoryUserDatabase implements UserDatabase {
                     writeLock.unlock();
                 }
             }
-        } catch (Exception ioe) {
-            log.error(sm.getString("memoryUserDatabase.reloadError", id, uri), ioe);
+        } catch (Exception e) {
+            log.error(sm.getString("memoryUserDatabase.reloadError", id, uri), e);
         } finally {
             if (uConn != null) {
                 try {
