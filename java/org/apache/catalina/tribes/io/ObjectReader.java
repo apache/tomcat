@@ -66,10 +66,10 @@ public class ObjectReader {
     public ObjectReader(Socket socket) {
         try {
             this.buffer = new XByteBuffer(socket.getReceiveBufferSize(), true);
-        } catch (IOException x) {
+        } catch (IOException ioe) {
             // unable to get buffer size
             log.warn(sm.getString("objectReader.retrieveFailed.socketReceiverBufferSize",
-                    Integer.toString(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE)));
+                    Integer.toString(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE)), ioe);
             this.buffer = new XByteBuffer(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE, true);
         }
     }
