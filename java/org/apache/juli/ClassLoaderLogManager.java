@@ -338,7 +338,7 @@ public class ClassLoaderLogManager extends LogManager {
         for (Handler handler : clLogInfo.handlers.values()) {
             try {
                 handler.close();
-            } catch (Exception e) {
+            } catch (Exception ignore) {
                 // Ignore
             }
         }
@@ -365,7 +365,7 @@ public class ClassLoaderLogManager extends LogManager {
         if (info == null) {
             try {
                 readConfiguration(classLoader);
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
             info = classLoaderLoggers.get(classLoader);

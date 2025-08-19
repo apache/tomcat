@@ -374,6 +374,7 @@ public abstract class AbstractReplicatedMap<K, V>
             try {
                 broadcast(MapMessage.MSG_STOP, false);
             } catch (Exception ignore) {
+                // Ignore
             }
             // cleanup
             this.channel.removeChannelListener(this);
