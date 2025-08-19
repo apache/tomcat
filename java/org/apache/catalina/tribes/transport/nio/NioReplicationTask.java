@@ -228,7 +228,7 @@ public class NioReplicationTask extends AbstractRxTask {
                 }
             } catch (RemoteProcessException e) {
                 if (log.isDebugEnabled()) {
-                    log.error(sm.getString("nioReplicationTask.process.clusterMsg.failed"), e);
+                    log.debug(sm.getString("nioReplicationTask.process.clusterMsg.failed"), e);
                 }
                 if (ChannelData.sendAckSync(msg.getOptions())) {
                     sendAck(key, (WritableByteChannel) channel, Constants.FAIL_ACK_COMMAND, saddr);

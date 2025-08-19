@@ -106,7 +106,7 @@ public class DataSourceStore extends JDBCStore {
                     }
                 }
             } catch (SQLException e) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
+                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException"), e);
                 keys = new String[0];
                 // Close the connection so that it gets reopened next time
             } finally {
@@ -140,7 +140,7 @@ public class DataSourceStore extends JDBCStore {
                     numberOfTries = 0;
                 }
             } catch (SQLException e) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
+                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException"), e);
             } finally {
                 release(_conn);
             }
@@ -187,7 +187,7 @@ public class DataSourceStore extends JDBCStore {
                     numberOfTries = 0;
                 }
             } catch (SQLException e) {
-                contextLog.error(sm.getString(getStoreName() + ".SQLException", e));
+                contextLog.error(sm.getString(getStoreName() + ".SQLException"), e);
             } finally {
                 context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
                 release(_conn);
@@ -213,7 +213,7 @@ public class DataSourceStore extends JDBCStore {
                 // Break out after the finally block
                 numberOfTries = 0;
             } catch (SQLException e) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
+                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException"), e);
             } finally {
                 release(_conn);
             }
@@ -261,7 +261,7 @@ public class DataSourceStore extends JDBCStore {
                 // Break out after the finally block
                 numberOfTries = 0;
             } catch (SQLException e) {
-                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
+                manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException"), e);
             } finally {
                 release(_conn);
             }
@@ -307,7 +307,7 @@ public class DataSourceStore extends JDBCStore {
                         numberOfTries = 0;
                     }
                 } catch (SQLException e) {
-                    manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException", e));
+                    manager.getContext().getLogger().error(sm.getString(getStoreName() + ".SQLException"), e);
                 } catch (IOException e) {
                     // Ignore
                 } finally {
@@ -407,8 +407,7 @@ public class DataSourceStore extends JDBCStore {
         try {
             dbConnection.close();
         } catch (SQLException e) {
-            manager.getContext().getLogger().error(sm.getString(getStoreName() + ".close", e.toString())); // Just log
-                                                                                                           // it here
+            manager.getContext().getLogger().error(sm.getString(getStoreName() + ".close"), e); // Just log it here
         }
     }
 

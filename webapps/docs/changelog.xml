@@ -113,6 +113,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name = "Other">
+    <changelog>
+      <scode>
+        Review logging and include the full stack trace and exception message
+        by default rather then just the exception message when logging an error
+        in response to an exception. (markt)
+      </scode>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.108 (remm)" rtext="2025-08-06">
   <subsection name="Catalina">
