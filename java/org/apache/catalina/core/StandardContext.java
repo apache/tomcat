@@ -4403,8 +4403,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                     if ((getCluster() != null) && distributable) {
                         try {
                             contextManager = getCluster().createManager(getName());
-                        } catch (Exception ex) {
-                            log.error(sm.getString("standardContext.cluster.managerError"), ex);
+                        } catch (Exception e) {
+                            log.error(sm.getString("standardContext.cluster.managerError"), e);
                             ok = false;
                         }
                     } else {
@@ -4763,8 +4763,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         // This object will no longer be visible or used.
         try {
             resetContext();
-        } catch (Exception ex) {
-            log.error(sm.getString("standardContext.resetContextFail", getName()), ex);
+        } catch (Exception e) {
+            log.error(sm.getString("standardContext.resetContextFail", getName()), e);
         }
 
         // reset the instance manager

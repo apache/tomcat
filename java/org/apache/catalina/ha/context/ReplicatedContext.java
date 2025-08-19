@@ -62,9 +62,9 @@ public class ReplicatedContext extends StandardContext implements MapOwner {
                 map.setChannelSendOptions(mapSendOptions);
                 ((ReplApplContext) this.context).setAttributeMap(map);
             }
-        } catch (Exception x) {
-            log.error(sm.getString("replicatedContext.startUnable", getName()), x);
-            throw new LifecycleException(sm.getString("replicatedContext.startFailed", getName()), x);
+        } catch (Exception e) {
+            log.error(sm.getString("replicatedContext.startUnable", getName()), e);
+            throw new LifecycleException(sm.getString("replicatedContext.startFailed", getName()), e);
         }
     }
 

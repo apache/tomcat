@@ -1108,8 +1108,8 @@ public abstract class AbstractEndpoint<S, U> {
             } else {
                 return IntrospectionUtils.setProperty(this, name, value, false);
             }
-        } catch (Exception x) {
-            getLog().error(sm.getString("endpoint.setAttributeError", name, value), x);
+        } catch (Exception e) {
+            getLog().error(sm.getString("endpoint.setAttributeError", name, value), e);
             return false;
         }
     }

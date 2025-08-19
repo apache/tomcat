@@ -175,11 +175,11 @@ public class RpcChannel implements ChannelListener {
                             replyMessageOptions & ~Channel.SEND_OPTIONS_SYNCHRONIZED_ACK);
                 }
                 finished = true;
-            } catch (Exception x) {
+            } catch (Exception e) {
                 if (excallback != null && !asyncReply) {
-                    excallback.replyFailed(rmsg.message, reply, sender, x);
+                    excallback.replyFailed(rmsg.message, reply, sender, e);
                 } else {
-                    log.error(sm.getString("rpcChannel.replyFailed"), x);
+                    log.error(sm.getString("rpcChannel.replyFailed"), e);
                 }
             }
             if (finished && excallback != null && !asyncReply) {

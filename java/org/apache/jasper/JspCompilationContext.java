@@ -602,8 +602,8 @@ public class JspCompilationContext {
             } catch (FileNotFoundException fnfe) {
                 // Re-throw to let caller handle this - will result in a 404
                 throw fnfe;
-            } catch (Exception ex) {
-                JasperException je = new JasperException(Localizer.getMessage("jsp.error.unable.compile"), ex);
+            } catch (Exception e) {
+                JasperException je = new JasperException(Localizer.getMessage("jsp.error.unable.compile"), e);
                 // Cache compilation exception
                 jsw.setCompilationException(je);
                 throw je;
@@ -623,8 +623,8 @@ public class JspCompilationContext {
             servletClass = jspLoader.loadClass(name);
         } catch (ClassNotFoundException cex) {
             throw new JasperException(Localizer.getMessage("jsp.error.unable.load"), cex);
-        } catch (Exception ex) {
-            throw new JasperException(Localizer.getMessage("jsp.error.unable.compile"), ex);
+        } catch (Exception e) {
+            throw new JasperException(Localizer.getMessage("jsp.error.unable.compile"), e);
         }
         removed = false;
         return servletClass;

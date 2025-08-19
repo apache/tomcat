@@ -106,8 +106,8 @@ public class TcpSender implements Sender {
                     }
                     connectionReaders[i] = new BufferedReader(new InputStreamReader(connections[i].getInputStream()));
                     connectionWriters[i] = new BufferedWriter(new OutputStreamWriter(connections[i].getOutputStream()));
-                } catch (Exception ex) {
-                    log.error(sm.getString("tcpSender.connectionFailed"), ex);
+                } catch (Exception e) {
+                    log.error(sm.getString("tcpSender.connectionFailed"), e);
                     close(i);
                 }
             }
@@ -125,8 +125,8 @@ public class TcpSender implements Sender {
                 writer.write(mess);
                 writer.write("\r\n");
                 writer.flush();
-            } catch (Exception ex) {
-                log.error(sm.getString("tcpSender.sendFailed"), ex);
+            } catch (Exception e) {
+                log.error(sm.getString("tcpSender.sendFailed"), e);
                 close(i);
             }
             if (connections[i] == null) {
