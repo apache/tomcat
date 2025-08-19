@@ -359,7 +359,7 @@ public class CombinedRealm extends RealmBase {
         // Stack trace will show where this was called from
         UnsupportedOperationException uoe =
                 new UnsupportedOperationException(sm.getString("combinedRealm.getPassword"));
-        log.error(sm.getString("combinedRealm.unexpectedMethod"), uoe);
+        log.error(uoe.getMessage(), uoe);
         throw uoe;
     }
 
@@ -369,7 +369,7 @@ public class CombinedRealm extends RealmBase {
         // Stack trace will show where this was called from
         UnsupportedOperationException uoe =
                 new UnsupportedOperationException(sm.getString("combinedRealm.getPrincipal"));
-        log.error(sm.getString("combinedRealm.unexpectedMethod"), uoe);
+        log.error(uoe.getMessage(), uoe);
         throw uoe;
     }
 
