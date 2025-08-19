@@ -496,11 +496,11 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             wrapper.getLogger().error(sm.getString("applicationDispatcher.allocateException", wrapper.getName()),
                     StandardWrapper.getRootCause(e));
             servletException = e;
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            wrapper.getLogger().error(sm.getString("applicationDispatcher.allocateException", wrapper.getName()), e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            wrapper.getLogger().error(sm.getString("applicationDispatcher.allocateException", wrapper.getName()), t);
             servletException =
-                    new ServletException(sm.getString("applicationDispatcher.allocateException", wrapper.getName()), e);
+                    new ServletException(sm.getString("applicationDispatcher.allocateException", wrapper.getName()), t);
             // servlet = null; is already done so no need to do it explicitly
         }
 
@@ -548,11 +548,11 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
         } catch (ServletException e) {
             wrapper.getLogger().error(sm.getString("applicationDispatcher.deallocateException", wrapper.getName()), e);
             servletException = e;
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            wrapper.getLogger().error(sm.getString("applicationDispatcher.deallocateException", wrapper.getName()), e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            wrapper.getLogger().error(sm.getString("applicationDispatcher.deallocateException", wrapper.getName()), t);
             servletException = new ServletException(
-                    sm.getString("applicationDispatcher.deallocateException", wrapper.getName()), e);
+                    sm.getString("applicationDispatcher.deallocateException", wrapper.getName()), t);
         }
 
         // Reset the old context class loader

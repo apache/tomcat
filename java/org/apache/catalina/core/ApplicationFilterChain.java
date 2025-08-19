@@ -109,9 +109,9 @@ public final class ApplicationFilterChain implements FilterChain {
                 filter.doFilter(request, response, this);
             } catch (IOException | ServletException | RuntimeException e) {
                 throw e;
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                throw new ServletException(sm.getString("filterChain.filter"), e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                throw new ServletException(sm.getString("filterChain.filter"), t);
             }
             return;
         }
@@ -130,9 +130,9 @@ public final class ApplicationFilterChain implements FilterChain {
             servlet.service(request, response);
         } catch (IOException | ServletException | RuntimeException e) {
             throw e;
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            throw new ServletException(sm.getString("filterChain.servlet"), e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            throw new ServletException(sm.getString("filterChain.servlet"), t);
         } finally {
             if (dispatcherWrapsSameObject) {
                 lastServicedRequest.set(null);

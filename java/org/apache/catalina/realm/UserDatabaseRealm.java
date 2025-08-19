@@ -224,10 +224,10 @@ public class UserDatabaseRealm extends RealmBase {
                             context = getServer().getGlobalNamingContext();
                         }
                         database = (UserDatabase) context.lookup(resourceName);
-                    } catch (Throwable e) {
-                        ExceptionUtils.handleThrowable(e);
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
                         if (containerLog != null) {
-                            containerLog.error(sm.getString("userDatabaseRealm.lookup", resourceName), e);
+                            containerLog.error(sm.getString("userDatabaseRealm.lookup", resourceName), t);
                         }
                         database = null;
                     }
