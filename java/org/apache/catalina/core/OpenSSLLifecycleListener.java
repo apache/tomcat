@@ -125,7 +125,7 @@ public class OpenSSLLifecycleListener implements LifecycleListener {
                 } catch (Throwable t) {
                     Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(throwable);
-                    log.info(sm.getString("openssllistener.destroy"));
+                    log.warn(sm.getString("openssllistener.destroy"), throwable);
                 }
             }
         }
