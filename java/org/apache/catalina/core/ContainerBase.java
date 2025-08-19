@@ -754,12 +754,12 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
         for (Future<Void> result : results) {
             try {
                 result.get();
-            } catch (Throwable e) {
-                log.error(sm.getString("containerBase.threadedStartFailed"), e);
+            } catch (Throwable t) {
+                log.error(sm.getString("containerBase.threadedStartFailed"), t);
                 if (multiThrowable == null) {
                     multiThrowable = new MultiThrowable();
                 }
-                multiThrowable.add(e);
+                multiThrowable.add(t);
             }
 
         }

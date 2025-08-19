@@ -95,8 +95,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
                 Constructor<?> ctor = engineOptionsClass.getConstructor(ctorSig);
                 Object[] args = { config, context };
                 options = (Options) ctor.newInstance(args);
-            } catch (Throwable e) {
-                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(e);
+            } catch (Throwable t) {
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(throwable);
                 // Need to localize this.
                 log.warn(Localizer.getMessage("jsp.warning.engineOptionsClass", engineOptionsName), throwable);
@@ -308,9 +308,9 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             serviceJspFile(request, response, jspUri, precompile);
         } catch (RuntimeException | IOException | ServletException e) {
             throw e;
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
-            throw new ServletException(e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            throw new ServletException(t);
         }
 
     }

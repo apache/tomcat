@@ -446,9 +446,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
             close(false);
             try {
                 holder.renameTo(new File(newFileName));
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                log.error(sm.getString("accessLogValve.rotateFail"), e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("accessLogValve.rotateFail"), t);
             }
 
             /* Make sure date is correct */
@@ -515,9 +515,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
                 if (!rotatedLogFile.renameTo(newLogFile)) {
                     log.error(sm.getString("accessLogValve.renameFail", rotatedLogFile, newLogFile));
                 }
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                log.error(sm.getString("accessLogValve.renameFail", rotatedLogFile, newLogFile), e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("accessLogValve.renameFail", rotatedLogFile, newLogFile), t);
             }
         }
     }
@@ -541,9 +541,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
                     if (!currentLogFile.renameTo(newLogFile)) {
                         log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile));
                     }
-                } catch (Throwable e) {
-                    ExceptionUtils.handleThrowable(e);
-                    log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile), e);
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile), t);
                 }
             } else {
                 log.error(sm.getString("accessLogValve.alreadyExists", currentLogFile, newLogFile));
@@ -566,9 +566,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
                 if (currentLogFile != null && !currentLogFile.exists()) {
                     try {
                         close(false);
-                    } catch (Throwable e) {
-                        ExceptionUtils.handleThrowable(e);
-                        log.info(sm.getString("accessLogValve.closeFail"), e);
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        log.info(sm.getString("accessLogValve.closeFail"), t);
                     }
 
                     /* Make sure date is correct */

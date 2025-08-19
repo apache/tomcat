@@ -165,10 +165,10 @@ public final class ApplicationFilterChain implements FilterChain {
                 }
             } catch (IOException | ServletException | RuntimeException e) {
                 throw e;
-            } catch (Throwable e) {
-                e = ExceptionUtils.unwrapInvocationTargetException(e);
+            } catch (Throwable t) {
+                e = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(e);
-                throw new ServletException(sm.getString("filterChain.filter"), e);
+                throw new ServletException(sm.getString("filterChain.filter"), t);
             }
             return;
         }
@@ -196,10 +196,16 @@ public final class ApplicationFilterChain implements FilterChain {
             }
         } catch (IOException | ServletException | RuntimeException e) {
             throw e;
+<<<<<<< HEAD
         } catch (Throwable e) {
             e = ExceptionUtils.unwrapInvocationTargetException(e);
             ExceptionUtils.handleThrowable(e);
             throw new ServletException(sm.getString("filterChain.servlet"), e);
+=======
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
+            throw new ServletException(sm.getString("filterChain.servlet"), t);
+>>>>>>> 99ceef12d3 (Code clean-up - no functional change. Use 't' for throwable)
         } finally {
             if (dispatcherWrapsSameObject) {
                 lastServicedRequest.set(null);
