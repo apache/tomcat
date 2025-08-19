@@ -925,6 +925,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                     try {
                         sd.fchannel.close();
                     } catch (Exception ignore) {
+                        // Ignore
                     }
                     // For calls from outside the Poller, the caller is
                     // responsible for registering the socket for the
