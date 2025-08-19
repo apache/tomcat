@@ -237,9 +237,9 @@ public abstract class SSLUtilBase implements SSLUtil {
             // May be expected when working with a trust store
             // Re-throw. Caller will catch and log as required
             throw ioe;
-        } catch (Exception ex) {
-            String msg = sm.getString("sslUtilBase.keystore_load_failed", type, path, ex.getMessage());
-            log.error(msg, ex);
+        } catch (Exception e) {
+            String msg = sm.getString("sslUtilBase.keystore_load_failed", type, path, e.getMessage());
+            log.error(msg, e);
             throw new IOException(msg);
         } finally {
             if (istream != null) {

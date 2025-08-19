@@ -141,9 +141,9 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
             map.setChannelSendOptions(mapSendOptions);
             map.setAccessTimeout(accessTimeout);
             this.sessions = map;
-        } catch (Exception x) {
-            log.error(sm.getString("backupManager.startUnable", getName()), x);
-            throw new LifecycleException(sm.getString("backupManager.startFailed", getName()), x);
+        } catch (Exception e) {
+            log.error(sm.getString("backupManager.startUnable", getName()), e);
+            throw new LifecycleException(sm.getString("backupManager.startFailed", getName()), e);
         }
         setState(LifecycleState.STARTING);
     }

@@ -116,9 +116,9 @@ class JspReader {
             if (reader != null) {
                 try {
                     reader.close();
-                } catch (Exception any) {
+                } catch (Exception e) {
                     if (log.isDebugEnabled()) {
-                        log.debug(Localizer.getMessage("jsp.error.file.close"), any);
+                        log.debug(Localizer.getMessage("jsp.error.file.close"), e);
                     }
                 }
             }

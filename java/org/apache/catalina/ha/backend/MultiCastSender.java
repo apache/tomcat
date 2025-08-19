@@ -60,8 +60,8 @@ public class MultiCastSender implements Sender {
 
                 s.setTimeToLive(config.getTtl());
                 s.joinGroup(new InetSocketAddress(group, 0), null);
-            } catch (Exception ex) {
-                log.error(sm.getString("multiCastSender.multiCastFailed"), ex);
+            } catch (Exception e) {
+                log.error(sm.getString("multiCastSender.multiCastFailed"), e);
                 s = null;
                 return -1;
             }
@@ -72,8 +72,8 @@ public class MultiCastSender implements Sender {
         DatagramPacket data = new DatagramPacket(buf, buf.length, group, config.getMultiport());
         try {
             s.send(data);
-        } catch (Exception ex) {
-            log.error(sm.getString("multiCastSender.sendFailed"), ex);
+        } catch (Exception e) {
+            log.error(sm.getString("multiCastSender.sendFailed"), e);
             s.close();
             s = null;
             return -1;

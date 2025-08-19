@@ -191,8 +191,8 @@ public class TcpPingInterceptor extends ChannelInterceptorBase implements TcpPin
                     // Ignore. Probably triggered by a call to stop().
                     // In the highly unlikely event it was a different trigger,
                     // simply ignore it and continue.
-                } catch (Exception x) {
-                    log.warn(sm.getString("tcpPingInterceptor.pingFailed.pingThread"), x);
+                } catch (Exception e) {
+                    log.warn(sm.getString("tcpPingInterceptor.pingFailed.pingThread"), e);
                 }
             }
         }

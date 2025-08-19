@@ -474,8 +474,8 @@ public class McastServiceImpl extends MembershipProviderBase {
                         }
                     };
                     executor.execute(t);
-                } catch (Exception x) {
-                    log.error(sm.getString("mcastServiceImpl.memberDisappeared.failed"), x);
+                } catch (Exception e) {
+                    log.error(sm.getString("mcastServiceImpl.memberDisappeared.failed"), e);
                 }
             }
         }
@@ -567,14 +567,14 @@ public class McastServiceImpl extends MembershipProviderBase {
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("mcastServiceImpl.invalidMemberPackage"), ax);
                     }
-                } catch (Exception x) {
+                } catch (Exception e) {
                     if (errorCounter == 0 && doRunReceiver) {
-                        log.warn(sm.getString("mcastServiceImpl.error.receiving"), x);
+                        log.warn(sm.getString("mcastServiceImpl.error.receiving"), e);
                     } else if (log.isDebugEnabled()) {
                         if (doRunReceiver) {
-                            log.debug(sm.getString("mcastServiceImpl.error.receiving"), x);
+                            log.debug(sm.getString("mcastServiceImpl.error.receiving"), e);
                         } else {
-                            log.warn(sm.getString("mcastServiceImpl.error.receivingNoSleep"), x);
+                            log.warn(sm.getString("mcastServiceImpl.error.receivingNoSleep"), e);
                         }
                     }
                     if (doRunReceiver) {
@@ -613,11 +613,11 @@ public class McastServiceImpl extends MembershipProviderBase {
                 try {
                     send(true);
                     errorCounter = 0;
-                } catch (Exception x) {
+                } catch (Exception e) {
                     if (errorCounter == 0) {
-                        log.warn(sm.getString("mcastServiceImpl.send.failed"), x);
+                        log.warn(sm.getString("mcastServiceImpl.send.failed"), e);
                     } else {
-                        log.debug(sm.getString("mcastServiceImpl.send.failed"), x);
+                        log.debug(sm.getString("mcastServiceImpl.send.failed"), e);
                     }
                     if ((++errorCounter) >= recoveryCounter) {
                         errorCounter = 0;
@@ -668,8 +668,8 @@ public class McastServiceImpl extends MembershipProviderBase {
             try {
                 parent.stop(Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ);
                 return true;
-            } catch (Exception x) {
-                log.warn(sm.getString("mcastServiceImpl.recovery.stopFailed"), x);
+            } catch (Exception e) {
+                log.warn(sm.getString("mcastServiceImpl.recovery.stopFailed"), e);
                 return false;
             }
         }
@@ -679,8 +679,8 @@ public class McastServiceImpl extends MembershipProviderBase {
                 parent.init();
                 parent.start(Channel.MBR_RX_SEQ | Channel.MBR_TX_SEQ);
                 return true;
-            } catch (Exception x) {
-                log.warn(sm.getString("mcastServiceImpl.recovery.startFailed"), x);
+            } catch (Exception e) {
+                log.warn(sm.getString("mcastServiceImpl.recovery.startFailed"), e);
                 return false;
             }
         }

@@ -147,8 +147,8 @@ public class DeltaRequest implements Externalizable {
         if (!this.actionPool.isEmpty()) {
             try {
                 info = actionPool.removeFirst();
-            } catch (Exception x) {
-                log.error(sm.getString("deltaRequest.removeUnable"), x);
+            } catch (Exception e) {
+                log.error(sm.getString("deltaRequest.removeUnable"), e);
                 info = new AttributeInfo(type, action, name, value);
             }
             info.init(type, action, name, value);
@@ -251,8 +251,8 @@ public class DeltaRequest implements Externalizable {
                 AttributeInfo info = actions.removeFirst();
                 info.recycle();
                 actionPool.addLast(info);
-            } catch (Exception x) {
-                log.error(sm.getString("deltaRequest.removeUnable"), x);
+            } catch (Exception e) {
+                log.error(sm.getString("deltaRequest.removeUnable"), e);
             }
         }
     }
@@ -293,8 +293,8 @@ public class DeltaRequest implements Externalizable {
             if (!this.actionPool.isEmpty()) {
                 try {
                     info = actionPool.removeFirst();
-                } catch (Exception x) {
-                    log.error(sm.getString("deltaRequest.removeUnable"), x);
+                } catch (Exception e) {
+                    log.error(sm.getString("deltaRequest.removeUnable"), e);
                     info = new AttributeInfo();
                 }
             } else {

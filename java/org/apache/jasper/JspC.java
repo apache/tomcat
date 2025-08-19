@@ -792,7 +792,7 @@ public class JspC extends Task implements Options {
         }
         try {
             uriRoot = resolveFile(s).getCanonicalPath();
-        } catch (Exception ex) {
+        } catch (Exception e) {
             uriRoot = s;
         }
     }

@@ -402,11 +402,11 @@ public class JspServletWrapper {
                 throw handleJspException(ex);
             }
             throw ex;
-        } catch (Exception ex) {
+        } catch (Exception e) {
             if (options.getDevelopment()) {
-                throw handleJspException(ex);
+                throw handleJspException(e);
             }
-            throw new JasperException(ex);
+            throw new JasperException(e);
         }
 
         try {
@@ -459,11 +459,11 @@ public class JspServletWrapper {
                 throw new IOException(handleJspException(ex).getMessage(), ex);
             }
             throw ex;
-        } catch (Exception ex) {
+        } catch (Exception e) {
             if (options.getDevelopment()) {
-                throw handleJspException(ex);
+                throw handleJspException(e);
             }
-            throw new JasperException(ex);
+            throw new JasperException(e);
         }
     }
 
@@ -577,7 +577,7 @@ public class JspServletWrapper {
 
             return new JasperException(
                     Localizer.getMessage("jsp.exception", detail.getJspFileName(), "" + source.lineNumber()), ex);
-        } catch (Exception je) {
+        } catch (Exception e) {
             // If anything goes wrong, just revert to the original behaviour
             if (ex instanceof JasperException) {
                 return (JasperException) ex;

@@ -280,8 +280,8 @@ public class NioReplicationTask extends AbstractRxTask {
                     log.trace("CKX Cancelling key:" + key);
                 }
 
-            } catch (Exception x) {
-                log.error(sm.getString("nioReplicationTask.error.register.key", key), x);
+            } catch (Exception e) {
+                log.error(sm.getString("nioReplicationTask.error.register.key", key), e);
             }
         };
         receiver.addEvent(r);

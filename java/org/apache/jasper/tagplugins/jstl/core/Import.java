@@ -158,7 +158,7 @@ public class Import implements TagPlugin {
             ctxt.generateJavaSource("    try{");
             ctxt.generateJavaSource("        " + tempReaderName + " = new java.io.InputStreamReader(" +
                     inputStreamName + ", " + charSetName + ");");
-            ctxt.generateJavaSource("    }catch(Exception ex){");
+            ctxt.generateJavaSource("    }catch(Exception e){");
             ctxt.generateJavaSource("        " + tempReaderName + " = new java.io.InputStreamReader(" +
                     inputStreamName + ", org.apache.jasper.tagplugins.jstl.Util.DEFAULT_ENCODING);");
             ctxt.generateJavaSource("    }");
@@ -306,8 +306,7 @@ public class Import implements TagPlugin {
             ctxt.generateJavaSource("    try{");
             ctxt.generateJavaSource("        " + tempReaderName + " = new java.io.InputStreamReader(" +
                     inputStreamName + "," + charSetName + ");");
-            ctxt.generateJavaSource("    }catch(Exception ex){");
-            // ctxt.generateJavaSource(" throw new JspTagException(ex.toString());");
+            ctxt.generateJavaSource("    }catch(Exception e){");
             ctxt.generateJavaSource("        " + tempReaderName + " = new java.io.InputStreamReader(" +
                     inputStreamName + ",org.apache.jasper.tagplugins.jstl.Util.DEFAULT_ENCODING);");
             ctxt.generateJavaSource("    }");

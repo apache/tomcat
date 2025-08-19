@@ -69,7 +69,7 @@ public class TagHandlerPool {
         if (maxSizeS != null) {
             try {
                 maxSize = Integer.parseInt(maxSizeS);
-            } catch (Exception ex) {
+            } catch (Exception e) {
                 // Ignore
             }
         }

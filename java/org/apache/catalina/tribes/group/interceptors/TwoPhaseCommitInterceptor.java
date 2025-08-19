@@ -129,8 +129,8 @@ public class TwoPhaseCommitInterceptor extends ChannelInterceptorBase {
                     messages.remove(entry.id);
                 }
             }
-        } catch (Exception x) {
-            log.warn(sm.getString("twoPhaseCommitInterceptor.heartbeat.failed"), x);
+        } catch (Exception e) {
+            log.warn(sm.getString("twoPhaseCommitInterceptor.heartbeat.failed"), e);
         } finally {
             super.heartbeat();
         }

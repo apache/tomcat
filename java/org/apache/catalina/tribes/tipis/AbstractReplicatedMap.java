@@ -717,8 +717,8 @@ public abstract class AbstractReplicatedMap<K, V>
                         diff.lock();
                         try {
                             diff.applyDiff(mapmsg.getDiffValue(), 0, mapmsg.getDiffValue().length);
-                        } catch (Exception x) {
-                            log.error(sm.getString("abstractReplicatedMap.unableApply.diff", entry.getKey()), x);
+                        } catch (Exception e) {
+                            log.error(sm.getString("abstractReplicatedMap.unableApply.diff", entry.getKey()), e);
                         } finally {
                             diff.unlock();
                         }
@@ -982,8 +982,8 @@ public abstract class AbstractReplicatedMap<K, V>
             if (this.state.isAvailable()) {
                 ping(accessTimeout);
             }
-        } catch (Exception x) {
-            log.error(sm.getString("abstractReplicatedMap.heartbeat.failed"), x);
+        } catch (Exception e) {
+            log.error(sm.getString("abstractReplicatedMap.heartbeat.failed"), e);
         }
     }
 
@@ -1526,8 +1526,8 @@ public abstract class AbstractReplicatedMap<K, V>
         public Serializable getKey() {
             try {
                 return key(null);
-            } catch (Exception x) {
-                throw new RuntimeException(sm.getString("mapMessage.deserialize.error.key"), x);
+            } catch (Exception e) {
+                throw new RuntimeException(sm.getString("mapMessage.deserialize.error.key"), e);
             }
         }
 
@@ -1550,8 +1550,8 @@ public abstract class AbstractReplicatedMap<K, V>
         public Serializable getValue() {
             try {
                 return value(null);
-            } catch (Exception x) {
-                throw new RuntimeException(sm.getString("mapMessage.deserialize.error.value"), x);
+            } catch (Exception e) {
+                throw new RuntimeException(sm.getString("mapMessage.deserialize.error.value"), e);
             }
         }
 
