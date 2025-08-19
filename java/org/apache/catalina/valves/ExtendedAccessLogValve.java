@@ -108,8 +108,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
 
         try {
             svalue = value.toString();
-        } catch (Throwable e) {
-            ExceptionUtils.handleThrowable(e);
+        } catch (Throwable t) {
+            ExceptionUtils.handleThrowable(t);
             /* Log error */
             buf.append('-');
             return;
@@ -554,8 +554,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                         String value;
                         try {
                             value = InetAddress.getLocalHost().getHostName();
-                        } catch (Throwable e) {
-                            ExceptionUtils.handleThrowable(e);
+                        } catch (Throwable t) {
+                            ExceptionUtils.handleThrowable(t);
                             value = "localhost";
                         }
                         buf.append(value);
