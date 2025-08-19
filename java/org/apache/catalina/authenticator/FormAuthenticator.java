@@ -245,7 +245,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             try {
                 saveRequest(request, session);
             } catch (IOException ioe) {
-                log.debug(sm.getString("authenticator.requestBodyTooBig"));
+                log.debug(sm.getString("authenticator.requestBodyTooBig"), ioe);
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, sm.getString("authenticator.requestBodyTooBig"));
                 return false;
             }

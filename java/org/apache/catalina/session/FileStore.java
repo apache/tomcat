@@ -204,7 +204,7 @@ public final class FileStore extends StoreBase {
             return session;
         } catch (FileNotFoundException e) {
             if (contextLog.isDebugEnabled()) {
-                contextLog.debug(sm.getString("fileStore.noFile", id, file.getAbsolutePath()));
+                contextLog.debug(sm.getString("fileStore.noFile", id, file.getAbsolutePath()), e);
             }
             return null;
         } finally {

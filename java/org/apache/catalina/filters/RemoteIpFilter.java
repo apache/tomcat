@@ -842,7 +842,7 @@ public class RemoteIpFilter extends GenericFilter {
                         }
 
                     } catch (IllegalArgumentException iae) {
-                        log.debug(sm.getString("remoteIpFilter.invalidHostHeader", hostHeaderValue, hostHeader));
+                        log.debug(sm.getString("remoteIpFilter.invalidHostHeader", hostHeaderValue, hostHeader), iae);
                     }
                 }
             }
@@ -904,7 +904,7 @@ public class RemoteIpFilter extends GenericFilter {
                 try {
                     port = Integer.parseInt(portHeaderValue);
                 } catch (NumberFormatException nfe) {
-                    log.debug(sm.getString("remoteIpFilter.invalidPort", portHeaderValue, getPortHeader()));
+                    log.debug(sm.getString("remoteIpFilter.invalidPort", portHeaderValue, getPortHeader()), nfe);
                 }
             }
         }

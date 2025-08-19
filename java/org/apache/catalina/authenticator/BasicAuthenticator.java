@@ -89,7 +89,7 @@ public class BasicAuthenticator extends AuthenticatorBase {
                 }
             } catch (IllegalArgumentException iae) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("basicAuthenticator.invalidAuthorization", iae.getMessage()));
+                    log.debug(sm.getString("basicAuthenticator.invalidAuthorization"), iae);
                 }
             }
         }

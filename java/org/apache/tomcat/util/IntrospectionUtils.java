@@ -144,7 +144,7 @@ public final class IntrospectionUtils {
                                 params[0] = InetAddress.getByName(value);
                             } catch (UnknownHostException exc) {
                                 if (log.isDebugEnabled()) {
-                                    log.debug(sm.getString("introspectionUtils.hostResolutionFail", value));
+                                    log.debug(sm.getString("introspectionUtils.hostResolutionFail", value), exc);
                                 }
                                 ok = false;
                             }
@@ -542,7 +542,7 @@ public final class IntrospectionUtils {
                     result = InetAddress.getByName(object);
                 } catch (UnknownHostException exc) {
                     if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("introspectionUtils.hostResolutionFail", object));
+                        log.debug(sm.getString("introspectionUtils.hostResolutionFail", object), exc);
                     }
                 }
 

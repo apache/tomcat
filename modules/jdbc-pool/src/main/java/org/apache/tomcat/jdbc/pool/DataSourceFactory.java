@@ -571,7 +571,7 @@ public class DataSourceFactory implements ObjectFactory {
                 log.warn("dataSourceJNDI property is configured, but local JNDI context is null.");
             }
         } catch (NamingException e) {
-            log.debug("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the local context.");
+            log.debug("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the local context.", e);
         }
         if (jndiDS==null) {
             try {
