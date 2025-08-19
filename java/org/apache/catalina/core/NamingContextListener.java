@@ -989,7 +989,7 @@ public class NamingContextListener implements LifecycleListener, PropertyChangeL
                 Registry.getRegistry(null).registerComponent(actualResource, on, null);
                 objectNames.put(resource.getName(), on);
             } catch (Exception e) {
-                log.warn(sm.getString("naming.jmxRegistrationFailed", e));
+                log.warn(sm.getString("naming.jmxRegistrationFailed", resource.getName()), e);
             }
             // Bug 63210. DBCP2 DataSources require an explicit close. This goes
             // further and cleans up and AutoCloseable DataSource by default.

@@ -286,6 +286,7 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                 sendElectionMsg(local, msg.getMembers()[current], msg);
                 sent = true;
             } catch (ChannelException x) {
+                // Exception is logged further up stack
                 log.warn(sm.getString("nonBlockingCoordinator.electionMessage.sendfailed", msg.getMembers()[current]));
                 current = Arrays.nextIndex(msg.getMembers()[current], msg.getMembers());
                 if (current == next) {

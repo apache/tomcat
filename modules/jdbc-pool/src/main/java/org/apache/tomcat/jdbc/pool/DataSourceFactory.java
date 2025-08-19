@@ -578,7 +578,7 @@ public class DataSourceFactory implements ObjectFactory {
                 context = new InitialContext();
                 jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
             } catch (NamingException e) {
-                log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the InitialContext.");
+                log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the InitialContext.", e);
             }
         }
         if (jndiDS!=null) {
