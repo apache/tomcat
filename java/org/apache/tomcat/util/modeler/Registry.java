@@ -238,11 +238,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
                 }
                 getMBeanServer().invoke(current, operation, new Object[] {}, new String[] {});
 
-            } catch (Exception t) {
+            } catch (Exception e) {
                 if (failFirst) {
-                    throw t;
+                    throw e;
                 }
-                log.info(sm.getString("registry.initError"), t);
+                log.info(sm.getString("registry.initError"), e);
             }
         }
     }
