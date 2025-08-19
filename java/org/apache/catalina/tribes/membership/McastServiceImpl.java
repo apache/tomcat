@@ -201,7 +201,11 @@ public class McastServiceImpl extends MembershipProviderBase {
                  * On some platforms (e.g. Linux) it is not possible to bind to the multicast address. In this case only
                  * bind to the port.
                  */
-                log.info(sm.getString("mcastServiceImpl.bind.failed"));
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("mcastServiceImpl.bind.failed"), e);
+                } else {
+                    log.info(sm.getString("mcastServiceImpl.bind.failed"));
+                }
                 socket = new MulticastSocket(port);
             }
         } else {

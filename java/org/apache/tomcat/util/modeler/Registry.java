@@ -338,8 +338,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         MBeanInfo info;
         try {
             info = getMBeanServer().getMBeanInfo(oname);
-        } catch (Exception e) {
+        } catch (InstanceNotFoundException e) {
             log.info(sm.getString("registry.noMetadata", oname));
+            return null;
+        } catch (Exception e) {
+            log.warn(sm.getString("registry.noMetadata", oname), e);
             return null;
         }
 
@@ -366,8 +369,11 @@ public class Registry implements RegistryMBean, MBeanRegistration {
         MBeanInfo info;
         try {
             info = getMBeanServer().getMBeanInfo(oname);
-        } catch (Exception e) {
+        } catch (InstanceNotFoundException e) {
             log.info(sm.getString("registry.noMetadata", oname));
+            return null;
+        } catch (Exception e) {
+            log.warn(sm.getString("registry.noMetadata", oname), e);
             return null;
         }
         MBeanOperationInfo[] attInfo = info.getOperations();
