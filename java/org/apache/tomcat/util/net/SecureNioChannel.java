@@ -401,12 +401,14 @@ public class SecureNioChannel extends NioChannel {
                 try {
                     key.cancel();
                 } catch (Exception ignore) {
+                    // Ignore
                 }
             }
             if (selector != null) {
                 try {
                     selector.close();
                 } catch (Exception ignore) {
+                    // Ignore
                 }
             }
         }
