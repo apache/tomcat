@@ -118,7 +118,7 @@
       <scode>
         Review logging and include the full stack trace and exception message
         by default rather then just the exception message when logging an error
-        in response to an exception. (markt)
+        or warning in response to an exception. (markt)
       </scode>
     </changelog>
   </subsection>

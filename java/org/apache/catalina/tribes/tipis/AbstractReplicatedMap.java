@@ -240,10 +240,13 @@ public abstract class AbstractReplicatedMap<K, V>
             // state is transferred, we are ready for messaging
             broadcast(MapMessage.MSG_START, true);
         } catch (ChannelException x) {
-            log.warn(sm.getString("abstractReplicatedMap.unableSend.startMessage"));
             if (terminate) {
+                // Exception is logged further up stack
+                log.warn(sm.getString("abstractReplicatedMap.unableSend.startMessage"));
                 breakdown();
                 throw new RuntimeException(sm.getString("abstractReplicatedMap.unableStart"), x);
+            } else {
+                log.warn(sm.getString("abstractReplicatedMap.unableSend.startMessage"), x);
             }
         }
         this.state = State.INITIALIZED;

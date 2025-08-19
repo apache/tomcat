@@ -1544,7 +1544,7 @@ public final class CGIServlet extends HttpServlet {
                     try {
                         errReaderThread.join(stderrTimeout);
                     } catch (InterruptedException e) {
-                        log.warn(sm.getString("cgiServlet.runReaderInterrupt"));
+                        log.warn(sm.getString("cgiServlet.runReaderInterrupt"), e);
                     }
                 }
                 if (proc != null) {

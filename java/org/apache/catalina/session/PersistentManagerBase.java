@@ -508,7 +508,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
             // Store session count
             result += getStore().getSize();
         } catch (IOException ioe) {
-            log.warn(sm.getString("persistentManager.storeSizeException"));
+            log.warn(sm.getString("persistentManager.storeSizeException"), ioe);
         }
         return result;
     }
@@ -521,8 +521,8 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         try {
             // Store session ID list
             sessionIds.addAll(Arrays.asList(getStore().keys()));
-        } catch (IOException e) {
-            log.warn(sm.getString("persistentManager.storeKeysException"));
+        } catch (IOException ioe) {
+            log.warn(sm.getString("persistentManager.storeKeysException"), ioe);
         }
         return sessionIds;
     }
