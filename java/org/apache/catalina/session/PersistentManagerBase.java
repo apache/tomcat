@@ -666,7 +666,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         try {
             store.save(session);
         } catch (IOException e) {
-            log.error(sm.getString("persistentManager.serializeError", session.getIdInternal(), e));
+            log.error(sm.getString("persistentManager.serializeError", session.getIdInternal()), e);
             throw e;
         }
 

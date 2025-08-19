@@ -736,7 +736,8 @@ public class ContextConfig implements LifecycleListener {
             }
         } catch (SAXParseException e) {
             log.error(sm.getString("contextConfig.contextParse", context.getName()), e);
-            log.error(sm.getString("contextConfig.defaultPosition", "" + e.getLineNumber(), "" + e.getColumnNumber()));
+            log.error(sm.getString("contextConfig.defaultPosition", Integer.toString(e.getLineNumber()),
+                    Integer.toString(e.getColumnNumber())));
             ok = false;
         } catch (Exception e) {
             log.error(sm.getString("contextConfig.contextParse", context.getName()), e);

@@ -1607,7 +1607,7 @@ public class ConnectionPool {
                         pool.testAllIdle(true);
                     }
                 } catch (Exception x) {
-                    log.error("", x);
+                    log.error(x.toString(), x);
                 }
             }
         }

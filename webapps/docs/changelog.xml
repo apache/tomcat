@@ -271,6 +271,11 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <scode>
+        Review logging and include the full stack trace and exception message
+        by default rather then just the exception message when logging an error
+        in response to an exception. (markt)
+      </scode>
     </changelog>
   </subsection>
 </section>
