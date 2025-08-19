@@ -516,7 +516,7 @@ public interface Channel {
         } catch (NumberFormatException nfe) {
             final Log log = LogFactory.getLog(Channel.class);
             log.trace(String.format("Failed to parse [%s] as integer, channelSendOptions possibly set by name(s)",
-                    input));
+                    input), nfe);
         }
 
         String[] options = input.split("\\s*,\\s*");
