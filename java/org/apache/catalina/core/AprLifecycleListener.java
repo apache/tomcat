@@ -180,7 +180,7 @@ public class AprLifecycleListener implements LifecycleListener {
                 } catch (Throwable t) {
                     Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
                     ExceptionUtils.handleThrowable(throwable);
-                    log.info(sm.getString("aprListener.aprDestroy"));
+                    log.warn(sm.getString("aprListener.aprDestroy"), throwable);
                 }
             }
         }

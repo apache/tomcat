@@ -80,7 +80,7 @@ public class OpenSSLUtil extends SSLUtilBase {
             // No (or invalid?) certificate chain was provided for the cert
             String msg = sm.getString("openssl.nonJsseChain", certificate.getCertificateChainFile());
             if (log.isDebugEnabled()) {
-                log.info(msg, e);
+                log.debug(msg, e);
             } else {
                 log.info(msg);
             }
@@ -93,7 +93,7 @@ public class OpenSSLUtil extends SSLUtilBase {
                 String msg = sm.getString("openssl.nonJsseCertificate", certificate.getCertificateFile(),
                         certificate.getCertificateKeyFile());
                 if (log.isDebugEnabled()) {
-                    log.info(msg, e);
+                    log.debug(msg, e);
                 } else {
                     log.info(msg);
                 }
