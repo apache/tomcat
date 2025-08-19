@@ -714,8 +714,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
             try {
                 jspMonitorON = new ObjectName(oname.toString());
                 Registry.getRegistry(null).registerComponent(instance, jspMonitorON, null);
-            } catch (Exception ex) {
-                log.warn(sm.getString("standardWrapper.jspMonitorError", instance));
+            } catch (Exception e) {
+                log.warn(sm.getString("standardWrapper.jspMonitorError", instance), e);
             }
         }
     }
