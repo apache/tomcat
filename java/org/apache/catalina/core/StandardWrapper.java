@@ -713,9 +713,9 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                         nInstances++;
                     } catch (ServletException e) {
                         throw e;
-                    } catch (Throwable e) {
-                        ExceptionUtils.handleThrowable(e);
-                        throw new ServletException(sm.getString("standardWrapper.allocate"), e);
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        throw new ServletException(sm.getString("standardWrapper.allocate"), t);
                     }
                 } else {
                     try {
@@ -905,8 +905,8 @@ public class StandardWrapper extends ContainerBase implements ServletConfig, Wra
                 unavailable(null);
                 // Restore the context ClassLoader
                 throw new ServletException(sm.getString("standardWrapper.notServlet", servletClass), e);
-            } catch (Throwable e) {
-                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(e);
+            } catch (Throwable t) {
+                Throwable throwable = ExceptionUtils.unwrapInvocationTargetException(t);
                 ExceptionUtils.handleThrowable(throwable);
                 unavailable(null);
 

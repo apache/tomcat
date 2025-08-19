@@ -1308,10 +1308,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                         getSocket().free();
                     }
                 }
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (log.isDebugEnabled()) {
-                    log.error(sm.getString("endpoint.debug.channelCloseFail"), e);
+                    log.error(sm.getString("endpoint.debug.channelCloseFail"), t);
                 }
             } finally {
                 socketBufferHandler = SocketBufferHandler.EMPTY;
@@ -1323,10 +1323,10 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> 
                 if (data != null && data.fchannel != null && data.fchannel.isOpen()) {
                     data.fchannel.close();
                 }
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (log.isDebugEnabled()) {
-                    log.error(sm.getString("endpoint.sendfile.closeError"), e);
+                    log.error(sm.getString("endpoint.sendfile.closeError"), t);
                 }
             }
         }

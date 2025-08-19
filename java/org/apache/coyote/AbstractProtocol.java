@@ -1049,9 +1049,9 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                             } finally {
                                 try {
                                     instanceManager.destroyInstance(httpUpgradeHandler);
-                                } catch (Throwable e) {
-                                    ExceptionUtils.handleThrowable(e);
-                                    getLog().error(sm.getString("abstractConnectionHandler.error"), e);
+                                } catch (Throwable t) {
+                                    ExceptionUtils.handleThrowable(t);
+                                    getLog().error(sm.getString("abstractConnectionHandler.error"), t);
                                 }
                                 upgradeToken.getContextBind().unbind(false, oldCL);
                             }
@@ -1086,12 +1086,12 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                 // Worst case, it isn't recoverable and the attempt at logging
                 // will trigger another OOME.
                 getLog().error(sm.getString("abstractConnectionHandler.oome"), oome);
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 // any other exception or error is odd. Here we log it
                 // with "ERROR" level, so it will show up even on
                 // less-than-verbose logs.
-                getLog().error(sm.getString("abstractConnectionHandler.error"), e);
+                getLog().error(sm.getString("abstractConnectionHandler.error"), t);
             }
 
             // Make sure socket/processor is removed from the list of current

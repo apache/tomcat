@@ -359,9 +359,9 @@ public class JAASRealm extends RealmBase {
             try {
                 Configuration config = getConfig();
                 loginContext = new LoginContext(appName, null, callbackHandler, config);
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                log.error(sm.getString("jaasRealm.unexpectedError"), e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("jaasRealm.unexpectedError"), t);
                 // There is configuration issue with JAAS so mark the realm as
                 // unavailable
                 invocationSuccess = false;
@@ -422,9 +422,9 @@ public class JAASRealm extends RealmBase {
                 // invocations so mark JAAS realm as available
                 invocationSuccess = true;
                 return null;
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                log.error(sm.getString("jaasRealm.unexpectedError"), e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("jaasRealm.unexpectedError"), t);
                 // JAAS throws exception different from LoginException so mark the
                 // realm as unavailable
                 invocationSuccess = false;

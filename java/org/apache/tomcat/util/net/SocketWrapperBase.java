@@ -446,10 +446,10 @@ public abstract class SocketWrapperBase<E> {
         if (closed.compareAndSet(false, true)) {
             try {
                 getEndpoint().getHandler().release(this);
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
                 if (log.isDebugEnabled()) {
-                    log.error(sm.getString("endpoint.debug.handlerRelease"), e);
+                    log.error(sm.getString("endpoint.debug.handlerRelease"), t);
                 }
             } finally {
                 getEndpoint().countDownConnection();
