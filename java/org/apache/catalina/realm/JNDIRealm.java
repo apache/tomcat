@@ -1850,7 +1850,7 @@ public class JNDIRealm extends RealmBase {
             validated = true;
         } catch (AuthenticationException e) {
             if (containerLog.isTraceEnabled()) {
-                containerLog.trace("  bind attempt failed");
+                containerLog.trace("  bind attempt failed", e);
             }
         } finally {
             // Restore GSSAPI SASL if previously configured

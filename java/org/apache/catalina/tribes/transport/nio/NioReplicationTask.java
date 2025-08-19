@@ -213,7 +213,8 @@ public class NioReplicationTask extends AbstractRxTask {
                     try {
                         Logs.MESSAGES.trace("NioReplicationThread - Received msg:" + new UniqueId(msg.getUniqueId()) +
                                 " at " + new java.sql.Timestamp(System.currentTimeMillis()));
-                    } catch (Throwable t) {
+                    } catch (Throwable ignore) {
+                        // Ignore
                     }
                 }
                 // process the message

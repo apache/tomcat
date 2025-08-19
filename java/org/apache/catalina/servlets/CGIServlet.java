@@ -431,7 +431,7 @@ public final class CGIServlet extends HttpServlet {
                 }
             }
         } catch (IllegalStateException ise) {
-            log.trace("Request Parameters: [Invalid]");
+            log.trace("Request Parameters: [Invalid]", ise);
         }
         log.trace("Protocol: [" + req.getProtocol() + "]");
         log.trace("Remote Address: [" + req.getRemoteAddr() + "]");
