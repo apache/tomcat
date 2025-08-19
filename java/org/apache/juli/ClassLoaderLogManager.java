@@ -364,7 +364,7 @@ public class ClassLoaderLogManager extends LogManager {
         for (Handler handler : clLogInfo.handlers.values()) {
             try {
                 handler.close();
-            } catch (Exception e) {
+            } catch (Exception ignore) {
                 // Ignore
             }
         }
@@ -393,7 +393,7 @@ public class ClassLoaderLogManager extends LogManager {
             AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
                 try {
                     readConfiguration(classLoaderParam);
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
                 return null;

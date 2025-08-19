@@ -286,12 +286,14 @@ public class FileMessageFactory {
             try {
                 in.close();
             } catch (IOException ignore) {
+                // Ignore
             }
         }
         if (out != null) {
             try {
                 out.close();
             } catch (IOException ignore) {
+                // Ignore
             }
         }
         in = null;

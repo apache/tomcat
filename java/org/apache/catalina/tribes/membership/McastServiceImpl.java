@@ -292,6 +292,7 @@ public class McastServiceImpl extends MembershipProviderBase {
         try {
             Thread.sleep(memberwait);
         } catch (InterruptedException ignore) {
+            // Ignore
         }
         if (log.isInfoEnabled()) {
             log.info(sm.getString("mcastServiceImpl.waitForMembers.done", Integer.toString(level)));
