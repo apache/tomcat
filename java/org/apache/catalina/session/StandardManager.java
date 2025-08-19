@@ -229,7 +229,7 @@ public class StandardManager extends ManagerBase {
             }
         } catch (FileNotFoundException e) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("standardManager.noFile", file.getAbsolutePath()));
+                log.debug(sm.getString("standardManager.noFile", file.getAbsolutePath()), e);
             }
             return;
         }

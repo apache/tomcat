@@ -542,7 +542,7 @@ public final class IntrospectionUtils {
                 result = InetAddress.getByName(object);
             } catch (UnknownHostException exc) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("introspectionUtils.hostResolutionFail", object));
+                    log.debug(sm.getString("introspectionUtils.hostResolutionFail", object), exc);
                 }
             }
 

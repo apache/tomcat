@@ -978,10 +978,10 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
         try {
             m = resource.getClass().getMethod(closeMethod, (Class<?>[]) null);
         } catch (SecurityException e) {
-            log.debug(sm.getString("namingResources.cleanupCloseSecurity", closeMethod, name, container));
+            log.debug(sm.getString("namingResources.cleanupCloseSecurity", closeMethod, name, container), e);
             return;
         } catch (NoSuchMethodException e) {
-            log.debug(sm.getString("namingResources.cleanupNoClose", name, container, closeMethod));
+            log.debug(sm.getString("namingResources.cleanupNoClose", name, container, closeMethod), e);
             return;
         }
         try {

@@ -727,7 +727,7 @@ public class RemoteIpValve extends ValveBase {
                         }
 
                     } catch (IllegalArgumentException iae) {
-                        log.debug(sm.getString("remoteIpValve.invalidHostHeader", hostHeaderValue, hostHeader));
+                        log.debug(sm.getString("remoteIpValve.invalidHostHeader", hostHeaderValue, hostHeader), iae);
                     }
                 }
             }

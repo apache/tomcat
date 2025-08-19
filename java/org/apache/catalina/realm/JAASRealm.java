@@ -394,7 +394,7 @@ public class JAASRealm extends RealmBase {
                 }
             } catch (AccountExpiredException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("jaasRealm.accountExpired", username));
+                    log.debug(sm.getString("jaasRealm.accountExpired", username), e);
                 }
                 // JAAS checked LoginExceptions are successful authentication
                 // invocations so mark JAAS realm as available
@@ -402,7 +402,7 @@ public class JAASRealm extends RealmBase {
                 return null;
             } catch (CredentialExpiredException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("jaasRealm.credentialExpired", username));
+                    log.debug(sm.getString("jaasRealm.credentialExpired", username), e);
                 }
                 // JAAS checked LoginExceptions are successful authentication
                 // invocations so mark JAAS realm as available
@@ -410,7 +410,7 @@ public class JAASRealm extends RealmBase {
                 return null;
             } catch (FailedLoginException e) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("jaasRealm.failedLogin", username));
+                    log.debug(sm.getString("jaasRealm.failedLogin", username), e);
                 }
                 // JAAS checked LoginExceptions are successful authentication
                 // invocations so mark JAAS realm as available
