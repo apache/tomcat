@@ -38,10 +38,10 @@ public class EchoAnnotation {
             if (session.isOpen()) {
                 session.getBasicRemote().sendText(msg, last);
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             try {
                 session.close();
-            } catch (IOException e1) {
+            } catch (IOException ignore) {
                 // Ignore
             }
         }
@@ -54,10 +54,10 @@ public class EchoAnnotation {
             if (session.isOpen()) {
                 session.getBasicRemote().sendBinary(bb, last);
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             try {
                 session.close();
-            } catch (IOException e1) {
+            } catch (IOException iognore) {
                 // Ignore
             }
         }

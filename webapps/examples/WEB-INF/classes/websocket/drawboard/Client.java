@@ -118,7 +118,7 @@ public class Client {
                             // Ideally, there should be some method that cancels the connection
                             // immediately...
                             session.close(cr);
-                        } catch (IOException e) {
+                        } catch (IOException ignore) {
                             // Ignore
                         }
 
@@ -208,7 +208,7 @@ public class Client {
                 // immediately...
                 try {
                     session.close();
-                } catch (IOException ex) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
