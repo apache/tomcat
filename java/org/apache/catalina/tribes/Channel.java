@@ -279,8 +279,8 @@ public interface Channel {
     void start(int svc) throws ChannelException;
 
     /**
-     * Shuts down the channel. This can be called multiple times for individual services to shut down.
-     * The svc parameter can be the logical or value of any constants
+     * Shuts down the channel. This can be called multiple times for individual services to shut down. The svc parameter
+     * can be the logical or value of any constants
      *
      * @param svc one of:
      *                <ul>
@@ -480,8 +480,7 @@ public interface Channel {
             case "synchronized_ack", "sync" -> SEND_OPTIONS_SYNCHRONIZED_ACK;
             case "udp" -> SEND_OPTIONS_UDP;
             case "use_ack" -> SEND_OPTIONS_USE_ACK;
-            default ->
-                    throw new IllegalArgumentException(String.format("[%s] is not a valid option", opt));
+            default -> throw new IllegalArgumentException(String.format("[%s] is not a valid option", opt));
         };
 
     }
@@ -499,8 +498,10 @@ public interface Channel {
             return Integer.parseInt(input);
         } catch (NumberFormatException nfe) {
             final Log log = LogFactory.getLog(Channel.class);
-            log.trace(String.format("Failed to parse [%s] as integer, channelSendOptions possibly set by name(s)",
-                    input), nfe);
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("Failed to parse [%s] as integer, channelSendOptions possibly set by name(s)",
+                        input), nfe);
+            }
         }
 
         String[] options = input.split("\\s*,\\s*");
