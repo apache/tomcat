@@ -71,8 +71,8 @@ public class ValuesTag extends TagSupport {
             } else {
                 out.print("-1");
             }
-        } catch (IOException ex) {
-            throw new JspTagException("IOException: " + ex.toString(), ex);
+        } catch (IOException ioe) {
+            throw new JspTagException("IOException: " + ioe.toString(), ioe);
         }
         return super.doEndTag();
     }

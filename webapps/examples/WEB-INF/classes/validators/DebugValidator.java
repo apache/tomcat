@@ -69,7 +69,7 @@ public class DebugValidator extends TagLibraryValidator {
                     break;
                 }
                 System.out.print((char) ch);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 break;
             }
         }

@@ -188,7 +188,7 @@ public class CompressionServletResponseWrapper
                     stream.close();
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore
         }
     }

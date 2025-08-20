@@ -24,7 +24,7 @@
         } else {
             pageContext.include("/jsp/pageContext2.jsp");
         }
-    } catch (IOException e) {
+    } catch (IOException ioe) {
         out.println("OK");
         return;
     } catch (Throwable t) {
