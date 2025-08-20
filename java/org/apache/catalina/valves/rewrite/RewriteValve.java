@@ -171,9 +171,9 @@ public class RewriteValve extends ValveBase {
             try {
                 ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(resourceName);
                 is = resource.getInputStream();
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (containerLog.isDebugEnabled()) {
-                    containerLog.debug(sm.getString("rewriteValve.noConfiguration", resourceName), e);
+                    containerLog.debug(sm.getString("rewriteValve.noConfiguration", resourceName), ioe);
                 }
             }
         }
@@ -191,8 +191,8 @@ public class RewriteValve extends ValveBase {
         } finally {
             try {
                 is.close();
-            } catch (IOException e) {
-                containerLog.error(sm.getString("rewriteValve.closeError"), e);
+            } catch (IOException ioe) {
+                containerLog.error(sm.getString("rewriteValve.closeError"), ioe);
             }
         }
 
@@ -274,8 +274,8 @@ public class RewriteValve extends ValveBase {
                         ((Lifecycle) map).start();
                     }
                 }
-            } catch (IOException e) {
-                containerLog.error(sm.getString("rewriteValve.readError"), e);
+            } catch (IOException ioe) {
+                containerLog.error(sm.getString("rewriteValve.readError"), ioe);
             }
         }
         this.mapsConfiguration = mapsConfiguration;

@@ -812,7 +812,7 @@ public class Tomcat {
         }
         try {
             baseFile = baseFile.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             baseFile = baseFile.getAbsoluteFile();
         }
         server.setCatalinaBase(baseFile);
@@ -829,7 +829,7 @@ public class Tomcat {
             }
             try {
                 homeFile = homeFile.getCanonicalFile();
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 homeFile = homeFile.getAbsoluteFile();
             }
             server.setCatalinaHome(homeFile);
@@ -1053,8 +1053,8 @@ public class Tomcat {
             for (Map.Entry<Object,Object> entry : defaultMimeMappings.entrySet()) {
                 context.addMimeMapping((String) entry.getKey(), (String) entry.getValue());
             }
-        } catch (IOException e) {
-            throw new IllegalStateException(sm.getString("tomcat.defaultMimeTypeMappingsFail"), e);
+        } catch (IOException ioe) {
+            throw new IllegalStateException(sm.getString("tomcat.defaultMimeTypeMappingsFail"), ioe);
         }
     }
 
@@ -1186,9 +1186,9 @@ public class Tomcat {
             if (entry != null) {
                 result = UriUtil.buildJarUrl(docBase, Constants.ApplicationContextXml);
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             Logger.getLogger(getLoggerName(getHost(), contextName)).log(Level.WARNING,
-                    sm.getString("tomcat.noContextXml", docBase), e);
+                    sm.getString("tomcat.noContextXml", docBase), ioe);
         }
         return result;
     }

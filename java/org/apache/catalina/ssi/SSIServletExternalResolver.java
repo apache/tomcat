@@ -447,7 +447,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         try {
             URLConnection urlConnection = getURLConnection(path, virtual);
             lastModified = urlConnection.getLastModified();
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore this. It will always fail for non-file based includes
         }
         return lastModified;
@@ -460,7 +460,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
         try {
             URLConnection urlConnection = getURLConnection(path, virtual);
             fileSize = urlConnection.getContentLengthLong();
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore this. It will always fail for non-file based includes
         }
         return fileSize;

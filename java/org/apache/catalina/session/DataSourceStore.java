@@ -565,7 +565,7 @@ public class DataSourceStore extends StoreBase {
                     }
                 } catch (SQLException e) {
                     manager.getContext().getLogger().error(sm.getString("dataSourceStore.SQLException"), e);
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     // Ignore
                 } finally {
                     release(_conn);

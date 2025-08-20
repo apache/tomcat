@@ -106,8 +106,8 @@ public class CheckEol extends Task {
                     log("Checking file '" + file + "' for correct line ends", Project.MSG_DEBUG);
                     try {
                         check(file, errors, mode);
-                    } catch (IOException e) {
-                        throw new BuildException("Could not check file '" + file.getAbsolutePath() + "'", e);
+                    } catch (IOException ioe) {
+                        throw new BuildException("Could not check file '" + file.getAbsolutePath() + "'", ioe);
                     }
                     count++;
                 }

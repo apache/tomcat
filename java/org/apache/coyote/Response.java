@@ -552,7 +552,7 @@ public final class Response {
         MediaType m = null;
         try {
             m = MediaType.parseMediaType(new StringReader(type));
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore - null test below handles this
         }
         if (m == null) {

@@ -50,8 +50,8 @@ public class WsFrameClient extends WsFrameBase {
     void startInputProcessing() {
         try {
             processSocketRead();
-        } catch (IOException e) {
-            close(e);
+        } catch (IOException ioe) {
+            close(ioe);
         }
     }
 
@@ -206,7 +206,7 @@ public class WsFrameClient extends WsFrameBase {
     private void resumeProcessing(boolean checkOpenOnError) {
         try {
             processSocketRead();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (checkOpenOnError) {
                 // Only send a close message on an IOException if the client
                 // has not yet received a close control message from the server
@@ -215,12 +215,12 @@ public class WsFrameClient extends WsFrameBase {
                 // control message.
                 if (isOpen()) {
                     if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("wsFrameClient.ioe"), e);
+                        log.debug(sm.getString("wsFrameClient.ioe"), ioe);
                     }
-                    close(e);
+                    close(ioe);
                 }
             } else {
-                close(e);
+                close(ioe);
             }
         }
     }

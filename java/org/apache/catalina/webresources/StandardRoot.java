@@ -790,7 +790,7 @@ public class StandardRoot extends LifecycleMBeanBase implements WebResourceRoot 
                     trackedResource.getCreatedBy());
             try {
                 trackedResource.close();
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
         }

@@ -1512,9 +1512,9 @@ public final class CGIServlet extends HttpServlet {
                     }
                 } // replacement for Process.waitFor()
 
-            } catch (IOException e) {
-                log.warn(sm.getString("cgiServlet.runFail"), e);
-                throw e;
+            } catch (IOException ioe) {
+                log.warn(sm.getString("cgiServlet.runFail"), ioe);
+                throw ioe;
             } finally {
                 // Close the header reader
                 if (cgiHeaderReader != null) {
@@ -1615,13 +1615,13 @@ public final class CGIServlet extends HttpServlet {
                     log.warn(sm.getString("cgiServlet.runStdErr", line));
                     lineCount++;
                 }
-            } catch (IOException e) {
-                log.warn(sm.getString("cgiServlet.runStdErrFail"), e);
+            } catch (IOException ioe) {
+                log.warn(sm.getString("cgiServlet.runStdErrFail"), ioe);
             } finally {
                 try {
                     rdr.close();
-                } catch (IOException e) {
-                    log.warn(sm.getString("cgiServlet.runStdErrFail"), e);
+                } catch (IOException ioe) {
+                    log.warn(sm.getString("cgiServlet.runStdErrFail"), ioe);
                 }
             }
             if (lineCount > 0) {

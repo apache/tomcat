@@ -2217,8 +2217,8 @@ public class JNDIRealm extends RealmBase {
         if (tls != null) {
             try {
                 tls.close();
-            } catch (IOException e) {
-                containerLog.error(sm.getString("jndiRealm.tlsClose"), e);
+            } catch (IOException ioe) {
+                containerLog.error(sm.getString("jndiRealm.tlsClose"), ioe);
             }
         }
         // Close our opened connection
@@ -2629,8 +2629,10 @@ public class JNDIRealm extends RealmBase {
             try {
                 SSLSession negotiate = tls.negotiate(getSSLSocketFactory());
                 containerLog.debug(sm.getString("jndiRealm.negotiatedTls", negotiate.getProtocol()));
-            } catch (IOException e) {
-                throw new NamingException(e.getMessage());
+            } catch (IOException ioe) {
+                NamingException ne = new NamingException(ioe.getMessage());
+                ne.initCause(ioe);
+                throw ne;
             }
         } finally {
             if (result != null) {

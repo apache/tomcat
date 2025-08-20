@@ -76,9 +76,9 @@ public class CertificateStreamProvider extends AbstractStreamProvider {
             keyManagerFactory.init(keyStore, clientKeyPassword);
 
             return keyManagerFactory.getKeyManagers();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             log.error(sm.getString("certificateStream.clientCertError", clientCertFile, clientKeyFile));
-            throw e;
+            throw ioe;
         }
     }
 

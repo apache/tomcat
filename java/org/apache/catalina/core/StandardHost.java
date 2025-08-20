@@ -331,7 +331,8 @@ public class StandardHost extends ContainerBase implements Host {
         }
         try {
             file = file.getCanonicalFile();
-        } catch (IOException e) {// ignore
+        } catch (IOException ignore) {
+            // Ignore
         }
         this.hostConfigBase = file;
         return file;

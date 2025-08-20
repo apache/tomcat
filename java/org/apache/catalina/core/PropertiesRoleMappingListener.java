@@ -111,9 +111,9 @@ public class PropertiesRoleMappingListener implements LifecycleListener {
             Context context = (Context) event.getLifecycle();
             try (Resource resource = context.findConfigFileResource(roleMappingFile)) {
                 props.load(resource.getInputStream());
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 throw new IllegalStateException(
-                        sm.getString("propertiesRoleMappingListener.roleMappingFileFail", roleMappingFile), e);
+                        sm.getString("propertiesRoleMappingListener.roleMappingFileFail", roleMappingFile), ioe);
             }
 
             int linkCount = 0;

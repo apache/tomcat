@@ -426,8 +426,8 @@ public class SingleSignOn extends ValveBase {
         Session session;
         try {
             session = manager.findSession(key.getSessionId());
-        } catch (IOException e) {
-            containerLog.warn(sm.getString("singleSignOn.sessionExpire.managerError", key), e);
+        } catch (IOException ioe) {
+            containerLog.warn(sm.getString("singleSignOn.sessionExpire.managerError", key), ioe);
             return;
         }
         if (session == null) {

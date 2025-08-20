@@ -55,8 +55,8 @@ public final class SSIFlastmod implements SSICommand {
                     ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                     writer.write(configErrMsg);
                 }
-            } catch (IOException e) {
-                ssiMediator.log(sm.getString("ssiFlastmod.noLastModified", substitutedValue), e);
+            } catch (IOException ioe) {
+                ssiMediator.log(sm.getString("ssiFlastmod.noLastModified", substitutedValue), ioe);
                 writer.write(configErrMsg);
             }
         }

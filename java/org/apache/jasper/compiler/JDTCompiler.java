@@ -114,8 +114,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                     }
                     result = new char[buf.length()];
                     buf.getChars(0, result.length, result, 0);
-                } catch (IOException e) {
-                    log.error(Localizer.getMessage("jsp.error.compilation.source", sourceFile), e);
+                } catch (IOException ioe) {
+                    log.error(Localizer.getMessage("jsp.error.compilation.source", sourceFile), ioe);
                 }
                 return result;
             }
@@ -508,8 +508,8 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                             }
                         }
                     }
-                } catch (IOException exc) {
-                    log.error(Localizer.getMessage("jsp.error.compilation.jdt"), exc);
+                } catch (IOException ioe) {
+                    log.error(Localizer.getMessage("jsp.error.compilation.jdt"), ioe);
                 }
             }
         };

@@ -187,9 +187,9 @@ public final class Parameters {
 
         try {
             decodedQuery.duplicate(queryMB);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Can't happen, as decodedQuery can't overflow
-            log.error(sm.getString("parameters.copyFail"), e);
+            log.error(sm.getString("parameters.copyFail"), ioe);
         }
         processParameters(decodedQuery, queryStringCharset);
     }
@@ -407,14 +407,14 @@ public final class Parameters {
                     }
                     break;
                 }
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 setParseFailedReason(FailReason.URL_DECODING);
                 decodeFailCount++;
                 if (decodeFailCount == 1 || log.isDebugEnabled()) {
                     if (log.isDebugEnabled()) {
                         log.debug(
                                 sm.getString("parameters.decodeFail.debug", origName.toString(), origValue.toString()),
-                                e);
+                                ioe);
                     } else if (log.isInfoEnabled()) {
                         UserDataHelper.Mode logMode = userDataLog.getNextMode();
                         if (logMode != null) {

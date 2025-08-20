@@ -338,7 +338,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                         (int) (sendfile.end - sendfile.pos);
                 sendfile.streamReservation = sendfile.stream.reserveWindowSize(reservation, true);
                 sendfile.connectionReservation = reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 return SendfileState.ERROR;
             }
 
@@ -375,7 +375,7 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                         ByteBuffer.wrap(header), sendfile.mappedBuffer);
                 try {
                     handleAsyncException();
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     return SendfileState.ERROR;
                 }
             }
@@ -400,8 +400,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                 if (sendfile.left == 0) {
                     try {
                         sendfile.stream.getOutputBuffer().end();
-                    } catch (IOException e) {
-                        failed(e, sendfile);
+                    } catch (IOException ioe) {
+                        failed(ioe, sendfile);
                     }
                     return;
                 }
@@ -418,8 +418,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                         sendfile.connectionReservation =
                                 reserveWindowSize(sendfile.stream, sendfile.streamReservation, true);
                     }
-                } catch (IOException e) {
-                    failed(e, sendfile);
+                } catch (IOException ioe) {
+                    failed(ioe, sendfile);
                     return;
                 }
 
@@ -460,8 +460,8 @@ public class Http2AsyncUpgradeHandler extends Http2UpgradeHandler {
                             ByteBuffer.wrap(header), sendfile.mappedBuffer);
                     try {
                         handleAsyncException();
-                    } catch (IOException e) {
-                        failed(e, sendfile);
+                    } catch (IOException ioe) {
+                        failed(ioe, sendfile);
                         return;
                     }
                 }

@@ -667,8 +667,8 @@ public class Catalina {
                         String.valueOf(s.getPortOffset())));
                 log.error(sm.getString("catalina.stopError"), ce);
                 System.exit(1);
-            } catch (IOException e) {
-                log.error(sm.getString("catalina.stopError"), e);
+            } catch (IOException ioe) {
+                log.error(sm.getString("catalina.stopError"), ioe);
                 System.exit(1);
             }
         } else {
@@ -925,9 +925,9 @@ public class Catalina {
         File loaderLocation = new File(generatedCodeLocation, generatedCodePackage);
         try (FileWriter writer = new FileWriter(new File(loaderLocation, loaderClassName + ".java"))) {
             writer.write(code.toString());
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Should not happen
-            log.debug(sm.getString("catalina.loaderWriteFail"), e);
+            log.debug(sm.getString("catalina.loaderWriteFail"), ioe);
         }
     }
 

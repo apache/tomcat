@@ -241,8 +241,8 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
 
         try {
             this.canonicalBase = fileBase.getCanonicalPath();
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(ioe);
         }
 
         // Need to handle mapping of the file system root as a special case

@@ -2454,8 +2454,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         if (!workDir.isAbsolute()) {
             try {
                 workDir = new File(getCatalinaBase().getCanonicalFile(), getWorkDir());
-            } catch (IOException e) {
-                log.warn(sm.getString("standardContext.workPath", getName()), e);
+            } catch (IOException ioe) {
+                log.warn(sm.getString("standardContext.workPath", getName()), ioe);
             }
         }
         return workDir.getAbsolutePath();
@@ -5348,8 +5348,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
             try {
                 catalinaHomePath = getCatalinaBase().getCanonicalPath();
                 dir = new File(catalinaHomePath, workDir);
-            } catch (IOException e) {
-                log.warn(sm.getString("standardContext.workCreateException", workDir, getCatalinaBase(), getName()), e);
+            } catch (IOException ioe) {
+                log.warn(sm.getString("standardContext.workCreateException", workDir, getCatalinaBase(), getName()), ioe);
             }
         }
         if (!dir.mkdirs() && !dir.isDirectory()) {

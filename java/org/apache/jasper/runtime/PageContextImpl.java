@@ -172,8 +172,8 @@ public class PageContextImpl extends PageContext {
         out = baseOut;
         try {
             ((JspWriterImpl) out).flushBuffer();
-        } catch (IOException ex) {
-            throw new IllegalStateException(Localizer.getMessage("jsp.error.flush"), ex);
+        } catch (IOException ioe) {
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.flush"), ioe);
         } finally {
             servlet = null;
             config = null;
@@ -497,8 +497,8 @@ public class PageContextImpl extends PageContext {
         try {
             out.clear();
             baseOut.clear();
-        } catch (IOException ex) {
-            throw new IllegalStateException(Localizer.getMessage("jsp.error.attempt_to_clear_flushed_buffer"), ex);
+        } catch (IOException ioe) {
+            throw new IllegalStateException(Localizer.getMessage("jsp.error.attempt_to_clear_flushed_buffer"), ioe);
         }
 
         // Make sure that the response object is not the wrapper for include

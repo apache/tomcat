@@ -803,7 +803,7 @@ public class JspUtil {
         } catch (IOException ioe) {
             try {
                 in.close();
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
             throw ioe;

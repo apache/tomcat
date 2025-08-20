@@ -57,8 +57,8 @@ public final class SSIFsize implements SSICommand {
                     ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                     writer.write(configErrMsg);
                 }
-            } catch (IOException e) {
-                ssiMediator.log(sm.getString("ssiFsize.noSize", substitutedValue), e);
+            } catch (IOException ioe) {
+                ssiMediator.log(sm.getString("ssiFsize.noSize", substitutedValue), ioe);
                 writer.write(configErrMsg);
             }
         }

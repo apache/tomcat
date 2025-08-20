@@ -392,8 +392,8 @@ public class ErrorReportValve extends ValveBase {
         try (OutputStream os = response.getOutputStream();
              InputStream is = new FileInputStream(file)) {
             IOTools.flow(is, os);
-        } catch (IOException e) {
-            getContainer().getLogger().warn(sm.getString("errorReportValve.errorPageIOException", location), e);
+        } catch (IOException ioe) {
+            getContainer().getLogger().warn(sm.getString("errorReportValve.errorPageIOException", location), ioe);
             return false;
         }
 
