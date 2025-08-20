@@ -126,7 +126,9 @@ public class ChatAnnotation {
             try {
                 client.sendMessage(msg);
             } catch (IOException e) {
-                log.debug("Chat Error: Failed to send message to client", e);
+                if (log.isDebugEnabled()) {
+                    log.debug("Chat Error: Failed to send message to client", e);
+                }
                 if (connections.remove(client)) {
                     try {
                         client.session.close();

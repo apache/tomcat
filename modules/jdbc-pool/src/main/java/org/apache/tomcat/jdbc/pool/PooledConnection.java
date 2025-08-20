@@ -214,7 +214,9 @@ public class PooledConnection implements PooledConnectionMBean {
             try {
                 this.disconnect(false);
             } catch (Exception x) {
-                log.debug("Unable to disconnect previous connection.", x);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to disconnect previous connection.", x);
+                }
             } //catch
         } //end if
         //if (poolProperties.getDataSource()==null && poolProperties.getDataSourceJNDI()!=null) {
@@ -415,7 +417,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 } else {
                     xaConnection.close();
                 }
-            }catch (Exception ignore) {
+            } catch (Exception ignore) {
                 if (log.isDebugEnabled()) {
                     log.debug("Unable to close underlying SQL connection",ignore);
                 }

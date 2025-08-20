@@ -390,7 +390,9 @@ public class AjpProcessor extends AbstractProcessor {
                 break;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
-                getLog().debug(sm.getString("ajpprocessor.header.error"), t);
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug(sm.getString("ajpprocessor.header.error"), t);
+                }
                 // 400 - Bad Request
                 response.setStatus(400);
                 setErrorState(ErrorState.CLOSE_CLEAN, t);
@@ -403,7 +405,9 @@ public class AjpProcessor extends AbstractProcessor {
                     prepareRequest();
                 } catch (Throwable t) {
                     ExceptionUtils.handleThrowable(t);
-                    getLog().debug(sm.getString("ajpprocessor.request.prepare"), t);
+                    if (getLog().isDebugEnabled()) {
+                        getLog().debug(sm.getString("ajpprocessor.request.prepare"), t);
+                    }
                     // 500 - Internal Server Error
                     response.setStatus(500);
                     setErrorState(ErrorState.CLOSE_CLEAN, t);

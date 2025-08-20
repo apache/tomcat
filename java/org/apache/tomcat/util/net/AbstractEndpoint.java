@@ -1284,7 +1284,9 @@ public abstract class AbstractEndpoint<S, U> {
         try {
             localAddress = getLocalAddress();
         } catch (IOException ioe) {
-            getLog().debug(sm.getString("endpoint.debug.unlock.localFail", getName()), ioe);
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("endpoint.debug.unlock.localFail", getName()), ioe);
+            }
         }
         if (localAddress == null) {
             getLog().warn(sm.getString("endpoint.debug.unlock.localNone", getName()));

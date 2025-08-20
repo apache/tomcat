@@ -62,9 +62,10 @@ public class TaskThread extends Thread {
             try {
                 wrappedRunnable.run();
             } catch(StopPooledThreadException exc) {
-                //expected : we just swallow the exception to avoid disturbing
-                //debuggers like eclipse's
-                log.debug(sm.getString("taskThread.exiting"), exc);
+                // expected : we just swallow the exception to avoid disturbing debuggers like eclipse's
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("taskThread.exiting"), exc);
+                }
             }
         }
     }

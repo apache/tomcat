@@ -627,9 +627,11 @@ public class PoolProperties implements PoolConfiguration, Cloneable, Serializabl
                 }
             }
             buf.append(']');
-        }catch (Exception x) {
+        } catch (Exception x) {
             //shouldn't happen
-            log.debug("toString() call failed", x);
+            if (log.isDebugEnabled()) {
+                log.debug("toString() call failed", x);
+            }
         }
         return buf.toString();
     }
