@@ -135,9 +135,9 @@ public class AsyncChannelWrapperSecure implements AsyncChannelWrapper {
     public void close() {
         try {
             socketChannel.close();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("asyncChannelWrapperSecure.closeFail"), e);
+                log.debug(sm.getString("asyncChannelWrapperSecure.closeFail"), ioe);
             } else {
                 log.info(sm.getString("asyncChannelWrapperSecure.closeFail"));
             }

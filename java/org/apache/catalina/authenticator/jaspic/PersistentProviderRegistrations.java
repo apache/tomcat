@@ -144,12 +144,12 @@ public final class PersistentProviderRegistrations {
                 writer.write("  </provider>\n");
             }
             writer.write("</jaspic-providers>\n");
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (!configFileNew.delete()) {
                 Log log = LogFactory.getLog(PersistentProviderRegistrations.class);
                 log.warn(sm.getString("persistentProviderRegistrations.deleteFail", configFileNew.getAbsolutePath()));
             }
-            throw new SecurityException(e);
+            throw new SecurityException(ioe);
         }
 
         // Move the current file out of the way

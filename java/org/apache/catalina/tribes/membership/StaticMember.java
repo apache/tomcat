@@ -46,8 +46,8 @@ public class StaticMember extends MemberImpl {
         } else {
             try {
                 setHostname(host);
-            } catch (IOException x) {
-                throw new RuntimeException(x);
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
             }
         }
 

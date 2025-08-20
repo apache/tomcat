@@ -974,13 +974,13 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         while ((numRead = stream.read(buf)) >= 0) {
                             baos.write(buf, 0, numRead);
                         }
-                    } catch (IOException e) {
-                        log.error(sm.getString("webappClassLoader.transformError", name), e);
+                    } catch (IOException ioe) {
+                        log.error(sm.getString("webappClassLoader.transformError", name), ioe);
                         return null;
                     } finally {
                         try {
                             stream.close();
-                        } catch (IOException e) {
+                        } catch (IOException ignore) {
                             // Ignore
                         }
                     }
@@ -1008,7 +1008,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         stream = url.openStream();
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 // Ignore
             }
             if (stream != null) {

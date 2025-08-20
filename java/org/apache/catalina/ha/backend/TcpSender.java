@@ -192,7 +192,7 @@ public class TcpSender implements Sender {
             if (connectionReaders[i] != null) {
                 connectionReaders[i].close();
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore
         }
         connectionReaders[i] = null;
@@ -200,7 +200,7 @@ public class TcpSender implements Sender {
             if (connectionWriters[i] != null) {
                 connectionWriters[i].close();
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore
         }
         connectionWriters[i] = null;
@@ -208,7 +208,7 @@ public class TcpSender implements Sender {
             if (connections[i] != null) {
                 connections[i].close();
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore
         }
         connections[i] = null;

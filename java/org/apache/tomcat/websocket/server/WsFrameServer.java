@@ -162,9 +162,9 @@ public class WsFrameServer extends WsFrameBase {
                     }
                     try {
                         return doOnDataAvailable();
-                    } catch (IOException e) {
+                    } catch (IOException ioe) {
                         changeReadState(ReadState.CLOSING);
-                        throw e;
+                        throw ioe;
                     }
                 case SUSPENDING_WAIT:
                     if (!changeReadState(ReadState.SUSPENDING_WAIT, ReadState.SUSPENDED)) {

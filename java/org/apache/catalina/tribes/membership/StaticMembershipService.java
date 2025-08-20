@@ -115,8 +115,8 @@ public class StaticMembershipService extends MembershipServiceBase implements St
             localMember.setSecurePort(securePort);
             localMember.setUdpPort(udpPort);
             localMember.getData(true, true);
-        } catch (IOException x) {
-            throw new IllegalArgumentException(x);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(ioe);
         }
     }
 

@@ -263,8 +263,8 @@ public class ExpandWar {
                             throw new EOFException();
                         }
                     }
-                } catch (IOException e) {
-                    log.error(sm.getString("expandWar.copy", fileSrc, fileDest), e);
+                } catch (IOException ioe) {
+                    log.error(sm.getString("expandWar.copy", fileSrc, fileDest), ioe);
                     result = false;
                 }
             }

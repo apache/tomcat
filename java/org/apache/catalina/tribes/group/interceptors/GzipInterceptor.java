@@ -94,9 +94,9 @@ public class GzipInterceptor extends ChannelInterceptorBase implements GzipInter
             if (statsEnabled && interval > 0 && currentCount % interval == 0) {
                 report();
             }
-        } catch (IOException x) {
+        } catch (IOException ioe) {
             log.error(sm.getString("gzipInterceptor.compress.failed"));
-            throw new ChannelException(x);
+            throw new ChannelException(ioe);
         }
     }
 
@@ -129,8 +129,8 @@ public class GzipInterceptor extends ChannelInterceptorBase implements GzipInter
             if (statsEnabled && interval > 0 && currentCount % interval == 0) {
                 report();
             }
-        } catch (IOException x) {
-            log.error(sm.getString("gzipInterceptor.decompress.failed"), x);
+        } catch (IOException ioe) {
+            log.error(sm.getString("gzipInterceptor.decompress.failed"), ioe);
         }
     }
 

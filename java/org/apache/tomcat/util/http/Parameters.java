@@ -159,9 +159,9 @@ public final class Parameters {
 
         try {
             decodedQuery.duplicate(queryMB);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Can't happen, as decodedQuery can't overflow
-            log.error(sm.getString("parameters.copyFail"), e);
+            log.error(sm.getString("parameters.copyFail"), ioe);
         }
         processParameters(decodedQuery, queryStringCharset);
     }
@@ -340,14 +340,14 @@ public final class Parameters {
                 }
 
                 addParameter(name, value);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 String message;
                 if (log.isDebugEnabled()) {
                     message = sm.getString("parameters.decodeFail.debug", origName.toString(), origValue.toString());
                 } else {
                     message = sm.getString("parameters.decodeFail.info", tmpName.toString(), tmpValue.toString());
                 }
-                throw new InvalidParameterException(message, e);
+                throw new InvalidParameterException(message, ioe);
             } finally {
                 tmpName.recycle();
                 tmpValue.recycle();

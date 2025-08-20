@@ -261,7 +261,7 @@ public class CoyoteAdapter implements Adapter {
                 }
                 success = false;
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Issues that should be logged will have already been logged
             success = false;
         } catch (Throwable t) {

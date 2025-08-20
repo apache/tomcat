@@ -883,7 +883,7 @@ public final class Request {
         MediaType mediaType = null;
         try {
             mediaType = MediaType.parseMediaType(new StringReader(contentType));
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Ignore - null test below handles this
         }
         if (mediaType != null) {

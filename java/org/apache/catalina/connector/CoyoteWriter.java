@@ -91,8 +91,8 @@ public class CoyoteWriter extends PrintWriter {
 
         try {
             ob.flush();
-        } catch (IOException e) {
-            setErrorException(e);
+        } catch (IOException ioe) {
+            setErrorException(ioe);
         }
 
     }
@@ -105,7 +105,7 @@ public class CoyoteWriter extends PrintWriter {
         // so the stream can be reused. We close ob.
         try {
             ob.close();
-        } catch (IOException ex) {
+        } catch (IOException ignore) {
             // Ignore
         }
         error = false;
@@ -129,8 +129,8 @@ public class CoyoteWriter extends PrintWriter {
 
         try {
             ob.write(c);
-        } catch (IOException e) {
-            setErrorException(e);
+        } catch (IOException ioe) {
+            setErrorException(ioe);
         }
 
     }
@@ -145,8 +145,8 @@ public class CoyoteWriter extends PrintWriter {
 
         try {
             ob.write(buf, off, len);
-        } catch (IOException e) {
-            setErrorException(e);
+        } catch (IOException ioe) {
+            setErrorException(ioe);
         }
 
     }
@@ -167,8 +167,8 @@ public class CoyoteWriter extends PrintWriter {
 
         try {
             ob.write(s, off, len);
-        } catch (IOException e) {
-            setErrorException(e);
+        } catch (IOException ioe) {
+            setErrorException(ioe);
         }
 
     }

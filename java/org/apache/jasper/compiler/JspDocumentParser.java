@@ -169,7 +169,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
                 jspDocParser.isValidating = true;
                 try {
                     source.getByteStream().close();
-                } catch (IOException e2) {
+                } catch (IOException ioe) {
                     // ignore
                 }
                 source = JspUtil.getInputSource(path, jar, jspDocParser.ctxt);
@@ -177,7 +177,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
             } finally {
                 try {
                     source.getByteStream().close();
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     // ignore
                 }
             }

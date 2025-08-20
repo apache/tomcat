@@ -477,7 +477,7 @@ public class FileHandler extends Handler {
                 for (Path file : files) {
                     Files.delete(file);
                 }
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 reportError("Unable to delete log files older than [" + maxDays + "] days", null,
                         ErrorManager.GENERIC_FAILURE);
             }

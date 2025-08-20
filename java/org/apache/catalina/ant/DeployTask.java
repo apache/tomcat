@@ -145,15 +145,15 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     FileChannel fsChannel = fsInput.getChannel();
                     contentLength = fsChannel.size();
                     stream = new BufferedInputStream(fsInput, 1024);
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     if (fsInput != null) {
                         try {
                             fsInput.close();
-                        } catch (IOException ioe) {
+                        } catch (IOException ignore ) {
                             // Ignore
                         }
                     }
-                    throw new BuildException(e);
+                    throw new BuildException(ioe);
                 }
             }
             contentType = "application/octet-stream";

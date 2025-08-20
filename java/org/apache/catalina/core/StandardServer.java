@@ -490,14 +490,14 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                 awaitSocket = null;
                 try {
                     s.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignored
                 }
             }
             t.interrupt();
             try {
                 t.join(1000);
-            } catch (InterruptedException e) {
+            } catch (InterruptedException ignore) {
                 // Ignored
             }
         }
@@ -530,9 +530,9 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
         // Set up a server socket to wait on
         try {
             awaitSocket = new ServerSocket(getPortWithOffset(), 1, InetAddress.getByName(address));
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             log.error(sm.getString("standardServer.awaitSocket.fail", address, String.valueOf(getPortWithOffset()),
-                    String.valueOf(getPort()), String.valueOf(getPortOffset())), e);
+                    String.valueOf(getPort()), String.valueOf(getPortOffset())), ioe);
             return;
         }
 
@@ -562,12 +562,12 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         log.warn(sm.getString("standardServer.accept.timeout",
                                 Long.valueOf(System.currentTimeMillis() - acceptStartTime)), ste);
                         continue;
-                    } catch (IOException e) {
+                    } catch (IOException ioe) {
                         if (stopAwait) {
                             // Wait was aborted with socket.close()
                             break;
                         }
-                        log.error(sm.getString("standardServer.accept.error"), e);
+                        log.error(sm.getString("standardServer.accept.error"), ioe);
                         break;
                     }
 
@@ -583,8 +583,8 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         int ch;
                         try {
                             ch = stream.read();
-                        } catch (IOException e) {
-                            log.warn(sm.getString("standardServer.accept.readError"), e);
+                        } catch (IOException ioe) {
+                            log.warn(sm.getString("standardServer.accept.readError"), ioe);
                             ch = -1;
                         }
                         // Control character or EOF (-1) terminates loop
@@ -600,7 +600,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
                         if (socket != null) {
                             socket.close();
                         }
-                    } catch (IOException e) {
+                    } catch (IOException ignore) {
                         // Ignore
                     }
                 }
@@ -623,7 +623,7 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
             if (serverSocket != null) {
                 try {
                     serverSocket.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }

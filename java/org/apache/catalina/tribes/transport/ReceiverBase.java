@@ -200,11 +200,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     setPort(port);
                     log.info(sm.getString("receiverBase.socket.bind", addr));
                     retries = 0;
-                } catch (IOException x) {
+                } catch (IOException ioe) {
                     retries--;
                     if (retries <= 0) {
                         log.info(sm.getString("receiverBase.unable.bind", addr));
-                        throw x;
+                        throw ioe;
                     }
                     port++;
                 }
@@ -232,11 +232,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                 setUdpPort(portstart);
                 log.info(sm.getString("receiverBase.udp.bind", addr));
                 return 0;
-            } catch (IOException x) {
+            } catch (IOException ioe) {
                 retries--;
                 if (retries <= 0) {
                     log.info(sm.getString("receiverBase.unable.bind.udp", addr));
-                    throw x;
+                    throw ioe;
                 }
                 portstart++;
                 try {

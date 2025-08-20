@@ -112,8 +112,8 @@ public class JspServlet extends HttpServlet implements PeriodicEventListener {
             }
             try {
                 serviceJspFile(null, null, jspFile, true);
-            } catch (IOException e) {
-                throw new ServletException(Localizer.getMessage("jsp.error.precompilation", jspFile), e);
+            } catch (IOException ioe) {
+                throw new ServletException(Localizer.getMessage("jsp.error.precompilation", jspFile), ioe);
             }
         }
 

@@ -184,9 +184,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         if (key.channel() instanceof SocketChannel) {
             try {
                 ((SocketChannel) key.channel()).socket().close();
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("nioReceiver.closeError"), e);
+                    log.debug(sm.getString("nioReceiver.closeError"), ioe);
                 }
             }
         }
@@ -201,9 +201,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         }
         try {
             key.channel().close();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("nioReceiver.closeError"), e);
+                log.debug(sm.getString("nioReceiver.closeError"), ioe);
             }
         }
 
@@ -397,9 +397,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
                 key.attach(null);
                 key.cancel();
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (log.isWarnEnabled()) {
-                log.warn(sm.getString("nioReceiver.cleanup.fail"), e);
+                log.warn(sm.getString("nioReceiver.cleanup.fail"), ioe);
             }
         } catch (ClosedSelectorException ignore) {
             // Ignore

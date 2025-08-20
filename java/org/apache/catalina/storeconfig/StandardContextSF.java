@@ -287,8 +287,8 @@ public class StandardContextSF extends StoreFactoryBase {
             file = new File(file, host.getName());
             try {
                 file = file.getCanonicalFile();
-            } catch (IOException e) {
-                log.error(sm.getString("standardContextSF.canonicalPathError"), e);
+            } catch (IOException ioe) {
+                log.error(sm.getString("standardContextSF.canonicalPathError"), ioe);
             }
         }
         return file;
