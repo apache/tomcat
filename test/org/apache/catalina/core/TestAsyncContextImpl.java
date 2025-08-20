@@ -1457,7 +1457,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                         try {
                             resp.sendError(status, ERROR_MESSAGE);
                             actxt.complete();
-                        } catch (IOException e) {
+                        } catch (IOException ignore) {
                             // Ignore
                         }
                     }
@@ -2379,8 +2379,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
             public void run() {
                 try {
                     getUrl("http://localhost:" + getPort() + "/asyncStashServlet");
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
                 }
             }
         });
@@ -3017,7 +3017,7 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                         resp.getWriter().write(TestCoyoteAdapter.TEXT_8K);
                         resp.flushBuffer();
                     }
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
                 ise.set(false);
@@ -3203,8 +3203,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
                 // Read again
                 try {
                     is.read();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
                     // Required. Clear the error marker.
                     testFailed.set(false);
                 }

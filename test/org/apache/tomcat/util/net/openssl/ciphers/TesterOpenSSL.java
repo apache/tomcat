@@ -46,7 +46,7 @@ public class TesterOpenSSL {
         String versionString = null;
         try {
             versionString = executeOpenSSLCommand("version");
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             versionString = "";
         }
         if (versionString.startsWith("OpenSSL 3.6.")) {
@@ -392,7 +392,7 @@ public class TesterOpenSSL {
         public void run() {
             try {
                 IOTools.flow(is, baos);
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
         }

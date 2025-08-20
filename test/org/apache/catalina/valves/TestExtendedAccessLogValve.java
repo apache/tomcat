@@ -87,8 +87,8 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         public void log(CharArrayWriter message) {
             try {
                 message.writeTo(writer);
-            } catch (IOException ex) {
-                log.error("Could not write to writer", ex);
+            } catch (IOException ioe) {
+                log.error("Could not write to writer", ioe);
             }
         }
     }

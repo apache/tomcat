@@ -468,8 +468,8 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
                         conn.getInputStream(), StandardCharsets.US_ASCII));
 
                 responseLine = reader.readLine();
-            } catch (IOException e) {
-                readEx = e;
+            } catch (IOException ioe) {
+                readEx = ioe;
             }
         }
 
