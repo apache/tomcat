@@ -375,8 +375,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                     try {
                         // Validate and write response headers
                         prepareResponse();
-                    } catch (IOException e) {
-                        handleIOException(e);
+                    } catch (IOException ioe) {
+                        handleIOException(ioe);
                     }
                 }
                 break;
@@ -385,8 +385,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 action(ActionCode.COMMIT, null);
                 try {
                     finishResponse();
-                } catch (IOException e) {
-                    handleIOException(e);
+                } catch (IOException ioe) {
+                    handleIOException(ioe);
                 }
                 break;
             }
@@ -397,8 +397,8 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             case EARLY_HINTS: {
                 try {
                     earlyHints();
-                } catch (IOException e) {
-                    handleIOException(e);
+                } catch (IOException ioe) {
+                    handleIOException(ioe);
                 }
                 break;
             }
@@ -406,9 +406,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
                 action(ActionCode.COMMIT, null);
                 try {
                     flush();
-                } catch (IOException e) {
-                    handleIOException(e);
-                    response.setErrorException(e);
+                } catch (IOException ioe) {
+                    handleIOException(ioe);
+                    response.setErrorException(ioe);
                 }
                 break;
             }
