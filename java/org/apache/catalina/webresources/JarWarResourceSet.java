@@ -141,7 +141,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                     if (jarFileIs != null) {
                         try {
                             jarFileIs.close();
-                        } catch (IOException e) {
+                        } catch (IOException ignore) {
                             // Ignore
                         }
                     }
@@ -258,8 +258,8 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
 
         try {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(ioe);
         }
     }
 

@@ -560,11 +560,11 @@ public class MemoryUserDatabase implements UserDatabase {
                 if (writer.checkError()) {
                     throw new IOException(sm.getString("memoryUserDatabase.writeException", fileNew.getAbsolutePath()));
                 }
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (fileNew.exists() && !fileNew.delete()) {
                     log.warn(sm.getString("memoryUserDatabase.fileDelete", fileNew));
                 }
-                throw e;
+                throw ioe;
             }
             this.lastModified = fileNew.lastModified();
         } finally {

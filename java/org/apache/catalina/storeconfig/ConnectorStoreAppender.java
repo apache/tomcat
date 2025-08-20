@@ -254,7 +254,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         File file = new File(System.getProperty(Globals.CATALINA_BASE_PROP));
         try {
             file = file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Ignore
         }
         return file;
@@ -269,7 +269,7 @@ public class ConnectorStoreAppender extends StoreAppender {
         }
         try {
             jkHomeBase = file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             jkHomeBase = file;
         }
         return jkHomeBase;

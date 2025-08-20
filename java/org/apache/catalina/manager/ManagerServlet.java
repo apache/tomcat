@@ -1504,11 +1504,11 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
 
         try (ServletInputStream istream = request.getInputStream(); OutputStream ostream = new FileOutputStream(war)) {
             IOTools.flow(istream, ostream);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (war.exists() && !war.delete()) {
                 writer.println(smClient.getString("managerServlet.deleteFail", war));
             }
-            throw e;
+            throw ioe;
         }
     }
 

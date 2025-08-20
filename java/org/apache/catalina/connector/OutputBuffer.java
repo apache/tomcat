@@ -323,11 +323,11 @@ public class OutputBuffer extends Writer {
                 // Prevent further output for this response
                 closed = true;
                 throw e;
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 // An IOException on a write is almost always due to
                 // the remote client aborting the request. Wrap this
                 // so that it can be handled better by the error dispatcher.
-                throw new ClientAbortException(e);
+                throw new ClientAbortException(ioe);
             }
         }
 

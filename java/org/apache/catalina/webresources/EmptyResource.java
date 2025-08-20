@@ -99,7 +99,7 @@ public class EmptyResource implements WebResource {
         } else {
             try {
                 return file.getCanonicalPath();
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 return null;
             }
         }

@@ -2507,8 +2507,8 @@ public class Request implements HttpServletRequest {
         } catch (SizeException | FileCountLimitExceededException e) {
             checkSwallowInput();
             partsParseException = new InvalidParameterException(e, HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
-        } catch (IOException e) {
-            partsParseException = e;
+        } catch (IOException ioe) {
+            partsParseException = ioe;
         } catch (IllegalStateException e) {
             checkSwallowInput();
             partsParseException = e;
@@ -2553,11 +2553,11 @@ public class Request implements HttpServletRequest {
         if (requestedSessionId != null) {
             try {
                 session = manager.findSession(requestedSessionId);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("request.session.failed", requestedSessionId, e.getMessage()), e);
+                    log.debug(sm.getString("request.session.failed", requestedSessionId, ioe.getMessage()), ioe);
                 } else {
-                    log.info(sm.getString("request.session.failed", requestedSessionId, e.getMessage()));
+                    log.info(sm.getString("request.session.failed", requestedSessionId, ioe.getMessage()));
                 }
                 session = null;
             }
@@ -2839,19 +2839,19 @@ public class Request implements HttpServletRequest {
             }
             try {
                 readPostBodyFully(formData, len);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 Context context = getContext();
                 if (context != null && context.getLogger().isDebugEnabled()) {
-                    context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
+                    context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), ioe);
                 }
-                if (e instanceof ClientAbortException) {
+                if (ioe instanceof ClientAbortException) {
                     // Client has disconnected. Close immediately.
                     response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
                 }
-                if (e instanceof BadRequestException) {
-                    parametersParseException = new InvalidParameterException(e);
+                if (ioe instanceof BadRequestException) {
+                    parametersParseException = new InvalidParameterException(ioe);
                 } else {
-                    parametersParseException = new InvalidParameterException(new BadRequestException(e));
+                    parametersParseException = new InvalidParameterException(new BadRequestException(ioe));
                 }
                 return;
             }
@@ -2862,19 +2862,19 @@ public class Request implements HttpServletRequest {
                 formData = readChunkedPostBody();
             } catch (IllegalStateException ise) {
                 parametersParseException = ise;
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 Context context = getContext();
                 if (context != null && context.getLogger().isDebugEnabled()) {
-                    context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
+                    context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), ioe);
                 }
-                if (e instanceof ClientAbortException) {
+                if (ioe instanceof ClientAbortException) {
                     // Client has disconnected. Close immediately.
                     response.getCoyoteResponse().action(ActionCode.CLOSE_NOW, null);
                 }
-                if (e instanceof BadRequestException) {
-                    parametersParseException = new InvalidParameterException(e);
+                if (ioe instanceof BadRequestException) {
+                    parametersParseException = new InvalidParameterException(ioe);
                 } else {
-                    parametersParseException = new InvalidParameterException(new BadRequestException(e));
+                    parametersParseException = new InvalidParameterException(new BadRequestException(ioe));
                 }
             }
             if (formData != null) {
@@ -2984,7 +2984,7 @@ public class Request implements HttpServletRequest {
         List<AcceptLanguage> acceptLanguages;
         try {
             acceptLanguages = AcceptLanguage.parse(new StringReader(value));
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Mal-formed headers are ignore. Do the same in the unlikely event
             // of an IOException.
             return;

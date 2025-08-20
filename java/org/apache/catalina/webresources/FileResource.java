@@ -267,9 +267,9 @@ public class FileResource extends AbstractResource {
         try {
             BasicFileAttributes attrs = Files.readAttributes(resource.toPath(), BasicFileAttributes.class);
             return attrs.creationTime().toMillis();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("fileResource.getCreationFail", resource.getPath()), e);
+                log.debug(sm.getString("fileResource.getCreationFail", resource.getPath()), ioe);
             }
             return 0;
         }

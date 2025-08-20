@@ -1720,9 +1720,9 @@ public class JspC extends Task implements Options {
         FileInputStream fis = new FileInputStream(file);
         try {
             return webxmlEncoding != null ? new InputStreamReader(fis, webxmlEncoding) : new InputStreamReader(fis);
-        } catch (IOException ex) {
+        } catch (IOException ioe) {
             fis.close();
-            throw ex;
+            throw ioe;
         }
     }
 
@@ -1730,9 +1730,9 @@ public class JspC extends Task implements Options {
         FileOutputStream fos = new FileOutputStream(file);
         try {
             return webxmlEncoding != null ? new OutputStreamWriter(fos, webxmlEncoding) : new OutputStreamWriter(fos);
-        } catch (IOException ex) {
+        } catch (IOException ioe) {
             fos.close();
-            throw ex;
+            throw ioe;
         }
     }
 

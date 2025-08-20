@@ -497,8 +497,8 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 log.trace("finished decoding with element size of: " + list.size());
             }
             return list.toArray(new AccessLogElement[0]);
-        } catch (IOException e) {
-            log.error(sm.getString("extendedAccessLogValve.patternParseError", pattern), e);
+        } catch (IOException ioe) {
+            log.error(sm.getString("extendedAccessLogValve.patternParseError", pattern), ioe);
             return null;
         }
     }

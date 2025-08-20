@@ -110,7 +110,7 @@ public class JasperLoader extends URLClassLoader {
             if (url != null) {
                 try {
                     is = url.openStream();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }

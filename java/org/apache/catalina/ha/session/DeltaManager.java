@@ -517,8 +517,8 @@ public class DeltaManager extends ClusterManagerBase {
                     counterSend_EVT_CHANGE_SESSION_ID.incrementAndGet();
                 }
                 send(msg);
-            } catch (IOException e) {
-                log.error(sm.getString("deltaManager.unableSerializeSessionID", newSessionID), e);
+            } catch (IOException ioe) {
+                log.error(sm.getString("deltaManager.unableSerializeSessionID", newSessionID), ioe);
             }
         }
     }
@@ -609,9 +609,9 @@ public class DeltaManager extends ClusterManagerBase {
         } catch (ClassNotFoundException e) {
             log.error(sm.getString("deltaManager.loading.cnfe", e), e);
             throw e;
-        } catch (IOException e) {
-            log.error(sm.getString("deltaManager.loading.ioe", e), e);
-            throw e;
+        } catch (IOException ioe) {
+            log.error(sm.getString("deltaManager.loading.ioe", ioe), ioe);
+            throw ioe;
         }
     }
 
@@ -637,9 +637,9 @@ public class DeltaManager extends ClusterManagerBase {
             }
             // Flush and close the output stream
             oos.flush();
-        } catch (IOException e) {
-            log.error(sm.getString("deltaManager.unloading.ioe", e), e);
-            throw e;
+        } catch (IOException ioe) {
+            log.error(sm.getString("deltaManager.unloading.ioe", ioe), ioe);
+            throw ioe;
         }
 
         // send object data as byte[]
@@ -925,8 +925,8 @@ public class DeltaManager extends ClusterManagerBase {
                 msg = new SessionMessageImpl(getName(), SessionMessage.EVT_SESSION_DELTA, session.getDiff(), sessionId,
                         sessionId + "-" + System.currentTimeMillis());
             }
-        } catch (IOException x) {
-            log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest", sessionId), x);
+        } catch (IOException ioe) {
+            log.error(sm.getString("deltaManager.createMessage.unableCreateDeltaRequest", sessionId), ioe);
             return null;
         }
         if (msg == null) {

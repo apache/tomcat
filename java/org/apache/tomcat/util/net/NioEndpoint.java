@@ -974,9 +974,9 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                     }
                     return SendfileState.PENDING;
                 }
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("endpoint.sendfile.error"), e);
+                    log.debug(sm.getString("endpoint.sendfile.error"), ioe);
                 }
                 if (!calledByProcessor && sc != null) {
                     socketWrapper.close();
@@ -1688,8 +1688,8 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                                 completionDone = false;
                             }
                         }
-                    } catch (IOException e) {
-                        setError(e);
+                    } catch (IOException ioe) {
+                        setError(ioe);
                     }
                 }
                 if (nBytes > 0 || (nBytes == 0 && !buffersArrayHasRemaining(buffers, offset, length) &&
@@ -1765,11 +1765,11 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                         // the handshake completes.
                         event = SocketEvent.OPEN_READ;
                     }
-                } catch (IOException x) {
+                } catch (IOException ioe) {
                     handshake = -1;
                     if (logHandshake.isDebugEnabled()) {
                         logHandshake.debug(sm.getString("endpoint.err.handshake", socketWrapper.getRemoteAddr(),
-                                Integer.toString(socketWrapper.getRemotePort())), x);
+                                Integer.toString(socketWrapper.getRemotePort())), ioe);
                     }
                 } catch (CancelledKeyException ckx) {
                     handshake = -1;

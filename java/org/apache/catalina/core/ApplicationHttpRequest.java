@@ -556,7 +556,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
                     if (localSession != null && !localSession.isValid()) {
                         localSession = null;
                     }
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
                 if (localSession == null && create) {
@@ -602,7 +602,7 @@ class ApplicationHttpRequest extends HttpServletRequestWrapper {
             Session session = null;
             try {
                 session = manager.findSession(requestedSessionId);
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
             return (session != null) && session.isValid();

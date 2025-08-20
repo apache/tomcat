@@ -391,17 +391,17 @@ public class JspCompilationContext {
                     result = uc.getLastModified();
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug(Localizer.getMessage("jsp.error.lastModified", getJspFile()), e);
+                log.debug(Localizer.getMessage("jsp.error.lastModified", getJspFile()), ioe);
             }
         } finally {
             if (uc != null) {
                 try {
                     uc.getInputStream().close();
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     if (log.isDebugEnabled()) {
-                        log.debug(Localizer.getMessage("jsp.error.lastModified", getJspFile()), e);
+                        log.debug(Localizer.getMessage("jsp.error.lastModified", getJspFile()), ioe);
                     }
                     result = -1;
                 }

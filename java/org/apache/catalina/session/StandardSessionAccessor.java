@@ -55,7 +55,7 @@ public class StandardSessionAccessor implements HttpSession.Accessor {
         Session session;
         try {
             session = manager.findSession(id);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             throw new IllegalStateException(sm.getString("standardSessionAccessor.access.ioe", id));
         }
 

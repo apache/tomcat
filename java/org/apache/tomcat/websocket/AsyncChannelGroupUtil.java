@@ -84,7 +84,7 @@ public class AsyncChannelGroupUtil {
 
             try {
                 return AsynchronousChannelGroup.withCachedThreadPool(executorService, initialSize);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 // No good reason for this to happen.
                 throw new IllegalStateException(sm.getString("asyncChannelGroup.createFail"));
             }

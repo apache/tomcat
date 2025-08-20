@@ -183,11 +183,11 @@ final class StandardWrapperValve extends ValveBase {
             }
             throwable = e;
             exception(request, response, e);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             container.getLogger()
-                    .error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);
-            throwable = e;
-            exception(request, response, e);
+                    .error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), ioe);
+            throwable = ioe;
+            exception(request, response, ioe);
         } catch (UnavailableException e) {
             container.getLogger()
                     .error(sm.getString("standardWrapper.serviceException", wrapper.getName(), context.getName()), e);

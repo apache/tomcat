@@ -601,8 +601,8 @@ public class ContextConfig implements LifecycleListener {
                     }
                 } catch (MalformedURLException e) {
                     log.error(sm.getString("contextConfig.badUrl", defaultContextXml), e);
-                } catch (IOException e) {
-                    // Not found
+                } catch (IOException ignore) {
+                    // Ignore - Not found
                 }
             }
 
@@ -643,8 +643,8 @@ public class ContextConfig implements LifecycleListener {
                     }
                 } catch (MalformedURLException e) {
                     log.error(sm.getString("contextConfig.badUrl", hostContextFile), e);
-                } catch (IOException e) {
-                    // Not found
+                } catch (IOException ignore) {
+                    // Ignore - Not found
                 }
             }
         }
@@ -675,7 +675,7 @@ public class ContextConfig implements LifecycleListener {
                     generateClassFooter(digester);
                     try (FileWriter writer = new FileWriter(contextXmlJavaSource)) {
                         writer.write(digester.getGeneratedCode().toString());
-                    } catch (IOException e) {
+                    } catch (IOException ignore) {
                         // Ignore
                     }
                     digester.endGeneratingCode();
@@ -747,8 +747,8 @@ public class ContextConfig implements LifecycleListener {
                 if (stream != null) {
                     stream.close();
                 }
-            } catch (IOException e) {
-                log.error(sm.getString("contextConfig.contextClose"), e);
+            } catch (IOException ioe) {
+                log.error(sm.getString("contextConfig.contextClose"), ioe);
             }
         }
     }
@@ -944,8 +944,8 @@ public class ContextConfig implements LifecycleListener {
 
         try {
             fixDocBase();
-        } catch (IOException e) {
-            log.error(sm.getString("contextConfig.fixDocBase", context.getName()), e);
+        } catch (IOException ioe) {
+            log.error(sm.getString("contextConfig.fixDocBase", context.getName()), ioe);
         }
 
         antiLocking();
@@ -1619,8 +1619,8 @@ public class ContextConfig implements LifecycleListener {
                 if (uc != null) {
                     try {
                         uc.getInputStream().close();
-                    } catch (IOException e) {
-                        ExceptionUtils.handleThrowable(e);
+                    } catch (IOException ioe) {
+                        ExceptionUtils.handleThrowable(ioe);
                         globalTimeStamp = -1;
                     }
                 }
@@ -1640,8 +1640,8 @@ public class ContextConfig implements LifecycleListener {
                 if (uc != null) {
                     try {
                         uc.getInputStream().close();
-                    } catch (IOException e) {
-                        ExceptionUtils.handleThrowable(e);
+                    } catch (IOException ioe) {
+                        ExceptionUtils.handleThrowable(ioe);
                         hostTimeStamp = -1;
                     }
                 }
@@ -1762,8 +1762,8 @@ public class ContextConfig implements LifecycleListener {
         try {
             WebappServiceLoader<ServletContainerInitializer> loader = new WebappServiceLoader<>(context);
             detectedScis = loader.load(ServletContainerInitializer.class);
-        } catch (IOException e) {
-            log.error(sm.getString("contextConfig.servletContainerInitializerFail", context.getName()), e);
+        } catch (IOException ioe) {
+            log.error(sm.getString("contextConfig.servletContainerInitializerFail", context.getName()), ioe);
             ok = false;
             return;
         }
@@ -1926,7 +1926,7 @@ public class ContextConfig implements LifecycleListener {
             if (source == null && stream != null) {
                 try {
                     stream.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -1976,7 +1976,7 @@ public class ContextConfig implements LifecycleListener {
                 String hostWebXml = Container.getConfigPath(context, Constants.HostWebXml);
                 webXmlResource = ConfigFileLoader.getSource().getResource(hostWebXml);
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore if not found
             return null;
         }
@@ -1996,7 +1996,7 @@ public class ContextConfig implements LifecycleListener {
             if (source == null && stream != null) {
                 try {
                     stream.close();
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     // Ignore
                 }
             }
@@ -2195,8 +2195,8 @@ public class ContextConfig implements LifecycleListener {
                 jar.nextEntry();
                 entryName = jar.getEntryName();
             }
-        } catch (IOException e) {
-            log.error(sm.getString("contextConfig.jarFile", url), e);
+        } catch (IOException ioe) {
+            log.error(sm.getString("contextConfig.jarFile", url), ioe);
         }
     }
 

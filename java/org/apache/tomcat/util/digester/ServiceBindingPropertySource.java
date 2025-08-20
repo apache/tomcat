@@ -129,7 +129,8 @@ public class ServiceBindingPropertySource implements IntrospectionUtils.Property
             }
 
             return new String(bytes, 0, length);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
+            // Treat as not found
             return null;
         }
     }

@@ -92,7 +92,7 @@ public class StoreContextAppender extends StoreAppender {
         }
         try {
             appBase = file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             appBase = file;
         }
         return appBase;
@@ -111,7 +111,7 @@ public class StoreContextAppender extends StoreAppender {
         }
         try {
             docBase = file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             docBase = file;
         }
         return docBase;

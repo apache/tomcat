@@ -79,8 +79,8 @@ public class UpgradeServletInputStream extends ServletInputStream {
 
         try {
             ready = Boolean.valueOf(socketWrapper.isReadyForRead());
-        } catch (IOException e) {
-            onError(e);
+        } catch (IOException ioe) {
+            onError(ioe);
         }
         return ready.booleanValue();
     }
@@ -213,8 +213,8 @@ public class UpgradeServletInputStream extends ServletInputStream {
             if (listener == null || !socketWrapper.isReadyForRead()) {
                 return;
             }
-        } catch (IOException e) {
-            onError(e);
+        } catch (IOException ioe) {
+            onError(ioe);
         }
         ready = Boolean.TRUE;
         ClassLoader oldCL = processor.getUpgradeToken().contextBind().bind(null);

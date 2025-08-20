@@ -165,8 +165,8 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
                 MemberImpl member;
                 try {
                     member = new MemberImpl(ip, port, aliveTime);
-                } catch (IOException e) {
-                    log.error(sm.getString("kubernetesMembershipProvider.memberError"), e);
+                } catch (IOException ioe) {
+                    log.error(sm.getString("kubernetesMembershipProvider.memberError"), ioe);
                     continue;
                 }
                 member.setUniqueId(id);

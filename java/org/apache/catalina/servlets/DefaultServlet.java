@@ -2002,8 +2002,8 @@ public class DefaultServlet extends HttpServlet {
                     if (debug > 10) {
                         log("readme '" + readmeFile + "' output error: " + ((e != null) ? e.getMessage() : ""));
                     }
-                } catch (IOException e) {
-                    log(sm.getString("defaultServlet.readerCloseFailed"), e);
+                } catch (IOException ioe) {
+                    log(sm.getString("defaultServlet.readerCloseFailed"), ioe);
                 } finally {
                     if (reader != null) {
                         try {
@@ -2654,8 +2654,8 @@ public class DefaultServlet extends HttpServlet {
                     break;
                 }
                 ostream.write(buffer, 0, len);
-            } catch (IOException e) {
-                exception = e;
+            } catch (IOException ioe) {
+                exception = ioe;
                 break;
             }
         }
@@ -2685,8 +2685,8 @@ public class DefaultServlet extends HttpServlet {
                     break;
                 }
                 writer.write(buffer, 0, len);
-            } catch (IOException e) {
-                exception = e;
+            } catch (IOException ioe) {
+                exception = ioe;
                 break;
             }
         }
@@ -2715,8 +2715,8 @@ public class DefaultServlet extends HttpServlet {
         long skipped;
         try {
             skipped = istream.skip(start);
-        } catch (IOException e) {
-            return e;
+        } catch (IOException ioe) {
+            return ioe;
         }
         if (skipped < start) {
             return new IOException(sm.getString("defaultServlet.skipfail", Long.valueOf(skipped), Long.valueOf(start)));
@@ -2737,8 +2737,8 @@ public class DefaultServlet extends HttpServlet {
                     ostream.write(buffer, 0, (int) bytesToRead);
                     bytesToRead = 0;
                 }
-            } catch (IOException e) {
-                exception = e;
+            } catch (IOException ioe) {
+                exception = ioe;
                 len = -1;
             }
         }
