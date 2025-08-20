@@ -995,7 +995,9 @@ public class WsWebSocketContainer implements WebSocketContainer, BackgroundProce
             try {
                 session.close(cr);
             } catch (IOException ioe) {
-                log.debug(sm.getString("wsWebSocketContainer.sessionCloseFail", session.getId()), ioe);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("wsWebSocketContainer.sessionCloseFail", session.getId()), ioe);
+                }
             }
         }
 

@@ -325,7 +325,9 @@ public class StuckThreadDetectionValve extends ValveBase {
                     // going out from here, maybe already serving a new request
                     this.interruptionSemaphore.acquire();
                 } catch (InterruptedException e) {
-                    log.debug(sm.getString("stuckThreadDetectionValve.interrupted"), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(sm.getString("stuckThreadDetectionValve.interrupted"), e);
+                    }
                 }
                 // no need to release the semaphore, it will be GCed
             }

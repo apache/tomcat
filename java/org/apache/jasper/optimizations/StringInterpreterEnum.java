@@ -37,7 +37,9 @@ public class StringInterpreterEnum extends DefaultStringInterpreter {
                 Enum<?> enumValue = Enum.valueOf((Class<? extends Enum>) c, s);
                 return c.getName() + "." + enumValue.name();
             } catch (IllegalArgumentException iae) {
-                log.debug(Localizer.getMessage("jsp.error.typeConversion", s, "Enum[" + c.getName() + "]"), iae);
+                if (log.isDebugEnabled()) {
+                    log.debug(Localizer.getMessage("jsp.error.typeConversion", s, "Enum[" + c.getName() + "]"), iae);
+                }
                 // Continue and resolve the value at runtime
             }
         }

@@ -1036,14 +1036,19 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler, MBeanRegis
                 return state;
             } catch (SocketException e) {
                 // SocketExceptions are normal
-                getLog().debug(sm.getString("abstractConnectionHandler.socketexception.debug"), e);
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug(sm.getString("abstractConnectionHandler.socketexception.debug"), e);
+                }
             } catch (IOException ioe) {
                 // IOExceptions are normal
-                getLog().debug(sm.getString("abstractConnectionHandler.ioexception.debug"), ioe);
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug(sm.getString("abstractConnectionHandler.ioexception.debug"), ioe);
+                }
             } catch (ProtocolException e) {
-                // Protocol exceptions normally mean the client sent invalid or
-                // incomplete data.
-                getLog().debug(sm.getString("abstractConnectionHandler.protocolexception.debug"), e);
+                // Protocol exceptions normally mean the client sent invalid or incomplete data.
+                if (getLog().isDebugEnabled()) {
+                    getLog().debug(sm.getString("abstractConnectionHandler.protocolexception.debug"), e);
+                }
             }
             // Future developers: if you discover any other
             // rare-but-nonfatal exceptions, catch them here, and log as

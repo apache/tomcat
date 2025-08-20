@@ -82,9 +82,8 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
             if (cookieValue != null && !cookieValue.isNull()) {
                 if (cookieValue.getType() != MessageBytes.T_BYTES) {
                     if (log.isDebugEnabled()) {
-                        Exception e = new Exception();
                         // TODO: Review this in light of HTTP/2
-                        log.debug(sm.getString("rfc6265CookieProcessor.expectedBytes"), e);
+                        log.debug(sm.getString("rfc6265CookieProcessor.expectedBytes"), new Exception());
                     }
                     cookieValue.toBytes();
                 }

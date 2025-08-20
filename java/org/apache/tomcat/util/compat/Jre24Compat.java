@@ -37,7 +37,9 @@ public class Jre24Compat extends Jre22Compat {
             m1 = Process.class.getMethod("waitFor", Duration.class);
         } catch (NoSuchMethodException e) {
             // Must be pre-Java 24
-            log.debug(sm.getString("jre22Compat.javaPre24"), e);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("jre22Compat.javaPre24"), e);
+            }
         }
         supported = (m1 != null);
     }
