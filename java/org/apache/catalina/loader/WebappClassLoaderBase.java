@@ -1244,9 +1244,8 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
         // It is not permitted to load resources once the web application has
         // been stopped.
         if (!state.isAvailable()) {
-            String msg = sm.getString("webappClassLoader.stopped", resource);
-            IllegalStateException ise = new IllegalStateException(msg);
-            log.info(msg, ise);
+            IllegalStateException ise = new IllegalStateException(sm.getString("webappClassLoader.stopped", resource));
+            log.info(ise.getMessage(), ise);
             throw ise;
         }
     }
