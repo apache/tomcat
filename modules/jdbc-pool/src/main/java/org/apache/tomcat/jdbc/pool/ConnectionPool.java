@@ -437,7 +437,9 @@ public class ConnectionPool {
                 interceptor.setProperties(proxies[i].getProperties());
                 interceptor.poolClosed(this);
             }catch (Exception x) {
-                log.debug("Unable to inform interceptor of pool closure.",x);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unable to inform interceptor of pool closure.",x);
+                }
             }
         }
     } //closePool
@@ -794,7 +796,7 @@ public class ConnectionPool {
         } catch (Exception e) {
             error = true;
             if (log.isDebugEnabled()) {
-              log.debug("Unable to create a new JDBC connection.", e);
+                log.debug("Unable to create a new JDBC connection.", e);
             }
             if (e instanceof SQLException) {
                 throw (SQLException)e;
@@ -805,7 +807,7 @@ public class ConnectionPool {
             }
         } finally {
             // con can never be null here
-            if (error ) {
+            if (error) {
                 release(con);
             }
             con.unlock();
@@ -1108,7 +1110,9 @@ public class ConnectionPool {
                 }
             } //while
         } catch (ConcurrentModificationException e) {
-            log.debug("checkAbandoned failed." ,e);
+            if (log.isDebugEnabled()) {
+                log.debug("checkAbandoned failed." ,e);
+            }
         } catch (Exception e) {
             log.warn("checkAbandoned failed, it will be retried.",e);
         }
@@ -1156,7 +1160,9 @@ public class ConnectionPool {
                 }
             } //while
         } catch (ConcurrentModificationException e) {
-            log.debug("checkIdle failed." ,e);
+            if (log.isDebugEnabled()) {
+                log.debug("checkIdle failed." ,e);
+            }
         } catch (Exception e) {
             log.warn("checkIdle failed, it will be retried.",e);
         }
@@ -1215,7 +1221,9 @@ public class ConnectionPool {
                 }
             } //while
         } catch (ConcurrentModificationException e) {
-            log.debug("testAllIdle failed." ,e);
+            if (log.isDebugEnabled()) {
+                log.debug("testAllIdle failed." ,e);
+            }
         } catch (Exception e) {
             log.warn("testAllIdle failed, it will be retried.",e);
         }

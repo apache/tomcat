@@ -110,7 +110,9 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     BigDecimal unused = new BigDecimal(m.group(2));
                     result = "new java.math.BigDecimal(\"" + m.group(2) + "\")";
                 } catch (NumberFormatException e) {
-                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "BigDecimal"), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "BigDecimal"), e);
+                    }
                     // Continue and resolve the value at runtime
                 }
             }
@@ -128,7 +130,9 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                         result = "Long.valueOf(\"" + m.group(2) + "\")";
                     }
                 } catch (NumberFormatException e) {
-                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Long"), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Long"), e);
+                    }
                     // Continue and resolve the value at runtime
                 }
             }
@@ -145,7 +149,9 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                         result = "Integer.valueOf(\"" + m.group(2) + "\")";
                     }
                 } catch (NumberFormatException e) {
-                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Integer"), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Integer"), e);
+                    }
                     // Continue and resolve the value at runtime
                 }
             }
@@ -163,7 +169,9 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                         result = "Short.valueOf(\"" + m.group(2) + "\")";
                     }
                 } catch (NumberFormatException e) {
-                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Short"), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Short"), e);
+                    }
                     // Continue and resolve the value at runtime
                 }
             }
@@ -181,7 +189,9 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                         result = "Byte.valueOf(\"" + m.group(2) + "\")";
                     }
                 } catch (NumberFormatException e) {
-                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Byte"), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Byte"), e);
+                    }
                     // Continue and resolve the value at runtime
                 }
             }
@@ -198,7 +208,9 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                         result = "Double.valueOf(\"" + m.group(2) + "\")";
                     }
                 } catch (NumberFormatException e) {
-                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Double"), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Double"), e);
+                    }
                     // Continue and resolve the value at runtime
                 }
             }
@@ -216,7 +228,9 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                         result = "Float.valueOf(\"" + m.group(2) + "\")";
                     }
                 } catch (NumberFormatException e) {
-                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Float"), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "Float"), e);
+                    }
                     // Continue and resolve the value at runtime
                 }
             }
@@ -229,7 +243,9 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     BigInteger unused = new BigInteger(m.group(2));
                     result = "new java.math.BigInteger(\"" + m.group(2) + "\")";
                 } catch (NumberFormatException e) {
-                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "BigInteger"), e);
+                    if (log.isDebugEnabled()) {
+                        log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2), "BigInteger"), e);
+                    }
                     // Continue and resolve the value at runtime
                 }
             }
@@ -242,8 +258,10 @@ public class ELInterpreterTagSetters implements ELInterpreter {
                     Enum<?> enumValue = Enum.valueOf((Class<? extends Enum>) expectedType, m.group(2));
                     result = expectedType.getName() + "." + enumValue.name();
                 } catch (IllegalArgumentException iae) {
-                    log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2),
-                            "Enum[" + expectedType.getName() + "]"), iae);
+                    if (log.isDebugEnabled()) {
+                        log.debug(Localizer.getMessage("jsp.error.typeConversion", m.group(2),
+                                "Enum[" + expectedType.getName() + "]"), iae);
+                    }
                     // Continue and resolve the value at runtime
                 }
             }
