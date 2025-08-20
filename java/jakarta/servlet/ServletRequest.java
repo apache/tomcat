@@ -105,7 +105,7 @@ public interface ServletRequest {
     default void setCharacterEncoding(Charset encoding) {
         try {
             setCharacterEncoding(encoding.name());
-        } catch (UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException ignore) {
             // Unreachable code
         }
     }

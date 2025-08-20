@@ -281,7 +281,7 @@ class Http2Parser {
         // RFC 7450 priority frames are ignored. Still need to treat as overhead.
         try {
             swallowPayload(streamId, FrameType.PRIORITY.getId(), 5, false, buffer);
-        } catch (ConnectionException e) {
+        } catch (ConnectionException ignore) {
             // Will never happen because swallowPayload() is called with isPadding set
             // to false
         }

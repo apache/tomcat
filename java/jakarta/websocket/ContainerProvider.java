@@ -47,7 +47,7 @@ public abstract class ContainerProvider {
                 Class<WebSocketContainer> clazz =
                         (Class<WebSocketContainer>) Class.forName(DEFAULT_PROVIDER_CLASS_NAME);
                 result = clazz.getConstructor().newInstance();
-            } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+            } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException ignore) {
                 // No options left. Just return null.
             }
         }

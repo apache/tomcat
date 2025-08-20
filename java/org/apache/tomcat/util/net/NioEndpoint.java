@@ -1325,8 +1325,11 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                                 } else {
                                     readLock.wait();
                                 }
-                            } catch (InterruptedException e) {
-                                // Continue
+                            } catch (InterruptedException ignore) {
+                                /*
+                                 * Most likely the Poller signalling there is data to read but could be spurious. Exit
+                                 * the wait, check status and proceed accordingly.
+                                 */
                             }
                         }
                     }
@@ -1432,8 +1435,11 @@ public class NioEndpoint extends AbstractNetworkChannelEndpoint<NioChannel,Socke
                                 } else {
                                     writeLock.wait();
                                 }
-                            } catch (InterruptedException e) {
-                                // Continue
+                            } catch (InterruptedException ignore) {
+                                /*
+                                 * Most likely the Poller signalling that data can be written but could be spurious.
+                                 * Exit the wait, check status and proceed accordingly.
+                                 */
                             }
                         } else if (startNanos > 0) {
                             // If something was written, reset timeout

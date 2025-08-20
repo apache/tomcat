@@ -82,8 +82,8 @@ public class ResponseUtil {
             StringReader input = new StringReader(varyHeader);
             try {
                 TokenList.parseTokenList(input, fieldNames);
-            } catch (IOException ioe) {
-                // Should never happen
+            } catch (IOException ignore) {
+                // Should never happen because a StringReader is used.
             }
         }
 

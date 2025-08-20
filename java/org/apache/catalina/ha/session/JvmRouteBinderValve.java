@@ -258,8 +258,8 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             Session catalinaSession = null;
             try {
                 catalinaSession = getManager(request).findSession(sessionId);
-            } catch (IOException e) {
-                // Hups!
+            } catch (IOException ignore) {
+                // Error looking for session using old session ID. Treat it as not found.
             }
             String id = sessionId.substring(0, index);
             String newSessionID = id + "." + localJvmRoute;
@@ -270,11 +270,11 @@ public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
             } else {
                 try {
                     catalinaSession = getManager(request).findSession(newSessionID);
-                } catch (IOException e) {
-                    // Hups!
+                } catch (IOException ignore) {
+                    // Error looking for session using new session ID. Treat it as not found.
                 }
                 if (catalinaSession != null) {
-                    // session is rewrite at other request, rewrite this also
+                    // Session was rewritten in other, concurrent request. Rewrite this request also.
                     changeRequestSessionID(request, sessionId, newSessionID);
                 } else {
                     if (log.isDebugEnabled()) {

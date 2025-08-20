@@ -735,9 +735,8 @@ public abstract class HttpServlet extends GenericServlet {
                 if (REQUEST_FACADE_CLAZZ.isAssignableFrom(req.getClass())) {
                     try {
                         return ((Boolean) GET_ALLOW_TRACE.invoke(req, (Object[]) null)).booleanValue();
-                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ignore) {
                         // Should never happen given the checks in place.
-                        // Ignore
                     }
                 }
             }
@@ -944,11 +943,11 @@ public abstract class HttpServlet extends GenericServlet {
             Writer osw = null;
             try {
                 osw = new OutputStreamWriter(out, encoding);
-            } catch (UnsupportedEncodingException e) {
-                // Impossible.
-                // The same values were used in the constructor. If this method
-                // gets called then the constructor must have succeeded so the
-                // above call must also succeed.
+            } catch (UnsupportedEncodingException ignore) {
+                /*
+                 * Impossible. The same values were used in the constructor. If this method gets called then the
+                 * constructor must have succeeded so the above call must also succeed.
+                 */
             }
             pw = new PrintWriter(osw);
         }
