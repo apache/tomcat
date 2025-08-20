@@ -237,8 +237,8 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                     for (int i = 0; i < 64; i++) {
                         os.write(TestCoyoteAdapter.TEXT_8K.getBytes(StandardCharsets.UTF_8));
                     }
-                } catch (IOException e) {
-                    // Expected
+                } catch (IOException ignore) {
+                    // Ignore - The test intends to trigger the IOE
                 }
             }
 

@@ -119,8 +119,8 @@ public class TesterLoginModule implements LoginModule {
 
             return true;
 
-        } catch (IOException e) {
-            throw new LoginException(e.getMessage());
+        } catch (IOException ioe) {
+            throw new LoginException(ioe.getMessage());
         } catch (UnsupportedCallbackException e) {
             throw new LoginException(e.getMessage());
         }

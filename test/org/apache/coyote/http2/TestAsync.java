@@ -239,8 +239,8 @@ public class TestAsync extends Http2TestBase {
                             public void run() {
                                 try {
                                     write();
-                                } catch (IOException e) {
-                                    throw new IllegalStateException(e);
+                                } catch (IOException ioe) {
+                                    throw new IllegalStateException(ioe);
                                 }
                             }
                         }, 200, TimeUnit.MILLISECONDS);

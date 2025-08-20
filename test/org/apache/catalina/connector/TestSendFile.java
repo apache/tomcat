@@ -166,9 +166,9 @@ public class TestSendFile extends TomcatBaseTest {
         try {
             getUrl("http://localhost:" + getPort() + "/test/?" + Globals.SENDFILE_SUPPORTED_ATTR
                     + "=true", bc, null);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Ignore possible IOE due to file delete on the server
-            System.out.println("Ignored: " + e.getMessage());
+            System.out.println("Ignored: " + ioe.getMessage());
         }
 
         CountDownLatch latch = new CountDownLatch(2);

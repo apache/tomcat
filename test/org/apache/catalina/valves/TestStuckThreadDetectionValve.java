@@ -68,8 +68,8 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
             public void run() {
                 try {
                     getUrl("http://localhost:" + getPort() + "/myservlet", result, null);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
                 }
             }
 
@@ -112,8 +112,8 @@ public class TestStuckThreadDetectionValve extends TomcatBaseTest {
             public void run() {
                 try {
                     getUrl("http://localhost:" + getPort() + "/myservlet", result, null);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
                 }
             }
 

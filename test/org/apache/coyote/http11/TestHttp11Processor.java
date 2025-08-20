@@ -749,7 +749,7 @@ public class TestHttp11Processor extends TomcatBaseTest {
                     resp.setCharacterEncoding("UTF-8");
                     try {
                         resp.getWriter().print("OK");
-                    } catch (IOException e) {
+                    } catch (IOException ignore) {
                         // Should never happen. Test will fail if it does.
                     }
                     ac.complete();

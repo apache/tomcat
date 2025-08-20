@@ -1209,8 +1209,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         if (isReady) {
                             onDataAvailable();
                         }
-                    } catch (IOException e) {
-                        onError(e);
+                    } catch (IOException ioe) {
+                        onError(ioe);
                     }
                 }
             }.start();
@@ -1572,8 +1572,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         public void run() {
             try {
                 setListeners();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
             }
         }
 
@@ -1594,8 +1594,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         String body = new String(buffer, StandardCharsets.UTF_8);
                         Assert.assertTrue(body.equals("body"));
 
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
                     }
                 }
 
@@ -1734,8 +1734,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                             is.read(buffer);
                         }
 
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
                     }
                 }
 
