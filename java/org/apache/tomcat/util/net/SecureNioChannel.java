@@ -578,7 +578,9 @@ public class SecureNioChannel extends NioChannel {
         } catch (IOException ioe) {
             // This is expected - swallowing the exception is the reason this
             // method exists. Log at debug in case someone is interested.
-            log.debug(sm.getString("channel.nio.ssl.closeSilentError"), ioe);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("channel.nio.ssl.closeSilentError"), ioe);
+            }
         }
     }
 

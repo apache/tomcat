@@ -101,7 +101,9 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         try {
             certs = session.getPeerCertificates();
         } catch (Throwable t) {
-            log.debug(sm.getString("jsseSupport.clientCertError"), t);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("jsseSupport.clientCertError"), t);
+            }
             return null;
         }
 

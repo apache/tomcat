@@ -344,9 +344,9 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         if (datagramChannel != null) {
             try {
                 datagramChannel.close();
-            } catch (Exception iox) {
+            } catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("nioReceiver.closeError"), iox);
+                    log.debug(sm.getString("nioReceiver.closeError"), e);
                 }
             }
             datagramChannel = null;

@@ -584,7 +584,7 @@ public class McastServiceImpl extends MembershipProviderBase {
                         if (doRunReceiver) {
                             log.debug(sm.getString("mcastServiceImpl.error.receiving"), e);
                         } else {
-                            log.warn(sm.getString("mcastServiceImpl.error.receivingNoSleep"), e);
+                            log.debug(sm.getString("mcastServiceImpl.error.receivingNoSleep"), e);
                         }
                     }
                     if (doRunReceiver) {

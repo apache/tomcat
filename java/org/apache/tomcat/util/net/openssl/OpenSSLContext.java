@@ -351,7 +351,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         x509TrustManager.checkClientTrusted(peerCerts, auth);
                         return true;
                     } catch (Exception e) {
-                        log.debug(sm.getString("openssl.certificateVerificationFailed"), e);
+                        if (log.isDebugEnabled()) {
+                            log.debug(sm.getString("openssl.certificateVerificationFailed"), e);
+                        }
                     }
                     return false;
                 });
