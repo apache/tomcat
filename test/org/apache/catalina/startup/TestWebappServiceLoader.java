@@ -164,8 +164,8 @@ public class TestWebappServiceLoader {
         control.replay();
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
-        } catch (IOException e) {
-            assertThat(e.getCause(), instanceOf(ClassCastException.class));
+        } catch (IOException ioe) {
+            assertThat(ioe.getCause(), instanceOf(ClassCastException.class));
         } finally {
             control.verify();
         }
@@ -183,8 +183,8 @@ public class TestWebappServiceLoader {
         control.replay();
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
-        } catch (IOException e) {
-            assertThat(e.getCause(), instanceOf(ReflectiveOperationException.class));
+        } catch (IOException ioe) {
+            assertThat(ioe.getCause(), instanceOf(ReflectiveOperationException.class));
         } finally {
             control.verify();
         }

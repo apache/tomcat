@@ -332,7 +332,7 @@ public class TestSsl extends TomcatBaseTest {
             if (!renegotiationSupported) {
                 Assert.fail("Renegotiation started when it should have failed");
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (renegotiationSupported) {
                 Assert.fail("Renegotiation failed when it should be supported");
             }

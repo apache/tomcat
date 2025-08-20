@@ -312,7 +312,7 @@ public class TestHttp2Limits extends Http2TestBase {
                     parser.readFrame();
                     MatcherAssert.assertThat(output.getTrace(),
                             RegexMatcher.matchesRegex("0-Goaway-\\[1\\]-\\[11\\]-\\[" + limitMessage + "\\]"));
-                } catch (IOException se) {
+                } catch (IOException ignore) {
                     // Expected on some platforms
                 }
                 break;

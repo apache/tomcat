@@ -290,8 +290,8 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
                 // reported
                 try {
                     ((HttpServletResponse) ac.getResponse()).sendError(599);
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
                 }
             }
 
