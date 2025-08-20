@@ -160,7 +160,7 @@ public class TestResolverSSL extends TomcatBaseTest {
         @Override
         public void invoke(Request request, Response response) throws IOException, ServletException {
             PrintWriter writer = response.getWriter();
-            Resolver resolver = new ResolverImpl(request);
+            Resolver resolver = new ResolverImpl(request, request.getContext().getLogger());
             for (String key : keys) {
                 resolve(key, resolver, writer);
             }

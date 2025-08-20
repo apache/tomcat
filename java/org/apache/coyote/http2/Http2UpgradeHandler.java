@@ -523,7 +523,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
 
             try {
                 writeGoAwayFrame((1 << 31) - 1, Http2Error.NO_ERROR.getCode(), null);
-            } catch (IOException ioe) {
+            } catch (IOException ignore) {
                 // This is fatal for the connection. Ignore it here. There will be
                 // further attempts at I/O in upgradeDispatch() and it can better
                 // handle the IO errors.
@@ -632,7 +632,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
         }
         try {
             writeGoAwayFrame(maxProcessedStreamId, code, msg);
-        } catch (IOException ioe) {
+        } catch (IOException ignore) {
             // Ignore. GOAWAY is sent on a best efforts basis and the original
             // error has already been logged.
         }

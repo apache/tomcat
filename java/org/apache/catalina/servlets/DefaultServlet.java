@@ -697,7 +697,7 @@ public class DefaultServlet extends HttpServlet {
             if (resourceInputStream != null) {
                 try {
                     resourceInputStream.close();
-                } catch (IOException ioe) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -1111,8 +1111,8 @@ public class DefaultServlet extends HttpServlet {
             if (serveContent) {
                 try {
                     response.setBufferSize(output);
-                } catch (IllegalStateException e) {
-                    // Silent catch
+                } catch (IllegalStateException ignore) {
+                    // Content has already been written - this must be an include. Ignore the error and continue.
                 }
                 InputStream renderResult = null;
                 if (ostream == null) {
@@ -1223,8 +1223,8 @@ public class DefaultServlet extends HttpServlet {
                 if (serveContent) {
                     try {
                         response.setBufferSize(output);
-                    } catch (IllegalStateException e) {
-                        // Silent catch
+                    } catch (IllegalStateException ignore) {
+                     // Content has already been written - this must be an include. Ignore the error and continue.
                     }
                     if (ostream != null) {
                         if (!checkSendfile(request, response, resource, range.end - range.start + 1, range)) {
@@ -1241,7 +1241,7 @@ public class DefaultServlet extends HttpServlet {
                     try {
                         response.setBufferSize(output);
                     } catch (IllegalStateException e) {
-                        // Silent catch
+                        // Content has already been written - this must be an include. Ignore the error and continue.
                     }
                     if (ostream != null) {
                         copy(resource, ostream, ranges.iterator(), contentType);
@@ -2111,7 +2111,7 @@ public class DefaultServlet extends HttpServlet {
                     if (reader != null) {
                         try {
                             reader.close();
-                        } catch (IOException e) {
+                        } catch (IOException ignore) {
                             // Ignore
                         }
                     }
@@ -2589,7 +2589,7 @@ public class DefaultServlet extends HttpServlet {
             long headerValueTime = -1L;
             try {
                 headerValueTime = request.getDateHeader("If-Range");
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ignore) {
                 // Ignore
             }
             if (headerValueTime >= 0) {

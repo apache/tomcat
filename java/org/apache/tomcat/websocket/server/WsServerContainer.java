@@ -466,7 +466,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
             for (WsSession wsSession : wsSessions) {
                 try {
                     wsSession.close(AUTHENTICATED_HTTP_SESSION_CLOSED);
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Any IOExceptions during close will have been caught and the
                     // onError method called.
                 }

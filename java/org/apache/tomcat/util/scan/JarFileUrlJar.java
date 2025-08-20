@@ -113,7 +113,7 @@ public class JarFileUrlJar implements Jar {
         if (jarFile != null) {
             try {
                 jarFile.close();
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
         }

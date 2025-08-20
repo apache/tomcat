@@ -298,7 +298,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
                 if (cl != null) {
                     return cl.loadClass(signature);
                 }
-            } catch (ClassNotFoundException e) {
+            } catch (ClassNotFoundException ignore) {
                 // Ignore
             }
             try {
@@ -407,7 +407,7 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
             names[n++] = item.getName();
             try {
                 setAttribute(item);
-            } catch (Exception e) {
+            } catch (Exception ignore) {
                 // Ignore all exceptions
             }
         }
@@ -467,29 +467,12 @@ public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBe
                     sm.getString("baseModelMBean.nullResource"));
         }
 
-        // if (!"objectreference".equalsIgnoreCase(type))
-        // throw new InvalidTargetObjectTypeException(type);
-
         this.resource = resource;
         this.resourceType = resource.getClass().getName();
-
-        // // Make the resource aware of the model mbean.
-        // try {
-        // Method m=resource.getClass().getMethod("setModelMBean",
-        // new Class[] {ModelMBean.class});
-        // if( m!= null ) {
-        // m.invoke(resource, new Object[] {this});
-        // }
-        // } catch( NoSuchMethodException t ) {
-        // // ignore
-        // } catch( Throwable t ) {
-        // log.error( "Can't set model mbean ", t );
-        // }
     }
 
 
     // ------------------------------ ModelMBeanNotificationBroadcaster Methods
-
 
     @Override
     public void addAttributeChangeNotificationListener(NotificationListener listener, String name, Object handback)

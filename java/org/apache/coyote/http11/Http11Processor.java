@@ -575,7 +575,7 @@ public class Http11Processor extends AbstractProcessor {
         long contentLength = -1;
         try {
             contentLength = request.getContentLengthLong();
-        } catch (Exception e) {
+        } catch (Exception ignore) {
             // Ignore, an error here is already processed in prepareRequest
             // but is done again since the content length is still -1
         }
@@ -757,7 +757,7 @@ public class Http11Processor extends AbstractProcessor {
                     try {
                         hostValueMB = headers.setValue("host");
                         hostValueMB.setBytes(uriB, uriBCStart + pos, slashPos - pos);
-                    } catch (IllegalStateException e) {
+                    } catch (IllegalStateException ignore) {
                         // Edge case
                         // If the request has too many headers it won't be
                         // possible to create the host header. Ignore this as

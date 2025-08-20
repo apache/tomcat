@@ -2348,8 +2348,8 @@ public class Request implements HttpServletRequest {
             Session session = null;
             try {
                 session = manager.findSession(requestedSessionId);
-            } catch (IOException e) {
-                // Can't find the session
+            } catch (IOException ignore) {
+                // Error looking up session. Treat it as not found.
             }
 
             if ((session == null) || !session.isValid()) {
@@ -2361,8 +2361,8 @@ public class Request implements HttpServletRequest {
                             if (ctxt.getManager().findSession(requestedSessionId) != null) {
                                 return true;
                             }
-                        } catch (IOException e) {
-                            // Ignore
+                        } catch (IOException ignore) {
+                            // Error looking up session. Treat it as not found.
                         }
                     }
                 }
@@ -2871,9 +2871,8 @@ public class Request implements HttpServletRequest {
                                 found = true;
                                 break;
                             }
-                        } catch (IOException e) {
-                            // Ignore. Problems with this manager will be
-                            // handled elsewhere.
+                        } catch (IOException ignore) {
+                            // Error looking up session. Treat it as not found.
                         }
                     }
                 }
@@ -2992,7 +2991,7 @@ public class Request implements HttpServletRequest {
                 String comment = scookie.getComment().toString();
                 cookie.setComment(version == 1 ? unescape(comment) : null);
                 cookies[idx++] = cookie;
-            } catch (IllegalArgumentException e) {
+            } catch (IllegalArgumentException ignore) {
                 // Ignore bad cookie
             }
         }

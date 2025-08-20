@@ -182,7 +182,7 @@ public interface ServerEndpointConfig extends EndpointConfig {
                     @SuppressWarnings("unchecked")
                     Class<Configurator> clazz = (Class<Configurator>) Class.forName(DEFAULT_IMPL_CLASSNAME);
                     result = clazz.getConstructor().newInstance();
-                } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+                } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException ignore) {
                     // No options left. Just return null.
                 }
             }

@@ -314,7 +314,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         stream.getInputBuffer().insertReplayedBody(body);
         try {
             stream.receivedEndOfStream();
-        } catch (ConnectionException e) {
+        } catch (ConnectionException ignore) {
             // Exception will not be thrown in this case
         }
     }

@@ -822,11 +822,11 @@ public abstract class HttpServlet extends GenericServlet {
             Writer osw = null;
             try {
                 osw = new OutputStreamWriter(out, encoding);
-            } catch (UnsupportedEncodingException e) {
-                // Impossible.
-                // The same values were used in the constructor. If this method
-                // gets called then the constructor must have succeeded so the
-                // above call must also succeed.
+            } catch (UnsupportedEncodingException ignore) {
+                /*
+                 * Impossible. The same values were used in the constructor. If this method gets called then the
+                 * constructor must have succeeded so the above call must also succeed.
+                 */
             }
             pw = new PrintWriter(osw);
         }

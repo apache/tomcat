@@ -362,7 +362,7 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
         setConnected(false);
         try {
             close();
-        } catch (Exception e) {
+        } catch (Exception ignore) {
             // Ignore
         }
     }
@@ -411,8 +411,9 @@ public class ParallelNioSender extends AbstractSender implements MultiPointSende
         if (result) {
             try {
                 selector.selectNow();
-            } catch (Exception e) {
-                /* Ignore */}
+            } catch (Exception ignore) {
+                // Ignore
+            }
         }
         return result;
     }

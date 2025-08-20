@@ -160,9 +160,9 @@ public class StoreFactoryBase implements IStoreFactory {
             for (Object element : elements) {
                 try {
                     storeElement(aWriter, indent, element);
-                } catch (IOException ioe) {
-                    // ignore children report error them self!
-                    // see StandardContext.storeWithBackup()
+                } catch (IOException ignore) {
+                    // Ignore. Children report error themselves.
+                    // See StandardContext.storeWithBackup()
                 }
             }
         }
