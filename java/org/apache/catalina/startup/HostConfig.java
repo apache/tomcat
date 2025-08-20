@@ -350,7 +350,7 @@ public class HostConfig implements LifecycleListener {
         }
         try {
             return file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             return file;
         }
     }
