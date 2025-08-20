@@ -295,8 +295,8 @@ public class TestValidator extends TomcatBaseTest {
         public int doStartTag() throws JspException {
             try {
                 pageContext.getOut().print("<p>" + echo + "</p>");
-            } catch (IOException e) {
-                pageContext.getServletContext().log("Tag (Echo21) failure", e);
+            } catch (IOException ioe) {
+                pageContext.getServletContext().log("Tag (Echo21) failure", ioe);
             }
             return super.doStartTag();
         }

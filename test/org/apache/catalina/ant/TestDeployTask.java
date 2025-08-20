@@ -40,7 +40,8 @@ public class TestDeployTask extends TomcatBaseTest {
                 Assert.assertEquals("application/octet-stream", contentType);
                 try {
                     istream.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
+                    // Ignore
                 }
             }
 
@@ -99,7 +100,8 @@ public class TestDeployTask extends TomcatBaseTest {
                 Assert.assertEquals("application/octet-stream", contentType);
                 try {
                     istream.close();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
+                    // Ignore
                 }
             }
 

@@ -246,8 +246,8 @@ public class TestGenerator extends TomcatBaseTest {
         public int doEndTag() throws JspException {
             try {
                 pageContext.getOut().print("attribute1: '" + attribute1 + "', " + "attribute2: '" + attribute2 + "'");
-            } catch (IOException e) {
-                throw new JspException(e);
+            } catch (IOException ioe) {
+                throw new JspException(ioe);
             }
             return EVAL_PAGE;
         }
@@ -262,11 +262,11 @@ public class TestGenerator extends TomcatBaseTest {
         try {
             getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug56581.jsp", res, null);
             Assert.fail("An IOException was expected.");
-        } catch (IOException expected) {
-            // ErrorReportValve in Tomcat 8.0.9+ flushes and aborts the
-            // connection when an unexpected error is encountered and response
-            // has already been committed. It results in an exception here:
-            // java.io.IOException: Premature EOF
+        } catch (IOException ignore) {
+            /*
+             * ErrorReportValve flushes and aborts the connection when an unexpected error is encountered and response
+             * has already been committed. It results in an exception here: java.io.IOException: Premature EOF
+             */
         }
 
         String result = res.toString();

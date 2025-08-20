@@ -108,8 +108,8 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
         public void onClose(Session session, CloseReason closeReason) {
             try {
                 session.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
             }
         }
 
@@ -137,7 +137,7 @@ public class TestWsSessionSuspendResume extends WebSocketBaseTest {
                     session.getBasicRemote().sendText(messages.toString());
                     messages.clear();
                     ((WsSession) session).resume();
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     Assert.fail();
                 }
             } else {
