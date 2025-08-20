@@ -79,8 +79,8 @@ public class FooTag extends ExampleTagBase {
             pageContext.setAttribute("member", atts[i]);
             i++;
             return EVAL_BODY_BUFFERED;
-        } catch (IOException ex) {
-            throw new JspTagException(ex.toString());
+        } catch (IOException ioe) {
+            throw new JspTagException(ioe.toString());
         }
     }
 }
