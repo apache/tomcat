@@ -54,8 +54,8 @@ public class LogTag extends ExampleTagBase {
                 bodyOut.writeOut(bodyOut.getEnclosingWriter());
             }
             return SKIP_BODY;
-        } catch (IOException ex) {
-            throw new JspTagException(ex.toString());
+        } catch (IOException ioe) {
+            throw new JspTagException(ioe.toString());
         }
     }
 }
