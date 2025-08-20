@@ -106,7 +106,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         String canPath = null;
         try {
             canPath = file.getCanonicalPath();
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore
         }
         if (canPath == null || !canPath.startsWith(canonicalBase)) {

@@ -359,8 +359,8 @@ public abstract class ExpressionFactory {
                 }
             } catch (FileNotFoundException e) {
                 // Should not happen - ignore it if it does
-            } catch (IOException e) {
-                throw new ELException(Util.message(null, "expressionFactory.readFailed", PROPERTY_FILE), e);
+            } catch (IOException ioe) {
+                throw new ELException(Util.message(null, "expressionFactory.readFailed", PROPERTY_FILE), ioe);
             }
         }
         return null;
