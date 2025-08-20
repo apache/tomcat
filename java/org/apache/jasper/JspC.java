@@ -1417,7 +1417,7 @@ public class JspC extends Task implements Options {
                             errorCount++;
                             log.error(Localizer.getMessage("jspc.error.compilation"), e);
                         }
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException ignore) {
                         // Ignore
                     }
                 }
@@ -1521,8 +1521,8 @@ public class JspC extends Task implements Options {
                     mapout.write(Localizer.getMessage("jspc.webinc.footer"));
                 }
                 mapout.close();
-            } catch (IOException ioe) {
-                // nothing to do if it fails since we are done with it
+            } catch (IOException ignore) {
+                // Nothing to do if it fails since we are done with it.
             }
         }
     }
@@ -1694,7 +1694,7 @@ public class JspC extends Task implements Options {
                     uriRoot = froot.getCanonicalPath();
                 }
             }
-        } catch (IOException ioe) {
+        } catch (IOException ignore) {
             // Missing uriRoot will be handled in the caller.
         }
     }

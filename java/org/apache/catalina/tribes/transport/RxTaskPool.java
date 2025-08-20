@@ -63,8 +63,8 @@ public class RxTaskPool {
                 if (!idle.isEmpty()) {
                     try {
                         worker = idle.removeFirst();
-                    } catch (java.util.NoSuchElementException x) {
-                        // this means that there are no available workers
+                    } catch (java.util.NoSuchElementException ignore) {
+                        // Should never happen as access to idle is always synchronized on mutex
                     }
                 } else if (used.size() < this.maxTasks && creator != null) {
                     worker = creator.createRxTask();

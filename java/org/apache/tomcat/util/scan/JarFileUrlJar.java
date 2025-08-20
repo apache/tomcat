@@ -67,11 +67,14 @@ public class JarFileUrlJar implements Jar {
         boolean multiReleaseValue = false;
         try {
             multiReleaseValue = jarFile.isMultiRelease();
-        } catch (IllegalStateException e) {
-            // ISE can be thrown if the JAR URL is bad, for example:
-            // https://github.com/spring-projects/spring-boot/issues/33633
-            // The Javadoc does not document that ISE and given what it does for a vanilla IOE,
-            // this looks like a Java bug, it should return false instead.
+        } catch (IllegalStateException ignore) {
+            /*
+             * ISE can be thrown if the JAR URL is bad, for example:
+             * https://github.com/spring-projects/spring-boot/issues/33633
+             *
+             * The Javadoc does not document that ISE and given what it does for a vanilla IOE, this looks like a Java
+             * bug, it should return false instead.
+             */
         }
         multiRelease = multiReleaseValue;
     }
@@ -122,7 +125,7 @@ public class JarFileUrlJar implements Jar {
         if (jarFile != null) {
             try {
                 jarFile.close();
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
         }
