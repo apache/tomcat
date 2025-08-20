@@ -91,8 +91,8 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 byte[] bytes = Files.readAllBytes(saTokenPath);
                 streamProvider = new TokenStreamProvider(new String(bytes, StandardCharsets.US_ASCII), caCertFile);
                 saTokenLastModifiedTime = Files.getLastModifiedTime(saTokenPath);
-            } catch (IOException e) {
-                log.error(sm.getString("kubernetesMembershipProvider.streamError"), e);
+            } catch (IOException ioe) {
+                log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
             }
         } else {
             if (protocol == null) {
@@ -155,8 +155,8 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
         try (InputStream stream = streamProvider.openStream(url, headers, connectionTimeout, readTimeout);
                 InputStreamReader reader = new InputStreamReader(stream, "UTF-8")) {
             parsePods(reader, members);
-        } catch (IOException e) {
-            log.error(sm.getString("kubernetesMembershipProvider.streamError"), e);
+        } catch (IOException ioe) {
+            log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
         }
 
         return members.toArray(new Member[0]);
@@ -181,8 +181,8 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 byte[] bytes = Files.readAllBytes(saTokenPath);
                 ((TokenStreamProvider)streamProvider).setToken(new String(bytes, StandardCharsets.US_ASCII));
             }
-        } catch (IOException e) {
-            log.error(sm.getString("kubernetesMembershipProvider.streamError"), e);
+        } catch (IOException ioe) {
+            log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);
         }
     }
 
@@ -263,10 +263,10 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
                 MemberImpl member;
                 try {
                     member = new MemberImpl(podIP, port, aliveTime);
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     // Shouldn't happen:
                     // an exception is thrown if hostname can't be resolved to IP, but we already provide an IP
-                    log.error(sm.getString("kubernetesMembershipProvider.memberError"), e);
+                    log.error(sm.getString("kubernetesMembershipProvider.memberError"), ioe);
                     continue;
                 }
                 byte[] id = md5.digest(uid.getBytes(StandardCharsets.US_ASCII));

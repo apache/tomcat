@@ -162,7 +162,7 @@ public final class URLEncoder implements Cloneable {
                 try {
                     writer.write((char) c);
                     writer.flush();
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     buf.reset();
                     continue;
                 }

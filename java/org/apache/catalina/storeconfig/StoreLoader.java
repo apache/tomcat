@@ -132,7 +132,7 @@ public class StoreLoader {
             synchronized (digester) {
                 registry = (StoreRegistry) digester.parse(is);
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Try default classloader location
             try (InputStream is =
                     StoreLoader.class.getResourceAsStream("/org/apache/catalina/storeconfig/server-registry.xml")) {
@@ -143,7 +143,7 @@ public class StoreLoader {
                         registry = (StoreRegistry) digester.parse(is);
                     }
                 } else {
-                    throw e;
+                    throw ioe;
                 }
             }
         }

@@ -392,9 +392,9 @@ public class SecureNioChannel extends NioChannel {
                         isWritable = key.isWritable();
                 }
             }
-        } catch (IOException x) {
+        } catch (IOException ioe) {
             closeSilently();
-            throw x;
+            throw ioe;
         } catch (Exception e) {
             closeSilently();
             throw new IOException(e);

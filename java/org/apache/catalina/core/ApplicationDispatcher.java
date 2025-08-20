@@ -371,7 +371,7 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
                 } catch (IllegalStateException | IOException f) {
                     // Ignore
                 }
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
         }
@@ -623,9 +623,9 @@ final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher 
             // Servlet Service Method is called by the FilterChain
         } catch (BadRequestException | CloseNowException e) {
             ioException = e;
-        } catch (IOException e) {
-            wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException", wrapper.getName()), e);
-            ioException = e;
+        } catch (IOException ioe) {
+            wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException", wrapper.getName()), ioe);
+            ioException = ioe;
         } catch (UnavailableException e) {
             wrapper.getLogger().error(sm.getString("applicationDispatcher.serviceException", wrapper.getName()), e);
             servletException = e;

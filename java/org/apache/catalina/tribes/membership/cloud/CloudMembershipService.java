@@ -200,8 +200,8 @@ public class CloudMembershipService extends MembershipServiceBase implements Clo
             localMember.setPayload(payload);
             localMember.setDomain(domain);
             localMember.getData(true, true);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(ioe);
         }
     }
 

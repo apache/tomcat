@@ -63,9 +63,9 @@ public class JarWarResource extends AbstractArchiveResource {
             }
 
             return new JarInputStreamWrapper(entry, jarIs);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jarResource.getInputStreamFail", getResource().getName(), getBaseUrl()), e);
+                log.debug(sm.getString("jarResource.getInputStreamFail", getResource().getName(), getBaseUrl()), ioe);
             }
             // Ensure jarIs is closed if there is an exception
             entry = null;

@@ -155,8 +155,8 @@ public class JspCServletContext implements ServletContext {
             if (!webXmlParser.parseWebXml(url, webXml, false)) {
                 throw new JasperException(Localizer.getMessage("jspc.error.invalidWebXml"));
             }
-        } catch (IOException e) {
-            throw new JasperException(e);
+        } catch (IOException ioe) {
+            throw new JasperException(ioe);
         }
 
         // if the application is metadata-complete then we can skip fragment processing
@@ -411,8 +411,8 @@ public class JspCServletContext implements ServletContext {
                             }
                         }
                     }
-                } catch (IOException e) {
-                    log(e.getMessage(), e);
+                } catch (IOException ioe) {
+                    log(ioe.getMessage(), ioe);
                 }
             }
         }

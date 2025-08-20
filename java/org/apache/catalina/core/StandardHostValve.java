@@ -226,8 +226,8 @@ final class StandardHostValve extends ValveBase {
                     response.finishResponse();
                 } catch (ClientAbortException e) {
                     // Ignore
-                } catch (IOException e) {
-                    container.getLogger().warn(sm.getString("standardHostValve.exception", errorPage), e);
+                } catch (IOException ioe) {
+                    container.getLogger().warn(sm.getString("standardHostValve.exception", errorPage), ioe);
                 }
             }
         }
@@ -280,8 +280,8 @@ final class StandardHostValve extends ValveBase {
                 if (custom(request, response, errorPage)) {
                     try {
                         response.finishResponse();
-                    } catch (IOException e) {
-                        container.getLogger().warn(sm.getString("standardHostValve.exception", errorPage), e);
+                    } catch (IOException ioe) {
+                        container.getLogger().warn(sm.getString("standardHostValve.exception", errorPage), ioe);
                     }
                 }
             }

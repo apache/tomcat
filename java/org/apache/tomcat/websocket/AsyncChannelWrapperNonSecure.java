@@ -65,7 +65,7 @@ public class AsyncChannelWrapperNonSecure implements AsyncChannelWrapper {
     public void close() {
         try {
             socketChannel.close();
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore
         }
     }

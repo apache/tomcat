@@ -226,8 +226,8 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                     socketWrapper.setWriteTimeout(timeout);
                     socketWrapper.flush(true);
                     handler.onResult(SENDRESULT_OK);
-                } catch (IOException e) {
-                    SendResult sr = new SendResult(e);
+                } catch (IOException ioe) {
+                    SendResult sr = new SendResult(ioe);
                     handler.onResult(sr);
                 }
             }

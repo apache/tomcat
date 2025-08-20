@@ -330,7 +330,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
         }
         try {
             appBaseFile = file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             appBaseFile = file;
         }
         if (!appBaseFile.mkdirs() && !appBaseFile.isDirectory()) {
@@ -354,7 +354,7 @@ public class HostManagerServlet extends HttpServlet implements ContainerServlet 
                 }
                 Path dest = new File(configBaseFile, "manager.xml").toPath();
                 Files.copy(is, dest);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 writer.println(smClient.getString("hostManagerServlet.managerXml"));
                 return;
             }

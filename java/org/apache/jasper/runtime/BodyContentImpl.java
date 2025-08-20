@@ -394,7 +394,7 @@ public class BodyContentImpl extends BodyContent {
         this.writer = null;
         try {
             this.clear();
-        } catch (IOException ex) {
+        } catch (IOException ignore) {
             // ignore
         }
     }

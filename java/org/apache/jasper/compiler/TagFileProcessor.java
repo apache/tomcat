@@ -440,7 +440,7 @@ public class TagFileProcessor {
         Node.Nodes page = null;
         try {
             page = pc.parseTagFileDirectives(path, jar);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             err.jspError("jsp.error.file.not.found", path);
         }
 

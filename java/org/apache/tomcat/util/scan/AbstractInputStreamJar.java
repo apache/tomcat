@@ -56,7 +56,7 @@ public abstract class AbstractInputStreamJar implements Jar {
         if (jarInputStream == null) {
             try {
                 reset();
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 entry = null;
                 return;
             }

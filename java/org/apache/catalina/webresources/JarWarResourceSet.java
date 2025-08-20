@@ -143,7 +143,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                     if (jarFileIs != null) {
                         try {
                             jarFileIs.close();
-                        } catch (IOException e) {
+                        } catch (IOException ignore) {
                             // Ignore
                         }
                     }

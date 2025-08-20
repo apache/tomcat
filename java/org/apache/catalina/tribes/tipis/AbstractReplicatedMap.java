@@ -479,8 +479,8 @@ public abstract class AbstractReplicatedMap<K, V>
                     msg = new MapMessage(mapContextName, getReplicateMessageType(), true, (Serializable) entry.getKey(),
                             null, rentry.getDiff(), entry.getPrimary(), entry.getBackupNodes());
                     rentry.resetDiff();
-                } catch (IOException x) {
-                    log.error(sm.getString("abstractReplicatedMap.unable.diffObject"), x);
+                } catch (IOException ioe) {
+                    log.error(sm.getString("abstractReplicatedMap.unable.diffObject"), ioe);
                 } finally {
                     rentry.unlock();
                 }
@@ -1615,8 +1615,8 @@ public abstract class AbstractReplicatedMap<K, V>
                     valuedata = XByteBuffer.serialize(value);
                 }
                 this.value = value;
-            } catch (IOException x) {
-                throw new RuntimeException(x);
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
             }
         }
 
@@ -1626,8 +1626,8 @@ public abstract class AbstractReplicatedMap<K, V>
                     keydata = XByteBuffer.serialize(key);
                 }
                 this.key = key;
-            } catch (IOException x) {
-                throw new RuntimeException(x);
+            } catch (IOException ioe) {
+                throw new RuntimeException(ioe);
             }
         }
 

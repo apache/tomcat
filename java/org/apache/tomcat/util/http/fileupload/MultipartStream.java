@@ -77,7 +77,7 @@ import org.apache.tomcat.util.http.fileupload.util.Streams;
  *     }
  *   } catch(MultipartStream.MalformedStreamException e) {
  *     // the stream failed to follow required syntax
- *   } catch(IOException e) {
+ *   } catch(IOException ioe) {
  *     // a read or write error occurred
  *   }
  * </pre>

@@ -539,7 +539,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             Map<String,String> directives;
             try {
                 directives = Authorization.parseAuthorizationDigest(new StringReader(authorization));
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 return false;
             }
 

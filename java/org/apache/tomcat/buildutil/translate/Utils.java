@@ -60,8 +60,8 @@ public class Utils {
         try (FileInputStream fis = new FileInputStream(f);
                 Reader r = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
             props.load(r);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
         return props;
     }

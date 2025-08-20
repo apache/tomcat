@@ -331,8 +331,8 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
             if (mf != null && mf.isFile()) {
                 try (FileInputStream fis = new FileInputStream(mf)) {
                     setManifest(new Manifest(fis));
-                } catch (IOException e) {
-                    log.warn(sm.getString("dirResourceSet.manifestFail", mf.getAbsolutePath()), e);
+                } catch (IOException ioe) {
+                    log.warn(sm.getString("dirResourceSet.manifestFail", mf.getAbsolutePath()), ioe);
                 }
             }
         }

@@ -201,8 +201,8 @@ public class StandardJarScanner implements JarScanner {
                         } else {
                             log.warn(sm.getString("jarScan.webinflibFail", path));
                         }
-                    } catch (IOException e) {
-                        log.warn(sm.getString("jarScan.webinflibFail", url), e);
+                    } catch (IOException ioe) {
+                        log.warn(sm.getString("jarScan.webinflibFail", url), ioe);
                     }
                 } else {
                     if (log.isTraceEnabled()) {
@@ -226,8 +226,8 @@ public class StandardJarScanner implements JarScanner {
                     if (url != null) {
                         try {
                             callback.scanWebInfClasses();
-                        } catch (IOException e) {
-                            log.warn(sm.getString("jarScan.webinfclassesFail"), e);
+                        } catch (IOException ioe) {
+                            log.warn(sm.getString("jarScan.webinfclassesFail"), ioe);
                         }
                     }
                 }

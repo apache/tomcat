@@ -625,10 +625,10 @@ public class AccessLogValve extends AbstractAccessLogValve {
                     false);
 
             currentLogFile = pathname;
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             writer = null;
             currentLogFile = null;
-            log.error(sm.getString("accessLogValve.openFail", pathname, System.getProperty("user.name")), e);
+            log.error(sm.getString("accessLogValve.openFail", pathname, System.getProperty("user.name")), ioe);
         }
         // Rotating a log file will always trigger a new file to be opened so
         // when a new file is opened, check to see if any old files need to be

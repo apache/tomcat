@@ -202,7 +202,7 @@ public class ProxyErrorReportValve extends ErrorReportValve {
             }
             try {
                 response.sendRedirect(urlString);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 // Ignore
             }
         } else {

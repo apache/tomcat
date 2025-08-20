@@ -1113,7 +1113,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                         stream = url.openStream();
                     }
                 }
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
             if (stream != null) {

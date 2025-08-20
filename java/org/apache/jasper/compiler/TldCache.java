@@ -138,7 +138,7 @@ public class TldCache {
                     result[1] = jar.getLastModified(tldResourcePath.getEntryName());
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore (shouldn't happen)
         }
         return result;

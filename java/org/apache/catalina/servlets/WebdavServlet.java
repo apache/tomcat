@@ -845,7 +845,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             IOTools.flow(is, os);
             body = os.toByteArray();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             resp.sendError(WebdavStatus.SC_BAD_REQUEST);
             return;
         }
@@ -1046,7 +1046,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             IOTools.flow(is, os);
             body = os.toByteArray();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             resp.sendError(WebdavStatus.SC_BAD_REQUEST);
             return;
         }
@@ -1400,7 +1400,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         try (InputStream is = req.getInputStream(); ByteArrayOutputStream os = new ByteArrayOutputStream()) {
             IOTools.flow(is, os);
             body = os.toByteArray();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             resp.sendError(WebdavStatus.SC_BAD_REQUEST);
             return;
         }
@@ -2263,8 +2263,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                 } else {
                     store.copy(source, dest);
                 }
-            } catch (IOException e) {
-                log(sm.getString("webdavservlet.inputstreamclosefail", source), e);
+            } catch (IOException ioe) {
+                log(sm.getString("webdavservlet.inputstreamclosefail", source), ioe);
             }
         } else {
             errorList.put(source, Integer.valueOf(WebdavStatus.SC_INTERNAL_SERVER_ERROR));

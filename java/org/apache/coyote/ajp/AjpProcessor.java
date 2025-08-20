@@ -367,11 +367,11 @@ public class AjpProcessor extends AbstractProcessor {
                     try {
                         socketWrapper.write(true, pongMessageArray, 0, pongMessageArray.length);
                         socketWrapper.flush(true);
-                    } catch (IOException e) {
+                    } catch (IOException ioe) {
                         if (getLog().isDebugEnabled()) {
-                            getLog().debug(sm.getString("ajpprocessor.pongFail"), e);
+                            getLog().debug(sm.getString("ajpprocessor.pongFail"), ioe);
                         }
-                        setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                        setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                     }
                     recycle();
                     continue;
@@ -385,8 +385,8 @@ public class AjpProcessor extends AbstractProcessor {
                     break;
                 }
                 request.setStartTime(System.currentTimeMillis());
-            } catch (IOException e) {
-                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+            } catch (IOException ioe) {
+                setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 break;
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
@@ -895,9 +895,9 @@ public class AjpProcessor extends AbstractProcessor {
     protected void populateHost() {
         try {
             request.serverName().duplicate(request.localName());
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             response.setStatus(400);
-            setErrorState(ErrorState.CLOSE_CLEAN, e);
+            setErrorState(ErrorState.CLOSE_CLEAN, ioe);
         }
     }
 
@@ -1058,10 +1058,12 @@ public class AjpProcessor extends AbstractProcessor {
         if (empty && doRead) {
             try {
                 refillReadBuffer(false);
-            } catch (IOException timeout) {
-                // Not ideal. This will indicate that data is available
-                // which should trigger a read which in turn will trigger
-                // another IOException and that one can be thrown.
+            } catch (IOException ioe) {
+                /*
+                 *  Probably a timeout. This approach isn't ideal but it works. Returning 1 will indicate that data is
+                 *  available which should trigger a read which in turn will trigger another IOException and that one
+                 *  can be thrown.
+                 */
                 return 1;
             }
         }
@@ -1297,8 +1299,8 @@ public class AjpProcessor extends AbstractProcessor {
                 // Validate and write response headers
                 try {
                     prepareResponse();
-                } catch (IOException e) {
-                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, e);
+                } catch (IOException ioe) {
+                    setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 }
             }
 

@@ -68,12 +68,12 @@ public class SSIExec implements SSICommand {
             } catch (InterruptedException e) {
                 ssiMediator.log(sm.getString("ssiExec.executeFailed", substitutedValue), e);
                 writer.write(configErrMsg);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (!foundProgram) {
                     // Apache doesn't output an error message if it can't find
                     // a program
                 }
-                ssiMediator.log(sm.getString("ssiExec.executeFailed", substitutedValue), e);
+                ssiMediator.log(sm.getString("ssiExec.executeFailed", substitutedValue), ioe);
             }
         }
         return lastModified;

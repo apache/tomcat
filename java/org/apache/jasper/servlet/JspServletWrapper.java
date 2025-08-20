@@ -465,11 +465,11 @@ public class JspServletWrapper {
                 throw handleJspException(ex);
             }
             throw ex;
-        } catch (IOException ex) {
+        } catch (IOException ioe) {
             if (options.getDevelopment()) {
-                throw new IOException(handleJspException(ex).getMessage(), ex);
+                throw new IOException(handleJspException(ioe).getMessage(), ioe);
             }
-            throw ex;
+            throw ioe;
         } catch (Exception e) {
             if (options.getDevelopment()) {
                 throw handleJspException(e);

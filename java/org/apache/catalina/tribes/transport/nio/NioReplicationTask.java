@@ -340,11 +340,11 @@ public class NioReplicationTask extends AbstractRxTask {
                         ((channel instanceof SocketChannel) ? ((SocketChannel) channel).socket().getInetAddress() :
                                 ((DatagramChannel) channel).socket().getInetAddress()));
             }
-        } catch (IOException x) {
+        } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("nioReplicationTask.unable.ack", x.getMessage()), x);
+                log.debug(sm.getString("nioReplicationTask.unable.ack", ioe.getMessage()), ioe);
             } else {
-                log.warn(sm.getString("nioReplicationTask.unable.ack", x.getMessage()));
+                log.warn(sm.getString("nioReplicationTask.unable.ack", ioe.getMessage()));
             }
         }
     }

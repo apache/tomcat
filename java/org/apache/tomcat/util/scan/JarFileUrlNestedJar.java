@@ -50,7 +50,7 @@ public class JarFileUrlNestedJar extends AbstractInputStreamJar {
         if (warFile != null) {
             try {
                 warFile.close();
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
         }

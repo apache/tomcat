@@ -72,8 +72,8 @@ public class RandomizedTextRewriteMap implements RewriteMap {
                     throw new IllegalArgumentException(sm.getString("rewriteMap.txtInvalidLine", line, txtFilePath));
                 }
             }
-        } catch (IOException e) {
-            throw new IllegalArgumentException(sm.getString("rewriteMap.txtReadError", txtFilePath), e);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(sm.getString("rewriteMap.txtReadError", txtFilePath), ioe);
         }
     }
 

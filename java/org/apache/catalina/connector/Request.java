@@ -1485,8 +1485,8 @@ public class Request implements HttpServletRequest {
             String canonicalPath;
             try {
                 canonicalPath = new File(value.toString()).getCanonicalPath();
-            } catch (IOException e) {
-                throw new SecurityException(sm.getString("coyoteRequest.sendfileNotCanonical", value), e);
+            } catch (IOException ioe) {
+                throw new SecurityException(sm.getString("coyoteRequest.sendfileNotCanonical", value), ioe);
             }
             // Sendfile is performed in Tomcat's security context so need to
             // check if the web app is permitted to access the file while still
@@ -2761,9 +2761,9 @@ public class Request implements HttpServletRequest {
                 parameters.setParseFailedReason(FailReason.POST_TOO_LARGE);
                 checkSwallowInput();
                 partsParseException = new IllegalStateException(e);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 parameters.setParseFailedReason(FailReason.IO_ERROR);
-                partsParseException = e;
+                partsParseException = ioe;
             } catch (IllegalStateException e) {
                 // addParameters() will set parseFailedReason
                 checkSwallowInput();
@@ -2818,11 +2818,11 @@ public class Request implements HttpServletRequest {
         if (requestedSessionId != null) {
             try {
                 session = manager.findSession(requestedSessionId);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 if (log.isDebugEnabled()) {
-                    log.debug(sm.getString("request.session.failed", requestedSessionId, e.getMessage()), e);
+                    log.debug(sm.getString("request.session.failed", requestedSessionId, ioe.getMessage()), ioe);
                 } else {
-                    log.info(sm.getString("request.session.failed", requestedSessionId, e.getMessage()));
+                    log.info(sm.getString("request.session.failed", requestedSessionId, ioe.getMessage()));
                 }
                 session = null;
             }
@@ -3097,11 +3097,11 @@ public class Request implements HttpServletRequest {
                 }
                 try {
                     readPostBodyFully(formData, len);
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     // Client disconnect
                     Context context = getContext();
                     if (context != null && context.getLogger().isDebugEnabled()) {
-                        context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
+                        context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), ioe);
                     }
                     parameters.setParseFailedReason(FailReason.CLIENT_DISCONNECT);
                     return;
@@ -3119,12 +3119,12 @@ public class Request implements HttpServletRequest {
                         context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), ise);
                     }
                     return;
-                } catch (IOException e) {
+                } catch (IOException ioe) {
                     // Client disconnect
                     parameters.setParseFailedReason(FailReason.CLIENT_DISCONNECT);
                     Context context = getContext();
                     if (context != null && context.getLogger().isDebugEnabled()) {
-                        context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), e);
+                        context.getLogger().debug(sm.getString("coyoteRequest.parseParameters"), ioe);
                     }
                     return;
                 }
@@ -3269,7 +3269,7 @@ public class Request implements HttpServletRequest {
         List<AcceptLanguage> acceptLanguages;
         try {
             acceptLanguages = AcceptLanguage.parse(new StringReader(value));
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Mal-formed headers are ignore. Do the same in the unlikely event
             // of an IOException.
             return;

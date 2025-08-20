@@ -152,7 +152,7 @@ class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
                             if (urlConn != null) {
                                 try {
                                     urlConn.getInputStream().close();
-                                } catch (IOException e) {
+                                } catch (IOException ignore) {
                                     // Ignore
                                 }
                             }
