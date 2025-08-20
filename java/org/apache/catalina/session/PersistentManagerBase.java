@@ -591,7 +591,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
         for (Session session : sessions) {
             try {
                 swapOut(session);
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // This is logged in writeSession()
             }
         }
@@ -796,9 +796,9 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
             } else {
                 store.save(session);
             }
-        } catch (IOException e) {
-            log.error(sm.getString("persistentManager.serializeError", session.getIdInternal()), e);
-            throw e;
+        } catch (IOException ioe) {
+            log.error(sm.getString("persistentManager.serializeError", session.getIdInternal()), ioe);
+            throw ioe;
         }
 
     }
@@ -899,7 +899,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                         }
                         try {
                             swapOut(session);
-                        } catch (IOException e) {
+                        } catch (IOException ignore) {
                             // This is logged in writeSession()
                         }
                     }
@@ -949,7 +949,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
                     }
                     try {
                         swapOut(session);
-                    } catch (IOException e) {
+                    } catch (IOException ignore) {
                         // This is logged in writeSession()
                     }
                     toswap--;
@@ -994,7 +994,7 @@ public abstract class PersistentManagerBase extends ManagerBase implements Store
 
                         try {
                             writeSession(session);
-                        } catch (IOException e) {
+                        } catch (IOException ignore) {
                             // This is logged in writeSession()
                         }
                         session.setNote(PERSISTED_LAST_ACCESSED_TIME, Long.valueOf(lastAccessedTime));

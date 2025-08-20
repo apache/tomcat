@@ -34,20 +34,41 @@ import java.util.concurrent.TimeUnit;
 import org.apache.catalina.WebResource;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.connector.Request;
+import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.jsse.PEMFile;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.net.openssl.ciphers.EncryptionLevel;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
+import org.apache.tomcat.util.res.StringManager;
 
 public class ResolverImpl extends Resolver {
 
-    protected Request request;
+    private static final StringManager sm = StringManager.getManager(ResolverImpl.class);
 
+    protected final Request request;
+    private final Log containerLog;
+
+
+    /**
+     * Create a resolver for the given request.
+     *
+     * @param request The request
+     *
+     * @deprecated Will be removed in Tomcat 12 onwards. Use {@link #ResolverImpl(Request, Log)}
+     */
+    @Deprecated
     public ResolverImpl(Request request) {
-        this.request = request;
+        this(request, request.getContext().getLogger());
     }
+
+
+    public ResolverImpl(Request request, Log containerLog) {
+        this.request = request;
+        this.containerLog = containerLog;
+    }
+
 
     /**
      * The following are not implemented:
@@ -228,8 +249,11 @@ public class ResolverImpl extends Resolver {
                     }
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // TLS access error
+            if (containerLog.isDebugEnabled()) {
+                containerLog.debug(sm.getString("resolverImpl.tlsError"), ioe);
+            }
         }
         return null;
     }
@@ -275,14 +299,14 @@ public class ResolverImpl extends Resolver {
         } else if (key.equals("CERT")) {
             try {
                 return PEMFile.toPEM(certificates[0]);
-            } catch (CertificateEncodingException e) {
+            } catch (CertificateEncodingException ignore) {
                 // Ignore
             }
         } else if (key.startsWith("CERT_CHAIN_")) {
             key = key.substring("CERT_CHAIN_".length());
             try {
                 return PEMFile.toPEM(certificates[Integer.parseInt(key)]);
-            } catch (NumberFormatException | ArrayIndexOutOfBoundsException | CertificateEncodingException e) {
+            } catch (NumberFormatException | ArrayIndexOutOfBoundsException | CertificateEncodingException ignore) {
                 // Ignore
             }
         }
@@ -317,7 +341,7 @@ public class ResolverImpl extends Resolver {
                     return elements.get(n);
                 }
             }
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | CertificateParsingException e) {
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException | CertificateParsingException ignore) {
             // Ignore
         }
         return null;

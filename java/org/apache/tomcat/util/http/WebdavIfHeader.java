@@ -226,8 +226,10 @@ public class WebdavIfHeader {
                     firstChar = readWhiteSpace(reader);
                     reader.reset();
                 } catch (IOException ignore) {
-                    // may be thrown according to API but is only thrown by the
-                    // StringReader class if the reader is already closed.
+                    /*
+                     * May be thrown according to API but is only thrown by the StringReader class if the reader is
+                     * already closed.
+                     */
                 }
 
                 if (firstChar == '(') {

@@ -333,13 +333,19 @@ public class McastServiceImpl extends MembershipProviderBase {
             // leave mcast group
             try {
                 socket.leaveGroup(new InetSocketAddress(address, 0), null);
-            } catch (Exception ignore) {
-                // NO-OP
+            } catch (Exception e) {
+                // Shutting down. Only log at debug.
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("mcastServiceImpl.error.stop"), e);
+                }
             }
             try {
                 socket.close();
-            } catch (Exception ignore) {
-                // NO-OP
+            } catch (Exception e) {
+                // Shutting down. Only log at debug.
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("mcastServiceImpl.error.stop"), e);
+                }
             }
             member.setServiceStartTime(-1);
         }
@@ -365,10 +371,11 @@ public class McastServiceImpl extends MembershipProviderBase {
                     memberBroadcastsReceived(data);
                 }
             }
-        } catch (SocketTimeoutException x) {
-            // do nothing, this is normal, we don't want to block forever
-            // since the receive thread is the same thread
-            // that does membership expiration
+        } catch (SocketTimeoutException ignore) {
+            /*
+             *  Do nothing. This is normal. We don't want to block forever since the receive thread is the same thread
+             *  that does membership expiration.
+             */
         }
         checkExpired();
     }

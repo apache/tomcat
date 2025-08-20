@@ -130,7 +130,7 @@ class Util {
             try {
                 Method method = clazz.getMethod(methodName, paramTypes);
                 return getMethod(clazz, base, method);
-            } catch (NoSuchMethodException | SecurityException e) {
+            } catch (NoSuchMethodException | SecurityException ignore) {
                 // Fall through to broader, slower logic
             }
         }

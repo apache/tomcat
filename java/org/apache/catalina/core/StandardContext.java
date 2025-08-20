@@ -5012,9 +5012,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         if (isUseNaming()) {
             try {
                 ContextBindings.bindThread(this, getNamingToken());
-            } catch (NamingException e) {
-                // Silent catch, as this is a normal case during the early
-                // startup stages
+            } catch (NamingException ignore) {
+                // Silent catch, as this is a normal case during the early startup stages
             }
         }
 

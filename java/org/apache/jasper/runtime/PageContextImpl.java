@@ -319,7 +319,7 @@ public class PageContextImpl extends PageContext {
                 if (session.getAttribute(name) != null) {
                     return SESSION_SCOPE;
                 }
-            } catch (IllegalStateException ise) {
+            } catch (IllegalStateException ignore) {
                 // Session has been invalidated.
                 // Ignore and fall through to application scope.
             }
@@ -351,7 +351,7 @@ public class PageContextImpl extends PageContext {
         if (session != null) {
             try {
                 o = session.getAttribute(name);
-            } catch (IllegalStateException ise) {
+            } catch (IllegalStateException ignore) {
                 // Session has been invalidated.
                 // Ignore and fall through to application scope.
             }
@@ -398,7 +398,7 @@ public class PageContextImpl extends PageContext {
         if (session != null) {
             try {
                 removeAttribute(name, SESSION_SCOPE);
-            } catch (IllegalStateException ise) {
+            } catch (IllegalStateException ignore) {
                 // Session has been invalidated.
                 // Ignore and fall throw to application scope.
             }

@@ -320,7 +320,7 @@ public class RewriteValve extends ValveBase {
 
         try {
 
-            Resolver resolver = new ResolverImpl(request);
+            Resolver resolver = new ResolverImpl(request, containerLog);
 
             invoked.set(Boolean.TRUE);
 

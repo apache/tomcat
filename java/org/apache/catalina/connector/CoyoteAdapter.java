@@ -261,8 +261,8 @@ public class CoyoteAdapter implements Adapter {
                 success = false;
             }
         } catch (IOException e) {
+            // Issues that should be logged will have already been logged
             success = false;
-            // Ignore
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             success = false;
@@ -373,8 +373,8 @@ public class CoyoteAdapter implements Adapter {
                 response.finishResponse();
             }
 
-        } catch (IOException e) {
-            // Ignore
+        } catch (IOException ignore) {
+            // Issues that should be logged will have already been logged
         } finally {
             AtomicBoolean error = new AtomicBoolean(false);
             res.action(ActionCode.IS_ERROR, error);
@@ -782,8 +782,8 @@ public class CoyoteAdapter implements Adapter {
                 // point.
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // Should never happen
+                } catch (InterruptedException ignore) {
+                    // Should never happen but, if it does, just continue looping
                 }
                 // Reset mapping
                 request.getMappingData().recycle();

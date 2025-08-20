@@ -366,7 +366,7 @@ public class FileHandler extends Handler {
         if (encoding != null && !encoding.isEmpty()) {
             try {
                 setEncoding(encoding);
-            } catch (UnsupportedEncodingException ex) {
+            } catch (UnsupportedEncodingException ignore) {
                 // Ignore
             }
         }
@@ -379,7 +379,7 @@ public class FileHandler extends Handler {
         if (filterName != null) {
             try {
                 setFilter((Filter) cl.loadClass(filterName).getConstructor().newInstance());
-            } catch (Exception e) {
+            } catch (Exception ignore) {
                 // Ignore
             }
         }
@@ -389,7 +389,7 @@ public class FileHandler extends Handler {
         if (formatterName != null) {
             try {
                 setFormatter((Formatter) cl.loadClass(formatterName).getConstructor().newInstance());
-            } catch (Exception e) {
+            } catch (Exception ignore) {
                 // Ignore and fallback to defaults
                 setFormatter(new OneLineFormatter());
             }
@@ -454,14 +454,14 @@ public class FileHandler extends Handler {
             if (fos != null) {
                 try {
                     fos.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
             if (os != null) {
                 try {
                     os.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -495,8 +495,8 @@ public class FileHandler extends Handler {
                 try {
                     LocalDate dateFromFile = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(date));
                     result = dateFromFile.isBefore(maxDaysOffset);
-                } catch (DateTimeException e) {
-                    // no-op
+                } catch (DateTimeException ignore) {
+                    // Unable to determine date from path. File will not be included.
                 }
             }
             return result;

@@ -726,12 +726,13 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         Class<?> clazz = null;
         try {
             clazz = Class.forName(jaspicCallbackHandlerClass, true, Thread.currentThread().getContextClassLoader());
-        } catch (ClassNotFoundException e) {
-            // Proceed with the retry below
+        } catch (ClassNotFoundException ignore) {
+            // Not found in the context class loader (web application class loader). Re-try below.
         }
 
         try {
             if (clazz == null) {
+                // Look in the same class loader that loaded this class - usually Tomcat's common loader.
                 clazz = Class.forName(jaspicCallbackHandlerClass);
             }
             callbackHandler = (CallbackHandler) clazz.getConstructor().newInstance();
