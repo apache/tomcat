@@ -525,7 +525,7 @@ public class Catalina {
                 Digester.setGeneratedCodeLoader(loader);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.info(sm.getString("catalina.noLoader", loaderClassName), e);
+                    log.debug(sm.getString("catalina.noLoader", loaderClassName), e);
                 } else {
                     log.info(sm.getString("catalina.noLoader", loaderClassName));
                 }

@@ -1787,7 +1787,7 @@ public class ContextConfig implements LifecycleListener {
                 ht = sci.getClass().getAnnotation(HandlesTypes.class);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.info(sm.getString("contextConfig.sci.debug", sci.getClass().getName()), e);
+                    log.debug(sm.getString("contextConfig.sci.debug", sci.getClass().getName()), e);
                 } else {
                     log.info(sm.getString("contextConfig.sci.info", sci.getClass().getName()));
                 }

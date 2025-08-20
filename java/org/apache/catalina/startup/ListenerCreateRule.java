@@ -49,7 +49,7 @@ public class ListenerCreateRule extends ObjectCreateRule {
             } catch (Exception e) {
                 String className = getRealClassName(attributes);
                 if (log.isDebugEnabled()) {
-                    log.info(sm.getString("listener.createFailed", className), e);
+                    log.debug(sm.getString("listener.createFailed", className), e);
                 } else {
                     log.info(sm.getString("listener.createFailed", className));
                 }
