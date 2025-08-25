@@ -33,13 +33,19 @@ jobs:
       matrix:
         isMain:
           - ${{ contains(github.ref, 'main') }}
-        java: [ 21, 25-ea ]
+        java: [ 21, 24, 25-ea ]
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         exclude:
           - os: windows-latest
             java: 21
           - os: macos-latest
             java: 21
+          - os: ubuntu-latest
+            java: 24
+          - os: windows-latest
+            java: 24
+          - os: macos-latest
+            java: 25-ea
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -65,3 +71,4 @@ jobs:
           hs_err_*.log
           output/build/logs/TEST*.txt
         retention-days: 7
+
