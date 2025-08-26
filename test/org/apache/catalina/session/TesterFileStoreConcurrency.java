@@ -98,6 +98,10 @@ public class TesterFileStoreConcurrency {
         Assert.assertFalse("Exception during save", saveTask.getFailed());
         Assert.assertFalse("Exception during load", loadTask.getFailed());
         Assert.assertFalse("Exception during remove", removeTask.getFailed());
+
+        System.out.println("Looped over sessions [" + saveTask.getLoopCount() + "] times calling save()");
+        System.out.println("Looped over sessions [" + loadTask.getLoopCount() + "] times calling load()");
+        System.out.println("Looped over sessions [" + removeTask.getLoopCount() + "] times calling remove()");
     }
 
 
@@ -147,6 +151,7 @@ public class TesterFileStoreConcurrency {
 
         private volatile boolean stop = false;
         private volatile boolean failed = false;
+        private volatile int loopCount = 0;
 
         @Override
         public void run() {
@@ -161,6 +166,7 @@ public class TesterFileStoreConcurrency {
                         failed = true;
                     }
                 }
+                loopCount++;
             }
         }
 
@@ -170,6 +176,10 @@ public class TesterFileStoreConcurrency {
 
         public boolean getFailed() {
             return failed;
+        }
+
+        public int getLoopCount() {
+            return loopCount;
         }
 
         protected abstract void doTask(Session session) throws Exception;
