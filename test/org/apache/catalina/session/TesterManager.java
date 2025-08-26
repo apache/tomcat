@@ -125,7 +125,7 @@ public class TesterManager implements Manager {
 
     @Override
     public Session createEmptySession() {
-        return null;
+        return new StandardSession(this);
     }
 
     @Override
