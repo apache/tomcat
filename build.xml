@@ -454,10 +454,10 @@
     <include name="org/apache/tomcat/util/collections/**" />
     <include name="org/apache/tomcat/util/compat/**" />
     <include name="org/apache/tomcat/util/file/**" />
+    <include name="org/apache/tomcat/util/json/**" />
     <include name="org/apache/tomcat/util/res/**" />
     <include name="org/apache/tomcat/util/security/**" />
     <include name="org/apache/tomcat/util/threads/**" />
-    <include name="org/apache/tomcat/util/json/**" />
     <include name="org/apache/tomcat/util/*" />
     <exclude name="org/apache/tomcat/util/bcel" />
     <exclude name="org/apache/tomcat/util/descriptor" />
