@@ -189,17 +189,12 @@ public class TesterManager implements Manager {
     }
 
     @Override
-    public void setSessionActivityCheck(boolean sessionActivityCheck) {
-        // NO-OP
-    }
-
-    @Override
-    public void setSessionLastAccessAtStart(boolean sessionLastAccessAtStart) {
-        // NO-OP
-    }
-
-    @Override
     public void setSessionCounter(long sessionCounter) {
+        // NO-OP
+    }
+
+    @Override
+    public void changeSessionId(Session session) {
         // NO-OP
     }
 }
