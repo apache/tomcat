@@ -17,6 +17,7 @@
 package org.apache.catalina;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -25,13 +26,27 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public interface WebResourceLockSet {
 
     /**
+     * Obtain a reentrant read/write lock for the resource at the provided path. The resource is not required to exist.
+     * Multiple calls to this method with the same path will return the same lock provided that at least one instance
+     * of the lock remains in use between the calls.
+     *
+     * @param path The path for which the lock should be obtained
+     *
+     * @return A reentrant read/write lock for the given resource.
+     */
+    ReadWriteLock getLock(String path);
+
+    /**
      * Lock the resource at the provided path for reading. The resource is not required to exist. Read locks are not
      * exclusive.
      *
      * @param path The path to the resource to be locked for reading
      *
      * @return The {@link ResourceLock} that must be passed to {@link #unlockForRead(ResourceLock)} to release the lock
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards. Use {@code #getLock(String)} instead.
      */
+    @Deprecated
     ResourceLock lockForRead(String path);
 
     /**
@@ -39,7 +54,10 @@ public interface WebResourceLockSet {
      *
      * @param resourceLock The {@link ResourceLock} associated with the resource for which a read lock should be
      *                         released
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards. Use {@code #getLock(String)} instead.
      */
+    @Deprecated
     void unlockForRead(ResourceLock resourceLock);
 
     /**
@@ -49,7 +67,10 @@ public interface WebResourceLockSet {
      * @param path The path to the resource to be locked for writing
      *
      * @return The {@link ResourceLock} that must be passed to {@link #unlockForWrite(ResourceLock)} to release the lock
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards. Use {@code #getLock(String)} instead.
      */
+    @Deprecated
     ResourceLock lockForWrite(String path);
 
     /**
@@ -57,10 +78,19 @@ public interface WebResourceLockSet {
      *
      * @param resourceLock The {@link ResourceLock} associated with the resource for which the write lock should be
      *                         released
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards. Use {@code #getLock(String)} instead.
      */
+    @Deprecated
     void unlockForWrite(ResourceLock resourceLock);
 
 
+    /**
+     * Represents a lock on a resource.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards.
+     */
+    @Deprecated
     class ResourceLock {
         public final AtomicInteger count = new AtomicInteger(0);
         public final ReentrantReadWriteLock reentrantLock = new ReentrantReadWriteLock();

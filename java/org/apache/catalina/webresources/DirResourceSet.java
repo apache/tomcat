@@ -22,11 +22,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.jar.Manifest;
 
 import org.apache.catalina.LifecycleException;
@@ -37,6 +37,7 @@ import org.apache.catalina.WebResourceRoot.ResourceSetType;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.concurrent.KeyedReentrantReadWriteLock;
 import org.apache.tomcat.util.http.RequestUtil;
 
 /**
@@ -46,8 +47,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
 
     private static final Log log = LogFactory.getLog(DirResourceSet.class);
 
-    private final Map<String,ResourceLock> resourceLocksByPath = new HashMap<>();
-    private final Object resourceLocksByPathLock = new Object();
+    private KeyedReentrantReadWriteLock resourceLocksByPath = new KeyedReentrantReadWriteLock();
 
 
     /**
@@ -95,7 +95,6 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     }
 
 
-    @SuppressWarnings("null") // lock can never be null when lock.key is read
     @Override
     public WebResource getResource(String path) {
         checkPath(path);
@@ -108,7 +107,11 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
              * and writes (e.g. HTTP GET and PUT / DELETE) for the same path causing corruption of the FileResource
              * where some of the fields are set as if the file exists and some as set as if it does not.
              */
-            ResourceLock lock = readOnly ? null : lockForRead(path);
+            Lock readLock = null;
+            if (!readOnly) {
+                readLock = getLock(path).readLock();
+                readLock.lock();
+            }
             try {
                 File f = file(path.substring(webAppMount.length()), false);
                 if (f == null) {
@@ -120,10 +123,10 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
                 if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
                     path = path + '/';
                 }
-                return new FileResource(root, path, f, readOnly, getManifest(), this, readOnly ? null : lock.key);
+                return new FileResource(root, path, f, readOnly, getManifest(), this, readOnly ? null : path);
             } finally {
-                if (!readOnly) {
-                    unlockForRead(lock);
+                if (readLock != null) {
+                    readLock.unlock();
                 }
             }
         } else {
@@ -281,7 +284,8 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
          * HTTP GET and PUT / DELETE) for the same path causing corruption of the FileResource where some of the fields
          * are set as if the file exists and some as set as if it does not.
          */
-        ResourceLock lock = lockForWrite(path);
+        Lock writeLock = getLock(path).writeLock();
+        writeLock.lock();
         try {
             dest = file(path.substring(webAppMount.length()), false);
             if (dest == null) {
@@ -304,7 +308,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
 
             return true;
         } finally {
-            unlockForWrite(lock);
+            writeLock.unlock();
         }
     }
 
@@ -348,78 +352,42 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     }
 
 
+
+    @Override
+    public ReadWriteLock getLock(String path) {
+        String key = getLockKey(path);
+        return resourceLocksByPath.getLock(key);
+    }
+
+
+    @SuppressWarnings("deprecation")
     @Override
     public ResourceLock lockForRead(String path) {
         String key = getLockKey(path);
-        ResourceLock resourceLock;
-        synchronized (resourceLocksByPathLock) {
-            /*
-             * Obtain the ResourceLock and increment the usage count inside the sync to ensure that that map always has
-             * a consistent view of the currently "in-use" ResourceLocks.
-             */
-            resourceLock = resourceLocksByPath.get(key);
-            if (resourceLock == null) {
-                resourceLock = new ResourceLock(key);
-                resourceLocksByPath.put(key, resourceLock);
-            }
-            resourceLock.count.incrementAndGet();
-        }
-        // Obtain the lock outside the sync as it will block if there is a current write lock.
-        resourceLock.reentrantLock.readLock().lock();
-        return resourceLock;
+        resourceLocksByPath.getLock(key).readLock().lock();
+        return new ResourceLock(key);
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public void unlockForRead(ResourceLock resourceLock) {
-        // Unlock outside the sync as there is no need to do it inside.
-        resourceLock.reentrantLock.readLock().unlock();
-        synchronized (resourceLocksByPathLock) {
-            /*
-             * Decrement the usage count and remove ResourceLocks no longer required inside the sync to ensure that that
-             * map always has a consistent view of the currently "in-use" ResourceLocks.
-             */
-            if (resourceLock.count.decrementAndGet() == 0) {
-                resourceLocksByPath.remove(resourceLock.key);
-            }
-        }
+        resourceLocksByPath.getLock(resourceLock.key).readLock().unlock();
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public ResourceLock lockForWrite(String path) {
         String key = getLockKey(path);
-        ResourceLock resourceLock;
-        synchronized (resourceLocksByPathLock) {
-            /*
-             * Obtain the ResourceLock and increment the usage count inside the sync to ensure that that map always has
-             * a consistent view of the currently "in-use" ResourceLocks.
-             */
-            resourceLock = resourceLocksByPath.get(key);
-            if (resourceLock == null) {
-                resourceLock = new ResourceLock(key);
-                resourceLocksByPath.put(key, resourceLock);
-            }
-            resourceLock.count.incrementAndGet();
-        }
-        // Obtain the lock outside the sync as it will block if there are any other current locks.
-        resourceLock.reentrantLock.writeLock().lock();
-        return resourceLock;
+        resourceLocksByPath.getLock(key).writeLock().lock();
+        return new ResourceLock(key);
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public void unlockForWrite(ResourceLock resourceLock) {
-        // Unlock outside the sync as there is no need to do it inside.
-        resourceLock.reentrantLock.writeLock().unlock();
-        synchronized (resourceLocksByPathLock) {
-            /*
-             * Decrement the usage count and remove ResourceLocks no longer required inside the sync to ensure that that
-             * map always has a consistent view of the currently "in-use" ResourceLocks.
-             */
-            if (resourceLock.count.decrementAndGet() == 0) {
-                resourceLocksByPath.remove(resourceLock.key);
-            }
-        }
+        resourceLocksByPath.getLock(resourceLock.key).writeLock().unlock();
     }
 }

@@ -182,6 +182,10 @@
         when the store was used with the <code>PersistentValve</code>. Based on
         pull request <pr>882</pr> by Aaron Ogburn. (markt)
       </fix>
+      <scode>
+        Refactor <code>WebResource</code> locking to use the new
+        <code>KeyedReentrantReadWriteLock</code>. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
