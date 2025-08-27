@@ -26,6 +26,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import jakarta.servlet.ServletContext;
 
@@ -33,6 +34,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Session;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.concurrent.KeyedReentrantReadWriteLock;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -69,6 +71,7 @@ public final class FileStore extends StoreBase {
      */
     private File directoryFile = null;
 
+    private KeyedReentrantReadWriteLock sessionLocksById = new KeyedReentrantReadWriteLock();
 
     /**
      * Name to register for this Store, used for logging.
@@ -182,7 +185,7 @@ public final class FileStore extends StoreBase {
     public Session load(String id) throws ClassNotFoundException, IOException {
         // Open an input stream to the specified pathname, if any
         File file = file(id);
-        if (file == null || !file.exists()) {
+        if (file == null) {
             return null;
         }
 
@@ -195,8 +198,13 @@ public final class FileStore extends StoreBase {
 
         ClassLoader oldThreadContextCL = context.bind(null);
 
+        Lock readLock = sessionLocksById.getLock(id).readLock();
+        readLock.lock();
         try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
                 ObjectInputStream ois = getObjectInputStream(fis)) {
+            if (!file.exists()) {
+                return null;
+            }
 
             StandardSession session = (StandardSession) manager.createEmptySession();
             session.readObjectData(ois);
@@ -208,6 +216,7 @@ public final class FileStore extends StoreBase {
             }
             return null;
         } finally {
+            readLock.unlock();
             context.unbind(oldThreadContextCL);
         }
     }
@@ -224,8 +233,14 @@ public final class FileStore extends StoreBase {
                     .trace(sm.getString(getStoreName() + ".removing", id, file.getAbsolutePath()));
         }
 
-        if (file.exists() && !file.delete()) {
-            throw new IOException(sm.getString("fileStore.deleteSessionFailed", file));
+        Lock writeLock = sessionLocksById.getLock(id).writeLock();
+        writeLock.lock();
+        try {
+            if (file.exists() && !file.delete()) {
+                throw new IOException(sm.getString("fileStore.deleteSessionFailed", file));
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
@@ -242,9 +257,15 @@ public final class FileStore extends StoreBase {
                     .trace(sm.getString(getStoreName() + ".saving", session.getIdInternal(), file.getAbsolutePath()));
         }
 
-        try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
-                ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
-            ((StandardSession) session).writeObjectData(oos);
+        Lock writeLock = sessionLocksById.getLock(session.getIdInternal()).writeLock();
+        writeLock.lock();
+        try {
+            try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
+                    ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
+                ((StandardSession) session).writeObjectData(oos);
+            }
+        } finally {
+            writeLock.unlock();
         }
     }
 
