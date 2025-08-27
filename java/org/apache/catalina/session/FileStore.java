@@ -198,26 +198,29 @@ public final class FileStore extends StoreBase {
         }
 
         ClassLoader oldThreadContextCL = context.bind(Globals.IS_SECURITY_ENABLED, null);
-
-        Lock readLock = sessionLocksById.getLock(id).readLock();
-        readLock.lock();
-        try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-                ObjectInputStream ois = getObjectInputStream(fis)) {
-            if (!file.exists()) {
-                return null;
+        try {
+            Lock readLock = sessionLocksById.getLock(id).readLock();
+            readLock.lock();
+            try {
+                if (!file.exists()) {
+                    return null;
+                }
+                try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+                        ObjectInputStream ois = getObjectInputStream(fis)) {
+                    StandardSession session = (StandardSession) manager.createEmptySession();
+                    session.readObjectData(ois);
+                    session.setManager(manager);
+                    return session;
+                } catch (FileNotFoundException e) {
+                    if (contextLog.isDebugEnabled()) {
+                        contextLog.debug(sm.getString("fileStore.noFile", id, file.getAbsolutePath()), e);
+                    }
+                    return null;
+                }
+            } finally {
+                readLock.unlock();
             }
-
-            StandardSession session = (StandardSession) manager.createEmptySession();
-            session.readObjectData(ois);
-            session.setManager(manager);
-            return session;
-        } catch (FileNotFoundException e) {
-            if (contextLog.isDebugEnabled()) {
-                contextLog.debug(sm.getString("fileStore.noFile", id, file.getAbsolutePath()), e);
-            }
-            return null;
         } finally {
-            readLock.unlock();
             context.unbind(Globals.IS_SECURITY_ENABLED, oldThreadContextCL);
         }
     }
