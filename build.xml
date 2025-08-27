@@ -448,6 +448,7 @@
     <include name="org/apache/tomcat/util/buf/**" />
     <include name="org/apache/tomcat/util/collections/**" />
     <include name="org/apache/tomcat/util/compat/**" />
+    <include name="org/apache/tomcat/util/concurrent/**" />
     <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/json/**" />
     <include name="org/apache/tomcat/util/res/**" />
@@ -543,6 +544,7 @@
     <include name="org/apache/tomcat/util/buf/**" />
     <include name="org/apache/tomcat/util/collections/**" />
     <include name="org/apache/tomcat/util/compat/**" />
+    <include name="org/apache/tomcat/util/concurrent/**" />
     <include name="org/apache/tomcat/util/descriptor/**" />
     <include name="org/apache/tomcat/util/file/**" />
     <include name="org/apache/tomcat/util/http/**" />
@@ -2461,6 +2463,7 @@
         <exclude name="org/apache/tomcat/util/buf" />
         <exclude name="org/apache/tomcat/util/collections" />
         <exclude name="org/apache/tomcat/util/compat" />
+        <exclude name="org/apache/tomcat/util/concurrent" />
         <exclude name="org/apache/tomcat/util/descriptor" />
         <exclude name="org/apache/tomcat/util/file" />
         <exclude name="org/apache/tomcat/util/http" />
