@@ -59,13 +59,13 @@ public class FileStoreTest {
     @Before
     public void beforeEachTest() throws IOException {
         fileStore.setDirectory(SESS_TEMPPATH);
-        if (!dir.mkdir()) {
+        if (!dir.exists() && !dir.mkdir()) {
+            Assert.fail(dir.getAbsolutePath());
+        }
+        if (!file1.exists() && !file1.createNewFile()) {
             Assert.fail();
         }
-        if (!file1.createNewFile()) {
-            Assert.fail();
-        }
-        if (!file2.createNewFile()) {
+        if (!file2.exists() && !file2.createNewFile()) {
             Assert.fail();
         }
     }
