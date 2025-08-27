@@ -65,7 +65,7 @@ public class FileResource extends AbstractResource {
     private final Manifest manifest;
     private final boolean needConvert;
     private final WebResourceLockSet lockSet;
-    private final String lockKey;
+    private final String lockPath;
 
     public FileResource(WebResourceRoot root, String webAppPath, File resource, boolean readOnly, Manifest manifest) {
         this(root, webAppPath, resource, readOnly, manifest, null, null);
@@ -73,11 +73,11 @@ public class FileResource extends AbstractResource {
 
 
     public FileResource(WebResourceRoot root, String webAppPath, File resource, boolean readOnly, Manifest manifest,
-            WebResourceLockSet lockSet, String lockKey) {
+            WebResourceLockSet lockSet, String lockPath) {
         super(root, webAppPath);
         this.resource = resource;
         this.lockSet = lockSet;
-        this.lockKey = lockKey;
+        this.lockPath = lockPath;
 
         if (webAppPath.charAt(webAppPath.length() - 1) == '/') {
             String realName = resource.getName() + '/';
@@ -136,7 +136,7 @@ public class FileResource extends AbstractResource {
          */
         Lock writeLock = null;
         if (lockSet != null) {
-            writeLock = lockSet.getLock(lockKey).writeLock();
+            writeLock = lockSet.getLock(lockPath).writeLock();
             writeLock.lock();
         }
         try {
