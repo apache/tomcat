@@ -37,7 +37,7 @@ import org.apache.tomcat.unittest.TesterContext;
  * This needs to be run manually. It will not run as part of the standard unit tests as it is named "Tester...". This
  * could be changed once the bug has been fixed.
  */
-public class TesterFileStoreConcurrency {
+public class TestFileStoreConcurrency {
 
     private static final int TEST_RUN_TIME_MS = 5000;
 

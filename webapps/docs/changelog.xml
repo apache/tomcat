@@ -111,6 +111,12 @@
         Remove a number of unnecessary packages from the catalina-deployer.jar.
         (markt)
       </scode>
+      <fix>
+        <bug>69781</bug>: Fix concurrent access issues in the session
+        <code>FileStore</code> implementation that were causing lost sessions
+        when the store was used with the <code>PersistentValve</code>. Based on
+        pull request <pr>882</pr> by Aaron Ogburn. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name = "Other">
