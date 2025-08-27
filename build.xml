@@ -446,7 +446,6 @@
 
   <patternset id="files.tomcat-util">
     <include name="org/apache/tomcat/util/buf/**" />
-    <include name="org/apache/tomcat/util/codec/**" />
     <include name="org/apache/tomcat/util/collections/**" />
     <include name="org/apache/tomcat/util/compat/**" />
     <include name="org/apache/tomcat/util/file/**" />
@@ -538,7 +537,6 @@
     <include name="org/apache/tomcat/util/*" />
     <include name="org/apache/tomcat/util/bcel/**" />
     <include name="org/apache/tomcat/util/buf/**" />
-    <include name="org/apache/tomcat/util/codec/**" />
     <include name="org/apache/tomcat/util/collections/**" />
     <include name="org/apache/tomcat/util/compat/**" />
     <include name="org/apache/tomcat/util/descriptor/**" />
@@ -2472,7 +2470,6 @@
         <include name="org/apache/tomcat/util/digester/**" />
         <exclude name="org/apache/tomcat/util/bcel" />
         <exclude name="org/apache/tomcat/util/buf" />
-        <exclude name="org/apache/tomcat/util/codec" />
         <exclude name="org/apache/tomcat/util/collections" />
         <exclude name="org/apache/tomcat/util/compat" />
         <exclude name="org/apache/tomcat/util/descriptor" />
