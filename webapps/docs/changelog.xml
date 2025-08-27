@@ -113,6 +113,10 @@
         in RFC 9110 that hash functions used to generate strong ETags should be
         collision resistant. (markt)
       </update>
+      <fix>
+        Correct a regression in the fix for <bug>69781</bug> that broke
+        <code>FileStore</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
