@@ -352,42 +352,9 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     }
 
 
-
     @Override
     public ReadWriteLock getLock(String path) {
         String key = getLockKey(path);
         return resourceLocksByPath.getLock(key);
-    }
-
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public ResourceLock lockForRead(String path) {
-        String key = getLockKey(path);
-        resourceLocksByPath.getLock(key).readLock().lock();
-        return new ResourceLock(key);
-    }
-
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void unlockForRead(ResourceLock resourceLock) {
-        resourceLocksByPath.getLock(resourceLock.key).readLock().unlock();
-    }
-
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public ResourceLock lockForWrite(String path) {
-        String key = getLockKey(path);
-        resourceLocksByPath.getLock(key).writeLock().lock();
-        return new ResourceLock(key);
-    }
-
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void unlockForWrite(ResourceLock resourceLock) {
-        resourceLocksByPath.getLock(resourceLock.key).writeLock().unlock();
     }
 }
