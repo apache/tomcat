@@ -459,6 +459,9 @@
     <include name="org/apache/tomcat/util/security/**" />
     <include name="org/apache/tomcat/util/threads/**" />
     <include name="org/apache/tomcat/util/*" />
+  	<!-- Strictly, none of these exclusions need to be listed here. They are -->
+  	<!-- listed to make it easier to check that no package has been          -->
+  	<!-- overlooked.                                                         -->
     <exclude name="org/apache/tomcat/util/bcel" />
     <exclude name="org/apache/tomcat/util/descriptor" />
     <exclude name="org/apache/tomcat/util/digester" />
@@ -468,6 +471,7 @@
     <exclude name="org/apache/tomcat/util/net" />
     <exclude name="org/apache/tomcat/util/openssl"/>
     <exclude name="org/apache/tomcat/util/scan" />
+    <exclude name="org/apache/tomcat/util/xreflection" />
   </patternset>
 
   <patternset id="files.tomcat-util-scan">
