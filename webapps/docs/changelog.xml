@@ -172,6 +172,10 @@
         performance. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <scode>
+        Remove a number of unnecessary packages from the catalina-deployer.jar.
+        (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
