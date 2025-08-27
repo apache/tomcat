@@ -123,7 +123,7 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
                 if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
                     path = path + '/';
                 }
-                return new FileResource(root, path, f, readOnly, getManifest(), this, readOnly ? null : path);
+                return new FileResource(root, path, f, readOnly, getManifest(), this, readOnly ? null : getLockKey(path));
             } finally {
                 if (readLock != null) {
                     readLock.unlock();
