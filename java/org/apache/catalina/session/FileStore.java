@@ -6,7 +6,7 @@
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -201,7 +201,7 @@ public final class FileStore extends StoreBase {
         Lock readLock = sessionLocksById.getLock(id).readLock();
         readLock.lock();
         try (FileInputStream fis = new FileInputStream(file.getAbsolutePath());
-                ObjectInputStream ois = getObjectInputStream(fis)) {
+             ObjectInputStream ois = getObjectInputStream(fis)) {
             if (!file.exists()) {
                 return null;
             }
@@ -261,7 +261,7 @@ public final class FileStore extends StoreBase {
         writeLock.lock();
         try {
             try (FileOutputStream fos = new FileOutputStream(file.getAbsolutePath());
-                    ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
+                 ObjectOutputStream oos = new ObjectOutputStream(new BufferedOutputStream(fos))) {
                 ((StandardSession) session).writeObjectData(oos);
             }
         } finally {
