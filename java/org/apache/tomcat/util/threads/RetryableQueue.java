@@ -25,25 +25,22 @@ public interface RetryableQueue<T> extends BlockingQueue<T> {
     /**
      * Used to add a task to the queue if the task has been rejected by the Executor.
      *
-     * @param o         The task to add to the queue
+     * @param o The task to add to the queue
      *
-     * @return          {@code true} if the task was added to the queue,
-     *                      otherwise {@code false}
+     * @return {@code true} if the task was added to the queue, otherwise {@code false}
      */
     boolean force(T o);
 
     /**
      * Used to add a task to the queue if the task has been rejected by the Executor.
      *
-     * @param o         The task to add to the queue
-     * @param timeout   The timeout to use when adding the task
-     * @param unit      The units in which the timeout is expressed
+     * @param o       The task to add to the queue
+     * @param timeout The timeout to use when adding the task
+     * @param unit    The units in which the timeout is expressed
      *
-     * @return          {@code true} if the task was added to the queue,
-     *                      otherwise {@code false}
+     * @return {@code true} if the task was added to the queue, otherwise {@code false}
      *
-     * @throws InterruptedException If the call is interrupted before the
-     *                              timeout expires
+     * @throws InterruptedException If the call is interrupted before the timeout expires
      *
      * @deprecated Unused. Will be removed in Tomcat 10.1.x.
      */

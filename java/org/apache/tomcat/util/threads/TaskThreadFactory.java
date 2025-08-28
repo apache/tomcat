@@ -25,8 +25,7 @@ import org.apache.tomcat.util.security.PrivilegedSetAccessControlContext;
 import org.apache.tomcat.util.security.PrivilegedSetTccl;
 
 /**
- * Simple task thread factory to use to create threads for an executor
- * implementation.
+ * Simple task thread factory to use to create threads for an executor implementation.
  */
 public class TaskThreadFactory implements ThreadFactory {
 
@@ -54,8 +53,7 @@ public class TaskThreadFactory implements ThreadFactory {
             // Set the context class loader of newly created threads to be the
             // class loader that loaded this factory. This avoids retaining
             // references to web application class loaders and similar.
-            PrivilegedAction<Void> pa = new PrivilegedSetTccl(
-                    t, getClass().getClassLoader());
+            PrivilegedAction<Void> pa = new PrivilegedSetTccl(t, getClass().getClassLoader());
             AccessController.doPrivileged(pa);
 
             // This method may be triggered from an InnocuousThread. Ensure that
