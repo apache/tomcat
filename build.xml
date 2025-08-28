@@ -915,6 +915,8 @@
         <!-- Exclude developer specific local files -->
         <exclude name="build.properties" />
         <exclude name="res/maven/mvn.properties" />
+        <!-- Exclude the default Coverity Scan output directory -->
+        <exclude name="cov-int/**" />
       </fileset>
       <fileset dir="modules/jdbc-pool" >
         <exclude name=".*/**"/>
