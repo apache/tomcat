@@ -119,6 +119,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Ensure keys are handed out to OpenSSL even if <code>PEMFile</code>
+        fails to process it, with appropriate logging. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name = "Other">
     <changelog>
       <scode>
