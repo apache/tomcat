@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net.openssl.panama;
 
 import java.io.IOException;
+import java.security.KeyException;
 import java.security.KeyStoreException;
 import java.util.List;
 import java.util.Set;
@@ -85,7 +86,7 @@ public class OpenSSLUtil extends SSLUtilBase {
                 log.info(msg);
             }
             return null;
-        } catch (KeyStoreException | IOException e) {
+        } catch (KeyStoreException | KeyException | IOException e) {
             // Depending on what is presented, JSSE may also throw
             // KeyStoreException or IOException if it doesn't understand the
             // provided file.
