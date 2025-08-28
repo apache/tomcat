@@ -45,6 +45,8 @@ jobs:
           - os: windows-latest
             java: 24
           - os: macos-latest
+            java: 24
+          - os: macos-latest
             java: 25-ea
     name: JDK${{ matrix.java }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -77,4 +79,3 @@ jobs:
           hs_err_*.log
           output/build/logs/TEST*.txt
         retention-days: 7
-
