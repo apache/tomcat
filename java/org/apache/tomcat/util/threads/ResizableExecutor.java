@@ -30,8 +30,7 @@ public interface ResizableExecutor extends Executor {
     int getMaxThreads();
 
     /**
-     * Returns the approximate number of threads that are actively executing
-     * tasks.
+     * Returns the approximate number of threads that are actively executing tasks.
      *
      * @return the number of threads
      */
