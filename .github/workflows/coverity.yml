@@ -2,9 +2,11 @@
 name: Coverity Scan
 
 # Allow on demand builds
-# TODO: Once working, enable automated daily builds
+# Run weekly on a Sunday at ~0600 UTC
 on:
-  workflow_dispatch
+  workflow_dispatch:
+  schedule:
+    - cron: 53 5 * * 0
 
 jobs:
   coverity:
