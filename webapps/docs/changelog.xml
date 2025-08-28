@@ -137,6 +137,9 @@
       <add>
         Add escaping to log formatters to align with JSON formatter. (markt)
       </add>
+      <update>
+        Update Checkstyle to 11.0.0. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
