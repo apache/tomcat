@@ -208,6 +208,10 @@
         <bug>69762</bug>: Additional overflow fix for HPACK decoding of
         integers. Pull request <pr>880</pr> by Chenjp. (markt)
       </fix>
+      <fix>
+        Ensure keys are handed out to OpenSSL even if <code>PEMFile</code>
+        fails to process it, with appropriate logging. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
