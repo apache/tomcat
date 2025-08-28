@@ -332,17 +332,18 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     /**
      * The main pool control state, ctl, is an atomic integer packing
-     * two conceptual fields
-     *   workerCount, indicating the effective number of threads
-     *   runState,    indicating whether running, shutting down etc
-     *
+     * two conceptual fields:
+     * <ul>
+     *   <li>workerCount, indicating the effective number of threads</li>
+     *   <li>runState,    indicating whether running, shutting down etc</li>
+     * </ul>
      * In order to pack them into one int, we limit workerCount to
      * (2^29)-1 (about 500 million) threads rather than (2^31)-1 (2
      * billion) otherwise representable. If this is ever an issue in
      * the future, the variable can be changed to be an AtomicLong,
      * and the shift/mask constants below adjusted. But until the need
      * arises, this code is a bit faster and simpler using an int.
-     *
+     * <p>
      * The workerCount is the number of workers that have been
      * permitted to start and not permitted to stop.  The value may be
      * transiently different from the actual number of live threads,
@@ -350,36 +351,36 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * asked, and when exiting threads are still performing
      * bookkeeping before terminating. The user-visible pool size is
      * reported as the current size of the workers set.
-     *
+     * <p>
      * The runState provides the main lifecycle control, taking on values:
-     *
-     *   RUNNING:  Accept new tasks and process queued tasks
-     *   SHUTDOWN: Don't accept new tasks, but process queued tasks
-     *   STOP:     Don't accept new tasks, don't process queued tasks,
-     *             and interrupt in-progress tasks
-     *   TIDYING:  All tasks have terminated, workerCount is zero,
+     * <ul>
+     *   <li>RUNNING:  Accept new tasks and process queued tasks</li>
+     *   <li>SHUTDOWN: Don't accept new tasks, but process queued tasks</li>
+     *   <li>STOP:     Don't accept new tasks, don't process queued tasks,
+     *             and interrupt in-progress tasks</li>
+     *   <li>TIDYING:  All tasks have terminated, workerCount is zero,
      *             the thread transitioning to state TIDYING
-     *             will run the terminated() hook method
-     *   TERMINATED: terminated() has completed
-     *
+     *             will run the terminated() hook method</li>
+     *   <li>TERMINATED: terminated() has completed</li>
+     * </ul>
      * The numerical order among these values matters, to allow
      * ordered comparisons. The runState monotonically increases over
      * time, but need not hit each state. The transitions are:
-     *
-     * RUNNING -> SHUTDOWN
-     *    On invocation of shutdown()
-     * (RUNNING or SHUTDOWN) -> STOP
-     *    On invocation of shutdownNow()
-     * SHUTDOWN -> TIDYING
-     *    When both queue and pool are empty
-     * STOP -> TIDYING
-     *    When pool is empty
-     * TIDYING -> TERMINATED
-     *    When the terminated() hook method has completed
-     *
+     * <ul>
+     * <li>RUNNING -> SHUTDOWN
+     *    On invocation of shutdown()</li>
+     * <li>(RUNNING or SHUTDOWN) -> STOP
+     *    On invocation of shutdownNow()</li>
+     * <li>SHUTDOWN -> TIDYING
+     *    When both queue and pool are empty</li>
+     * <li>STOP -> TIDYING
+     *    When pool is empty</li>
+     * <li>TIDYING -> TERMINATED
+     *    When the terminated() hook method has completed</li>
+     * </ul>
      * Threads waiting in awaitTermination() will return when the
      * state reaches TERMINATED.
-     *
+     * <p>
      * Detecting the transition from SHUTDOWN to TIDYING is less
      * straightforward than you'd like because the queue may become
      * empty after non-empty and vice versa during SHUTDOWN state, but
@@ -529,7 +530,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * treated as an error, failure to create threads may result in
      * new tasks being rejected or existing ones remaining stuck in
      * the queue.
-     *
+     * <p>
      * We go further and preserve pool invariants even in the face of
      * errors such as OutOfMemoryError, that might be thrown while
      * trying to create threads.  Such errors are rather common due to
@@ -564,7 +565,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * Core pool size is the minimum number of workers to keep alive
      * (and not allow to time out etc) unless allowCoreThreadTimeOut
      * is set, in which case the minimum is zero.
-     *
+     * <p>
      * Since the worker count is actually stored in COUNT_BITS bits,
      * the effective limit is {@code corePoolSize & COUNT_MASK}.
      */
@@ -572,7 +573,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     /**
      * Maximum pool size.
-     *
+     * <p>
      * Since the worker count is actually stored in COUNT_BITS bits,
      * the effective limit is {@code maximumPoolSize & COUNT_MASK}.
      */
@@ -994,10 +995,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
 
     /**
      * Rolls back the worker thread creation.
-     * - removes worker from workers, if present
-     * - decrements worker count
-     * - rechecks for termination, in case the existence of this
-     *   worker was holding up termination
+     * <ul>
+     * <li>removes worker from workers, if present</li>
+     * <li>decrements worker count</li>
+     * <li>rechecks for termination, in case the existence of this
+     *   worker was holding up termination</li>
+     * </ul>
      */
     private void addWorkerFailed(Worker w) {
         final ReentrantLock mainLock = this.mainLock;
@@ -1068,16 +1071,17 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * Performs blocking or timed wait for a task, depending on
      * current configuration settings, or returns null if this worker
      * must exit because of any of:
-     * 1. There are more than maximumPoolSize workers (due to
-     *    a call to setMaximumPoolSize).
-     * 2. The pool is stopped.
-     * 3. The pool is shutdown and the queue is empty.
-     * 4. This worker timed out waiting for a task, and timed-out
+     * <ol>
+     * <li>There are more than maximumPoolSize workers (due to
+     *    a call to setMaximumPoolSize).</li>
+     * <li>The pool is stopped.</li>
+     * <li>The pool is shutdown and the queue is empty.</li>
+     * <li>This worker timed out waiting for a task, and timed-out
      *    workers are subject to termination (that is,
      *    {@code allowCoreThreadTimeOut || workerCount > corePoolSize})
      *    both before and after the timed wait, and if the queue is
-     *    non-empty, this worker is not the last thread in the pool.
-     *
+     *    non-empty, this worker is not the last thread in the pool.</li>
+     * </ol>
      * @return task, or null if the worker must exit, in which case
      *         workerCount is decremented
      */
@@ -1124,7 +1128,7 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
     /**
      * Main worker run loop.  Repeatedly gets tasks from queue and
      * executes them, while coping with a number of issues:
-     *
+     * <p>
      * 1. We may start out with an initial task, in which case we
      * don't need to get the first one. Otherwise, as long as pool is
      * running, we get tasks from getTask. If it returns null then the
@@ -1132,17 +1136,17 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * parameters.  Other exits result from exception throws in
      * external code, in which case completedAbruptly holds, which
      * usually leads processWorkerExit to replace this thread.
-     *
+     * <p>
      * 2. Before running any task, the lock is acquired to prevent
      * other pool interrupts while the task is executing, and then we
      * ensure that unless pool is stopping, this thread does not have
      * its interrupt set.
-     *
+     * <p>
      * 3. Each task run is preceded by a call to beforeExecute, which
      * might throw an exception, in which case we cause thread to die
      * (breaking loop with completedAbruptly true) without processing
      * the task.
-     *
+     * <p>
      * 4. Assuming beforeExecute completes normally, we run the task,
      * gathering any of its thrown exceptions to send to afterExecute.
      * We separately handle RuntimeException, Error (both of which the
@@ -1151,12 +1155,12 @@ public class ThreadPoolExecutor extends AbstractExecutorService {
      * wrap them within Errors on the way out (to the thread's
      * UncaughtExceptionHandler).  Any thrown exception also
      * conservatively causes thread to die.
-     *
+     * <p>
      * 5. After task.run completes, we call afterExecute, which may
      * also throw an exception, which will also cause thread to
      * die. According to JLS Sec 14.20, this exception is the one that
      * will be in effect even if task.run throws.
-     *
+     * <p>
      * The net effect of the exception mechanics is that afterExecute
      * and the thread's UncaughtExceptionHandler have as accurate
      * information as we can provide about any problems encountered by
