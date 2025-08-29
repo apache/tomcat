@@ -33,7 +33,7 @@ import org.apache.catalina.filters.TesterHttpServletResponse;
 public class TesterHttpServletPerformance {
 
     @Test
-    public void testDoOptions() throws IOException, ServletException{
+    public void testDoOptions() throws IOException, ServletException {
         TesterServlet testerServlet = new TesterServlet();
         TesterRequest testerRequest = new TesterRequest(false);
         TesterHttpServletResponse testerResponse = new TesterHttpServletResponse();

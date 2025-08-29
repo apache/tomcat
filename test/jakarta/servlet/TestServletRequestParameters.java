@@ -74,7 +74,7 @@ public class TestServletRequestParameters extends ServletRequestParametersBaseTe
         }
 
         // Connection should be closed by the server.
-        //readLine() will receive an EOF reading the status line resulting in a null
+        // readLine() will receive an EOF reading the status line resulting in a null
         Assert.assertNull(client.getResponseLine());
     }
 }
