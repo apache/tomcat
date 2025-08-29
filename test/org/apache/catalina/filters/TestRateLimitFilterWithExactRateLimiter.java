@@ -191,7 +191,7 @@ public class TestRateLimitFilterWithExactRateLimiter extends TomcatBaseTest {
                      * complete. Do comparisons in milliseconds.
                      */
                     long expectedDuration = (i + 1) * timePerRequest;
-                    long duration = (System.nanoTime() - start)/1000000;
+                    long duration = (System.nanoTime() - start) / 1000000;
                     if (expectedDuration > duration) {
                         sleep(expectedDuration - duration);
                     }

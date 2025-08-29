@@ -366,11 +366,11 @@ public class TesterHttpServletResponse implements HttpServletResponse {
         /* NOOP */}
 
     @Override
-    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+    public void setTrailerFields(Supplier<Map<String,String>> supplier) {
         /* NOOP */ }
 
     @Override
-    public Supplier<Map<String, String>> getTrailerFields() {
+    public Supplier<Map<String,String>> getTrailerFields() {
         return null;
     }
 }

@@ -45,17 +45,17 @@ import org.apache.catalina.util.URLEncoder;
 
 public class TestManagerWebapp extends TomcatBaseTest {
 
-    public static final String CONFIG = "<?xml version=\"1.0\" ?>"
-            + "<tomcat-users xmlns=\"http://tomcat.apache.org/xml\""
-            + " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
-            + " xsi:schemaLocation=\"http://tomcat.apache.org/xml/tomcat-users.xsd\""
-            + " version=\"1.0\">"
-            + "<role rolename=\"admin\" />"
-            + "<user username=\"admin\" password=\"sekr3t\" roles=\"manager-gui,manager-script,manager-jmx,manager-status,admin-gui,admin-script\" />"
-            + "</tomcat-users>";
+    public static final String CONFIG = "<?xml version=\"1.0\" ?>" +
+            "<tomcat-users xmlns=\"http://tomcat.apache.org/xml\"" +
+            " xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" +
+            " xsi:schemaLocation=\"http://tomcat.apache.org/xml/tomcat-users.xsd\"" + " version=\"1.0\">" +
+            "<role rolename=\"admin\" />" +
+            "<user username=\"admin\" password=\"sekr3t\" roles=\"manager-gui,manager-script,manager-jmx,manager-status,admin-gui,admin-script\" />" +
+            "</tomcat-users>";
 
     /**
      * Integration test for the manager webapp (verify all main Servlets are working).
+     *
      * @throws Exception if an error occurs
      */
     @Test
@@ -277,7 +277,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
             // 10s default too low for some CI systems
             @Override
             public void connect() throws UnknownHostException, IOException {
-                connect(30000,30000);
+                connect(30000, 30000);
             }
 
             @Override
@@ -398,8 +398,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertTrue(serverXml.canRead());
         addDeleteOnTearDown(serverXml);
         String serverXmlDump = "";
-        try (FileReader reader = new FileReader(serverXml);
-                StringWriter writer = new StringWriter()) {
+        try (FileReader reader = new FileReader(serverXml); StringWriter writer = new StringWriter()) {
             IOTools.flow(reader, writer);
             serverXmlDump = writer.toString();
         }
