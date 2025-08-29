@@ -240,9 +240,6 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
      * Repeatedly access the protected resource after the client has
      * successfully logged-in to the webapp. The current session attributes
      * will be used and cannot be changed.
-     *  3. after successful login, follow the redirect to the original page
-     *  4. repeatedly access the protected resource to demonstrate
-     *     persistence of the authenticated session
      *
      * @param resourceMethod HTTP method for accessing the protected resource
      * @param protectedUri to access (with or without sessionid)
@@ -308,6 +305,7 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
          *   1. fully qualified uri.
          *   2. minimal uri without webapp path.
          *   3. null - use the default protected resource
+         *
          * Cookies are sent if available and supported by the test. Otherwise, the
          * caller is expected to have provided a session id as a path parameter.
          */
