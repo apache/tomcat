@@ -95,11 +95,14 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
 
         OptionsHttpClient client = new OptionsHttpClient();
         client.setPort(getPort());
+        // @formatter:off
         client.setRequest(new String[] {
                 "OPTIONS /webdav/" + url + " HTTP/1.1" + CRLF +
                 "Host: localhost:" + getPort() + CRLF +
                 "Connection: close" + CRLF +
-                CRLF });
+                CRLF
+                });
+        // @formatter:on
 
         client.connect();
         client.processRequest();
@@ -110,11 +113,14 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
         client.disconnect();
         client.reset();
 
+        // @formatter:off
         client.setRequest(new String[] {
                 method + " /webdav/" + url + " HTTP/1.1" + CRLF +
                 "Host: localhost:" + getPort() + CRLF +
                 "Connection: close" + CRLF +
-                CRLF });
+                CRLF
+                });
+        // @formatter:on
 
         client.connect();
         client.processRequest();

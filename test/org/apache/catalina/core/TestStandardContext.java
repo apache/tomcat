@@ -52,6 +52,7 @@ import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.ContainerEvent;
 import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
@@ -79,11 +80,13 @@ import org.apache.tomcat.util.descriptor.web.LoginConfig;
 
 public class TestStandardContext extends TomcatBaseTest {
 
+    // @formatter:off
     private static final String REQUEST =
-        "GET / HTTP/1.1\r\n" +
-        "Host: anything\r\n" +
-        "Connection: close\r\n" +
-        "\r\n";
+        "GET / HTTP/1.1" + CRLF +
+        "Host: anything" + CRLF +
+        "Connection: close" + CRLF +
+        CRLF;
+    // @formatter:on
 
     @Test
     public void testBug46243() throws Exception {

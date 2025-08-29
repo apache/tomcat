@@ -72,6 +72,7 @@ public class TestServletRequestParametersMultipartEncoded extends ServletRequest
         TestParameterClient client = new TestParameterClient();
         client.setPort(getPort());
         if (chunked) {
+            // @formatter:off
             client.setRequest(new String[] {
                     "POST / HTTP/1.1" + CRLF +
                     "Host: localhost:" + getPort() + CRLF +
@@ -100,8 +101,11 @@ public class TestServletRequestParametersMultipartEncoded extends ServletRequest
                     "0a" + CRLF +
                     "--AaBbCc--" + CRLF +
                     "0" + CRLF +
-                    CRLF});
+                    CRLF
+                    });
+            // @formatter:on
         } else {
+            // @formatter:off
             client.setRequest(new String[] {
                     "POST / HTTP/1.1" + CRLF +
                     "Host: localhost:" + getPort() + CRLF +
@@ -121,7 +125,9 @@ public class TestServletRequestParametersMultipartEncoded extends ServletRequest
                     "Content-Disposition: form-data; name=\"var3\"" + CRLF +
                     CRLF +
                     "val3" + CRLF +
-                    "--AaBbCc--"});
+                    "--AaBbCc--"
+                    });
+            // @formatter:on
         }
         client.setResponseBodyEncoding(StandardCharsets.UTF_8);
         client.connect();

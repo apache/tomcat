@@ -82,10 +82,14 @@ public class TestStatusTransformer extends TomcatBaseTest {
             }
         };
         client.setPort(getPort());
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
 
@@ -95,10 +99,14 @@ public class TestStatusTransformer extends TomcatBaseTest {
             case JSON -> requestline = "GET /status/all?JSON=true HTTP/1.1";
             default -> requestline = "GET /status/all HTTP/1.1";
         }
+        // @formatter:off
         client.setRequest(new String[] {
                 requestline + CRLF +
                 "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         String body = client.getResponseBody();

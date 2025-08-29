@@ -58,6 +58,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
+        // @formatter:off
         parameterSets.add(new Object[] { "GET /00 HTTP/1.1",
                                          "Host: lÿ#" + CRLF,
                                          "400" } );
@@ -94,7 +95,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
                                          "Host: localhost" + CRLF +
                                          COOKIE_250,
                                          "400" } );
-
+        // @formatter:on
         return parameterSets;
     }
 

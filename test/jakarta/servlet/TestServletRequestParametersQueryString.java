@@ -94,11 +94,14 @@ public class TestServletRequestParametersQueryString extends ServletRequestParam
 
         TestParameterClient client = new TestParameterClient();
         client.setPort(getPort());
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /?" + queryString +" HTTP/1.1" + CRLF +
                 "Host: localhost:" + getPort() + CRLF +
                 "Connection: close" + CRLF +
-                CRLF });
+                CRLF
+                });
+        // @formatter:on
         client.setResponseBodyEncoding(StandardCharsets.UTF_8);
         client.connect();
         client.processRequest();
