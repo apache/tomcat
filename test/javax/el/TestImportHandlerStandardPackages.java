@@ -43,9 +43,9 @@ public class TestImportHandlerStandardPackages {
         Object obj = f.get(null);
 
         @SuppressWarnings("unchecked")
-        Map<String, Set<String>> standardPackageName = (Map<String, Set<String>>) obj;
+        Map<String,Set<String>> standardPackageName = (Map<String,Set<String>>) obj;
 
-        for (Map.Entry<String, Set<String>> entry : standardPackageName.entrySet()) {
+        for (Map.Entry<String,Set<String>> entry : standardPackageName.entrySet()) {
             checkPackageClassList(entry.getKey(), entry.getValue());
         }
     }
