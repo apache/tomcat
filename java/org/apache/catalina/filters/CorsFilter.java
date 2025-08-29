@@ -548,7 +548,7 @@ public class CorsFilter extends GenericFilter {
         if (originHeader.isEmpty() || !RequestUtil.isValidOrigin(originHeader)) {
             return CORSRequestType.INVALID_CORS;
         }
-        if(RequestUtil.isSameOrigin(request, originHeader)) {
+        if (RequestUtil.isSameOrigin(request, originHeader)) {
             return CORSRequestType.NOT_CORS;
         }
         String method = request.getMethod();
@@ -557,7 +557,8 @@ public class CorsFilter extends GenericFilter {
         }
         switch (method) {
             case "OPTIONS":
-                String accessControlRequestMethodHeader = request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+                String accessControlRequestMethodHeader =
+                        request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
                 if (accessControlRequestMethodHeader != null) {
                     if (accessControlRequestMethodHeader.isEmpty()) {
                         return CORSRequestType.INVALID_CORS;

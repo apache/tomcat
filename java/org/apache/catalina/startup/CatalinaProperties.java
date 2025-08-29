@@ -102,7 +102,7 @@ public class CatalinaProperties {
                 properties.load(is);
             } catch (Throwable t) {
                 handleThrowable(t);
-                log.warn(t.getMessage(),t);
+                log.warn(t.getMessage(), t);
             } finally {
                 try {
                     is.close();

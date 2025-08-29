@@ -79,7 +79,7 @@ public class QuotedStringTokenizer {
                     break;
                 default:
                     throw new IllegalStateException(sm.getString("quotedStringTokenizer.tokenizeError", inputText,
-                        Integer.valueOf(pos), currentMode));
+                            Integer.valueOf(pos), currentMode));
             }
             pos++;
         }

@@ -50,10 +50,9 @@ import org.apache.tomcat.InstanceManager;
 import org.apache.tomcat.Jar;
 
 /**
- * The Jasper JSP engine. The servlet container is responsible for providing a URLClassLoader for the web
- * application context Jasper is being used in. Jasper will try to get the Tomcat ServletContext attribute for its
- * ServletContext class loader, if that fails, it uses the parent class loader. In either case, it must be a
- * URLClassLoader.
+ * The Jasper JSP engine. The servlet container is responsible for providing a URLClassLoader for the web application
+ * context Jasper is being used in. Jasper will try to get the Tomcat ServletContext attribute for its ServletContext
+ * class loader, if that fails, it uses the parent class loader. In either case, it must be a URLClassLoader.
  *
  * @author Anil K. Vijendran
  * @author Harish Prabandham
@@ -524,7 +523,8 @@ public class JspServletWrapper {
      * Attempts to construct a JasperException that contains helpful information about what went wrong. Uses the JSP
      * compiler system to translate the line number in the generated servlet that originated the exception to a line
      * number in the JSP. Then constructs an exception containing that information, and a snippet of the JSP to help
-     * debugging. Please see <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=37062">BZ 37062</a> for more details.
+     * debugging. Please see <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=37062">BZ 37062</a> for more
+     * details.
      * </p>
      *
      * @param ex the exception that was the cause of the problem.

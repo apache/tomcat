@@ -66,23 +66,15 @@ class Validator {
 
         private final ErrorDispatcher err;
 
-        private static final JspUtil.ValidAttribute[] pageDirectiveAttrs = {
-            new JspUtil.ValidAttribute("language"),
-            new JspUtil.ValidAttribute("extends"),
-            new JspUtil.ValidAttribute("import"),
-            new JspUtil.ValidAttribute("session"),
-            new JspUtil.ValidAttribute("buffer"),
-            new JspUtil.ValidAttribute("autoFlush"),
-            new JspUtil.ValidAttribute("isThreadSafe"),
-            new JspUtil.ValidAttribute("info"),
-            new JspUtil.ValidAttribute("errorPage"),
-            new JspUtil.ValidAttribute("isErrorPage"),
-            new JspUtil.ValidAttribute("contentType"),
-            new JspUtil.ValidAttribute("pageEncoding"),
-            new JspUtil.ValidAttribute("isELIgnored"),
-            new JspUtil.ValidAttribute("deferredSyntaxAllowedAsLiteral"),
-            new JspUtil.ValidAttribute("trimDirectiveWhitespaces")
-        };
+        private static final JspUtil.ValidAttribute[] pageDirectiveAttrs = { new JspUtil.ValidAttribute("language"),
+                new JspUtil.ValidAttribute("extends"), new JspUtil.ValidAttribute("import"),
+                new JspUtil.ValidAttribute("session"), new JspUtil.ValidAttribute("buffer"),
+                new JspUtil.ValidAttribute("autoFlush"), new JspUtil.ValidAttribute("isThreadSafe"),
+                new JspUtil.ValidAttribute("info"), new JspUtil.ValidAttribute("errorPage"),
+                new JspUtil.ValidAttribute("isErrorPage"), new JspUtil.ValidAttribute("contentType"),
+                new JspUtil.ValidAttribute("pageEncoding"), new JspUtil.ValidAttribute("isELIgnored"),
+                new JspUtil.ValidAttribute("deferredSyntaxAllowedAsLiteral"),
+                new JspUtil.ValidAttribute("trimDirectiveWhitespaces") };
 
         private boolean pageEncodingSeen = false;
 
@@ -444,8 +436,7 @@ class Validator {
         public void visit(Node.JspRoot n) throws JasperException {
             JspUtil.checkAttributes("Jsp:root", n, jspRootAttrs, err);
             String version = n.getTextAttribute("version");
-            if (!version.equals("1.2") && !version.equals("2.0") &&
-                    !version.equals("2.1") && !version.equals("2.2") &&
+            if (!version.equals("1.2") && !version.equals("2.0") && !version.equals("2.1") && !version.equals("2.2") &&
                     !version.equals("2.3")) {
                 err.jspError(n, "jsp.error.jsproot.version.invalid", version);
             }
@@ -1018,7 +1009,7 @@ class Validator {
                 }
                 for (int j = 0; tldAttrs != null && j < tldAttrs.length; j++) {
                     if (attrs.getLocalName(i).equals(tldAttrs[j].getName()) && (attrs.getURI(i) == null ||
-                        attrs.getURI(i).isEmpty() || attrs.getURI(i).equals(n.getURI()))) {
+                            attrs.getURI(i).isEmpty() || attrs.getURI(i).equals(n.getURI()))) {
 
                         TagAttributeInfo tldAttr = tldAttrs[j];
                         if (tldAttr.canBeRequestTime() || tldAttr.isDeferredMethod() || tldAttr.isDeferredValue()) { // JSP

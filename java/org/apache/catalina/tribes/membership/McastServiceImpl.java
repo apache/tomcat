@@ -372,8 +372,8 @@ public class McastServiceImpl extends MembershipProviderBase {
             }
         } catch (SocketTimeoutException ignore) {
             /*
-             *  Do nothing. This is normal. We don't want to block forever since the receive thread is the same thread
-             *  that does membership expiration.
+             * Do nothing. This is normal. We don't want to block forever since the receive thread is the same thread
+             * that does membership expiration.
              */
         }
         checkExpired();

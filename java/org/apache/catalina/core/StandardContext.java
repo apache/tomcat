@@ -5376,7 +5376,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
                 catalinaHomePath = getCatalinaBase().getCanonicalPath();
                 dir = new File(catalinaHomePath, workDir);
             } catch (IOException ioe) {
-                log.warn(sm.getString("standardContext.workCreateException", workDir, getCatalinaBase(), getName()), ioe);
+                log.warn(sm.getString("standardContext.workCreateException", workDir, getCatalinaBase(), getName()),
+                        ioe);
             }
         }
         if (!dir.mkdirs() && !dir.isDirectory()) {

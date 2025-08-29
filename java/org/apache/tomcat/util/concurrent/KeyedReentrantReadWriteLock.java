@@ -31,8 +31,8 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Provides a reentrant read/write lock for a given key. Any locks obtained from an instance of this class using the
  * same key will use the same underlying reentrant read/write lock as long as at least one lock for that key remains in
- * use. Once no locks are in use for the given key, the lock is eligible for GC and the next lock obtained using that key
- * will use a new underlying reentrant read/write lock.
+ * use. Once no locks are in use for the given key, the lock is eligible for GC and the next lock obtained using that
+ * key will use a new underlying reentrant read/write lock.
  * <p>
  * The class is used when Tomcat needs to manage concurrent access to components identified by a key (e.g. sessions).
  * <p>

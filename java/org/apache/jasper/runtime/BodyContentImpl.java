@@ -30,8 +30,8 @@ import org.apache.jasper.Constants;
 import org.apache.jasper.compiler.Localizer;
 
 /**
- * Write text to a character-output stream, buffering characters to provide efficient writing of single
- * characters, arrays, and strings. Provide support for discarding the output that has been buffered.
+ * Write text to a character-output stream, buffering characters to provide efficient writing of single characters,
+ * arrays, and strings. Provide support for discarding the output that has been buffered.
  *
  * @author Rajiv Mordani
  * @author Jan Luehe

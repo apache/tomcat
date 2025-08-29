@@ -359,7 +359,9 @@ public class FileMessageFactory {
             msg = read.readMessage(msg);
         } // while
         System.out.println("Actually wrote " + cnt + " messages.");
-    }/// main
+    }
+
+    /// main
 
     public File getFile() {
         return file;

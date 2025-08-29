@@ -60,7 +60,7 @@ public class Introspection {
      */
     public static boolean isValidSetter(Method method) {
         return method.getName().startsWith("set") && method.getName().length() > 3 &&
-            method.getParameterTypes().length == 1 && method.getReturnType().getName().equals("void");
+                method.getParameterTypes().length == 1 && method.getReturnType().getName().equals("void");
     }
 
     /**

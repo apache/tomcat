@@ -665,8 +665,8 @@ public class MemoryUserDatabase implements UserDatabase {
 
     @Override
     public String toString() {
-        return "MemoryUserDatabase[id=" + this.id + ",pathname=" + pathname + ",groupCount=" +
-                this.groups.size() + ",roleCount=" + this.roles.size() + ",userCount=" + this.users.size() + ']';
+        return "MemoryUserDatabase[id=" + this.id + ",pathname=" + pathname + ",groupCount=" + this.groups.size() +
+                ",roleCount=" + this.roles.size() + ",userCount=" + this.users.size() + ']';
     }
 }
 

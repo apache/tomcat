@@ -362,8 +362,8 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
      *
      * The SAX does not call this method with all of the template text, but may invoke this method with chunks of it.
      * This is a problem when we try to determine if the text contains only whitespaces, or when we are looking for an
-     * EL expression string. Therefore, it is necessary to buffer and concatenate the chunks and process the concatenated
-     * text later (at beginTag and endTag)
+     * EL expression string. Therefore, it is necessary to buffer and concatenate the chunks and process the
+     * concatenated text later (at beginTag and endTag)
      *
      * @param buf The characters
      *

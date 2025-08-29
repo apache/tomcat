@@ -217,10 +217,10 @@ public class ParameterLimitValve extends ValveBase {
                 Pattern pattern = Pattern.compile(UDecoder.URLDecode(patternString, StandardCharsets.UTF_8));
                 String[] limits = limitsString.split(",");
                 if (limits.length == 1) {
-                    urlPatternLimits.put(pattern, new Integer[] { Integer.valueOf(limits[0]), null, null});
+                    urlPatternLimits.put(pattern, new Integer[] { Integer.valueOf(limits[0]), null, null });
                 } else if (limits.length == 3) {
-                    urlPatternLimits.put(pattern, new Integer[] {
-                            Integer.valueOf(limits[0]), Integer.valueOf(limits[1]), Integer.valueOf(limits[2])});
+                    urlPatternLimits.put(pattern, new Integer[] { Integer.valueOf(limits[0]),
+                            Integer.valueOf(limits[1]), Integer.valueOf(limits[2]) });
                 } else {
                     throw new IllegalArgumentException(
                             sm.getString("parameterLimitValve.invalidLimitsString", limitsString));

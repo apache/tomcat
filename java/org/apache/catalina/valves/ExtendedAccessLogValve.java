@@ -42,8 +42,8 @@ import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * An implementation of the W3c Extended Log File Format. See
- * <a href="http://www.w3.org/TR/WD-logfile.html">WD-logfile-960323</a>
- * for more information about the format. The following fields are supported:
+ * <a href="http://www.w3.org/TR/WD-logfile.html">WD-logfile-960323</a> for more information about the format. The
+ * following fields are supported:
  * <ul>
  * <li><code>c-dns</code>: Client hostname (or ip address if <code>enableLookups</code> for the connector is false)</li>
  * <li><code>c-ip</code>: Client ip address</li>
@@ -96,7 +96,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
      * toString() fails, '-' will be written to the buffer.
      *
      * @param value - The value to wrap
-     * @param buf the buffer to write to
+     * @param buf   the buffer to write to
      */
     static void wrap(Object value, CharArrayWriter buf) {
         String svalue;

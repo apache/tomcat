@@ -182,9 +182,9 @@ public abstract class TimeBucketCounterBase {
      */
     public void periodicEvict() {
         /*
-         * The implementation of this method assumes that the time taken for eviction is less than 1 bucket duration.
-         * It is possible that the eviction process starts in one bucket but finishes in another. Therefore, keys for
-         * the current bucket and the next bucket when the eviction process starts are excluded from eviction.
+         * The implementation of this method assumes that the time taken for eviction is less than 1 bucket duration. It
+         * is possible that the eviction process starts in one bucket but finishes in another. Therefore, keys for the
+         * current bucket and the next bucket when the eviction process starts are excluded from eviction.
          */
         long currentBucketIndex = getCurrentBucketPrefix();
         String currentBucketPrefix = String.valueOf(currentBucketIndex);

@@ -43,7 +43,7 @@ public class JavaCompiler extends Compiler {
     private final Log log = LogFactory.getLog(JavaCompiler.class); // must not be static
 
     @Override
-    protected void generateClass(Map<String, SmapStratum> smaps) throws JasperException, IOException {
+    protected void generateClass(Map<String,SmapStratum> smaps) throws JasperException, IOException {
 
         long t1 = 0;
         if (log.isDebugEnabled()) {
@@ -52,8 +52,8 @@ public class JavaCompiler extends Compiler {
 
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        StandardJavaFileManager fileManager =
-                compiler.getStandardFileManager(diagnostics, null, Charset.forName(ctxt.getOptions().getJavaEncoding()));
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null,
+                Charset.forName(ctxt.getOptions().getJavaEncoding()));
         List<File> compilationUnitsList = new ArrayList<>(1);
         compilationUnitsList.add(new File(ctxt.getServletJavaFileName()));
         Iterable<? extends JavaFileObject> compilationUnits =
