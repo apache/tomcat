@@ -41,6 +41,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.TestCoyoteAdapter;
@@ -110,9 +111,12 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
         Client client = new Client();
         client.setPort(getPort());
-        client.setRequest(new String[] { "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
-                                         "Host: localhost:" + SimpleHttpClient.CRLF +
-                                         SimpleHttpClient.CRLF});
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET / HTTP/1.1" + CRLF +
+                "Host: localhost:" + CRLF +
+                CRLF});
+        // @formatter:on
         client.connect();
         client.sendRequest();
 

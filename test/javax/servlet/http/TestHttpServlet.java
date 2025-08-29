@@ -32,6 +32,7 @@ import javax.servlet.WriteListener;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
@@ -280,15 +281,15 @@ public class TestHttpServlet extends TomcatBaseTest {
             request.append(" HTTP/");
             request.append(httpVersion);
         }
-        request.append(SimpleHttpClient.CRLF);
+        request.append(CRLF);
 
         request.append("Host: localhost:8080");
-        request.append(SimpleHttpClient.CRLF);
+        request.append(CRLF);
 
         request.append("Connection: close");
-        request.append(SimpleHttpClient.CRLF);
+        request.append(CRLF);
 
-        request.append(SimpleHttpClient.CRLF);
+        request.append(CRLF);
 
         Client client = new Client(request.toString(), "0.9".equals(httpVersion));
 
@@ -320,14 +321,17 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         TraceClient client = new TraceClient();
         client.setPort(getPort());
+        // @formatter:off
         client.setRequest(new String[] {
-                "TRACE / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                "X-aaa: a1, a2" + SimpleHttpClient.CRLF +
-                "X-aaa: a3" + SimpleHttpClient.CRLF +
-                "Cookie: c1-v1" + SimpleHttpClient.CRLF +
-                "Authorization: not-a-real-credential" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF});
+                "TRACE / HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "X-aaa: a1, a2" + CRLF +
+                "X-aaa: a3" + CRLF +
+                "Cookie: c1-v1" + CRLF +
+                "Authorization: not-a-real-credential" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.setUseContentLength(true);
 
         client.connect();

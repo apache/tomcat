@@ -122,31 +122,43 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
         client.setPort(connector.getLocalPort());
         String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sslConnectorCiphers HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains(" -"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sslConnectorCerts HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("Subject: CN=localhost"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sslConnectorTrustedCerts HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
@@ -154,28 +166,34 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().getProtocolHandlerClassName().contains("Apr")
                 || client.getResponseBody().contains("Subject: CN=Apache Tomcat Test CA"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sslReload HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains(" -"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sslConnectorCerts HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("Subject: CN=localhost"));
 
         Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
-
     }
-
 }

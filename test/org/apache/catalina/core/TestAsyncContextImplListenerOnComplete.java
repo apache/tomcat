@@ -38,9 +38,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
-import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 
@@ -97,8 +97,12 @@ public class TestAsyncContextImplListenerOnComplete extends TomcatBaseTest {
             socket.connect(new InetSocketAddress("localhost", port));
 
             try (Writer writer = new OutputStreamWriter(socket.getOutputStream())) {
-                writer.write("GET /repro" + SimpleHttpClient.CRLF + "Accept: text/event-stream" +
-                        SimpleHttpClient.CRLF + SimpleHttpClient.CRLF);
+                // @formatter:off
+                writer.write(
+                        "GET /repro" + CRLF +
+                        "Accept: text/event-stream" + CRLF +
+                        CRLF);
+                // @formatter:on
                 writer.flush();
             }
             Thread.sleep(1_000);

@@ -297,13 +297,17 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
                 String content = new String(sb.toString().getBytes("UTF-8"),
                         "ASCII");
 
-                request = new String[] { "POST http://localhost:" + getPort() + URI + " HTTP/1.1" + CRLF
+                // @formatter:off
+                request = new String[] {
+                        "POST http://localhost:" + getPort() + URI + " HTTP/1.1" + CRLF
                         + "Host: localhost:" + getPort() + CRLF
                         + "Connection: close" + CRLF
                         + "Content-Type: multipart/form-data; boundary=" + boundary + CRLF
                         + "Content-Length: " + content.length() + CRLF
                         + CRLF
-                        + content + CRLF };
+                        + content + CRLF
+                        };
+                // @formatter:on
 
                 setRequest(request);
                 processRequest(); // blocks until response has been read
@@ -390,12 +394,15 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
                 String content = new String(body);
 
-                request = new String[] { "POST http://localhost:" + getPort() + URI + " HTTP/1.1" + CRLF
+                // @formatter:off
+                request = new String[] {
+                        "POST http://localhost:" + getPort() + URI + " HTTP/1.1" + CRLF
                         + "Host: localhost:" + getPort() + CRLF
                         + "Connection: close" + CRLF
                         + "Content-Length: " + content.length() + CRLF
                         + CRLF
                         + content + CRLF };
+                // @formatter:on
 
                 setRequest(request);
                 processRequest(); // blocks until response has been read
