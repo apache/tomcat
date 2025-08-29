@@ -66,10 +66,10 @@ public abstract class Authenticator {
      *
      * @return a map of authentication parameter names and values
      */
-    public Map<String, String> parseAuthenticateHeader(String authenticateHeader) {
+    public Map<String,String> parseAuthenticateHeader(String authenticateHeader) {
 
         Matcher m = pattern.matcher(authenticateHeader);
-        Map<String, String> parameterMap = new HashMap<>();
+        Map<String,String> parameterMap = new HashMap<>();
 
         while (m.find()) {
             String key = m.group(1);
