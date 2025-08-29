@@ -63,7 +63,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
     private List<Extension> negotiatedExtensions;
     private String subProtocol;
     private Transformation transformation;
-    private Map<String, String> pathParameters;
+    private Map<String,String> pathParameters;
     private boolean secure;
     private WebConnection connection;
 
@@ -85,7 +85,7 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
 
     public void preInit(ServerEndpointConfig serverEndpointConfig, WsServerContainer wsc,
             WsHandshakeRequest handshakeRequest, List<Extension> negotiatedExtensionsPhase2, String subProtocol,
-            Transformation transformation, Map<String, String> pathParameters, boolean secure) {
+            Transformation transformation, Map<String,String> pathParameters, boolean secure) {
         this.serverEndpointConfig = serverEndpointConfig;
         this.webSocketContainer = wsc;
         this.handshakeRequest = handshakeRequest;
@@ -117,8 +117,8 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
         ClassLoader cl = t.getContextClassLoader();
         t.setContextClassLoader(applicationClassLoader);
         try {
-            wsRemoteEndpointServer = new WsRemoteEndpointImplServer(socketWrapper, upgradeInfo, webSocketContainer,
-                    connection);
+            wsRemoteEndpointServer =
+                    new WsRemoteEndpointImplServer(socketWrapper, upgradeInfo, webSocketContainer, connection);
             wsSession = new WsSession(wsRemoteEndpointServer, webSocketContainer, handshakeRequest.getRequestURI(),
                     handshakeRequest.getParameterMap(), handshakeRequest.getQueryString(),
                     handshakeRequest.getUserPrincipal(), httpSessionId, negotiatedExtensions, subProtocol,
@@ -162,8 +162,8 @@ public class WsHttpUpgradeHandler implements InternalHttpUpgradeHandler {
                 wsRemoteEndpointServer.onWritePossible(false);
                 break;
             case STOP:
-                CloseReason cr = new CloseReason(CloseCodes.GOING_AWAY,
-                        sm.getString("wsHttpUpgradeHandler.serverStop"));
+                CloseReason cr =
+                        new CloseReason(CloseCodes.GOING_AWAY, sm.getString("wsHttpUpgradeHandler.serverStop"));
                 try {
                     wsSession.close(cr);
                 } catch (IOException ioe) {

@@ -171,7 +171,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
             }
             socketWrapper.write(block ? BlockingMode.BLOCK : BlockingMode.SEMI_BLOCK, timeout, TimeUnit.MILLISECONDS,
-                    null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long, Void>() {
+                    null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long,Void>() {
                         @Override
                         public void completed(Long result, Void attachment) {
                             if (block) {
