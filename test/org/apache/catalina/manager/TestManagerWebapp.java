@@ -87,109 +87,153 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.setPort(getPort());
         String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/html HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_UNAUTHORIZED, client.getStatusCode());
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/html HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/manager/css/manager.css"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/status HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("MiB"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/jmxproxy HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("Tomcat:type=ThreadPool,name="));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains(" - "));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sessions?path=/manager HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("[1]"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/resources HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains(" - "));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/serverinfo HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("[Apache Tomcat"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/vminfo HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("vmName: "));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/threaddump HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("http-"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/list HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
@@ -246,74 +290,106 @@ public class TestManagerWebapp extends TomcatBaseTest {
 
         appDir = new File(webappDir, "examples");
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/deploy?war=" + URLEncoder.QUERY.encode(appDir.getAbsolutePath(), StandardCharsets.UTF_8) + " HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("OK - "));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/examples/servlets/servlet/RequestInfoExample"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/stop?path=/examples HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, client.getStatusCode());
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/start?path=/examples HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/examples/servlets/servlet/RequestInfoExample"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/save HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/save?path=/examples HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
@@ -329,68 +405,96 @@ public class TestManagerWebapp extends TomcatBaseTest {
         }
         Assert.assertTrue(serverXmlDump.contains("StoreConfigLifecycleListener"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/reload?path=/examples HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/list HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/examples:running"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/examples/servlets/servlet/RequestInfoExample"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/list HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertTrue(client.getResponseBody().contains("/examples:running"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/undeploy?path=/examples HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/list HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertFalse(client.getResponseBody().contains("/examples:running"));
 
+        // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/findleaks?statusLine=true HTTP/1.1" + CRLF +
                 "Host: localhost" + CRLF +
                 "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF + CRLF });
+                "Connection: Close" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());

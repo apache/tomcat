@@ -55,6 +55,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.AsyncContextImpl;
@@ -159,11 +160,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedNoSplits() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -171,12 +175,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitBeforeChunkHeader() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
                 "",
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -184,12 +191,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitInChunkHeader() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
                 "1",
-                "4" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "4" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -197,12 +207,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitAfterChunkHeader() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
                 "14",
-                SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -210,12 +223,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitInHeaderCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
                 "14\r",
                 "\n" +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -223,11 +239,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitAfterHeaderCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF,
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "14" + CRLF,
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -235,12 +254,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitBeforeExtensionDelimiter() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
                 "14",
-                ";a=b" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                ";a=b" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -248,12 +270,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitAfterExtensionDelimiter() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
                 "14;",
-                "a=b" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "a=b" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -261,12 +286,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitInExtension() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
                 "14;a",
-                "=b" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "=b" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -274,12 +302,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitAfterExtension() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
                 "14;a=b",
-                SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -287,12 +318,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitInChunkBody() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
                 "012345",
-                "678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "678901FINISHED" + CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -300,12 +334,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitBeforeChunkBodyCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
                 "012345678901FINISHED",
-                SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                CRLF +
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -313,12 +350,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitInChunkBodyCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
                 "012345678901FINISHED\r",
                 "\n" +
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -326,11 +366,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitAfterChunkBodyCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF,
-                "0" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF,
+                "0" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -338,12 +381,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitBeforeEndChunkCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
                 "0",
-                SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -351,13 +397,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitInEndChunkCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
                 "0" +
                 "\r",
                 "\n" +
-                SimpleHttpClient.CRLF};
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -365,12 +414,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitAfterEndChunkCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
                 "0" +
-                SimpleHttpClient.CRLF,
-                SimpleHttpClient.CRLF};
+                CRLF,
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -378,12 +430,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitBeforeTrailer() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF,
-                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF,
+                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
     }
@@ -391,13 +446,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitInTrailerName() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
                 "x-te",
-                "st" + ": " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "st" + ": " + TRAILER_HEADER_VALUE + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
     }
@@ -405,13 +463,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitAfterTrailerName() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
                 TRAILER_HEADER_NAME,
-                ": " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                ": " + TRAILER_HEADER_VALUE + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
     }
@@ -419,13 +480,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitAfterTrailerDelimiter() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
                 TRAILER_HEADER_NAME + ":",
-                " " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                " " + TRAILER_HEADER_VALUE + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
     }
@@ -433,13 +497,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitBeforeTrailerValue() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
                 TRAILER_HEADER_NAME + ": ",
-                TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                TRAILER_HEADER_VALUE + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
     }
@@ -447,13 +514,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitInTrailerValue() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
                 TRAILER_HEADER_NAME + ": abc",
-                "de" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                "de" + CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
     }
@@ -461,13 +531,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitAfterTrailerValue() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
                 TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE,
-                SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF};
+                CRLF +
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
     }
@@ -475,13 +548,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitInTrailerCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
                 TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + "\r",
                 "\n" +
-                SimpleHttpClient.CRLF};
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
     }
@@ -489,12 +565,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitAfterTrailerCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF,
-                SimpleHttpClient.CRLF};
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + CRLF,
+                CRLF
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
     }
@@ -502,13 +581,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitInFinalCrlf() throws Exception {
+        // @formatter:off
         String[] requestBody = new String[] {
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
                 "0" +
-                SimpleHttpClient.CRLF +
+                CRLF +
                 "\r",
-                "\n"};
+                "\n"
+                };
+        // @formatter:on
 
         doTestNonBlockingReadChunked(requestBody);
     }
@@ -516,12 +598,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testNonBlockingReadChunkedSplitMaximum() throws Exception {
+        // @formatter:off
         String requestBody = new String(
-                "14" + SimpleHttpClient.CRLF +
-                "012345678901FINISHED" + SimpleHttpClient.CRLF +
-                "0" + SimpleHttpClient.CRLF +
-                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF);
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + CRLF +
+                CRLF);
+        // @formatter:on
 
         String[] requestBodySplit = new String[requestBody.length()];
         for (int i = 0; i < requestBody.length(); i++) {
@@ -553,12 +637,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         tomcat.start();
 
         // Add the headers to the first part of the chunked body
+        // @formatter:off
         requestBody[0] =
-                "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost" + getPort() + SimpleHttpClient.CRLF +
-                "Transfer-Encoding: chunked" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF +
+                "GET / HTTP/1.1" + CRLF +
+                "Host: localhost" + getPort() + CRLF +
+                "Transfer-Encoding: chunked" + CRLF +
+                CRLF +
                 requestBody[0];
+        // @formatter:on
 
         Client client = new Client();
         client.setPort(getPort());
@@ -1764,26 +1850,30 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testCanceledPostChunked() throws Exception {
+        // @formatter:off
         doTestCanceledPost(new String[] {
-                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + SimpleHttpClient.CRLF +
-                "Transfer-Encoding: Chunked" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF +
-                "10" + SimpleHttpClient.CRLF +
-                "This is 16 bytes" + SimpleHttpClient.CRLF
+                "POST / HTTP/1.1" + CRLF +
+                "Host: localhost:" + CRLF +
+                "Transfer-Encoding: Chunked" + CRLF +
+                CRLF +
+                "10" + CRLF +
+                "This is 16 bytes" + CRLF
                 });
+        // @formatter:on
     }
 
 
     @Test
     public void testCanceledPostNoChunking() throws Exception {
+        // @formatter:off
         doTestCanceledPost(new String[] {
-                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + SimpleHttpClient.CRLF +
-                "Content-Length: 100" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF +
+                "POST / HTTP/1.1" + CRLF +
+                "Host: localhost:" + CRLF +
+                "Content-Length: 100" + CRLF +
+                CRLF +
                 "This is 16 bytes"
                 });
+        // @formatter:on
     }
 
 
@@ -2005,11 +2095,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         ResponseOKClient client = new ResponseOKClient();
         client.setPort(getPort());
+        // @formatter:off
         client.setRequest(new String[] {
-                "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF
+                "GET / HTTP/1.1" + CRLF +
+                "Host: localhost:" + CRLF +
+                CRLF
                 });
+        // @formatter:on
         client.connect();
         client.sendRequest();
 

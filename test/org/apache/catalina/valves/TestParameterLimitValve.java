@@ -76,17 +76,31 @@ public class TestParameterLimitValve extends TomcatBaseTest {
                 null);
         Assert.assertEquals(200, rc);
 
-        byte[] body = ("POST / HTTP/1.1" + CRLF + "Host: localhost:" + getPort() + CRLF + "Connection: close" + CRLF +
-                "Transfer-Encoding: chunked" + CRLF + "Content-Type: application/x-www-form-urlencoded" + CRLF + CRLF +
+        // @formatter:off
+        byte[] body = (
+                "POST / HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Connection: close" + CRLF +
+                "Transfer-Encoding: chunked" + CRLF +
+                "Content-Type: application/x-www-form-urlencoded" + CRLF +
+                CRLF +
                 "param1=value1&param2=value2&param3=value3" + CRLF).getBytes(StandardCharsets.UTF_8);
+        // @formatter:on
 
         rc = postUrl(body, "http://localhost:" + getPort() + "/special/endpoint", new ByteChunk(), null);
 
         Assert.assertEquals(400, rc);
 
-        body = ("POST / HTTP/1.1" + CRLF + "Host: localhost:" + getPort() + CRLF + "Connection: close" + CRLF +
-                "Transfer-Encoding: chunked" + CRLF + "Content-Type: application/x-www-form-urlencoded" + CRLF + CRLF +
+        // @formatter:off
+        body = (
+                "POST / HTTP/1.1" + CRLF +
+                "Host: localhost:" + getPort() + CRLF +
+                "Connection: close" + CRLF +
+                "Transfer-Encoding: chunked" + CRLF +
+                "Content-Type: application/x-www-form-urlencoded" + CRLF +
+                CRLF +
                 "param1=value1&param2=value2" + CRLF).getBytes(StandardCharsets.UTF_8);
+        // @formatter:on
 
         rc = postUrl(body, "http://localhost:" + getPort() + "/special/endpoint", new ByteChunk(), null);
 
@@ -487,12 +501,17 @@ public class TestParameterLimitValve extends TomcatBaseTest {
         // Construct a simple multipart body with two parts
         String boundary = "--simpleBoundary";
 
+        // @formatter:off
         String content = "--" + boundary + CRLF +
-                "Content-Disposition: form-data; name=\"part1\"" + CRLF + CRLF +
+                "Content-Disposition: form-data; name=\"part1\"" + CRLF +
+                CRLF +
                 "part value 1" + CRLF +
                 "--" + boundary + CRLF +
-                "Content-Disposition: form-data; name=\"part2\"" + CRLF + CRLF +
-                "part value 2" + CRLF +                "--" + boundary + "--" + CRLF;
+                "Content-Disposition: form-data; name=\"part2\"" + CRLF +
+                CRLF +
+                "part value 2" + CRLF +
+                "--" + boundary + "--" + CRLF;
+        // @formatter:on
 
         Map<String,List<String>> reqHeaders = new HashMap<>();
         reqHeaders.put("Content-Type", List.of("multipart/form-data; boundary=" + boundary));

@@ -76,8 +76,15 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 connect();
 
                 String[] request = new String[1];
-                request[0] = "GET http://localhost:8080/test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF +
-                        "X-Bug48839: abcd" + CRLF + "\tefgh" + CRLF + "Connection: close" + CRLF + CRLF;
+                // @formatter:off
+                request[0] =
+                        "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                        "Host: localhost:8080" + CRLF +
+                        "X-Bug48839: abcd" + CRLF +
+                        "\tefgh" + CRLF +
+                        "Connection: close" + CRLF +
+                        CRLF;
+                // @formatter:on
 
                 setRequest(request);
                 processRequest(); // blocks until response has been read
@@ -322,8 +329,15 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 connect();
 
                 String[] request = new String[1];
-                request[0] = "GET http://localhost:8080/test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF +
-                        headerLine + CRLF + "X-Bug51557: abcd" + CRLF + "Connection: close" + CRLF + CRLF;
+                // @formatter:off
+                request[0] =
+                        "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                        "Host: localhost:8080" + CRLF +
+                        headerLine + CRLF +
+                        "X-Bug51557: abcd" + CRLF +
+                        "Connection: close" + CRLF +
+                        CRLF;
+                // @formatter:on
 
                 setRequest(request);
                 processRequest(); // blocks until response has been read
@@ -447,8 +461,16 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
                 connect();
 
                 String[] request = new String[1];
-                request[0] = newLines + "GET http://localhost:8080/test HTTP/1.1" + CRLF + "Host: localhost:8080" +
-                        CRLF + "X-Bug48839: abcd" + CRLF + "\tefgh" + CRLF + "Connection: close" + CRLF + CRLF;
+                // @formatter:off
+                request[0] =
+                        newLines +
+                        "GET http://localhost:8080/test HTTP/1.1" + CRLF +
+                        "Host: localhost:8080" + CRLF +
+                        "X-Bug48839: abcd" + CRLF +
+                        "\tefgh" + CRLF +
+                        "Connection: close" + CRLF +
+                        CRLF;
+                // @formatter:on
 
                 setRequest(request);
                 processRequest(); // blocks until response has been read
@@ -764,8 +786,14 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
         tomcat.start();
 
-        String request = "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF + "Host: localhost" + SimpleHttpClient.CRLF + ":b" +
-                SimpleHttpClient.CRLF + "X-Dummy:b" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /foo HTTP/1.1" + SimpleHttpClient.CRLF +
+                "Host: localhost" + SimpleHttpClient.CRLF +
+                ":b" + SimpleHttpClient.CRLF +
+                "X-Dummy:b" + SimpleHttpClient.CRLF +
+                SimpleHttpClient.CRLF;
+        // @formatter:on
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
         client.setRequest(new String[] { request });
