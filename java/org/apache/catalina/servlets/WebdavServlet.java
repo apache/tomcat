@@ -1845,7 +1845,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         if (!allowSpecialPaths) {
             String upperCasePath = path.toUpperCase(Locale.ENGLISH);
             return upperCasePath.startsWith("/WEB-INF/") || upperCasePath.startsWith("/META-INF/") ||
-                upperCasePath.equals("/WEB-INF") || upperCasePath.equals("/META-INF");
+                    upperCasePath.equals("/WEB-INF") || upperCasePath.equals("/META-INF");
         }
         return false;
     }
@@ -1973,7 +1973,7 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
                     if (parentPath == path || parentLock.depth > 0) {
                         if (parentLock.isExclusive()) {
                             return !ifHeader.contains(":" + parentLock.token + ">") ||
-                                (parentLock.principal != null && !parentLock.principal.equals(principal));
+                                    (parentLock.principal != null && !parentLock.principal.equals(principal));
                         } else {
                             for (String token : parentLock.sharedTokens) {
                                 LockInfo lock = sharedLocks.get(token);
@@ -2750,8 +2750,8 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
     private static boolean propertyEquals(Node node1, Node node2) {
         return node1.getLocalName().equals(node2.getLocalName()) &&
-            ((node1.getNamespaceURI() == null && node2.getNamespaceURI() == null) ||
-                (node1.getNamespaceURI() != null && node1.getNamespaceURI().equals(node2.getNamespaceURI())));
+                ((node1.getNamespaceURI() == null && node2.getNamespaceURI() == null) ||
+                        (node1.getNamespaceURI() != null && node1.getNamespaceURI().equals(node2.getNamespaceURI())));
     }
 
 

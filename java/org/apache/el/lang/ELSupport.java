@@ -193,8 +193,8 @@ public class ELSupport {
     }
 
     /*
-     * Going to have some casts /raw types somewhere so doing it here keeps them all in one place. There might
-     * be a neater / better solution, but I couldn't find it.
+     * Going to have some casts /raw types somewhere so doing it here keeps them all in one place. There might be a
+     * neater / better solution, but I couldn't find it.
      */
     @SuppressWarnings("unchecked")
     public static Enum<?> coerceToEnum(final ELContext ctx, final Object obj,
@@ -243,8 +243,7 @@ public class ELSupport {
      *
      * @throws ELException if object is not Boolean or String
      */
-    public static Boolean coerceToBoolean(final ELContext ctx, final Object obj, boolean primitive)
-            throws ELException {
+    public static Boolean coerceToBoolean(final ELContext ctx, final Object obj, boolean primitive) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
@@ -352,8 +351,7 @@ public class ELSupport {
         throw new ELException(MessageFactory.get("error.convert", number, number.getClass(), type));
     }
 
-    public static Number coerceToNumber(final ELContext ctx, final Object obj, final Class<?> type)
-            throws ELException {
+    public static Number coerceToNumber(final ELContext ctx, final Object obj, final Class<?> type) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
@@ -512,13 +510,13 @@ public class ELSupport {
             case Date d -> d.toInstant();
             case String s -> Instant.parse(s);
             default -> {
-                throw new ELException(MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class));
+                throw new ELException(
+                        MessageFactory.get("error.convert", obj, obj.getClass().getName(), Instant.class));
             }
         };
     }
 
-    public static <T> T coerceToType(final ELContext ctx, final Object obj, final Class<T> type)
-            throws ELException {
+    public static <T> T coerceToType(final ELContext ctx, final Object obj, final Class<T> type) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
@@ -694,7 +692,7 @@ public class ELSupport {
 
     public static boolean isDateOp(final Object obj0, Object obj1) {
         return obj0 instanceof TemporalAccessor || obj1 instanceof TemporalAccessor || obj0 instanceof Clock ||
-                obj1 instanceof Clock ||obj0 instanceof Date || obj1 instanceof Date ||obj0 instanceof Timestamp ||
+                obj1 instanceof Clock || obj0 instanceof Date || obj1 instanceof Date || obj0 instanceof Timestamp ||
                 obj1 instanceof Timestamp;
     }
 

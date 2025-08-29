@@ -206,8 +206,7 @@ public class JAASCallbackHandler implements CallbackHandler {
                         case "digestA2" -> cb.setText(digestA2);
                         case "authMethod" -> cb.setText(authMethod);
                         case "algorithm" -> cb.setText(algorithm);
-                        case "catalinaBase" ->
-                                cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
+                        case "catalinaBase" -> cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
                         default -> throw new UnsupportedCallbackException(callback);
                     }
                 }

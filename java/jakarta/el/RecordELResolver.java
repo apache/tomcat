@@ -28,8 +28,8 @@ import java.util.Objects;
  * <p>
  * This resolver is always read-only since {@link Record}s are always read-only.
  * <p>
- * {@code ELResolver}s are combined using {@link CompositeELResolver}s to define rich semantics for evaluating
- * an expression. See the javadocs for {@link ELResolver} for details.
+ * {@code ELResolver}s are combined using {@link CompositeELResolver}s to define rich semantics for evaluating an
+ * expression. See the javadocs for {@link ELResolver} for details.
  *
  * @since EL 6.0
  */

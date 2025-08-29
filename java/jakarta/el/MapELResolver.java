@@ -39,7 +39,7 @@ public class MapELResolver extends ELResolver {
     public Class<?> getType(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
 
-        if (base instanceof Map<?, ?> map) {
+        if (base instanceof Map<?,?> map) {
             context.setPropertyResolved(base, property);
 
             if (readOnly || map.getClass() == UNMODIFIABLE) {

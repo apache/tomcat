@@ -210,9 +210,9 @@ public class CompressionConfig {
             if (tokens.contains("identity")) {
                 // If identity, do not do content modifications
                 useContentEncoding = false;
-            } else if (tokens.contains("br") || tokens.contains("compress") || tokens.contains("dcb")
-                    || tokens.contains("dcz") || tokens.contains("deflate") || tokens.contains("gzip")
-                    || tokens.contains("pack200-gzip") || tokens.contains("zstd")) {
+            } else if (tokens.contains("br") || tokens.contains("compress") || tokens.contains("dcb") ||
+                    tokens.contains("dcz") || tokens.contains("deflate") || tokens.contains("gzip") ||
+                    tokens.contains("pack200-gzip") || tokens.contains("zstd")) {
                 // Content should not be compressed twice
                 return false;
             }

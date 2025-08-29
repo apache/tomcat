@@ -29,8 +29,8 @@ public interface ServerAuth {
      *
      * @return An AuthStatus instance that represents the result of the validation
      *
-     * @throws AuthException If a failure occurred in a manner that prevented the failure from being communicated
-     *                           via messageInfo
+     * @throws AuthException If a failure occurred in a manner that prevented the failure from being communicated via
+     *                           messageInfo
      */
     AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
             throws AuthException;
@@ -43,8 +43,8 @@ public interface ServerAuth {
      *
      * @return An AuthStatus instance that represents the result of the authentication
      *
-     * @throws AuthException If a failure occurred in a manner that prevented the failure from being communicated
-     *                           via messageInfo
+     * @throws AuthException If a failure occurred in a manner that prevented the failure from being communicated via
+     *                           messageInfo
      */
     default AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject) throws AuthException {
         return AuthStatus.SUCCESS;

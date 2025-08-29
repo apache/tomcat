@@ -490,7 +490,7 @@ public class ExpiresFilter extends FilterBase {
      * ({@link StartingPoint#ACCESS_TIME}) or the last time the HTML-page/servlet-response was modified (
      * {@link StartingPoint#LAST_MODIFICATION_TIME}).
      */
-   public enum StartingPoint {
+    public enum StartingPoint {
         ACCESS_TIME,
         LAST_MODIFICATION_TIME
     }

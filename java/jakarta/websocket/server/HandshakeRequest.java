@@ -123,7 +123,7 @@ public interface HandshakeRequest {
      * WebSocket handshake request. If the request was not sent via an IP connection, -1 will be returned.
      *
      * @return the Internet Protocol (IP) port number of the interface of the client or last proxy which sent the
-     * WebSocket handshake request or -1 if not applicable
+     *             WebSocket handshake request or -1 if not applicable
      *
      * @since WebSocket 2.3
      */

@@ -66,7 +66,8 @@ public interface ServletResponse {
      * <code>getWriter</code> has been called or after the response has been committed have no effect on the character
      * encoding. If no character encoding has been specified, <code>ISO-8859-1</code> is returned.
      * <p>
-     * See <a href="http://www.ietf.org/rfc/rfc2047.txt">RFC 2047</a> for more information about character encoding and MIME.
+     * See <a href="http://www.ietf.org/rfc/rfc2047.txt">RFC 2047</a> for more information about character encoding and
+     * MIME.
      *
      * @return a <code>String</code> specifying the name of the character encoding, for example, <code>UTF-8</code>
      */

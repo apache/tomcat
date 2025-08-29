@@ -446,8 +446,7 @@ public class JDTCompiler extends org.apache.jasper.compiler.Compiler {
                             String name = new String(problem.getOriginatingFileName());
                             try {
                                 problemList.add(ErrorDispatcher.createJavacError(name, pageNodes,
-                                        new StringBuilder(problem.getMessage()), problem.getSourceLineNumber(),
-                                        ctxt));
+                                        new StringBuilder(problem.getMessage()), problem.getSourceLineNumber(), ctxt));
                             } catch (JasperException e) {
                                 log.error(Localizer.getMessage("jsp.error.compilation.jdtProblemError"), e);
                             }

@@ -179,7 +179,7 @@ public class KubernetesMembershipProvider extends CloudMembershipProvider {
             // Use != to protect against clock issues
             if (!saTokenLastModifiedTime.equals(oldSaTokenLastModifiedTime)) {
                 byte[] bytes = Files.readAllBytes(saTokenPath);
-                ((TokenStreamProvider)streamProvider).setToken(new String(bytes, StandardCharsets.US_ASCII));
+                ((TokenStreamProvider) streamProvider).setToken(new String(bytes, StandardCharsets.US_ASCII));
             }
         } catch (IOException ioe) {
             log.error(sm.getString("kubernetesMembershipProvider.streamError"), ioe);

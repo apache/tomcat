@@ -25,8 +25,8 @@ public interface WebResourceLockSet {
 
     /**
      * Obtain a reentrant read/write lock for the resource at the provided path. The resource is not required to exist.
-     * Multiple calls to this method with the same path will return the same lock provided that at least one instance
-     * of the lock remains in use between the calls.
+     * Multiple calls to this method with the same path will return the same lock provided that at least one instance of
+     * the lock remains in use between the calls.
      *
      * @param path The path for which the lock should be obtained
      *

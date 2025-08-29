@@ -275,8 +275,8 @@ public class CrawlerSessionManagerValve extends ValveBase {
         return result.toString();
     }
 
-    private record CrawlerHttpSessionBindingListener(Map<String, String> clientIdSessionId,
-                                                     String clientIdentifier) implements HttpSessionBindingListener, Serializable {
+    private record CrawlerHttpSessionBindingListener(Map<String,String> clientIdSessionId, String clientIdentifier)
+            implements HttpSessionBindingListener, Serializable {
         @Serial
         private static final long serialVersionUID = 1L;
 

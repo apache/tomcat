@@ -165,14 +165,9 @@ public class TagAttributeInfo {
      */
     @Override
     public String toString() {
-        return "name = " + name + " " +
-                "type = " + type + " " +
-                "reqTime = " + reqTime + " " +
-                "required = " + required + " " +
-                "fragment = " + fragment + " " +
-                "deferredValue = " + deferredValue + " " +
-                "expectedTypeName = " + expectedTypeName + " " +
-                "deferredMethod = " + deferredMethod + " " +
+        return "name = " + name + " " + "type = " + type + " " + "reqTime = " + reqTime + " " + "required = " +
+                required + " " + "fragment = " + fragment + " " + "deferredValue = " + deferredValue + " " +
+                "expectedTypeName = " + expectedTypeName + " " + "deferredMethod = " + deferredMethod + " " +
                 "methodSignature = " + methodSignature;
     }
 

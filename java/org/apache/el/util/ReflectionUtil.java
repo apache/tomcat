@@ -502,9 +502,8 @@ public class ReflectionUtil {
     /*
      * This class duplicates code in jakarta.el.Util. When making changes keep the code in sync.
      */
-    private record MatchResult(boolean varArgs, int exactCount, int assignableCount,
-                               int coercibleCount, int varArgsCount,
-                               boolean bridge) implements Comparable<MatchResult> {
+    private record MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount,
+            int varArgsCount, boolean bridge) implements Comparable<MatchResult> {
 
         @Override
         public int compareTo(MatchResult o) {
@@ -540,8 +539,7 @@ public class ReflectionUtil {
                     ((MatchResult) o).assignableCount() == this.assignableCount() &&
                     ((MatchResult) o).coercibleCount() == this.coercibleCount() &&
                     ((MatchResult) o).varArgsCount() == this.varArgsCount() &&
-                    ((MatchResult) o).varArgs() == this.varArgs() &&
-                    ((MatchResult) o).bridge() == this.bridge());
+                    ((MatchResult) o).varArgs() == this.varArgs() && ((MatchResult) o).bridge() == this.bridge());
         }
 
         @Override

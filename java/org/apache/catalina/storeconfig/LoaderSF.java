@@ -62,6 +62,6 @@ public class LoaderSF extends StoreFactoryBase {
             return false;
         }
         return (!wloader.getDelegate()) &&
-            wloader.getLoaderClass().equals("org.apache.catalina.loader.WebappClassLoader");
+                wloader.getLoaderClass().equals("org.apache.catalina.loader.WebappClassLoader");
     }
 }

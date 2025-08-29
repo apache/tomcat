@@ -191,6 +191,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * XForwardedFilter configuration:
  * </p>
+ *
  * <pre>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
@@ -217,7 +218,8 @@ import org.apache.tomcat.util.res.StringManager;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre>
+ * &lt;/filter-mapping&gt;
+ * </pre>
  * <table border="1">
  * <caption>Request Values</caption>
  * <tr>
@@ -270,6 +272,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * RemoteIpFilter configuration:
  * </p>
+ *
  * <pre>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
@@ -296,7 +299,8 @@ import org.apache.tomcat.util.res.StringManager;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre>
+ * &lt;/filter-mapping&gt;
+ * </pre>
  * <table border="1">
  * <caption>Request Values</caption>
  * <tr>
@@ -332,6 +336,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * RemoteIpFilter configuration:
  * </p>
+ *
  * <pre>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
@@ -358,7 +363,8 @@ import org.apache.tomcat.util.res.StringManager;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre>
+ * &lt;/filter-mapping&gt;
+ * </pre>
  * <table border="1">
  * <caption>Request Values</caption>
  * <tr>
@@ -395,6 +401,7 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * RemoteIpFilter configuration:
  * </p>
+ *
  * <pre>
  * &lt;filter&gt;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
@@ -421,7 +428,8 @@ import org.apache.tomcat.util.res.StringManager;
  *    &lt;filter-name&gt;RemoteIpFilter&lt;/filter-name&gt;
  *    &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  *    &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- * &lt;/filter-mapping&gt;</pre>
+ * &lt;/filter-mapping&gt;
+ * </pre>
  * <table border="1">
  * <caption>Request Values</caption>
  * <tr>
@@ -686,14 +694,13 @@ public class RemoteIpFilter extends GenericFilter {
     /**
      * @see #setInternalProxies(String)
      */
-    private Pattern internalProxies =
-            Pattern.compile("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" + "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" +
-                    "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" + "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
-                    "100\\.6[4-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.[7-9]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" +
-                    "100\\.1[0-1]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.12[0-7]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
-                    "172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
-                    "172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "0:0:0:0:0:0:0:1|::1|" +
-                    "fe[89ab]\\p{XDigit}:.*|" + "f[cd]\\p{XDigit}{2}+:.*");
+    private Pattern internalProxies = Pattern.compile("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
+            "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" + "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" +
+            "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.6[4-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+            "100\\.[7-9]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.1[0-1]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+            "100\\.12[0-7]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+            "172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+            "0:0:0:0:0:0:0:1|::1|" + "fe[89ab]\\p{XDigit}:.*|" + "f[cd]\\p{XDigit}{2}+:.*");
 
     /**
      * @see #setProtocolHeader(String)

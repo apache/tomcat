@@ -81,8 +81,8 @@ public interface TagPluginContext {
     String getConstantAttribute(String attribute);
 
     /**
-     * Generate codes to evaluate value of an attribute in the custom tag The codes is a Java expression. NOTE: Currently
-     * cannot handle attributes that are fragments.
+     * Generate codes to evaluate value of an attribute in the custom tag The codes is a Java expression. NOTE:
+     * Currently cannot handle attributes that are fragments.
      *
      * @param attribute The specified attribute
      */

@@ -1744,7 +1744,7 @@ class Generator {
                         nvp = " + \" " + jspAttribute.getName() + "=\\\"\" + " + value + " + \"\\\"\"";
                     } else {
                         nvp = " + (java.lang.Boolean.valueOf(" + omit + ")?\"\":\" " + jspAttribute.getName() +
-                            "=\\\"\" + " + value + " + \"\\\"\")";
+                                "=\\\"\" + " + value + " + \"\\\"\")";
                     }
                 } else {
                     value = attributeValue(jspAttribute, false, Object.class);
@@ -3038,73 +3038,68 @@ class Generator {
         }
 
         /**
-         * Determines whether a tag should be handled via nonstandard code (typically
-         * faster). Considers both configuration and level of support within Tomcat.
+         * Determines whether a tag should be handled via nonstandard code (typically faster). Considers both
+         * configuration and level of support within Tomcat.
          * <p>
-         * Note that Tomcat is free to ignore any case it cannot handle, as long as it
-         * reports it accurately to the caller by returning false. For example, the
-         * initial implementation for c:set excludes support for body content. c:set
-         * tags with body content will be generated with the standard code and tags
-         * without body content will be generated via non-standard code.
+         * Note that Tomcat is free to ignore any case it cannot handle, as long as it reports it accurately to the
+         * caller by returning false. For example, the initial implementation for c:set excludes support for body
+         * content. c:set tags with body content will be generated with the standard code and tags without body content
+         * will be generated via non-standard code.
          *
-         * @param n tag
+         * @param n             tag
          * @param jspAttributes jsp attributes
+         *
          * @return whether code was generated
+         *
          * @throws JasperException unexpected error
          */
-        private boolean visitPotentiallyNonstandardCustomTag(Node.CustomTag n)
-                throws JasperException {
+        private boolean visitPotentiallyNonstandardCustomTag(Node.CustomTag n) throws JasperException {
             if (!nonstandardCustomTagNames.contains(n.getQName())) {
                 // tag is not configured, move along
                 return false;
             }
 
             // collect the attributes into one Map for further checks
-            Map<String, JspAttribute> jspAttributes = new HashMap<>();
+            Map<String,JspAttribute> jspAttributes = new HashMap<>();
             if (n.getJspAttributes() != null) {
                 for (JspAttribute jspAttr : n.getJspAttributes()) {
                     jspAttributes.put(jspAttr.getLocalName(), jspAttr);
                 }
             }
             switch (n.qName) {
-            case "c:set":
-                // requires var and value, scope is optional, body is prohibited, value cannot be deferred
-                if (n.hasEmptyBody()
-                        && jspAttributes.containsKey("var")
-                        && jspAttributes.containsKey("value")
-                        && CORE_LIBS_URI.equals(n.getURI())) {
-                    // verify value is not a deferred expression
-                    String valueText = jspAttributes.get("value").getValue();
-                    if (valueText.startsWith("#")) {
-                        return false;
-                    } else if (jspAttributes.size() == 2
-                            || (jspAttributes.size() == 3 && jspAttributes.containsKey("scope"))) {
-                        generateNonstandardSetLogic(n, jspAttributes);
-                        return true;
+                case "c:set":
+                    // requires var and value, scope is optional, body is prohibited, value cannot be deferred
+                    if (n.hasEmptyBody() && jspAttributes.containsKey("var") && jspAttributes.containsKey("value") &&
+                            CORE_LIBS_URI.equals(n.getURI())) {
+                        // verify value is not a deferred expression
+                        String valueText = jspAttributes.get("value").getValue();
+                        if (valueText.startsWith("#")) {
+                            return false;
+                        } else if (jspAttributes.size() == 2 ||
+                                (jspAttributes.size() == 3 && jspAttributes.containsKey("scope"))) {
+                            generateNonstandardSetLogic(n, jspAttributes);
+                            return true;
+                        }
                     }
-                }
-                break;
-            case "c:remove":
-                // requires var, scope is optional, body is prohibited
-                if (n.hasEmptyBody()
-                        && jspAttributes.containsKey("var")
-                        && CORE_LIBS_URI.equals(n.getURI())
-                        && (jspAttributes.size() == 1
-                                || (jspAttributes.size() == 2
-                                && jspAttributes.containsKey("scope")))) {
-                    generateNonstandardRemoveLogic(n, jspAttributes);
-                    return true;
+                    break;
+                case "c:remove":
+                    // requires var, scope is optional, body is prohibited
+                    if (n.hasEmptyBody() && jspAttributes.containsKey("var") && CORE_LIBS_URI.equals(n.getURI()) &&
+                            (jspAttributes.size() == 1 ||
+                                    (jspAttributes.size() == 2 && jspAttributes.containsKey("scope")))) {
+                        generateNonstandardRemoveLogic(n, jspAttributes);
+                        return true;
 
-                }
-                break;
-            default:
-                // This indicates someone configured a tag with no non-standard implementation.
-                // Harmless, fall back to the standard implementation.
+                    }
+                    break;
+                default:
+                    // This indicates someone configured a tag with no non-standard implementation.
+                    // Harmless, fall back to the standard implementation.
             }
             return false;
         }
 
-        private void generateNonstandardSetLogic(Node.CustomTag n, Map<String, JspAttribute> jspAttributes)
+        private void generateNonstandardSetLogic(Node.CustomTag n, Map<String,JspAttribute> jspAttributes)
                 throws JasperException {
             String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
             String tagMethod = "_jspx_meth_" + baseVar;
@@ -3133,13 +3128,13 @@ class Generator {
 
             JspAttribute varAttribute = jspAttributes.get("var");
             Mark m = n.getStart();
-            out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") "
-                    + varAttribute.getTagAttributeInfo());
+            out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") " +
+                    varAttribute.getTagAttributeInfo());
 
             JspAttribute valueAttribute = jspAttributes.get("value");
             m = n.getStart();
-            out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") "
-                    + valueAttribute.getTagAttributeInfo());
+            out.printil("// " + m.getFile() + "(" + m.getLineNumber() + "," + m.getColumnNumber() + ") " +
+                    valueAttribute.getTagAttributeInfo());
 
             String varValue = varAttribute.getValue();
 
@@ -3147,12 +3142,11 @@ class Generator {
             String scopeValue = translateScopeToConstant(jspAttributes);
 
             // translates the specified value attributes into EL-interpretation code using standard logic
-            String evaluatedAttribute = evaluateAttribute(getTagHandlerInfo(n), valueAttribute,
-                    n, null);
+            String evaluatedAttribute = evaluateAttribute(getTagHandlerInfo(n), valueAttribute, n, null);
 
             // call the multi-line logic equivalent of SetTag
-            out.printil("org.apache.jasper.runtime.JspRuntimeLibrary.nonstandardSetTag(_jspx_page_context, \""
-                    + varValue + "\", " + evaluatedAttribute + ", " + scopeValue + ");");
+            out.printil("org.apache.jasper.runtime.JspRuntimeLibrary.nonstandardSetTag(_jspx_page_context, \"" +
+                    varValue + "\", " + evaluatedAttribute + ", " + scopeValue + ");");
 
             // Generate end of method
             out.popIndent();
@@ -3166,46 +3160,49 @@ class Generator {
 
         /**
          * Compile-time translation of the scope variable into the constant equivalent. Avoids runtime evaluation as
-         * performed by SetTag.  Unspecified scope means page.
+         * performed by SetTag. Unspecified scope means page.
          *
          * @param jspAttributes attributes
+         *
          * @return equivalent constant from PageContext
          */
-        private String translateScopeToConstant(Map<String, JspAttribute> jspAttributes) {
+        private String translateScopeToConstant(Map<String,JspAttribute> jspAttributes) {
             String scopeValue;
             JspAttribute scopeAttribute = jspAttributes.get("scope");
             if (scopeAttribute == null) {
                 scopeValue = "jakarta.servlet.jsp.PageContext.PAGE_SCOPE";
             } else {
                 switch (scopeAttribute.getValue()) {
-                case "":
-                case "page":
-                    scopeValue = "jakarta.servlet.jsp.PageContext.PAGE_SCOPE";
-                    break;
-                case "request":
-                    scopeValue = "jakarta.servlet.jsp.PageContext.REQUEST_SCOPE";
-                    break;
-                case "session":
-                    scopeValue = "jakarta.servlet.jsp.PageContext.SESSION_SCOPE";
-                    break;
-                case "application":
-                    scopeValue = "jakarta.servlet.jsp.PageContext.APPLICATION_SCOPE";
-                    break;
-                default:
-                    throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
+                    case "":
+                    case "page":
+                        scopeValue = "jakarta.servlet.jsp.PageContext.PAGE_SCOPE";
+                        break;
+                    case "request":
+                        scopeValue = "jakarta.servlet.jsp.PageContext.REQUEST_SCOPE";
+                        break;
+                    case "session":
+                        scopeValue = "jakarta.servlet.jsp.PageContext.SESSION_SCOPE";
+                        break;
+                    case "application":
+                        scopeValue = "jakarta.servlet.jsp.PageContext.APPLICATION_SCOPE";
+                        break;
+                    default:
+                        throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
                 }
             }
             return scopeValue;
         }
 
         /**
-         * Generates the code for a non-standard remove.  Note that removes w/o a specified scope will remove from all scopes.
+         * Generates the code for a non-standard remove. Note that removes w/o a specified scope will remove from all
+         * scopes.
          *
-         * @param n tag
+         * @param n             tag
          * @param jspAttributes attributes
+         *
          * @throws JasperException unspecified error
          */
-        private void generateNonstandardRemoveLogic(Node.CustomTag n, Map<String, JspAttribute> jspAttributes)
+        private void generateNonstandardRemoveLogic(Node.CustomTag n, Map<String,JspAttribute> jspAttributes)
                 throws JasperException {
             String baseVar = createTagVarName(n.getQName(), n.getPrefix(), n.getLocalName());
             String tagMethod = "_jspx_meth_" + baseVar;

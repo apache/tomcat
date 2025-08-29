@@ -71,9 +71,8 @@ public class QuotedStringTokenizer {
                         currentMode = WordMode.SPACES;
                     }
                 }
-                default ->
-                    throw new IllegalStateException(sm.getString("quotedStringTokenizer.tokenizeError", inputText,
-                        Integer.valueOf(pos), currentMode));
+                default -> throw new IllegalStateException(sm.getString("quotedStringTokenizer.tokenizeError",
+                        inputText, Integer.valueOf(pos), currentMode));
             }
             pos++;
         }

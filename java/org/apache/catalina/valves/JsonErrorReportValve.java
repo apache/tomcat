@@ -28,8 +28,8 @@ import org.apache.tomcat.util.json.JSONFilter;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implementation of a Valve that outputs error JSON.
- * This Valve should be attached at the Host level, although it will work if attached to a Context.
+ * Implementation of a Valve that outputs error JSON. This Valve should be attached at the Host level, although it will
+ * work if attached to a Context.
  */
 public class JsonErrorReportValve extends ErrorReportValve {
 
@@ -112,7 +112,8 @@ public class JsonErrorReportValve extends ErrorReportValve {
                 }
                 for (int i = 0; i < pos; i++) {
                     if (!(elements[i].getClassName().startsWith("org.apache.catalina.core."))) {
-                        sb.append(',').append('\"').append(' ').append(JSONFilter.escape(elements[i].toString())).append('\"');
+                        sb.append(',').append('\"').append(' ').append(JSONFilter.escape(elements[i].toString()))
+                                .append('\"');
                     }
                 }
 

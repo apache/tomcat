@@ -962,7 +962,7 @@ class Validator {
                 }
                 for (int j = 0; tldAttrs != null && j < tldAttrs.length; j++) {
                     if (attrs.getLocalName(i).equals(tldAttrs[j].getName()) && (attrs.getURI(i) == null ||
-                        attrs.getURI(i).isEmpty() || attrs.getURI(i).equals(n.getURI()))) {
+                            attrs.getURI(i).isEmpty() || attrs.getURI(i).equals(n.getURI()))) {
 
                         TagAttributeInfo tldAttr = tldAttrs[j];
                         if (tldAttr.canBeRequestTime() || tldAttr.isDeferredMethod() || tldAttr.isDeferredValue()) { // JSP

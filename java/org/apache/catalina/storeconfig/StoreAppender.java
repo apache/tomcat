@@ -35,9 +35,9 @@ public class StoreAppender {
     /**
      * The set of classes that represent persistable properties.
      */
-    private static final Class<?>[] persistables = { String.class, Integer.class, Integer.TYPE, Boolean.class, Boolean.TYPE,
-            Byte.class, Byte.TYPE, Character.class, Character.TYPE, Double.class, Double.TYPE, Float.class, Float.TYPE,
-            Long.class, Long.TYPE, Short.class, Short.TYPE, InetAddress.class };
+    private static final Class<?>[] persistables = { String.class, Integer.class, Integer.TYPE, Boolean.class,
+            Boolean.TYPE, Byte.class, Byte.TYPE, Character.class, Character.TYPE, Double.class, Double.TYPE,
+            Float.class, Float.TYPE, Long.class, Long.TYPE, Short.class, Short.TYPE, InetAddress.class };
 
     private int pos = 0;
 

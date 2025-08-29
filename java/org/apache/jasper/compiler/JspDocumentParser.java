@@ -362,8 +362,8 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
      *
      * The SAX does not call this method with all of the template text, but may invoke this method with chunks of it.
      * This is a problem when we try to determine if the text contains only whitespaces, or when we are looking for an
-     * EL expression string. Therefore, it is necessary to buffer and concatenate the chunks and process the concatenated
-     * text later (at beginTag and endTag)
+     * EL expression string. Therefore, it is necessary to buffer and concatenate the chunks and process the
+     * concatenated text later (at beginTag and endTag)
      *
      * @param buf The characters
      *
@@ -741,7 +741,8 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
                 }
             }
             case INCLUDE_DIRECTIVE_ACTION -> {
-                node = new Node.IncludeDirective(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                node = new Node.IncludeDirective(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start,
+                        current);
                 processIncludeDirective(nonTaglibAttrs.getValue("file"), node);
             }
             case DECLARATION_ACTION -> {
@@ -788,7 +789,8 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
                 node = new Node.JspOutput(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case TAG_DIRECTIVE_ACTION -> {
                 if (!isTagFile) {
-                    throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName), locator);
+                    throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName),
+                            locator);
                 }
                 node = new Node.TagDirective(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
                 String imports = nonTaglibAttrs.getValue("import");
@@ -799,32 +801,38 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
             }
             case ATTRIBUTE_DIRECTIVE_ACTION -> {
                 if (!isTagFile) {
-                    throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName), locator);
+                    throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName),
+                            locator);
                 }
-                node = new Node.AttributeDirective(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                node = new Node.AttributeDirective(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start,
+                        current);
             }
             case VARIABLE_DIRECTIVE_ACTION -> {
                 if (!isTagFile) {
-                    throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName), locator);
+                    throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName),
+                            locator);
                 }
-                node = new Node.VariableDirective(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                node = new Node.VariableDirective(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start,
+                        current);
             }
             case INVOKE_ACTION -> {
                 if (!isTagFile) {
-                    throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName), locator);
+                    throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName),
+                            locator);
                 }
                 node = new Node.InvokeAction(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             }
             case DOBODY_ACTION -> {
                 if (!isTagFile) {
-                    throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName), locator);
+                    throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName),
+                            locator);
                 }
                 node = new Node.DoBodyAction(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             }
             case ELEMENT_ACTION ->
                 node = new Node.JspElement(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
-            default ->
-                throw new SAXParseException(Localizer.getMessage("jsp.error.xml.badStandardAction", localName), locator);
+            default -> throw new SAXParseException(Localizer.getMessage("jsp.error.xml.badStandardAction", localName),
+                    locator);
         }
 
         return node;

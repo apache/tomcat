@@ -252,24 +252,24 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     }
 
     private record SerializablePrincipal(String name, String[] roles, Principal principal,
-                                         Map<String, Object> attributes) implements Serializable {
-            @Serial
-            private static final long serialVersionUID = 1L;
+            Map<String,Object> attributes) implements Serializable {
+        @Serial
+        private static final long serialVersionUID = 1L;
 
-            private SerializablePrincipal(String name, String[] roles, Principal principal, Map<String, Object> attributes) {
-                this.name = name;
-                this.roles = roles;
-                if (principal instanceof Serializable) {
-                    this.principal = principal;
-                } else {
-                    this.principal = null;
-                }
-                this.attributes = attributes;
+        private SerializablePrincipal(String name, String[] roles, Principal principal, Map<String,Object> attributes) {
+            this.name = name;
+            this.roles = roles;
+            if (principal instanceof Serializable) {
+                this.principal = principal;
+            } else {
+                this.principal = null;
             }
-
-            @Serial
-            private Object readResolve() {
-                return new GenericPrincipal(name, Arrays.asList(roles), principal, null, null, attributes);
-            }
+            this.attributes = attributes;
         }
+
+        @Serial
+        private Object readResolve() {
+            return new GenericPrincipal(name, Arrays.asList(roles), principal, null, null, attributes);
+        }
+    }
 }

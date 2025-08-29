@@ -631,8 +631,8 @@ class Util {
     /*
      * This class duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
-    private record MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
-                               boolean bridge) implements Comparable<MatchResult> {
+    private record MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount,
+            int varArgsCount, boolean bridge) implements Comparable<MatchResult> {
 
         public boolean isVarArgs() {
             return varArgs;

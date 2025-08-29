@@ -207,13 +207,11 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             } else {
                 credentialLifetime = GSSCredential.DEFAULT_LIFETIME;
             }
-            gssContext = manager.createContext(Subject.callAs(subject, () ->
-                manager.createCredential(null, credentialLifetime, new Oid("1.3.6.1.5.5.2"),
-                    GSSCredential.ACCEPT_ONLY)));
+            gssContext = manager.createContext(Subject.callAs(subject, () -> manager.createCredential(null,
+                    credentialLifetime, new Oid("1.3.6.1.5.5.2"), GSSCredential.ACCEPT_ONLY)));
 
             final GSSContext gssContextFinal = gssContext;
-            outToken = Subject.callAs(subject,
-                () -> gssContextFinal.acceptSecContext(decoded, 0, decoded.length));
+            outToken = Subject.callAs(subject, () -> gssContextFinal.acceptSecContext(decoded, 0, decoded.length));
 
             if (outToken == null) {
                 if (log.isDebugEnabled()) {
@@ -226,7 +224,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             }
 
             principal = Subject.callAs(subject,
-                () -> context.getRealm().authenticate(gssContextFinal, storeDelegatedCredential));
+                    () -> context.getRealm().authenticate(gssContextFinal, storeDelegatedCredential));
         } catch (GSSException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail"), e);

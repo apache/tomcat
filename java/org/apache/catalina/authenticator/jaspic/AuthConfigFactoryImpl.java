@@ -521,7 +521,7 @@ public class AuthConfigFactoryImpl extends AuthConfigFactory {
     private record SingleModuleServerAuthContext(ServerAuthModule module) implements ServerAuthContext {
         @Override
         public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
-            throws AuthException {
+                throws AuthException {
             return module.validateRequest(messageInfo, clientSubject, serviceSubject);
         }
 

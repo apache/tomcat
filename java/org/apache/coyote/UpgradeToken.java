@@ -31,7 +31,7 @@ import org.apache.tomcat.InstanceManager;
  * @param protocol           The desired protocol to upgrade to
  */
 public record UpgradeToken(HttpUpgradeHandler httpUpgradeHandler, ContextBind contextBind,
-                           InstanceManager instanceManager, String protocol) {
+        InstanceManager instanceManager, String protocol) {
 
     public ContextBind getContextBind() {
         return contextBind;

@@ -42,7 +42,7 @@ public class JavaCompiler extends Compiler {
     private final Log log = LogFactory.getLog(JavaCompiler.class); // must not be static
 
     @Override
-    protected void generateClass(Map<String, SmapStratum> smaps) throws JasperException, IOException {
+    protected void generateClass(Map<String,SmapStratum> smaps) throws JasperException, IOException {
 
         long t1 = 0;
         if (log.isDebugEnabled()) {
@@ -51,14 +51,13 @@ public class JavaCompiler extends Compiler {
 
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
-        StandardJavaFileManager fileManager =
-                compiler.getStandardFileManager(diagnostics, null, Charset.forName(ctxt.getOptions().getJavaEncoding()));
+        StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, null,
+                Charset.forName(ctxt.getOptions().getJavaEncoding()));
         Iterable<? extends JavaFileObject> compilationUnits =
                 fileManager.getJavaFileObjectsFromFiles(List.of(new File(ctxt.getServletJavaFileName())));
         // Perform Java compilation using the appropriate options
-        List<String> compilerOptions =
-                List.of("-classpath", ctxt.getClassPath(), "-source", ctxt.getOptions().getCompilerSourceVM(),
-                        "-target", ctxt.getOptions().getCompilerTargetVM());
+        List<String> compilerOptions = List.of("-classpath", ctxt.getClassPath(), "-source",
+                ctxt.getOptions().getCompilerSourceVM(), "-target", ctxt.getOptions().getCompilerTargetVM());
         Boolean result =
                 compiler.getTask(null, fileManager, diagnostics, compilerOptions, null, compilationUnits).call();
 

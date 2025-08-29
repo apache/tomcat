@@ -405,7 +405,8 @@ class JspReader {
         Boolean result;
         Mark restart = null;
 
-        skip: while ((result = indexOf(firstChar, ret)) != null) {
+        skip:
+        while ((result = indexOf(firstChar, ret)) != null) {
             if (result.booleanValue()) {
                 if (restart != null) {
                     restart.init(current, true);
@@ -442,7 +443,8 @@ class JspReader {
         int ch;
         int prev = 'x'; // Doesn't matter
         char firstChar = limit.charAt(0);
-        skip: for (ch = nextChar(ret); ch != -1; prev = ch, ch = nextChar(ret)) {
+        skip:
+        for (ch = nextChar(ret); ch != -1; prev = ch, ch = nextChar(ret)) {
             if (ch == '\\' && prev == '\\') {
                 ch = 0; // Double \ is not an escape char anymore
             } else if (prev == '\\') {
