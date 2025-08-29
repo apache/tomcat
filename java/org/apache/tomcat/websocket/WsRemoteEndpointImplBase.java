@@ -211,8 +211,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
             throw new IllegalArgumentException(sm.getString("wsRemoteEndpoint.nullHandler"));
         }
         stateMachine.textStart();
-        TextMessageSendHandler tmsh = new TextMessageSendHandler(handler, CharBuffer.wrap(text), true, encoder,
-                encoderBuffer, this);
+        TextMessageSendHandler tmsh =
+                new TextMessageSendHandler(handler, CharBuffer.wrap(text), true, encoder, encoderBuffer, this);
         tmsh.write();
         // TextMessageSendHandler will update stateMachine when it completes
     }
@@ -263,8 +263,8 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     void sendMessageBlock(byte opCode, ByteBuffer payload, boolean last, long timeout) throws IOException {
         /*
-         *  Get the timeout before we send the message. The message may trigger a session close and depending on timing
-         *  the client session may close before we can read the timeout.
+         * Get the timeout before we send the message. The message may trigger a session close and depending on timing
+         * the client session may close before we can read the timeout.
          */
         sendMessageBlockInternal(opCode, payload, last, getTimeoutExpiry(timeout));
     }
@@ -515,9 +515,9 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
         if (getBatchingAllowed() || isMasked()) {
             // Need to write via output buffer
-            OutputBufferSendHandler obsh = new OutputBufferSendHandler(mp.getEndHandler(),
-                    mp.getBlockingWriteTimeoutExpiry(), headerBuffer, mp.getPayload(), mask, outputBuffer,
-                    !getBatchingAllowed(), this);
+            OutputBufferSendHandler obsh =
+                    new OutputBufferSendHandler(mp.getEndHandler(), mp.getBlockingWriteTimeoutExpiry(), headerBuffer,
+                            mp.getPayload(), mask, outputBuffer, !getBatchingAllowed(), this);
             obsh.write();
         } else {
             // Can write directly
@@ -556,8 +556,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     /**
      * Wraps the user provided handler so that the end point is notified when the message is complete.
      */
-    private record EndMessageHandler(WsRemoteEndpointImplBase endpoint,
-                                     SendHandler handler) implements SendHandler {
+    private record EndMessageHandler(WsRemoteEndpointImplBase endpoint, SendHandler handler) implements SendHandler {
         @Override
         public void onResult(SendResult result) {
             endpoint.endMessage(handler, result);
@@ -567,13 +566,11 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
 
     /**
      * If a transformation needs to split a {@link MessagePart} into multiple {@link MessagePart}s, it uses this handler
-     * as the end handler for each of the additional {@link MessagePart}s. This handler notifies this class that
-     * the {@link MessagePart} has been processed and that the next {@link MessagePart} in the queue should be started.
-     * The final {@link MessagePart} will use the {@link EndMessageHandler} provided with the original
-     * {@link MessagePart}.
+     * as the end handler for each of the additional {@link MessagePart}s. This handler notifies this class that the
+     * {@link MessagePart} has been processed and that the next {@link MessagePart} in the queue should be started. The
+     * final {@link MessagePart} will use the {@link EndMessageHandler} provided with the original {@link MessagePart}.
      */
-    private record IntermediateMessageHandler(
-            WsRemoteEndpointImplBase endpoint) implements SendHandler {
+    private record IntermediateMessageHandler(WsRemoteEndpointImplBase endpoint) implements SendHandler {
         @Override
         public void onResult(SendResult result) {
             endpoint.endMessage(null, result);
@@ -955,8 +952,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     /**
      * Ensures that the output buffer is cleared after it has been flushed.
      */
-    private record OutputBufferFlushSendHandler(ByteBuffer outputBuffer,
-                                                SendHandler handler) implements SendHandler {
+    private record OutputBufferFlushSendHandler(ByteBuffer outputBuffer, SendHandler handler) implements SendHandler {
 
         @Override
         public void onResult(SendResult result) {
@@ -1217,8 +1213,7 @@ public abstract class WsRemoteEndpointImplBase implements RemoteEndpoint {
     }
 
 
-    private record StateUpdateSendHandler(SendHandler handler,
-                                          StateMachine stateMachine) implements SendHandler {
+    private record StateUpdateSendHandler(SendHandler handler, StateMachine stateMachine) implements SendHandler {
         @Override
         public void onResult(SendResult result) {
             if (result.isOK()) {

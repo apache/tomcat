@@ -211,8 +211,8 @@ public class Util {
             // the interface of interest
             // Map that unknown type to the generic types defined in this class
             ParameterizedType superClassType = (ParameterizedType) clazz.getGenericSuperclass();
-            TypeResult result = getTypeParameter(clazz,
-                    superClassType.getActualTypeArguments()[superClassTypeResult.getIndex()]);
+            TypeResult result =
+                    getTypeParameter(clazz, superClassType.getActualTypeArguments()[superClassTypeResult.getIndex()]);
             result.incrementDimension(superClassTypeResult.getDimension());
             if (result.getClazz() != null && result.getDimension() > 0) {
                 superClassTypeResult = result;
@@ -274,8 +274,8 @@ public class Util {
             return true;
         } else {
             return clazz.equals(Boolean.class) || clazz.equals(Byte.class) || clazz.equals(Character.class) ||
-                clazz.equals(Double.class) || clazz.equals(Float.class) || clazz.equals(Integer.class) ||
-                clazz.equals(Long.class) || clazz.equals(Short.class);
+                    clazz.equals(Double.class) || clazz.equals(Float.class) || clazz.equals(Integer.class) ||
+                    clazz.equals(Long.class) || clazz.equals(Short.class);
         }
     }
 
@@ -332,8 +332,8 @@ public class Util {
                         // Don't need this instance, so destroy it
                         instanceManager.destroyInstance(instance);
                     }
-                } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException
-                        | NamingException e) {
+                } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException |
+                        NamingException e) {
                     throw new DeploymentException(
                             sm.getString("pojoMethodMapping.invalidDecoder", decoderClazz.getName()), e);
                 }
@@ -367,13 +367,16 @@ public class Util {
             // the types expected by the frame handling code
         } else if (byte[].class.isAssignableFrom(target)) {
             boolean whole = MessageHandler.Whole.class.isAssignableFrom(listener.getClass());
-            MessageHandlerResult result = new MessageHandlerResult(whole
-                    ? new PojoMessageHandlerWholeBinary(listener, getOnMessageMethod(listener), session, endpointConfig,
-                            matchDecoders(target, endpointConfig, true, ((WsSession) session).getInstanceManager()),
-                            new Object[1], 0, true, -1, false, -1)
-                    : new PojoMessageHandlerPartialBinary(listener, getOnMessagePartialMethod(listener), session,
-                            new Object[2], 0, true, 1, -1, -1),
-                    MessageHandlerResultType.BINARY);
+            MessageHandlerResult result =
+                    new MessageHandlerResult(whole ?
+                            new PojoMessageHandlerWholeBinary(listener, getOnMessageMethod(listener), session,
+                                    endpointConfig,
+                                    matchDecoders(target, endpointConfig, true,
+                                            ((WsSession) session).getInstanceManager()),
+                                    new Object[1], 0, true, -1, false, -1) :
+                            new PojoMessageHandlerPartialBinary(listener, getOnMessagePartialMethod(listener), session,
+                                    new Object[2], 0, true, 1, -1, -1),
+                            MessageHandlerResultType.BINARY);
             results.add(result);
         } else if (InputStream.class.isAssignableFrom(target)) {
             MessageHandlerResult result = new MessageHandlerResult(
@@ -392,8 +395,8 @@ public class Util {
         } else {
             // Handler needs wrapping and requires decoder to convert it to one
             // of the types expected by the frame handling code
-            DecoderMatch decoderMatch = matchDecoders(target, endpointConfig,
-                    ((WsSession) session).getInstanceManager());
+            DecoderMatch decoderMatch =
+                    matchDecoders(target, endpointConfig, ((WsSession) session).getInstanceManager());
             Method m = getOnMessageMethod(listener);
             if (!decoderMatch.getBinaryDecoders().isEmpty()) {
                 MessageHandlerResult result = new MessageHandlerResult(
