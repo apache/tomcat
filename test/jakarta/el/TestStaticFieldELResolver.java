@@ -111,8 +111,8 @@ public class TestStaticFieldELResolver {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.getValue(context, new ELClass(MethodUnderTest.class),
-                MethodUnderTest.GET_TYPE.toString());
+        Object result =
+                resolver.getValue(context, new ELClass(MethodUnderTest.class), MethodUnderTest.GET_TYPE.toString());
 
         Assert.assertEquals(MethodUnderTest.GET_TYPE, result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -284,8 +284,8 @@ public class TestStaticFieldELResolver {
         StaticFieldELResolver resolver = new StaticFieldELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Class<?> result = resolver.getType(context, new ELClass(MethodUnderTest.class),
-                MethodUnderTest.GET_TYPE.toString());
+        Class<?> result =
+                resolver.getType(context, new ELClass(MethodUnderTest.class), MethodUnderTest.GET_TYPE.toString());
 
         // Resolver is read-only so this should return null
         Assert.assertNull(result);
