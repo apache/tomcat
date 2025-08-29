@@ -49,8 +49,7 @@ public class TestApplicationContext extends TomcatBaseTest {
     public void testBug53257() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug53257/index.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug53257/index.jsp");
 
         String result = res.toString();
         String[] lines = result.split("\n");
@@ -67,8 +66,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk res = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug53467%5D.jsp", res, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug53467%5D.jsp", res, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertTrue(res.toString().contains("<p>OK</p>"));
@@ -103,8 +101,7 @@ public class TestApplicationContext extends TomcatBaseTest {
     public void testGetJspConfigDescriptor() throws Exception {
         Tomcat tomcat = getTomcatInstanceTestWebapp(false, false);
 
-        StandardContext standardContext =
-                (StandardContext) tomcat.getHost().findChildren()[0];
+        StandardContext standardContext = (StandardContext) tomcat.getHost().findChildren()[0];
 
         ServletContext servletContext = standardContext.getServletContext();
 
@@ -119,8 +116,7 @@ public class TestApplicationContext extends TomcatBaseTest {
     public void testJspPropertyGroupsAreIsolated() throws Exception {
         Tomcat tomcat = getTomcatInstanceTestWebapp(false, false);
 
-        StandardContext standardContext =
-                (StandardContext) tomcat.getHost().findChildren()[0];
+        StandardContext standardContext = (StandardContext) tomcat.getHost().findChildren()[0];
 
         ServletContext servletContext = standardContext.getServletContext();
 
@@ -128,10 +124,8 @@ public class TestApplicationContext extends TomcatBaseTest {
 
         tomcat.start();
 
-        JspConfigDescriptor jspConfigDescriptor =
-                servletContext.getJspConfigDescriptor();
-        Collection<JspPropertyGroupDescriptor> propertyGroups =
-                jspConfigDescriptor.getJspPropertyGroups();
+        JspConfigDescriptor jspConfigDescriptor = servletContext.getJspConfigDescriptor();
+        Collection<JspPropertyGroupDescriptor> propertyGroups = jspConfigDescriptor.getJspPropertyGroups();
         Assert.assertFalse(propertyGroups.isEmpty());
         propertyGroups.clear();
 
@@ -144,8 +138,7 @@ public class TestApplicationContext extends TomcatBaseTest {
     private ServletContext getServletContext() throws LifecycleException {
         Tomcat tomcat = getTomcatInstanceTestWebapp(false, false);
 
-        StandardContext standardContext =
-                (StandardContext) tomcat.getHost().findChildren()[0];
+        StandardContext standardContext = (StandardContext) tomcat.getHost().findChildren()[0];
 
         return standardContext.getServletContext();
     }
@@ -213,8 +206,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             PrintWriter pw = resp.getWriter();
             ServletContext sc = req.getServletContext();
@@ -249,9 +241,8 @@ public class TestApplicationContext extends TomcatBaseTest {
 
 
     /*
-     * The expectation is that you can set a context attribute on
-     * ServletContextB from ServletContextA and then access that attribute via
-     * a cross-context dispatch to ServletContextB.
+     * The expectation is that you can set a context attribute on ServletContextB from ServletContextA and then access
+     * that attribute via a cross-context dispatch to ServletContextB.
      */
     @Test
     public void testCrossContextSetAttribute() throws Exception {
@@ -296,8 +287,7 @@ public class TestApplicationContext extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             ServletContext sc;
             if (targetContextPath == null) {
                 sc = req.getServletContext();
@@ -315,12 +305,10 @@ public class TestApplicationContext extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             PrintWriter pw = resp.getWriter();
-            String value = (String) req.getServletContext().getAttribute(
-                    SetAttributeServlet.ATTRIBUTE_NAME);
+            String value = (String) req.getServletContext().getAttribute(SetAttributeServlet.ATTRIBUTE_NAME);
             if (SetAttributeServlet.ATTRIBUTE_VALUE.equals(value)) {
                 pw.print("01-PASS");
             } else {

@@ -49,9 +49,8 @@ public class TestAuthInfoResponseHeaders extends TomcatBaseTest {
     private static String CLIENT_AUTH_HEADER = "authorization";
 
     /*
-     * Encapsulate the logic to generate an HTTP header
-     * for BASIC Authentication.
-     * Note: only used internally, so no need to validate arguments.
+     * Encapsulate the logic to generate an HTTP header for BASIC Authentication. Note: only used internally, so no need
+     * to validate arguments.
      */
     private static final class BasicCredentials {
 
@@ -60,16 +59,14 @@ public class TestAuthInfoResponseHeaders extends TomcatBaseTest {
         private final String password;
         private final String credentials;
 
-        private BasicCredentials(String aMethod,
-                String aUsername, String aPassword) {
+        private BasicCredentials(String aMethod, String aUsername, String aPassword) {
             method = aMethod;
             username = aUsername;
             password = aPassword;
             String userCredentials = username + ":" + password;
-            byte[] credentialsBytes =
-                    userCredentials.getBytes(StandardCharsets.ISO_8859_1);
+            byte[] credentialsBytes = userCredentials.getBytes(StandardCharsets.ISO_8859_1);
             String base64auth = Base64.getEncoder().encodeToString(credentialsBytes);
-            credentials= method + " " + base64auth;
+            credentials = method + " " + base64auth;
         }
 
         private String getCredentials() {
@@ -87,13 +84,11 @@ public class TestAuthInfoResponseHeaders extends TomcatBaseTest {
         doTest(USER, PWD, CONTEXT_PATH + URI, true);
     }
 
-    public void doTest(String user, String pwd, String uri, boolean expectResponseAuthHeaders)
-            throws Exception {
+    public void doTest(String user, String pwd, String uri, boolean expectResponseAuthHeaders) throws Exception {
 
         if (expectResponseAuthHeaders) {
             BasicAuthenticator auth =
-                (BasicAuthenticator) getTomcatInstance().getHost().findChild(
-                        CONTEXT_PATH).getPipeline().getFirst();
+                    (BasicAuthenticator) getTomcatInstance().getHost().findChild(CONTEXT_PATH).getPipeline().getFirst();
             auth.setSendAuthInfoResponseHeaders(true);
         }
         getTomcatInstance().start();
@@ -114,8 +109,7 @@ public class TestAuthInfoResponseHeaders extends TomcatBaseTest {
         Map<String,List<String>> respHeaders = new HashMap<>();
 
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + uri, bc, reqHeaders,
-                respHeaders);
+        int rc = getUrl("http://localhost:" + getPort() + uri, bc, reqHeaders, respHeaders);
         Assert.assertEquals(200, rc);
         Assert.assertEquals("OK", bc.toString());
 

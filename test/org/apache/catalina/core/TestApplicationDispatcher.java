@@ -122,8 +122,7 @@ public class TestApplicationDispatcher extends TomcatBaseTest {
             resp.setCharacterEncoding(StandardCharsets.UTF_8);
             PrintWriter pw = resp.getWriter();
 
-            if ("POST".equals(req.getAttribute(RequestDispatcher.ERROR_METHOD)) &&
-                    "GET".equals(req.getMethod())) {
+            if ("POST".equals(req.getAttribute(RequestDispatcher.ERROR_METHOD)) && "GET".equals(req.getMethod())) {
                 pw.print("OK");
             } else {
                 pw.print("FAIL");

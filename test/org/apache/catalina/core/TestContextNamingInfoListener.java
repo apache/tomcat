@@ -42,19 +42,27 @@ public class TestContextNamingInfoListener extends TomcatBaseTest {
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] { "", "", null,  Boolean.FALSE, "/", "/", "ROOT" });
-        parameterSets.add(new Object[] { "", "42", null,  Boolean.FALSE, "/", "/", "ROOT##42" });
-        parameterSets.add(new Object[] { "", "", null,  Boolean.TRUE, "", "", "" });
-        parameterSets.add(new Object[] { "", "42", null,  Boolean.TRUE, "", "", "##42" });
-        for (Boolean b: Arrays.asList(Boolean.FALSE, Boolean.TRUE)) {
-            parameterSets.add(new Object[] { "/foo", "", null,  b, "/foo", "/foo", "/foo" });
-            parameterSets.add(new Object[] { "/foo", "", "My Foo Webapp",  b, "/foo", "/foo", "/foo" });
-            parameterSets.add(new Object[] { "/foo", "42", "My Foo Webapp",  b, "/foo", "/foo", "/foo##42" });
-            parameterSets.add(new Object[] { "/foo/bar", "", null,  b, "/foo/bar", "/foo/bar", "/foo/bar" });
-            parameterSets.add(new Object[] { "/foo/bar", "", "My Foobar Webapp",  b, "/foo/bar", "/foo/bar", "/foo/bar" });
-            parameterSets.add(new Object[] { "/foo/bar", "42", "My Foobar Webapp",  b, "/foo/bar", "/foo/bar", "/foo/bar##42" });
-            parameterSets.add(new Object[] { "/\u0444\u0443/\u0431\u0430\u0440", "", "\u041C\u043E\u0439 \u0424\u0443\u0431\u0430\u0440 \u0412\u0435\u0431\u0430\u043F\u043F",  b, "/\u0444\u0443/\u0431\u0430\u0440", "/%D1%84%D1%83/%D0%B1%D0%B0%D1%80", "/\u0444\u0443/\u0431\u0430\u0440" });
-            parameterSets.add(new Object[] { "/\u0444\u0443/\u0431\u0430\u0440", "42", "\u041C\u043E\u0439 \u0424\u0443\u0431\u0430\u0440 \u0412\u0435\u0431\u0430\u043F\u043F",  b, "/\u0444\u0443/\u0431\u0430\u0440", "/%D1%84%D1%83/%D0%B1%D0%B0%D1%80", "/\u0444\u0443/\u0431\u0430\u0440##42" });
+        parameterSets.add(new Object[] { "", "", null, Boolean.FALSE, "/", "/", "ROOT" });
+        parameterSets.add(new Object[] { "", "42", null, Boolean.FALSE, "/", "/", "ROOT##42" });
+        parameterSets.add(new Object[] { "", "", null, Boolean.TRUE, "", "", "" });
+        parameterSets.add(new Object[] { "", "42", null, Boolean.TRUE, "", "", "##42" });
+        for (Boolean b : Arrays.asList(Boolean.FALSE, Boolean.TRUE)) {
+            parameterSets.add(new Object[] { "/foo", "", null, b, "/foo", "/foo", "/foo" });
+            parameterSets.add(new Object[] { "/foo", "", "My Foo Webapp", b, "/foo", "/foo", "/foo" });
+            parameterSets.add(new Object[] { "/foo", "42", "My Foo Webapp", b, "/foo", "/foo", "/foo##42" });
+            parameterSets.add(new Object[] { "/foo/bar", "", null, b, "/foo/bar", "/foo/bar", "/foo/bar" });
+            parameterSets
+                    .add(new Object[] { "/foo/bar", "", "My Foobar Webapp", b, "/foo/bar", "/foo/bar", "/foo/bar" });
+            parameterSets.add(
+                    new Object[] { "/foo/bar", "42", "My Foobar Webapp", b, "/foo/bar", "/foo/bar", "/foo/bar##42" });
+            parameterSets.add(new Object[] { "/\u0444\u0443/\u0431\u0430\u0440", "",
+                    "\u041C\u043E\u0439 \u0424\u0443\u0431\u0430\u0440 \u0412\u0435\u0431\u0430\u043F\u043F", b,
+                    "/\u0444\u0443/\u0431\u0430\u0440", "/%D1%84%D1%83/%D0%B1%D0%B0%D1%80",
+                    "/\u0444\u0443/\u0431\u0430\u0440" });
+            parameterSets.add(new Object[] { "/\u0444\u0443/\u0431\u0430\u0440", "42",
+                    "\u041C\u043E\u0439 \u0424\u0443\u0431\u0430\u0440 \u0412\u0435\u0431\u0430\u043F\u043F", b,
+                    "/\u0444\u0443/\u0431\u0430\u0440", "/%D1%84%D1%83/%D0%B1%D0%B0%D1%80",
+                    "/\u0444\u0443/\u0431\u0430\u0440##42" });
         }
 
         return parameterSets;
