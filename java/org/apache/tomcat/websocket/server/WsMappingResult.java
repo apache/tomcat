@@ -20,5 +20,5 @@ import java.util.Map;
 
 import jakarta.websocket.server.ServerEndpointConfig;
 
-public record WsMappingResult(ServerEndpointConfig config, Map<String, String> pathParams) {
+public record WsMappingResult(ServerEndpointConfig config, Map<String,String> pathParams) {
 }

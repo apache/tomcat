@@ -165,7 +165,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
                 }
             }
             socketWrapper.write(block ? BlockingMode.BLOCK : BlockingMode.SEMI_BLOCK, timeout, TimeUnit.MILLISECONDS,
-                    null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long, Void>() {
+                    null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long,Void>() {
                         @Override
                         public void completed(Long result, Void attachment) {
                             if (block) {
@@ -378,8 +378,7 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
     }
 
 
-    private record OnResultRunnable(WsSession session, SendHandler sh,
-                                    Throwable t) implements Runnable {
+    private record OnResultRunnable(WsSession session, SendHandler sh, Throwable t) implements Runnable {
         @Override
         public void run() {
             if (t == null) {

@@ -34,8 +34,8 @@ public class WsWriteTimeout implements BackgroundProcess {
     /**
      * Note: The comparator imposes orderings that are inconsistent with equals
      */
-    private final Set<WsRemoteEndpointImplServer> endpoints = new ConcurrentSkipListSet<>(
-            Comparator.comparingLong(WsRemoteEndpointImplServer::getTimeoutExpiry));
+    private final Set<WsRemoteEndpointImplServer> endpoints =
+            new ConcurrentSkipListSet<>(Comparator.comparingLong(WsRemoteEndpointImplServer::getTimeoutExpiry));
     private final AtomicInteger count = new AtomicInteger(0);
     private int backgroundProcessCount = 0;
     private volatile int processPeriod = 1;
