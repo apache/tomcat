@@ -32,8 +32,7 @@ public class TesterContainerProviderPerformance {
     @Test
     public void testGetWebSocketContainer() throws Exception {
         for (int i = 1; i < 9; i++) {
-            TesterThreadedPerformance test =
-                    new TesterThreadedPerformance(i, 250000, new TestInstanceSupplier());
+            TesterThreadedPerformance test = new TesterThreadedPerformance(i, 250000, new TestInstanceSupplier());
             long duration = test.doTest();
             System.out.println(i + " threads completed in " + duration + "ns");
         }
