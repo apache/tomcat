@@ -31,10 +31,18 @@ import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
@@ -49,7 +57,10 @@ import org.junit.Before;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Server;
@@ -924,5 +935,113 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         for (Session session : sessions) {
             session.setMaxInactiveInterval(newIntervalSecs);
         }
+    }
+
+    /**
+     * Captures webapp-scoped logs (e.g. ContextConfig/Digester) during the
+     * CONFIGURE_START phase of a {@link Context}.
+     */
+    public static class WebappLogCapture implements LifecycleListener, AutoCloseable {
+        private final Level level;
+        private final String[] loggerNames;
+        private final List<LogRecord> logRecords = Collections.synchronizedList(new ArrayList<>());
+        private final Map<Logger, Level> previousLevelsOfLoggersMap = new IdentityHashMap<>();
+        private final List<Logger> attachedLoggers = new CopyOnWriteArrayList<>();
+        private volatile boolean installed = false;
+
+        private final Handler handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                logRecords.add(record);
+            }
+
+            @Override
+            public void flush() {
+            }
+
+            @Override
+            public void close() throws SecurityException {
+                logRecords.clear();
+            }
+        };
+        public WebappLogCapture(Level level, String... loggerNames) {
+            this.level = level == null ? Level.ALL : level;
+            this.loggerNames = loggerNames;
+        }
+
+        @Override
+        public void close() throws Exception {
+            for (Logger l : attachedLoggers) {
+                try {
+                    l.removeHandler(handler);
+                } catch (Throwable ignore) {
+                }
+                try {
+                    l.setLevel(previousLevelsOfLoggersMap.get(l));
+                } catch (Throwable ignore) {
+                }
+            }
+            attachedLoggers.clear();
+            previousLevelsOfLoggersMap.clear();
+        }
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType()) && !installed) {
+                installed = true;
+                for (String name : loggerNames) {
+                    Logger logger = Logger.getLogger(name);
+                    previousLevelsOfLoggersMap.put(logger, logger.getLevel());
+                    logger.addHandler(handler);
+                    logger.setLevel(level);
+                    attachedLoggers.add(logger);
+                }
+            }
+        }
+
+        public boolean containsText(CharSequence s) {
+            for (LogRecord record : logRecords) {
+                if (record.getMessage().contains(s)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        public boolean hasException(Class<? extends Throwable> type) {
+            for (LogRecord record : logRecords) {
+                Throwable t = record.getThrown();
+                while (t != null) {
+                    if (type.isInstance(t)) {return true;}
+                    t = t.getCause();
+                }
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Installs a {@link WebappLogCapture} on the given {@link Context} so it runs
+     * before {@link ContextConfig} during CONFIGURE_START.
+     * @param ctx         the webapp context
+     * @param level       level for loggers (e.g. {@code Level.ALL})
+     * @param loggerNames fully-qualified logger names
+     * @return the active capture
+     */
+    public static WebappLogCapture attachWebappLogCapture(Context ctx, Level level, String... loggerNames) {
+        List<LifecycleListener> lifecycleListenersToReAdd = new ArrayList<>();
+        for (LifecycleListener l : ctx.findLifecycleListeners()) {
+            if (l instanceof ContextConfig) {
+                lifecycleListenersToReAdd.add(l);
+            }
+        }
+        for (LifecycleListener l : lifecycleListenersToReAdd) {
+            ctx.removeLifecycleListener(l);
+        }
+        WebappLogCapture webappLogCapture = new WebappLogCapture(level, loggerNames);
+        ctx.addLifecycleListener(webappLogCapture);
+        for (LifecycleListener l : lifecycleListenersToReAdd) {
+            ctx.addLifecycleListener(l);
+        }
+        return webappLogCapture;
     }
 }
