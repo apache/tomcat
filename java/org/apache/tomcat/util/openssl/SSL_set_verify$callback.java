@@ -26,8 +26,7 @@ import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 
 /**
- * {@snippet lang=c :
- * SSL_verify_cb callback
+ * {@snippet lang = c : * SSL_verify_cb callback
  * }
  */
 @SuppressWarnings("javadoc")
@@ -37,17 +36,15 @@ public class SSL_set_verify$callback {
         int apply(int _x0, MemorySegment _x1);
     }
 
-    private static final FunctionDescriptor $DESC = FunctionDescriptor.of(
-        openssl_h.C_INT,
-        openssl_h.C_INT,
-        openssl_h.C_POINTER
-    );
+    private static final FunctionDescriptor $DESC =
+            FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_INT, openssl_h.C_POINTER);
 
     public static FunctionDescriptor descriptor() {
         return $DESC;
     }
 
-    private static final MethodHandle UP$MH = openssl_h.upcallHandle(SSL_set_verify$callback.Function.class, "apply", $DESC);
+    private static final MethodHandle UP$MH =
+            openssl_h.upcallHandle(SSL_set_verify$callback.Function.class, "apply", $DESC);
 
     public static MemorySegment allocate(SSL_set_verify$callback.Function fi, Arena scope) {
         return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, scope);
@@ -55,7 +52,7 @@ public class SSL_set_verify$callback {
 
     private static final MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
 
-    public static int invoke(MemorySegment funcPtr,int _x0, MemorySegment _x1) {
+    public static int invoke(MemorySegment funcPtr, int _x0, MemorySegment _x1) {
         try {
             return (int) DOWN$MH.invokeExact(funcPtr, _x0, _x1);
         } catch (Throwable ex$) {

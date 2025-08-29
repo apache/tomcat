@@ -29,7 +29,7 @@ import org.apache.tomcat.util.compat.JrePlatform;
 import java.lang.foreign.*;
 import static java.lang.foreign.ValueLayout.*;
 
-@SuppressWarnings({"javadoc", "boxing"})
+@SuppressWarnings({ "javadoc", "boxing" })
 public class openssl_h {
 
     openssl_h() {
@@ -40,15 +40,12 @@ public class openssl_h {
     static final boolean TRACE_DOWNCALLS = Boolean.getBoolean("jextract.trace.downcalls");
 
     static void traceDowncall(String name, Object... args) {
-         String traceArgs = Arrays.stream(args)
-                       .map(Object::toString)
-                       .collect(Collectors.joining(", "));
-         System.out.printf("%s(%s)\n", name, traceArgs);
+        String traceArgs = Arrays.stream(args).map(Object::toString).collect(Collectors.joining(", "));
+        System.out.printf("%s(%s)\n", name, traceArgs);
     }
 
     static MemorySegment findOrThrow(String symbol) {
-        return SYMBOL_LOOKUP.find(symbol)
-            .orElseThrow(() -> new UnsatisfiedLinkError("unresolved symbol: " + symbol));
+        return SYMBOL_LOOKUP.find(symbol).orElseThrow(() -> new UnsatisfiedLinkError("unresolved symbol: " + symbol));
     }
 
     static MethodHandle upcallHandle(Class<?> fi, String name, FunctionDescriptor fdesc) {
@@ -64,22 +61,24 @@ public class openssl_h {
             case PaddingLayout p -> p;
             case ValueLayout v -> v.withByteAlignment(align);
             case GroupLayout g -> {
-                MemoryLayout[] alignedMembers = g.memberLayouts().stream()
-                        .map(m -> align(m, align)).toArray(MemoryLayout[]::new);
-                yield g instanceof StructLayout ?
-                        MemoryLayout.structLayout(alignedMembers) : MemoryLayout.unionLayout(alignedMembers);
+                MemoryLayout[] alignedMembers =
+                        g.memberLayouts().stream().map(m -> align(m, align)).toArray(MemoryLayout[]::new);
+                yield g instanceof StructLayout ? MemoryLayout.structLayout(alignedMembers) :
+                        MemoryLayout.unionLayout(alignedMembers);
             }
             case SequenceLayout s -> MemoryLayout.sequenceLayout(s.elementCount(), align(s.elementLayout(), align));
         };
     }
 
     /*
-     * On macOS SymbolLookup.libraryLookup() appears to ignore java.library.path which means the LibreSSL
-     * library will be found which will then fail. Therefore, skip that lookup on macOS.
-     * On other platforms this can also be used to give more flexibility when testing.
+     * On macOS SymbolLookup.libraryLookup() appears to ignore java.library.path which means the LibreSSL library will
+     * be found which will then fail. Therefore, skip that lookup on macOS. On other platforms this can also be used to
+     * give more flexibility when testing.
      */
-    public static final boolean USE_SYSTEM_LOAD_LIBRARY = Boolean.getBoolean("org.apache.tomcat.util.openssl.USE_SYSTEM_LOAD_LIBRARY");
-    public static final String CRYPTO_LIBRARY_NAME = System.getProperty("org.apache.tomcat.util.openssl.CRYPTO_LIBRARY_NAME");
+    public static final boolean USE_SYSTEM_LOAD_LIBRARY =
+            Boolean.getBoolean("org.apache.tomcat.util.openssl.USE_SYSTEM_LOAD_LIBRARY");
+    public static final String CRYPTO_LIBRARY_NAME =
+            System.getProperty("org.apache.tomcat.util.openssl.CRYPTO_LIBRARY_NAME");
     public static final String LIBRARY_NAME = System.getProperty("org.apache.tomcat.util.openssl.LIBRARY_NAME",
             (JrePlatform.IS_MAC_OS) ? "ssl.48" : "ssl");
 
@@ -93,8 +92,7 @@ public class openssl_h {
             SYMBOL_LOOKUP = SymbolLookup.loaderLookup().or(Linker.nativeLinker().defaultLookup());
         } else {
             SYMBOL_LOOKUP = SymbolLookup.libraryLookup(System.mapLibraryName(LIBRARY_NAME), LIBRARY_ARENA)
-                    .or(SymbolLookup.loaderLookup())
-                    .or(Linker.nativeLinker().defaultLookup());
+                    .or(SymbolLookup.loaderLookup()).or(Linker.nativeLinker().defaultLookup());
         }
     }
 
@@ -105,679 +103,753 @@ public class openssl_h {
     public static final ValueLayout.OfLong C_LONG_LONG = ValueLayout.JAVA_LONG;
     public static final ValueLayout.OfFloat C_FLOAT = ValueLayout.JAVA_FLOAT;
     public static final ValueLayout.OfDouble C_DOUBLE = ValueLayout.JAVA_DOUBLE;
-    public static final AddressLayout C_POINTER = ValueLayout.ADDRESS
-            .withTargetLayout(MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE, JAVA_BYTE));
+    public static final AddressLayout C_POINTER =
+            ValueLayout.ADDRESS.withTargetLayout(MemoryLayout.sequenceLayout(java.lang.Long.MAX_VALUE, JAVA_BYTE));
     public static final ValueLayout.OfLong C_LONG = ValueLayout.JAVA_LONG;
-    private static final int BIO_CLOSE = (int)1L;
+    private static final int BIO_CLOSE = (int) 1L;
+
     /**
-     * {@snippet lang=c :
-     * #define BIO_CLOSE 1
+     * {@snippet lang = c : * #define BIO_CLOSE 1
      * }
      */
     public static int BIO_CLOSE() {
         return BIO_CLOSE;
     }
-    private static final int BIO_CTRL_RESET = (int)1L;
+
+    private static final int BIO_CTRL_RESET = (int) 1L;
+
     /**
-     * {@snippet lang=c :
-     * #define BIO_CTRL_RESET 1
+     * {@snippet lang = c : * #define BIO_CTRL_RESET 1
      * }
      */
     public static int BIO_CTRL_RESET() {
         return BIO_CTRL_RESET;
     }
-    private static final int BIO_FP_READ = (int)2L;
+
+    private static final int BIO_FP_READ = (int) 2L;
+
     /**
-     * {@snippet lang=c :
-     * #define BIO_FP_READ 2
+     * {@snippet lang = c : * #define BIO_FP_READ 2
      * }
      */
     public static int BIO_FP_READ() {
         return BIO_FP_READ;
     }
-    private static final int BIO_C_SET_FILENAME = (int)108L;
+
+    private static final int BIO_C_SET_FILENAME = (int) 108L;
+
     /**
-     * {@snippet lang=c :
-     * #define BIO_C_SET_FILENAME 108
+     * {@snippet lang = c : * #define BIO_C_SET_FILENAME 108
      * }
      */
     public static int BIO_C_SET_FILENAME() {
         return BIO_C_SET_FILENAME;
     }
-    private static final int NID_info_access = (int)177L;
+
+    private static final int NID_info_access = (int) 177L;
+
     /**
-     * {@snippet lang=c :
-     * #define NID_info_access 177
+     * {@snippet lang = c : * #define NID_info_access 177
      * }
      */
     public static int NID_info_access() {
         return NID_info_access;
     }
-    private static final int X509_FILETYPE_PEM = (int)1L;
+
+    private static final int X509_FILETYPE_PEM = (int) 1L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_FILETYPE_PEM 1
+     * {@snippet lang = c : * #define X509_FILETYPE_PEM 1
      * }
      */
     public static int X509_FILETYPE_PEM() {
         return X509_FILETYPE_PEM;
     }
-    private static final int X509_L_FILE_LOAD = (int)1L;
+
+    private static final int X509_L_FILE_LOAD = (int) 1L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_L_FILE_LOAD 1
+     * {@snippet lang = c : * #define X509_L_FILE_LOAD 1
      * }
      */
     public static int X509_L_FILE_LOAD() {
         return X509_L_FILE_LOAD;
     }
-    private static final int X509_L_ADD_DIR = (int)2L;
+
+    private static final int X509_L_ADD_DIR = (int) 2L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_L_ADD_DIR 2
+     * {@snippet lang = c : * #define X509_L_ADD_DIR 2
      * }
      */
     public static int X509_L_ADD_DIR() {
         return X509_L_ADD_DIR;
     }
-    private static final int X509_V_OK = (int)0L;
+
+    private static final int X509_V_OK = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_V_OK 0
+     * {@snippet lang = c : * #define X509_V_OK 0
      * }
      */
     public static int X509_V_OK() {
         return X509_V_OK;
     }
-    private static final int X509_V_ERR_CRL_HAS_EXPIRED = (int)12L;
+
+    private static final int X509_V_ERR_CRL_HAS_EXPIRED = (int) 12L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_V_ERR_CRL_HAS_EXPIRED 12
+     * {@snippet lang = c : * #define X509_V_ERR_CRL_HAS_EXPIRED 12
      * }
      */
     public static int X509_V_ERR_CRL_HAS_EXPIRED() {
         return X509_V_ERR_CRL_HAS_EXPIRED;
     }
-    private static final int X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT = (int)18L;
+
+    private static final int X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT = (int) 18L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT 18
+     * {@snippet lang = c : * #define X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT 18
      * }
      */
     public static int X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT() {
         return X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT;
     }
-    private static final int X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN = (int)19L;
+
+    private static final int X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN = (int) 19L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN 19
+     * {@snippet lang = c : * #define X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN 19
      * }
      */
     public static int X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN() {
         return X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN;
     }
-    private static final int X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY = (int)20L;
+
+    private static final int X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY = (int) 20L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY 20
+     * {@snippet lang = c : * #define X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY 20
      * }
      */
     public static int X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY() {
         return X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY;
     }
-    private static final int X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE = (int)21L;
+
+    private static final int X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE = (int) 21L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE 21
+     * {@snippet lang = c : * #define X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE 21
      * }
      */
     public static int X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE() {
         return X509_V_ERR_UNABLE_TO_VERIFY_LEAF_SIGNATURE;
     }
-    private static final int X509_V_ERR_CERT_UNTRUSTED = (int)27L;
+
+    private static final int X509_V_ERR_CERT_UNTRUSTED = (int) 27L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_V_ERR_CERT_UNTRUSTED 27
+     * {@snippet lang = c : * #define X509_V_ERR_CERT_UNTRUSTED 27
      * }
      */
     public static int X509_V_ERR_CERT_UNTRUSTED() {
         return X509_V_ERR_CERT_UNTRUSTED;
     }
-    private static final int X509_V_ERR_APPLICATION_VERIFICATION = (int)50L;
+
+    private static final int X509_V_ERR_APPLICATION_VERIFICATION = (int) 50L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_V_ERR_APPLICATION_VERIFICATION 50
+     * {@snippet lang = c : * #define X509_V_ERR_APPLICATION_VERIFICATION 50
      * }
      */
     public static int X509_V_ERR_APPLICATION_VERIFICATION() {
         return X509_V_ERR_APPLICATION_VERIFICATION;
     }
-    private static final int X509_V_FLAG_CRL_CHECK = (int)4L;
+
+    private static final int X509_V_FLAG_CRL_CHECK = (int) 4L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_V_FLAG_CRL_CHECK 4
+     * {@snippet lang = c : * #define X509_V_FLAG_CRL_CHECK 4
      * }
      */
     public static int X509_V_FLAG_CRL_CHECK() {
         return X509_V_FLAG_CRL_CHECK;
     }
-    private static final int X509_V_FLAG_CRL_CHECK_ALL = (int)8L;
+
+    private static final int X509_V_FLAG_CRL_CHECK_ALL = (int) 8L;
+
     /**
-     * {@snippet lang=c :
-     * #define X509_V_FLAG_CRL_CHECK_ALL 8
+     * {@snippet lang = c : * #define X509_V_FLAG_CRL_CHECK_ALL 8
      * }
      */
     public static int X509_V_FLAG_CRL_CHECK_ALL() {
         return X509_V_FLAG_CRL_CHECK_ALL;
     }
-    private static final int PEM_R_NO_START_LINE = (int)108L;
+
+    private static final int PEM_R_NO_START_LINE = (int) 108L;
+
     /**
-     * {@snippet lang=c :
-     * #define PEM_R_NO_START_LINE 108
+     * {@snippet lang = c : * #define PEM_R_NO_START_LINE 108
      * }
      */
     public static int PEM_R_NO_START_LINE() {
         return PEM_R_NO_START_LINE;
     }
-    private static final int SSL3_VERSION = (int)768L;
+
+    private static final int SSL3_VERSION = (int) 768L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL3_VERSION 768
+     * {@snippet lang = c : * #define SSL3_VERSION 768
      * }
      */
     public static int SSL3_VERSION() {
         return SSL3_VERSION;
     }
-    private static final int TLS1_VERSION = (int)769L;
+
+    private static final int TLS1_VERSION = (int) 769L;
+
     /**
-     * {@snippet lang=c :
-     * #define TLS1_VERSION 769
+     * {@snippet lang = c : * #define TLS1_VERSION 769
      * }
      */
     public static int TLS1_VERSION() {
         return TLS1_VERSION;
     }
-    private static final int TLS1_1_VERSION = (int)770L;
+
+    private static final int TLS1_1_VERSION = (int) 770L;
+
     /**
-     * {@snippet lang=c :
-     * #define TLS1_1_VERSION 770
+     * {@snippet lang = c : * #define TLS1_1_VERSION 770
      * }
      */
     public static int TLS1_1_VERSION() {
         return TLS1_1_VERSION;
     }
-    private static final int TLS1_2_VERSION = (int)771L;
+
+    private static final int TLS1_2_VERSION = (int) 771L;
+
     /**
-     * {@snippet lang=c :
-     * #define TLS1_2_VERSION 771
+     * {@snippet lang = c : * #define TLS1_2_VERSION 771
      * }
      */
     public static int TLS1_2_VERSION() {
         return TLS1_2_VERSION;
     }
-    private static final int TLS1_3_VERSION = (int)772L;
+
+    private static final int TLS1_3_VERSION = (int) 772L;
+
     /**
-     * {@snippet lang=c :
-     * #define TLS1_3_VERSION 772
+     * {@snippet lang = c : * #define TLS1_3_VERSION 772
      * }
      */
     public static int TLS1_3_VERSION() {
         return TLS1_3_VERSION;
     }
-    private static final int SSL_SENT_SHUTDOWN = (int)1L;
+
+    private static final int SSL_SENT_SHUTDOWN = (int) 1L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_SENT_SHUTDOWN 1
+     * {@snippet lang = c : * #define SSL_SENT_SHUTDOWN 1
      * }
      */
     public static int SSL_SENT_SHUTDOWN() {
         return SSL_SENT_SHUTDOWN;
     }
-    private static final int SSL_RECEIVED_SHUTDOWN = (int)2L;
+
+    private static final int SSL_RECEIVED_SHUTDOWN = (int) 2L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_RECEIVED_SHUTDOWN 2
+     * {@snippet lang = c : * #define SSL_RECEIVED_SHUTDOWN 2
      * }
      */
     public static int SSL_RECEIVED_SHUTDOWN() {
         return SSL_RECEIVED_SHUTDOWN;
     }
-    private static final int SSL_OP_SINGLE_ECDH_USE = (int)0L;
+
+    private static final int SSL_OP_SINGLE_ECDH_USE = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_SINGLE_ECDH_USE 0
+     * {@snippet lang = c : * #define SSL_OP_SINGLE_ECDH_USE 0
      * }
      */
     public static int SSL_OP_SINGLE_ECDH_USE() {
         return SSL_OP_SINGLE_ECDH_USE;
     }
-    private static final int SSL_OP_SINGLE_DH_USE = (int)0L;
+
+    private static final int SSL_OP_SINGLE_DH_USE = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_SINGLE_DH_USE 0
+     * {@snippet lang = c : * #define SSL_OP_SINGLE_DH_USE 0
      * }
      */
     public static int SSL_OP_SINGLE_DH_USE() {
         return SSL_OP_SINGLE_DH_USE;
     }
-    private static final int SSL_OP_NO_SSLv2 = (int)0L;
+
+    private static final int SSL_OP_NO_SSLv2 = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_NO_SSLv2 0
+     * {@snippet lang = c : * #define SSL_OP_NO_SSLv2 0
      * }
      */
     public static int SSL_OP_NO_SSLv2() {
         return SSL_OP_NO_SSLv2;
     }
-    private static final int SSL_CONF_FLAG_FILE = (int)2L;
+
+    private static final int SSL_CONF_FLAG_FILE = (int) 2L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CONF_FLAG_FILE 2
+     * {@snippet lang = c : * #define SSL_CONF_FLAG_FILE 2
      * }
      */
     public static int SSL_CONF_FLAG_FILE() {
         return SSL_CONF_FLAG_FILE;
     }
-    private static final int SSL_CONF_FLAG_SERVER = (int)8L;
+
+    private static final int SSL_CONF_FLAG_SERVER = (int) 8L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CONF_FLAG_SERVER 8
+     * {@snippet lang = c : * #define SSL_CONF_FLAG_SERVER 8
      * }
      */
     public static int SSL_CONF_FLAG_SERVER() {
         return SSL_CONF_FLAG_SERVER;
     }
-    private static final int SSL_CONF_FLAG_SHOW_ERRORS = (int)16L;
+
+    private static final int SSL_CONF_FLAG_SHOW_ERRORS = (int) 16L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CONF_FLAG_SHOW_ERRORS 16
+     * {@snippet lang = c : * #define SSL_CONF_FLAG_SHOW_ERRORS 16
      * }
      */
     public static int SSL_CONF_FLAG_SHOW_ERRORS() {
         return SSL_CONF_FLAG_SHOW_ERRORS;
     }
-    private static final int SSL_CONF_FLAG_CERTIFICATE = (int)32L;
+
+    private static final int SSL_CONF_FLAG_CERTIFICATE = (int) 32L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CONF_FLAG_CERTIFICATE 32
+     * {@snippet lang = c : * #define SSL_CONF_FLAG_CERTIFICATE 32
      * }
      */
     public static int SSL_CONF_FLAG_CERTIFICATE() {
         return SSL_CONF_FLAG_CERTIFICATE;
     }
-    private static final int SSL_CONF_TYPE_UNKNOWN = (int)0L;
+
+    private static final int SSL_CONF_TYPE_UNKNOWN = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CONF_TYPE_UNKNOWN 0
+     * {@snippet lang = c : * #define SSL_CONF_TYPE_UNKNOWN 0
      * }
      */
     public static int SSL_CONF_TYPE_UNKNOWN() {
         return SSL_CONF_TYPE_UNKNOWN;
     }
-    private static final int SSL_CONF_TYPE_FILE = (int)2L;
+
+    private static final int SSL_CONF_TYPE_FILE = (int) 2L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CONF_TYPE_FILE 2
+     * {@snippet lang = c : * #define SSL_CONF_TYPE_FILE 2
      * }
      */
     public static int SSL_CONF_TYPE_FILE() {
         return SSL_CONF_TYPE_FILE;
     }
-    private static final int SSL_CONF_TYPE_DIR = (int)3L;
+
+    private static final int SSL_CONF_TYPE_DIR = (int) 3L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CONF_TYPE_DIR 3
+     * {@snippet lang = c : * #define SSL_CONF_TYPE_DIR 3
      * }
      */
     public static int SSL_CONF_TYPE_DIR() {
         return SSL_CONF_TYPE_DIR;
     }
-    private static final int SSL_SESS_CACHE_OFF = (int)0L;
+
+    private static final int SSL_SESS_CACHE_OFF = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_SESS_CACHE_OFF 0
+     * {@snippet lang = c : * #define SSL_SESS_CACHE_OFF 0
      * }
      */
     public static int SSL_SESS_CACHE_OFF() {
         return SSL_SESS_CACHE_OFF;
     }
-    private static final int SSL_SESS_CACHE_SERVER = (int)2L;
+
+    private static final int SSL_SESS_CACHE_SERVER = (int) 2L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_SESS_CACHE_SERVER 2
+     * {@snippet lang = c : * #define SSL_SESS_CACHE_SERVER 2
      * }
      */
     public static int SSL_SESS_CACHE_SERVER() {
         return SSL_SESS_CACHE_SERVER;
     }
-    private static final int SSL2_VERSION = (int)2L;
+
+    private static final int SSL2_VERSION = (int) 2L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL2_VERSION 2
+     * {@snippet lang = c : * #define SSL2_VERSION 2
      * }
      */
     public static int SSL2_VERSION() {
         return SSL2_VERSION;
     }
-    private static final int SSL_TLSEXT_ERR_OK = (int)0L;
+
+    private static final int SSL_TLSEXT_ERR_OK = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_TLSEXT_ERR_OK 0
+     * {@snippet lang = c : * #define SSL_TLSEXT_ERR_OK 0
      * }
      */
     public static int SSL_TLSEXT_ERR_OK() {
         return SSL_TLSEXT_ERR_OK;
     }
-    private static final int SSL_TLSEXT_ERR_NOACK = (int)3L;
+
+    private static final int SSL_TLSEXT_ERR_NOACK = (int) 3L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_TLSEXT_ERR_NOACK 3
+     * {@snippet lang = c : * #define SSL_TLSEXT_ERR_NOACK 3
      * }
      */
     public static int SSL_TLSEXT_ERR_NOACK() {
         return SSL_TLSEXT_ERR_NOACK;
     }
-    private static final int SSL_CB_HANDSHAKE_DONE = (int)32L;
+
+    private static final int SSL_CB_HANDSHAKE_DONE = (int) 32L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CB_HANDSHAKE_DONE 32
+     * {@snippet lang = c : * #define SSL_CB_HANDSHAKE_DONE 32
      * }
      */
     public static int SSL_CB_HANDSHAKE_DONE() {
         return SSL_CB_HANDSHAKE_DONE;
     }
-    private static final int SSL_VERIFY_NONE = (int)0L;
+
+    private static final int SSL_VERIFY_NONE = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_VERIFY_NONE 0
+     * {@snippet lang = c : * #define SSL_VERIFY_NONE 0
      * }
      */
     public static int SSL_VERIFY_NONE() {
         return SSL_VERIFY_NONE;
     }
-    private static final int SSL_VERIFY_PEER = (int)1L;
+
+    private static final int SSL_VERIFY_PEER = (int) 1L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_VERIFY_PEER 1
+     * {@snippet lang = c : * #define SSL_VERIFY_PEER 1
      * }
      */
     public static int SSL_VERIFY_PEER() {
         return SSL_VERIFY_PEER;
     }
-    private static final int SSL_VERIFY_FAIL_IF_NO_PEER_CERT = (int)2L;
+
+    private static final int SSL_VERIFY_FAIL_IF_NO_PEER_CERT = (int) 2L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_VERIFY_FAIL_IF_NO_PEER_CERT 2
+     * {@snippet lang = c : * #define SSL_VERIFY_FAIL_IF_NO_PEER_CERT 2
      * }
      */
     public static int SSL_VERIFY_FAIL_IF_NO_PEER_CERT() {
         return SSL_VERIFY_FAIL_IF_NO_PEER_CERT;
     }
-    private static final int SSL_ERROR_NONE = (int)0L;
+
+    private static final int SSL_ERROR_NONE = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_ERROR_NONE 0
+     * {@snippet lang = c : * #define SSL_ERROR_NONE 0
      * }
      */
     public static int SSL_ERROR_NONE() {
         return SSL_ERROR_NONE;
     }
-    private static final int SSL_CTRL_SET_TMP_DH = (int)3L;
+
+    private static final int SSL_CTRL_SET_TMP_DH = (int) 3L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SET_TMP_DH 3
+     * {@snippet lang = c : * #define SSL_CTRL_SET_TMP_DH 3
      * }
      */
     public static int SSL_CTRL_SET_TMP_DH() {
         return SSL_CTRL_SET_TMP_DH;
     }
-    private static final int SSL_CTRL_SET_TMP_ECDH = (int)4L;
+
+    private static final int SSL_CTRL_SET_TMP_ECDH = (int) 4L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SET_TMP_ECDH 4
+     * {@snippet lang = c : * #define SSL_CTRL_SET_TMP_ECDH 4
      * }
      */
     public static int SSL_CTRL_SET_TMP_ECDH() {
         return SSL_CTRL_SET_TMP_ECDH;
     }
-    private static final int SSL_CTRL_SESS_NUMBER = (int)20L;
+
+    private static final int SSL_CTRL_SESS_NUMBER = (int) 20L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_NUMBER 20
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_NUMBER 20
      * }
      */
     public static int SSL_CTRL_SESS_NUMBER() {
         return SSL_CTRL_SESS_NUMBER;
     }
-    private static final int SSL_CTRL_SESS_CONNECT = (int)21L;
+
+    private static final int SSL_CTRL_SESS_CONNECT = (int) 21L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_CONNECT 21
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_CONNECT 21
      * }
      */
     public static int SSL_CTRL_SESS_CONNECT() {
         return SSL_CTRL_SESS_CONNECT;
     }
-    private static final int SSL_CTRL_SESS_CONNECT_GOOD = (int)22L;
+
+    private static final int SSL_CTRL_SESS_CONNECT_GOOD = (int) 22L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_CONNECT_GOOD 22
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_CONNECT_GOOD 22
      * }
      */
     public static int SSL_CTRL_SESS_CONNECT_GOOD() {
         return SSL_CTRL_SESS_CONNECT_GOOD;
     }
-    private static final int SSL_CTRL_SESS_CONNECT_RENEGOTIATE = (int)23L;
+
+    private static final int SSL_CTRL_SESS_CONNECT_RENEGOTIATE = (int) 23L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_CONNECT_RENEGOTIATE 23
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_CONNECT_RENEGOTIATE 23
      * }
      */
     public static int SSL_CTRL_SESS_CONNECT_RENEGOTIATE() {
         return SSL_CTRL_SESS_CONNECT_RENEGOTIATE;
     }
-    private static final int SSL_CTRL_SESS_ACCEPT = (int)24L;
+
+    private static final int SSL_CTRL_SESS_ACCEPT = (int) 24L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_ACCEPT 24
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_ACCEPT 24
      * }
      */
     public static int SSL_CTRL_SESS_ACCEPT() {
         return SSL_CTRL_SESS_ACCEPT;
     }
-    private static final int SSL_CTRL_SESS_ACCEPT_GOOD = (int)25L;
+
+    private static final int SSL_CTRL_SESS_ACCEPT_GOOD = (int) 25L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_ACCEPT_GOOD 25
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_ACCEPT_GOOD 25
      * }
      */
     public static int SSL_CTRL_SESS_ACCEPT_GOOD() {
         return SSL_CTRL_SESS_ACCEPT_GOOD;
     }
-    private static final int SSL_CTRL_SESS_ACCEPT_RENEGOTIATE = (int)26L;
+
+    private static final int SSL_CTRL_SESS_ACCEPT_RENEGOTIATE = (int) 26L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_ACCEPT_RENEGOTIATE 26
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_ACCEPT_RENEGOTIATE 26
      * }
      */
     public static int SSL_CTRL_SESS_ACCEPT_RENEGOTIATE() {
         return SSL_CTRL_SESS_ACCEPT_RENEGOTIATE;
     }
-    private static final int SSL_CTRL_SESS_HIT = (int)27L;
+
+    private static final int SSL_CTRL_SESS_HIT = (int) 27L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_HIT 27
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_HIT 27
      * }
      */
     public static int SSL_CTRL_SESS_HIT() {
         return SSL_CTRL_SESS_HIT;
     }
-    private static final int SSL_CTRL_SESS_CB_HIT = (int)28L;
+
+    private static final int SSL_CTRL_SESS_CB_HIT = (int) 28L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_CB_HIT 28
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_CB_HIT 28
      * }
      */
     public static int SSL_CTRL_SESS_CB_HIT() {
         return SSL_CTRL_SESS_CB_HIT;
     }
-    private static final int SSL_CTRL_SESS_MISSES = (int)29L;
+
+    private static final int SSL_CTRL_SESS_MISSES = (int) 29L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_MISSES 29
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_MISSES 29
      * }
      */
     public static int SSL_CTRL_SESS_MISSES() {
         return SSL_CTRL_SESS_MISSES;
     }
-    private static final int SSL_CTRL_SESS_TIMEOUTS = (int)30L;
+
+    private static final int SSL_CTRL_SESS_TIMEOUTS = (int) 30L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_TIMEOUTS 30
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_TIMEOUTS 30
      * }
      */
     public static int SSL_CTRL_SESS_TIMEOUTS() {
         return SSL_CTRL_SESS_TIMEOUTS;
     }
-    private static final int SSL_CTRL_SESS_CACHE_FULL = (int)31L;
+
+    private static final int SSL_CTRL_SESS_CACHE_FULL = (int) 31L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SESS_CACHE_FULL 31
+     * {@snippet lang = c : * #define SSL_CTRL_SESS_CACHE_FULL 31
      * }
      */
     public static int SSL_CTRL_SESS_CACHE_FULL() {
         return SSL_CTRL_SESS_CACHE_FULL;
     }
-    private static final int SSL_CTRL_SET_SESS_CACHE_SIZE = (int)42L;
+
+    private static final int SSL_CTRL_SET_SESS_CACHE_SIZE = (int) 42L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SET_SESS_CACHE_SIZE 42
+     * {@snippet lang = c : * #define SSL_CTRL_SET_SESS_CACHE_SIZE 42
      * }
      */
     public static int SSL_CTRL_SET_SESS_CACHE_SIZE() {
         return SSL_CTRL_SET_SESS_CACHE_SIZE;
     }
-    private static final int SSL_CTRL_GET_SESS_CACHE_SIZE = (int)43L;
+
+    private static final int SSL_CTRL_GET_SESS_CACHE_SIZE = (int) 43L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_GET_SESS_CACHE_SIZE 43
+     * {@snippet lang = c : * #define SSL_CTRL_GET_SESS_CACHE_SIZE 43
      * }
      */
     public static int SSL_CTRL_GET_SESS_CACHE_SIZE() {
         return SSL_CTRL_GET_SESS_CACHE_SIZE;
     }
-    private static final int SSL_CTRL_SET_SESS_CACHE_MODE = (int)44L;
+
+    private static final int SSL_CTRL_SET_SESS_CACHE_MODE = (int) 44L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SET_SESS_CACHE_MODE 44
+     * {@snippet lang = c : * #define SSL_CTRL_SET_SESS_CACHE_MODE 44
      * }
      */
     public static int SSL_CTRL_SET_SESS_CACHE_MODE() {
         return SSL_CTRL_SET_SESS_CACHE_MODE;
     }
-    private static final int SSL_CTRL_GET_SESS_CACHE_MODE = (int)45L;
+
+    private static final int SSL_CTRL_GET_SESS_CACHE_MODE = (int) 45L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_GET_SESS_CACHE_MODE 45
+     * {@snippet lang = c : * #define SSL_CTRL_GET_SESS_CACHE_MODE 45
      * }
      */
     public static int SSL_CTRL_GET_SESS_CACHE_MODE() {
         return SSL_CTRL_GET_SESS_CACHE_MODE;
     }
-    private static final int SSL_CTRL_SET_TLSEXT_TICKET_KEYS = (int)59L;
+
+    private static final int SSL_CTRL_SET_TLSEXT_TICKET_KEYS = (int) 59L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SET_TLSEXT_TICKET_KEYS 59
+     * {@snippet lang = c : * #define SSL_CTRL_SET_TLSEXT_TICKET_KEYS 59
      * }
      */
     public static int SSL_CTRL_SET_TLSEXT_TICKET_KEYS() {
         return SSL_CTRL_SET_TLSEXT_TICKET_KEYS;
     }
-    private static final int SSL_CTRL_CHAIN_CERT = (int)89L;
+
+    private static final int SSL_CTRL_CHAIN_CERT = (int) 89L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_CHAIN_CERT 89
+     * {@snippet lang = c : * #define SSL_CTRL_CHAIN_CERT 89
      * }
      */
     public static int SSL_CTRL_CHAIN_CERT() {
         return SSL_CTRL_CHAIN_CERT;
     }
-    private static final int SSL_CTRL_SET_GROUPS = (int)91L;
+
+    private static final int SSL_CTRL_SET_GROUPS = (int) 91L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SET_GROUPS 91
+     * {@snippet lang = c : * #define SSL_CTRL_SET_GROUPS 91
      * }
      */
     public static int SSL_CTRL_SET_GROUPS() {
         return SSL_CTRL_SET_GROUPS;
     }
-    private static final int SSL_CTRL_SET_DH_AUTO = (int)118L;
+
+    private static final int SSL_CTRL_SET_DH_AUTO = (int) 118L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SET_DH_AUTO 118
+     * {@snippet lang = c : * #define SSL_CTRL_SET_DH_AUTO 118
      * }
      */
     public static int SSL_CTRL_SET_DH_AUTO() {
         return SSL_CTRL_SET_DH_AUTO;
     }
-    private static final int SSL_CTRL_SET_MIN_PROTO_VERSION = (int)123L;
+
+    private static final int SSL_CTRL_SET_MIN_PROTO_VERSION = (int) 123L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SET_MIN_PROTO_VERSION 123
+     * {@snippet lang = c : * #define SSL_CTRL_SET_MIN_PROTO_VERSION 123
      * }
      */
     public static int SSL_CTRL_SET_MIN_PROTO_VERSION() {
         return SSL_CTRL_SET_MIN_PROTO_VERSION;
     }
-    private static final int SSL_CTRL_SET_MAX_PROTO_VERSION = (int)124L;
+
+    private static final int SSL_CTRL_SET_MAX_PROTO_VERSION = (int) 124L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_CTRL_SET_MAX_PROTO_VERSION 124
+     * {@snippet lang = c : * #define SSL_CTRL_SET_MAX_PROTO_VERSION 124
      * }
      */
     public static int SSL_CTRL_SET_MAX_PROTO_VERSION() {
         return SSL_CTRL_SET_MAX_PROTO_VERSION;
     }
-    private static final int ERR_REASON_MASK = (int)8388607L;
+
+    private static final int ERR_REASON_MASK = (int) 8388607L;
+
     /**
-     * {@snippet lang=c :
-     * #define ERR_REASON_MASK 8388607
+     * {@snippet lang = c : * #define ERR_REASON_MASK 8388607
      * }
      */
     public static int ERR_REASON_MASK() {
         return ERR_REASON_MASK;
     }
-    private static final int OCSP_RESPONSE_STATUS_SUCCESSFUL = (int)0L;
+
+    private static final int OCSP_RESPONSE_STATUS_SUCCESSFUL = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define OCSP_RESPONSE_STATUS_SUCCESSFUL 0
+     * {@snippet lang = c : * #define OCSP_RESPONSE_STATUS_SUCCESSFUL 0
      * }
      */
     public static int OCSP_RESPONSE_STATUS_SUCCESSFUL() {
         return OCSP_RESPONSE_STATUS_SUCCESSFUL;
     }
-    private static final int V_OCSP_CERTSTATUS_GOOD = (int)0L;
+
+    private static final int V_OCSP_CERTSTATUS_GOOD = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define V_OCSP_CERTSTATUS_GOOD 0
+     * {@snippet lang = c : * #define V_OCSP_CERTSTATUS_GOOD 0
      * }
      */
     public static int V_OCSP_CERTSTATUS_GOOD() {
         return V_OCSP_CERTSTATUS_GOOD;
     }
-    private static final int V_OCSP_CERTSTATUS_REVOKED = (int)1L;
+
+    private static final int V_OCSP_CERTSTATUS_REVOKED = (int) 1L;
+
     /**
-     * {@snippet lang=c :
-     * #define V_OCSP_CERTSTATUS_REVOKED 1
+     * {@snippet lang = c : * #define V_OCSP_CERTSTATUS_REVOKED 1
      * }
      */
     public static int V_OCSP_CERTSTATUS_REVOKED() {
         return V_OCSP_CERTSTATUS_REVOKED;
     }
-    private static final int V_OCSP_CERTSTATUS_UNKNOWN = (int)2L;
+
+    private static final int V_OCSP_CERTSTATUS_UNKNOWN = (int) 2L;
+
     /**
-     * {@snippet lang=c :
-     * #define V_OCSP_CERTSTATUS_UNKNOWN 2
+     * {@snippet lang = c : * #define V_OCSP_CERTSTATUS_UNKNOWN 2
      * }
      */
     public static int V_OCSP_CERTSTATUS_UNKNOWN() {
@@ -785,10 +857,7 @@ public class openssl_h {
     }
 
     private static class OPENSSL_sk_num {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OPENSSL_sk_num");
 
@@ -797,8 +866,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int OPENSSL_sk_num(const OPENSSL_STACK *)
+     * {@snippet lang = c : * int OPENSSL_sk_num(const OPENSSL_STACK *)
      * }
      */
     public static FunctionDescriptor OPENSSL_sk_num$descriptor() {
@@ -807,8 +875,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int OPENSSL_sk_num(const OPENSSL_STACK *)
+     * {@snippet lang = c : * int OPENSSL_sk_num(const OPENSSL_STACK *)
      * }
      */
     public static MethodHandle OPENSSL_sk_num$handle() {
@@ -817,8 +884,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int OPENSSL_sk_num(const OPENSSL_STACK *)
+     * {@snippet lang = c : * int OPENSSL_sk_num(const OPENSSL_STACK *)
      * }
      */
     public static MemorySegment OPENSSL_sk_num$address() {
@@ -826,8 +892,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int OPENSSL_sk_num(const OPENSSL_STACK *)
+     * {@snippet lang = c : * int OPENSSL_sk_num(const OPENSSL_STACK *)
      * }
      */
     public static int OPENSSL_sk_num(MemorySegment x0) {
@@ -836,18 +901,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OPENSSL_sk_num", x0);
             }
-            return (int)mh$.invokeExact(x0);
+            return (int) mh$.invokeExact(x0);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OPENSSL_sk_value {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OPENSSL_sk_value");
 
@@ -856,8 +918,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void *OPENSSL_sk_value(const OPENSSL_STACK *, int)
+     * {@snippet lang = c : * void *OPENSSL_sk_value(const OPENSSL_STACK *, int)
      * }
      */
     public static FunctionDescriptor OPENSSL_sk_value$descriptor() {
@@ -866,8 +927,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void *OPENSSL_sk_value(const OPENSSL_STACK *, int)
+     * {@snippet lang = c : * void *OPENSSL_sk_value(const OPENSSL_STACK *, int)
      * }
      */
     public static MethodHandle OPENSSL_sk_value$handle() {
@@ -876,8 +936,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void *OPENSSL_sk_value(const OPENSSL_STACK *, int)
+     * {@snippet lang = c : * void *OPENSSL_sk_value(const OPENSSL_STACK *, int)
      * }
      */
     public static MemorySegment OPENSSL_sk_value$address() {
@@ -885,8 +944,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void *OPENSSL_sk_value(const OPENSSL_STACK *, int)
+     * {@snippet lang = c : * void *OPENSSL_sk_value(const OPENSSL_STACK *, int)
      * }
      */
     public static MemorySegment OPENSSL_sk_value(MemorySegment x0, int x1) {
@@ -895,15 +953,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OPENSSL_sk_value", x0, x1);
             }
-            return (MemorySegment)mh$.invokeExact(x0, x1);
+            return (MemorySegment) mh$.invokeExact(x0, x1);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OpenSSL_version_num {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OpenSSL_version_num");
 
@@ -912,8 +969,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * unsigned long OpenSSL_version_num()
+     * {@snippet lang = c : * unsigned long OpenSSL_version_num()
      * }
      */
     public static FunctionDescriptor OpenSSL_version_num$descriptor() {
@@ -922,8 +978,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * unsigned long OpenSSL_version_num()
+     * {@snippet lang = c : * unsigned long OpenSSL_version_num()
      * }
      */
     public static MethodHandle OpenSSL_version_num$handle() {
@@ -932,8 +987,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * unsigned long OpenSSL_version_num()
+     * {@snippet lang = c : * unsigned long OpenSSL_version_num()
      * }
      */
     public static MemorySegment OpenSSL_version_num$address() {
@@ -941,8 +995,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * unsigned long OpenSSL_version_num()
+     * {@snippet lang = c : * unsigned long OpenSSL_version_num()
      * }
      */
     public static long OpenSSL_version_num() {
@@ -951,17 +1004,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OpenSSL_version_num");
             }
-            return (long)mh$.invokeExact();
+            return (long) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OpenSSL_version {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OpenSSL_version");
 
@@ -970,8 +1020,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const char *OpenSSL_version(int type)
+     * {@snippet lang = c : * const char *OpenSSL_version(int type)
      * }
      */
     public static FunctionDescriptor OpenSSL_version$descriptor() {
@@ -980,8 +1029,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const char *OpenSSL_version(int type)
+     * {@snippet lang = c : * const char *OpenSSL_version(int type)
      * }
      */
     public static MethodHandle OpenSSL_version$handle() {
@@ -990,8 +1038,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const char *OpenSSL_version(int type)
+     * {@snippet lang = c : * const char *OpenSSL_version(int type)
      * }
      */
     public static MemorySegment OpenSSL_version$address() {
@@ -999,8 +1046,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const char *OpenSSL_version(int type)
+     * {@snippet lang = c : * const char *OpenSSL_version(int type)
      * }
      */
     public static MemorySegment OpenSSL_version(int type) {
@@ -1009,18 +1055,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OpenSSL_version", type);
             }
-            return (MemorySegment)mh$.invokeExact(type);
+            return (MemorySegment) mh$.invokeExact(type);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class CRYPTO_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("CRYPTO_free");
 
@@ -1029,8 +1072,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void CRYPTO_free(void *ptr, const char *file, int line)
+     * {@snippet lang = c : * void CRYPTO_free(void *ptr, const char *file, int line)
      * }
      */
     public static FunctionDescriptor CRYPTO_free$descriptor() {
@@ -1039,8 +1081,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void CRYPTO_free(void *ptr, const char *file, int line)
+     * {@snippet lang = c : * void CRYPTO_free(void *ptr, const char *file, int line)
      * }
      */
     public static MethodHandle CRYPTO_free$handle() {
@@ -1049,8 +1090,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void CRYPTO_free(void *ptr, const char *file, int line)
+     * {@snippet lang = c : * void CRYPTO_free(void *ptr, const char *file, int line)
      * }
      */
     public static MemorySegment CRYPTO_free$address() {
@@ -1058,8 +1098,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void CRYPTO_free(void *ptr, const char *file, int line)
+     * {@snippet lang = c : * void CRYPTO_free(void *ptr, const char *file, int line)
      * }
      */
     public static void CRYPTO_free(MemorySegment ptr, MemorySegment file, int line) {
@@ -1070,15 +1109,12 @@ public class openssl_h {
             }
             mh$.invokeExact(ptr, file, line);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_ctrl_pending {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_ctrl_pending");
 
@@ -1087,8 +1123,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * size_t BIO_ctrl_pending(BIO *b)
+     * {@snippet lang = c : * size_t BIO_ctrl_pending(BIO *b)
      * }
      */
     public static FunctionDescriptor BIO_ctrl_pending$descriptor() {
@@ -1097,8 +1132,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * size_t BIO_ctrl_pending(BIO *b)
+     * {@snippet lang = c : * size_t BIO_ctrl_pending(BIO *b)
      * }
      */
     public static MethodHandle BIO_ctrl_pending$handle() {
@@ -1107,8 +1141,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * size_t BIO_ctrl_pending(BIO *b)
+     * {@snippet lang = c : * size_t BIO_ctrl_pending(BIO *b)
      * }
      */
     public static MemorySegment BIO_ctrl_pending$address() {
@@ -1116,8 +1149,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * size_t BIO_ctrl_pending(BIO *b)
+     * {@snippet lang = c : * size_t BIO_ctrl_pending(BIO *b)
      * }
      */
     public static long BIO_ctrl_pending(MemorySegment b) {
@@ -1126,15 +1158,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_ctrl_pending", b);
             }
-            return (long)mh$.invokeExact(b);
+            return (long) mh$.invokeExact(b);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_s_file {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_s_file");
 
@@ -1143,8 +1174,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_file()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_file()
      * }
      */
     public static FunctionDescriptor BIO_s_file$descriptor() {
@@ -1153,8 +1183,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_file()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_file()
      * }
      */
     public static MethodHandle BIO_s_file$handle() {
@@ -1163,8 +1192,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_file()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_file()
      * }
      */
     public static MemorySegment BIO_s_file$address() {
@@ -1172,8 +1200,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_file()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_file()
      * }
      */
     public static MemorySegment BIO_s_file() {
@@ -1182,18 +1209,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_s_file");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_new_file {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_new_file");
 
@@ -1202,8 +1226,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIO *BIO_new_file(const char *filename, const char *mode)
+     * {@snippet lang = c : * BIO *BIO_new_file(const char *filename, const char *mode)
      * }
      */
     public static FunctionDescriptor BIO_new_file$descriptor() {
@@ -1212,8 +1235,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIO *BIO_new_file(const char *filename, const char *mode)
+     * {@snippet lang = c : * BIO *BIO_new_file(const char *filename, const char *mode)
      * }
      */
     public static MethodHandle BIO_new_file$handle() {
@@ -1222,8 +1244,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIO *BIO_new_file(const char *filename, const char *mode)
+     * {@snippet lang = c : * BIO *BIO_new_file(const char *filename, const char *mode)
      * }
      */
     public static MemorySegment BIO_new_file$address() {
@@ -1231,8 +1252,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIO *BIO_new_file(const char *filename, const char *mode)
+     * {@snippet lang = c : * BIO *BIO_new_file(const char *filename, const char *mode)
      * }
      */
     public static MemorySegment BIO_new_file(MemorySegment filename, MemorySegment mode) {
@@ -1241,17 +1261,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_new_file", filename, mode);
             }
-            return (MemorySegment)mh$.invokeExact(filename, mode);
+            return (MemorySegment) mh$.invokeExact(filename, mode);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_new {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_new");
 
@@ -1260,8 +1277,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIO *BIO_new(const BIO_METHOD *type)
+     * {@snippet lang = c : * BIO *BIO_new(const BIO_METHOD *type)
      * }
      */
     public static FunctionDescriptor BIO_new$descriptor() {
@@ -1270,8 +1286,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIO *BIO_new(const BIO_METHOD *type)
+     * {@snippet lang = c : * BIO *BIO_new(const BIO_METHOD *type)
      * }
      */
     public static MethodHandle BIO_new$handle() {
@@ -1280,8 +1295,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIO *BIO_new(const BIO_METHOD *type)
+     * {@snippet lang = c : * BIO *BIO_new(const BIO_METHOD *type)
      * }
      */
     public static MemorySegment BIO_new$address() {
@@ -1289,8 +1303,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIO *BIO_new(const BIO_METHOD *type)
+     * {@snippet lang = c : * BIO *BIO_new(const BIO_METHOD *type)
      * }
      */
     public static MemorySegment BIO_new(MemorySegment type) {
@@ -1299,17 +1312,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_new", type);
             }
-            return (MemorySegment)mh$.invokeExact(type);
+            return (MemorySegment) mh$.invokeExact(type);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_free");
 
@@ -1318,8 +1328,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int BIO_free(BIO *a)
+     * {@snippet lang = c : * int BIO_free(BIO *a)
      * }
      */
     public static FunctionDescriptor BIO_free$descriptor() {
@@ -1328,8 +1337,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int BIO_free(BIO *a)
+     * {@snippet lang = c : * int BIO_free(BIO *a)
      * }
      */
     public static MethodHandle BIO_free$handle() {
@@ -1338,8 +1346,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int BIO_free(BIO *a)
+     * {@snippet lang = c : * int BIO_free(BIO *a)
      * }
      */
     public static MemorySegment BIO_free$address() {
@@ -1347,8 +1354,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int BIO_free(BIO *a)
+     * {@snippet lang = c : * int BIO_free(BIO *a)
      * }
      */
     public static int BIO_free(MemorySegment a) {
@@ -1357,19 +1363,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_free", a);
             }
-            return (int)mh$.invokeExact(a);
+            return (int) mh$.invokeExact(a);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_read {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_read");
 
@@ -1378,8 +1380,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int BIO_read(BIO *b, void *data, int dlen)
+     * {@snippet lang = c : * int BIO_read(BIO *b, void *data, int dlen)
      * }
      */
     public static FunctionDescriptor BIO_read$descriptor() {
@@ -1388,8 +1389,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int BIO_read(BIO *b, void *data, int dlen)
+     * {@snippet lang = c : * int BIO_read(BIO *b, void *data, int dlen)
      * }
      */
     public static MethodHandle BIO_read$handle() {
@@ -1398,8 +1398,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int BIO_read(BIO *b, void *data, int dlen)
+     * {@snippet lang = c : * int BIO_read(BIO *b, void *data, int dlen)
      * }
      */
     public static MemorySegment BIO_read$address() {
@@ -1407,8 +1406,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int BIO_read(BIO *b, void *data, int dlen)
+     * {@snippet lang = c : * int BIO_read(BIO *b, void *data, int dlen)
      * }
      */
     public static int BIO_read(MemorySegment b, MemorySegment data, int dlen) {
@@ -1417,19 +1415,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_read", b, data, dlen);
             }
-            return (int)mh$.invokeExact(b, data, dlen);
+            return (int) mh$.invokeExact(b, data, dlen);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_write {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_write");
 
@@ -1438,8 +1432,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int BIO_write(BIO *b, const void *data, int dlen)
+     * {@snippet lang = c : * int BIO_write(BIO *b, const void *data, int dlen)
      * }
      */
     public static FunctionDescriptor BIO_write$descriptor() {
@@ -1448,8 +1441,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int BIO_write(BIO *b, const void *data, int dlen)
+     * {@snippet lang = c : * int BIO_write(BIO *b, const void *data, int dlen)
      * }
      */
     public static MethodHandle BIO_write$handle() {
@@ -1458,8 +1450,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int BIO_write(BIO *b, const void *data, int dlen)
+     * {@snippet lang = c : * int BIO_write(BIO *b, const void *data, int dlen)
      * }
      */
     public static MemorySegment BIO_write$address() {
@@ -1467,8 +1458,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int BIO_write(BIO *b, const void *data, int dlen)
+     * {@snippet lang = c : * int BIO_write(BIO *b, const void *data, int dlen)
      * }
      */
     public static int BIO_write(MemorySegment b, MemorySegment data, int dlen) {
@@ -1477,20 +1467,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_write", b, data, dlen);
             }
-            return (int)mh$.invokeExact(b, data, dlen);
+            return (int) mh$.invokeExact(b, data, dlen);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_ctrl {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT,
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER,
+                openssl_h.C_INT, openssl_h.C_LONG, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_ctrl");
 
@@ -1499,8 +1484,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg)
+     * {@snippet lang = c : * long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg)
      * }
      */
     public static FunctionDescriptor BIO_ctrl$descriptor() {
@@ -1509,8 +1493,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg)
+     * {@snippet lang = c : * long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg)
      * }
      */
     public static MethodHandle BIO_ctrl$handle() {
@@ -1519,8 +1502,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg)
+     * {@snippet lang = c : * long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg)
      * }
      */
     public static MemorySegment BIO_ctrl$address() {
@@ -1528,8 +1510,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg)
+     * {@snippet lang = c : * long BIO_ctrl(BIO *bp, int cmd, long larg, void *parg)
      * }
      */
     public static long BIO_ctrl(MemorySegment bp, int cmd, long larg, MemorySegment parg) {
@@ -1538,15 +1519,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_ctrl", bp, cmd, larg, parg);
             }
-            return (long)mh$.invokeExact(bp, cmd, larg, parg);
+            return (long) mh$.invokeExact(bp, cmd, larg, parg);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_s_mem {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_s_mem");
 
@@ -1555,8 +1535,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_mem()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_mem()
      * }
      */
     public static FunctionDescriptor BIO_s_mem$descriptor() {
@@ -1565,8 +1544,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_mem()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_mem()
      * }
      */
     public static MethodHandle BIO_s_mem$handle() {
@@ -1575,8 +1553,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_mem()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_mem()
      * }
      */
     public static MemorySegment BIO_s_mem$address() {
@@ -1584,8 +1561,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_mem()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_mem()
      * }
      */
     public static MemorySegment BIO_s_mem() {
@@ -1594,15 +1570,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_s_mem");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_s_bio {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_s_bio");
 
@@ -1611,8 +1586,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_bio()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_bio()
      * }
      */
     public static FunctionDescriptor BIO_s_bio$descriptor() {
@@ -1621,8 +1595,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_bio()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_bio()
      * }
      */
     public static MethodHandle BIO_s_bio$handle() {
@@ -1631,8 +1604,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_bio()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_bio()
      * }
      */
     public static MemorySegment BIO_s_bio$address() {
@@ -1640,8 +1612,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const BIO_METHOD *BIO_s_bio()
+     * {@snippet lang = c : * const BIO_METHOD *BIO_s_bio()
      * }
      */
     public static MemorySegment BIO_s_bio() {
@@ -1650,20 +1621,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_s_bio");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BIO_new_bio_pair {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER,
+                openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BIO_new_bio_pair");
 
@@ -1672,8 +1638,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int BIO_new_bio_pair(BIO **bio1, size_t writebuf1, BIO **bio2, size_t writebuf2)
+     * {@snippet lang = c : * int BIO_new_bio_pair(BIO **bio1, size_t writebuf1, BIO **bio2, size_t writebuf2)
      * }
      */
     public static FunctionDescriptor BIO_new_bio_pair$descriptor() {
@@ -1682,8 +1647,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int BIO_new_bio_pair(BIO **bio1, size_t writebuf1, BIO **bio2, size_t writebuf2)
+     * {@snippet lang = c : * int BIO_new_bio_pair(BIO **bio1, size_t writebuf1, BIO **bio2, size_t writebuf2)
      * }
      */
     public static MethodHandle BIO_new_bio_pair$handle() {
@@ -1692,8 +1656,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int BIO_new_bio_pair(BIO **bio1, size_t writebuf1, BIO **bio2, size_t writebuf2)
+     * {@snippet lang = c : * int BIO_new_bio_pair(BIO **bio1, size_t writebuf1, BIO **bio2, size_t writebuf2)
      * }
      */
     public static MemorySegment BIO_new_bio_pair$address() {
@@ -1701,8 +1664,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int BIO_new_bio_pair(BIO **bio1, size_t writebuf1, BIO **bio2, size_t writebuf2)
+     * {@snippet lang = c : * int BIO_new_bio_pair(BIO **bio1, size_t writebuf1, BIO **bio2, size_t writebuf2)
      * }
      */
     public static int BIO_new_bio_pair(MemorySegment bio1, long writebuf1, MemorySegment bio2, long writebuf2) {
@@ -1711,15 +1673,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BIO_new_bio_pair", bio1, writebuf1, bio2, writebuf2);
             }
-            return (int)mh$.invokeExact(bio1, writebuf1, bio2, writebuf2);
+            return (int) mh$.invokeExact(bio1, writebuf1, bio2, writebuf2);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BN_new {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_new");
 
@@ -1728,8 +1689,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_new()
+     * {@snippet lang = c : * BIGNUM *BN_new()
      * }
      */
     public static FunctionDescriptor BN_new$descriptor() {
@@ -1738,8 +1698,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_new()
+     * {@snippet lang = c : * BIGNUM *BN_new()
      * }
      */
     public static MethodHandle BN_new$handle() {
@@ -1748,8 +1707,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_new()
+     * {@snippet lang = c : * BIGNUM *BN_new()
      * }
      */
     public static MemorySegment BN_new$address() {
@@ -1757,8 +1715,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIGNUM *BN_new()
+     * {@snippet lang = c : * BIGNUM *BN_new()
      * }
      */
     public static MemorySegment BN_new() {
@@ -1767,18 +1724,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BN_new");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BN_set_word {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_set_word");
 
@@ -1787,8 +1741,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int BN_set_word(BIGNUM *a, unsigned long w)
+     * {@snippet lang = c : * int BN_set_word(BIGNUM *a, unsigned long w)
      * }
      */
     public static FunctionDescriptor BN_set_word$descriptor() {
@@ -1797,8 +1750,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int BN_set_word(BIGNUM *a, unsigned long w)
+     * {@snippet lang = c : * int BN_set_word(BIGNUM *a, unsigned long w)
      * }
      */
     public static MethodHandle BN_set_word$handle() {
@@ -1807,8 +1759,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int BN_set_word(BIGNUM *a, unsigned long w)
+     * {@snippet lang = c : * int BN_set_word(BIGNUM *a, unsigned long w)
      * }
      */
     public static MemorySegment BN_set_word$address() {
@@ -1816,8 +1767,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int BN_set_word(BIGNUM *a, unsigned long w)
+     * {@snippet lang = c : * int BN_set_word(BIGNUM *a, unsigned long w)
      * }
      */
     public static int BN_set_word(MemorySegment a, long w) {
@@ -1826,17 +1776,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BN_set_word", a, w);
             }
-            return (int)mh$.invokeExact(a, w);
+            return (int) mh$.invokeExact(a, w);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BN_get_rfc2409_prime_768 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_get_rfc2409_prime_768");
 
@@ -1845,8 +1792,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc2409_prime_768(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc2409_prime_768(BIGNUM *bn)
      * }
      */
     public static FunctionDescriptor BN_get_rfc2409_prime_768$descriptor() {
@@ -1855,8 +1801,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc2409_prime_768(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc2409_prime_768(BIGNUM *bn)
      * }
      */
     public static MethodHandle BN_get_rfc2409_prime_768$handle() {
@@ -1865,8 +1810,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc2409_prime_768(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc2409_prime_768(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc2409_prime_768$address() {
@@ -1874,8 +1818,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc2409_prime_768(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc2409_prime_768(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc2409_prime_768(MemorySegment bn) {
@@ -1884,17 +1827,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BN_get_rfc2409_prime_768", bn);
             }
-            return (MemorySegment)mh$.invokeExact(bn);
+            return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BN_get_rfc2409_prime_1024 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_get_rfc2409_prime_1024");
 
@@ -1903,8 +1843,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc2409_prime_1024(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc2409_prime_1024(BIGNUM *bn)
      * }
      */
     public static FunctionDescriptor BN_get_rfc2409_prime_1024$descriptor() {
@@ -1913,8 +1852,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc2409_prime_1024(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc2409_prime_1024(BIGNUM *bn)
      * }
      */
     public static MethodHandle BN_get_rfc2409_prime_1024$handle() {
@@ -1923,8 +1861,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc2409_prime_1024(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc2409_prime_1024(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc2409_prime_1024$address() {
@@ -1932,8 +1869,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc2409_prime_1024(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc2409_prime_1024(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc2409_prime_1024(MemorySegment bn) {
@@ -1942,17 +1878,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BN_get_rfc2409_prime_1024", bn);
             }
-            return (MemorySegment)mh$.invokeExact(bn);
+            return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BN_get_rfc3526_prime_1536 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_get_rfc3526_prime_1536");
 
@@ -1961,8 +1894,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_1536(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_1536(BIGNUM *bn)
      * }
      */
     public static FunctionDescriptor BN_get_rfc3526_prime_1536$descriptor() {
@@ -1971,8 +1903,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_1536(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_1536(BIGNUM *bn)
      * }
      */
     public static MethodHandle BN_get_rfc3526_prime_1536$handle() {
@@ -1981,8 +1912,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_1536(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_1536(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_1536$address() {
@@ -1990,8 +1920,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_1536(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_1536(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_1536(MemorySegment bn) {
@@ -2000,17 +1929,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BN_get_rfc3526_prime_1536", bn);
             }
-            return (MemorySegment)mh$.invokeExact(bn);
+            return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BN_get_rfc3526_prime_2048 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_get_rfc3526_prime_2048");
 
@@ -2019,8 +1945,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_2048(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_2048(BIGNUM *bn)
      * }
      */
     public static FunctionDescriptor BN_get_rfc3526_prime_2048$descriptor() {
@@ -2029,8 +1954,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_2048(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_2048(BIGNUM *bn)
      * }
      */
     public static MethodHandle BN_get_rfc3526_prime_2048$handle() {
@@ -2039,8 +1963,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_2048(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_2048(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_2048$address() {
@@ -2048,8 +1971,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_2048(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_2048(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_2048(MemorySegment bn) {
@@ -2058,17 +1980,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BN_get_rfc3526_prime_2048", bn);
             }
-            return (MemorySegment)mh$.invokeExact(bn);
+            return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BN_get_rfc3526_prime_3072 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_get_rfc3526_prime_3072");
 
@@ -2077,8 +1996,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_3072(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_3072(BIGNUM *bn)
      * }
      */
     public static FunctionDescriptor BN_get_rfc3526_prime_3072$descriptor() {
@@ -2087,8 +2005,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_3072(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_3072(BIGNUM *bn)
      * }
      */
     public static MethodHandle BN_get_rfc3526_prime_3072$handle() {
@@ -2097,8 +2014,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_3072(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_3072(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_3072$address() {
@@ -2106,8 +2022,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_3072(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_3072(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_3072(MemorySegment bn) {
@@ -2116,17 +2031,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BN_get_rfc3526_prime_3072", bn);
             }
-            return (MemorySegment)mh$.invokeExact(bn);
+            return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BN_get_rfc3526_prime_4096 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_get_rfc3526_prime_4096");
 
@@ -2135,8 +2047,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_4096(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_4096(BIGNUM *bn)
      * }
      */
     public static FunctionDescriptor BN_get_rfc3526_prime_4096$descriptor() {
@@ -2145,8 +2056,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_4096(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_4096(BIGNUM *bn)
      * }
      */
     public static MethodHandle BN_get_rfc3526_prime_4096$handle() {
@@ -2155,8 +2065,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_4096(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_4096(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_4096$address() {
@@ -2164,8 +2073,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_4096(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_4096(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_4096(MemorySegment bn) {
@@ -2174,17 +2082,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BN_get_rfc3526_prime_4096", bn);
             }
-            return (MemorySegment)mh$.invokeExact(bn);
+            return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BN_get_rfc3526_prime_6144 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_get_rfc3526_prime_6144");
 
@@ -2193,8 +2098,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_6144(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_6144(BIGNUM *bn)
      * }
      */
     public static FunctionDescriptor BN_get_rfc3526_prime_6144$descriptor() {
@@ -2203,8 +2107,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_6144(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_6144(BIGNUM *bn)
      * }
      */
     public static MethodHandle BN_get_rfc3526_prime_6144$handle() {
@@ -2213,8 +2116,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_6144(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_6144(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_6144$address() {
@@ -2222,8 +2124,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_6144(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_6144(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_6144(MemorySegment bn) {
@@ -2232,17 +2133,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BN_get_rfc3526_prime_6144", bn);
             }
-            return (MemorySegment)mh$.invokeExact(bn);
+            return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class BN_get_rfc3526_prime_8192 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("BN_get_rfc3526_prime_8192");
 
@@ -2251,8 +2149,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_8192(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_8192(BIGNUM *bn)
      * }
      */
     public static FunctionDescriptor BN_get_rfc3526_prime_8192$descriptor() {
@@ -2261,8 +2158,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_8192(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_8192(BIGNUM *bn)
      * }
      */
     public static MethodHandle BN_get_rfc3526_prime_8192$handle() {
@@ -2271,8 +2167,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_8192(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_8192(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_8192$address() {
@@ -2280,8 +2175,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * BIGNUM *BN_get_rfc3526_prime_8192(BIGNUM *bn)
+     * {@snippet lang = c : * BIGNUM *BN_get_rfc3526_prime_8192(BIGNUM *bn)
      * }
      */
     public static MemorySegment BN_get_rfc3526_prime_8192(MemorySegment bn) {
@@ -2290,17 +2184,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("BN_get_rfc3526_prime_8192", bn);
             }
-            return (MemorySegment)mh$.invokeExact(bn);
+            return (MemorySegment) mh$.invokeExact(bn);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class ASN1_STRING_length {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("ASN1_STRING_length");
 
@@ -2309,8 +2200,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int ASN1_STRING_length(const ASN1_STRING *x)
+     * {@snippet lang = c : * int ASN1_STRING_length(const ASN1_STRING *x)
      * }
      */
     public static FunctionDescriptor ASN1_STRING_length$descriptor() {
@@ -2319,8 +2209,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int ASN1_STRING_length(const ASN1_STRING *x)
+     * {@snippet lang = c : * int ASN1_STRING_length(const ASN1_STRING *x)
      * }
      */
     public static MethodHandle ASN1_STRING_length$handle() {
@@ -2329,8 +2218,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int ASN1_STRING_length(const ASN1_STRING *x)
+     * {@snippet lang = c : * int ASN1_STRING_length(const ASN1_STRING *x)
      * }
      */
     public static MemorySegment ASN1_STRING_length$address() {
@@ -2338,8 +2226,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int ASN1_STRING_length(const ASN1_STRING *x)
+     * {@snippet lang = c : * int ASN1_STRING_length(const ASN1_STRING *x)
      * }
      */
     public static int ASN1_STRING_length(MemorySegment x) {
@@ -2348,17 +2235,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ASN1_STRING_length", x);
             }
-            return (int)mh$.invokeExact(x);
+            return (int) mh$.invokeExact(x);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class ASN1_STRING_get0_data {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("ASN1_STRING_get0_data");
 
@@ -2367,8 +2251,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *x)
+     * {@snippet lang = c : * const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *x)
      * }
      */
     public static FunctionDescriptor ASN1_STRING_get0_data$descriptor() {
@@ -2377,8 +2260,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *x)
+     * {@snippet lang = c : * const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *x)
      * }
      */
     public static MethodHandle ASN1_STRING_get0_data$handle() {
@@ -2387,8 +2269,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *x)
+     * {@snippet lang = c : * const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *x)
      * }
      */
     public static MemorySegment ASN1_STRING_get0_data$address() {
@@ -2396,8 +2277,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *x)
+     * {@snippet lang = c : * const unsigned char *ASN1_STRING_get0_data(const ASN1_STRING *x)
      * }
      */
     public static MemorySegment ASN1_STRING_get0_data(MemorySegment x) {
@@ -2406,17 +2286,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ASN1_STRING_get0_data", x);
             }
-            return (MemorySegment)mh$.invokeExact(x);
+            return (MemorySegment) mh$.invokeExact(x);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class EVP_MD_get0_provider {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("EVP_MD_get0_provider");
 
@@ -2425,8 +2302,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const OSSL_PROVIDER *EVP_MD_get0_provider(const EVP_MD *md)
+     * {@snippet lang = c : * const OSSL_PROVIDER *EVP_MD_get0_provider(const EVP_MD *md)
      * }
      */
     public static FunctionDescriptor EVP_MD_get0_provider$descriptor() {
@@ -2435,8 +2311,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const OSSL_PROVIDER *EVP_MD_get0_provider(const EVP_MD *md)
+     * {@snippet lang = c : * const OSSL_PROVIDER *EVP_MD_get0_provider(const EVP_MD *md)
      * }
      */
     public static MethodHandle EVP_MD_get0_provider$handle() {
@@ -2445,8 +2320,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const OSSL_PROVIDER *EVP_MD_get0_provider(const EVP_MD *md)
+     * {@snippet lang = c : * const OSSL_PROVIDER *EVP_MD_get0_provider(const EVP_MD *md)
      * }
      */
     public static MemorySegment EVP_MD_get0_provider$address() {
@@ -2454,8 +2328,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const OSSL_PROVIDER *EVP_MD_get0_provider(const EVP_MD *md)
+     * {@snippet lang = c : * const OSSL_PROVIDER *EVP_MD_get0_provider(const EVP_MD *md)
      * }
      */
     public static MemorySegment EVP_MD_get0_provider(MemorySegment md) {
@@ -2464,19 +2337,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("EVP_MD_get0_provider", md);
             }
-            return (MemorySegment)mh$.invokeExact(md);
+            return (MemorySegment) mh$.invokeExact(md);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class EVP_MD_fetch {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("EVP_MD_fetch");
 
@@ -2485,8 +2354,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * EVP_MD *EVP_MD_fetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
+     * {@snippet lang = c : * EVP_MD *EVP_MD_fetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
      * }
      */
     public static FunctionDescriptor EVP_MD_fetch$descriptor() {
@@ -2495,8 +2363,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * EVP_MD *EVP_MD_fetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
+     * {@snippet lang = c : * EVP_MD *EVP_MD_fetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
      * }
      */
     public static MethodHandle EVP_MD_fetch$handle() {
@@ -2505,8 +2372,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * EVP_MD *EVP_MD_fetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
+     * {@snippet lang = c : * EVP_MD *EVP_MD_fetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
      * }
      */
     public static MemorySegment EVP_MD_fetch$address() {
@@ -2514,8 +2380,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * EVP_MD *EVP_MD_fetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
+     * {@snippet lang = c : * EVP_MD *EVP_MD_fetch(OSSL_LIB_CTX *ctx, const char *algorithm, const char *properties)
      * }
      */
     public static MemorySegment EVP_MD_fetch(MemorySegment ctx, MemorySegment algorithm, MemorySegment properties) {
@@ -2524,16 +2389,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("EVP_MD_fetch", ctx, algorithm, properties);
             }
-            return (MemorySegment)mh$.invokeExact(ctx, algorithm, properties);
+            return (MemorySegment) mh$.invokeExact(ctx, algorithm, properties);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class EVP_MD_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("EVP_MD_free");
 
@@ -2542,8 +2405,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void EVP_MD_free(EVP_MD *md)
+     * {@snippet lang = c : * void EVP_MD_free(EVP_MD *md)
      * }
      */
     public static FunctionDescriptor EVP_MD_free$descriptor() {
@@ -2552,8 +2414,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void EVP_MD_free(EVP_MD *md)
+     * {@snippet lang = c : * void EVP_MD_free(EVP_MD *md)
      * }
      */
     public static MethodHandle EVP_MD_free$handle() {
@@ -2562,8 +2423,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void EVP_MD_free(EVP_MD *md)
+     * {@snippet lang = c : * void EVP_MD_free(EVP_MD *md)
      * }
      */
     public static MemorySegment EVP_MD_free$address() {
@@ -2571,8 +2431,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void EVP_MD_free(EVP_MD *md)
+     * {@snippet lang = c : * void EVP_MD_free(EVP_MD *md)
      * }
      */
     public static void EVP_MD_free(MemorySegment md) {
@@ -2583,15 +2442,12 @@ public class openssl_h {
             }
             mh$.invokeExact(md);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class EVP_PKEY_get_base_id {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("EVP_PKEY_get_base_id");
 
@@ -2600,8 +2456,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int EVP_PKEY_get_base_id(const EVP_PKEY *pkey)
+     * {@snippet lang = c : * int EVP_PKEY_get_base_id(const EVP_PKEY *pkey)
      * }
      */
     public static FunctionDescriptor EVP_PKEY_get_base_id$descriptor() {
@@ -2610,8 +2465,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int EVP_PKEY_get_base_id(const EVP_PKEY *pkey)
+     * {@snippet lang = c : * int EVP_PKEY_get_base_id(const EVP_PKEY *pkey)
      * }
      */
     public static MethodHandle EVP_PKEY_get_base_id$handle() {
@@ -2620,8 +2474,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int EVP_PKEY_get_base_id(const EVP_PKEY *pkey)
+     * {@snippet lang = c : * int EVP_PKEY_get_base_id(const EVP_PKEY *pkey)
      * }
      */
     public static MemorySegment EVP_PKEY_get_base_id$address() {
@@ -2629,8 +2482,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int EVP_PKEY_get_base_id(const EVP_PKEY *pkey)
+     * {@snippet lang = c : * int EVP_PKEY_get_base_id(const EVP_PKEY *pkey)
      * }
      */
     public static int EVP_PKEY_get_base_id(MemorySegment pkey) {
@@ -2639,17 +2491,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("EVP_PKEY_get_base_id", pkey);
             }
-            return (int)mh$.invokeExact(pkey);
+            return (int) mh$.invokeExact(pkey);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class EVP_PKEY_get_bits {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("EVP_PKEY_get_bits");
 
@@ -2658,8 +2507,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int EVP_PKEY_get_bits(const EVP_PKEY *pkey)
+     * {@snippet lang = c : * int EVP_PKEY_get_bits(const EVP_PKEY *pkey)
      * }
      */
     public static FunctionDescriptor EVP_PKEY_get_bits$descriptor() {
@@ -2668,8 +2516,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int EVP_PKEY_get_bits(const EVP_PKEY *pkey)
+     * {@snippet lang = c : * int EVP_PKEY_get_bits(const EVP_PKEY *pkey)
      * }
      */
     public static MethodHandle EVP_PKEY_get_bits$handle() {
@@ -2678,8 +2525,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int EVP_PKEY_get_bits(const EVP_PKEY *pkey)
+     * {@snippet lang = c : * int EVP_PKEY_get_bits(const EVP_PKEY *pkey)
      * }
      */
     public static MemorySegment EVP_PKEY_get_bits$address() {
@@ -2687,8 +2533,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int EVP_PKEY_get_bits(const EVP_PKEY *pkey)
+     * {@snippet lang = c : * int EVP_PKEY_get_bits(const EVP_PKEY *pkey)
      * }
      */
     public static int EVP_PKEY_get_bits(MemorySegment pkey) {
@@ -2697,16 +2542,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("EVP_PKEY_get_bits", pkey);
             }
-            return (int)mh$.invokeExact(pkey);
+            return (int) mh$.invokeExact(pkey);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class EVP_PKEY_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("EVP_PKEY_free");
 
@@ -2715,8 +2558,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void EVP_PKEY_free(EVP_PKEY *pkey)
+     * {@snippet lang = c : * void EVP_PKEY_free(EVP_PKEY *pkey)
      * }
      */
     public static FunctionDescriptor EVP_PKEY_free$descriptor() {
@@ -2725,8 +2567,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void EVP_PKEY_free(EVP_PKEY *pkey)
+     * {@snippet lang = c : * void EVP_PKEY_free(EVP_PKEY *pkey)
      * }
      */
     public static MethodHandle EVP_PKEY_free$handle() {
@@ -2735,8 +2576,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void EVP_PKEY_free(EVP_PKEY *pkey)
+     * {@snippet lang = c : * void EVP_PKEY_free(EVP_PKEY *pkey)
      * }
      */
     public static MemorySegment EVP_PKEY_free$address() {
@@ -2744,8 +2584,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void EVP_PKEY_free(EVP_PKEY *pkey)
+     * {@snippet lang = c : * void EVP_PKEY_free(EVP_PKEY *pkey)
      * }
      */
     public static void EVP_PKEY_free(MemorySegment pkey) {
@@ -2756,14 +2595,12 @@ public class openssl_h {
             }
             mh$.invokeExact(pkey);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class EC_GROUP_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("EC_GROUP_free");
 
@@ -2772,8 +2609,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void EC_GROUP_free(EC_GROUP *group)
+     * {@snippet lang = c : * void EC_GROUP_free(EC_GROUP *group)
      * }
      */
     public static FunctionDescriptor EC_GROUP_free$descriptor() {
@@ -2782,8 +2618,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void EC_GROUP_free(EC_GROUP *group)
+     * {@snippet lang = c : * void EC_GROUP_free(EC_GROUP *group)
      * }
      */
     public static MethodHandle EC_GROUP_free$handle() {
@@ -2792,8 +2627,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void EC_GROUP_free(EC_GROUP *group)
+     * {@snippet lang = c : * void EC_GROUP_free(EC_GROUP *group)
      * }
      */
     public static MemorySegment EC_GROUP_free$address() {
@@ -2801,8 +2635,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void EC_GROUP_free(EC_GROUP *group)
+     * {@snippet lang = c : * void EC_GROUP_free(EC_GROUP *group)
      * }
      */
     public static void EC_GROUP_free(MemorySegment group) {
@@ -2813,15 +2646,12 @@ public class openssl_h {
             }
             mh$.invokeExact(group);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class EC_GROUP_get_curve_name {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("EC_GROUP_get_curve_name");
 
@@ -2830,8 +2660,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int EC_GROUP_get_curve_name(const EC_GROUP *group)
+     * {@snippet lang = c : * int EC_GROUP_get_curve_name(const EC_GROUP *group)
      * }
      */
     public static FunctionDescriptor EC_GROUP_get_curve_name$descriptor() {
@@ -2840,8 +2669,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int EC_GROUP_get_curve_name(const EC_GROUP *group)
+     * {@snippet lang = c : * int EC_GROUP_get_curve_name(const EC_GROUP *group)
      * }
      */
     public static MethodHandle EC_GROUP_get_curve_name$handle() {
@@ -2850,8 +2678,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int EC_GROUP_get_curve_name(const EC_GROUP *group)
+     * {@snippet lang = c : * int EC_GROUP_get_curve_name(const EC_GROUP *group)
      * }
      */
     public static MemorySegment EC_GROUP_get_curve_name$address() {
@@ -2859,8 +2686,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int EC_GROUP_get_curve_name(const EC_GROUP *group)
+     * {@snippet lang = c : * int EC_GROUP_get_curve_name(const EC_GROUP *group)
      * }
      */
     public static int EC_GROUP_get_curve_name(MemorySegment group) {
@@ -2869,19 +2695,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("EC_GROUP_get_curve_name", group);
             }
-            return (int)mh$.invokeExact(group);
+            return (int) mh$.invokeExact(group);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class d2i_ECPKParameters {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("d2i_ECPKParameters");
 
@@ -2890,8 +2712,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * EC_GROUP *d2i_ECPKParameters(EC_GROUP **, const unsigned char **in, long len)
+     * {@snippet lang = c : * EC_GROUP *d2i_ECPKParameters(EC_GROUP **, const unsigned char **in, long len)
      * }
      */
     public static FunctionDescriptor d2i_ECPKParameters$descriptor() {
@@ -2900,8 +2721,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * EC_GROUP *d2i_ECPKParameters(EC_GROUP **, const unsigned char **in, long len)
+     * {@snippet lang = c : * EC_GROUP *d2i_ECPKParameters(EC_GROUP **, const unsigned char **in, long len)
      * }
      */
     public static MethodHandle d2i_ECPKParameters$handle() {
@@ -2910,8 +2730,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * EC_GROUP *d2i_ECPKParameters(EC_GROUP **, const unsigned char **in, long len)
+     * {@snippet lang = c : * EC_GROUP *d2i_ECPKParameters(EC_GROUP **, const unsigned char **in, long len)
      * }
      */
     public static MemorySegment d2i_ECPKParameters$address() {
@@ -2919,8 +2738,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * EC_GROUP *d2i_ECPKParameters(EC_GROUP **, const unsigned char **in, long len)
+     * {@snippet lang = c : * EC_GROUP *d2i_ECPKParameters(EC_GROUP **, const unsigned char **in, long len)
      * }
      */
     public static MemorySegment d2i_ECPKParameters(MemorySegment x0, MemorySegment in, long len) {
@@ -2929,17 +2747,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("d2i_ECPKParameters", x0, in, len);
             }
-            return (MemorySegment)mh$.invokeExact(x0, in, len);
+            return (MemorySegment) mh$.invokeExact(x0, in, len);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class EC_KEY_new_by_curve_name {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("EC_KEY_new_by_curve_name");
 
@@ -2948,8 +2763,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * EC_KEY *EC_KEY_new_by_curve_name(int nid)
+     * {@snippet lang = c : * EC_KEY *EC_KEY_new_by_curve_name(int nid)
      * }
      */
     public static FunctionDescriptor EC_KEY_new_by_curve_name$descriptor() {
@@ -2958,8 +2772,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * EC_KEY *EC_KEY_new_by_curve_name(int nid)
+     * {@snippet lang = c : * EC_KEY *EC_KEY_new_by_curve_name(int nid)
      * }
      */
     public static MethodHandle EC_KEY_new_by_curve_name$handle() {
@@ -2968,8 +2781,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * EC_KEY *EC_KEY_new_by_curve_name(int nid)
+     * {@snippet lang = c : * EC_KEY *EC_KEY_new_by_curve_name(int nid)
      * }
      */
     public static MemorySegment EC_KEY_new_by_curve_name$address() {
@@ -2977,8 +2789,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * EC_KEY *EC_KEY_new_by_curve_name(int nid)
+     * {@snippet lang = c : * EC_KEY *EC_KEY_new_by_curve_name(int nid)
      * }
      */
     public static MemorySegment EC_KEY_new_by_curve_name(int nid) {
@@ -2987,16 +2798,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("EC_KEY_new_by_curve_name", nid);
             }
-            return (MemorySegment)mh$.invokeExact(nid);
+            return (MemorySegment) mh$.invokeExact(nid);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class EC_KEY_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("EC_KEY_free");
 
@@ -3005,8 +2814,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void EC_KEY_free(EC_KEY *key)
+     * {@snippet lang = c : * void EC_KEY_free(EC_KEY *key)
      * }
      */
     public static FunctionDescriptor EC_KEY_free$descriptor() {
@@ -3015,8 +2823,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void EC_KEY_free(EC_KEY *key)
+     * {@snippet lang = c : * void EC_KEY_free(EC_KEY *key)
      * }
      */
     public static MethodHandle EC_KEY_free$handle() {
@@ -3025,8 +2832,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void EC_KEY_free(EC_KEY *key)
+     * {@snippet lang = c : * void EC_KEY_free(EC_KEY *key)
      * }
      */
     public static MemorySegment EC_KEY_free$address() {
@@ -3034,8 +2840,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void EC_KEY_free(EC_KEY *key)
+     * {@snippet lang = c : * void EC_KEY_free(EC_KEY *key)
      * }
      */
     public static void EC_KEY_free(MemorySegment key) {
@@ -3046,13 +2851,12 @@ public class openssl_h {
             }
             mh$.invokeExact(key);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class DH_new {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("DH_new");
 
@@ -3061,8 +2865,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * DH *DH_new()
+     * {@snippet lang = c : * DH *DH_new()
      * }
      */
     public static FunctionDescriptor DH_new$descriptor() {
@@ -3071,8 +2874,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * DH *DH_new()
+     * {@snippet lang = c : * DH *DH_new()
      * }
      */
     public static MethodHandle DH_new$handle() {
@@ -3081,8 +2883,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * DH *DH_new()
+     * {@snippet lang = c : * DH *DH_new()
      * }
      */
     public static MemorySegment DH_new$address() {
@@ -3090,8 +2891,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * DH *DH_new()
+     * {@snippet lang = c : * DH *DH_new()
      * }
      */
     public static MemorySegment DH_new() {
@@ -3100,16 +2900,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("DH_new");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class DH_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("DH_free");
 
@@ -3118,8 +2916,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void DH_free(DH *dh)
+     * {@snippet lang = c : * void DH_free(DH *dh)
      * }
      */
     public static FunctionDescriptor DH_free$descriptor() {
@@ -3128,8 +2925,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void DH_free(DH *dh)
+     * {@snippet lang = c : * void DH_free(DH *dh)
      * }
      */
     public static MethodHandle DH_free$handle() {
@@ -3138,8 +2934,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void DH_free(DH *dh)
+     * {@snippet lang = c : * void DH_free(DH *dh)
      * }
      */
     public static MemorySegment DH_free$address() {
@@ -3147,8 +2942,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void DH_free(DH *dh)
+     * {@snippet lang = c : * void DH_free(DH *dh)
      * }
      */
     public static void DH_free(MemorySegment dh) {
@@ -3159,18 +2953,13 @@ public class openssl_h {
             }
             mh$.invokeExact(dh);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class DH_set0_pqg {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("DH_set0_pqg");
 
@@ -3179,8 +2968,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
+     * {@snippet lang = c : * int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
      * }
      */
     public static FunctionDescriptor DH_set0_pqg$descriptor() {
@@ -3189,8 +2977,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
+     * {@snippet lang = c : * int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
      * }
      */
     public static MethodHandle DH_set0_pqg$handle() {
@@ -3199,8 +2986,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
+     * {@snippet lang = c : * int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
      * }
      */
     public static MemorySegment DH_set0_pqg$address() {
@@ -3208,8 +2994,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
+     * {@snippet lang = c : * int DH_set0_pqg(DH *dh, BIGNUM *p, BIGNUM *q, BIGNUM *g)
      * }
      */
     public static int DH_set0_pqg(MemorySegment dh, MemorySegment p, MemorySegment q, MemorySegment g) {
@@ -3218,18 +3003,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("DH_set0_pqg", dh, p, q, g);
             }
-            return (int)mh$.invokeExact(dh, p, q, g);
+            return (int) mh$.invokeExact(dh, p, q, g);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_STORE_set_flags {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_set_flags");
 
@@ -3238,8 +3020,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int X509_STORE_set_flags(X509_STORE *xs, unsigned long flags)
+     * {@snippet lang = c : * int X509_STORE_set_flags(X509_STORE *xs, unsigned long flags)
      * }
      */
     public static FunctionDescriptor X509_STORE_set_flags$descriptor() {
@@ -3248,8 +3029,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int X509_STORE_set_flags(X509_STORE *xs, unsigned long flags)
+     * {@snippet lang = c : * int X509_STORE_set_flags(X509_STORE *xs, unsigned long flags)
      * }
      */
     public static MethodHandle X509_STORE_set_flags$handle() {
@@ -3258,8 +3038,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int X509_STORE_set_flags(X509_STORE *xs, unsigned long flags)
+     * {@snippet lang = c : * int X509_STORE_set_flags(X509_STORE *xs, unsigned long flags)
      * }
      */
     public static MemorySegment X509_STORE_set_flags$address() {
@@ -3267,8 +3046,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int X509_STORE_set_flags(X509_STORE *xs, unsigned long flags)
+     * {@snippet lang = c : * int X509_STORE_set_flags(X509_STORE *xs, unsigned long flags)
      * }
      */
     public static int X509_STORE_set_flags(MemorySegment xs, long flags) {
@@ -3277,17 +3055,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_STORE_set_flags", xs, flags);
             }
-            return (int)mh$.invokeExact(xs, flags);
+            return (int) mh$.invokeExact(xs, flags);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_STORE_CTX_get0_untrusted {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get0_untrusted");
 
@@ -3296,8 +3071,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * struct stack_st_X509 *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * struct stack_st_X509 *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx)
      * }
      */
     public static FunctionDescriptor X509_STORE_CTX_get0_untrusted$descriptor() {
@@ -3306,8 +3080,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * struct stack_st_X509 *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * struct stack_st_X509 *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx)
      * }
      */
     public static MethodHandle X509_STORE_CTX_get0_untrusted$handle() {
@@ -3316,8 +3089,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * struct stack_st_X509 *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * struct stack_st_X509 *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx)
      * }
      */
     public static MemorySegment X509_STORE_CTX_get0_untrusted$address() {
@@ -3325,8 +3097,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * struct stack_st_X509 *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * struct stack_st_X509 *X509_STORE_CTX_get0_untrusted(const X509_STORE_CTX *ctx)
      * }
      */
     public static MemorySegment X509_STORE_CTX_get0_untrusted(MemorySegment ctx) {
@@ -3335,18 +3106,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_STORE_CTX_get0_untrusted", ctx);
             }
-            return (MemorySegment)mh$.invokeExact(ctx);
+            return (MemorySegment) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_STORE_add_lookup {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_add_lookup");
 
@@ -3355,8 +3123,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *xs, X509_LOOKUP_METHOD *m)
+     * {@snippet lang = c : * X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *xs, X509_LOOKUP_METHOD *m)
      * }
      */
     public static FunctionDescriptor X509_STORE_add_lookup$descriptor() {
@@ -3365,8 +3132,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *xs, X509_LOOKUP_METHOD *m)
+     * {@snippet lang = c : * X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *xs, X509_LOOKUP_METHOD *m)
      * }
      */
     public static MethodHandle X509_STORE_add_lookup$handle() {
@@ -3375,8 +3141,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *xs, X509_LOOKUP_METHOD *m)
+     * {@snippet lang = c : * X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *xs, X509_LOOKUP_METHOD *m)
      * }
      */
     public static MemorySegment X509_STORE_add_lookup$address() {
@@ -3384,8 +3149,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *xs, X509_LOOKUP_METHOD *m)
+     * {@snippet lang = c : * X509_LOOKUP *X509_STORE_add_lookup(X509_STORE *xs, X509_LOOKUP_METHOD *m)
      * }
      */
     public static MemorySegment X509_STORE_add_lookup(MemorySegment xs, MemorySegment m) {
@@ -3394,15 +3158,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_STORE_add_lookup", xs, m);
             }
-            return (MemorySegment)mh$.invokeExact(xs, m);
+            return (MemorySegment) mh$.invokeExact(xs, m);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_LOOKUP_hash_dir {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_LOOKUP_hash_dir");
 
@@ -3411,8 +3174,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir()
+     * {@snippet lang = c : * X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir()
      * }
      */
     public static FunctionDescriptor X509_LOOKUP_hash_dir$descriptor() {
@@ -3421,8 +3183,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir()
+     * {@snippet lang = c : * X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir()
      * }
      */
     public static MethodHandle X509_LOOKUP_hash_dir$handle() {
@@ -3431,8 +3192,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir()
+     * {@snippet lang = c : * X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir()
      * }
      */
     public static MemorySegment X509_LOOKUP_hash_dir$address() {
@@ -3440,8 +3200,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir()
+     * {@snippet lang = c : * X509_LOOKUP_METHOD *X509_LOOKUP_hash_dir()
      * }
      */
     public static MemorySegment X509_LOOKUP_hash_dir() {
@@ -3450,15 +3209,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_LOOKUP_hash_dir");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_LOOKUP_file {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_LOOKUP_file");
 
@@ -3467,8 +3225,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * X509_LOOKUP_METHOD *X509_LOOKUP_file()
+     * {@snippet lang = c : * X509_LOOKUP_METHOD *X509_LOOKUP_file()
      * }
      */
     public static FunctionDescriptor X509_LOOKUP_file$descriptor() {
@@ -3477,8 +3234,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * X509_LOOKUP_METHOD *X509_LOOKUP_file()
+     * {@snippet lang = c : * X509_LOOKUP_METHOD *X509_LOOKUP_file()
      * }
      */
     public static MethodHandle X509_LOOKUP_file$handle() {
@@ -3487,8 +3243,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * X509_LOOKUP_METHOD *X509_LOOKUP_file()
+     * {@snippet lang = c : * X509_LOOKUP_METHOD *X509_LOOKUP_file()
      * }
      */
     public static MemorySegment X509_LOOKUP_file$address() {
@@ -3496,8 +3251,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * X509_LOOKUP_METHOD *X509_LOOKUP_file()
+     * {@snippet lang = c : * X509_LOOKUP_METHOD *X509_LOOKUP_file()
      * }
      */
     public static MemorySegment X509_LOOKUP_file() {
@@ -3506,21 +3260,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_LOOKUP_file");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_LOOKUP_ctrl {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER,
+                openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_LONG, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_LOOKUP_ctrl");
 
@@ -3529,8 +3277,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int X509_LOOKUP_ctrl(X509_LOOKUP *ctx, int cmd, const char *argc, long argl, char **ret)
+     * {@snippet lang = c : * int X509_LOOKUP_ctrl(X509_LOOKUP *ctx, int cmd, const char *argc, long argl, char **ret)
      * }
      */
     public static FunctionDescriptor X509_LOOKUP_ctrl$descriptor() {
@@ -3539,8 +3286,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int X509_LOOKUP_ctrl(X509_LOOKUP *ctx, int cmd, const char *argc, long argl, char **ret)
+     * {@snippet lang = c : * int X509_LOOKUP_ctrl(X509_LOOKUP *ctx, int cmd, const char *argc, long argl, char **ret)
      * }
      */
     public static MethodHandle X509_LOOKUP_ctrl$handle() {
@@ -3549,8 +3295,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int X509_LOOKUP_ctrl(X509_LOOKUP *ctx, int cmd, const char *argc, long argl, char **ret)
+     * {@snippet lang = c : * int X509_LOOKUP_ctrl(X509_LOOKUP *ctx, int cmd, const char *argc, long argl, char **ret)
      * }
      */
     public static MemorySegment X509_LOOKUP_ctrl$address() {
@@ -3558,8 +3303,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int X509_LOOKUP_ctrl(X509_LOOKUP *ctx, int cmd, const char *argc, long argl, char **ret)
+     * {@snippet lang = c : * int X509_LOOKUP_ctrl(X509_LOOKUP *ctx, int cmd, const char *argc, long argl, char **ret)
      * }
      */
     public static int X509_LOOKUP_ctrl(MemorySegment ctx, int cmd, MemorySegment argc, long argl, MemorySegment ret) {
@@ -3568,18 +3312,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_LOOKUP_ctrl", ctx, cmd, argc, argl, ret);
             }
-            return (int)mh$.invokeExact(ctx, cmd, argc, argl, ret);
+            return (int) mh$.invokeExact(ctx, cmd, argc, argl, ret);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_STORE_CTX_get_ex_data {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get_ex_data");
 
@@ -3588,8 +3329,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void *X509_STORE_CTX_get_ex_data(const X509_STORE_CTX *ctx, int idx)
+     * {@snippet lang = c : * void *X509_STORE_CTX_get_ex_data(const X509_STORE_CTX *ctx, int idx)
      * }
      */
     public static FunctionDescriptor X509_STORE_CTX_get_ex_data$descriptor() {
@@ -3598,8 +3338,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void *X509_STORE_CTX_get_ex_data(const X509_STORE_CTX *ctx, int idx)
+     * {@snippet lang = c : * void *X509_STORE_CTX_get_ex_data(const X509_STORE_CTX *ctx, int idx)
      * }
      */
     public static MethodHandle X509_STORE_CTX_get_ex_data$handle() {
@@ -3608,8 +3347,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void *X509_STORE_CTX_get_ex_data(const X509_STORE_CTX *ctx, int idx)
+     * {@snippet lang = c : * void *X509_STORE_CTX_get_ex_data(const X509_STORE_CTX *ctx, int idx)
      * }
      */
     public static MemorySegment X509_STORE_CTX_get_ex_data$address() {
@@ -3617,8 +3355,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void *X509_STORE_CTX_get_ex_data(const X509_STORE_CTX *ctx, int idx)
+     * {@snippet lang = c : * void *X509_STORE_CTX_get_ex_data(const X509_STORE_CTX *ctx, int idx)
      * }
      */
     public static MemorySegment X509_STORE_CTX_get_ex_data(MemorySegment ctx, int idx) {
@@ -3627,17 +3364,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_STORE_CTX_get_ex_data", ctx, idx);
             }
-            return (MemorySegment)mh$.invokeExact(ctx, idx);
+            return (MemorySegment) mh$.invokeExact(ctx, idx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_STORE_CTX_get_error {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get_error");
 
@@ -3646,8 +3380,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get_error(const X509_STORE_CTX *ctx)
      * }
      */
     public static FunctionDescriptor X509_STORE_CTX_get_error$descriptor() {
@@ -3656,8 +3389,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get_error(const X509_STORE_CTX *ctx)
      * }
      */
     public static MethodHandle X509_STORE_CTX_get_error$handle() {
@@ -3666,8 +3398,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get_error(const X509_STORE_CTX *ctx)
      * }
      */
     public static MemorySegment X509_STORE_CTX_get_error$address() {
@@ -3675,8 +3406,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get_error(const X509_STORE_CTX *ctx)
      * }
      */
     public static int X509_STORE_CTX_get_error(MemorySegment ctx) {
@@ -3685,17 +3415,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_STORE_CTX_get_error", ctx);
             }
-            return (int)mh$.invokeExact(ctx);
+            return (int) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_STORE_CTX_set_error {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_set_error");
 
@@ -3704,8 +3431,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void X509_STORE_CTX_set_error(X509_STORE_CTX *ctx, int s)
+     * {@snippet lang = c : * void X509_STORE_CTX_set_error(X509_STORE_CTX *ctx, int s)
      * }
      */
     public static FunctionDescriptor X509_STORE_CTX_set_error$descriptor() {
@@ -3714,8 +3440,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void X509_STORE_CTX_set_error(X509_STORE_CTX *ctx, int s)
+     * {@snippet lang = c : * void X509_STORE_CTX_set_error(X509_STORE_CTX *ctx, int s)
      * }
      */
     public static MethodHandle X509_STORE_CTX_set_error$handle() {
@@ -3724,8 +3449,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void X509_STORE_CTX_set_error(X509_STORE_CTX *ctx, int s)
+     * {@snippet lang = c : * void X509_STORE_CTX_set_error(X509_STORE_CTX *ctx, int s)
      * }
      */
     public static MemorySegment X509_STORE_CTX_set_error$address() {
@@ -3733,8 +3457,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void X509_STORE_CTX_set_error(X509_STORE_CTX *ctx, int s)
+     * {@snippet lang = c : * void X509_STORE_CTX_set_error(X509_STORE_CTX *ctx, int s)
      * }
      */
     public static void X509_STORE_CTX_set_error(MemorySegment ctx, int s) {
@@ -3745,15 +3468,12 @@ public class openssl_h {
             }
             mh$.invokeExact(ctx, s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_STORE_CTX_get_error_depth {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get_error_depth");
 
@@ -3762,8 +3482,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX *ctx)
      * }
      */
     public static FunctionDescriptor X509_STORE_CTX_get_error_depth$descriptor() {
@@ -3772,8 +3491,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX *ctx)
      * }
      */
     public static MethodHandle X509_STORE_CTX_get_error_depth$handle() {
@@ -3782,8 +3500,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX *ctx)
      * }
      */
     public static MemorySegment X509_STORE_CTX_get_error_depth$address() {
@@ -3791,8 +3508,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get_error_depth(const X509_STORE_CTX *ctx)
      * }
      */
     public static int X509_STORE_CTX_get_error_depth(MemorySegment ctx) {
@@ -3801,17 +3517,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_STORE_CTX_get_error_depth", ctx);
             }
-            return (int)mh$.invokeExact(ctx);
+            return (int) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_STORE_CTX_get_current_cert {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get_current_cert");
 
@@ -3820,8 +3533,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx)
      * }
      */
     public static FunctionDescriptor X509_STORE_CTX_get_current_cert$descriptor() {
@@ -3830,8 +3542,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx)
      * }
      */
     public static MethodHandle X509_STORE_CTX_get_current_cert$handle() {
@@ -3840,8 +3551,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx)
      * }
      */
     public static MemorySegment X509_STORE_CTX_get_current_cert$address() {
@@ -3849,8 +3559,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get_current_cert(const X509_STORE_CTX *ctx)
      * }
      */
     public static MemorySegment X509_STORE_CTX_get_current_cert(MemorySegment ctx) {
@@ -3859,17 +3568,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_STORE_CTX_get_current_cert", ctx);
             }
-            return (MemorySegment)mh$.invokeExact(ctx);
+            return (MemorySegment) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_STORE_CTX_get0_current_issuer {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get0_current_issuer");
 
@@ -3878,8 +3584,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
      * }
      */
     public static FunctionDescriptor X509_STORE_CTX_get0_current_issuer$descriptor() {
@@ -3888,8 +3593,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
      * }
      */
     public static MethodHandle X509_STORE_CTX_get0_current_issuer$handle() {
@@ -3898,8 +3602,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
      * }
      */
     public static MemorySegment X509_STORE_CTX_get0_current_issuer$address() {
@@ -3907,8 +3610,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
      * }
      */
     public static MemorySegment X509_STORE_CTX_get0_current_issuer(MemorySegment ctx) {
@@ -3917,18 +3619,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_STORE_CTX_get0_current_issuer", ctx);
             }
-            return (MemorySegment)mh$.invokeExact(ctx);
+            return (MemorySegment) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class d2i_X509_bio {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("d2i_X509_bio");
 
@@ -3937,8 +3636,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * X509 *d2i_X509_bio(BIO *bp, X509 **x509)
+     * {@snippet lang = c : * X509 *d2i_X509_bio(BIO *bp, X509 **x509)
      * }
      */
     public static FunctionDescriptor d2i_X509_bio$descriptor() {
@@ -3947,8 +3645,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * X509 *d2i_X509_bio(BIO *bp, X509 **x509)
+     * {@snippet lang = c : * X509 *d2i_X509_bio(BIO *bp, X509 **x509)
      * }
      */
     public static MethodHandle d2i_X509_bio$handle() {
@@ -3957,8 +3654,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * X509 *d2i_X509_bio(BIO *bp, X509 **x509)
+     * {@snippet lang = c : * X509 *d2i_X509_bio(BIO *bp, X509 **x509)
      * }
      */
     public static MemorySegment d2i_X509_bio$address() {
@@ -3966,8 +3662,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * X509 *d2i_X509_bio(BIO *bp, X509 **x509)
+     * {@snippet lang = c : * X509 *d2i_X509_bio(BIO *bp, X509 **x509)
      * }
      */
     public static MemorySegment d2i_X509_bio(MemorySegment bp, MemorySegment x509) {
@@ -3976,16 +3671,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("d2i_X509_bio", bp, x509);
             }
-            return (MemorySegment)mh$.invokeExact(bp, x509);
+            return (MemorySegment) mh$.invokeExact(bp, x509);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_free");
 
@@ -3994,8 +3687,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern void X509_free(X509 *a)
+     * {@snippet lang = c : * extern void X509_free(X509 *a)
      * }
      */
     public static FunctionDescriptor X509_free$descriptor() {
@@ -4004,8 +3696,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern void X509_free(X509 *a)
+     * {@snippet lang = c : * extern void X509_free(X509 *a)
      * }
      */
     public static MethodHandle X509_free$handle() {
@@ -4014,8 +3705,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern void X509_free(X509 *a)
+     * {@snippet lang = c : * extern void X509_free(X509 *a)
      * }
      */
     public static MemorySegment X509_free$address() {
@@ -4023,8 +3713,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern void X509_free(X509 *a)
+     * {@snippet lang = c : * extern void X509_free(X509 *a)
      * }
      */
     public static void X509_free(MemorySegment a) {
@@ -4035,17 +3724,13 @@ public class openssl_h {
             }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class d2i_X509 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("d2i_X509");
 
@@ -4054,8 +3739,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern X509 *d2i_X509(X509 **a, const unsigned char **in, long len)
+     * {@snippet lang = c : * extern X509 *d2i_X509(X509 **a, const unsigned char **in, long len)
      * }
      */
     public static FunctionDescriptor d2i_X509$descriptor() {
@@ -4064,8 +3748,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern X509 *d2i_X509(X509 **a, const unsigned char **in, long len)
+     * {@snippet lang = c : * extern X509 *d2i_X509(X509 **a, const unsigned char **in, long len)
      * }
      */
     public static MethodHandle d2i_X509$handle() {
@@ -4074,8 +3757,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern X509 *d2i_X509(X509 **a, const unsigned char **in, long len)
+     * {@snippet lang = c : * extern X509 *d2i_X509(X509 **a, const unsigned char **in, long len)
      * }
      */
     public static MemorySegment d2i_X509$address() {
@@ -4083,8 +3765,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern X509 *d2i_X509(X509 **a, const unsigned char **in, long len)
+     * {@snippet lang = c : * extern X509 *d2i_X509(X509 **a, const unsigned char **in, long len)
      * }
      */
     public static MemorySegment d2i_X509(MemorySegment a, MemorySegment in, long len) {
@@ -4093,18 +3774,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("d2i_X509", a, in, len);
             }
-            return (MemorySegment)mh$.invokeExact(a, in, len);
+            return (MemorySegment) mh$.invokeExact(a, in, len);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class i2d_X509 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("i2d_X509");
 
@@ -4113,8 +3791,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern int i2d_X509(const X509 *a, unsigned char **out)
+     * {@snippet lang = c : * extern int i2d_X509(const X509 *a, unsigned char **out)
      * }
      */
     public static FunctionDescriptor i2d_X509$descriptor() {
@@ -4123,8 +3800,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern int i2d_X509(const X509 *a, unsigned char **out)
+     * {@snippet lang = c : * extern int i2d_X509(const X509 *a, unsigned char **out)
      * }
      */
     public static MethodHandle i2d_X509$handle() {
@@ -4133,8 +3809,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern int i2d_X509(const X509 *a, unsigned char **out)
+     * {@snippet lang = c : * extern int i2d_X509(const X509 *a, unsigned char **out)
      * }
      */
     public static MemorySegment i2d_X509$address() {
@@ -4142,8 +3817,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern int i2d_X509(const X509 *a, unsigned char **out)
+     * {@snippet lang = c : * extern int i2d_X509(const X509 *a, unsigned char **out)
      * }
      */
     public static int i2d_X509(MemorySegment a, MemorySegment out) {
@@ -4152,19 +3826,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("i2d_X509", a, out);
             }
-            return (int)mh$.invokeExact(a, out);
+            return (int) mh$.invokeExact(a, out);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_get_ext_by_NID {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_INT, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_get_ext_by_NID");
 
@@ -4173,8 +3843,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int X509_get_ext_by_NID(const X509 *x, int nid, int lastpos)
+     * {@snippet lang = c : * int X509_get_ext_by_NID(const X509 *x, int nid, int lastpos)
      * }
      */
     public static FunctionDescriptor X509_get_ext_by_NID$descriptor() {
@@ -4183,8 +3852,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int X509_get_ext_by_NID(const X509 *x, int nid, int lastpos)
+     * {@snippet lang = c : * int X509_get_ext_by_NID(const X509 *x, int nid, int lastpos)
      * }
      */
     public static MethodHandle X509_get_ext_by_NID$handle() {
@@ -4193,8 +3861,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int X509_get_ext_by_NID(const X509 *x, int nid, int lastpos)
+     * {@snippet lang = c : * int X509_get_ext_by_NID(const X509 *x, int nid, int lastpos)
      * }
      */
     public static MemorySegment X509_get_ext_by_NID$address() {
@@ -4202,8 +3869,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int X509_get_ext_by_NID(const X509 *x, int nid, int lastpos)
+     * {@snippet lang = c : * int X509_get_ext_by_NID(const X509 *x, int nid, int lastpos)
      * }
      */
     public static int X509_get_ext_by_NID(MemorySegment x, int nid, int lastpos) {
@@ -4212,18 +3878,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_get_ext_by_NID", x, nid, lastpos);
             }
-            return (int)mh$.invokeExact(x, nid, lastpos);
+            return (int) mh$.invokeExact(x, nid, lastpos);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_get_ext {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_get_ext");
 
@@ -4232,8 +3895,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * X509_EXTENSION *X509_get_ext(const X509 *x, int loc)
+     * {@snippet lang = c : * X509_EXTENSION *X509_get_ext(const X509 *x, int loc)
      * }
      */
     public static FunctionDescriptor X509_get_ext$descriptor() {
@@ -4242,8 +3904,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * X509_EXTENSION *X509_get_ext(const X509 *x, int loc)
+     * {@snippet lang = c : * X509_EXTENSION *X509_get_ext(const X509 *x, int loc)
      * }
      */
     public static MethodHandle X509_get_ext$handle() {
@@ -4252,8 +3913,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * X509_EXTENSION *X509_get_ext(const X509 *x, int loc)
+     * {@snippet lang = c : * X509_EXTENSION *X509_get_ext(const X509 *x, int loc)
      * }
      */
     public static MemorySegment X509_get_ext$address() {
@@ -4261,8 +3921,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * X509_EXTENSION *X509_get_ext(const X509 *x, int loc)
+     * {@snippet lang = c : * X509_EXTENSION *X509_get_ext(const X509 *x, int loc)
      * }
      */
     public static MemorySegment X509_get_ext(MemorySegment x, int loc) {
@@ -4271,17 +3930,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_get_ext", x, loc);
             }
-            return (MemorySegment)mh$.invokeExact(x, loc);
+            return (MemorySegment) mh$.invokeExact(x, loc);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_EXTENSION_get_data {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_EXTENSION_get_data");
 
@@ -4290,8 +3946,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * ASN1_OCTET_STRING *X509_EXTENSION_get_data(X509_EXTENSION *ne)
+     * {@snippet lang = c : * ASN1_OCTET_STRING *X509_EXTENSION_get_data(X509_EXTENSION *ne)
      * }
      */
     public static FunctionDescriptor X509_EXTENSION_get_data$descriptor() {
@@ -4300,8 +3955,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * ASN1_OCTET_STRING *X509_EXTENSION_get_data(X509_EXTENSION *ne)
+     * {@snippet lang = c : * ASN1_OCTET_STRING *X509_EXTENSION_get_data(X509_EXTENSION *ne)
      * }
      */
     public static MethodHandle X509_EXTENSION_get_data$handle() {
@@ -4310,8 +3964,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * ASN1_OCTET_STRING *X509_EXTENSION_get_data(X509_EXTENSION *ne)
+     * {@snippet lang = c : * ASN1_OCTET_STRING *X509_EXTENSION_get_data(X509_EXTENSION *ne)
      * }
      */
     public static MemorySegment X509_EXTENSION_get_data$address() {
@@ -4319,8 +3972,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * ASN1_OCTET_STRING *X509_EXTENSION_get_data(X509_EXTENSION *ne)
+     * {@snippet lang = c : * ASN1_OCTET_STRING *X509_EXTENSION_get_data(X509_EXTENSION *ne)
      * }
      */
     public static MemorySegment X509_EXTENSION_get_data(MemorySegment ne) {
@@ -4329,22 +3981,16 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_EXTENSION_get_data", ne);
             }
-            return (MemorySegment)mh$.invokeExact(ne);
+            return (MemorySegment) mh$.invokeExact(ne);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class PEM_ASN1_read_bio {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER,
+                        openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("PEM_ASN1_read_bio");
 
@@ -4353,8 +3999,8 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void *PEM_ASN1_read_bio(d2i_of_void *d2i, const char *name, BIO *bp, void **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * void *PEM_ASN1_read_bio(d2i_of_void *d2i, const char *name, BIO *bp, void **x, pem_password_cb *cb, void *u)
      * }
      */
     public static FunctionDescriptor PEM_ASN1_read_bio$descriptor() {
@@ -4363,8 +4009,8 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void *PEM_ASN1_read_bio(d2i_of_void *d2i, const char *name, BIO *bp, void **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * void *PEM_ASN1_read_bio(d2i_of_void *d2i, const char *name, BIO *bp, void **x, pem_password_cb *cb, void *u)
      * }
      */
     public static MethodHandle PEM_ASN1_read_bio$handle() {
@@ -4373,8 +4019,8 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void *PEM_ASN1_read_bio(d2i_of_void *d2i, const char *name, BIO *bp, void **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * void *PEM_ASN1_read_bio(d2i_of_void *d2i, const char *name, BIO *bp, void **x, pem_password_cb *cb, void *u)
      * }
      */
     public static MemorySegment PEM_ASN1_read_bio$address() {
@@ -4382,30 +4028,26 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void *PEM_ASN1_read_bio(d2i_of_void *d2i, const char *name, BIO *bp, void **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * void *PEM_ASN1_read_bio(d2i_of_void *d2i, const char *name, BIO *bp, void **x, pem_password_cb *cb, void *u)
      * }
      */
-    public static MemorySegment PEM_ASN1_read_bio(MemorySegment d2i, MemorySegment name, MemorySegment bp, MemorySegment x, MemorySegment cb, MemorySegment u) {
+    public static MemorySegment PEM_ASN1_read_bio(MemorySegment d2i, MemorySegment name, MemorySegment bp,
+            MemorySegment x, MemorySegment cb, MemorySegment u) {
         var mh$ = PEM_ASN1_read_bio.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("PEM_ASN1_read_bio", d2i, name, bp, x, cb, u);
             }
-            return (MemorySegment)mh$.invokeExact(d2i, name, bp, x, cb, u);
+            return (MemorySegment) mh$.invokeExact(d2i, name, bp, x, cb, u);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class PEM_read_bio_X509_AUX {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("PEM_read_bio_X509_AUX");
 
@@ -4414,8 +4056,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern X509 *PEM_read_bio_X509_AUX(BIO *out, X509 **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c : * extern X509 *PEM_read_bio_X509_AUX(BIO *out, X509 **x, pem_password_cb *cb, void *u)
      * }
      */
     public static FunctionDescriptor PEM_read_bio_X509_AUX$descriptor() {
@@ -4424,8 +4065,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern X509 *PEM_read_bio_X509_AUX(BIO *out, X509 **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c : * extern X509 *PEM_read_bio_X509_AUX(BIO *out, X509 **x, pem_password_cb *cb, void *u)
      * }
      */
     public static MethodHandle PEM_read_bio_X509_AUX$handle() {
@@ -4434,8 +4074,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern X509 *PEM_read_bio_X509_AUX(BIO *out, X509 **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c : * extern X509 *PEM_read_bio_X509_AUX(BIO *out, X509 **x, pem_password_cb *cb, void *u)
      * }
      */
     public static MemorySegment PEM_read_bio_X509_AUX$address() {
@@ -4443,30 +4082,25 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern X509 *PEM_read_bio_X509_AUX(BIO *out, X509 **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c : * extern X509 *PEM_read_bio_X509_AUX(BIO *out, X509 **x, pem_password_cb *cb, void *u)
      * }
      */
-    public static MemorySegment PEM_read_bio_X509_AUX(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
+    public static MemorySegment PEM_read_bio_X509_AUX(MemorySegment out, MemorySegment x, MemorySegment cb,
+            MemorySegment u) {
         var mh$ = PEM_read_bio_X509_AUX.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("PEM_read_bio_X509_AUX", out, x, cb, u);
             }
-            return (MemorySegment)mh$.invokeExact(out, x, cb, u);
+            return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class PEM_read_bio_ECPKParameters {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("PEM_read_bio_ECPKParameters");
 
@@ -4475,8 +4109,8 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * EC_GROUP *PEM_read_bio_ECPKParameters(BIO *out, EC_GROUP **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * EC_GROUP *PEM_read_bio_ECPKParameters(BIO *out, EC_GROUP **x, pem_password_cb *cb, void *u)
      * }
      */
     public static FunctionDescriptor PEM_read_bio_ECPKParameters$descriptor() {
@@ -4485,8 +4119,8 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * EC_GROUP *PEM_read_bio_ECPKParameters(BIO *out, EC_GROUP **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * EC_GROUP *PEM_read_bio_ECPKParameters(BIO *out, EC_GROUP **x, pem_password_cb *cb, void *u)
      * }
      */
     public static MethodHandle PEM_read_bio_ECPKParameters$handle() {
@@ -4495,8 +4129,8 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * EC_GROUP *PEM_read_bio_ECPKParameters(BIO *out, EC_GROUP **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * EC_GROUP *PEM_read_bio_ECPKParameters(BIO *out, EC_GROUP **x, pem_password_cb *cb, void *u)
      * }
      */
     public static MemorySegment PEM_read_bio_ECPKParameters$address() {
@@ -4504,30 +4138,26 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * EC_GROUP *PEM_read_bio_ECPKParameters(BIO *out, EC_GROUP **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * EC_GROUP *PEM_read_bio_ECPKParameters(BIO *out, EC_GROUP **x, pem_password_cb *cb, void *u)
      * }
      */
-    public static MemorySegment PEM_read_bio_ECPKParameters(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
+    public static MemorySegment PEM_read_bio_ECPKParameters(MemorySegment out, MemorySegment x, MemorySegment cb,
+            MemorySegment u) {
         var mh$ = PEM_read_bio_ECPKParameters.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("PEM_read_bio_ECPKParameters", out, x, cb, u);
             }
-            return (MemorySegment)mh$.invokeExact(out, x, cb, u);
+            return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class PEM_read_bio_DHparams {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("PEM_read_bio_DHparams");
 
@@ -4536,8 +4166,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * DH *PEM_read_bio_DHparams(BIO *out, DH **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c : * DH *PEM_read_bio_DHparams(BIO *out, DH **x, pem_password_cb *cb, void *u)
      * }
      */
     public static FunctionDescriptor PEM_read_bio_DHparams$descriptor() {
@@ -4546,8 +4175,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * DH *PEM_read_bio_DHparams(BIO *out, DH **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c : * DH *PEM_read_bio_DHparams(BIO *out, DH **x, pem_password_cb *cb, void *u)
      * }
      */
     public static MethodHandle PEM_read_bio_DHparams$handle() {
@@ -4556,8 +4184,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * DH *PEM_read_bio_DHparams(BIO *out, DH **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c : * DH *PEM_read_bio_DHparams(BIO *out, DH **x, pem_password_cb *cb, void *u)
      * }
      */
     public static MemorySegment PEM_read_bio_DHparams$address() {
@@ -4565,30 +4192,25 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * DH *PEM_read_bio_DHparams(BIO *out, DH **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c : * DH *PEM_read_bio_DHparams(BIO *out, DH **x, pem_password_cb *cb, void *u)
      * }
      */
-    public static MemorySegment PEM_read_bio_DHparams(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
+    public static MemorySegment PEM_read_bio_DHparams(MemorySegment out, MemorySegment x, MemorySegment cb,
+            MemorySegment u) {
         var mh$ = PEM_read_bio_DHparams.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("PEM_read_bio_DHparams", out, x, cb, u);
             }
-            return (MemorySegment)mh$.invokeExact(out, x, cb, u);
+            return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class PEM_read_bio_PrivateKey {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("PEM_read_bio_PrivateKey");
 
@@ -4597,8 +4219,8 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern EVP_PKEY *PEM_read_bio_PrivateKey(BIO *out, EVP_PKEY **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * extern EVP_PKEY *PEM_read_bio_PrivateKey(BIO *out, EVP_PKEY **x, pem_password_cb *cb, void *u)
      * }
      */
     public static FunctionDescriptor PEM_read_bio_PrivateKey$descriptor() {
@@ -4607,8 +4229,8 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern EVP_PKEY *PEM_read_bio_PrivateKey(BIO *out, EVP_PKEY **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * extern EVP_PKEY *PEM_read_bio_PrivateKey(BIO *out, EVP_PKEY **x, pem_password_cb *cb, void *u)
      * }
      */
     public static MethodHandle PEM_read_bio_PrivateKey$handle() {
@@ -4617,8 +4239,8 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern EVP_PKEY *PEM_read_bio_PrivateKey(BIO *out, EVP_PKEY **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * extern EVP_PKEY *PEM_read_bio_PrivateKey(BIO *out, EVP_PKEY **x, pem_password_cb *cb, void *u)
      * }
      */
     public static MemorySegment PEM_read_bio_PrivateKey$address() {
@@ -4626,28 +4248,26 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern EVP_PKEY *PEM_read_bio_PrivateKey(BIO *out, EVP_PKEY **x, pem_password_cb *cb, void *u)
+     * {@snippet lang = c
+     * : * extern EVP_PKEY *PEM_read_bio_PrivateKey(BIO *out, EVP_PKEY **x, pem_password_cb *cb, void *u)
      * }
      */
-    public static MemorySegment PEM_read_bio_PrivateKey(MemorySegment out, MemorySegment x, MemorySegment cb, MemorySegment u) {
+    public static MemorySegment PEM_read_bio_PrivateKey(MemorySegment out, MemorySegment x, MemorySegment cb,
+            MemorySegment u) {
         var mh$ = PEM_read_bio_PrivateKey.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("PEM_read_bio_PrivateKey", out, x, cb, u);
             }
-            return (MemorySegment)mh$.invokeExact(out, x, cb, u);
+            return (MemorySegment) mh$.invokeExact(out, x, cb, u);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class PEM_read_bio_Parameters {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("PEM_read_bio_Parameters");
 
@@ -4656,8 +4276,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x)
+     * {@snippet lang = c : * EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x)
      * }
      */
     public static FunctionDescriptor PEM_read_bio_Parameters$descriptor() {
@@ -4666,8 +4285,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x)
+     * {@snippet lang = c : * EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x)
      * }
      */
     public static MethodHandle PEM_read_bio_Parameters$handle() {
@@ -4676,8 +4294,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x)
+     * {@snippet lang = c : * EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x)
      * }
      */
     public static MemorySegment PEM_read_bio_Parameters$address() {
@@ -4685,8 +4302,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x)
+     * {@snippet lang = c : * EVP_PKEY *PEM_read_bio_Parameters(BIO *bp, EVP_PKEY **x)
      * }
      */
     public static MemorySegment PEM_read_bio_Parameters(MemorySegment bp, MemorySegment x) {
@@ -4695,17 +4311,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("PEM_read_bio_Parameters", bp, x);
             }
-            return (MemorySegment)mh$.invokeExact(bp, x);
+            return (MemorySegment) mh$.invokeExact(bp, x);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_get_options {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_get_options");
 
@@ -4714,8 +4327,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_get_options(const SSL_CTX *ctx)
+     * {@snippet lang = c : * uint64_t SSL_CTX_get_options(const SSL_CTX *ctx)
      * }
      */
     public static FunctionDescriptor SSL_CTX_get_options$descriptor() {
@@ -4724,8 +4336,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_get_options(const SSL_CTX *ctx)
+     * {@snippet lang = c : * uint64_t SSL_CTX_get_options(const SSL_CTX *ctx)
      * }
      */
     public static MethodHandle SSL_CTX_get_options$handle() {
@@ -4734,8 +4345,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_get_options(const SSL_CTX *ctx)
+     * {@snippet lang = c : * uint64_t SSL_CTX_get_options(const SSL_CTX *ctx)
      * }
      */
     public static MemorySegment SSL_CTX_get_options$address() {
@@ -4743,8 +4353,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_get_options(const SSL_CTX *ctx)
+     * {@snippet lang = c : * uint64_t SSL_CTX_get_options(const SSL_CTX *ctx)
      * }
      */
     public static long SSL_CTX_get_options(MemorySegment ctx) {
@@ -4753,17 +4362,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_get_options", ctx);
             }
-            return (long)mh$.invokeExact(ctx);
+            return (long) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get_options {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get_options");
 
@@ -4772,8 +4378,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * uint64_t SSL_get_options(const SSL *s)
+     * {@snippet lang = c : * uint64_t SSL_get_options(const SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_get_options$descriptor() {
@@ -4782,8 +4387,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * uint64_t SSL_get_options(const SSL *s)
+     * {@snippet lang = c : * uint64_t SSL_get_options(const SSL *s)
      * }
      */
     public static MethodHandle SSL_get_options$handle() {
@@ -4792,8 +4396,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * uint64_t SSL_get_options(const SSL *s)
+     * {@snippet lang = c : * uint64_t SSL_get_options(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get_options$address() {
@@ -4801,8 +4404,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * uint64_t SSL_get_options(const SSL *s)
+     * {@snippet lang = c : * uint64_t SSL_get_options(const SSL *s)
      * }
      */
     public static long SSL_get_options(MemorySegment s) {
@@ -4811,18 +4413,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_get_options", s);
             }
-            return (long)mh$.invokeExact(s);
+            return (long) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_clear_options {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_clear_options");
 
@@ -4831,8 +4430,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_clear_options(SSL_CTX *ctx, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_CTX_clear_options(SSL_CTX *ctx, uint64_t op)
      * }
      */
     public static FunctionDescriptor SSL_CTX_clear_options$descriptor() {
@@ -4841,8 +4439,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_clear_options(SSL_CTX *ctx, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_CTX_clear_options(SSL_CTX *ctx, uint64_t op)
      * }
      */
     public static MethodHandle SSL_CTX_clear_options$handle() {
@@ -4851,8 +4448,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_clear_options(SSL_CTX *ctx, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_CTX_clear_options(SSL_CTX *ctx, uint64_t op)
      * }
      */
     public static MemorySegment SSL_CTX_clear_options$address() {
@@ -4860,8 +4456,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_clear_options(SSL_CTX *ctx, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_CTX_clear_options(SSL_CTX *ctx, uint64_t op)
      * }
      */
     public static long SSL_CTX_clear_options(MemorySegment ctx, long op) {
@@ -4870,18 +4465,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_clear_options", ctx, op);
             }
-            return (long)mh$.invokeExact(ctx, op);
+            return (long) mh$.invokeExact(ctx, op);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_options {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_options");
 
@@ -4890,8 +4482,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_set_options(SSL_CTX *ctx, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_CTX_set_options(SSL_CTX *ctx, uint64_t op)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_options$descriptor() {
@@ -4900,8 +4491,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_set_options(SSL_CTX *ctx, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_CTX_set_options(SSL_CTX *ctx, uint64_t op)
      * }
      */
     public static MethodHandle SSL_CTX_set_options$handle() {
@@ -4910,8 +4500,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_set_options(SSL_CTX *ctx, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_CTX_set_options(SSL_CTX *ctx, uint64_t op)
      * }
      */
     public static MemorySegment SSL_CTX_set_options$address() {
@@ -4919,8 +4508,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * uint64_t SSL_CTX_set_options(SSL_CTX *ctx, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_CTX_set_options(SSL_CTX *ctx, uint64_t op)
      * }
      */
     public static long SSL_CTX_set_options(MemorySegment ctx, long op) {
@@ -4929,18 +4517,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_set_options", ctx, op);
             }
-            return (long)mh$.invokeExact(ctx, op);
+            return (long) mh$.invokeExact(ctx, op);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_set_options {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_set_options");
 
@@ -4949,8 +4534,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * uint64_t SSL_set_options(SSL *s, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_set_options(SSL *s, uint64_t op)
      * }
      */
     public static FunctionDescriptor SSL_set_options$descriptor() {
@@ -4959,8 +4543,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * uint64_t SSL_set_options(SSL *s, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_set_options(SSL *s, uint64_t op)
      * }
      */
     public static MethodHandle SSL_set_options$handle() {
@@ -4969,8 +4552,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * uint64_t SSL_set_options(SSL *s, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_set_options(SSL *s, uint64_t op)
      * }
      */
     public static MemorySegment SSL_set_options$address() {
@@ -4978,8 +4560,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * uint64_t SSL_set_options(SSL *s, uint64_t op)
+     * {@snippet lang = c : * uint64_t SSL_set_options(SSL *s, uint64_t op)
      * }
      */
     public static long SSL_set_options(MemorySegment s, long op) {
@@ -4988,18 +4569,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_set_options", s, op);
             }
-            return (long)mh$.invokeExact(s, op);
+            return (long) mh$.invokeExact(s, op);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_alpn_select_cb {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_alpn_select_cb");
 
@@ -5008,8 +4586,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_alpn_select_cb(SSL_CTX *ctx, SSL_CTX_alpn_select_cb_func cb, void *arg)
+     * {@snippet lang = c : * void SSL_CTX_set_alpn_select_cb(SSL_CTX *ctx, SSL_CTX_alpn_select_cb_func cb, void *arg)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_alpn_select_cb$descriptor() {
@@ -5018,8 +4595,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_alpn_select_cb(SSL_CTX *ctx, SSL_CTX_alpn_select_cb_func cb, void *arg)
+     * {@snippet lang = c : * void SSL_CTX_set_alpn_select_cb(SSL_CTX *ctx, SSL_CTX_alpn_select_cb_func cb, void *arg)
      * }
      */
     public static MethodHandle SSL_CTX_set_alpn_select_cb$handle() {
@@ -5028,8 +4604,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_alpn_select_cb(SSL_CTX *ctx, SSL_CTX_alpn_select_cb_func cb, void *arg)
+     * {@snippet lang = c : * void SSL_CTX_set_alpn_select_cb(SSL_CTX *ctx, SSL_CTX_alpn_select_cb_func cb, void *arg)
      * }
      */
     public static MemorySegment SSL_CTX_set_alpn_select_cb$address() {
@@ -5037,8 +4612,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_alpn_select_cb(SSL_CTX *ctx, SSL_CTX_alpn_select_cb_func cb, void *arg)
+     * {@snippet lang = c : * void SSL_CTX_set_alpn_select_cb(SSL_CTX *ctx, SSL_CTX_alpn_select_cb_func cb, void *arg)
      * }
      */
     public static void SSL_CTX_set_alpn_select_cb(MemorySegment ctx, MemorySegment cb, MemorySegment arg) {
@@ -5049,16 +4623,13 @@ public class openssl_h {
             }
             mh$.invokeExact(ctx, cb, arg);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get0_alpn_selected {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get0_alpn_selected");
 
@@ -5067,8 +4638,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_get0_alpn_selected(const SSL *ssl, const unsigned char **data, unsigned int *len)
+     * {@snippet lang = c : * void SSL_get0_alpn_selected(const SSL *ssl, const unsigned char **data, unsigned int *len)
      * }
      */
     public static FunctionDescriptor SSL_get0_alpn_selected$descriptor() {
@@ -5077,8 +4647,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_get0_alpn_selected(const SSL *ssl, const unsigned char **data, unsigned int *len)
+     * {@snippet lang = c : * void SSL_get0_alpn_selected(const SSL *ssl, const unsigned char **data, unsigned int *len)
      * }
      */
     public static MethodHandle SSL_get0_alpn_selected$handle() {
@@ -5087,8 +4656,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_get0_alpn_selected(const SSL *ssl, const unsigned char **data, unsigned int *len)
+     * {@snippet lang = c : * void SSL_get0_alpn_selected(const SSL *ssl, const unsigned char **data, unsigned int *len)
      * }
      */
     public static MemorySegment SSL_get0_alpn_selected$address() {
@@ -5096,8 +4664,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_get0_alpn_selected(const SSL *ssl, const unsigned char **data, unsigned int *len)
+     * {@snippet lang = c : * void SSL_get0_alpn_selected(const SSL *ssl, const unsigned char **data, unsigned int *len)
      * }
      */
     public static void SSL_get0_alpn_selected(MemorySegment ssl, MemorySegment data, MemorySegment len) {
@@ -5108,15 +4675,12 @@ public class openssl_h {
             }
             mh$.invokeExact(ssl, data, len);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_in_init {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_in_init");
 
@@ -5125,8 +4689,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_in_init(const SSL *s)
+     * {@snippet lang = c : * int SSL_in_init(const SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_in_init$descriptor() {
@@ -5135,8 +4698,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_in_init(const SSL *s)
+     * {@snippet lang = c : * int SSL_in_init(const SSL *s)
      * }
      */
     public static MethodHandle SSL_in_init$handle() {
@@ -5145,8 +4707,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_in_init(const SSL *s)
+     * {@snippet lang = c : * int SSL_in_init(const SSL *s)
      * }
      */
     public static MemorySegment SSL_in_init$address() {
@@ -5154,8 +4715,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_in_init(const SSL *s)
+     * {@snippet lang = c : * int SSL_in_init(const SSL *s)
      * }
      */
     public static int SSL_in_init(MemorySegment s) {
@@ -5164,18 +4724,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_in_init", s);
             }
-            return (int)mh$.invokeExact(s);
+            return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set0_tmp_dh_pkey {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set0_tmp_dh_pkey");
 
@@ -5184,8 +4741,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX *ctx, EVP_PKEY *dhpkey)
+     * {@snippet lang = c : * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX *ctx, EVP_PKEY *dhpkey)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set0_tmp_dh_pkey$descriptor() {
@@ -5194,8 +4750,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX *ctx, EVP_PKEY *dhpkey)
+     * {@snippet lang = c : * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX *ctx, EVP_PKEY *dhpkey)
      * }
      */
     public static MethodHandle SSL_CTX_set0_tmp_dh_pkey$handle() {
@@ -5204,8 +4759,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX *ctx, EVP_PKEY *dhpkey)
+     * {@snippet lang = c : * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX *ctx, EVP_PKEY *dhpkey)
      * }
      */
     public static MemorySegment SSL_CTX_set0_tmp_dh_pkey$address() {
@@ -5213,8 +4767,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX *ctx, EVP_PKEY *dhpkey)
+     * {@snippet lang = c : * int SSL_CTX_set0_tmp_dh_pkey(SSL_CTX *ctx, EVP_PKEY *dhpkey)
      * }
      */
     public static int SSL_CTX_set0_tmp_dh_pkey(MemorySegment ctx, MemorySegment dhpkey) {
@@ -5223,18 +4776,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_set0_tmp_dh_pkey", ctx, dhpkey);
             }
-            return (int)mh$.invokeExact(ctx, dhpkey);
+            return (int) mh$.invokeExact(ctx, dhpkey);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_cipher_list {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_cipher_list");
 
@@ -5243,8 +4793,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_cipher_list(SSL_CTX *, const char *str)
+     * {@snippet lang = c : * int SSL_CTX_set_cipher_list(SSL_CTX *, const char *str)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_cipher_list$descriptor() {
@@ -5253,8 +4802,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_cipher_list(SSL_CTX *, const char *str)
+     * {@snippet lang = c : * int SSL_CTX_set_cipher_list(SSL_CTX *, const char *str)
      * }
      */
     public static MethodHandle SSL_CTX_set_cipher_list$handle() {
@@ -5263,8 +4811,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_cipher_list(SSL_CTX *, const char *str)
+     * {@snippet lang = c : * int SSL_CTX_set_cipher_list(SSL_CTX *, const char *str)
      * }
      */
     public static MemorySegment SSL_CTX_set_cipher_list$address() {
@@ -5272,8 +4819,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_set_cipher_list(SSL_CTX *, const char *str)
+     * {@snippet lang = c : * int SSL_CTX_set_cipher_list(SSL_CTX *, const char *str)
      * }
      */
     public static int SSL_CTX_set_cipher_list(MemorySegment x0, MemorySegment str) {
@@ -5282,17 +4828,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_set_cipher_list", x0, str);
             }
-            return (int)mh$.invokeExact(x0, str);
+            return (int) mh$.invokeExact(x0, str);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_new {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_new");
 
@@ -5301,8 +4844,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
+     * {@snippet lang = c : * SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
      * }
      */
     public static FunctionDescriptor SSL_CTX_new$descriptor() {
@@ -5311,8 +4853,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
+     * {@snippet lang = c : * SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
      * }
      */
     public static MethodHandle SSL_CTX_new$handle() {
@@ -5321,8 +4862,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
+     * {@snippet lang = c : * SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
      * }
      */
     public static MemorySegment SSL_CTX_new$address() {
@@ -5330,8 +4870,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
+     * {@snippet lang = c : * SSL_CTX *SSL_CTX_new(const SSL_METHOD *meth)
      * }
      */
     public static MemorySegment SSL_CTX_new(MemorySegment meth) {
@@ -5340,16 +4879,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_new", meth);
             }
-            return (MemorySegment)mh$.invokeExact(meth);
+            return (MemorySegment) mh$.invokeExact(meth);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_free");
 
@@ -5358,8 +4895,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_CTX_free(SSL_CTX *)
+     * {@snippet lang = c : * void SSL_CTX_free(SSL_CTX *)
      * }
      */
     public static FunctionDescriptor SSL_CTX_free$descriptor() {
@@ -5368,8 +4904,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_CTX_free(SSL_CTX *)
+     * {@snippet lang = c : * void SSL_CTX_free(SSL_CTX *)
      * }
      */
     public static MethodHandle SSL_CTX_free$handle() {
@@ -5378,8 +4913,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_CTX_free(SSL_CTX *)
+     * {@snippet lang = c : * void SSL_CTX_free(SSL_CTX *)
      * }
      */
     public static MemorySegment SSL_CTX_free$address() {
@@ -5387,8 +4921,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_CTX_free(SSL_CTX *)
+     * {@snippet lang = c : * void SSL_CTX_free(SSL_CTX *)
      * }
      */
     public static void SSL_CTX_free(MemorySegment x0) {
@@ -5399,16 +4932,13 @@ public class openssl_h {
             }
             mh$.invokeExact(x0);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_timeout {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_timeout");
 
@@ -5417,8 +4947,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * long SSL_CTX_set_timeout(SSL_CTX *ctx, long t)
+     * {@snippet lang = c : * long SSL_CTX_set_timeout(SSL_CTX *ctx, long t)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_timeout$descriptor() {
@@ -5427,8 +4956,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * long SSL_CTX_set_timeout(SSL_CTX *ctx, long t)
+     * {@snippet lang = c : * long SSL_CTX_set_timeout(SSL_CTX *ctx, long t)
      * }
      */
     public static MethodHandle SSL_CTX_set_timeout$handle() {
@@ -5437,8 +4965,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * long SSL_CTX_set_timeout(SSL_CTX *ctx, long t)
+     * {@snippet lang = c : * long SSL_CTX_set_timeout(SSL_CTX *ctx, long t)
      * }
      */
     public static MemorySegment SSL_CTX_set_timeout$address() {
@@ -5446,8 +4973,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * long SSL_CTX_set_timeout(SSL_CTX *ctx, long t)
+     * {@snippet lang = c : * long SSL_CTX_set_timeout(SSL_CTX *ctx, long t)
      * }
      */
     public static long SSL_CTX_set_timeout(MemorySegment ctx, long t) {
@@ -5456,17 +4982,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_set_timeout", ctx, t);
             }
-            return (long)mh$.invokeExact(ctx, t);
+            return (long) mh$.invokeExact(ctx, t);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_get_timeout {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_get_timeout");
 
@@ -5475,8 +4998,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * long SSL_CTX_get_timeout(const SSL_CTX *ctx)
+     * {@snippet lang = c : * long SSL_CTX_get_timeout(const SSL_CTX *ctx)
      * }
      */
     public static FunctionDescriptor SSL_CTX_get_timeout$descriptor() {
@@ -5485,8 +5007,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * long SSL_CTX_get_timeout(const SSL_CTX *ctx)
+     * {@snippet lang = c : * long SSL_CTX_get_timeout(const SSL_CTX *ctx)
      * }
      */
     public static MethodHandle SSL_CTX_get_timeout$handle() {
@@ -5495,8 +5016,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * long SSL_CTX_get_timeout(const SSL_CTX *ctx)
+     * {@snippet lang = c : * long SSL_CTX_get_timeout(const SSL_CTX *ctx)
      * }
      */
     public static MemorySegment SSL_CTX_get_timeout$address() {
@@ -5504,8 +5024,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * long SSL_CTX_get_timeout(const SSL_CTX *ctx)
+     * {@snippet lang = c : * long SSL_CTX_get_timeout(const SSL_CTX *ctx)
      * }
      */
     public static long SSL_CTX_get_timeout(MemorySegment ctx) {
@@ -5514,17 +5033,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_get_timeout", ctx);
             }
-            return (long)mh$.invokeExact(ctx);
+            return (long) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_get_cert_store {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_get_cert_store");
 
@@ -5533,8 +5049,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *)
+     * {@snippet lang = c : * X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *)
      * }
      */
     public static FunctionDescriptor SSL_CTX_get_cert_store$descriptor() {
@@ -5543,8 +5058,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *)
+     * {@snippet lang = c : * X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *)
      * }
      */
     public static MethodHandle SSL_CTX_get_cert_store$handle() {
@@ -5553,8 +5067,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *)
+     * {@snippet lang = c : * X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *)
      * }
      */
     public static MemorySegment SSL_CTX_get_cert_store$address() {
@@ -5562,8 +5075,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *)
+     * {@snippet lang = c : * X509_STORE *SSL_CTX_get_cert_store(const SSL_CTX *)
      * }
      */
     public static MemorySegment SSL_CTX_get_cert_store(MemorySegment x0) {
@@ -5572,17 +5084,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_get_cert_store", x0);
             }
-            return (MemorySegment)mh$.invokeExact(x0);
+            return (MemorySegment) mh$.invokeExact(x0);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get_current_cipher {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get_current_cipher");
 
@@ -5591,8 +5100,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
+     * {@snippet lang = c : * const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_get_current_cipher$descriptor() {
@@ -5601,8 +5109,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
+     * {@snippet lang = c : * const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
      * }
      */
     public static MethodHandle SSL_get_current_cipher$handle() {
@@ -5611,8 +5118,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
+     * {@snippet lang = c : * const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get_current_cipher$address() {
@@ -5620,8 +5126,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
+     * {@snippet lang = c : * const SSL_CIPHER *SSL_get_current_cipher(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get_current_cipher(MemorySegment s) {
@@ -5630,17 +5135,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_get_current_cipher", s);
             }
-            return (MemorySegment)mh$.invokeExact(s);
+            return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CIPHER_get_name {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CIPHER_get_name");
 
@@ -5649,8 +5151,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const char *SSL_CIPHER_get_name(const SSL_CIPHER *c)
+     * {@snippet lang = c : * const char *SSL_CIPHER_get_name(const SSL_CIPHER *c)
      * }
      */
     public static FunctionDescriptor SSL_CIPHER_get_name$descriptor() {
@@ -5659,8 +5160,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const char *SSL_CIPHER_get_name(const SSL_CIPHER *c)
+     * {@snippet lang = c : * const char *SSL_CIPHER_get_name(const SSL_CIPHER *c)
      * }
      */
     public static MethodHandle SSL_CIPHER_get_name$handle() {
@@ -5669,8 +5169,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const char *SSL_CIPHER_get_name(const SSL_CIPHER *c)
+     * {@snippet lang = c : * const char *SSL_CIPHER_get_name(const SSL_CIPHER *c)
      * }
      */
     public static MemorySegment SSL_CIPHER_get_name$address() {
@@ -5678,8 +5177,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const char *SSL_CIPHER_get_name(const SSL_CIPHER *c)
+     * {@snippet lang = c : * const char *SSL_CIPHER_get_name(const SSL_CIPHER *c)
      * }
      */
     public static MemorySegment SSL_CIPHER_get_name(MemorySegment c) {
@@ -5688,17 +5186,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CIPHER_get_name", c);
             }
-            return (MemorySegment)mh$.invokeExact(c);
+            return (MemorySegment) mh$.invokeExact(c);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CIPHER_get_kx_nid {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CIPHER_get_kx_nid");
 
@@ -5707,8 +5202,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CIPHER_get_kx_nid(const SSL_CIPHER *c)
+     * {@snippet lang = c : * int SSL_CIPHER_get_kx_nid(const SSL_CIPHER *c)
      * }
      */
     public static FunctionDescriptor SSL_CIPHER_get_kx_nid$descriptor() {
@@ -5717,8 +5211,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CIPHER_get_kx_nid(const SSL_CIPHER *c)
+     * {@snippet lang = c : * int SSL_CIPHER_get_kx_nid(const SSL_CIPHER *c)
      * }
      */
     public static MethodHandle SSL_CIPHER_get_kx_nid$handle() {
@@ -5727,8 +5220,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CIPHER_get_kx_nid(const SSL_CIPHER *c)
+     * {@snippet lang = c : * int SSL_CIPHER_get_kx_nid(const SSL_CIPHER *c)
      * }
      */
     public static MemorySegment SSL_CIPHER_get_kx_nid$address() {
@@ -5736,8 +5228,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CIPHER_get_kx_nid(const SSL_CIPHER *c)
+     * {@snippet lang = c : * int SSL_CIPHER_get_kx_nid(const SSL_CIPHER *c)
      * }
      */
     public static int SSL_CIPHER_get_kx_nid(MemorySegment c) {
@@ -5746,17 +5237,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CIPHER_get_kx_nid", c);
             }
-            return (int)mh$.invokeExact(c);
+            return (int) mh$.invokeExact(c);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CIPHER_get_auth_nid {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CIPHER_get_auth_nid");
 
@@ -5765,8 +5253,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CIPHER_get_auth_nid(const SSL_CIPHER *c)
+     * {@snippet lang = c : * int SSL_CIPHER_get_auth_nid(const SSL_CIPHER *c)
      * }
      */
     public static FunctionDescriptor SSL_CIPHER_get_auth_nid$descriptor() {
@@ -5775,8 +5262,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CIPHER_get_auth_nid(const SSL_CIPHER *c)
+     * {@snippet lang = c : * int SSL_CIPHER_get_auth_nid(const SSL_CIPHER *c)
      * }
      */
     public static MethodHandle SSL_CIPHER_get_auth_nid$handle() {
@@ -5785,8 +5271,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CIPHER_get_auth_nid(const SSL_CIPHER *c)
+     * {@snippet lang = c : * int SSL_CIPHER_get_auth_nid(const SSL_CIPHER *c)
      * }
      */
     public static MemorySegment SSL_CIPHER_get_auth_nid$address() {
@@ -5794,8 +5279,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CIPHER_get_auth_nid(const SSL_CIPHER *c)
+     * {@snippet lang = c : * int SSL_CIPHER_get_auth_nid(const SSL_CIPHER *c)
      * }
      */
     public static int SSL_CIPHER_get_auth_nid(MemorySegment c) {
@@ -5804,17 +5288,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CIPHER_get_auth_nid", c);
             }
-            return (int)mh$.invokeExact(c);
+            return (int) mh$.invokeExact(c);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_pending {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_pending");
 
@@ -5823,8 +5304,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_pending(const SSL *s)
+     * {@snippet lang = c : * int SSL_pending(const SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_pending$descriptor() {
@@ -5833,8 +5313,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_pending(const SSL *s)
+     * {@snippet lang = c : * int SSL_pending(const SSL *s)
      * }
      */
     public static MethodHandle SSL_pending$handle() {
@@ -5843,8 +5322,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_pending(const SSL *s)
+     * {@snippet lang = c : * int SSL_pending(const SSL *s)
      * }
      */
     public static MemorySegment SSL_pending$address() {
@@ -5852,8 +5330,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_pending(const SSL *s)
+     * {@snippet lang = c : * int SSL_pending(const SSL *s)
      * }
      */
     public static int SSL_pending(MemorySegment s) {
@@ -5862,18 +5339,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_pending", s);
             }
-            return (int)mh$.invokeExact(s);
+            return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_set_bio {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_set_bio");
 
@@ -5882,8 +5356,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
+     * {@snippet lang = c : * void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
      * }
      */
     public static FunctionDescriptor SSL_set_bio$descriptor() {
@@ -5892,8 +5365,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
+     * {@snippet lang = c : * void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
      * }
      */
     public static MethodHandle SSL_set_bio$handle() {
@@ -5902,8 +5374,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
+     * {@snippet lang = c : * void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
      * }
      */
     public static MemorySegment SSL_set_bio$address() {
@@ -5911,8 +5382,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
+     * {@snippet lang = c : * void SSL_set_bio(SSL *s, BIO *rbio, BIO *wbio)
      * }
      */
     public static void SSL_set_bio(MemorySegment s, MemorySegment rbio, MemorySegment wbio) {
@@ -5923,16 +5393,13 @@ public class openssl_h {
             }
             mh$.invokeExact(s, rbio, wbio);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_set_cipher_list {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_set_cipher_list");
 
@@ -5941,8 +5408,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_set_cipher_list(SSL *s, const char *str)
+     * {@snippet lang = c : * int SSL_set_cipher_list(SSL *s, const char *str)
      * }
      */
     public static FunctionDescriptor SSL_set_cipher_list$descriptor() {
@@ -5951,8 +5417,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_set_cipher_list(SSL *s, const char *str)
+     * {@snippet lang = c : * int SSL_set_cipher_list(SSL *s, const char *str)
      * }
      */
     public static MethodHandle SSL_set_cipher_list$handle() {
@@ -5961,8 +5426,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_set_cipher_list(SSL *s, const char *str)
+     * {@snippet lang = c : * int SSL_set_cipher_list(SSL *s, const char *str)
      * }
      */
     public static MemorySegment SSL_set_cipher_list$address() {
@@ -5970,8 +5434,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_set_cipher_list(SSL *s, const char *str)
+     * {@snippet lang = c : * int SSL_set_cipher_list(SSL *s, const char *str)
      * }
      */
     public static int SSL_set_cipher_list(MemorySegment s, MemorySegment str) {
@@ -5980,18 +5443,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_set_cipher_list", s, str);
             }
-            return (int)mh$.invokeExact(s, str);
+            return (int) mh$.invokeExact(s, str);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_ciphersuites {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_ciphersuites");
 
@@ -6000,8 +5460,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
+     * {@snippet lang = c : * int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_ciphersuites$descriptor() {
@@ -6010,8 +5469,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
+     * {@snippet lang = c : * int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
      * }
      */
     public static MethodHandle SSL_CTX_set_ciphersuites$handle() {
@@ -6020,8 +5478,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
+     * {@snippet lang = c : * int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
      * }
      */
     public static MemorySegment SSL_CTX_set_ciphersuites$address() {
@@ -6029,8 +5486,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
+     * {@snippet lang = c : * int SSL_CTX_set_ciphersuites(SSL_CTX *ctx, const char *str)
      * }
      */
     public static int SSL_CTX_set_ciphersuites(MemorySegment ctx, MemorySegment str) {
@@ -6039,18 +5495,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_set_ciphersuites", ctx, str);
             }
-            return (int)mh$.invokeExact(ctx, str);
+            return (int) mh$.invokeExact(ctx, str);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_set_verify {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_set_verify");
 
@@ -6059,8 +5512,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_set_verify(SSL *s, int mode, SSL_verify_cb callback)
+     * {@snippet lang = c : * void SSL_set_verify(SSL *s, int mode, SSL_verify_cb callback)
      * }
      */
     public static FunctionDescriptor SSL_set_verify$descriptor() {
@@ -6069,8 +5521,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_set_verify(SSL *s, int mode, SSL_verify_cb callback)
+     * {@snippet lang = c : * void SSL_set_verify(SSL *s, int mode, SSL_verify_cb callback)
      * }
      */
     public static MethodHandle SSL_set_verify$handle() {
@@ -6079,8 +5530,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_set_verify(SSL *s, int mode, SSL_verify_cb callback)
+     * {@snippet lang = c : * void SSL_set_verify(SSL *s, int mode, SSL_verify_cb callback)
      * }
      */
     public static MemorySegment SSL_set_verify$address() {
@@ -6088,8 +5538,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_set_verify(SSL *s, int mode, SSL_verify_cb callback)
+     * {@snippet lang = c : * void SSL_set_verify(SSL *s, int mode, SSL_verify_cb callback)
      * }
      */
     public static void SSL_set_verify(MemorySegment s, int mode, MemorySegment callback) {
@@ -6100,16 +5549,13 @@ public class openssl_h {
             }
             mh$.invokeExact(s, mode, callback);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_use_certificate_chain_file {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_use_certificate_chain_file");
 
@@ -6118,8 +5564,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
+     * {@snippet lang = c : * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
      * }
      */
     public static FunctionDescriptor SSL_CTX_use_certificate_chain_file$descriptor() {
@@ -6128,8 +5573,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
+     * {@snippet lang = c : * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
      * }
      */
     public static MethodHandle SSL_CTX_use_certificate_chain_file$handle() {
@@ -6138,8 +5582,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
+     * {@snippet lang = c : * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
      * }
      */
     public static MemorySegment SSL_CTX_use_certificate_chain_file$address() {
@@ -6147,8 +5590,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
+     * {@snippet lang = c : * int SSL_CTX_use_certificate_chain_file(SSL_CTX *ctx, const char *file)
      * }
      */
     public static int SSL_CTX_use_certificate_chain_file(MemorySegment ctx, MemorySegment file) {
@@ -6157,17 +5599,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_use_certificate_chain_file", ctx, file);
             }
-            return (int)mh$.invokeExact(ctx, file);
+            return (int) mh$.invokeExact(ctx, file);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_load_client_CA_file {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_load_client_CA_file");
 
@@ -6176,8 +5615,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * struct stack_st_X509_NAME *SSL_load_client_CA_file(const char *file)
+     * {@snippet lang = c : * struct stack_st_X509_NAME *SSL_load_client_CA_file(const char *file)
      * }
      */
     public static FunctionDescriptor SSL_load_client_CA_file$descriptor() {
@@ -6186,8 +5624,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * struct stack_st_X509_NAME *SSL_load_client_CA_file(const char *file)
+     * {@snippet lang = c : * struct stack_st_X509_NAME *SSL_load_client_CA_file(const char *file)
      * }
      */
     public static MethodHandle SSL_load_client_CA_file$handle() {
@@ -6196,8 +5633,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * struct stack_st_X509_NAME *SSL_load_client_CA_file(const char *file)
+     * {@snippet lang = c : * struct stack_st_X509_NAME *SSL_load_client_CA_file(const char *file)
      * }
      */
     public static MemorySegment SSL_load_client_CA_file$address() {
@@ -6205,8 +5641,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * struct stack_st_X509_NAME *SSL_load_client_CA_file(const char *file)
+     * {@snippet lang = c : * struct stack_st_X509_NAME *SSL_load_client_CA_file(const char *file)
      * }
      */
     public static MemorySegment SSL_load_client_CA_file(MemorySegment file) {
@@ -6215,18 +5650,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_load_client_CA_file", file);
             }
-            return (MemorySegment)mh$.invokeExact(file);
+            return (MemorySegment) mh$.invokeExact(file);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_add_file_cert_subjects_to_stack {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_add_file_cert_subjects_to_stack");
 
@@ -6235,8 +5667,8 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_add_file_cert_subjects_to_stack(struct stack_st_X509_NAME *stackCAs, const char *file)
+     * {@snippet lang = c
+     * : * int SSL_add_file_cert_subjects_to_stack(struct stack_st_X509_NAME *stackCAs, const char *file)
      * }
      */
     public static FunctionDescriptor SSL_add_file_cert_subjects_to_stack$descriptor() {
@@ -6245,8 +5677,8 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_add_file_cert_subjects_to_stack(struct stack_st_X509_NAME *stackCAs, const char *file)
+     * {@snippet lang = c
+     * : * int SSL_add_file_cert_subjects_to_stack(struct stack_st_X509_NAME *stackCAs, const char *file)
      * }
      */
     public static MethodHandle SSL_add_file_cert_subjects_to_stack$handle() {
@@ -6255,8 +5687,8 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_add_file_cert_subjects_to_stack(struct stack_st_X509_NAME *stackCAs, const char *file)
+     * {@snippet lang = c
+     * : * int SSL_add_file_cert_subjects_to_stack(struct stack_st_X509_NAME *stackCAs, const char *file)
      * }
      */
     public static MemorySegment SSL_add_file_cert_subjects_to_stack$address() {
@@ -6264,8 +5696,8 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_add_file_cert_subjects_to_stack(struct stack_st_X509_NAME *stackCAs, const char *file)
+     * {@snippet lang = c
+     * : * int SSL_add_file_cert_subjects_to_stack(struct stack_st_X509_NAME *stackCAs, const char *file)
      * }
      */
     public static int SSL_add_file_cert_subjects_to_stack(MemorySegment stackCAs, MemorySegment file) {
@@ -6274,17 +5706,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_add_file_cert_subjects_to_stack", stackCAs, file);
             }
-            return (int)mh$.invokeExact(stackCAs, file);
+            return (int) mh$.invokeExact(stackCAs, file);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_SESSION_get_time {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_SESSION_get_time");
 
@@ -6293,8 +5722,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * long SSL_SESSION_get_time(const SSL_SESSION *s)
+     * {@snippet lang = c : * long SSL_SESSION_get_time(const SSL_SESSION *s)
      * }
      */
     public static FunctionDescriptor SSL_SESSION_get_time$descriptor() {
@@ -6303,8 +5731,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * long SSL_SESSION_get_time(const SSL_SESSION *s)
+     * {@snippet lang = c : * long SSL_SESSION_get_time(const SSL_SESSION *s)
      * }
      */
     public static MethodHandle SSL_SESSION_get_time$handle() {
@@ -6313,8 +5740,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * long SSL_SESSION_get_time(const SSL_SESSION *s)
+     * {@snippet lang = c : * long SSL_SESSION_get_time(const SSL_SESSION *s)
      * }
      */
     public static MemorySegment SSL_SESSION_get_time$address() {
@@ -6322,8 +5748,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * long SSL_SESSION_get_time(const SSL_SESSION *s)
+     * {@snippet lang = c : * long SSL_SESSION_get_time(const SSL_SESSION *s)
      * }
      */
     public static long SSL_SESSION_get_time(MemorySegment s) {
@@ -6332,18 +5757,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_SESSION_get_time", s);
             }
-            return (long)mh$.invokeExact(s);
+            return (long) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_SESSION_get_id {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_SESSION_get_id");
 
@@ -6352,8 +5774,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s, unsigned int *len)
+     * {@snippet lang = c : * const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s, unsigned int *len)
      * }
      */
     public static FunctionDescriptor SSL_SESSION_get_id$descriptor() {
@@ -6362,8 +5783,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s, unsigned int *len)
+     * {@snippet lang = c : * const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s, unsigned int *len)
      * }
      */
     public static MethodHandle SSL_SESSION_get_id$handle() {
@@ -6372,8 +5792,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s, unsigned int *len)
+     * {@snippet lang = c : * const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s, unsigned int *len)
      * }
      */
     public static MemorySegment SSL_SESSION_get_id$address() {
@@ -6381,8 +5800,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s, unsigned int *len)
+     * {@snippet lang = c : * const unsigned char *SSL_SESSION_get_id(const SSL_SESSION *s, unsigned int *len)
      * }
      */
     public static MemorySegment SSL_SESSION_get_id(MemorySegment s, MemorySegment len) {
@@ -6391,17 +5809,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_SESSION_get_id", s, len);
             }
-            return (MemorySegment)mh$.invokeExact(s, len);
+            return (MemorySegment) mh$.invokeExact(s, len);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get1_peer_certificate {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get1_peer_certificate");
 
@@ -6410,8 +5825,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * X509 *SSL_get1_peer_certificate(const SSL *s)
+     * {@snippet lang = c : * X509 *SSL_get1_peer_certificate(const SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_get1_peer_certificate$descriptor() {
@@ -6420,8 +5834,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * X509 *SSL_get1_peer_certificate(const SSL *s)
+     * {@snippet lang = c : * X509 *SSL_get1_peer_certificate(const SSL *s)
      * }
      */
     public static MethodHandle SSL_get1_peer_certificate$handle() {
@@ -6430,8 +5843,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * X509 *SSL_get1_peer_certificate(const SSL *s)
+     * {@snippet lang = c : * X509 *SSL_get1_peer_certificate(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get1_peer_certificate$address() {
@@ -6439,8 +5851,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * X509 *SSL_get1_peer_certificate(const SSL *s)
+     * {@snippet lang = c : * X509 *SSL_get1_peer_certificate(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get1_peer_certificate(MemorySegment s) {
@@ -6449,17 +5860,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_get1_peer_certificate", s);
             }
-            return (MemorySegment)mh$.invokeExact(s);
+            return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get_peer_cert_chain {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get_peer_cert_chain");
 
@@ -6468,8 +5876,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * struct stack_st_X509 *SSL_get_peer_cert_chain(const SSL *s)
+     * {@snippet lang = c : * struct stack_st_X509 *SSL_get_peer_cert_chain(const SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_get_peer_cert_chain$descriptor() {
@@ -6478,8 +5885,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * struct stack_st_X509 *SSL_get_peer_cert_chain(const SSL *s)
+     * {@snippet lang = c : * struct stack_st_X509 *SSL_get_peer_cert_chain(const SSL *s)
      * }
      */
     public static MethodHandle SSL_get_peer_cert_chain$handle() {
@@ -6488,8 +5894,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * struct stack_st_X509 *SSL_get_peer_cert_chain(const SSL *s)
+     * {@snippet lang = c : * struct stack_st_X509 *SSL_get_peer_cert_chain(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get_peer_cert_chain$address() {
@@ -6497,8 +5902,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * struct stack_st_X509 *SSL_get_peer_cert_chain(const SSL *s)
+     * {@snippet lang = c : * struct stack_st_X509 *SSL_get_peer_cert_chain(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get_peer_cert_chain(MemorySegment s) {
@@ -6507,18 +5911,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_get_peer_cert_chain", s);
             }
-            return (MemorySegment)mh$.invokeExact(s);
+            return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_verify {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_verify");
 
@@ -6527,8 +5928,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, SSL_verify_cb callback)
+     * {@snippet lang = c : * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, SSL_verify_cb callback)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_verify$descriptor() {
@@ -6537,8 +5937,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, SSL_verify_cb callback)
+     * {@snippet lang = c : * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, SSL_verify_cb callback)
      * }
      */
     public static MethodHandle SSL_CTX_set_verify$handle() {
@@ -6547,8 +5946,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, SSL_verify_cb callback)
+     * {@snippet lang = c : * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, SSL_verify_cb callback)
      * }
      */
     public static MemorySegment SSL_CTX_set_verify$address() {
@@ -6556,8 +5954,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, SSL_verify_cb callback)
+     * {@snippet lang = c : * void SSL_CTX_set_verify(SSL_CTX *ctx, int mode, SSL_verify_cb callback)
      * }
      */
     public static void SSL_CTX_set_verify(MemorySegment ctx, int mode, MemorySegment callback) {
@@ -6568,16 +5965,13 @@ public class openssl_h {
             }
             mh$.invokeExact(ctx, mode, callback);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_cert_verify_callback {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_cert_verify_callback");
 
@@ -6586,8 +5980,8 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb)(X509_STORE_CTX *, void *), void *arg)
+     * {@snippet lang = c
+     * : * void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb)(X509_STORE_CTX *, void *), void *arg)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_cert_verify_callback$descriptor() {
@@ -6596,8 +5990,8 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb)(X509_STORE_CTX *, void *), void *arg)
+     * {@snippet lang = c
+     * : * void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb)(X509_STORE_CTX *, void *), void *arg)
      * }
      */
     public static MethodHandle SSL_CTX_set_cert_verify_callback$handle() {
@@ -6606,8 +6000,8 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb)(X509_STORE_CTX *, void *), void *arg)
+     * {@snippet lang = c
+     * : * void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb)(X509_STORE_CTX *, void *), void *arg)
      * }
      */
     public static MemorySegment SSL_CTX_set_cert_verify_callback$address() {
@@ -6615,8 +6009,8 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb)(X509_STORE_CTX *, void *), void *arg)
+     * {@snippet lang = c
+     * : * void SSL_CTX_set_cert_verify_callback(SSL_CTX *ctx, int (*cb)(X509_STORE_CTX *, void *), void *arg)
      * }
      */
     public static void SSL_CTX_set_cert_verify_callback(MemorySegment ctx, MemorySegment cb, MemorySegment arg) {
@@ -6627,16 +6021,13 @@ public class openssl_h {
             }
             mh$.invokeExact(ctx, cb, arg);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_use_PrivateKey {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_use_PrivateKey");
 
@@ -6645,8 +6036,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey)
+     * {@snippet lang = c : * int SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey)
      * }
      */
     public static FunctionDescriptor SSL_CTX_use_PrivateKey$descriptor() {
@@ -6655,8 +6045,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey)
+     * {@snippet lang = c : * int SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey)
      * }
      */
     public static MethodHandle SSL_CTX_use_PrivateKey$handle() {
@@ -6665,8 +6054,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey)
+     * {@snippet lang = c : * int SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey)
      * }
      */
     public static MemorySegment SSL_CTX_use_PrivateKey$address() {
@@ -6674,8 +6062,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey)
+     * {@snippet lang = c : * int SSL_CTX_use_PrivateKey(SSL_CTX *ctx, EVP_PKEY *pkey)
      * }
      */
     public static int SSL_CTX_use_PrivateKey(MemorySegment ctx, MemorySegment pkey) {
@@ -6684,18 +6071,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_use_PrivateKey", ctx, pkey);
             }
-            return (int)mh$.invokeExact(ctx, pkey);
+            return (int) mh$.invokeExact(ctx, pkey);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_use_certificate {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_use_certificate");
 
@@ -6704,8 +6088,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
+     * {@snippet lang = c : * int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
      * }
      */
     public static FunctionDescriptor SSL_CTX_use_certificate$descriptor() {
@@ -6714,8 +6097,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
+     * {@snippet lang = c : * int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
      * }
      */
     public static MethodHandle SSL_CTX_use_certificate$handle() {
@@ -6724,8 +6106,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
+     * {@snippet lang = c : * int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
      * }
      */
     public static MemorySegment SSL_CTX_use_certificate$address() {
@@ -6733,8 +6114,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
+     * {@snippet lang = c : * int SSL_CTX_use_certificate(SSL_CTX *ctx, X509 *x)
      * }
      */
     public static int SSL_CTX_use_certificate(MemorySegment ctx, MemorySegment x) {
@@ -6743,17 +6123,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_use_certificate", ctx, x);
             }
-            return (int)mh$.invokeExact(ctx, x);
+            return (int) mh$.invokeExact(ctx, x);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_default_passwd_cb {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_default_passwd_cb");
 
@@ -6762,8 +6140,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, pem_password_cb *cb)
+     * {@snippet lang = c : * void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, pem_password_cb *cb)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_default_passwd_cb$descriptor() {
@@ -6772,8 +6149,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, pem_password_cb *cb)
+     * {@snippet lang = c : * void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, pem_password_cb *cb)
      * }
      */
     public static MethodHandle SSL_CTX_set_default_passwd_cb$handle() {
@@ -6782,8 +6158,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, pem_password_cb *cb)
+     * {@snippet lang = c : * void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, pem_password_cb *cb)
      * }
      */
     public static MemorySegment SSL_CTX_set_default_passwd_cb$address() {
@@ -6791,8 +6166,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, pem_password_cb *cb)
+     * {@snippet lang = c : * void SSL_CTX_set_default_passwd_cb(SSL_CTX *ctx, pem_password_cb *cb)
      * }
      */
     public static void SSL_CTX_set_default_passwd_cb(MemorySegment ctx, MemorySegment cb) {
@@ -6803,15 +6177,12 @@ public class openssl_h {
             }
             mh$.invokeExact(ctx, cb);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_check_private_key {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_check_private_key");
 
@@ -6820,8 +6191,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_check_private_key(const SSL_CTX *ctx)
+     * {@snippet lang = c : * int SSL_CTX_check_private_key(const SSL_CTX *ctx)
      * }
      */
     public static FunctionDescriptor SSL_CTX_check_private_key$descriptor() {
@@ -6830,8 +6200,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_check_private_key(const SSL_CTX *ctx)
+     * {@snippet lang = c : * int SSL_CTX_check_private_key(const SSL_CTX *ctx)
      * }
      */
     public static MethodHandle SSL_CTX_check_private_key$handle() {
@@ -6840,8 +6209,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_check_private_key(const SSL_CTX *ctx)
+     * {@snippet lang = c : * int SSL_CTX_check_private_key(const SSL_CTX *ctx)
      * }
      */
     public static MemorySegment SSL_CTX_check_private_key$address() {
@@ -6849,8 +6217,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_check_private_key(const SSL_CTX *ctx)
+     * {@snippet lang = c : * int SSL_CTX_check_private_key(const SSL_CTX *ctx)
      * }
      */
     public static int SSL_CTX_check_private_key(MemorySegment ctx) {
@@ -6859,19 +6226,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_check_private_key", ctx);
             }
-            return (int)mh$.invokeExact(ctx);
+            return (int) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_session_id_context {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_session_id_context");
 
@@ -6880,8 +6243,8 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_session_id_context(SSL_CTX *ctx, const unsigned char *sid_ctx, unsigned int sid_ctx_len)
+     * {@snippet lang = c
+     * : * int SSL_CTX_set_session_id_context(SSL_CTX *ctx, const unsigned char *sid_ctx, unsigned int sid_ctx_len)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_session_id_context$descriptor() {
@@ -6890,8 +6253,8 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_session_id_context(SSL_CTX *ctx, const unsigned char *sid_ctx, unsigned int sid_ctx_len)
+     * {@snippet lang = c
+     * : * int SSL_CTX_set_session_id_context(SSL_CTX *ctx, const unsigned char *sid_ctx, unsigned int sid_ctx_len)
      * }
      */
     public static MethodHandle SSL_CTX_set_session_id_context$handle() {
@@ -6900,8 +6263,8 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_session_id_context(SSL_CTX *ctx, const unsigned char *sid_ctx, unsigned int sid_ctx_len)
+     * {@snippet lang = c
+     * : * int SSL_CTX_set_session_id_context(SSL_CTX *ctx, const unsigned char *sid_ctx, unsigned int sid_ctx_len)
      * }
      */
     public static MemorySegment SSL_CTX_set_session_id_context$address() {
@@ -6909,8 +6272,8 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_set_session_id_context(SSL_CTX *ctx, const unsigned char *sid_ctx, unsigned int sid_ctx_len)
+     * {@snippet lang = c
+     * : * int SSL_CTX_set_session_id_context(SSL_CTX *ctx, const unsigned char *sid_ctx, unsigned int sid_ctx_len)
      * }
      */
     public static int SSL_CTX_set_session_id_context(MemorySegment ctx, MemorySegment sid_ctx, int sid_ctx_len) {
@@ -6919,17 +6282,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_set_session_id_context", ctx, sid_ctx, sid_ctx_len);
             }
-            return (int)mh$.invokeExact(ctx, sid_ctx, sid_ctx_len);
+            return (int) mh$.invokeExact(ctx, sid_ctx, sid_ctx_len);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_new {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_new");
 
@@ -6938,8 +6298,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * SSL *SSL_new(SSL_CTX *ctx)
+     * {@snippet lang = c : * SSL *SSL_new(SSL_CTX *ctx)
      * }
      */
     public static FunctionDescriptor SSL_new$descriptor() {
@@ -6948,8 +6307,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * SSL *SSL_new(SSL_CTX *ctx)
+     * {@snippet lang = c : * SSL *SSL_new(SSL_CTX *ctx)
      * }
      */
     public static MethodHandle SSL_new$handle() {
@@ -6958,8 +6316,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * SSL *SSL_new(SSL_CTX *ctx)
+     * {@snippet lang = c : * SSL *SSL_new(SSL_CTX *ctx)
      * }
      */
     public static MemorySegment SSL_new$address() {
@@ -6967,8 +6324,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * SSL *SSL_new(SSL_CTX *ctx)
+     * {@snippet lang = c : * SSL *SSL_new(SSL_CTX *ctx)
      * }
      */
     public static MemorySegment SSL_new(MemorySegment ctx) {
@@ -6977,16 +6333,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_new", ctx);
             }
-            return (MemorySegment)mh$.invokeExact(ctx);
+            return (MemorySegment) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_free");
 
@@ -6995,8 +6349,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_free(SSL *ssl)
+     * {@snippet lang = c : * void SSL_free(SSL *ssl)
      * }
      */
     public static FunctionDescriptor SSL_free$descriptor() {
@@ -7005,8 +6358,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_free(SSL *ssl)
+     * {@snippet lang = c : * void SSL_free(SSL *ssl)
      * }
      */
     public static MethodHandle SSL_free$handle() {
@@ -7015,8 +6367,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_free(SSL *ssl)
+     * {@snippet lang = c : * void SSL_free(SSL *ssl)
      * }
      */
     public static MemorySegment SSL_free$address() {
@@ -7024,8 +6375,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_free(SSL *ssl)
+     * {@snippet lang = c : * void SSL_free(SSL *ssl)
      * }
      */
     public static void SSL_free(MemorySegment ssl) {
@@ -7036,17 +6386,13 @@ public class openssl_h {
             }
             mh$.invokeExact(ssl);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_read {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_read");
 
@@ -7055,8 +6401,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_read(SSL *ssl, void *buf, int num)
+     * {@snippet lang = c : * int SSL_read(SSL *ssl, void *buf, int num)
      * }
      */
     public static FunctionDescriptor SSL_read$descriptor() {
@@ -7065,8 +6410,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_read(SSL *ssl, void *buf, int num)
+     * {@snippet lang = c : * int SSL_read(SSL *ssl, void *buf, int num)
      * }
      */
     public static MethodHandle SSL_read$handle() {
@@ -7075,8 +6419,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_read(SSL *ssl, void *buf, int num)
+     * {@snippet lang = c : * int SSL_read(SSL *ssl, void *buf, int num)
      * }
      */
     public static MemorySegment SSL_read$address() {
@@ -7084,8 +6427,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_read(SSL *ssl, void *buf, int num)
+     * {@snippet lang = c : * int SSL_read(SSL *ssl, void *buf, int num)
      * }
      */
     public static int SSL_read(MemorySegment ssl, MemorySegment buf, int num) {
@@ -7094,19 +6436,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_read", ssl, buf, num);
             }
-            return (int)mh$.invokeExact(ssl, buf, num);
+            return (int) mh$.invokeExact(ssl, buf, num);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_write {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_write");
 
@@ -7115,8 +6453,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_write(SSL *ssl, const void *buf, int num)
+     * {@snippet lang = c : * int SSL_write(SSL *ssl, const void *buf, int num)
      * }
      */
     public static FunctionDescriptor SSL_write$descriptor() {
@@ -7125,8 +6462,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_write(SSL *ssl, const void *buf, int num)
+     * {@snippet lang = c : * int SSL_write(SSL *ssl, const void *buf, int num)
      * }
      */
     public static MethodHandle SSL_write$handle() {
@@ -7135,8 +6471,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_write(SSL *ssl, const void *buf, int num)
+     * {@snippet lang = c : * int SSL_write(SSL *ssl, const void *buf, int num)
      * }
      */
     public static MemorySegment SSL_write$address() {
@@ -7144,8 +6479,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_write(SSL *ssl, const void *buf, int num)
+     * {@snippet lang = c : * int SSL_write(SSL *ssl, const void *buf, int num)
      * }
      */
     public static int SSL_write(MemorySegment ssl, MemorySegment buf, int num) {
@@ -7154,20 +6488,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_write", ssl, buf, num);
             }
-            return (int)mh$.invokeExact(ssl, buf, num);
+            return (int) mh$.invokeExact(ssl, buf, num);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_ctrl {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT,
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER,
+                openssl_h.C_INT, openssl_h.C_LONG, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_ctrl");
 
@@ -7176,8 +6505,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
+     * {@snippet lang = c : * long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
      * }
      */
     public static FunctionDescriptor SSL_CTX_ctrl$descriptor() {
@@ -7186,8 +6514,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
+     * {@snippet lang = c : * long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
      * }
      */
     public static MethodHandle SSL_CTX_ctrl$handle() {
@@ -7196,8 +6523,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
+     * {@snippet lang = c : * long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
      * }
      */
     public static MemorySegment SSL_CTX_ctrl$address() {
@@ -7205,8 +6531,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
+     * {@snippet lang = c : * long SSL_CTX_ctrl(SSL_CTX *ctx, int cmd, long larg, void *parg)
      * }
      */
     public static long SSL_CTX_ctrl(MemorySegment ctx, int cmd, long larg, MemorySegment parg) {
@@ -7215,17 +6540,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_ctrl", ctx, cmd, larg, parg);
             }
-            return (long)mh$.invokeExact(ctx, cmd, larg, parg);
+            return (long) mh$.invokeExact(ctx, cmd, larg, parg);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get_version {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get_version");
 
@@ -7234,8 +6556,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const char *SSL_get_version(const SSL *s)
+     * {@snippet lang = c : * const char *SSL_get_version(const SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_get_version$descriptor() {
@@ -7244,8 +6565,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const char *SSL_get_version(const SSL *s)
+     * {@snippet lang = c : * const char *SSL_get_version(const SSL *s)
      * }
      */
     public static MethodHandle SSL_get_version$handle() {
@@ -7254,8 +6574,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const char *SSL_get_version(const SSL *s)
+     * {@snippet lang = c : * const char *SSL_get_version(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get_version$address() {
@@ -7263,8 +6582,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const char *SSL_get_version(const SSL *s)
+     * {@snippet lang = c : * const char *SSL_get_version(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get_version(MemorySegment s) {
@@ -7273,15 +6591,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_get_version", s);
             }
-            return (MemorySegment)mh$.invokeExact(s);
+            return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class TLS_server_method {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("TLS_server_method");
 
@@ -7290,8 +6607,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const SSL_METHOD *TLS_server_method()
+     * {@snippet lang = c : * const SSL_METHOD *TLS_server_method()
      * }
      */
     public static FunctionDescriptor TLS_server_method$descriptor() {
@@ -7300,8 +6616,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const SSL_METHOD *TLS_server_method()
+     * {@snippet lang = c : * const SSL_METHOD *TLS_server_method()
      * }
      */
     public static MethodHandle TLS_server_method$handle() {
@@ -7310,8 +6625,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const SSL_METHOD *TLS_server_method()
+     * {@snippet lang = c : * const SSL_METHOD *TLS_server_method()
      * }
      */
     public static MemorySegment TLS_server_method$address() {
@@ -7319,8 +6633,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const SSL_METHOD *TLS_server_method()
+     * {@snippet lang = c : * const SSL_METHOD *TLS_server_method()
      * }
      */
     public static MemorySegment TLS_server_method() {
@@ -7329,17 +6642,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("TLS_server_method");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get_ciphers {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get_ciphers");
 
@@ -7348,8 +6658,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER *SSL_get_ciphers(const SSL *s)
+     * {@snippet lang = c : * struct stack_st_SSL_CIPHER *SSL_get_ciphers(const SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_get_ciphers$descriptor() {
@@ -7358,8 +6667,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER *SSL_get_ciphers(const SSL *s)
+     * {@snippet lang = c : * struct stack_st_SSL_CIPHER *SSL_get_ciphers(const SSL *s)
      * }
      */
     public static MethodHandle SSL_get_ciphers$handle() {
@@ -7368,8 +6676,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER *SSL_get_ciphers(const SSL *s)
+     * {@snippet lang = c : * struct stack_st_SSL_CIPHER *SSL_get_ciphers(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get_ciphers$address() {
@@ -7377,8 +6684,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER *SSL_get_ciphers(const SSL *s)
+     * {@snippet lang = c : * struct stack_st_SSL_CIPHER *SSL_get_ciphers(const SSL *s)
      * }
      */
     public static MemorySegment SSL_get_ciphers(MemorySegment s) {
@@ -7387,17 +6693,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_get_ciphers", s);
             }
-            return (MemorySegment)mh$.invokeExact(s);
+            return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_get_ciphers {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_get_ciphers");
 
@@ -7406,8 +6709,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
+     * {@snippet lang = c : * struct stack_st_SSL_CIPHER *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
      * }
      */
     public static FunctionDescriptor SSL_CTX_get_ciphers$descriptor() {
@@ -7416,8 +6718,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
+     * {@snippet lang = c : * struct stack_st_SSL_CIPHER *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
      * }
      */
     public static MethodHandle SSL_CTX_get_ciphers$handle() {
@@ -7426,8 +6727,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
+     * {@snippet lang = c : * struct stack_st_SSL_CIPHER *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
      * }
      */
     public static MemorySegment SSL_CTX_get_ciphers$address() {
@@ -7435,8 +6735,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * struct stack_st_SSL_CIPHER *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
+     * {@snippet lang = c : * struct stack_st_SSL_CIPHER *SSL_CTX_get_ciphers(const SSL_CTX *ctx)
      * }
      */
     public static MemorySegment SSL_CTX_get_ciphers(MemorySegment ctx) {
@@ -7445,17 +6744,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_get_ciphers", ctx);
             }
-            return (MemorySegment)mh$.invokeExact(ctx);
+            return (MemorySegment) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_do_handshake {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_do_handshake");
 
@@ -7464,8 +6760,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_do_handshake(SSL *s)
+     * {@snippet lang = c : * int SSL_do_handshake(SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_do_handshake$descriptor() {
@@ -7474,8 +6769,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_do_handshake(SSL *s)
+     * {@snippet lang = c : * int SSL_do_handshake(SSL *s)
      * }
      */
     public static MethodHandle SSL_do_handshake$handle() {
@@ -7484,8 +6778,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_do_handshake(SSL *s)
+     * {@snippet lang = c : * int SSL_do_handshake(SSL *s)
      * }
      */
     public static MemorySegment SSL_do_handshake$address() {
@@ -7493,8 +6786,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_do_handshake(SSL *s)
+     * {@snippet lang = c : * int SSL_do_handshake(SSL *s)
      * }
      */
     public static int SSL_do_handshake(MemorySegment s) {
@@ -7503,17 +6795,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_do_handshake", s);
             }
-            return (int)mh$.invokeExact(s);
+            return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_renegotiate {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_renegotiate");
 
@@ -7522,8 +6811,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_renegotiate(SSL *s)
+     * {@snippet lang = c : * int SSL_renegotiate(SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_renegotiate$descriptor() {
@@ -7532,8 +6820,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_renegotiate(SSL *s)
+     * {@snippet lang = c : * int SSL_renegotiate(SSL *s)
      * }
      */
     public static MethodHandle SSL_renegotiate$handle() {
@@ -7542,8 +6829,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_renegotiate(SSL *s)
+     * {@snippet lang = c : * int SSL_renegotiate(SSL *s)
      * }
      */
     public static MemorySegment SSL_renegotiate$address() {
@@ -7551,8 +6837,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_renegotiate(SSL *s)
+     * {@snippet lang = c : * int SSL_renegotiate(SSL *s)
      * }
      */
     public static int SSL_renegotiate(MemorySegment s) {
@@ -7561,17 +6846,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_renegotiate", s);
             }
-            return (int)mh$.invokeExact(s);
+            return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_renegotiate_pending {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_renegotiate_pending");
 
@@ -7580,8 +6862,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_renegotiate_pending(const SSL *s)
+     * {@snippet lang = c : * int SSL_renegotiate_pending(const SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_renegotiate_pending$descriptor() {
@@ -7590,8 +6871,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_renegotiate_pending(const SSL *s)
+     * {@snippet lang = c : * int SSL_renegotiate_pending(const SSL *s)
      * }
      */
     public static MethodHandle SSL_renegotiate_pending$handle() {
@@ -7600,8 +6880,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_renegotiate_pending(const SSL *s)
+     * {@snippet lang = c : * int SSL_renegotiate_pending(const SSL *s)
      * }
      */
     public static MemorySegment SSL_renegotiate_pending$address() {
@@ -7609,8 +6888,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_renegotiate_pending(const SSL *s)
+     * {@snippet lang = c : * int SSL_renegotiate_pending(const SSL *s)
      * }
      */
     public static int SSL_renegotiate_pending(MemorySegment s) {
@@ -7619,17 +6897,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_renegotiate_pending", s);
             }
-            return (int)mh$.invokeExact(s);
+            return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_shutdown {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_shutdown");
 
@@ -7638,8 +6913,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_shutdown(SSL *s)
+     * {@snippet lang = c : * int SSL_shutdown(SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_shutdown$descriptor() {
@@ -7648,8 +6922,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_shutdown(SSL *s)
+     * {@snippet lang = c : * int SSL_shutdown(SSL *s)
      * }
      */
     public static MethodHandle SSL_shutdown$handle() {
@@ -7658,8 +6931,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_shutdown(SSL *s)
+     * {@snippet lang = c : * int SSL_shutdown(SSL *s)
      * }
      */
     public static MemorySegment SSL_shutdown$address() {
@@ -7667,8 +6939,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_shutdown(SSL *s)
+     * {@snippet lang = c : * int SSL_shutdown(SSL *s)
      * }
      */
     public static int SSL_shutdown(MemorySegment s) {
@@ -7677,17 +6948,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_shutdown", s);
             }
-            return (int)mh$.invokeExact(s);
+            return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_verify_client_post_handshake {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_verify_client_post_handshake");
 
@@ -7696,8 +6964,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_verify_client_post_handshake(SSL *s)
+     * {@snippet lang = c : * int SSL_verify_client_post_handshake(SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_verify_client_post_handshake$descriptor() {
@@ -7706,8 +6973,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_verify_client_post_handshake(SSL *s)
+     * {@snippet lang = c : * int SSL_verify_client_post_handshake(SSL *s)
      * }
      */
     public static MethodHandle SSL_verify_client_post_handshake$handle() {
@@ -7716,8 +6982,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_verify_client_post_handshake(SSL *s)
+     * {@snippet lang = c : * int SSL_verify_client_post_handshake(SSL *s)
      * }
      */
     public static MemorySegment SSL_verify_client_post_handshake$address() {
@@ -7725,8 +6990,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_verify_client_post_handshake(SSL *s)
+     * {@snippet lang = c : * int SSL_verify_client_post_handshake(SSL *s)
      * }
      */
     public static int SSL_verify_client_post_handshake(MemorySegment s) {
@@ -7735,17 +6999,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_verify_client_post_handshake", s);
             }
-            return (int)mh$.invokeExact(s);
+            return (int) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_client_CA_list {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_client_CA_list");
 
@@ -7754,8 +7016,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, struct stack_st_X509_NAME *name_list)
+     * {@snippet lang = c : * void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, struct stack_st_X509_NAME *name_list)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_client_CA_list$descriptor() {
@@ -7764,8 +7025,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, struct stack_st_X509_NAME *name_list)
+     * {@snippet lang = c : * void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, struct stack_st_X509_NAME *name_list)
      * }
      */
     public static MethodHandle SSL_CTX_set_client_CA_list$handle() {
@@ -7774,8 +7034,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, struct stack_st_X509_NAME *name_list)
+     * {@snippet lang = c : * void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, struct stack_st_X509_NAME *name_list)
      * }
      */
     public static MemorySegment SSL_CTX_set_client_CA_list$address() {
@@ -7783,8 +7042,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, struct stack_st_X509_NAME *name_list)
+     * {@snippet lang = c : * void SSL_CTX_set_client_CA_list(SSL_CTX *ctx, struct stack_st_X509_NAME *name_list)
      * }
      */
     public static void SSL_CTX_set_client_CA_list(MemorySegment ctx, MemorySegment name_list) {
@@ -7795,15 +7053,12 @@ public class openssl_h {
             }
             mh$.invokeExact(ctx, name_list);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_get_client_CA_list {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_get_client_CA_list");
 
@@ -7812,8 +7067,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * struct stack_st_X509_NAME *SSL_CTX_get_client_CA_list(const SSL_CTX *s)
+     * {@snippet lang = c : * struct stack_st_X509_NAME *SSL_CTX_get_client_CA_list(const SSL_CTX *s)
      * }
      */
     public static FunctionDescriptor SSL_CTX_get_client_CA_list$descriptor() {
@@ -7822,8 +7076,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * struct stack_st_X509_NAME *SSL_CTX_get_client_CA_list(const SSL_CTX *s)
+     * {@snippet lang = c : * struct stack_st_X509_NAME *SSL_CTX_get_client_CA_list(const SSL_CTX *s)
      * }
      */
     public static MethodHandle SSL_CTX_get_client_CA_list$handle() {
@@ -7832,8 +7085,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * struct stack_st_X509_NAME *SSL_CTX_get_client_CA_list(const SSL_CTX *s)
+     * {@snippet lang = c : * struct stack_st_X509_NAME *SSL_CTX_get_client_CA_list(const SSL_CTX *s)
      * }
      */
     public static MemorySegment SSL_CTX_get_client_CA_list$address() {
@@ -7841,8 +7093,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * struct stack_st_X509_NAME *SSL_CTX_get_client_CA_list(const SSL_CTX *s)
+     * {@snippet lang = c : * struct stack_st_X509_NAME *SSL_CTX_get_client_CA_list(const SSL_CTX *s)
      * }
      */
     public static MemorySegment SSL_CTX_get_client_CA_list(MemorySegment s) {
@@ -7851,18 +7102,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_get_client_CA_list", s);
             }
-            return (MemorySegment)mh$.invokeExact(s);
+            return (MemorySegment) mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_add_client_CA {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_add_client_CA");
 
@@ -7871,8 +7119,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
+     * {@snippet lang = c : * int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
      * }
      */
     public static FunctionDescriptor SSL_CTX_add_client_CA$descriptor() {
@@ -7881,8 +7128,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
+     * {@snippet lang = c : * int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
      * }
      */
     public static MethodHandle SSL_CTX_add_client_CA$handle() {
@@ -7891,8 +7137,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
+     * {@snippet lang = c : * int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
      * }
      */
     public static MemorySegment SSL_CTX_add_client_CA$address() {
@@ -7900,8 +7145,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
+     * {@snippet lang = c : * int SSL_CTX_add_client_CA(SSL_CTX *ctx, X509 *x)
      * }
      */
     public static int SSL_CTX_add_client_CA(MemorySegment ctx, MemorySegment x) {
@@ -7910,16 +7154,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_add_client_CA", ctx, x);
             }
-            return (int)mh$.invokeExact(ctx, x);
+            return (int) mh$.invokeExact(ctx, x);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_set_connect_state {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_set_connect_state");
 
@@ -7928,8 +7170,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_set_connect_state(SSL *s)
+     * {@snippet lang = c : * void SSL_set_connect_state(SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_set_connect_state$descriptor() {
@@ -7938,8 +7179,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_set_connect_state(SSL *s)
+     * {@snippet lang = c : * void SSL_set_connect_state(SSL *s)
      * }
      */
     public static MethodHandle SSL_set_connect_state$handle() {
@@ -7948,8 +7188,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_set_connect_state(SSL *s)
+     * {@snippet lang = c : * void SSL_set_connect_state(SSL *s)
      * }
      */
     public static MemorySegment SSL_set_connect_state$address() {
@@ -7957,8 +7196,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_set_connect_state(SSL *s)
+     * {@snippet lang = c : * void SSL_set_connect_state(SSL *s)
      * }
      */
     public static void SSL_set_connect_state(MemorySegment s) {
@@ -7969,14 +7207,12 @@ public class openssl_h {
             }
             mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_set_accept_state {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_set_accept_state");
 
@@ -7985,8 +7221,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_set_accept_state(SSL *s)
+     * {@snippet lang = c : * void SSL_set_accept_state(SSL *s)
      * }
      */
     public static FunctionDescriptor SSL_set_accept_state$descriptor() {
@@ -7995,8 +7230,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_set_accept_state(SSL *s)
+     * {@snippet lang = c : * void SSL_set_accept_state(SSL *s)
      * }
      */
     public static MethodHandle SSL_set_accept_state$handle() {
@@ -8005,8 +7239,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_set_accept_state(SSL *s)
+     * {@snippet lang = c : * void SSL_set_accept_state(SSL *s)
      * }
      */
     public static MemorySegment SSL_set_accept_state$address() {
@@ -8014,8 +7247,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_set_accept_state(SSL *s)
+     * {@snippet lang = c : * void SSL_set_accept_state(SSL *s)
      * }
      */
     public static void SSL_set_accept_state(MemorySegment s) {
@@ -8026,15 +7258,12 @@ public class openssl_h {
             }
             mh$.invokeExact(s);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get_privatekey {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get_privatekey");
 
@@ -8043,8 +7272,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * struct evp_pkey_st *SSL_get_privatekey(const SSL *ssl)
+     * {@snippet lang = c : * struct evp_pkey_st *SSL_get_privatekey(const SSL *ssl)
      * }
      */
     public static FunctionDescriptor SSL_get_privatekey$descriptor() {
@@ -8053,8 +7281,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * struct evp_pkey_st *SSL_get_privatekey(const SSL *ssl)
+     * {@snippet lang = c : * struct evp_pkey_st *SSL_get_privatekey(const SSL *ssl)
      * }
      */
     public static MethodHandle SSL_get_privatekey$handle() {
@@ -8063,8 +7290,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * struct evp_pkey_st *SSL_get_privatekey(const SSL *ssl)
+     * {@snippet lang = c : * struct evp_pkey_st *SSL_get_privatekey(const SSL *ssl)
      * }
      */
     public static MemorySegment SSL_get_privatekey$address() {
@@ -8072,8 +7298,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * struct evp_pkey_st *SSL_get_privatekey(const SSL *ssl)
+     * {@snippet lang = c : * struct evp_pkey_st *SSL_get_privatekey(const SSL *ssl)
      * }
      */
     public static MemorySegment SSL_get_privatekey(MemorySegment ssl) {
@@ -8082,17 +7307,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_get_privatekey", ssl);
             }
-            return (MemorySegment)mh$.invokeExact(ssl);
+            return (MemorySegment) mh$.invokeExact(ssl);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get_shutdown {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get_shutdown");
 
@@ -8101,8 +7323,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_get_shutdown(const SSL *ssl)
+     * {@snippet lang = c : * int SSL_get_shutdown(const SSL *ssl)
      * }
      */
     public static FunctionDescriptor SSL_get_shutdown$descriptor() {
@@ -8111,8 +7332,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_get_shutdown(const SSL *ssl)
+     * {@snippet lang = c : * int SSL_get_shutdown(const SSL *ssl)
      * }
      */
     public static MethodHandle SSL_get_shutdown$handle() {
@@ -8121,8 +7341,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_get_shutdown(const SSL *ssl)
+     * {@snippet lang = c : * int SSL_get_shutdown(const SSL *ssl)
      * }
      */
     public static MemorySegment SSL_get_shutdown$address() {
@@ -8130,8 +7349,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_get_shutdown(const SSL *ssl)
+     * {@snippet lang = c : * int SSL_get_shutdown(const SSL *ssl)
      * }
      */
     public static int SSL_get_shutdown(MemorySegment ssl) {
@@ -8140,17 +7358,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_get_shutdown", ssl);
             }
-            return (int)mh$.invokeExact(ssl);
+            return (int) mh$.invokeExact(ssl);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_default_verify_paths {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_default_verify_paths");
 
@@ -8159,8 +7374,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
+     * {@snippet lang = c : * int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_default_verify_paths$descriptor() {
@@ -8169,8 +7383,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
+     * {@snippet lang = c : * int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
      * }
      */
     public static MethodHandle SSL_CTX_set_default_verify_paths$handle() {
@@ -8179,8 +7392,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
+     * {@snippet lang = c : * int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
      * }
      */
     public static MemorySegment SSL_CTX_set_default_verify_paths$address() {
@@ -8188,8 +7400,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
+     * {@snippet lang = c : * int SSL_CTX_set_default_verify_paths(SSL_CTX *ctx)
      * }
      */
     public static int SSL_CTX_set_default_verify_paths(MemorySegment ctx) {
@@ -8198,19 +7409,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_set_default_verify_paths", ctx);
             }
-            return (int)mh$.invokeExact(ctx);
+            return (int) mh$.invokeExact(ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_load_verify_locations {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_load_verify_locations");
 
@@ -8219,8 +7426,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath)
+     * {@snippet lang = c : * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath)
      * }
      */
     public static FunctionDescriptor SSL_CTX_load_verify_locations$descriptor() {
@@ -8229,8 +7435,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath)
+     * {@snippet lang = c : * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath)
      * }
      */
     public static MethodHandle SSL_CTX_load_verify_locations$handle() {
@@ -8239,8 +7444,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath)
+     * {@snippet lang = c : * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath)
      * }
      */
     public static MemorySegment SSL_CTX_load_verify_locations$address() {
@@ -8248,8 +7452,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath)
+     * {@snippet lang = c : * int SSL_CTX_load_verify_locations(SSL_CTX *ctx, const char *CAfile, const char *CApath)
      * }
      */
     public static int SSL_CTX_load_verify_locations(MemorySegment ctx, MemorySegment CAfile, MemorySegment CApath) {
@@ -8258,17 +7461,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CTX_load_verify_locations", ctx, CAfile, CApath);
             }
-            return (int)mh$.invokeExact(ctx, CAfile, CApath);
+            return (int) mh$.invokeExact(ctx, CAfile, CApath);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get_session {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get_session");
 
@@ -8277,8 +7477,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * SSL_SESSION *SSL_get_session(const SSL *ssl)
+     * {@snippet lang = c : * SSL_SESSION *SSL_get_session(const SSL *ssl)
      * }
      */
     public static FunctionDescriptor SSL_get_session$descriptor() {
@@ -8287,8 +7486,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * SSL_SESSION *SSL_get_session(const SSL *ssl)
+     * {@snippet lang = c : * SSL_SESSION *SSL_get_session(const SSL *ssl)
      * }
      */
     public static MethodHandle SSL_get_session$handle() {
@@ -8297,8 +7495,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * SSL_SESSION *SSL_get_session(const SSL *ssl)
+     * {@snippet lang = c : * SSL_SESSION *SSL_get_session(const SSL *ssl)
      * }
      */
     public static MemorySegment SSL_get_session$address() {
@@ -8306,8 +7503,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * SSL_SESSION *SSL_get_session(const SSL *ssl)
+     * {@snippet lang = c : * SSL_SESSION *SSL_get_session(const SSL *ssl)
      * }
      */
     public static MemorySegment SSL_get_session(MemorySegment ssl) {
@@ -8316,17 +7512,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_get_session", ssl);
             }
-            return (MemorySegment)mh$.invokeExact(ssl);
+            return (MemorySegment) mh$.invokeExact(ssl);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_set_info_callback {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_set_info_callback");
 
@@ -8335,8 +7529,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
+     * {@snippet lang = c : * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
      * }
      */
     public static FunctionDescriptor SSL_set_info_callback$descriptor() {
@@ -8345,8 +7538,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
+     * {@snippet lang = c : * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
      * }
      */
     public static MethodHandle SSL_set_info_callback$handle() {
@@ -8355,8 +7547,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
+     * {@snippet lang = c : * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
      * }
      */
     public static MemorySegment SSL_set_info_callback$address() {
@@ -8364,8 +7555,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
+     * {@snippet lang = c : * void SSL_set_info_callback(SSL *ssl, void (*cb)(const SSL *, int, int))
      * }
      */
     public static void SSL_set_info_callback(MemorySegment ssl, MemorySegment cb) {
@@ -8376,15 +7566,12 @@ public class openssl_h {
             }
             mh$.invokeExact(ssl, cb);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_set_verify_result {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_set_verify_result");
 
@@ -8393,8 +7580,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_set_verify_result(SSL *ssl, long v)
+     * {@snippet lang = c : * void SSL_set_verify_result(SSL *ssl, long v)
      * }
      */
     public static FunctionDescriptor SSL_set_verify_result$descriptor() {
@@ -8403,8 +7589,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_set_verify_result(SSL *ssl, long v)
+     * {@snippet lang = c : * void SSL_set_verify_result(SSL *ssl, long v)
      * }
      */
     public static MethodHandle SSL_set_verify_result$handle() {
@@ -8413,8 +7598,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_set_verify_result(SSL *ssl, long v)
+     * {@snippet lang = c : * void SSL_set_verify_result(SSL *ssl, long v)
      * }
      */
     public static MemorySegment SSL_set_verify_result$address() {
@@ -8422,8 +7606,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_set_verify_result(SSL *ssl, long v)
+     * {@snippet lang = c : * void SSL_set_verify_result(SSL *ssl, long v)
      * }
      */
     public static void SSL_set_verify_result(MemorySegment ssl, long v) {
@@ -8434,13 +7617,12 @@ public class openssl_h {
             }
             mh$.invokeExact(ssl, v);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_get_ex_data_X509_STORE_CTX_idx {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_get_ex_data_X509_STORE_CTX_idx");
 
@@ -8449,8 +7631,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_get_ex_data_X509_STORE_CTX_idx()
+     * {@snippet lang = c : * int SSL_get_ex_data_X509_STORE_CTX_idx()
      * }
      */
     public static FunctionDescriptor SSL_get_ex_data_X509_STORE_CTX_idx$descriptor() {
@@ -8459,8 +7640,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_get_ex_data_X509_STORE_CTX_idx()
+     * {@snippet lang = c : * int SSL_get_ex_data_X509_STORE_CTX_idx()
      * }
      */
     public static MethodHandle SSL_get_ex_data_X509_STORE_CTX_idx$handle() {
@@ -8469,8 +7649,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_get_ex_data_X509_STORE_CTX_idx()
+     * {@snippet lang = c : * int SSL_get_ex_data_X509_STORE_CTX_idx()
      * }
      */
     public static MemorySegment SSL_get_ex_data_X509_STORE_CTX_idx$address() {
@@ -8478,8 +7657,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_get_ex_data_X509_STORE_CTX_idx()
+     * {@snippet lang = c : * int SSL_get_ex_data_X509_STORE_CTX_idx()
      * }
      */
     public static int SSL_get_ex_data_X509_STORE_CTX_idx() {
@@ -8488,17 +7666,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_get_ex_data_X509_STORE_CTX_idx");
             }
-            return (int)mh$.invokeExact();
+            return (int) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CTX_set_tmp_dh_callback {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CTX_set_tmp_dh_callback");
 
@@ -8507,8 +7683,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh)(SSL *, int, int))
+     * {@snippet lang = c : * void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh)(SSL *, int, int))
      * }
      */
     public static FunctionDescriptor SSL_CTX_set_tmp_dh_callback$descriptor() {
@@ -8517,8 +7692,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh)(SSL *, int, int))
+     * {@snippet lang = c : * void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh)(SSL *, int, int))
      * }
      */
     public static MethodHandle SSL_CTX_set_tmp_dh_callback$handle() {
@@ -8527,8 +7701,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh)(SSL *, int, int))
+     * {@snippet lang = c : * void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh)(SSL *, int, int))
      * }
      */
     public static MemorySegment SSL_CTX_set_tmp_dh_callback$address() {
@@ -8536,8 +7709,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh)(SSL *, int, int))
+     * {@snippet lang = c : * void SSL_CTX_set_tmp_dh_callback(SSL_CTX *ctx, DH *(*dh)(SSL *, int, int))
      * }
      */
     public static void SSL_CTX_set_tmp_dh_callback(MemorySegment ctx, MemorySegment dh) {
@@ -8548,13 +7720,12 @@ public class openssl_h {
             }
             mh$.invokeExact(ctx, dh);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CONF_CTX_new {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CONF_CTX_new");
 
@@ -8563,8 +7734,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * SSL_CONF_CTX *SSL_CONF_CTX_new()
+     * {@snippet lang = c : * SSL_CONF_CTX *SSL_CONF_CTX_new()
      * }
      */
     public static FunctionDescriptor SSL_CONF_CTX_new$descriptor() {
@@ -8573,8 +7743,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * SSL_CONF_CTX *SSL_CONF_CTX_new()
+     * {@snippet lang = c : * SSL_CONF_CTX *SSL_CONF_CTX_new()
      * }
      */
     public static MethodHandle SSL_CONF_CTX_new$handle() {
@@ -8583,8 +7752,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * SSL_CONF_CTX *SSL_CONF_CTX_new()
+     * {@snippet lang = c : * SSL_CONF_CTX *SSL_CONF_CTX_new()
      * }
      */
     public static MemorySegment SSL_CONF_CTX_new$address() {
@@ -8592,8 +7760,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * SSL_CONF_CTX *SSL_CONF_CTX_new()
+     * {@snippet lang = c : * SSL_CONF_CTX *SSL_CONF_CTX_new()
      * }
      */
     public static MemorySegment SSL_CONF_CTX_new() {
@@ -8602,17 +7769,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CONF_CTX_new");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CONF_CTX_finish {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CONF_CTX_finish");
 
@@ -8621,8 +7785,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CONF_CTX_finish(SSL_CONF_CTX *cctx)
+     * {@snippet lang = c : * int SSL_CONF_CTX_finish(SSL_CONF_CTX *cctx)
      * }
      */
     public static FunctionDescriptor SSL_CONF_CTX_finish$descriptor() {
@@ -8631,8 +7794,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CONF_CTX_finish(SSL_CONF_CTX *cctx)
+     * {@snippet lang = c : * int SSL_CONF_CTX_finish(SSL_CONF_CTX *cctx)
      * }
      */
     public static MethodHandle SSL_CONF_CTX_finish$handle() {
@@ -8641,8 +7803,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CONF_CTX_finish(SSL_CONF_CTX *cctx)
+     * {@snippet lang = c : * int SSL_CONF_CTX_finish(SSL_CONF_CTX *cctx)
      * }
      */
     public static MemorySegment SSL_CONF_CTX_finish$address() {
@@ -8650,8 +7811,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CONF_CTX_finish(SSL_CONF_CTX *cctx)
+     * {@snippet lang = c : * int SSL_CONF_CTX_finish(SSL_CONF_CTX *cctx)
      * }
      */
     public static int SSL_CONF_CTX_finish(MemorySegment cctx) {
@@ -8660,16 +7820,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CONF_CTX_finish", cctx);
             }
-            return (int)mh$.invokeExact(cctx);
+            return (int) mh$.invokeExact(cctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CONF_CTX_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CONF_CTX_free");
 
@@ -8678,8 +7836,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_CONF_CTX_free(SSL_CONF_CTX *cctx)
+     * {@snippet lang = c : * void SSL_CONF_CTX_free(SSL_CONF_CTX *cctx)
      * }
      */
     public static FunctionDescriptor SSL_CONF_CTX_free$descriptor() {
@@ -8688,8 +7845,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_CONF_CTX_free(SSL_CONF_CTX *cctx)
+     * {@snippet lang = c : * void SSL_CONF_CTX_free(SSL_CONF_CTX *cctx)
      * }
      */
     public static MethodHandle SSL_CONF_CTX_free$handle() {
@@ -8698,8 +7854,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_CONF_CTX_free(SSL_CONF_CTX *cctx)
+     * {@snippet lang = c : * void SSL_CONF_CTX_free(SSL_CONF_CTX *cctx)
      * }
      */
     public static MemorySegment SSL_CONF_CTX_free$address() {
@@ -8707,8 +7862,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_CONF_CTX_free(SSL_CONF_CTX *cctx)
+     * {@snippet lang = c : * void SSL_CONF_CTX_free(SSL_CONF_CTX *cctx)
      * }
      */
     public static void SSL_CONF_CTX_free(MemorySegment cctx) {
@@ -8719,16 +7873,13 @@ public class openssl_h {
             }
             mh$.invokeExact(cctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CONF_CTX_set_flags {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CONF_CTX_set_flags");
 
@@ -8737,8 +7888,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * unsigned int SSL_CONF_CTX_set_flags(SSL_CONF_CTX *cctx, unsigned int flags)
+     * {@snippet lang = c : * unsigned int SSL_CONF_CTX_set_flags(SSL_CONF_CTX *cctx, unsigned int flags)
      * }
      */
     public static FunctionDescriptor SSL_CONF_CTX_set_flags$descriptor() {
@@ -8747,8 +7897,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * unsigned int SSL_CONF_CTX_set_flags(SSL_CONF_CTX *cctx, unsigned int flags)
+     * {@snippet lang = c : * unsigned int SSL_CONF_CTX_set_flags(SSL_CONF_CTX *cctx, unsigned int flags)
      * }
      */
     public static MethodHandle SSL_CONF_CTX_set_flags$handle() {
@@ -8757,8 +7906,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * unsigned int SSL_CONF_CTX_set_flags(SSL_CONF_CTX *cctx, unsigned int flags)
+     * {@snippet lang = c : * unsigned int SSL_CONF_CTX_set_flags(SSL_CONF_CTX *cctx, unsigned int flags)
      * }
      */
     public static MemorySegment SSL_CONF_CTX_set_flags$address() {
@@ -8766,8 +7914,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * unsigned int SSL_CONF_CTX_set_flags(SSL_CONF_CTX *cctx, unsigned int flags)
+     * {@snippet lang = c : * unsigned int SSL_CONF_CTX_set_flags(SSL_CONF_CTX *cctx, unsigned int flags)
      * }
      */
     public static int SSL_CONF_CTX_set_flags(MemorySegment cctx, int flags) {
@@ -8776,17 +7923,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CONF_CTX_set_flags", cctx, flags);
             }
-            return (int)mh$.invokeExact(cctx, flags);
+            return (int) mh$.invokeExact(cctx, flags);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CONF_CTX_set_ssl_ctx {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CONF_CTX_set_ssl_ctx");
 
@@ -8795,8 +7940,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void SSL_CONF_CTX_set_ssl_ctx(SSL_CONF_CTX *cctx, SSL_CTX *ctx)
+     * {@snippet lang = c : * void SSL_CONF_CTX_set_ssl_ctx(SSL_CONF_CTX *cctx, SSL_CTX *ctx)
      * }
      */
     public static FunctionDescriptor SSL_CONF_CTX_set_ssl_ctx$descriptor() {
@@ -8805,8 +7949,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void SSL_CONF_CTX_set_ssl_ctx(SSL_CONF_CTX *cctx, SSL_CTX *ctx)
+     * {@snippet lang = c : * void SSL_CONF_CTX_set_ssl_ctx(SSL_CONF_CTX *cctx, SSL_CTX *ctx)
      * }
      */
     public static MethodHandle SSL_CONF_CTX_set_ssl_ctx$handle() {
@@ -8815,8 +7958,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void SSL_CONF_CTX_set_ssl_ctx(SSL_CONF_CTX *cctx, SSL_CTX *ctx)
+     * {@snippet lang = c : * void SSL_CONF_CTX_set_ssl_ctx(SSL_CONF_CTX *cctx, SSL_CTX *ctx)
      * }
      */
     public static MemorySegment SSL_CONF_CTX_set_ssl_ctx$address() {
@@ -8824,8 +7966,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void SSL_CONF_CTX_set_ssl_ctx(SSL_CONF_CTX *cctx, SSL_CTX *ctx)
+     * {@snippet lang = c : * void SSL_CONF_CTX_set_ssl_ctx(SSL_CONF_CTX *cctx, SSL_CTX *ctx)
      * }
      */
     public static void SSL_CONF_CTX_set_ssl_ctx(MemorySegment cctx, MemorySegment ctx) {
@@ -8836,17 +7977,13 @@ public class openssl_h {
             }
             mh$.invokeExact(cctx, ctx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CONF_cmd {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CONF_cmd");
 
@@ -8855,8 +7992,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CONF_cmd(SSL_CONF_CTX *cctx, const char *cmd, const char *value)
+     * {@snippet lang = c : * int SSL_CONF_cmd(SSL_CONF_CTX *cctx, const char *cmd, const char *value)
      * }
      */
     public static FunctionDescriptor SSL_CONF_cmd$descriptor() {
@@ -8865,8 +8001,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CONF_cmd(SSL_CONF_CTX *cctx, const char *cmd, const char *value)
+     * {@snippet lang = c : * int SSL_CONF_cmd(SSL_CONF_CTX *cctx, const char *cmd, const char *value)
      * }
      */
     public static MethodHandle SSL_CONF_cmd$handle() {
@@ -8875,8 +8010,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CONF_cmd(SSL_CONF_CTX *cctx, const char *cmd, const char *value)
+     * {@snippet lang = c : * int SSL_CONF_cmd(SSL_CONF_CTX *cctx, const char *cmd, const char *value)
      * }
      */
     public static MemorySegment SSL_CONF_cmd$address() {
@@ -8884,8 +8018,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CONF_cmd(SSL_CONF_CTX *cctx, const char *cmd, const char *value)
+     * {@snippet lang = c : * int SSL_CONF_cmd(SSL_CONF_CTX *cctx, const char *cmd, const char *value)
      * }
      */
     public static int SSL_CONF_cmd(MemorySegment cctx, MemorySegment cmd, MemorySegment value) {
@@ -8894,18 +8027,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CONF_cmd", cctx, cmd, value);
             }
-            return (int)mh$.invokeExact(cctx, cmd, value);
+            return (int) mh$.invokeExact(cctx, cmd, value);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class SSL_CONF_cmd_value_type {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("SSL_CONF_cmd_value_type");
 
@@ -8914,8 +8044,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int SSL_CONF_cmd_value_type(SSL_CONF_CTX *cctx, const char *cmd)
+     * {@snippet lang = c : * int SSL_CONF_cmd_value_type(SSL_CONF_CTX *cctx, const char *cmd)
      * }
      */
     public static FunctionDescriptor SSL_CONF_cmd_value_type$descriptor() {
@@ -8924,8 +8053,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int SSL_CONF_cmd_value_type(SSL_CONF_CTX *cctx, const char *cmd)
+     * {@snippet lang = c : * int SSL_CONF_cmd_value_type(SSL_CONF_CTX *cctx, const char *cmd)
      * }
      */
     public static MethodHandle SSL_CONF_cmd_value_type$handle() {
@@ -8934,8 +8062,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int SSL_CONF_cmd_value_type(SSL_CONF_CTX *cctx, const char *cmd)
+     * {@snippet lang = c : * int SSL_CONF_cmd_value_type(SSL_CONF_CTX *cctx, const char *cmd)
      * }
      */
     public static MemorySegment SSL_CONF_cmd_value_type$address() {
@@ -8943,8 +8070,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int SSL_CONF_cmd_value_type(SSL_CONF_CTX *cctx, const char *cmd)
+     * {@snippet lang = c : * int SSL_CONF_cmd_value_type(SSL_CONF_CTX *cctx, const char *cmd)
      * }
      */
     public static int SSL_CONF_cmd_value_type(MemorySegment cctx, MemorySegment cmd) {
@@ -8953,18 +8079,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("SSL_CONF_cmd_value_type", cctx, cmd);
             }
-            return (int)mh$.invokeExact(cctx, cmd);
+            return (int) mh$.invokeExact(cctx, cmd);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OPENSSL_init_ssl {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_LONG, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OPENSSL_init_ssl");
 
@@ -8973,8 +8096,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
+     * {@snippet lang = c : * int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
      * }
      */
     public static FunctionDescriptor OPENSSL_init_ssl$descriptor() {
@@ -8983,8 +8105,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
+     * {@snippet lang = c : * int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
      * }
      */
     public static MethodHandle OPENSSL_init_ssl$handle() {
@@ -8993,8 +8114,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
+     * {@snippet lang = c : * int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
      * }
      */
     public static MemorySegment OPENSSL_init_ssl$address() {
@@ -9002,8 +8122,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
+     * {@snippet lang = c : * int OPENSSL_init_ssl(uint64_t opts, const OPENSSL_INIT_SETTINGS *settings)
      * }
      */
     public static int OPENSSL_init_ssl(long opts, MemorySegment settings) {
@@ -9012,15 +8131,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OPENSSL_init_ssl", opts, settings);
             }
-            return (int)mh$.invokeExact(opts, settings);
+            return (int) mh$.invokeExact(opts, settings);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class ERR_get_error {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("ERR_get_error");
 
@@ -9029,8 +8147,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * unsigned long ERR_get_error()
+     * {@snippet lang = c : * unsigned long ERR_get_error()
      * }
      */
     public static FunctionDescriptor ERR_get_error$descriptor() {
@@ -9039,8 +8156,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * unsigned long ERR_get_error()
+     * {@snippet lang = c : * unsigned long ERR_get_error()
      * }
      */
     public static MethodHandle ERR_get_error$handle() {
@@ -9049,8 +8165,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * unsigned long ERR_get_error()
+     * {@snippet lang = c : * unsigned long ERR_get_error()
      * }
      */
     public static MemorySegment ERR_get_error$address() {
@@ -9058,8 +8173,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * unsigned long ERR_get_error()
+     * {@snippet lang = c : * unsigned long ERR_get_error()
      * }
      */
     public static long ERR_get_error() {
@@ -9068,15 +8182,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ERR_get_error");
             }
-            return (long)mh$.invokeExact();
+            return (long) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class ERR_peek_last_error {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_LONG    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("ERR_peek_last_error");
 
@@ -9085,8 +8198,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * unsigned long ERR_peek_last_error()
+     * {@snippet lang = c : * unsigned long ERR_peek_last_error()
      * }
      */
     public static FunctionDescriptor ERR_peek_last_error$descriptor() {
@@ -9095,8 +8207,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * unsigned long ERR_peek_last_error()
+     * {@snippet lang = c : * unsigned long ERR_peek_last_error()
      * }
      */
     public static MethodHandle ERR_peek_last_error$handle() {
@@ -9105,8 +8216,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * unsigned long ERR_peek_last_error()
+     * {@snippet lang = c : * unsigned long ERR_peek_last_error()
      * }
      */
     public static MemorySegment ERR_peek_last_error$address() {
@@ -9114,8 +8224,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * unsigned long ERR_peek_last_error()
+     * {@snippet lang = c : * unsigned long ERR_peek_last_error()
      * }
      */
     public static long ERR_peek_last_error() {
@@ -9124,14 +8233,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ERR_peek_last_error");
             }
-            return (long)mh$.invokeExact();
+            return (long) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class ERR_clear_error {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid();
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("ERR_clear_error");
 
@@ -9140,8 +8249,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void ERR_clear_error()
+     * {@snippet lang = c : * void ERR_clear_error()
      * }
      */
     public static FunctionDescriptor ERR_clear_error$descriptor() {
@@ -9150,8 +8258,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void ERR_clear_error()
+     * {@snippet lang = c : * void ERR_clear_error()
      * }
      */
     public static MethodHandle ERR_clear_error$handle() {
@@ -9160,8 +8267,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void ERR_clear_error()
+     * {@snippet lang = c : * void ERR_clear_error()
      * }
      */
     public static MemorySegment ERR_clear_error$address() {
@@ -9169,8 +8275,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void ERR_clear_error()
+     * {@snippet lang = c : * void ERR_clear_error()
      * }
      */
     public static void ERR_clear_error() {
@@ -9181,16 +8286,13 @@ public class openssl_h {
             }
             mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class ERR_error_string {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_LONG, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("ERR_error_string");
 
@@ -9199,8 +8301,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * char *ERR_error_string(unsigned long e, char *buf)
+     * {@snippet lang = c : * char *ERR_error_string(unsigned long e, char *buf)
      * }
      */
     public static FunctionDescriptor ERR_error_string$descriptor() {
@@ -9209,8 +8310,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * char *ERR_error_string(unsigned long e, char *buf)
+     * {@snippet lang = c : * char *ERR_error_string(unsigned long e, char *buf)
      * }
      */
     public static MethodHandle ERR_error_string$handle() {
@@ -9219,8 +8319,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * char *ERR_error_string(unsigned long e, char *buf)
+     * {@snippet lang = c : * char *ERR_error_string(unsigned long e, char *buf)
      * }
      */
     public static MemorySegment ERR_error_string$address() {
@@ -9228,8 +8327,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * char *ERR_error_string(unsigned long e, char *buf)
+     * {@snippet lang = c : * char *ERR_error_string(unsigned long e, char *buf)
      * }
      */
     public static MemorySegment ERR_error_string(long e, MemorySegment buf) {
@@ -9238,18 +8336,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("ERR_error_string", e, buf);
             }
-            return (MemorySegment)mh$.invokeExact(e, buf);
+            return (MemorySegment) mh$.invokeExact(e, buf);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class ERR_error_string_n {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_LONG,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.ofVoid(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("ERR_error_string_n");
 
@@ -9258,8 +8353,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void ERR_error_string_n(unsigned long e, char *buf, size_t len)
+     * {@snippet lang = c : * void ERR_error_string_n(unsigned long e, char *buf, size_t len)
      * }
      */
     public static FunctionDescriptor ERR_error_string_n$descriptor() {
@@ -9268,8 +8362,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void ERR_error_string_n(unsigned long e, char *buf, size_t len)
+     * {@snippet lang = c : * void ERR_error_string_n(unsigned long e, char *buf, size_t len)
      * }
      */
     public static MethodHandle ERR_error_string_n$handle() {
@@ -9278,8 +8371,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void ERR_error_string_n(unsigned long e, char *buf, size_t len)
+     * {@snippet lang = c : * void ERR_error_string_n(unsigned long e, char *buf, size_t len)
      * }
      */
     public static MemorySegment ERR_error_string_n$address() {
@@ -9287,8 +8379,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void ERR_error_string_n(unsigned long e, char *buf, size_t len)
+     * {@snippet lang = c : * void ERR_error_string_n(unsigned long e, char *buf, size_t len)
      * }
      */
     public static void ERR_error_string_n(long e, MemorySegment buf, long len) {
@@ -9299,17 +8390,13 @@ public class openssl_h {
             }
             mh$.invokeExact(e, buf, len);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class PKCS12_verify_mac {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("PKCS12_verify_mac");
 
@@ -9318,8 +8405,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
+     * {@snippet lang = c : * int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
      * }
      */
     public static FunctionDescriptor PKCS12_verify_mac$descriptor() {
@@ -9328,8 +8414,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
+     * {@snippet lang = c : * int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
      * }
      */
     public static MethodHandle PKCS12_verify_mac$handle() {
@@ -9338,8 +8423,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
+     * {@snippet lang = c : * int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
      * }
      */
     public static MemorySegment PKCS12_verify_mac$address() {
@@ -9347,8 +8431,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
+     * {@snippet lang = c : * int PKCS12_verify_mac(PKCS12 *p12, const char *pass, int passlen)
      * }
      */
     public static int PKCS12_verify_mac(MemorySegment p12, MemorySegment pass, int passlen) {
@@ -9357,16 +8440,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("PKCS12_verify_mac", p12, pass, passlen);
             }
-            return (int)mh$.invokeExact(p12, pass, passlen);
+            return (int) mh$.invokeExact(p12, pass, passlen);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class PKCS12_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("PKCS12_free");
 
@@ -9375,8 +8456,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern void PKCS12_free(PKCS12 *a)
+     * {@snippet lang = c : * extern void PKCS12_free(PKCS12 *a)
      * }
      */
     public static FunctionDescriptor PKCS12_free$descriptor() {
@@ -9385,8 +8465,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern void PKCS12_free(PKCS12 *a)
+     * {@snippet lang = c : * extern void PKCS12_free(PKCS12 *a)
      * }
      */
     public static MethodHandle PKCS12_free$handle() {
@@ -9395,8 +8474,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern void PKCS12_free(PKCS12 *a)
+     * {@snippet lang = c : * extern void PKCS12_free(PKCS12 *a)
      * }
      */
     public static MemorySegment PKCS12_free$address() {
@@ -9404,8 +8482,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern void PKCS12_free(PKCS12 *a)
+     * {@snippet lang = c : * extern void PKCS12_free(PKCS12 *a)
      * }
      */
     public static void PKCS12_free(MemorySegment a) {
@@ -9416,19 +8493,13 @@ public class openssl_h {
             }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class PKCS12_parse {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("PKCS12_parse");
 
@@ -9437,8 +8508,8 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert, struct stack_st_X509 **ca)
+     * {@snippet lang = c
+     * : * int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert, struct stack_st_X509 **ca)
      * }
      */
     public static FunctionDescriptor PKCS12_parse$descriptor() {
@@ -9447,8 +8518,8 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert, struct stack_st_X509 **ca)
+     * {@snippet lang = c
+     * : * int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert, struct stack_st_X509 **ca)
      * }
      */
     public static MethodHandle PKCS12_parse$handle() {
@@ -9457,8 +8528,8 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert, struct stack_st_X509 **ca)
+     * {@snippet lang = c
+     * : * int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert, struct stack_st_X509 **ca)
      * }
      */
     public static MemorySegment PKCS12_parse$address() {
@@ -9466,28 +8537,26 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert, struct stack_st_X509 **ca)
+     * {@snippet lang = c
+     * : * int PKCS12_parse(PKCS12 *p12, const char *pass, EVP_PKEY **pkey, X509 **cert, struct stack_st_X509 **ca)
      * }
      */
-    public static int PKCS12_parse(MemorySegment p12, MemorySegment pass, MemorySegment pkey, MemorySegment cert, MemorySegment ca) {
+    public static int PKCS12_parse(MemorySegment p12, MemorySegment pass, MemorySegment pkey, MemorySegment cert,
+            MemorySegment ca) {
         var mh$ = PKCS12_parse.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("PKCS12_parse", p12, pass, pkey, cert, ca);
             }
-            return (int)mh$.invokeExact(p12, pass, pkey, cert, ca);
+            return (int) mh$.invokeExact(p12, pass, pkey, cert, ca);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class d2i_PKCS12_bio {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("d2i_PKCS12_bio");
 
@@ -9496,8 +8565,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * PKCS12 *d2i_PKCS12_bio(BIO *bp, PKCS12 **p12)
+     * {@snippet lang = c : * PKCS12 *d2i_PKCS12_bio(BIO *bp, PKCS12 **p12)
      * }
      */
     public static FunctionDescriptor d2i_PKCS12_bio$descriptor() {
@@ -9506,8 +8574,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * PKCS12 *d2i_PKCS12_bio(BIO *bp, PKCS12 **p12)
+     * {@snippet lang = c : * PKCS12 *d2i_PKCS12_bio(BIO *bp, PKCS12 **p12)
      * }
      */
     public static MethodHandle d2i_PKCS12_bio$handle() {
@@ -9516,8 +8583,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * PKCS12 *d2i_PKCS12_bio(BIO *bp, PKCS12 **p12)
+     * {@snippet lang = c : * PKCS12 *d2i_PKCS12_bio(BIO *bp, PKCS12 **p12)
      * }
      */
     public static MemorySegment d2i_PKCS12_bio$address() {
@@ -9525,8 +8591,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * PKCS12 *d2i_PKCS12_bio(BIO *bp, PKCS12 **p12)
+     * {@snippet lang = c : * PKCS12 *d2i_PKCS12_bio(BIO *bp, PKCS12 **p12)
      * }
      */
     public static MemorySegment d2i_PKCS12_bio(MemorySegment bp, MemorySegment p12) {
@@ -9535,17 +8600,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("d2i_PKCS12_bio", bp, p12);
             }
-            return (MemorySegment)mh$.invokeExact(bp, p12);
+            return (MemorySegment) mh$.invokeExact(bp, p12);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class RAND_seed {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("RAND_seed");
 
@@ -9554,8 +8616,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * void RAND_seed(const void *buf, int num)
+     * {@snippet lang = c : * void RAND_seed(const void *buf, int num)
      * }
      */
     public static FunctionDescriptor RAND_seed$descriptor() {
@@ -9564,8 +8625,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * void RAND_seed(const void *buf, int num)
+     * {@snippet lang = c : * void RAND_seed(const void *buf, int num)
      * }
      */
     public static MethodHandle RAND_seed$handle() {
@@ -9574,8 +8634,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * void RAND_seed(const void *buf, int num)
+     * {@snippet lang = c : * void RAND_seed(const void *buf, int num)
      * }
      */
     public static MemorySegment RAND_seed$address() {
@@ -9583,8 +8642,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * void RAND_seed(const void *buf, int num)
+     * {@snippet lang = c : * void RAND_seed(const void *buf, int num)
      * }
      */
     public static void RAND_seed(MemorySegment buf, int num) {
@@ -9595,16 +8653,13 @@ public class openssl_h {
             }
             mh$.invokeExact(buf, num);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class RAND_load_file {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("RAND_load_file");
 
@@ -9613,8 +8668,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int RAND_load_file(const char *file, long max_bytes)
+     * {@snippet lang = c : * int RAND_load_file(const char *file, long max_bytes)
      * }
      */
     public static FunctionDescriptor RAND_load_file$descriptor() {
@@ -9623,8 +8677,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int RAND_load_file(const char *file, long max_bytes)
+     * {@snippet lang = c : * int RAND_load_file(const char *file, long max_bytes)
      * }
      */
     public static MethodHandle RAND_load_file$handle() {
@@ -9633,8 +8686,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int RAND_load_file(const char *file, long max_bytes)
+     * {@snippet lang = c : * int RAND_load_file(const char *file, long max_bytes)
      * }
      */
     public static MemorySegment RAND_load_file$address() {
@@ -9642,8 +8694,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int RAND_load_file(const char *file, long max_bytes)
+     * {@snippet lang = c : * int RAND_load_file(const char *file, long max_bytes)
      * }
      */
     public static int RAND_load_file(MemorySegment file, long max_bytes) {
@@ -9652,18 +8703,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("RAND_load_file", file, max_bytes);
             }
-            return (int)mh$.invokeExact(file, max_bytes);
+            return (int) mh$.invokeExact(file, max_bytes);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class X509_check_issued {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_check_issued");
 
@@ -9672,8 +8720,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int X509_check_issued(X509 *issuer, X509 *subject)
+     * {@snippet lang = c : * int X509_check_issued(X509 *issuer, X509 *subject)
      * }
      */
     public static FunctionDescriptor X509_check_issued$descriptor() {
@@ -9682,8 +8729,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int X509_check_issued(X509 *issuer, X509 *subject)
+     * {@snippet lang = c : * int X509_check_issued(X509 *issuer, X509 *subject)
      * }
      */
     public static MethodHandle X509_check_issued$handle() {
@@ -9692,8 +8738,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int X509_check_issued(X509 *issuer, X509 *subject)
+     * {@snippet lang = c : * int X509_check_issued(X509 *issuer, X509 *subject)
      * }
      */
     public static MemorySegment X509_check_issued$address() {
@@ -9701,8 +8746,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int X509_check_issued(X509 *issuer, X509 *subject)
+     * {@snippet lang = c : * int X509_check_issued(X509 *issuer, X509 *subject)
      * }
      */
     public static int X509_check_issued(MemorySegment issuer, MemorySegment subject) {
@@ -9711,19 +8755,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("X509_check_issued", issuer, subject);
             }
-            return (int)mh$.invokeExact(issuer, subject);
+            return (int) mh$.invokeExact(issuer, subject);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_cert_to_id {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_cert_to_id");
 
@@ -9732,8 +8772,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject, const X509 *issuer)
+     * {@snippet lang = c : * OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject, const X509 *issuer)
      * }
      */
     public static FunctionDescriptor OCSP_cert_to_id$descriptor() {
@@ -9742,8 +8781,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject, const X509 *issuer)
+     * {@snippet lang = c : * OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject, const X509 *issuer)
      * }
      */
     public static MethodHandle OCSP_cert_to_id$handle() {
@@ -9752,8 +8790,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject, const X509 *issuer)
+     * {@snippet lang = c : * OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject, const X509 *issuer)
      * }
      */
     public static MemorySegment OCSP_cert_to_id$address() {
@@ -9761,8 +8798,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject, const X509 *issuer)
+     * {@snippet lang = c : * OCSP_CERTID *OCSP_cert_to_id(const EVP_MD *dgst, const X509 *subject, const X509 *issuer)
      * }
      */
     public static MemorySegment OCSP_cert_to_id(MemorySegment dgst, MemorySegment subject, MemorySegment issuer) {
@@ -9771,18 +8807,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OCSP_cert_to_id", dgst, subject, issuer);
             }
-            return (MemorySegment)mh$.invokeExact(dgst, subject, issuer);
+            return (MemorySegment) mh$.invokeExact(dgst, subject, issuer);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_request_add0_id {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_request_add0_id");
 
@@ -9791,8 +8824,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * OCSP_ONEREQ *OCSP_request_add0_id(OCSP_REQUEST *req, OCSP_CERTID *cid)
+     * {@snippet lang = c : * OCSP_ONEREQ *OCSP_request_add0_id(OCSP_REQUEST *req, OCSP_CERTID *cid)
      * }
      */
     public static FunctionDescriptor OCSP_request_add0_id$descriptor() {
@@ -9801,8 +8833,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * OCSP_ONEREQ *OCSP_request_add0_id(OCSP_REQUEST *req, OCSP_CERTID *cid)
+     * {@snippet lang = c : * OCSP_ONEREQ *OCSP_request_add0_id(OCSP_REQUEST *req, OCSP_CERTID *cid)
      * }
      */
     public static MethodHandle OCSP_request_add0_id$handle() {
@@ -9811,8 +8842,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * OCSP_ONEREQ *OCSP_request_add0_id(OCSP_REQUEST *req, OCSP_CERTID *cid)
+     * {@snippet lang = c : * OCSP_ONEREQ *OCSP_request_add0_id(OCSP_REQUEST *req, OCSP_CERTID *cid)
      * }
      */
     public static MemorySegment OCSP_request_add0_id$address() {
@@ -9820,8 +8850,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * OCSP_ONEREQ *OCSP_request_add0_id(OCSP_REQUEST *req, OCSP_CERTID *cid)
+     * {@snippet lang = c : * OCSP_ONEREQ *OCSP_request_add0_id(OCSP_REQUEST *req, OCSP_CERTID *cid)
      * }
      */
     public static MemorySegment OCSP_request_add0_id(MemorySegment req, MemorySegment cid) {
@@ -9830,17 +8859,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OCSP_request_add0_id", req, cid);
             }
-            return (MemorySegment)mh$.invokeExact(req, cid);
+            return (MemorySegment) mh$.invokeExact(req, cid);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_response_status {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_response_status");
 
@@ -9849,8 +8875,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int OCSP_response_status(OCSP_RESPONSE *resp)
+     * {@snippet lang = c : * int OCSP_response_status(OCSP_RESPONSE *resp)
      * }
      */
     public static FunctionDescriptor OCSP_response_status$descriptor() {
@@ -9859,8 +8884,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int OCSP_response_status(OCSP_RESPONSE *resp)
+     * {@snippet lang = c : * int OCSP_response_status(OCSP_RESPONSE *resp)
      * }
      */
     public static MethodHandle OCSP_response_status$handle() {
@@ -9869,8 +8893,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int OCSP_response_status(OCSP_RESPONSE *resp)
+     * {@snippet lang = c : * int OCSP_response_status(OCSP_RESPONSE *resp)
      * }
      */
     public static MemorySegment OCSP_response_status$address() {
@@ -9878,8 +8901,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int OCSP_response_status(OCSP_RESPONSE *resp)
+     * {@snippet lang = c : * int OCSP_response_status(OCSP_RESPONSE *resp)
      * }
      */
     public static int OCSP_response_status(MemorySegment resp) {
@@ -9888,17 +8910,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OCSP_response_status", resp);
             }
-            return (int)mh$.invokeExact(resp);
+            return (int) mh$.invokeExact(resp);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_response_get1_basic {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_response_get1_basic");
 
@@ -9907,8 +8926,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * OCSP_BASICRESP *OCSP_response_get1_basic(OCSP_RESPONSE *resp)
+     * {@snippet lang = c : * OCSP_BASICRESP *OCSP_response_get1_basic(OCSP_RESPONSE *resp)
      * }
      */
     public static FunctionDescriptor OCSP_response_get1_basic$descriptor() {
@@ -9917,8 +8935,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * OCSP_BASICRESP *OCSP_response_get1_basic(OCSP_RESPONSE *resp)
+     * {@snippet lang = c : * OCSP_BASICRESP *OCSP_response_get1_basic(OCSP_RESPONSE *resp)
      * }
      */
     public static MethodHandle OCSP_response_get1_basic$handle() {
@@ -9927,8 +8944,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * OCSP_BASICRESP *OCSP_response_get1_basic(OCSP_RESPONSE *resp)
+     * {@snippet lang = c : * OCSP_BASICRESP *OCSP_response_get1_basic(OCSP_RESPONSE *resp)
      * }
      */
     public static MemorySegment OCSP_response_get1_basic$address() {
@@ -9936,8 +8952,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * OCSP_BASICRESP *OCSP_response_get1_basic(OCSP_RESPONSE *resp)
+     * {@snippet lang = c : * OCSP_BASICRESP *OCSP_response_get1_basic(OCSP_RESPONSE *resp)
      * }
      */
     public static MemorySegment OCSP_response_get1_basic(MemorySegment resp) {
@@ -9946,18 +8961,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OCSP_response_get1_basic", resp);
             }
-            return (MemorySegment)mh$.invokeExact(resp);
+            return (MemorySegment) mh$.invokeExact(resp);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_resp_get0 {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_resp_get0");
 
@@ -9966,8 +8978,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * OCSP_SINGLERESP *OCSP_resp_get0(OCSP_BASICRESP *bs, int idx)
+     * {@snippet lang = c : * OCSP_SINGLERESP *OCSP_resp_get0(OCSP_BASICRESP *bs, int idx)
      * }
      */
     public static FunctionDescriptor OCSP_resp_get0$descriptor() {
@@ -9976,8 +8987,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * OCSP_SINGLERESP *OCSP_resp_get0(OCSP_BASICRESP *bs, int idx)
+     * {@snippet lang = c : * OCSP_SINGLERESP *OCSP_resp_get0(OCSP_BASICRESP *bs, int idx)
      * }
      */
     public static MethodHandle OCSP_resp_get0$handle() {
@@ -9986,8 +8996,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * OCSP_SINGLERESP *OCSP_resp_get0(OCSP_BASICRESP *bs, int idx)
+     * {@snippet lang = c : * OCSP_SINGLERESP *OCSP_resp_get0(OCSP_BASICRESP *bs, int idx)
      * }
      */
     public static MemorySegment OCSP_resp_get0$address() {
@@ -9995,8 +9004,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * OCSP_SINGLERESP *OCSP_resp_get0(OCSP_BASICRESP *bs, int idx)
+     * {@snippet lang = c : * OCSP_SINGLERESP *OCSP_resp_get0(OCSP_BASICRESP *bs, int idx)
      * }
      */
     public static MemorySegment OCSP_resp_get0(MemorySegment bs, int idx) {
@@ -10005,19 +9013,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OCSP_resp_get0", bs, idx);
             }
-            return (MemorySegment)mh$.invokeExact(bs, idx);
+            return (MemorySegment) mh$.invokeExact(bs, idx);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_resp_find {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_INT
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_resp_find");
 
@@ -10026,8 +9030,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int OCSP_resp_find(OCSP_BASICRESP *bs, OCSP_CERTID *id, int last)
+     * {@snippet lang = c : * int OCSP_resp_find(OCSP_BASICRESP *bs, OCSP_CERTID *id, int last)
      * }
      */
     public static FunctionDescriptor OCSP_resp_find$descriptor() {
@@ -10036,8 +9039,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int OCSP_resp_find(OCSP_BASICRESP *bs, OCSP_CERTID *id, int last)
+     * {@snippet lang = c : * int OCSP_resp_find(OCSP_BASICRESP *bs, OCSP_CERTID *id, int last)
      * }
      */
     public static MethodHandle OCSP_resp_find$handle() {
@@ -10046,8 +9048,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int OCSP_resp_find(OCSP_BASICRESP *bs, OCSP_CERTID *id, int last)
+     * {@snippet lang = c : * int OCSP_resp_find(OCSP_BASICRESP *bs, OCSP_CERTID *id, int last)
      * }
      */
     public static MemorySegment OCSP_resp_find$address() {
@@ -10055,8 +9056,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int OCSP_resp_find(OCSP_BASICRESP *bs, OCSP_CERTID *id, int last)
+     * {@snippet lang = c : * int OCSP_resp_find(OCSP_BASICRESP *bs, OCSP_CERTID *id, int last)
      * }
      */
     public static int OCSP_resp_find(MemorySegment bs, MemorySegment id, int last) {
@@ -10065,21 +9065,15 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OCSP_resp_find", bs, id, last);
             }
-            return (int)mh$.invokeExact(bs, id, last);
+            return (int) mh$.invokeExact(bs, id, last);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_single_get0_status {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER,
+                openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_single_get0_status");
 
@@ -10088,8 +9082,8 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * int OCSP_single_get0_status(OCSP_SINGLERESP *single, int *reason, ASN1_GENERALIZEDTIME **revtime, ASN1_GENERALIZEDTIME **thisupd, ASN1_GENERALIZEDTIME **nextupd)
+     * {@snippet lang = c
+     * : * int OCSP_single_get0_status(OCSP_SINGLERESP *single, int *reason, ASN1_GENERALIZEDTIME **revtime, ASN1_GENERALIZEDTIME **thisupd, ASN1_GENERALIZEDTIME **nextupd)
      * }
      */
     public static FunctionDescriptor OCSP_single_get0_status$descriptor() {
@@ -10098,8 +9092,8 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * int OCSP_single_get0_status(OCSP_SINGLERESP *single, int *reason, ASN1_GENERALIZEDTIME **revtime, ASN1_GENERALIZEDTIME **thisupd, ASN1_GENERALIZEDTIME **nextupd)
+     * {@snippet lang = c
+     * : * int OCSP_single_get0_status(OCSP_SINGLERESP *single, int *reason, ASN1_GENERALIZEDTIME **revtime, ASN1_GENERALIZEDTIME **thisupd, ASN1_GENERALIZEDTIME **nextupd)
      * }
      */
     public static MethodHandle OCSP_single_get0_status$handle() {
@@ -10108,8 +9102,8 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * int OCSP_single_get0_status(OCSP_SINGLERESP *single, int *reason, ASN1_GENERALIZEDTIME **revtime, ASN1_GENERALIZEDTIME **thisupd, ASN1_GENERALIZEDTIME **nextupd)
+     * {@snippet lang = c
+     * : * int OCSP_single_get0_status(OCSP_SINGLERESP *single, int *reason, ASN1_GENERALIZEDTIME **revtime, ASN1_GENERALIZEDTIME **thisupd, ASN1_GENERALIZEDTIME **nextupd)
      * }
      */
     public static MemorySegment OCSP_single_get0_status$address() {
@@ -10117,26 +9111,25 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * int OCSP_single_get0_status(OCSP_SINGLERESP *single, int *reason, ASN1_GENERALIZEDTIME **revtime, ASN1_GENERALIZEDTIME **thisupd, ASN1_GENERALIZEDTIME **nextupd)
+     * {@snippet lang = c
+     * : * int OCSP_single_get0_status(OCSP_SINGLERESP *single, int *reason, ASN1_GENERALIZEDTIME **revtime, ASN1_GENERALIZEDTIME **thisupd, ASN1_GENERALIZEDTIME **nextupd)
      * }
      */
-    public static int OCSP_single_get0_status(MemorySegment single, MemorySegment reason, MemorySegment revtime, MemorySegment thisupd, MemorySegment nextupd) {
+    public static int OCSP_single_get0_status(MemorySegment single, MemorySegment reason, MemorySegment revtime,
+            MemorySegment thisupd, MemorySegment nextupd) {
         var mh$ = OCSP_single_get0_status.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OCSP_single_get0_status", single, reason, revtime, thisupd, nextupd);
             }
-            return (int)mh$.invokeExact(single, reason, revtime, thisupd, nextupd);
+            return (int) mh$.invokeExact(single, reason, revtime, thisupd, nextupd);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_BASICRESP_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_BASICRESP_free");
 
@@ -10145,8 +9138,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern void OCSP_BASICRESP_free(OCSP_BASICRESP *a)
+     * {@snippet lang = c : * extern void OCSP_BASICRESP_free(OCSP_BASICRESP *a)
      * }
      */
     public static FunctionDescriptor OCSP_BASICRESP_free$descriptor() {
@@ -10155,8 +9147,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern void OCSP_BASICRESP_free(OCSP_BASICRESP *a)
+     * {@snippet lang = c : * extern void OCSP_BASICRESP_free(OCSP_BASICRESP *a)
      * }
      */
     public static MethodHandle OCSP_BASICRESP_free$handle() {
@@ -10165,8 +9156,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern void OCSP_BASICRESP_free(OCSP_BASICRESP *a)
+     * {@snippet lang = c : * extern void OCSP_BASICRESP_free(OCSP_BASICRESP *a)
      * }
      */
     public static MemorySegment OCSP_BASICRESP_free$address() {
@@ -10174,8 +9164,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern void OCSP_BASICRESP_free(OCSP_BASICRESP *a)
+     * {@snippet lang = c : * extern void OCSP_BASICRESP_free(OCSP_BASICRESP *a)
      * }
      */
     public static void OCSP_BASICRESP_free(MemorySegment a) {
@@ -10186,14 +9175,12 @@ public class openssl_h {
             }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_RESPONSE_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_RESPONSE_free");
 
@@ -10202,8 +9189,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern void OCSP_RESPONSE_free(OCSP_RESPONSE *a)
+     * {@snippet lang = c : * extern void OCSP_RESPONSE_free(OCSP_RESPONSE *a)
      * }
      */
     public static FunctionDescriptor OCSP_RESPONSE_free$descriptor() {
@@ -10212,8 +9198,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern void OCSP_RESPONSE_free(OCSP_RESPONSE *a)
+     * {@snippet lang = c : * extern void OCSP_RESPONSE_free(OCSP_RESPONSE *a)
      * }
      */
     public static MethodHandle OCSP_RESPONSE_free$handle() {
@@ -10222,8 +9207,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern void OCSP_RESPONSE_free(OCSP_RESPONSE *a)
+     * {@snippet lang = c : * extern void OCSP_RESPONSE_free(OCSP_RESPONSE *a)
      * }
      */
     public static MemorySegment OCSP_RESPONSE_free$address() {
@@ -10231,8 +9215,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern void OCSP_RESPONSE_free(OCSP_RESPONSE *a)
+     * {@snippet lang = c : * extern void OCSP_RESPONSE_free(OCSP_RESPONSE *a)
      * }
      */
     public static void OCSP_RESPONSE_free(MemorySegment a) {
@@ -10243,17 +9226,13 @@ public class openssl_h {
             }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class d2i_OCSP_RESPONSE {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER,
-            openssl_h.C_LONG
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_LONG);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("d2i_OCSP_RESPONSE");
 
@@ -10262,8 +9241,8 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern OCSP_RESPONSE *d2i_OCSP_RESPONSE(OCSP_RESPONSE **a, const unsigned char **in, long len)
+     * {@snippet lang = c
+     * : * extern OCSP_RESPONSE *d2i_OCSP_RESPONSE(OCSP_RESPONSE **a, const unsigned char **in, long len)
      * }
      */
     public static FunctionDescriptor d2i_OCSP_RESPONSE$descriptor() {
@@ -10272,8 +9251,8 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern OCSP_RESPONSE *d2i_OCSP_RESPONSE(OCSP_RESPONSE **a, const unsigned char **in, long len)
+     * {@snippet lang = c
+     * : * extern OCSP_RESPONSE *d2i_OCSP_RESPONSE(OCSP_RESPONSE **a, const unsigned char **in, long len)
      * }
      */
     public static MethodHandle d2i_OCSP_RESPONSE$handle() {
@@ -10282,8 +9261,8 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern OCSP_RESPONSE *d2i_OCSP_RESPONSE(OCSP_RESPONSE **a, const unsigned char **in, long len)
+     * {@snippet lang = c
+     * : * extern OCSP_RESPONSE *d2i_OCSP_RESPONSE(OCSP_RESPONSE **a, const unsigned char **in, long len)
      * }
      */
     public static MemorySegment d2i_OCSP_RESPONSE$address() {
@@ -10291,8 +9270,8 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern OCSP_RESPONSE *d2i_OCSP_RESPONSE(OCSP_RESPONSE **a, const unsigned char **in, long len)
+     * {@snippet lang = c
+     * : * extern OCSP_RESPONSE *d2i_OCSP_RESPONSE(OCSP_RESPONSE **a, const unsigned char **in, long len)
      * }
      */
     public static MemorySegment d2i_OCSP_RESPONSE(MemorySegment a, MemorySegment in, long len) {
@@ -10301,16 +9280,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("d2i_OCSP_RESPONSE", a, in, len);
             }
-            return (MemorySegment)mh$.invokeExact(a, in, len);
+            return (MemorySegment) mh$.invokeExact(a, in, len);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_CERTID_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_CERTID_free");
 
@@ -10319,8 +9296,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern void OCSP_CERTID_free(OCSP_CERTID *a)
+     * {@snippet lang = c : * extern void OCSP_CERTID_free(OCSP_CERTID *a)
      * }
      */
     public static FunctionDescriptor OCSP_CERTID_free$descriptor() {
@@ -10329,8 +9305,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern void OCSP_CERTID_free(OCSP_CERTID *a)
+     * {@snippet lang = c : * extern void OCSP_CERTID_free(OCSP_CERTID *a)
      * }
      */
     public static MethodHandle OCSP_CERTID_free$handle() {
@@ -10339,8 +9314,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern void OCSP_CERTID_free(OCSP_CERTID *a)
+     * {@snippet lang = c : * extern void OCSP_CERTID_free(OCSP_CERTID *a)
      * }
      */
     public static MemorySegment OCSP_CERTID_free$address() {
@@ -10348,8 +9322,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern void OCSP_CERTID_free(OCSP_CERTID *a)
+     * {@snippet lang = c : * extern void OCSP_CERTID_free(OCSP_CERTID *a)
      * }
      */
     public static void OCSP_CERTID_free(MemorySegment a) {
@@ -10360,13 +9333,12 @@ public class openssl_h {
             }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_REQUEST_new {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER    );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_REQUEST_new");
 
@@ -10375,8 +9347,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern OCSP_REQUEST *OCSP_REQUEST_new()
+     * {@snippet lang = c : * extern OCSP_REQUEST *OCSP_REQUEST_new()
      * }
      */
     public static FunctionDescriptor OCSP_REQUEST_new$descriptor() {
@@ -10385,8 +9356,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern OCSP_REQUEST *OCSP_REQUEST_new()
+     * {@snippet lang = c : * extern OCSP_REQUEST *OCSP_REQUEST_new()
      * }
      */
     public static MethodHandle OCSP_REQUEST_new$handle() {
@@ -10395,8 +9365,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern OCSP_REQUEST *OCSP_REQUEST_new()
+     * {@snippet lang = c : * extern OCSP_REQUEST *OCSP_REQUEST_new()
      * }
      */
     public static MemorySegment OCSP_REQUEST_new$address() {
@@ -10404,8 +9373,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern OCSP_REQUEST *OCSP_REQUEST_new()
+     * {@snippet lang = c : * extern OCSP_REQUEST *OCSP_REQUEST_new()
      * }
      */
     public static MemorySegment OCSP_REQUEST_new() {
@@ -10414,16 +9382,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OCSP_REQUEST_new");
             }
-            return (MemorySegment)mh$.invokeExact();
+            return (MemorySegment) mh$.invokeExact();
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OCSP_REQUEST_free {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.ofVoid(openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OCSP_REQUEST_free");
 
@@ -10432,8 +9398,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern void OCSP_REQUEST_free(OCSP_REQUEST *a)
+     * {@snippet lang = c : * extern void OCSP_REQUEST_free(OCSP_REQUEST *a)
      * }
      */
     public static FunctionDescriptor OCSP_REQUEST_free$descriptor() {
@@ -10442,8 +9407,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern void OCSP_REQUEST_free(OCSP_REQUEST *a)
+     * {@snippet lang = c : * extern void OCSP_REQUEST_free(OCSP_REQUEST *a)
      * }
      */
     public static MethodHandle OCSP_REQUEST_free$handle() {
@@ -10452,8 +9416,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern void OCSP_REQUEST_free(OCSP_REQUEST *a)
+     * {@snippet lang = c : * extern void OCSP_REQUEST_free(OCSP_REQUEST *a)
      * }
      */
     public static MemorySegment OCSP_REQUEST_free$address() {
@@ -10461,8 +9424,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern void OCSP_REQUEST_free(OCSP_REQUEST *a)
+     * {@snippet lang = c : * extern void OCSP_REQUEST_free(OCSP_REQUEST *a)
      * }
      */
     public static void OCSP_REQUEST_free(MemorySegment a) {
@@ -10473,16 +9435,13 @@ public class openssl_h {
             }
             mh$.invokeExact(a);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class i2d_OCSP_REQUEST {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_INT,
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("i2d_OCSP_REQUEST");
 
@@ -10491,8 +9450,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * extern int i2d_OCSP_REQUEST(const OCSP_REQUEST *a, unsigned char **out)
+     * {@snippet lang = c : * extern int i2d_OCSP_REQUEST(const OCSP_REQUEST *a, unsigned char **out)
      * }
      */
     public static FunctionDescriptor i2d_OCSP_REQUEST$descriptor() {
@@ -10501,8 +9459,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * extern int i2d_OCSP_REQUEST(const OCSP_REQUEST *a, unsigned char **out)
+     * {@snippet lang = c : * extern int i2d_OCSP_REQUEST(const OCSP_REQUEST *a, unsigned char **out)
      * }
      */
     public static MethodHandle i2d_OCSP_REQUEST$handle() {
@@ -10511,8 +9468,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * extern int i2d_OCSP_REQUEST(const OCSP_REQUEST *a, unsigned char **out)
+     * {@snippet lang = c : * extern int i2d_OCSP_REQUEST(const OCSP_REQUEST *a, unsigned char **out)
      * }
      */
     public static MemorySegment i2d_OCSP_REQUEST$address() {
@@ -10520,8 +9476,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * extern int i2d_OCSP_REQUEST(const OCSP_REQUEST *a, unsigned char **out)
+     * {@snippet lang = c : * extern int i2d_OCSP_REQUEST(const OCSP_REQUEST *a, unsigned char **out)
      * }
      */
     public static int i2d_OCSP_REQUEST(MemorySegment a, MemorySegment out) {
@@ -10530,17 +9485,14 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("i2d_OCSP_REQUEST", a, out);
             }
-            return (int)mh$.invokeExact(a, out);
+            return (int) mh$.invokeExact(a, out);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
 
     private static class OSSL_PROVIDER_get0_name {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(
-            openssl_h.C_POINTER,
-            openssl_h.C_POINTER
-        );
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("OSSL_PROVIDER_get0_name");
 
@@ -10549,8 +9501,7 @@ public class openssl_h {
 
     /**
      * Function descriptor for:
-     * {@snippet lang=c :
-     * const char *OSSL_PROVIDER_get0_name(const OSSL_PROVIDER *prov)
+     * {@snippet lang = c : * const char *OSSL_PROVIDER_get0_name(const OSSL_PROVIDER *prov)
      * }
      */
     public static FunctionDescriptor OSSL_PROVIDER_get0_name$descriptor() {
@@ -10559,8 +9510,7 @@ public class openssl_h {
 
     /**
      * Downcall method handle for:
-     * {@snippet lang=c :
-     * const char *OSSL_PROVIDER_get0_name(const OSSL_PROVIDER *prov)
+     * {@snippet lang = c : * const char *OSSL_PROVIDER_get0_name(const OSSL_PROVIDER *prov)
      * }
      */
     public static MethodHandle OSSL_PROVIDER_get0_name$handle() {
@@ -10569,8 +9519,7 @@ public class openssl_h {
 
     /**
      * Address for:
-     * {@snippet lang=c :
-     * const char *OSSL_PROVIDER_get0_name(const OSSL_PROVIDER *prov)
+     * {@snippet lang = c : * const char *OSSL_PROVIDER_get0_name(const OSSL_PROVIDER *prov)
      * }
      */
     public static MemorySegment OSSL_PROVIDER_get0_name$address() {
@@ -10578,8 +9527,7 @@ public class openssl_h {
     }
 
     /**
-     * {@snippet lang=c :
-     * const char *OSSL_PROVIDER_get0_name(const OSSL_PROVIDER *prov)
+     * {@snippet lang = c : * const char *OSSL_PROVIDER_get0_name(const OSSL_PROVIDER *prov)
      * }
      */
     public static MemorySegment OSSL_PROVIDER_get0_name(MemorySegment prov) {
@@ -10588,174 +9536,188 @@ public class openssl_h {
             if (TRACE_DOWNCALLS) {
                 traceDowncall("OSSL_PROVIDER_get0_name", prov);
             }
-            return (MemorySegment)mh$.invokeExact(prov);
+            return (MemorySegment) mh$.invokeExact(prov);
         } catch (Throwable ex$) {
-           throw new AssertionError("should not reach here", ex$);
+            throw new AssertionError("should not reach here", ex$);
         }
     }
+
     /**
-     * {@snippet lang=c :
-     * #define OPENSSL_FILE "jextract$macro.h"
+     * {@snippet lang = c : * #define OPENSSL_FILE "jextract$macro.h"
      * }
      */
     public static MemorySegment OPENSSL_FILE() {
         class Holder {
-            static final MemorySegment OPENSSL_FILE
-                = openssl_h.LIBRARY_ARENA.allocateFrom("jextract$macro.h");
+            static final MemorySegment OPENSSL_FILE = openssl_h.LIBRARY_ARENA.allocateFrom("jextract$macro.h");
         }
         return Holder.OPENSSL_FILE;
     }
-    private static final int OPENSSL_LINE = (int)58L;
+
+    private static final int OPENSSL_LINE = (int) 58L;
+
     /**
-     * {@snippet lang=c :
-     * #define OPENSSL_LINE 58
+     * {@snippet lang = c : * #define OPENSSL_LINE 58
      * }
      */
     public static int OPENSSL_LINE() {
         return OPENSSL_LINE;
     }
+
     private static final long OPENSSL_INIT_ENGINE_ALL_BUILTIN = 30208L;
+
     /**
-     * {@snippet lang=c :
-     * #define OPENSSL_INIT_ENGINE_ALL_BUILTIN 30208
+     * {@snippet lang = c : * #define OPENSSL_INIT_ENGINE_ALL_BUILTIN 30208
      * }
      */
     public static long OPENSSL_INIT_ENGINE_ALL_BUILTIN() {
         return OPENSSL_INIT_ENGINE_ALL_BUILTIN;
     }
-    private static final int EVP_PKEY_NONE = (int)0L;
+
+    private static final int EVP_PKEY_NONE = (int) 0L;
+
     /**
-     * {@snippet lang=c :
-     * #define EVP_PKEY_NONE 0
+     * {@snippet lang = c : * #define EVP_PKEY_NONE 0
      * }
      */
     public static int EVP_PKEY_NONE() {
         return EVP_PKEY_NONE;
     }
-    private static final int EVP_PKEY_RSA = (int)6L;
+
+    private static final int EVP_PKEY_RSA = (int) 6L;
+
     /**
-     * {@snippet lang=c :
-     * #define EVP_PKEY_RSA 6
+     * {@snippet lang = c : * #define EVP_PKEY_RSA 6
      * }
      */
     public static int EVP_PKEY_RSA() {
         return EVP_PKEY_RSA;
     }
-    private static final int EVP_PKEY_DSA = (int)116L;
+
+    private static final int EVP_PKEY_DSA = (int) 116L;
+
     /**
-     * {@snippet lang=c :
-     * #define EVP_PKEY_DSA 116
+     * {@snippet lang = c : * #define EVP_PKEY_DSA 116
      * }
      */
     public static int EVP_PKEY_DSA() {
         return EVP_PKEY_DSA;
     }
+
     /**
-     * {@snippet lang=c :
-     * #define PEM_STRING_ECPARAMETERS "EC PARAMETERS"
+     * {@snippet lang = c : * #define PEM_STRING_ECPARAMETERS "EC PARAMETERS"
      * }
      */
     public static MemorySegment PEM_STRING_ECPARAMETERS() {
         class Holder {
-            static final MemorySegment PEM_STRING_ECPARAMETERS
-                = openssl_h.LIBRARY_ARENA.allocateFrom("EC PARAMETERS");
+            static final MemorySegment PEM_STRING_ECPARAMETERS = openssl_h.LIBRARY_ARENA.allocateFrom("EC PARAMETERS");
         }
         return Holder.PEM_STRING_ECPARAMETERS;
     }
+
     private static final long SSL_OP_NO_TICKET = 16384L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_NO_TICKET 16384
+     * {@snippet lang = c : * #define SSL_OP_NO_TICKET 16384
      * }
      */
     public static long SSL_OP_NO_TICKET() {
         return SSL_OP_NO_TICKET;
     }
+
     private static final long SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION = 65536L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION 65536
+     * {@snippet lang = c : * #define SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION 65536
      * }
      */
     public static long SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION() {
         return SSL_OP_NO_SESSION_RESUMPTION_ON_RENEGOTIATION;
     }
+
     private static final long SSL_OP_NO_COMPRESSION = 131072L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_NO_COMPRESSION 131072
+     * {@snippet lang = c : * #define SSL_OP_NO_COMPRESSION 131072
      * }
      */
     public static long SSL_OP_NO_COMPRESSION() {
         return SSL_OP_NO_COMPRESSION;
     }
+
     private static final long SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION = 262144L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION 262144
+     * {@snippet lang = c : * #define SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION 262144
      * }
      */
     public static long SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION() {
         return SSL_OP_ALLOW_UNSAFE_LEGACY_RENEGOTIATION;
     }
+
     private static final long SSL_OP_CIPHER_SERVER_PREFERENCE = 4194304L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_CIPHER_SERVER_PREFERENCE 4194304
+     * {@snippet lang = c : * #define SSL_OP_CIPHER_SERVER_PREFERENCE 4194304
      * }
      */
     public static long SSL_OP_CIPHER_SERVER_PREFERENCE() {
         return SSL_OP_CIPHER_SERVER_PREFERENCE;
     }
+
     private static final long SSL_OP_NO_SSLv3 = 33554432L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_NO_SSLv3 33554432
+     * {@snippet lang = c : * #define SSL_OP_NO_SSLv3 33554432
      * }
      */
     public static long SSL_OP_NO_SSLv3() {
         return SSL_OP_NO_SSLv3;
     }
+
     private static final long SSL_OP_NO_TLSv1 = 67108864L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_NO_TLSv1 67108864
+     * {@snippet lang = c : * #define SSL_OP_NO_TLSv1 67108864
      * }
      */
     public static long SSL_OP_NO_TLSv1() {
         return SSL_OP_NO_TLSv1;
     }
+
     private static final long SSL_OP_NO_TLSv1_2 = 134217728L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_NO_TLSv1_2 134217728
+     * {@snippet lang = c : * #define SSL_OP_NO_TLSv1_2 134217728
      * }
      */
     public static long SSL_OP_NO_TLSv1_2() {
         return SSL_OP_NO_TLSv1_2;
     }
+
     private static final long SSL_OP_NO_TLSv1_1 = 268435456L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_NO_TLSv1_1 268435456
+     * {@snippet lang = c : * #define SSL_OP_NO_TLSv1_1 268435456
      * }
      */
     public static long SSL_OP_NO_TLSv1_1() {
         return SSL_OP_NO_TLSv1_1;
     }
+
     private static final long SSL_OP_NO_TLSv1_3 = 536870912L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_NO_TLSv1_3 536870912
+     * {@snippet lang = c : * #define SSL_OP_NO_TLSv1_3 536870912
      * }
      */
     public static long SSL_OP_NO_TLSv1_3() {
         return SSL_OP_NO_TLSv1_3;
     }
+
     private static final long SSL_OP_ALL = 2147485776L;
+
     /**
-     * {@snippet lang=c :
-     * #define SSL_OP_ALL 2147485776
+     * {@snippet lang = c : * #define SSL_OP_ALL 2147485776
      * }
      */
     public static long SSL_OP_ALL() {
