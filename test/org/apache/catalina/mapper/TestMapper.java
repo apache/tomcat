@@ -37,7 +37,7 @@ public class TestMapper extends LoggingBaseTest {
 
     protected Mapper mapper;
 
-    private HashMap<String, Host> hostMap = new HashMap<>();
+    private HashMap<String,Host> hostMap = new HashMap<>();
 
     private synchronized Host createHost(String name) {
         Host host = hostMap.get(name);
@@ -524,16 +524,16 @@ public class TestMapper extends LoggingBaseTest {
         mapper.addContextVersion("aaaaaa", createHost("a6"), "", "0", createContext("c6"), new String[0], null, null);
         mapper.addContextVersion("aaaaaaa", createHost("a7"), "", "0", createContext("c7"), new String[0], null, null);
 
-        mapper.addWrappers("aaa", "", "0", Arrays.asList(new WrapperMappingInfo[] {
-                new WrapperMappingInfo("/", createWrapper("c3-default"), false, false) }));
-        mapper.addWrappers("aaaa", "", "0", Arrays.asList(new WrapperMappingInfo[] {
-                new WrapperMappingInfo("/", createWrapper("c4-default"), false, false) }));
-        mapper.addWrappers("aaaaa", "", "0", Arrays.asList(new WrapperMappingInfo[] {
-                new WrapperMappingInfo("/", createWrapper("c5-default"), false, false) }));
-        mapper.addWrappers("aaaaaa", "", "0", Arrays.asList(new WrapperMappingInfo[] {
-                new WrapperMappingInfo("/", createWrapper("c6-default"), false, false) }));
-        mapper.addWrappers("aaaaaaa", "", "0", Arrays.asList(new WrapperMappingInfo[] {
-                new WrapperMappingInfo("/", createWrapper("c7-default"), false, false) }));
+        mapper.addWrappers("aaa", "", "0", Arrays.asList(
+                new WrapperMappingInfo[] { new WrapperMappingInfo("/", createWrapper("c3-default"), false, false) }));
+        mapper.addWrappers("aaaa", "", "0", Arrays.asList(
+                new WrapperMappingInfo[] { new WrapperMappingInfo("/", createWrapper("c4-default"), false, false) }));
+        mapper.addWrappers("aaaaa", "", "0", Arrays.asList(
+                new WrapperMappingInfo[] { new WrapperMappingInfo("/", createWrapper("c5-default"), false, false) }));
+        mapper.addWrappers("aaaaaa", "", "0", Arrays.asList(
+                new WrapperMappingInfo[] { new WrapperMappingInfo("/", createWrapper("c6-default"), false, false) }));
+        mapper.addWrappers("aaaaaaa", "", "0", Arrays.asList(
+                new WrapperMappingInfo[] { new WrapperMappingInfo("/", createWrapper("c7-default"), false, false) }));
 
         MappingData mappingData = new MappingData();
         MessageBytes hostMB = MessageBytes.newInstance();

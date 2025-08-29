@@ -235,8 +235,7 @@ public class TestHostManagerWebapp extends TomcatBaseTest {
         Assert.assertTrue(serverXml.canRead());
         addDeleteOnTearDown(serverXml);
         String serverXmlDump = "";
-        try (FileReader reader = new FileReader(serverXml);
-                StringWriter writer = new StringWriter()) {
+        try (FileReader reader = new FileReader(serverXml); StringWriter writer = new StringWriter()) {
             IOTools.flow(reader, writer);
             serverXmlDump = writer.toString();
         }
