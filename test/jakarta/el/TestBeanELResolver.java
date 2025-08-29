@@ -414,8 +414,8 @@ public class TestBeanELResolver {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), METHOD01_NAME, new Class<?>[] {},
-                new Object[] {});
+        Object result =
+                resolver.invoke(context, new TesterBean(BEAN_NAME), METHOD01_NAME, new Class<?>[] {}, new Object[] {});
 
         Assert.assertEquals(BEAN_NAME, result);
         Assert.assertTrue(context.isPropertyResolved());
@@ -508,8 +508,8 @@ public class TestBeanELResolver {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs", null,
-                new String[] { null });
+        Object result =
+                resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs", null, new String[] { null });
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -519,8 +519,8 @@ public class TestBeanELResolver {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs", new Class<?>[] { null },
-                null);
+        Object result =
+                resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs", new Class<?>[] { null }, null);
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -762,8 +762,8 @@ public class TestBeanELResolver {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs", null,
-                new Object[] { null });
+        Object result =
+                resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs", null, new Object[] { null });
 
         Assert.assertEquals(BEAN_NAME, result);
     }
@@ -773,8 +773,8 @@ public class TestBeanELResolver {
         BeanELResolver resolver = new BeanELResolver();
         ELContext context = new StandardELContext(ELManager.getExpressionFactory());
 
-        Object result = resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs", new Class<?>[] { null },
-                null);
+        Object result =
+                resolver.invoke(context, new TesterBean(BEAN_NAME), "getNameVarargs", new Class<?>[] { null }, null);
 
         Assert.assertEquals(BEAN_NAME, result);
     }
