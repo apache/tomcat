@@ -35,14 +35,12 @@ public class TestSimpleServerAuthConfig {
     private static final Map<String,Object> CONFIG_PROPERTIES;
     static {
         CONFIG_PROPERTIES = new HashMap<>();
-        CONFIG_PROPERTIES.put(SERVER_AUTH_MODULE_KEY_PREFIX + "1",
-                TesterServerAuthModuleA.class.getName());
+        CONFIG_PROPERTIES.put(SERVER_AUTH_MODULE_KEY_PREFIX + "1", TesterServerAuthModuleA.class.getName());
     }
 
     @Test
     public void testConfigOnServerAuthConfig() throws Exception {
-        ServerAuthConfig serverAuthConfig =
-                new SimpleServerAuthConfig(null,  null, null, CONFIG_PROPERTIES);
+        ServerAuthConfig serverAuthConfig = new SimpleServerAuthConfig(null, null, null, CONFIG_PROPERTIES);
         ServerAuthContext serverAuthContext = serverAuthConfig.getAuthContext(null, null, null);
 
         validateServerAuthContext(serverAuthContext);
@@ -51,17 +49,16 @@ public class TestSimpleServerAuthConfig {
 
     @Test
     public void testConfigOnGetAuthContext() throws Exception {
-        ServerAuthConfig serverAuthConfig = new SimpleServerAuthConfig(null,  null, null, null);
-        ServerAuthContext serverAuthContext =
-                serverAuthConfig.getAuthContext(null, null, CONFIG_PROPERTIES);
+        ServerAuthConfig serverAuthConfig = new SimpleServerAuthConfig(null, null, null, null);
+        ServerAuthContext serverAuthContext = serverAuthConfig.getAuthContext(null, null, CONFIG_PROPERTIES);
 
         validateServerAuthContext(serverAuthContext);
     }
 
 
-    @Test(expected=AuthException.class)
+    @Test(expected = AuthException.class)
     public void testConfigNone() throws Exception {
-        ServerAuthConfig serverAuthConfig = new SimpleServerAuthConfig(null,  null, null, null);
+        ServerAuthConfig serverAuthConfig = new SimpleServerAuthConfig(null, null, null, null);
         serverAuthConfig.getAuthContext(null, null, null);
     }
 

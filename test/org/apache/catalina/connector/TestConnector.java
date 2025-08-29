@@ -47,8 +47,7 @@ public class TestConnector extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         Context root = tomcat.addContext("", TEMP_DIR);
-        Wrapper w =
-            Tomcat.addServlet(root, "tester", new TesterServlet());
+        Wrapper w = Tomcat.addServlet(root, "tester", new TesterServlet());
         w.setAsyncSupported(true);
         root.addServletMappingDecoded("/", "tester");
 
@@ -68,8 +67,7 @@ public class TestConnector extends TomcatBaseTest {
         connector.stop();
 
         try {
-            rc = getUrl("http://localhost:" + getPort() + "/", bc, 1000,
-                    null, null);
+            rc = getUrl("http://localhost:" + getPort() + "/", bc, 1000, null, null);
         } catch (SocketTimeoutException ste) {
             // May also see this with NIO
             // Make sure the test passes if we do
@@ -101,7 +99,7 @@ public class TestConnector extends TomcatBaseTest {
     }
 
 
-    @Test(expected=LifecycleException.class)
+    @Test(expected = LifecycleException.class)
     public void testInvalidProtocolThrows() throws Exception {
         doTestInvalidProtocol(true);
     }
@@ -121,7 +119,7 @@ public class TestConnector extends TomcatBaseTest {
     }
 
 
-    @Test(expected=LifecycleException.class)
+    @Test(expected = LifecycleException.class)
     public void testDuplicatePortThrows() throws Exception {
         doTestDuplicatePort(true);
     }
@@ -198,8 +196,7 @@ public class TestConnector extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         Map<String,List<String>> respHeaders = new HashMap<>();
-        int rc = methodUrl("http://localhost:" + getPort() + "/index.html",
-                bc, 30000, null, respHeaders, "OPTIONS");
+        int rc = methodUrl("http://localhost:" + getPort() + "/index.html", bc, 30000, null, respHeaders, "OPTIONS");
 
         Assert.assertEquals(200, rc);
 

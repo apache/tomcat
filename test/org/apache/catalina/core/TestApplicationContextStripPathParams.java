@@ -44,29 +44,18 @@ public class TestApplicationContextStripPathParams extends TomcatBaseTest {
 
     @Parameters(name = "{index}: input[{0}]")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-            { "/foo", "/foo", Boolean.FALSE },
-            { "/foo/", "/foo/", Boolean.FALSE },
-            { "/foo/bar", "/foo/bar", Boolean.FALSE },
-            { "/foo;", "/foo", Boolean.FALSE },
-            { "/foo;/", "/foo/", Boolean.FALSE },
-            { "/foo;/bar", "/foo/bar", Boolean.FALSE },
-            { "/foo;a=1", "/foo", Boolean.TRUE },
-            { "/foo;a=1/", "/foo/", Boolean.TRUE },
-            { "/foo;a=1/bar", "/foo/bar", Boolean.TRUE },
-            // Arguably not valid but does the right thing anyway
-            { ";/foo", "/foo", Boolean.FALSE },
-            { ";a=1/foo", "/foo", Boolean.TRUE },
-            { ";/foo/bar", "/foo/bar", Boolean.FALSE },
-            { ";/foo;a=1/bar", "/foo/bar", Boolean.TRUE },
-            { ";/foo;=/bar", "/foo/bar", Boolean.FALSE },
-            { ";/foo;a=/bar", "/foo/bar", Boolean.FALSE },
-            { ";/foo;=1/bar", "/foo/bar", Boolean.FALSE },
-            { "/foo;a=1;b=1/bar", "/foo/bar", Boolean.TRUE },
-            { ";/foo;a=1;b=1/bar", "/foo/bar", Boolean.TRUE },
-            { "/foo;b=1;a=1/bar", "/foo/bar", Boolean.TRUE },
-            { ";/foo;b=1;a=1/bar", "/foo/bar", Boolean.TRUE },
-        });
+        return Arrays.asList(new Object[][] { { "/foo", "/foo", Boolean.FALSE }, { "/foo/", "/foo/", Boolean.FALSE },
+                { "/foo/bar", "/foo/bar", Boolean.FALSE }, { "/foo;", "/foo", Boolean.FALSE },
+                { "/foo;/", "/foo/", Boolean.FALSE }, { "/foo;/bar", "/foo/bar", Boolean.FALSE },
+                { "/foo;a=1", "/foo", Boolean.TRUE }, { "/foo;a=1/", "/foo/", Boolean.TRUE },
+                { "/foo;a=1/bar", "/foo/bar", Boolean.TRUE },
+                // Arguably not valid but does the right thing anyway
+                { ";/foo", "/foo", Boolean.FALSE }, { ";a=1/foo", "/foo", Boolean.TRUE },
+                { ";/foo/bar", "/foo/bar", Boolean.FALSE }, { ";/foo;a=1/bar", "/foo/bar", Boolean.TRUE },
+                { ";/foo;=/bar", "/foo/bar", Boolean.FALSE }, { ";/foo;a=/bar", "/foo/bar", Boolean.FALSE },
+                { ";/foo;=1/bar", "/foo/bar", Boolean.FALSE }, { "/foo;a=1;b=1/bar", "/foo/bar", Boolean.TRUE },
+                { ";/foo;a=1;b=1/bar", "/foo/bar", Boolean.TRUE }, { "/foo;b=1;a=1/bar", "/foo/bar", Boolean.TRUE },
+                { ";/foo;b=1;a=1/bar", "/foo/bar", Boolean.TRUE }, });
     }
 
     @Test

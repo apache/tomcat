@@ -93,7 +93,8 @@ public class TestDigestAuthenticatorAlgorithms extends TomcatBaseTest {
                     } else {
                         user = USER;
                     }
-                    parameterSets.add(new Object[] { algorithms.toString(), algorithm, digestPassword, user, Boolean.valueOf(authExpected) });
+                    parameterSets.add(new Object[] { algorithms.toString(), algorithm, digestPassword, user,
+                            Boolean.valueOf(authExpected) });
                 }
             }
         }
@@ -169,7 +170,7 @@ public class TestDigestAuthenticatorAlgorithms extends TomcatBaseTest {
         tomcat.start();
 
         // The first request will always fail - but we need the challenge
-        Map<String, List<String>> respHeaders = new HashMap<>();
+        Map<String,List<String>> respHeaders = new HashMap<>();
         ByteChunk bc = new ByteChunk();
         int rc = getUrl("http://localhost:" + getPort() + URI, bc, respHeaders);
         Assert.assertEquals(401, rc);
@@ -180,7 +181,7 @@ public class TestDigestAuthenticatorAlgorithms extends TomcatBaseTest {
         List<String> auth = new ArrayList<>();
         auth.add(buildDigestResponse(user, PASSWORD, URI, REALM_NAME, clientAlgorithm,
                 respHeaders.get(AuthenticatorBase.AUTH_HEADER_NAME), "00000001", CNONCE, DigestAuthenticator.QOP));
-        Map<String, List<String>> reqHeaders = new HashMap<>();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
         reqHeaders.put("authorization", auth);
         rc = getUrl("http://localhost:" + getPort() + URI, bc, reqHeaders, null);
 

@@ -121,7 +121,7 @@ public class TestPropertiesRoleMappingListener extends TomcatBaseTest {
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
-        LoginConfig loginConfig  = new LoginConfig();
+        LoginConfig loginConfig = new LoginConfig();
         loginConfig.setAuthMethod(HttpServletRequest.BASIC_AUTH);
         ctx.setLoginConfig(loginConfig);
         ctx.getPipeline().addValve(new BasicAuthenticator());
@@ -157,7 +157,7 @@ public class TestPropertiesRoleMappingListener extends TomcatBaseTest {
 
     private void testRequest(String credentials, String path, int statusCode) throws IOException {
         ByteChunk out = new ByteChunk();
-        Map<String, List<String>> reqHead = new HashMap<>();
+        Map<String,List<String>> reqHead = new HashMap<>();
         List<String> head = new ArrayList<>();
         head.add(HttpServletRequest.BASIC_AUTH + " " +
                 Base64.getEncoder().encodeToString(credentials.getBytes(StandardCharsets.ISO_8859_1)));

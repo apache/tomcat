@@ -64,10 +64,8 @@ import org.apache.tomcat.util.descriptor.web.LoginConfig;
 public class TestRequest extends TomcatBaseTest {
 
     /**
-     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=37794
-     * POST parameters are not returned from a call to
-     * any of the {@link HttpServletRequest} getParameterXXX() methods if the
-     * request is chunked.
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=37794 POST parameters are not returned from a call
+     * to any of the {@link HttpServletRequest} getParameterXXX() methods if the request is chunked.
      */
     @Test
     public void testBug37794() {
@@ -118,8 +116,7 @@ public class TestRequest extends TomcatBaseTest {
          * Only interested in the parameters and values for POST requests.
          */
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // Just echo the parameters and values back as plain text
             resp.setContentType("text/plain");
 
@@ -143,7 +140,7 @@ public class TestRequest extends TomcatBaseTest {
 
         private synchronized void init() throws Exception {
             if (init) {
-              return;
+                return;
             }
 
             Tomcat tomcat = getTomcatInstance();
@@ -231,9 +228,7 @@ public class TestRequest extends TomcatBaseTest {
     }
 
     /*
-     * Test case for
-     * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=38113">bug
-     * 38118</a>.
+     * Test case for <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=38113">bug 38118</a>.
      */
     @Test
     public void testBug38113() throws Exception {
@@ -267,8 +262,7 @@ public class TestRequest extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             PrintWriter pw = resp.getWriter();
             pw.print("QueryString=" + req.getQueryString());
@@ -276,11 +270,10 @@ public class TestRequest extends TomcatBaseTest {
     }
 
     /*
-     * Test case for {@link Request#login(String, String)} and
-     * {@link Request#logout()}.
+     * Test case for {@link Request#login(String, String)} and {@link Request#logout()}.
      */
     @Test
-    public void testLoginLogout() throws Exception{
+    public void testLoginLogout() throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -312,25 +305,24 @@ public class TestRequest extends TomcatBaseTest {
         private static final String OK = "OK";
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             req.login(USER, PWD);
 
             if (!req.getRemoteUser().equals(USER)) {
-              throw new ServletException();
+                throw new ServletException();
             }
             if (!req.getUserPrincipal().getName().equals(USER)) {
-              throw new ServletException();
+                throw new ServletException();
             }
 
             req.logout();
 
             if (req.getRemoteUser() != null) {
-              throw new ServletException();
+                throw new ServletException();
             }
             if (req.getUserPrincipal() != null) {
-              throw new ServletException();
+                throw new ServletException();
             }
 
             resp.getWriter().write(OK);
@@ -341,8 +333,7 @@ public class TestRequest extends TomcatBaseTest {
     @Test
     public void testBug49424NoChunking() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        Context root = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
         root.addServletMappingDecoded("/", "Bug37794");
         tomcat.start();
@@ -355,8 +346,7 @@ public class TestRequest extends TomcatBaseTest {
     @Test
     public void testBug49424WithChunking() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        Context root = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         Tomcat.addServlet(root, "Bug37794", new Bug37794Servlet());
         root.addServletMappingDecoded("/", "Bug37794");
         tomcat.start();
@@ -368,10 +358,8 @@ public class TestRequest extends TomcatBaseTest {
     }
 
     /**
-     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=48692
-     * PUT requests should be able to fetch request parameters coming from
-     * the request body (when properly configured using the new parseBodyMethod
-     * setting).
+     * Test case for https://bz.apache.org/bugzilla/show_bug.cgi?id=48692 PUT requests should be able to fetch request
+     * parameters coming from the request body (when properly configured using the new parseBodyMethod setting).
      */
     @Test
     public void testBug48692() {
@@ -380,11 +368,8 @@ public class TestRequest extends TomcatBaseTest {
         // Make sure GET works properly
         client.doRequest("GET", "foo=bar", null, null, false);
 
-        Assert.assertTrue("Non-200 response for GET request",
-                   client.isResponse200());
-        Assert.assertEquals("Incorrect response for GET request",
-                     "foo=bar",
-                     client.getResponseBody());
+        Assert.assertTrue("Non-200 response for GET request", client.isResponse200());
+        Assert.assertEquals("Incorrect response for GET request", "foo=bar", client.getResponseBody());
 
         client.reset();
 
@@ -394,44 +379,34 @@ public class TestRequest extends TomcatBaseTest {
         // POST with separate GET and POST parameters
         client.doRequest("POST", "foo=bar", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz", true);
 
-        Assert.assertTrue("Non-200 response for POST request",
-                   client.isResponse200());
-        Assert.assertEquals("Incorrect response for POST request",
-                     "bar=baz,foo=bar",
-                     client.getResponseBody());
+        Assert.assertTrue("Non-200 response for POST request", client.isResponse200());
+        Assert.assertEquals("Incorrect response for POST request", "bar=baz,foo=bar", client.getResponseBody());
 
         client.reset();
 
         // POST with overlapping GET and POST parameters
         client.doRequest("POST", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
 
-        Assert.assertTrue("Non-200 response for POST request",
-                   client.isResponse200());
-        Assert.assertEquals("Incorrect response for POST request",
-                     "bar=baz,bar=foo,foo=bar,foo=baz",
-                     client.getResponseBody());
+        Assert.assertTrue("Non-200 response for POST request", client.isResponse200());
+        Assert.assertEquals("Incorrect response for POST request", "bar=baz,bar=foo,foo=bar,foo=baz",
+                client.getResponseBody());
 
         client.reset();
 
         // PUT without POST-style parsing
         client.doRequest("PUT", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", false);
 
-        Assert.assertTrue("Non-200 response for PUT/noparse request",
-                   client.isResponse200());
-        Assert.assertEquals("Incorrect response for PUT request",
-                     "bar=foo,foo=bar",
-                     client.getResponseBody());
+        Assert.assertTrue("Non-200 response for PUT/noparse request", client.isResponse200());
+        Assert.assertEquals("Incorrect response for PUT request", "bar=foo,foo=bar", client.getResponseBody());
 
         client.reset();
 
         // PUT with POST-style parsing
         client.doRequest("PUT", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
 
-        Assert.assertTrue("Non-200 response for PUT request",
-                   client.isResponse200());
-        Assert.assertEquals("Incorrect response for PUT/parse request",
-                     "bar=baz,bar=foo,foo=bar,foo=baz",
-                     client.getResponseBody());
+        Assert.assertTrue("Non-200 response for PUT request", client.isResponse200());
+        Assert.assertEquals("Incorrect response for PUT/parse request", "bar=baz,bar=foo,foo=bar,foo=baz",
+                client.getResponseBody());
 
         client.reset();
     }
@@ -439,15 +414,13 @@ public class TestRequest extends TomcatBaseTest {
     @Test
     public void testBug54984() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        Context root = tomcat.addContext("",
-                System.getProperty("java.io.tmpdir"));
+        Context root = tomcat.addContext("", System.getProperty("java.io.tmpdir"));
         root.setAllowCasualMultipartParsing(true);
         Tomcat.addServlet(root, "Bug54984", new Bug54984Servlet());
         root.addServletMappingDecoded("/", "Bug54984");
         tomcat.start();
 
-        HttpURLConnection conn = getConnection("http://localhost:" + getPort()
-                + "/parseParametersBeforeParseParts");
+        HttpURLConnection conn = getConnection("http://localhost:" + getPort() + "/parseParametersBeforeParseParts");
 
         prepareMultiPartRequest(conn);
 
@@ -472,33 +445,30 @@ public class TestRequest extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         /**
-         * Only interested in the parameters and values for requests.
-         * Note: echos parameters in alphabetical order.
+         * Only interested in the parameters and values for requests. Note: echos parameters in alphabetical order.
          */
         @Override
-        protected void service(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+        protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // Just echo the parameters and values back as plain text
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
 
             PrintWriter out = resp.getWriter();
 
-            TreeMap<String,String[]> parameters =
-                    new TreeMap<>(req.getParameterMap());
+            TreeMap<String,String[]> parameters = new TreeMap<>(req.getParameterMap());
 
             boolean first = true;
 
-            for(String name: parameters.keySet()) {
+            for (String name : parameters.keySet()) {
                 String[] values = req.getParameterValues(name);
 
                 Arrays.sort(values);
 
                 for (String value : values) {
                     if (first) {
-                      first = false;
+                        first = false;
                     } else {
-                      out.print(",");
+                        out.print(",");
                     }
 
                     out.print(name + "=" + value);
@@ -516,7 +486,7 @@ public class TestRequest extends TomcatBaseTest {
 
         private synchronized void init() throws Exception {
             if (init) {
-              return;
+                return;
             }
 
             Tomcat tomcat = getTomcatInstance();
@@ -530,28 +500,24 @@ public class TestRequest extends TomcatBaseTest {
             init = true;
         }
 
-        private Exception doRequest(String method,
-                                    String queryString,
-                                    String contentType,
-                                    String requestBody,
-                                    boolean allowBody) {
+        private Exception doRequest(String method, String queryString, String contentType, String requestBody,
+                boolean allowBody) {
             Tomcat tomcat = getTomcatInstance();
 
             try {
                 init();
-                if(allowBody) {
-                  tomcat.getConnector().setParseBodyMethods(method);
-                }
-                else {
-                  tomcat.getConnector().setParseBodyMethods(""); // never parse
+                if (allowBody) {
+                    tomcat.getConnector().setParseBodyMethods(method);
+                } else {
+                    tomcat.getConnector().setParseBodyMethods(""); // never parse
                 }
 
                 // Open connection
                 connect();
 
                 // Re-encode the request body so that bytes = characters
-                if(null != requestBody) {
-                  requestBody = new String(requestBody.getBytes("UTF-8"), "ASCII");
+                if (null != requestBody) {
+                    requestBody = new String(requestBody.getBytes("UTF-8"), "ASCII");
                 }
 
                 // Send specified request body using method
@@ -604,8 +570,7 @@ public class TestRequest extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             req.setCharacterEncoding("UTF-8");
 
             if (req.getRequestURI().endsWith("parseParametersBeforeParseParts")) {
@@ -621,11 +586,9 @@ public class TestRequest extends TomcatBaseTest {
         }
     }
 
-    private void prepareMultiPartRequest(HttpURLConnection conn)
-            throws Exception {
+    private void prepareMultiPartRequest(HttpURLConnection conn) throws Exception {
         String boundary = "-----" + System.currentTimeMillis();
-        conn.setRequestProperty("Content-Type",
-                "multipart/form-data; boundary=" + boundary);
+        conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
 
         try (OutputStreamWriter osw = new OutputStreamWriter(conn.getOutputStream(), "UTF-8");
                 PrintWriter writer = new PrintWriter(osw, true)) {
@@ -643,8 +606,7 @@ public class TestRequest extends TomcatBaseTest {
         }
     }
 
-    private void checkResponseBug54984(HttpURLConnection conn)
-            throws Exception {
+    private void checkResponseBug54984(HttpURLConnection conn) throws Exception {
         List<String> response = new ArrayList<>();
         int status = conn.getResponseCode();
         if (status == HttpURLConnection.HTTP_OK) {
@@ -821,8 +783,7 @@ public class TestRequest extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.getWriter().print(req.getContextPath());
         }
@@ -842,8 +803,7 @@ public class TestRequest extends TomcatBaseTest {
     }
 
     /*
-     * Reverse header order of getLocaleMultipleHeaders01() and make sure the
-     * result is the same.
+     * Reverse header order of getLocaleMultipleHeaders01() and make sure the result is the same.
      */
     @Test
     public void getLocaleMultipleHeaders02() throws Exception {
@@ -871,8 +831,7 @@ public class TestRequest extends TomcatBaseTest {
     }
 
 
-    private void doTestGetReader(String userAgentCharacterEncoding, boolean expect200)
-            throws Exception {
+    private void doTestGetReader(String userAgentCharacterEncoding, boolean expect200) throws Exception {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -895,7 +854,7 @@ public class TestRequest extends TomcatBaseTest {
         ByteChunk bc = new ByteChunk();
         Map<String,List<String>> reqHeaders = new HashMap<>();
         reqHeaders.put("Content-Type",
-                Arrays.asList(new String[] {"text/plain;charset=" + userAgentCharacterEncoding}));
+                Arrays.asList(new String[] { "text/plain;charset=" + userAgentCharacterEncoding }));
 
         int rc = postUrl(body, "http://localhost:" + getPort() + "/", bc, reqHeaders, null);
 
@@ -912,15 +871,13 @@ public class TestRequest extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // This is intended for POST requests
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // Container will handle any errors
             req.getReader();
         }
