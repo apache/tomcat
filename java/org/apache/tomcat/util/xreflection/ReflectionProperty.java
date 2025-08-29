@@ -104,9 +104,7 @@ record ReflectionProperty(String clazz, String propertyName, Class<?> propertyTy
 
     @Override
     public String toString() {
-        return "ReflectionProperty{" + "name='" + propertyName + '\'' +
-            ", type=" + propertyType +
-            '}';
+        return "ReflectionProperty{" + "name='" + propertyName + '\'' + ", type=" + propertyType + '}';
     }
 
     @Override
