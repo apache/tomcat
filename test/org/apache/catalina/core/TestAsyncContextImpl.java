@@ -54,6 +54,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.Request;
@@ -2924,9 +2925,13 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
         Bug63816Client client = new Bug63816Client();
         client.setPort(getPort());
-        client.setRequest(new String[] { "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
-                                         "Host: localhost:" + SimpleHttpClient.CRLF +
-                                         SimpleHttpClient.CRLF});
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET / HTTP/1.1" + CRLF +
+                "Host: localhost:" + CRLF +
+                CRLF
+                });
+        // @formatter:on
         client.connect();
         client.sendRequest();
 
@@ -3031,26 +3036,30 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
 
     @Test
     public void testCanceledPostChunked() throws Exception {
+        // @formatter:off
         doTestCanceledPost(new String[] {
-                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + SimpleHttpClient.CRLF +
-                "Transfer-Encoding: Chunked" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF +
-                "10" + SimpleHttpClient.CRLF +
-                "This is 16 bytes" + SimpleHttpClient.CRLF
+                "POST / HTTP/1.1" + CRLF +
+                "Host: localhost:" + CRLF +
+                "Transfer-Encoding: Chunked" + CRLF +
+                CRLF +
+                "10" + CRLF +
+                "This is 16 bytes" + CRLF
                 });
+        // @formatter:on
     }
 
 
     @Test
     public void testCanceledPostNoChunking() throws Exception {
+        // @formatter:off
         doTestCanceledPost(new String[] {
-                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + SimpleHttpClient.CRLF +
-                "Content-Length: 100" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF +
+                "POST / HTTP/1.1" + CRLF +
+                "Host: localhost:" + CRLF +
+                "Content-Length: 100" + CRLF +
+                CRLF +
                 "This is 16 bytes"
                 });
+        // @formatter:on
     }
 
 

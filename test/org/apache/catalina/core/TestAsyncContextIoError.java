@@ -30,6 +30,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
@@ -65,9 +66,13 @@ public class TestAsyncContextIoError extends TomcatBaseTest {
 
         AsyncClient client = new AsyncClient();
         client.setPort(getPort());
-        client.setRequest(new String[] { "GET /async HTTP/1.1" + SimpleHttpClient.CRLF +
-                                         "Host: localhost:" + getPort() + SimpleHttpClient.CRLF +
-                                         SimpleHttpClient.CRLF});
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET /async HTTP/1.1" + CRLF +
+                 "Host: localhost:" + getPort() + CRLF +
+                 CRLF
+                 });
+        // @formatter:on
         client.connect();
         client.sendRequest();
 

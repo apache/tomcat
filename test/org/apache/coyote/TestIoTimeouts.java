@@ -108,12 +108,13 @@ public class TestIoTimeouts extends TomcatBaseTest {
                 }
 
                 String[] request = new String[packetCount];
+                // @formatter:off
                 request[0] =
-                    "POST /test HTTP/1.1" + CRLF +
-                    "Host: localhost:8080" + CRLF +
-                    "Transfer-Encoding: chunked" + CRLF +
-                    "Connection: close" + CRLF +
-                    CRLF;
+                        "POST /test HTTP/1.1" + CRLF +
+                        "Host: localhost:8080" + CRLF +
+                        "Transfer-Encoding: chunked" + CRLF +
+                        "Connection: close" + CRLF +
+                        CRLF;
                 request[1] =
                         "b8" + CRLF +
                         "{" + CRLF +
@@ -124,6 +125,7 @@ public class TestIoTimeouts extends TomcatBaseTest {
                         "  \"assetStoreId\": \"5051\", "  + CRLF +
                         "  \"zipCode\": \"98109\"" + CRLF +
                         "}" + CRLF;
+                // @formatter:on
                 if (sendEndChunk) {
                     request[2] =
                             "0" + CRLF +
