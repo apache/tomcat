@@ -448,7 +448,7 @@ public class MBeanUtils {
     static ObjectName createObjectName(String domain, Group group) throws MalformedObjectNameException {
 
         return new ObjectName(domain + ":type=Group,groupname=" + ObjectName.quote(group.getGroupname()) +
-            ",database=" + group.getUserDatabase().getId());
+                ",database=" + group.getUserDatabase().getId());
 
     }
 
@@ -465,8 +465,8 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, Role role) throws MalformedObjectNameException {
 
-        return new ObjectName(domain + ":type=Role,rolename=" + ObjectName.quote(role.getRolename()) +
-            ",database=" + role.getUserDatabase().getId());
+        return new ObjectName(domain + ":type=Role,rolename=" + ObjectName.quote(role.getRolename()) + ",database=" +
+                role.getUserDatabase().getId());
 
     }
 
@@ -483,8 +483,8 @@ public class MBeanUtils {
      */
     static ObjectName createObjectName(String domain, User user) throws MalformedObjectNameException {
 
-        return new ObjectName(domain + ":type=User,username=" + ObjectName.quote(user.getUsername()) +
-            ",database=" + user.getUserDatabase().getId());
+        return new ObjectName(domain + ":type=User,username=" + ObjectName.quote(user.getUsername()) + ",database=" +
+                user.getUserDatabase().getId());
     }
 
 

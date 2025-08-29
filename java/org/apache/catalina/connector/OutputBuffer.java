@@ -419,8 +419,8 @@ public class OutputBuffer extends Writer {
         /*
          * Handle the requirements of section 5.7 of the Servlet specification - Closure of the Response Object.
          *
-         * Currently, this just handles the simple case. There is work in progress to better define what should happen if
-         * an attempt is made to write > content-length bytes. When that work is complete, this is likely where the
+         * Currently, this just handles the simple case. There is work in progress to better define what should happen
+         * if an attempt is made to write > content-length bytes. When that work is complete, this is likely where the
          * implementation will end up.
          */
         if (contentLength != -1 && bytesWritten >= contentLength) {

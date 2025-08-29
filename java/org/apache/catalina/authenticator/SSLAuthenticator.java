@@ -197,7 +197,8 @@ public class SSLAuthenticator extends AuthenticatorBase {
                 UpgradeProtocol[] upgradeProtocols = connector.findUpgradeProtocols();
                 for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
                     if ("h2".equals(upgradeProtocol.getAlpnName())) {
-                        log.warn(sm.getString("sslAuthenticatorValve.http2", context.getName(), host.getName(), connector));
+                        log.warn(sm.getString("sslAuthenticatorValve.http2", context.getName(), host.getName(),
+                                connector));
                         break;
                     }
                 }

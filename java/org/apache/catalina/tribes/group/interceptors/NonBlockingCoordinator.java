@@ -266,8 +266,8 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
         Arrays.fill(m, others);
         Member[] mbrs = m.getMembers();
         m.reset();
-        return new CoordinationMessage(leader, local, mbrs,
-                new UniqueId(UUIDGenerator.randomUUID(true)), COORD_REQUEST);
+        return new CoordinationMessage(leader, local, mbrs, new UniqueId(UUIDGenerator.randomUUID(true)),
+                COORD_REQUEST);
     }
 
     protected void sendElectionMsg(Member local, Member next, CoordinationMessage msg) throws ChannelException {

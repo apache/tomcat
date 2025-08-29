@@ -1675,7 +1675,6 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
     }
 
 
-
     /**
      * Write identifier element %{xxx}L
      */
@@ -1705,7 +1704,7 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
         @Override
         public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
-            switch(identifierType) {
+            switch (identifierType) {
                 case CONNECTION:
                     buf.append(request.getServletConnection().getConnectionId());
                     break;

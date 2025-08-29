@@ -177,8 +177,8 @@ public class ELSupport {
     }
 
     /*
-     * Going to have some casts /raw types somewhere so doing it here keeps them all in one place. There might
-     * be a neater / better solution, but I couldn't find it.
+     * Going to have some casts /raw types somewhere so doing it here keeps them all in one place. There might be a
+     * neater / better solution, but I couldn't find it.
      */
     @SuppressWarnings("unchecked")
     public static Enum<?> coerceToEnum(final ELContext ctx, final Object obj,
@@ -227,8 +227,7 @@ public class ELSupport {
      *
      * @throws ELException if object is not Boolean or String
      */
-    public static Boolean coerceToBoolean(final ELContext ctx, final Object obj, boolean primitive)
-            throws ELException {
+    public static Boolean coerceToBoolean(final ELContext ctx, final Object obj, boolean primitive) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
@@ -336,8 +335,7 @@ public class ELSupport {
         throw new ELException(MessageFactory.get("error.convert", number, number.getClass(), type));
     }
 
-    public static Number coerceToNumber(final ELContext ctx, final Object obj, final Class<?> type)
-            throws ELException {
+    public static Number coerceToNumber(final ELContext ctx, final Object obj, final Class<?> type) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();
@@ -476,8 +474,7 @@ public class ELSupport {
         }
     }
 
-    public static <T> T coerceToType(final ELContext ctx, final Object obj, final Class<T> type)
-            throws ELException {
+    public static <T> T coerceToType(final ELContext ctx, final Object obj, final Class<T> type) throws ELException {
 
         if (ctx != null) {
             boolean originalIsPropertyResolved = ctx.isPropertyResolved();

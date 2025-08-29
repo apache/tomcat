@@ -177,7 +177,7 @@ public class BackupManager extends ClusterManagerBase implements MapOwner, Distr
 
         setState(LifecycleState.STOPPING);
 
-        if (sessions instanceof LazyReplicatedMap<String, Session> map) {
+        if (sessions instanceof LazyReplicatedMap<String,Session> map) {
             map.breakdown();
         }
 

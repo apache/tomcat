@@ -76,8 +76,8 @@ public abstract class GenericFilter implements Filter, FilterConfig, Serializabl
 
 
     /**
-     * Convenience method for subclasses to save them having to call <code>super.init(config)</code>. This is a NO-OP
-     * by default.
+     * Convenience method for subclasses to save them having to call <code>super.init(config)</code>. This is a NO-OP by
+     * default.
      *
      * @throws ServletException If an exception occurs that interrupts the Filter's normal operation
      */

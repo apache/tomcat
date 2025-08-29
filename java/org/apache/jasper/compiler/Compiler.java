@@ -427,8 +427,8 @@ public abstract class Compiler {
 
         if (jsw != null && (ctxt.getOptions().getModificationTestInterval() > 0)) {
 
-            if (jsw.getLastModificationTest() +
-                (ctxt.getOptions().getModificationTestInterval() * 1000L) > System.currentTimeMillis()) {
+            if (jsw.getLastModificationTest() + (ctxt.getOptions().getModificationTestInterval() * 1000L) > System
+                    .currentTimeMillis()) {
                 return false;
             }
             jsw.setLastModificationTest(System.currentTimeMillis());

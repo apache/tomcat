@@ -72,9 +72,9 @@ public interface ServletContext {
      * Returns a <code>ServletContext</code> object that corresponds to a specified URL on the server.
      * <p>
      * This method allows servlets to gain access to the context for various parts of the server, and as needed obtain
-     * {@link RequestDispatcher} objects from the context. The given path must begin with "/", is interpreted
-     * relative to the server's document root and is matched against the context roots of other web applications hosted
-     * on this container.
+     * {@link RequestDispatcher} objects from the context. The given path must begin with "/", is interpreted relative
+     * to the server's document root and is matched against the context roots of other web applications hosted on this
+     * container.
      * <p>
      * In a security conscious environment, the servlet container may return <code>null</code> for a given URL.
      *

@@ -77,8 +77,8 @@ public interface HttpServletRequest extends ServletRequest {
      * <code>Date</code> object. Use this method with headers that contain dates, such as
      * <code>If-Modified-Since</code>.
      * <p>
-     * The date is returned as the number of milliseconds since January 1, 1970 GMT. The header name
-     * is case-insensitive.
+     * The date is returned as the number of milliseconds since January 1, 1970 GMT. The header name is
+     * case-insensitive.
      * <p>
      * If the request did not have a header of the specified name, this method returns -1. If the header can't be
      * converted to a date, the method throws an <code>IllegalArgumentException</code>.
@@ -297,8 +297,8 @@ public interface HttpServletRequest extends ServletRequest {
     String getRequestedSessionId();
 
     /**
-     * Returns the URI path part of this request's URL which starts after the authority (if any) and ends before the query
-     * string delimiter ({@code ?}), if any. The web container does not decode this String. For example:
+     * Returns the URI path part of this request's URL which starts after the authority (if any) and ends before the
+     * query string delimiter ({@code ?}), if any. The web container does not decode this String. For example:
      * <table>
      * <caption>Examples of Returned Values</caption>
      * <tr>
@@ -320,7 +320,8 @@ public interface HttpServletRequest extends ServletRequest {
      * <p>
      * To reconstruct a URL with a scheme and host, use {@link #getRequestURL}.
      *
-     * @return a <code>String</code> containing the path part of the URL from after the authority to before the query string
+     * @return a <code>String</code> containing the path part of the URL from after the authority to before the query
+     *             string
      *
      * @see #getRequestURL
      */

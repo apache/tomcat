@@ -182,8 +182,7 @@ public class FilterValve extends ValveBase implements FilterConfig {
                                 ScheduledThreadPoolExecutor.class.getName().equals(args[0])) {
                             return executor;
                         } else {
-                            throw new UnsupportedOperationException(
-                                    sm.getString("filterValve.proxyServletContext"));
+                            throw new UnsupportedOperationException(sm.getString("filterValve.proxyServletContext"));
                         }
                     });
         }

@@ -486,7 +486,8 @@ public class PEMFile {
                     try {
                         return KeyFactory.getInstance(algorithm).generatePrivate(keySpec);
                     } catch (InvalidKeySpecException e) {
-                        exception.addSuppressed(new InvalidKeySpecException(sm.getString("pemFile.parseError.algorithm", algorithm), e));
+                        exception.addSuppressed(new InvalidKeySpecException(
+                                sm.getString("pemFile.parseError.algorithm", algorithm), e));
                     }
                 }
             } else {

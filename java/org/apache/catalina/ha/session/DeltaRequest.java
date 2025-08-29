@@ -430,9 +430,8 @@ public class DeltaRequest implements Externalizable {
 
         @Override
         public String toString() {
-            return "AttributeInfo[type=" + getType() + ", action=" + getAction() +
-                    ", name=" + getName() + ", value=" + getValue() +
-                    ", addr=" + super.toString() + ']';
+            return "AttributeInfo[type=" + getType() + ", action=" + getAction() + ", name=" + getName() + ", value=" +
+                    getValue() + ", addr=" + super.toString() + ']';
         }
 
     }

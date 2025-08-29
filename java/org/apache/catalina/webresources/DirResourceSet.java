@@ -377,7 +377,6 @@ public class DirResourceSet extends AbstractFileResourceSet implements WebResour
     }
 
 
-
     @Override
     public ReadWriteLock getLock(String path) {
         String key = getLockKey(path);

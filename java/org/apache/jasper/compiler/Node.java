@@ -346,8 +346,8 @@ public abstract class Node implements TagConstants {
     }
 
     /**
-     * Selects and invokes a method in the visitor class based on the node type. This is abstract and should be overridden
-     * by the extending classes.
+     * Selects and invokes a method in the visitor class based on the node type. This is abstract and should be
+     * overridden by the extending classes.
      *
      * @param v The visitor class
      */
@@ -1507,7 +1507,7 @@ public abstract class Node implements TagConstants {
                 case VariableInfo.AT_END -> this.atEndScriptingVars;
                 case VariableInfo.NESTED -> this.nestedScriptingVars;
                 default -> throw new IllegalArgumentException(
-                    Localizer.getMessage("jsp.error.page.invalid.varscope", Integer.valueOf(scope)));
+                        Localizer.getMessage("jsp.error.page.invalid.varscope", Integer.valueOf(scope)));
             };
         }
 

@@ -272,6 +272,7 @@ public class HTMLManagerServlet extends ManagerServlet {
      * @param cn       Name of the application to be deployed
      * @param war      URL of the web application archive to be deployed
      * @param smClient internationalized strings
+     *
      * @return message String
      */
     protected String deployInternal(String config, ContextName cn, String war, StringManager smClient) {
@@ -292,6 +293,7 @@ public class HTMLManagerServlet extends ManagerServlet {
      * @param response The response
      * @param message  a message to display
      * @param smClient internationalized strings
+     *
      * @throws IOException an IO error occurred
      */
     protected void list(HttpServletRequest request, HttpServletResponse response, String message,
@@ -570,7 +572,9 @@ public class HTMLManagerServlet extends ManagerServlet {
      *
      * @param cn       Name of the application to be restarted
      * @param smClient StringManager for the client's locale
+     *
      * @return message String
+     *
      * @see ManagerServlet#reload(PrintWriter, ContextName, StringManager)
      */
     protected String reload(ContextName cn, StringManager smClient) {
@@ -588,7 +592,9 @@ public class HTMLManagerServlet extends ManagerServlet {
      *
      * @param cn       Name of the application to be undeployed
      * @param smClient StringManager for the client's locale
+     *
      * @return message String
+     *
      * @see ManagerServlet#undeploy(PrintWriter, ContextName, StringManager)
      */
     protected String undeploy(ContextName cn, StringManager smClient) {
@@ -607,7 +613,9 @@ public class HTMLManagerServlet extends ManagerServlet {
      * @param cn       Name of the application to list session information
      * @param idle     Expire all sessions with idle time &ge; idle for this context
      * @param smClient StringManager for the client's locale
+     *
      * @return message String
+     *
      * @see ManagerServlet#sessions(PrintWriter, ContextName, int, StringManager)
      */
     protected String sessions(ContextName cn, int idle, StringManager smClient) {
@@ -625,7 +633,9 @@ public class HTMLManagerServlet extends ManagerServlet {
      *
      * @param cn       Name of the application to be started
      * @param smClient StringManager for the client's locale
+     *
      * @return message String
+     *
      * @see ManagerServlet#start(PrintWriter, ContextName, StringManager)
      */
     protected String start(ContextName cn, StringManager smClient) {
@@ -643,7 +653,9 @@ public class HTMLManagerServlet extends ManagerServlet {
      *
      * @param cn       Name of the application to be stopped
      * @param smClient StringManager for the client's locale
+     *
      * @return message String
+     *
      * @see ManagerServlet#stop(PrintWriter, ContextName, StringManager)
      */
     protected String stop(ContextName cn, StringManager smClient) {
@@ -660,7 +672,9 @@ public class HTMLManagerServlet extends ManagerServlet {
      * Find potential memory leaks caused by web application reload.
      *
      * @param smClient StringManager for the client's locale
+     *
      * @return message String
+     *
      * @see ManagerServlet#findleaks(boolean, PrintWriter, StringManager)
      */
     protected String findleaks(StringManager smClient) {
@@ -742,6 +756,7 @@ public class HTMLManagerServlet extends ManagerServlet {
      * @param cn       Name of the application from which to expire sessions
      * @param req      The Servlet request
      * @param smClient StringManager for the client's locale
+     *
      * @return message string
      */
     protected String expireSessions(ContextName cn, HttpServletRequest req, StringManager smClient) {
@@ -764,6 +779,7 @@ public class HTMLManagerServlet extends ManagerServlet {
      * @param req      The Servlet request
      * @param resp     The Servlet response
      * @param smClient StringManager for the client's locale
+     *
      * @throws ServletException Propagated Servlet error
      * @throws IOException      An IO error occurred
      */
@@ -849,6 +865,7 @@ public class HTMLManagerServlet extends ManagerServlet {
      * @param req      The Servlet request
      * @param resp     The Servlet response
      * @param smClient StringManager for the client's locale
+     *
      * @throws ServletException Propagated Servlet error
      * @throws IOException      An IO error occurred
      */
@@ -898,6 +915,7 @@ public class HTMLManagerServlet extends ManagerServlet {
      * @param cn        Name of the application for which the sessions will be listed
      * @param sessionId the session id
      * @param smClient  StringManager for the client's locale
+     *
      * @throws ServletException Propagated Servlet error
      * @throws IOException      An IO error occurred
      */
@@ -920,6 +938,7 @@ public class HTMLManagerServlet extends ManagerServlet {
      * @param cn         Name of the application for which sessions are to be invalidated
      * @param sessionIds the session ids of the sessions
      * @param smClient   StringManager for the client's locale
+     *
      * @return number of invalidated sessions
      */
     protected int invalidateSessions(ContextName cn, String[] sessionIds, StringManager smClient) {
@@ -958,6 +977,7 @@ public class HTMLManagerServlet extends ManagerServlet {
      * @param sessionId     the session id
      * @param attributeName the attribute name
      * @param smClient      StringManager for the client's locale
+     *
      * @return true if there was an attribute removed, false otherwise
      */
     protected boolean removeSessionAttribute(ContextName cn, String sessionId, String attributeName,

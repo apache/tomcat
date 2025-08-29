@@ -182,8 +182,8 @@ public interface ChannelInterceptor extends MembershipListener, Heartbeat {
     void start(int svc) throws ChannelException;
 
     /**
-     * Shuts down the channel. This can be called multiple times for individual services to shut down.
-     * The svc parameter can be the logical or value of any constants
+     * Shuts down the channel. This can be called multiple times for individual services to shut down. The svc parameter
+     * can be the logical or value of any constants
      *
      * @param svc one of:
      *                <ul>
