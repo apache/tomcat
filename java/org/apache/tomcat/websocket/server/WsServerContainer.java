@@ -65,12 +65,13 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
     private final WsWriteTimeout wsWriteTimeout = new WsWriteTimeout();
 
     private final ServletContext servletContext;
-    private final Map<String, ExactPathMatch> configExactMatchMap = new ConcurrentHashMap<>();
-    private final Map<Integer, ConcurrentSkipListMap<String, TemplatePathMatch>> configTemplateMatchMap = new ConcurrentHashMap<>();
+    private final Map<String,ExactPathMatch> configExactMatchMap = new ConcurrentHashMap<>();
+    private final Map<Integer,ConcurrentSkipListMap<String,TemplatePathMatch>> configTemplateMatchMap =
+            new ConcurrentHashMap<>();
     @SuppressWarnings("deprecation")
     private volatile boolean enforceNoAddAfterHandshake = org.apache.tomcat.websocket.Constants.STRICT_SPEC_COMPLIANCE;
     private volatile boolean addAllowed = true;
-    private final Map<String, Set<WsSession>> authenticatedSessions = new ConcurrentHashMap<>();
+    private final Map<String,Set<WsSession>> authenticatedSessions = new ConcurrentHashMap<>();
     private volatile boolean endpointsRegistered = false;
     private volatile boolean deploymentFailed = false;
 
@@ -151,7 +152,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
             UriTemplate uriTemplate = new UriTemplate(path);
             if (uriTemplate.hasParameters()) {
                 Integer key = Integer.valueOf(uriTemplate.getSegmentCount());
-                ConcurrentSkipListMap<String, TemplatePathMatch> templateMatches = configTemplateMatchMap.get(key);
+                ConcurrentSkipListMap<String,TemplatePathMatch> templateMatches = configTemplateMatchMap.get(key);
                 if (templateMatches == null) {
                     // Ensure that if concurrent threads execute this block they
                     // all end up using the same ConcurrentSkipListMap instance
@@ -289,7 +290,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
      */
     @Deprecated
     public void doUpgrade(HttpServletRequest request, HttpServletResponse response, ServerEndpointConfig sec,
-            Map<String, String> pathParams) throws ServletException, IOException {
+            Map<String,String> pathParams) throws ServletException, IOException {
         UpgradeUtil.doUpgrade(this, request, response, sec, pathParams);
     }
 
@@ -325,7 +326,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
      *                                           connection
      */
     public void upgradeHttpToWebSocket(Object httpServletRequest, Object httpServletResponse, ServerEndpointConfig sec,
-            Map<String, String> pathParameters) throws IOException, DeploymentException {
+            Map<String,String> pathParameters) throws IOException, DeploymentException {
         try {
             UpgradeUtil.doUpgrade(this, (HttpServletRequest) httpServletRequest,
                     (HttpServletResponse) httpServletResponse, sec, pathParameters);
@@ -360,7 +361,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
 
         // Number of segments has to match
         Integer key = Integer.valueOf(pathUriTemplate.getSegmentCount());
-        ConcurrentSkipListMap<String, TemplatePathMatch> templateMatches = configTemplateMatchMap.get(key);
+        ConcurrentSkipListMap<String,TemplatePathMatch> templateMatches = configTemplateMatchMap.get(key);
 
         if (templateMatches == null) {
             // No templates with an equal number of segments so there will be
@@ -371,7 +372,7 @@ public class WsServerContainer extends WsWebSocketContainer implements ServerCon
         // List is in alphabetical order of normalised templates.
         // Correct match is the first one that matches.
         ServerEndpointConfig sec = null;
-        Map<String, String> pathParams = null;
+        Map<String,String> pathParams = null;
         for (TemplatePathMatch templateMatch : templateMatches.values()) {
             pathParams = templateMatch.getUriTemplate().match(pathUriTemplate);
             if (pathParams != null) {
