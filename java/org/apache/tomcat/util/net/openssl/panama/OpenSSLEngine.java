@@ -741,13 +741,56 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     @Override
     public synchronized void setEnabledProtocols(String[] protocols) {
-        if(initialized){return;}if(protocols==null){
-        // This is correct from the API docs
-        throw new IllegalArgumentException();}if(destroyed){return;}boolean sslv2=false;boolean sslv3=false;boolean tlsv1=false;boolean tlsv1_1=false;boolean tlsv1_2=false;boolean tlsv1_3=false;for(String p:protocols){if(!IMPLEMENTED_PROTOCOLS_SET.contains(p)){throw new IllegalArgumentException(sm.getString("engine.unsupportedProtocol",p));}switch(p){case Constants.SSL_PROTO_SSLv2->sslv2=true;case Constants.SSL_PROTO_SSLv3->sslv3=true;case Constants.SSL_PROTO_TLSv1->tlsv1=true;case Constants.SSL_PROTO_TLSv1_1->tlsv1_1=true;case Constants.SSL_PROTO_TLSv1_2->tlsv1_2=true;case Constants.SSL_PROTO_TLSv1_3->tlsv1_3=true;}}
+        if (initialized) {
+            return;
+        }
+        if (protocols == null) {
+            // This is correct from the API docs
+            throw new IllegalArgumentException();
+        }
+        if (destroyed) {
+            return;
+        }
+        boolean sslv2 = false;
+        boolean sslv3 = false;
+        boolean tlsv1 = false;
+        boolean tlsv1_1 = false;
+        boolean tlsv1_2 = false;
+        boolean tlsv1_3 = false;
+        for (String p : protocols) {
+            if (!IMPLEMENTED_PROTOCOLS_SET.contains(p)) {
+                throw new IllegalArgumentException(sm.getString("engine.unsupportedProtocol", p));
+            }
+            switch (p) {
+                case Constants.SSL_PROTO_SSLv2 -> sslv2 = true;
+                case Constants.SSL_PROTO_SSLv3 -> sslv3 = true;
+                case Constants.SSL_PROTO_TLSv1 -> tlsv1 = true;
+                case Constants.SSL_PROTO_TLSv1_1 -> tlsv1_1 = true;
+                case Constants.SSL_PROTO_TLSv1_2 -> tlsv1_2 = true;
+                case Constants.SSL_PROTO_TLSv1_3 -> tlsv1_3 = true;
+            }
+        }
         // Enable all and then disable what we not want
-        openssl_h_Compatibility.SSL_set_options(state.ssl,SSL_OP_ALL());
+        openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_ALL());
 
-        if(!sslv2){openssl_h_Compatibility.SSL_set_options(state.ssl,SSL_OP_NO_SSLv2());}if(!sslv3){openssl_h_Compatibility.SSL_set_options(state.ssl,SSL_OP_NO_SSLv3());}if(!tlsv1){openssl_h_Compatibility.SSL_set_options(state.ssl,SSL_OP_NO_TLSv1());}if(!tlsv1_1){openssl_h_Compatibility.SSL_set_options(state.ssl,SSL_OP_NO_TLSv1_1());}if(!tlsv1_2){openssl_h_Compatibility.SSL_set_options(state.ssl,SSL_OP_NO_TLSv1_2());}if(!tlsv1_3){openssl_h_Compatibility.SSL_set_options(state.ssl,SSL_OP_NO_TLSv1_3());}
+        if (!sslv2) {
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_SSLv2());
+        }
+        if (!sslv3) {
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_SSLv3());
+        }
+        if (!tlsv1) {
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1());
+        }
+        if (!tlsv1_1) {
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_1());
+        }
+        if (!tlsv1_2) {
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_2());
+        }
+        if (!tlsv1_3) {
+            openssl_h_Compatibility.SSL_set_options(state.ssl, SSL_OP_NO_TLSv1_3());
+        }
     }
 
     @Override
@@ -1031,7 +1074,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             state.certificateVerifyMode = switch (mode) {
                 case NONE -> SSL_VERIFY_NONE();
                 case REQUIRE -> SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
-                case OPTIONAL -> certificateVerificationOptionalNoCA ? OpenSSLContext.OPTIONAL_NO_CA : SSL_VERIFY_PEER();
+                case OPTIONAL ->
+                    certificateVerificationOptionalNoCA ? OpenSSLContext.OPTIONAL_NO_CA : SSL_VERIFY_PEER();
             };
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             int value = switch (mode) {

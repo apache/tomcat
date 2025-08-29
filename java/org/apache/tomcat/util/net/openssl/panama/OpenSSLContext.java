@@ -439,11 +439,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     /**
      * Set up the SSL_CTX.
      *
-     * @param kms Must contain a KeyManager of the type
-     *            {@code OpenSSLKeyManager}
-     * @param tms Must contain a TrustManager of the type
-     *            {@code X509TrustManager}
-     * @param sr Is not used for this implementation.
+     * @param kms Must contain a KeyManager of the type {@code OpenSSLKeyManager}
+     * @param tms Must contain a TrustManager of the type {@code X509TrustManager}
+     * @param sr  Is not used for this implementation.
+     *
      * @throws KeyManagementException if an error occurs
      */
     @Override
@@ -485,15 +484,14 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // List the ciphers that the client is permitted to negotiate
             if (minTlsVersion <= TLS1_2_VERSION()) {
-                if (SSL_CTX_set_cipher_list(state.sslCtx,
-                        localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
+                if (SSL_CTX_set_cipher_list(state.sslCtx, localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
                     log.warn(sm.getString("engine.failedCipherList", sslHostConfig.getCiphers()));
                 }
             }
             // Check if the ciphers have been changed from the defaults
-            if (maxTlsVersion >= TLS1_3_VERSION() && (sslHostConfig.getCiphers() != SSLHostConfig.DEFAULT_TLS_CIPHERS)) {
-                if (SSL_CTX_set_ciphersuites(state.sslCtx,
-                        localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
+            if (maxTlsVersion >= TLS1_3_VERSION() &&
+                    (sslHostConfig.getCiphers() != SSLHostConfig.DEFAULT_TLS_CIPHERS)) {
+                if (SSL_CTX_set_ciphersuites(state.sslCtx, localArena.allocateFrom(sslHostConfig.getCiphers())) <= 0) {
                     log.warn(sm.getString("engine.failedCipherSuite", sslHostConfig.getCiphers()));
                 }
             }
@@ -521,8 +519,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (tms != null) {
                 // Client certificate verification based on custom trust managers
                 x509TrustManager = chooseTrustManager(tms);
-                SSL_CTX_set_cert_verify_callback(state.sslCtx,
-                        SSL_CTX_set_cert_verify_callback$cb.allocate(new CertVerifyCallback(x509TrustManager), contextArena), state.sslCtx);
+                SSL_CTX_set_cert_verify_callback(state.sslCtx, SSL_CTX_set_cert_verify_callback$cb
+                        .allocate(new CertVerifyCallback(x509TrustManager), contextArena), state.sslCtx);
 
                 // Pass along the DER encoded certificates of the accepted client
                 // certificate issuers, so that their subjects can be presented
@@ -542,13 +540,17 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 }
             } else {
                 // Client certificate verification based on trusted CA files and dirs
-                MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null
-                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) : MemorySegment.NULL;
-                MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null
-                        ? localArena.allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) : MemorySegment.NULL;
-                if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null)
-                        && SSL_CTX_load_verify_locations(state.sslCtx,
-                                caCertificateFileNative, caCertificatePathNative) <= 0) {
+                MemorySegment caCertificateFileNative = sslHostConfig.getCaCertificateFile() != null ?
+                        localArena
+                                .allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile())) :
+                        MemorySegment.NULL;
+                MemorySegment caCertificatePathNative = sslHostConfig.getCaCertificatePath() != null ?
+                        localArena
+                                .allocateFrom(SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath())) :
+                        MemorySegment.NULL;
+                if ((sslHostConfig.getCaCertificateFile() != null || sslHostConfig.getCaCertificatePath() != null) &&
+                        SSL_CTX_load_verify_locations(state.sslCtx, caCertificateFileNative,
+                                caCertificatePathNative) <= 0) {
                     logLastError("openssl.errorConfiguringLocations");
                 } else {
                     var caCerts = SSL_CTX_get_client_CA_list(state.sslCtx);
@@ -559,8 +561,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                         }
                     } else {
                         // OpenSSL might crash here when passing null on some platforms
-                        if (MemorySegment.NULL.equals(caCertificateFileNative)
-                                || (SSL_add_file_cert_subjects_to_stack(caCerts, caCertificateFileNative) <= 0)) {
+                        if (MemorySegment.NULL.equals(caCertificateFileNative) ||
+                                (SSL_add_file_cert_subjects_to_stack(caCerts, caCertificateFileNative) <= 0)) {
                             caCerts = MemorySegment.NULL;
                         }
                     }
@@ -571,8 +573,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
 
             if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {
-                SSL_CTX_set_alpn_select_cb(state.sslCtx,
-                        SSL_CTX_set_alpn_select_cb$cb.allocate(new ALPNSelectCallback(negotiableProtocols), contextArena), state.sslCtx);
+                SSL_CTX_set_alpn_select_cb(state.sslCtx, SSL_CTX_set_alpn_select_cb$cb
+                        .allocate(new ALPNSelectCallback(negotiableProtocols), contextArena), state.sslCtx);
             }
 
             // Log any non fatal init errors
@@ -630,8 +632,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 if ((opts & SSL_OP_NO_SSLv3()) == 0) {
                     enabled.add(Constants.SSL_PROTO_SSLv3);
                 }
-                sslHostConfig.setEnabledProtocols(
-                        enabled.toArray(new String[0]));
+                sslHostConfig.setEnabledProtocols(enabled.toArray(new String[0]));
                 // Reconfigure the enabled ciphers
                 sslHostConfig.setEnabledCiphers(getCiphers(state.sslCtx));
             }
