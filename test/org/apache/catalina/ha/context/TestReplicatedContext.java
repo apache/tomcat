@@ -64,8 +64,7 @@ public class TestReplicatedContext extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             getServletContext().setAttribute("NULL", null);
             resp.getWriter().print("OK");
         }

@@ -101,11 +101,15 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
 
     @Test
     public void testNoNonceBuilders() {
-        Assert.assertEquals(CsrfPreventionFilter.PrefixPredicate.class, CsrfPreventionFilter.createNoNoncePredicate(null, "/images/*").getClass());
-        Assert.assertEquals(CsrfPreventionFilter.SuffixPredicate.class, CsrfPreventionFilter.createNoNoncePredicate(null, "*.png").getClass());
-        Assert.assertEquals(CsrfPreventionFilter.PatternPredicate.class, CsrfPreventionFilter.createNoNoncePredicate(null, "/^(/images/.*|.*\\.png)$/").getClass());
+        Assert.assertEquals(CsrfPreventionFilter.PrefixPredicate.class,
+                CsrfPreventionFilter.createNoNoncePredicate(null, "/images/*").getClass());
+        Assert.assertEquals(CsrfPreventionFilter.SuffixPredicate.class,
+                CsrfPreventionFilter.createNoNoncePredicate(null, "*.png").getClass());
+        Assert.assertEquals(CsrfPreventionFilter.PatternPredicate.class,
+                CsrfPreventionFilter.createNoNoncePredicate(null, "/^(/images/.*|.*\\.png)$/").getClass());
 
-        Collection<Predicate<String>> chain = CsrfPreventionFilter.createNoNoncePredicates(null, "*.png,/js/*,*.jpg,/images/*,mime:*/png,mime:image/*");
+        Collection<Predicate<String>> chain = CsrfPreventionFilter.createNoNoncePredicates(null,
+                "*.png,/js/*,*.jpg,/images/*,mime:*/png,mime:image/*");
 
         Assert.assertEquals(6, chain.size());
         Iterator<Predicate<String>> items = chain.iterator();
@@ -116,11 +120,13 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         Assert.assertEquals(CsrfPreventionFilter.PrefixPredicate.class, items.next().getClass());
         Predicate<String> item = items.next();
         Assert.assertEquals(CsrfPreventionFilter.MimePredicate.class, item.getClass());
-        Assert.assertEquals(CsrfPreventionFilter.SuffixPredicate.class, ((CsrfPreventionFilter.MimePredicate)item).getPredicate().getClass());
+        Assert.assertEquals(CsrfPreventionFilter.SuffixPredicate.class,
+                ((CsrfPreventionFilter.MimePredicate) item).getPredicate().getClass());
 
         item = items.next();
         Assert.assertEquals(CsrfPreventionFilter.MimePredicate.class, item.getClass());
-        Assert.assertEquals(CsrfPreventionFilter.PrefixPredicate.class, ((CsrfPreventionFilter.MimePredicate)item).getPredicate().getClass());
+        Assert.assertEquals(CsrfPreventionFilter.PrefixPredicate.class,
+                ((CsrfPreventionFilter.MimePredicate) item).getPredicate().getClass());
     }
 
     @Test
@@ -130,7 +136,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         Predicate<String> suffix = new CsrfPreventionFilter.SuffixPredicate(".png");
         Predicate<String> regex = new CsrfPreventionFilter.PatternPredicate("^(/images/.*|.*\\.png)$");
 
-        for(String url : urls) {
+        for (String url : urls) {
             Assert.assertTrue("Prefix match fails", prefix.test(url));
             Assert.assertTrue("Suffix match fails", suffix.test(url));
             Assert.assertTrue("Pattern match fails", regex.test(url));
@@ -159,7 +165,8 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
     @Test
     public void testNoNonceMimeMatcher() {
         MimeTypeServletContext context = new MimeTypeServletContext();
-        Predicate<String> mime = new CsrfPreventionFilter.MimePredicate(context, new CsrfPreventionFilter.PrefixPredicate("image/"));
+        Predicate<String> mime =
+                new CsrfPreventionFilter.MimePredicate(context, new CsrfPreventionFilter.PrefixPredicate("image/"));
 
         context.setMimeType("image/png");
         Assert.assertTrue("MIME match fails", mime.test("/images/home.png"));
@@ -191,6 +198,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
 
     private static class MimeTypeServletContext extends TesterServletContext {
         private String mimeType;
+
         public void setMimeType(String type) {
             mimeType = type;
         }
@@ -200,6 +208,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
             return mimeType;
         }
     }
+
     private static class NonEncodingResponse extends TesterHttpServletResponse {
 
         @Override

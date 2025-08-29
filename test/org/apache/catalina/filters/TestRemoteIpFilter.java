@@ -739,7 +739,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     public void testWithTomcatServer() throws Exception {
 
         // mostly default configuration : enable "x-forwarded-proto"
-        Map<String, String> remoteIpFilterParameter = new HashMap<>();
+        Map<String,String> remoteIpFilterParameter = new HashMap<>();
         remoteIpFilterParameter.put("protocolHeader", "x-forwarded-proto");
 
         // SETUP
@@ -766,8 +766,9 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
         getTomcatInstance().start();
 
         // TEST
-        HttpURLConnection httpURLConnection = (HttpURLConnection) new URL(
-                "http://localhost:" + tomcat.getConnector().getLocalPort() + "/test").openConnection();
+        HttpURLConnection httpURLConnection =
+                (HttpURLConnection) new URL("http://localhost:" + tomcat.getConnector().getLocalPort() + "/test")
+                        .openConnection();
         String expectedRemoteAddr = "my-remote-addr";
         httpURLConnection.addRequestProperty("x-forwarded-for", expectedRemoteAddr);
         httpURLConnection.addRequestProperty("x-forwarded-proto", "https");
@@ -789,7 +790,7 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     public void testJSessionIdSecureAttributeMissing() throws Exception {
 
         // mostly default configuration : enable "x-forwarded-proto"
-        Map<String, String> remoteIpFilterParameter = new HashMap<>();
+        Map<String,String> remoteIpFilterParameter = new HashMap<>();
         remoteIpFilterParameter.put("protocolHeader", "x-forwarded-proto");
 
         // SETUP
@@ -815,8 +816,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
 
         getTomcatInstance().start();
 
-        Map<String, List<String>> resHeaders = new HashMap<>();
-        Map<String, List<String>> reqHeaders = new HashMap<>();
+        Map<String,List<String>> resHeaders = new HashMap<>();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
         String expectedRemoteAddr = "my-remote-addr";
         List<String> forwardedFor = new ArrayList<>(1);
         forwardedFor.add(expectedRemoteAddr);

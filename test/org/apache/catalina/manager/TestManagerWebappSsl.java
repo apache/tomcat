@@ -42,9 +42,8 @@ import org.apache.tomcat.util.net.TesterSupport;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 /**
- * The keys and certificates used in this file are all available in svn and were
- * generated using a test CA the files for which are in the Tomcat PMC private
- * repository since not all of them are AL2 licensed.
+ * The keys and certificates used in this file are all available in svn and were generated using a test CA the files for
+ * which are in the Tomcat PMC private repository since not all of them are AL2 licensed.
  */
 @RunWith(Parameterized.class)
 public class TestManagerWebappSsl extends TomcatBaseTest {
@@ -52,12 +51,11 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        parameterSets.add(new Object[] {
-                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
-        parameterSets.add(new Object[] {
-                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
-        parameterSets.add(new Object[] {
-                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+        parameterSets.add(new Object[] { "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation" });
+        parameterSets.add(
+                new Object[] { "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation" });
+        parameterSets.add(new Object[] { "OpenSSL-FFM", Boolean.TRUE,
+                "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" });
 
         return parameterSets;
     }
@@ -90,7 +88,7 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
         tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
 
         appDir = new File(webappDir, "examples");
-        Context ctxt  = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+        Context ctxt = tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
         TesterSupport.initSsl(tomcat);
@@ -98,8 +96,7 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
 
         tomcat.start();
 
-        ByteChunk res = getUrl("https://localhost:" + getPort() +
-            "/examples/servlets/servlet/HelloWorldExample");
+        ByteChunk res = getUrl("https://localhost:" + getPort() + "/examples/servlets/servlet/HelloWorldExample");
         Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
 
         // Add a regular connector
@@ -163,8 +160,8 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
         Assert.assertFalse(client.getResponseBody().contains("Subject: CN=localhost"));
-        Assert.assertTrue(tomcat.getConnector().getProtocolHandlerClassName().contains("Apr")
-                || client.getResponseBody().contains("Subject: CN=Apache Tomcat Test CA"));
+        Assert.assertTrue(tomcat.getConnector().getProtocolHandlerClassName().contains("Apr") ||
+                client.getResponseBody().contains("Subject: CN=Apache Tomcat Test CA"));
 
         // @formatter:off
         client.setRequest(new String[] {

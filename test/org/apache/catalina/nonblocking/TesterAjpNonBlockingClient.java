@@ -35,22 +35,19 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * This is not a standard set of unit tests. This is a set of test clients for
- * AJP support of Servlet 3.1 non-blocking IO. It assumes that there is an httpd
- * instance listening on localhost:80 that is redirecting all traffic to a
- * default Tomcat instance of version 8 or above that includes the examples
- * web application.
+ * This is not a standard set of unit tests. This is a set of test clients for AJP support of Servlet 3.1 non-blocking
+ * IO. It assumes that there is an httpd instance listening on localhost:80 that is redirecting all traffic to a default
+ * Tomcat instance of version 8 or above that includes the examples web application.
  */
 public class TesterAjpNonBlockingClient extends TomcatBaseTest {
 
     @Test
     public void doTestAJPNonBlockingRead() throws Exception {
 
-        Map<String, List<String>> resHeaders = new HashMap<>();
+        Map<String,List<String>> resHeaders = new HashMap<>();
         ByteChunk out = new ByteChunk();
-        int rc = postUrl(true, new DataWriter(2000, 5), "http://localhost" +
-                "/examples/servlets/nonblocking/bytecounter",
-                out, resHeaders, null);
+        int rc = postUrl(true, new DataWriter(2000, 5),
+                "http://localhost" + "/examples/servlets/nonblocking/bytecounter", out, resHeaders, null);
 
         System.out.println(out.toString());
 
@@ -66,10 +63,8 @@ public class TesterAjpNonBlockingClient extends TomcatBaseTest {
 
         ByteChunk result = new ByteChunk();
         OutputStream os = s.getOutputStream();
-        os.write(("GET /examples/servlets/nonblocking/numberwriter HTTP/1.1\r\n" +
-                "Host: localhost\r\n" +
-                "Connection: close\r\n" +
-                "\r\n").getBytes(StandardCharsets.ISO_8859_1));
+        os.write(("GET /examples/servlets/nonblocking/numberwriter HTTP/1.1\r\n" + "Host: localhost\r\n" +
+                "Connection: close\r\n" + "\r\n").getBytes(StandardCharsets.ISO_8859_1));
         os.flush();
 
         InputStream is = s.getInputStream();

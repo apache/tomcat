@@ -55,14 +55,12 @@ public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest
 
         Tomcat tomcat = getTomcatInstance();
         // Need to make sure we see a leak for the right reasons
-        tomcat.getServer().addLifecycleListener(
-                new JreMemoryLeakPreventionListener());
+        tomcat.getServer().addLifecycleListener(new JreMemoryLeakPreventionListener());
 
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
 
-        Tomcat.addServlet(ctx, "leakServlet1",
-                "org.apache.tomcat.unittest.TesterLeakingServlet1");
+        Tomcat.addServlet(ctx, "leakServlet1", "org.apache.tomcat.unittest.TesterLeakingServlet1");
         ctx.addServletMappingDecoded("/leak1", "leakServlet1");
 
         tomcat.start();
@@ -71,20 +69,17 @@ public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest
         ((ThreadPoolExecutor) executor).setThreadRenewalDelay(-1);
 
         // Configure logging filter to check leak message appears
-        TesterLogValidationFilter f = TesterLogValidationFilter.add(null,
-                "The web application [ROOT] created a ThreadLocal with key of", null,
-                "org.apache.catalina.loader.WebappClassLoaderBase");
+        TesterLogValidationFilter f =
+                TesterLogValidationFilter.add(null, "The web application [ROOT] created a ThreadLocal with key of",
+                        null, "org.apache.catalina.loader.WebappClassLoaderBase");
 
         // Need to force loading of all web application classes via the web
         // application class loader
-        loadClass("TesterCounter",
-                (WebappClassLoaderBase) ctx.getLoader().getClassLoader());
-        loadClass("TesterLeakingServlet1",
-                (WebappClassLoaderBase) ctx.getLoader().getClassLoader());
+        loadClass("TesterCounter", (WebappClassLoaderBase) ctx.getLoader().getClassLoader());
+        loadClass("TesterLeakingServlet1", (WebappClassLoaderBase) ctx.getLoader().getClassLoader());
 
         // This will trigger the ThreadLocal creation
-        int rc = getUrl("http://localhost:" + getPort() + "/leak1",
-                new ByteChunk(), null);
+        int rc = getUrl("http://localhost:" + getPort() + "/leak1", new ByteChunk(), null);
 
         // Make sure request is OK
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
@@ -95,8 +90,7 @@ public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest
         ctx = null;
 
         // Make sure we have a memory leak
-        String[] leaks = ((StandardHost) tomcat.getHost())
-                .findReloadedContextMemoryLeaks();
+        String[] leaks = ((StandardHost) tomcat.getHost()).findReloadedContextMemoryLeaks();
         Assert.assertNotNull(leaks);
         Assert.assertTrue(leaks.length > 0);
 
@@ -110,14 +104,12 @@ public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest
 
         Tomcat tomcat = getTomcatInstance();
         // Need to make sure we see a leak for the right reasons
-        tomcat.getServer().addLifecycleListener(
-                new JreMemoryLeakPreventionListener());
+        tomcat.getServer().addLifecycleListener(new JreMemoryLeakPreventionListener());
 
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
 
-        Tomcat.addServlet(ctx, "leakServlet2",
-                "org.apache.tomcat.unittest.TesterLeakingServlet2");
+        Tomcat.addServlet(ctx, "leakServlet2", "org.apache.tomcat.unittest.TesterLeakingServlet2");
         ctx.addServletMappingDecoded("/leak2", "leakServlet2");
 
         tomcat.start();
@@ -126,22 +118,18 @@ public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest
         ((ThreadPoolExecutor) executor).setThreadRenewalDelay(-1);
 
         // Configure logging filter to check leak message appears
-        TesterLogValidationFilter f = TesterLogValidationFilter.add(null,
-                "The web application [ROOT] created a ThreadLocal with key of", null,
-                "org.apache.catalina.loader.WebappClassLoaderBase");
+        TesterLogValidationFilter f =
+                TesterLogValidationFilter.add(null, "The web application [ROOT] created a ThreadLocal with key of",
+                        null, "org.apache.catalina.loader.WebappClassLoaderBase");
 
         // Need to force loading of all web application classes via the web
         // application class loader
-        loadClass("TesterCounter",
-                (WebappClassLoaderBase) ctx.getLoader().getClassLoader());
-        loadClass("TesterThreadScopedHolder",
-                (WebappClassLoaderBase) ctx.getLoader().getClassLoader());
-        loadClass("TesterLeakingServlet2",
-                (WebappClassLoaderBase) ctx.getLoader().getClassLoader());
+        loadClass("TesterCounter", (WebappClassLoaderBase) ctx.getLoader().getClassLoader());
+        loadClass("TesterThreadScopedHolder", (WebappClassLoaderBase) ctx.getLoader().getClassLoader());
+        loadClass("TesterLeakingServlet2", (WebappClassLoaderBase) ctx.getLoader().getClassLoader());
 
         // This will trigger the ThreadLocal creation
-        int rc = getUrl("http://localhost:" + getPort() + "/leak2",
-                new ByteChunk(), null);
+        int rc = getUrl("http://localhost:" + getPort() + "/leak2", new ByteChunk(), null);
 
         // Make sure request is OK
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
@@ -152,8 +140,7 @@ public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest
         ctx = null;
 
         // Make sure we have a memory leak
-        String[] leaks = ((StandardHost) tomcat.getHost())
-                .findReloadedContextMemoryLeaks();
+        String[] leaks = ((StandardHost) tomcat.getHost()).findReloadedContextMemoryLeaks();
         Assert.assertNotNull(leaks);
         Assert.assertTrue(leaks.length > 0);
 
@@ -163,23 +150,18 @@ public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest
 
 
     /**
-     * Utility method to ensure that classes are loaded by the
-     * WebappClassLoader. We can't just create classes since they will be loaded
-     * by the current class loader rather than the WebappClassLoader. This would
-     * mean that no leak occurred making the test for a leak rather pointless
-     * So, we load the bytes via the current class loader but define the class
-     * with the WebappClassLoader.
-     *
-     * This method assumes that all classes are in the current package.
+     * Utility method to ensure that classes are loaded by the WebappClassLoader. We can't just create classes since
+     * they will be loaded by the current class loader rather than the WebappClassLoader. This would mean that no leak
+     * occurred making the test for a leak rather pointless So, we load the bytes via the current class loader but
+     * define the class with the WebappClassLoader. This method assumes that all classes are in the current package.
      */
     private void loadClass(String name, WebappClassLoaderBase cl) throws Exception {
-        try (InputStream is = cl.getResourceAsStream(
-                "org/apache/tomcat/unittest/" + name + ".class")) {
+        try (InputStream is = cl.getResourceAsStream("org/apache/tomcat/unittest/" + name + ".class")) {
             // We know roughly how big the class will be (~ 1K) so allow 2k as a
             // starting point
             byte[] classBytes = new byte[2048];
             int offset = 0;
-            int read = is.read(classBytes, offset, classBytes.length-offset);
+            int read = is.read(classBytes, offset, classBytes.length - offset);
             while (read > -1) {
                 offset += read;
                 if (offset == classBytes.length) {
@@ -188,11 +170,10 @@ public class TesterWebappClassLoaderThreadLocalMemoryLeak extends TomcatBaseTest
                     System.arraycopy(classBytes, 0, tmp, 0, classBytes.length);
                     classBytes = tmp;
                 }
-                read = is.read(classBytes, offset, classBytes.length-offset);
+                read = is.read(classBytes, offset, classBytes.length - offset);
             }
-            Class<?> lpClass = cl.doDefineClass(
-                    "org.apache.tomcat.unittest." + name, classBytes, 0,
-                    offset, cl.getClass().getProtectionDomain());
+            Class<?> lpClass = cl.doDefineClass("org.apache.tomcat.unittest." + name, classBytes, 0, offset,
+                    cl.getClass().getProtectionDomain());
             // Make sure we can create an instance
             lpClass.getConstructor().newInstance();
         }

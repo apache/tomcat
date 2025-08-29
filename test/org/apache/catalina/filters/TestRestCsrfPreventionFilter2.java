@@ -170,8 +170,8 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     private void testInvalidPostWithRequestParams() throws Exception {
         String validBody = Constants.CSRF_REST_NONCE_HEADER_NAME + "=" + validNonce;
         String invalidbody1 = Constants.CSRF_REST_NONCE_HEADER_NAME + "=" + INVALID_NONCE_1;
-        String invalidbody2 = Constants.CSRF_REST_NONCE_HEADER_NAME + "=" +
-                Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE;
+        String invalidbody2 =
+                Constants.CSRF_REST_NONCE_HEADER_NAME + "=" + Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE;
         doTest(METHOD_POST, REMOVE_ALL_CUSTOMERS, CREDENTIALS, validBody.getBytes(StandardCharsets.ISO_8859_1),
                 USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null, null, true,
                 Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
@@ -186,8 +186,8 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     private void doTest(String method, String uri, BasicCredentials credentials, byte[] body, boolean useCookie,
             int expectedRC, String expectedResponse, String nonce, boolean expectCsrfRH, String expectedCsrfRHV)
             throws Exception {
-        Map<String, List<String>> reqHeaders = new HashMap<>();
-        Map<String, List<String>> respHeaders = new HashMap<>();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
+        Map<String,List<String>> respHeaders = new HashMap<>();
 
         addNonce(reqHeaders, nonce, n -> Objects.nonNull(n));
 
@@ -232,7 +232,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
         }
     }
 
-    private void addCookies(Map<String, List<String>> reqHeaders, Predicate<List<String>> tester) {
+    private void addCookies(Map<String,List<String>> reqHeaders, Predicate<List<String>> tester) {
         if (tester.test(cookies)) {
             StringBuilder cookieHeader = new StringBuilder();
             boolean first = true;
@@ -248,20 +248,20 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
         }
     }
 
-    private void addNonce(Map<String, List<String>> reqHeaders, String nonce, Predicate<String> tester) {
+    private void addNonce(Map<String,List<String>> reqHeaders, String nonce, Predicate<String> tester) {
         if (tester.test(nonce)) {
             addRequestHeader(reqHeaders, Constants.CSRF_REST_NONCE_HEADER_NAME, nonce);
         }
     }
 
-    private void addCredentials(Map<String, List<String>> reqHeaders, BasicCredentials credentials,
+    private void addCredentials(Map<String,List<String>> reqHeaders, BasicCredentials credentials,
             Predicate<BasicCredentials> tester) {
         if (tester.test(credentials)) {
             addRequestHeader(reqHeaders, CLIENT_AUTH_HEADER, credentials.getCredentials());
         }
     }
 
-    private void addRequestHeader(Map<String, List<String>> reqHeaders, String key, String value) {
+    private void addRequestHeader(Map<String,List<String>> reqHeaders, String key, String value) {
         List<String> valueList = new ArrayList<>(1);
         valueList.add(value);
         reqHeaders.put(key, valueList);

@@ -53,8 +53,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
 
         copyResource(PACKAGE_PREFIX + "/TesterNeverWeavedClass.class",
                 new File(classes, "TesterNeverWeavedClass.class"));
-        copyResource(PACKAGE_PREFIX + "/TesterUnweavedClass.class",
-                new File(classes, "TesterUnweavedClass.class"));
+        copyResource(PACKAGE_PREFIX + "/TesterUnweavedClass.class", new File(classes, "TesterUnweavedClass.class"));
 
     }
 
@@ -269,11 +268,9 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
                 Boolean.valueOf(copiedLoader.getClearReferencesStopTimerThreads()));
         Assert.assertEquals("getContextName did not match.", this.loader.getContextName(),
                 copiedLoader.getContextName());
-        Assert.assertEquals("getDelegate did not match.",
-                Boolean.valueOf(this.loader.getDelegate()),
+        Assert.assertEquals("getDelegate did not match.", Boolean.valueOf(this.loader.getDelegate()),
                 Boolean.valueOf(copiedLoader.getDelegate()));
-        Assert.assertEquals("getURLs did not match.", this.loader.getURLs().length,
-                copiedLoader.getURLs().length);
+        Assert.assertEquals("getURLs did not match.", this.loader.getURLs().length, copiedLoader.getURLs().length);
         Assert.assertSame("getParent did not match.", this.loader.getParent(), copiedLoader.getParent());
 
     }
@@ -293,8 +290,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         }
     }
 
-    private static String invokeDoMethodOnClass(WebappClassLoaderBase loader, String className)
-            throws Exception {
+    private static String invokeDoMethodOnClass(WebappClassLoaderBase loader, String className) throws Exception {
 
         Class<?> c = loader.findClass("org.apache.catalina.loader." + className);
         Assert.assertNotNull("The loaded class should not be null.", c);
@@ -317,8 +313,7 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
         }
 
         @Override
-        public byte[] transform(ClassLoader loader, String className, Class<?> x,
-                                ProtectionDomain y, byte[] b) {
+        public byte[] transform(ClassLoader loader, String className, Class<?> x, ProtectionDomain y, byte[] b) {
 
             if (CLASS_TO_WEAVE.equals(className)) {
                 return this.replacement;
@@ -331,67 +326,55 @@ public class TestWebappClassLoaderWeaving extends TomcatBaseTest {
     }
 
     /**
-     * Compiled version of org.apache.catalina.loader.TesterUnweavedClass, except that
-     * the doMethod method returns "Hello, Weaver #1!". Compiled with Oracle Java 1.6.0_51.
+     * Compiled version of org.apache.catalina.loader.TesterUnweavedClass, except that the doMethod method returns
+     * "Hello, Weaver #1!". Compiled with Oracle Java 1.6.0_51.
      */
-    private static final byte[] WEAVED_REPLACEMENT_1 = new byte[] {
-            -54, -2, -70, -66, 0, 0, 0, 50, 0, 17, 10, 0, 4, 0, 13, 8, 0, 14, 7, 0, 15, 7, 0, 16, 1,
-            0, 6, 60, 105, 110, 105, 116, 62, 1, 0, 3, 40, 41, 86, 1, 0, 4, 67, 111, 100, 101, 1, 0,
-            15, 76, 105, 110, 101, 78, 117, 109, 98, 101, 114, 84, 97, 98, 108, 101, 1, 0, 8, 100,
-            111, 77, 101, 116, 104, 111, 100, 1, 0, 20, 40, 41, 76, 106, 97, 118, 97, 47, 108, 97,
-            110, 103, 47, 83, 116, 114, 105, 110, 103, 59, 1, 0, 10, 83, 111, 117, 114, 99, 101, 70,
-            105, 108, 101, 1, 0, 24, 84, 101, 115, 116, 101, 114, 85, 110, 119, 101, 97, 118, 101,
-            100, 67, 108, 97, 115, 115, 46, 106, 97, 118, 97, 12, 0, 5, 0, 6, 1, 0, 17, 72, 101,
-            108, 108, 111, 44, 32, 87, 101, 97, 118, 101, 114, 32, 35, 49, 33, 1, 0, 46, 111, 114,
-            103, 47, 97, 112, 97, 99, 104, 101, 47, 99, 97, 116, 97, 108, 105, 110, 97, 47, 108,
-            111, 97, 100, 101, 114, 47, 84, 101, 115, 116, 101, 114, 85, 110, 119, 101, 97, 118,
-            101, 100, 67, 108, 97, 115, 115, 1, 0, 16, 106, 97, 118, 97, 47, 108, 97, 110, 103, 47,
-            79, 98, 106, 101, 99, 116, 0, 33, 0, 3, 0, 4, 0, 0, 0, 0, 0, 2, 0, 1, 0, 5, 0, 6, 0, 1,
-            0, 7, 0, 0, 0, 29, 0, 1, 0, 1, 0, 0, 0, 5, 42, -73, 0, 1, -79, 0, 0, 0, 1, 0, 8, 0, 0,
-            0, 6, 0, 1, 0, 0, 0, 19, 0, 1, 0, 9, 0, 10, 0, 1, 0, 7, 0, 0, 0, 27, 0, 1, 0, 1, 0, 0,
-            0, 3, 18, 2, -80, 0, 0, 0, 1, 0, 8, 0, 0, 0, 6, 0, 1, 0, 0, 0, 22, 0, 1, 0, 11, 0, 0, 0,
-            2, 0, 12
-    };
+    private static final byte[] WEAVED_REPLACEMENT_1 = new byte[] { -54, -2, -70, -66, 0, 0, 0, 50, 0, 17, 10, 0, 4, 0,
+            13, 8, 0, 14, 7, 0, 15, 7, 0, 16, 1, 0, 6, 60, 105, 110, 105, 116, 62, 1, 0, 3, 40, 41, 86, 1, 0, 4, 67,
+            111, 100, 101, 1, 0, 15, 76, 105, 110, 101, 78, 117, 109, 98, 101, 114, 84, 97, 98, 108, 101, 1, 0, 8, 100,
+            111, 77, 101, 116, 104, 111, 100, 1, 0, 20, 40, 41, 76, 106, 97, 118, 97, 47, 108, 97, 110, 103, 47, 83,
+            116, 114, 105, 110, 103, 59, 1, 0, 10, 83, 111, 117, 114, 99, 101, 70, 105, 108, 101, 1, 0, 24, 84, 101,
+            115, 116, 101, 114, 85, 110, 119, 101, 97, 118, 101, 100, 67, 108, 97, 115, 115, 46, 106, 97, 118, 97, 12,
+            0, 5, 0, 6, 1, 0, 17, 72, 101, 108, 108, 111, 44, 32, 87, 101, 97, 118, 101, 114, 32, 35, 49, 33, 1, 0, 46,
+            111, 114, 103, 47, 97, 112, 97, 99, 104, 101, 47, 99, 97, 116, 97, 108, 105, 110, 97, 47, 108, 111, 97, 100,
+            101, 114, 47, 84, 101, 115, 116, 101, 114, 85, 110, 119, 101, 97, 118, 101, 100, 67, 108, 97, 115, 115, 1,
+            0, 16, 106, 97, 118, 97, 47, 108, 97, 110, 103, 47, 79, 98, 106, 101, 99, 116, 0, 33, 0, 3, 0, 4, 0, 0, 0,
+            0, 0, 2, 0, 1, 0, 5, 0, 6, 0, 1, 0, 7, 0, 0, 0, 29, 0, 1, 0, 1, 0, 0, 0, 5, 42, -73, 0, 1, -79, 0, 0, 0, 1,
+            0, 8, 0, 0, 0, 6, 0, 1, 0, 0, 0, 19, 0, 1, 0, 9, 0, 10, 0, 1, 0, 7, 0, 0, 0, 27, 0, 1, 0, 1, 0, 0, 0, 3, 18,
+            2, -80, 0, 0, 0, 1, 0, 8, 0, 0, 0, 6, 0, 1, 0, 0, 0, 22, 0, 1, 0, 11, 0, 0, 0, 2, 0, 12 };
 
     /**
-     * Compiled version of org.apache.catalina.loader.TesterUnweavedClass, except that
-     * the doMethod method returns "Hello, Weaver #2!". Compiled with Oracle Java 1.6.0_51.
+     * Compiled version of org.apache.catalina.loader.TesterUnweavedClass, except that the doMethod method returns
+     * "Hello, Weaver #2!". Compiled with Oracle Java 1.6.0_51.
      */
-    private static final byte[] WEAVED_REPLACEMENT_2 = new byte[] {
-            -54, -2, -70, -66, 0, 0, 0, 50, 0, 17, 10, 0, 4, 0, 13, 8, 0, 14, 7, 0, 15, 7, 0, 16, 1,
-            0, 6, 60, 105, 110, 105, 116, 62, 1, 0, 3, 40, 41, 86, 1, 0, 4, 67, 111, 100, 101, 1, 0,
-            15, 76, 105, 110, 101, 78, 117, 109, 98, 101, 114, 84, 97, 98, 108, 101, 1, 0, 8, 100,
-            111, 77, 101, 116, 104, 111, 100, 1, 0, 20, 40, 41, 76, 106, 97, 118, 97, 47, 108, 97,
-            110, 103, 47, 83, 116, 114, 105, 110, 103, 59, 1, 0, 10, 83, 111, 117, 114, 99, 101, 70,
-            105, 108, 101, 1, 0, 24, 84, 101, 115, 116, 101, 114, 85, 110, 119, 101, 97, 118, 101,
-            100, 67, 108, 97, 115, 115, 46, 106, 97, 118, 97, 12, 0, 5, 0, 6, 1, 0, 17, 72, 101,
-            108, 108, 111, 44, 32, 87, 101, 97, 118, 101, 114, 32, 35, 50, 33, 1, 0, 46, 111, 114,
-            103, 47, 97, 112, 97, 99, 104, 101, 47, 99, 97, 116, 97, 108, 105, 110, 97, 47, 108,
-            111, 97, 100, 101, 114, 47, 84, 101, 115, 116, 101, 114, 85, 110, 119, 101, 97, 118,
-            101, 100, 67, 108, 97, 115, 115, 1, 0, 16, 106, 97, 118, 97, 47, 108, 97, 110, 103, 47,
-            79, 98, 106, 101, 99, 116, 0, 33, 0, 3, 0, 4, 0, 0, 0, 0, 0, 2, 0, 1, 0, 5, 0, 6, 0, 1,
-            0, 7, 0, 0, 0, 29, 0, 1, 0, 1, 0, 0, 0, 5, 42, -73, 0, 1, -79, 0, 0, 0, 1, 0, 8, 0, 0,
-            0, 6, 0, 1, 0, 0, 0, 19, 0, 1, 0, 9, 0, 10, 0, 1, 0, 7, 0, 0, 0, 27, 0, 1, 0, 1, 0, 0,
-            0, 3, 18, 2, -80, 0, 0, 0, 1, 0, 8, 0, 0, 0, 6, 0, 1, 0, 0, 0, 22, 0, 1, 0, 11, 0, 0, 0,
-            2, 0, 12
-    };
+    private static final byte[] WEAVED_REPLACEMENT_2 = new byte[] { -54, -2, -70, -66, 0, 0, 0, 50, 0, 17, 10, 0, 4, 0,
+            13, 8, 0, 14, 7, 0, 15, 7, 0, 16, 1, 0, 6, 60, 105, 110, 105, 116, 62, 1, 0, 3, 40, 41, 86, 1, 0, 4, 67,
+            111, 100, 101, 1, 0, 15, 76, 105, 110, 101, 78, 117, 109, 98, 101, 114, 84, 97, 98, 108, 101, 1, 0, 8, 100,
+            111, 77, 101, 116, 104, 111, 100, 1, 0, 20, 40, 41, 76, 106, 97, 118, 97, 47, 108, 97, 110, 103, 47, 83,
+            116, 114, 105, 110, 103, 59, 1, 0, 10, 83, 111, 117, 114, 99, 101, 70, 105, 108, 101, 1, 0, 24, 84, 101,
+            115, 116, 101, 114, 85, 110, 119, 101, 97, 118, 101, 100, 67, 108, 97, 115, 115, 46, 106, 97, 118, 97, 12,
+            0, 5, 0, 6, 1, 0, 17, 72, 101, 108, 108, 111, 44, 32, 87, 101, 97, 118, 101, 114, 32, 35, 50, 33, 1, 0, 46,
+            111, 114, 103, 47, 97, 112, 97, 99, 104, 101, 47, 99, 97, 116, 97, 108, 105, 110, 97, 47, 108, 111, 97, 100,
+            101, 114, 47, 84, 101, 115, 116, 101, 114, 85, 110, 119, 101, 97, 118, 101, 100, 67, 108, 97, 115, 115, 1,
+            0, 16, 106, 97, 118, 97, 47, 108, 97, 110, 103, 47, 79, 98, 106, 101, 99, 116, 0, 33, 0, 3, 0, 4, 0, 0, 0,
+            0, 0, 2, 0, 1, 0, 5, 0, 6, 0, 1, 0, 7, 0, 0, 0, 29, 0, 1, 0, 1, 0, 0, 0, 5, 42, -73, 0, 1, -79, 0, 0, 0, 1,
+            0, 8, 0, 0, 0, 6, 0, 1, 0, 0, 0, 19, 0, 1, 0, 9, 0, 10, 0, 1, 0, 7, 0, 0, 0, 27, 0, 1, 0, 1, 0, 0, 0, 3, 18,
+            2, -80, 0, 0, 0, 1, 0, 8, 0, 0, 0, 6, 0, 1, 0, 0, 0, 22, 0, 1, 0, 11, 0, 0, 0, 2, 0, 12 };
 
     /*
-     * The WEAVED_REPLACEMENT_1 and WEAVED_REPLACEMENT_2 field contents are generated using the
-     * following code. To regenerate them, alter the TesterUnweavedClass code as desired, recompile,
-     * and run this main method.
+     * The WEAVED_REPLACEMENT_1 and WEAVED_REPLACEMENT_2 field contents are generated using the following code. To
+     * regenerate them, alter the TesterUnweavedClass code as desired, recompile, and run this main method.
      */
     public static void main(String... arguments) throws Exception {
         ClassLoader cl = TestWebappClassLoaderWeaving.class.getClassLoader();
-        try (InputStream input = cl.getResourceAsStream(
-                "org/apache/catalina/loader/TesterUnweavedClass.class")) {
+        try (InputStream input = cl.getResourceAsStream("org/apache/catalina/loader/TesterUnweavedClass.class")) {
 
             StringBuilder builder = new StringBuilder();
             builder.append("            ");
 
             System.out.println("    private static final byte[] WEAVED_REPLACEMENT_1 = new byte[] {");
             for (int i = 0, b = input.read(); b >= 0; i++, b = input.read()) {
-                String value = "" + ((byte)b);
+                String value = "" + ((byte) b);
                 if (builder.length() + value.length() > 97) {
                     builder.append(',');
                     System.out.println(builder.toString());

@@ -49,8 +49,8 @@ import javax.servlet.http.PushBuilder;
 
 public class TesterHttpServletRequest implements HttpServletRequest {
 
-    private final Map<String, Object> attributes = new HashMap<>();
-    private final Map<String, List<String>> headers = new HashMap<>();
+    private final Map<String,Object> attributes = new HashMap<>();
+    private final Map<String,List<String>> headers = new HashMap<>();
     private String method;
     private String scheme;
     private String serverName;
@@ -117,7 +117,7 @@ public class TesterHttpServletRequest implements HttpServletRequest {
      * This test implementation is hard coded to return an empty Hashmap.
      */
     @Override
-    public Map<String, String[]> getParameterMap() {
+    public Map<String,String[]> getParameterMap() {
         return new HashMap<>();
     }
 
@@ -472,10 +472,11 @@ public class TesterHttpServletRequest implements HttpServletRequest {
      */
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
-        throws IOException, ServletException {
+            throws IOException, ServletException {
         try {
             return httpUpgradeHandlerClass.getDeclaredConstructor().newInstance();
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException ignore) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                IllegalAccessException ignore) {
         }
         return null;
     }
@@ -491,7 +492,7 @@ public class TesterHttpServletRequest implements HttpServletRequest {
     }
 
     @Override
-    public Map<String, String> getTrailerFields() {
+    public Map<String,String> getTrailerFields() {
         throw new RuntimeException("Not implemented");
     }
 }
