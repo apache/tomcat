@@ -45,7 +45,8 @@ import org.apache.tomcat.util.descriptor.web.ErrorPage;
 @RunWith(Parameterized.class)
 public class TestHttpServletResponseSendError extends TomcatBaseTest {
 
-    /*
+    /* @formatter:off
+     *
      * Implementation notes:
      * Original Request
      *   - async
@@ -57,6 +58,8 @@ public class TestHttpServletResponseSendError extends TomcatBaseTest {
      *   - async
      *     - complete
      *     - dispatch
+     *
+     * @formatter:on
      */
 
     private enum AsyncErrorPoint {
