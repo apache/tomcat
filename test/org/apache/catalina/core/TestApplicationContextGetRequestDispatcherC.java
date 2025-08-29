@@ -46,14 +46,12 @@ public class TestApplicationContextGetRequestDispatcherC extends TomcatBaseTest 
 
     @Parameters(name = "{index}: pathInfoRequest[{0}], pathInfoDispatcher[{1}]")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-            // Defaults
-            { "/a/b/c", "/a/b/c", null, null },
-            { "/a%2fb%5cc/%25", "/a/b/c/%", "decode", "decode" },
-            { "/a%2fb%5cc/%25", "/a/b%5cc/%25", "decode", "passthrough" },
-            { "/a%2fb%5cc/%25", "/a%2fb/c/%25", "passthrough", "decode" },
-            { "/a%2fb%5cc/%25", "/a%2fb%5cc/%25", "passthrough", "passthrough" },
-        });
+        return Arrays.asList(new Object[][] {
+                // Defaults
+                { "/a/b/c", "/a/b/c", null, null }, { "/a%2fb%5cc/%25", "/a/b/c/%", "decode", "decode" },
+                { "/a%2fb%5cc/%25", "/a/b%5cc/%25", "decode", "passthrough" },
+                { "/a%2fb%5cc/%25", "/a%2fb/c/%25", "passthrough", "decode" },
+                { "/a%2fb%5cc/%25", "/a%2fb%5cc/%25", "passthrough", "passthrough" }, });
     }
 
 

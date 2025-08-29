@@ -53,6 +53,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         TEXT_8K = sb.toString();
         BYTES_8K = TEXT_8K.getBytes(StandardCharsets.UTF_8);
     }
+
     @Test
     public void testPathParmsRootNone() throws Exception {
         pathParamTest("/", "none");
@@ -154,8 +155,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             PrintWriter pw = resp.getWriter();
             String sessionId = req.getRequestedSessionId();
@@ -181,8 +181,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         pathParamExtensionTest("/testapp/blah;x=y/blah.txt", "none");
     }
 
-    private void pathParamExtensionTest(String path, String expected)
-            throws Exception {
+    private void pathParamExtensionTest(String path, String expected) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -228,8 +227,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         doTestUriDecoding("/foo%ed%a0%80", "UTF-8", "/foo\uFFFD\uFFFD\uFFFD");
     }
 
-    private void doTestUriDecoding(String path, String encoding,
-            String expectedPathInfo) throws Exception{
+    private void doTestUriDecoding(String path, String encoding, String expectedPathInfo) throws Exception {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -245,8 +243,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         tomcat.start();
 
-        int rc = getUrl("http://localhost:" + getPort() + path,
-                new ByteChunk(), null);
+        int rc = getUrl("http://localhost:" + getPort() + path, new ByteChunk(), null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         Assert.assertEquals(expectedPathInfo, servlet.getPathInfo());
@@ -263,8 +260,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             // Not thread safe. Concurrent requests to this servlet will
             // over-write all the results but the last processed.
@@ -303,7 +299,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         // @formatter:on
 
         client.setPort(getPort());
-        client.setRequest(new String[] {request});
+        client.setRequest(new String[] { request });
 
         client.connect();
         client.sendRequest();
@@ -322,8 +318,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         long startTime = System.nanoTime();
         t.join(5000);
         long endTime = System.nanoTime();
-        log.info("Waited for servlet thread to stop for "
-                + (endTime - startTime) / 1000000 + " ms");
+        log.info("Waited for servlet thread to stop for " + (endTime - startTime) / 1000000 + " ms");
 
         Assert.assertTrue(servlet.isCompleted());
     }
@@ -368,8 +363,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
@@ -389,7 +383,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                             // because the client has gone away). In some cases
                             // there may be a large (ish) buffer to fill before
                             // the write fails.
-                            for (int j = 0 ; j < 8; j++) {
+                            for (int j = 0; j < 8; j++) {
                                 os.write(BYTES_8K);
                             }
                             os.flush();

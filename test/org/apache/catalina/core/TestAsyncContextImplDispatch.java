@@ -40,9 +40,8 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Written for the specific test case of async Servlet, dispatches to sync
- * Servlet that then tries to call startAsync() but covers all combinations
- * for completeness.
+ * Written for the specific test case of async Servlet, dispatches to sync Servlet that then tries to call startAsync()
+ * but covers all combinations for completeness.
  */
 @RunWith(Parameterized.class)
 public class TestAsyncContextImplDispatch extends TomcatBaseTest {
@@ -54,11 +53,12 @@ public class TestAsyncContextImplDispatch extends TomcatBaseTest {
         for (Boolean targetAsyncSupported : booleans) {
             for (Boolean dispatchAsyncSupported : booleans) {
                 for (Boolean dispatchAsyncStart : booleans) {
-                    Boolean allowed = Boolean.valueOf(!dispatchAsyncStart.booleanValue() ||
-                            targetAsyncSupported.booleanValue() && dispatchAsyncSupported.booleanValue() &&
-                                    dispatchAsyncStart.booleanValue());
+                    Boolean allowed =
+                            Boolean.valueOf(!dispatchAsyncStart.booleanValue() || targetAsyncSupported.booleanValue() &&
+                                    dispatchAsyncSupported.booleanValue() && dispatchAsyncStart.booleanValue());
 
-                    parameterSets.add(new Object[] { targetAsyncSupported, dispatchAsyncSupported, dispatchAsyncStart, allowed} );
+                    parameterSets.add(
+                            new Object[] { targetAsyncSupported, dispatchAsyncSupported, dispatchAsyncStart, allowed });
                 }
             }
         }
@@ -115,8 +115,7 @@ public class TestAsyncContextImplDispatch extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             req.getRequestDispatcher("/dispatch").forward(req, resp);
         }
@@ -127,7 +126,7 @@ public class TestAsyncContextImplDispatch extends TomcatBaseTest {
 
         private static final long serialVersionUID = 1L;
 
-        private final  boolean start;
+        private final boolean start;
 
         public TesterDispatchServlet(boolean start) {
             this.start = start;
@@ -135,8 +134,7 @@ public class TestAsyncContextImplDispatch extends TomcatBaseTest {
 
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             if (start) {
                 AsyncContext ac = req.startAsync();

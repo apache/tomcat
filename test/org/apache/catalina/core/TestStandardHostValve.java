@@ -74,8 +74,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
     }
 
 
-    private void doTestErrorPageHandling(int error, String exception, String report)
-            throws Exception {
+    private void doTestErrorPageHandling(int error, String exception, String report) throws Exception {
 
         // Set up a container
         Tomcat tomcat = getTomcatInstance();
@@ -118,8 +117,8 @@ public class TestStandardHostValve extends TomcatBaseTest {
 
         // Request a page that triggers an error
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + "/error?errorCode=" + error + "&exception=" + exception,
-                bc, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/error?errorCode=" + error + "&exception=" + exception, bc,
+                null);
 
         if (error > 399) {
             // Specific status code expected
@@ -136,7 +135,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
     }
 
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testInvalidErrorPage() throws Exception {
         // No file system docBase required
         Context ctx = getProgrammaticRootContext();
@@ -238,8 +237,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             int error = Integer.parseInt(req.getParameter("errorCode"));
             if (error > 399) {
                 resp.sendError(error);
@@ -273,8 +271,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.flushBuffer();
             throw new IOException();
         }
@@ -286,8 +283,7 @@ public class TestStandardHostValve extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             String pathInfo = req.getPathInfo();
             resp.setContentType("text/plain");
             PrintWriter pw = resp.getWriter();

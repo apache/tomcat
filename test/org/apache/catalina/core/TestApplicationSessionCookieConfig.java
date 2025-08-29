@@ -28,8 +28,7 @@ public class TestApplicationSessionCookieConfig {
 
     @Before
     public void setUp() throws Exception {
-        applicationSessionCookieConfig = new ApplicationSessionCookieConfig(
-                context);
+        applicationSessionCookieConfig = new ApplicationSessionCookieConfig(context);
     }
 
     @Test

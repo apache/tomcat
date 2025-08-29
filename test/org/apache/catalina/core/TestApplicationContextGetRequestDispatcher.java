@@ -53,10 +53,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
     @Parameters(name = "{index}: useAsync[{0}]")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-                {Boolean.TRUE},
-                {Boolean.FALSE}
-        });
+        return Arrays.asList(new Object[][] { { Boolean.TRUE }, { Boolean.FALSE } });
     }
 
     @Test
@@ -73,78 +70,67 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
     @Test
     public void testGetRequestDispatcherOutsideContextRoot01() throws Exception {
-        doTestGetRequestDispatcher(
-                true, "/start", null, "../outside", "/target", DispatcherServlet.NULL);
+        doTestGetRequestDispatcher(true, "/start", null, "../outside", "/target", DispatcherServlet.NULL);
     }
 
 
     @Test
     public void testGetRequestDispatcherOutsideContextRoot02() throws Exception {
-        doTestGetRequestDispatcher(
-                false, "/start", null, "../outside", "/target", DispatcherServlet.NULL);
+        doTestGetRequestDispatcher(false, "/start", null, "../outside", "/target", DispatcherServlet.NULL);
     }
 
 
     @Test
     public void testGetRequestDispatcherTraversal01() throws Exception {
-        doTestGetRequestDispatcher(
-                true, "/prefix/start", null, "../target", "/target", TargetServlet.OK);
+        doTestGetRequestDispatcher(true, "/prefix/start", null, "../target", "/target", TargetServlet.OK);
     }
 
 
     @Test
     public void testGetRequestDispatcherTraversal02() throws Exception {
-        doTestGetRequestDispatcher(
-                false, "/prefix/start", null, "../target", "/target", TargetServlet.OK);
+        doTestGetRequestDispatcher(false, "/prefix/start", null, "../target", "/target", TargetServlet.OK);
     }
 
 
     @Test
     public void testGetRequestDispatcherTraversal03() throws Exception {
-        doTestGetRequestDispatcher(
-                true, "/prefix/start", null, "../target?a=b", "/target", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(true, "/prefix/start", null, "../target?a=b", "/target", TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcherTraversal04() throws Exception {
-        doTestGetRequestDispatcher(
-                false, "/prefix/start", null, "../target?a=b", "/target", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(false, "/prefix/start", null, "../target?a=b", "/target", TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcherTraversal05() throws Exception {
-        doTestGetRequestDispatcher(
-                true, "/prefix/start", "a=b", "../target", "/target", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(true, "/prefix/start", "a=b", "../target", "/target", TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcherTraversal06() throws Exception {
-        doTestGetRequestDispatcher(
-                false, "/prefix/start", "a=b", "../target", "/target", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(false, "/prefix/start", "a=b", "../target", "/target", TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcherTraversal07() throws Exception {
-        doTestGetRequestDispatcher(
-                true, "/prefix/start", null, "../../target", "/target", DispatcherServlet.NULL);
+        doTestGetRequestDispatcher(true, "/prefix/start", null, "../../target", "/target", DispatcherServlet.NULL);
     }
 
 
     @Test
     public void testGetRequestDispatcher01() throws Exception {
-        doTestGetRequestDispatcher(
-                true, "/prefix/start", null, "target", "/prefix/target", TargetServlet.OK);
+        doTestGetRequestDispatcher(true, "/prefix/start", null, "target", "/prefix/target", TargetServlet.OK);
     }
 
 
     @Test
     public void testGetRequestDispatcher02() throws Exception {
-        doTestGetRequestDispatcher(
-                false, "/prefix/start", null, "target", "/prefix/target", TargetServlet.OK);
+        doTestGetRequestDispatcher(false, "/prefix/start", null, "target", "/prefix/target", TargetServlet.OK);
     }
 
 
@@ -164,22 +150,20 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
     @Test
     public void testGetRequestDispatcher05() throws Exception {
-        doTestGetRequestDispatcher(true, "/prefix/start", "a=b", "target", "/prefix/target",
-                TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(true, "/prefix/start", "a=b", "target", "/prefix/target", TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcher06() throws Exception {
-        doTestGetRequestDispatcher(false, "/prefix/start", "a=b", "target", "/prefix/target",
-                TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(false, "/prefix/start", "a=b", "target", "/prefix/target", TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcher11() throws Exception {
-        doTestGetRequestDispatcher(true, "/aa%3Fbb%3Dcc/start", null, "target",
-                "/aa%3Fbb%3Dcc/target", TargetServlet.OK);
+        doTestGetRequestDispatcher(true, "/aa%3Fbb%3Dcc/start", null, "target", "/aa%3Fbb%3Dcc/target",
+                TargetServlet.OK);
     }
 
 
@@ -188,15 +172,15 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         // Expected to fail because when the RD processes this as unencoded it
         // sees /aa?bb=cc/target which it thinks is a query string. This is why
         // Tomcat encodes by default.
-        doTestGetRequestDispatcher(false, "/aa%3Fbb%3Dcc/start", null, "target",
-                "/aa%3Fbb%3Dcc/target", Default404Servlet.DEFAULT_404);
+        doTestGetRequestDispatcher(false, "/aa%3Fbb%3Dcc/start", null, "target", "/aa%3Fbb%3Dcc/target",
+                Default404Servlet.DEFAULT_404);
     }
 
 
     @Test
     public void testGetRequestDispatcher13() throws Exception {
-        doTestGetRequestDispatcher(true, "/aa%3Fbb%3Dcc/start", null, "target?a=b",
-                "/aa%3Fbb%3Dcc/target", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(true, "/aa%3Fbb%3Dcc/start", null, "target?a=b", "/aa%3Fbb%3Dcc/target",
+                TargetServlet.OK + "a=b");
     }
 
 
@@ -205,15 +189,15 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         // Expected to fail because when the RD processes this as unencoded it
         // sees /aa?bb=cc/target which it thinks is a query string. This is why
         // Tomcat encodes by default.
-        doTestGetRequestDispatcher(false, "/aa%3Fbb%3Dcc/start", null, "target?a=b",
-                "/aa%3Fbb%3Dcc/target", Default404Servlet.DEFAULT_404);
+        doTestGetRequestDispatcher(false, "/aa%3Fbb%3Dcc/start", null, "target?a=b", "/aa%3Fbb%3Dcc/target",
+                Default404Servlet.DEFAULT_404);
     }
 
 
     @Test
     public void testGetRequestDispatcher15() throws Exception {
-        doTestGetRequestDispatcher(true, "/aa%3Fbb%3Dcc/start", "a=b", "target",
-                "/aa%3Fbb%3Dcc/target", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(true, "/aa%3Fbb%3Dcc/start", "a=b", "target", "/aa%3Fbb%3Dcc/target",
+                TargetServlet.OK + "a=b");
     }
 
 
@@ -222,154 +206,151 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         // Expected to fail because when the RD processes this as unencoded it
         // sees /aa?bb=cc/target which it thinks is a query string. This is why
         // Tomcat encodes by default.
-        doTestGetRequestDispatcher(false, "/aa%3Fbb%3Dcc/start", "a=b", "target",
-                "/aa%3Fbb%3Dcc/target", Default404Servlet.DEFAULT_404);
+        doTestGetRequestDispatcher(false, "/aa%3Fbb%3Dcc/start", "a=b", "target", "/aa%3Fbb%3Dcc/target",
+                Default404Servlet.DEFAULT_404);
     }
 
 
     @Test
     public void testGetRequestDispatcher21() throws Exception {
-        doTestGetRequestDispatcher(true, "/aa%3Dbb%3Dcc/start", null, "target",
-                "/aa%3Dbb%3Dcc/target", TargetServlet.OK);
+        doTestGetRequestDispatcher(true, "/aa%3Dbb%3Dcc/start", null, "target", "/aa%3Dbb%3Dcc/target",
+                TargetServlet.OK);
     }
 
 
     @Test
     public void testGetRequestDispatcher22() throws Exception {
-        doTestGetRequestDispatcher(false, "/aa%3Dbb%3Dcc/start", null, "target",
-                "/aa%3Dbb%3Dcc/target", TargetServlet.OK);
+        doTestGetRequestDispatcher(false, "/aa%3Dbb%3Dcc/start", null, "target", "/aa%3Dbb%3Dcc/target",
+                TargetServlet.OK);
     }
 
 
     @Test
     public void testGetRequestDispatcher23() throws Exception {
-        doTestGetRequestDispatcher(true, "/aa%3Dbb%3Dcc/start", null, "target?a=b",
-                "/aa%3Dbb%3Dcc/target", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(true, "/aa%3Dbb%3Dcc/start", null, "target?a=b", "/aa%3Dbb%3Dcc/target",
+                TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcher24() throws Exception {
-        doTestGetRequestDispatcher(false, "/aa%3Dbb%3Dcc/start", null, "target?a=b",
-                "/aa%3Dbb%3Dcc/target", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(false, "/aa%3Dbb%3Dcc/start", null, "target?a=b", "/aa%3Dbb%3Dcc/target",
+                TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcher25() throws Exception {
-        doTestGetRequestDispatcher(true, "/aa%3Dbb%3Dcc/start", "a=b", "target",
-                "/aa%3Dbb%3Dcc/target", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(true, "/aa%3Dbb%3Dcc/start", "a=b", "target", "/aa%3Dbb%3Dcc/target",
+                TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcher26() throws Exception {
-        doTestGetRequestDispatcher(false, "/aa%3Dbb%3Dcc/start", "a=b", "target",
-                "/aa%3Dbb%3Dcc/target", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(false, "/aa%3Dbb%3Dcc/start", "a=b", "target", "/aa%3Dbb%3Dcc/target",
+                TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcher31() throws Exception {
-        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa%3Fbb%3Dcc",
-                "/prefix/aa%3Fbb%3Dcc", TargetServlet.OK);
+        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa%3Fbb%3Dcc", "/prefix/aa%3Fbb%3Dcc",
+                TargetServlet.OK);
     }
 
 
     @Test
     public void testGetRequestDispatcher32() throws Exception {
-        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa%3Fbb%3Dcc",
-                "/prefix/aa%3Fbb%3Dcc", Default404Servlet.DEFAULT_404);
+        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa%3Fbb%3Dcc", "/prefix/aa%3Fbb%3Dcc",
+                Default404Servlet.DEFAULT_404);
     }
 
 
     @Test
     public void testGetRequestDispatcher33() throws Exception {
-        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa%3Fbb%3Dcc?a=b",
-                "/prefix/aa%3Fbb%3Dcc", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa%3Fbb%3Dcc?a=b", "/prefix/aa%3Fbb%3Dcc",
+                TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcher34() throws Exception {
-        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa%3Fbb%3Dcc?a=b",
-                "/prefix/aa%3Fbb%3Dcc", Default404Servlet.DEFAULT_404);
+        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa%3Fbb%3Dcc?a=b", "/prefix/aa%3Fbb%3Dcc",
+                Default404Servlet.DEFAULT_404);
     }
 
 
     @Test
     public void testGetRequestDispatcher35() throws Exception {
-        doTestGetRequestDispatcher(true, "/prefix/start", "a=b", "aa%3Fbb%3Dcc",
-                "/prefix/aa%3Fbb%3Dcc", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(true, "/prefix/start", "a=b", "aa%3Fbb%3Dcc", "/prefix/aa%3Fbb%3Dcc",
+                TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcher36() throws Exception {
-        doTestGetRequestDispatcher(false, "/prefix/start", "a=b", "aa%3Fbb%3Dcc",
-                "/prefix/aa%3Fbb%3Dcc", Default404Servlet.DEFAULT_404);
+        doTestGetRequestDispatcher(false, "/prefix/start", "a=b", "aa%3Fbb%3Dcc", "/prefix/aa%3Fbb%3Dcc",
+                Default404Servlet.DEFAULT_404);
     }
 
 
     @Test
     public void testGetRequestDispatcher41() throws Exception {
-        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa%3Fbb%3Dcc",
-                "/prefix/aa%253Fbb%253Dcc", Default404Servlet.DEFAULT_404);
+        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa%3Fbb%3Dcc", "/prefix/aa%253Fbb%253Dcc",
+                Default404Servlet.DEFAULT_404);
     }
 
 
     @Test
     public void testGetRequestDispatcher42() throws Exception {
-        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa%3Fbb%3Dcc",
-                "/prefix/aa%253Fbb%253Dcc", TargetServlet.OK);
+        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa%3Fbb%3Dcc", "/prefix/aa%253Fbb%253Dcc",
+                TargetServlet.OK);
     }
 
 
     @Test
     public void testGetRequestDispatcher43() throws Exception {
-        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa%3Fbb%3Dcc?a=b",
-                "/prefix/aa%253Fbb%253Dcc", Default404Servlet.DEFAULT_404);
+        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa%3Fbb%3Dcc?a=b", "/prefix/aa%253Fbb%253Dcc",
+                Default404Servlet.DEFAULT_404);
     }
 
 
     @Test
     public void testGetRequestDispatcher44() throws Exception {
-        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa%3Fbb%3Dcc?a=b",
-                "/prefix/aa%253Fbb%253Dcc", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa%3Fbb%3Dcc?a=b", "/prefix/aa%253Fbb%253Dcc",
+                TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcher45() throws Exception {
-        doTestGetRequestDispatcher(true, "/prefix/start", "a=b", "aa%3Fbb%3Dcc",
-                "/prefix/aa%253Fbb%253Dcc", Default404Servlet.DEFAULT_404);
+        doTestGetRequestDispatcher(true, "/prefix/start", "a=b", "aa%3Fbb%3Dcc", "/prefix/aa%253Fbb%253Dcc",
+                Default404Servlet.DEFAULT_404);
     }
 
 
     @Test
     public void testGetRequestDispatcher46() throws Exception {
-        doTestGetRequestDispatcher(false, "/prefix/start", "a=b", "aa%3Fbb%3Dcc",
-                "/prefix/aa%253Fbb%253Dcc", TargetServlet.OK + "a=b");
+        doTestGetRequestDispatcher(false, "/prefix/start", "a=b", "aa%3Fbb%3Dcc", "/prefix/aa%253Fbb%253Dcc",
+                TargetServlet.OK + "a=b");
     }
 
 
     @Test
     public void testGetRequestDispatcher47() throws Exception {
-        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa+bb",
-                "/prefix/aa+bb", TargetServlet.OK);
+        doTestGetRequestDispatcher(true, "/prefix/start", null, "aa+bb", "/prefix/aa+bb", TargetServlet.OK);
     }
 
 
     @Test
     public void testGetRequestDispatcher48() throws Exception {
-        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa+bb",
-                "/prefix/aa+bb", TargetServlet.OK);
+        doTestGetRequestDispatcher(false, "/prefix/start", null, "aa+bb", "/prefix/aa+bb", TargetServlet.OK);
     }
 
 
-    private void doTestGetRequestDispatcher(boolean useEncodedDispatchPaths, String startPath,
-            String startQueryString, String dispatchPath, String targetPath, String expectedBody)
-            throws Exception {
+    private void doTestGetRequestDispatcher(boolean useEncodedDispatchPaths, String startPath, String startQueryString,
+            String dispatchPath, String targetPath, String expectedBody) throws Exception {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -384,12 +365,10 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
 
         // Add a target servlet to dispatch to
         Tomcat.addServlet(ctx, "target", new TargetServlet());
-        ctx.addServletMappingDecoded(
-                UDecoder.URLDecode(targetPath, StandardCharsets.UTF_8), "target");
+        ctx.addServletMappingDecoded(UDecoder.URLDecode(targetPath, StandardCharsets.UTF_8), "target");
 
         if (useAsync) {
-            Wrapper w = Tomcat.addServlet(
-                    ctx, "rd", new AsyncDispatcherServlet(dispatchPath, useEncodedDispatchPaths));
+            Wrapper w = Tomcat.addServlet(ctx, "rd", new AsyncDispatcherServlet(dispatchPath, useEncodedDispatchPaths));
             w.setAsyncSupported(true);
         } else {
             Tomcat.addServlet(ctx, "rd", new DispatcherServlet(dispatchPath));
@@ -420,8 +399,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         private static final String DEFAULT_404 = "DEFAULT-404";
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             resp.getWriter().print(DEFAULT_404);
@@ -442,8 +420,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             RequestDispatcher rd = req.getRequestDispatcher(dispatchPath);
             if (rd == null) {
@@ -463,8 +440,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         private static final String OK = "OK";
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             String contextPath = req.getContextPath();
@@ -495,8 +471,7 @@ public class TestApplicationContextGetRequestDispatcher extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             AsyncContext ac = req.startAsync();
             // Quick and dirty. Sufficient for this test but ignores lots of

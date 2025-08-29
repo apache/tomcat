@@ -34,11 +34,11 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
-public class TestOutputBuffer extends TomcatBaseTest{
+public class TestOutputBuffer extends TomcatBaseTest {
 
     /*
-     * Expect that the buffered results are slightly slower since Tomcat now has
-     * an internal buffer so an extra one just adds overhead.
+     * Expect that the buffered results are slightly slower since Tomcat now has an internal buffer so an extra one just
+     * adds overhead.
      *
      * @see "https://bz.apache.org/bugzilla/show_bug.cgi?id=52328"
      */
@@ -48,7 +48,7 @@ public class TestOutputBuffer extends TomcatBaseTest{
 
         Context root = tomcat.addContext("", TEMP_DIR);
 
-        for (int i = 1; i <= WritingServlet.EXPECTED_CONTENT_LENGTH; i*=10) {
+        for (int i = 1; i <= WritingServlet.EXPECTED_CONTENT_LENGTH; i *= 10) {
             WritingServlet servlet = new WritingServlet(i);
             Tomcat.addServlet(root, "servlet" + i, servlet);
             root.addServletMappingDecoded("/servlet" + i, "servlet" + i);
@@ -58,20 +58,16 @@ public class TestOutputBuffer extends TomcatBaseTest{
 
         ByteChunk bc = new ByteChunk();
 
-        for (int i = 1; i <= WritingServlet.EXPECTED_CONTENT_LENGTH; i*=10) {
-            int rc = getUrl("http://localhost:" + getPort() +
-                    "/servlet" + i, bc, null, null);
+        for (int i = 1; i <= WritingServlet.EXPECTED_CONTENT_LENGTH; i *= 10) {
+            int rc = getUrl("http://localhost:" + getPort() + "/servlet" + i, bc, null, null);
             Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-            Assert.assertEquals(
-                    WritingServlet.EXPECTED_CONTENT_LENGTH, bc.getLength());
+            Assert.assertEquals(WritingServlet.EXPECTED_CONTENT_LENGTH, bc.getLength());
 
             bc.recycle();
 
-            rc = getUrl("http://localhost:" + getPort() +
-                    "/servlet" + i + "?useBuffer=y", bc, null, null);
+            rc = getUrl("http://localhost:" + getPort() + "/servlet" + i + "?useBuffer=y", bc, null, null);
             Assert.assertEquals(HttpServletResponse.SC_OK, rc);
-            Assert.assertEquals(
-                    WritingServlet.EXPECTED_CONTENT_LENGTH, bc.getLength());
+            Assert.assertEquals(WritingServlet.EXPECTED_CONTENT_LENGTH, bc.getLength());
 
             bc.recycle();
         }
@@ -115,8 +111,7 @@ public class TestOutputBuffer extends TomcatBaseTest{
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("ISO-8859-1");
@@ -138,9 +133,8 @@ public class TestOutputBuffer extends TomcatBaseTest{
             }
             long lastRunNano = System.nanoTime() - start;
 
-            System.out.println("Write length: " + writeString.length() +
-                    ", Buffered: " + (useBufferStr == null ? "n" : "y") +
-                    ", Time: " + lastRunNano + "ns");
+            System.out.println("Write length: " + writeString.length() + ", Buffered: " +
+                    (useBufferStr == null ? "n" : "y") + ", Time: " + lastRunNano + "ns");
         }
     }
 
@@ -149,8 +143,7 @@ public class TestOutputBuffer extends TomcatBaseTest{
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             Writer w = resp.getWriter();
             w.write("OK");
             resp.resetBuffer();
@@ -198,8 +191,7 @@ public class TestOutputBuffer extends TomcatBaseTest{
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain");
