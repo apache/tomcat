@@ -116,9 +116,7 @@ final class ReflectionProperty implements Comparable<ReflectionProperty> {
 
     @Override
     public String toString() {
-        return "ReflectionProperty{" + "name='" + propertyName + '\'' +
-            ", type=" + propertyType +
-            '}';
+        return "ReflectionProperty{" + "name='" + propertyName + '\'' + ", type=" + propertyType + '}';
     }
 
     @Override
