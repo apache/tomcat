@@ -24,10 +24,10 @@ import jakarta.el.ELContext;
 import org.apache.jasper.compiler.Localizer;
 
 public class TesterPageContextWithAttributes extends TesterPageContext {
-    private final Map<String, Object> applicationAttributes = new HashMap<>();
-    private final Map<String, Object> pageAttributes = new HashMap<>();
-    private final Map<String, Object> requestAttributes = new HashMap<>();
-    private final Map<String, Object> sessionAttributes = new HashMap<>();
+    private final Map<String,Object> applicationAttributes = new HashMap<>();
+    private final Map<String,Object> pageAttributes = new HashMap<>();
+    private final Map<String,Object> requestAttributes = new HashMap<>();
+    private final Map<String,Object> sessionAttributes = new HashMap<>();
 
     public TesterPageContextWithAttributes() {
         super();
@@ -49,11 +49,11 @@ public class TesterPageContextWithAttributes extends TesterPageContext {
         }
 
         return switch (scope) {
-        case PAGE_SCOPE -> pageAttributes.get(name);
-        case REQUEST_SCOPE -> requestAttributes.get(name);
-        case SESSION_SCOPE -> sessionAttributes.get(name);
-        case APPLICATION_SCOPE -> applicationAttributes.get(name);
-        default -> throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
+            case PAGE_SCOPE -> pageAttributes.get(name);
+            case REQUEST_SCOPE -> requestAttributes.get(name);
+            case SESSION_SCOPE -> sessionAttributes.get(name);
+            case APPLICATION_SCOPE -> applicationAttributes.get(name);
+            default -> throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
         };
     }
 
@@ -68,20 +68,20 @@ public class TesterPageContextWithAttributes extends TesterPageContext {
     @Override
     public void removeAttribute(String name, int scope) {
         switch (scope) {
-        case PageContext.APPLICATION_SCOPE:
-            applicationAttributes.remove(name);
-            break;
-        case PageContext.PAGE_SCOPE:
-            pageAttributes.remove(name);
-            break;
-        case PageContext.REQUEST_SCOPE:
-            requestAttributes.remove(name);
-            break;
-        case PageContext.SESSION_SCOPE:
-            sessionAttributes.remove(name);
-            break;
-        default:
-            throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
+            case PageContext.APPLICATION_SCOPE:
+                applicationAttributes.remove(name);
+                break;
+            case PageContext.PAGE_SCOPE:
+                pageAttributes.remove(name);
+                break;
+            case PageContext.REQUEST_SCOPE:
+                requestAttributes.remove(name);
+                break;
+            case PageContext.SESSION_SCOPE:
+                sessionAttributes.remove(name);
+                break;
+            default:
+                throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
         }
     }
 
@@ -96,24 +96,24 @@ public class TesterPageContextWithAttributes extends TesterPageContext {
             removeAttribute(name, scope);
         } else {
             switch (scope) {
-            case PAGE_SCOPE:
-                pageAttributes.put(name, value);
-                break;
+                case PAGE_SCOPE:
+                    pageAttributes.put(name, value);
+                    break;
 
-            case REQUEST_SCOPE:
-                requestAttributes.put(name, value);
-                break;
+                case REQUEST_SCOPE:
+                    requestAttributes.put(name, value);
+                    break;
 
-            case SESSION_SCOPE:
-                sessionAttributes.put(name, value);
-                break;
+                case SESSION_SCOPE:
+                    sessionAttributes.put(name, value);
+                    break;
 
-            case APPLICATION_SCOPE:
-                applicationAttributes.put(name, value);
-                break;
+                case APPLICATION_SCOPE:
+                    applicationAttributes.put(name, value);
+                    break;
 
-            default:
-                throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
+                default:
+                    throw new IllegalArgumentException(Localizer.getMessage("jsp.error.page.invalid.scope"));
             }
         }
     }

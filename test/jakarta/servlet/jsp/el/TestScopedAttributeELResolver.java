@@ -28,8 +28,7 @@ public class TestScopedAttributeELResolver extends TomcatBaseTest {
     public void testBug49196() throws Exception {
         getTomcatInstanceTestWebapp(true, true);
 
-        ByteChunk res = getUrl("http://localhost:" + getPort() +
-                "/test/bug6nnnn/bug62453.jsp");
+        ByteChunk res = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug62453.jsp");
 
         String result = res.toString();
         Assert.assertTrue(result, result.contains("<div>foo:  OK</div>"));
