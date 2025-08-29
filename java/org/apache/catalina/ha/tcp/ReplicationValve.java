@@ -545,8 +545,7 @@ public class ReplicationValve extends ValveBase implements ClusterValve {
                             Long.valueOf(totalSendTime.longValue() / nrOfRequests.longValue()),
                             Long.valueOf(nrOfRequests.longValue()), Long.valueOf(nrOfSendRequests.longValue()),
                             Long.valueOf(nrOfCrossContextSendRequests.longValue()),
-                            Long.valueOf(nrOfFilterRequests.longValue()),
-                            Long.valueOf(totalRequestTime.longValue()),
+                            Long.valueOf(nrOfFilterRequests.longValue()), Long.valueOf(totalRequestTime.longValue()),
                             Long.valueOf(totalSendTime.longValue())));
                 }
             }

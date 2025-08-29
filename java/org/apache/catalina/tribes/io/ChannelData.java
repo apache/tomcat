@@ -337,9 +337,7 @@ public class ChannelData implements ChannelMessage {
 
     @Override
     public String toString() {
-        return "ClusterData[src=" +
-                getAddress() + "; id=" +
-                bToS(getUniqueId()) + "; sent=" +
+        return "ClusterData[src=" + getAddress() + "; id=" + bToS(getUniqueId()) + "; sent=" +
                 new Timestamp(this.getTimestamp()).toString() + ']';
     }
 

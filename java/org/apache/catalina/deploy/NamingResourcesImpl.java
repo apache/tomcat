@@ -513,8 +513,8 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the array of defined environment entries for this web application. If none have been defined, a zero-length
-     *             array is returned.
+     * @return the array of defined environment entries for this web application. If none have been defined, a
+     *             zero-length array is returned.
      */
     public ContextEnvironment[] findEnvironments() {
 
@@ -649,8 +649,8 @@ public class NamingResourcesImpl extends LifecycleMBeanBase implements Serializa
 
 
     /**
-     * @return the array of resource environment reference names for this web application. If none have been specified, a
-     *             zero-length array is returned.
+     * @return the array of resource environment reference names for this web application. If none have been specified,
+     *             a zero-length array is returned.
      */
     public ContextResourceEnvRef[] findResourceEnvRefs() {
 

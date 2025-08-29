@@ -54,6 +54,7 @@ import org.apache.tools.ant.BuildException;
  *
  * </li>
  * <li>Create new AccessLogger at localhost
+ *
  * <pre>
  *   &lt;jmx:invoke
  *           name="Catalina:type=MBeanFactory"
@@ -61,15 +62,20 @@ import org.apache.tools.ant.BuildException;
  *           resultproperty="accessLoggerObjectName"&gt;
  *         &lt;arg value="Catalina:type=Host,host=localhost"/&gt;
  *   &lt;/jmx:invoke&gt;
- * </pre></li>
+ * </pre>
+ *
+ * </li>
  * <li>Remove existing AccessLogger at localhost
+ *
  * <pre>
  *   &lt;jmx:invoke
  *           name="Catalina:type=MBeanFactory"
  *           operation="removeValve"&gt;
  *         &lt;arg value="Catalina:type=Valve,name=AccessLogValve,host=localhost"/&gt;
  *   &lt;/jmx:invoke&gt;
- * </pre></li>
+ * </pre>
+ *
+ * </li>
  * </ul>
  * <p>
  * First call to a remote MBeanserver save the JMXConnection a referenz <em>jmx.server</em>

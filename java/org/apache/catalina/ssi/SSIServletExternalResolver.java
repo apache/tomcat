@@ -308,8 +308,8 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
             } else if (nameParts[1].equals("PROTOCOL")) {
                 retVal = req.getProtocol();
             } else if (nameParts[1].equals("SOFTWARE")) {
-                retVal = context.getServerInfo() + ' ' + System.getProperty("java.vm.name") +
-                        '/' + System.getProperty("java.vm.version") + ' ' + System.getProperty("os.name");
+                retVal = context.getServerInfo() + ' ' + System.getProperty("java.vm.name") + '/' +
+                        System.getProperty("java.vm.version") + ' ' + System.getProperty("os.name");
             }
         } else if (name.equalsIgnoreCase("UNIQUE_ID")) {
             retVal = req.getRequestedSessionId();

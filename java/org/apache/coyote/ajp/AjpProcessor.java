@@ -1059,9 +1059,9 @@ public class AjpProcessor extends AbstractProcessor {
                 refillReadBuffer(false);
             } catch (IOException ioe) {
                 /*
-                 *  Probably a timeout. This approach isn't ideal but it works. Returning 1 will indicate that data is
-                 *  available which should trigger a read which in turn will trigger another IOException and that one
-                 *  can be thrown.
+                 * Probably a timeout. This approach isn't ideal but it works. Returning 1 will indicate that data is
+                 * available which should trigger a read which in turn will trigger another IOException and that one can
+                 * be thrown.
                  */
                 return 1;
             }

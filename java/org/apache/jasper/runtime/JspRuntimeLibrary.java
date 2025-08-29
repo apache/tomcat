@@ -587,8 +587,8 @@ public class JspRuntimeLibrary {
             ProtectedFunctionMapper functionMapper) throws JasperException {
         try {
             Method method = getWriteMethod(bean.getClass(), prop);
-            method.invoke(bean, PageContextImpl.proprietaryEvaluate(expression,
-                    method.getParameterTypes()[0], pageContext, functionMapper));
+            method.invoke(bean, PageContextImpl.proprietaryEvaluate(expression, method.getParameterTypes()[0],
+                    pageContext, functionMapper));
         } catch (Exception e) {
             Throwable thr = ExceptionUtils.unwrapInvocationTargetException(e);
             ExceptionUtils.handleThrowable(thr);
@@ -970,9 +970,9 @@ public class JspRuntimeLibrary {
      * This method parallels the logic of {@code SetSupport.doEndTag()}.
      *
      * @param pageContext pageContext
-     * @param var name of the variable
-     * @param value value to store
-     * @param scope scope
+     * @param var         name of the variable
+     * @param value       value to store
+     * @param scope       scope
      */
     public static void nonstandardSetTag(jakarta.servlet.jsp.PageContext pageContext, String var, Object value,
             int scope) {

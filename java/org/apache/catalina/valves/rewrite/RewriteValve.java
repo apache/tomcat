@@ -253,7 +253,7 @@ public class RewriteValve extends ValveBase {
                     for (RewriteCond condition : conditions) {
                         if (containerLog.isTraceEnabled()) {
                             containerLog.trace("Add condition " + condition.getCondPattern() + " test " +
-                                condition.getTestString() + " to rule with pattern " + rule.getPatternString() +
+                                    condition.getTestString() + " to rule with pattern " + rule.getPatternString() +
                                     " and substitution " + rule.getSubstitutionString() +
                                     (condition.isOrnext() ? " [OR]" : "") + (condition.isNocase() ? " [NC]" : ""));
                         }
@@ -537,7 +537,8 @@ public class RewriteValve extends ValveBase {
                         urlStringRewriteEncoded = urlStringRewriteEncoded.substring(0, queryIndex);
                     }
                     // Parse path parameters from rewrite production and populate request path parameters
-                    urlStringRewriteEncoded = org.apache.catalina.util.RequestUtil.stripPathParams(urlStringRewriteEncoded, request);
+                    urlStringRewriteEncoded =
+                            org.apache.catalina.util.RequestUtil.stripPathParams(urlStringRewriteEncoded, request);
                     // Save the current context path before re-writing starts
                     String contextPath = null;
                     if (context) {

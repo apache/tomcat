@@ -687,8 +687,8 @@ public class DefaultServlet extends HttpServlet {
                 }
             } else {
                 try {
-                    resp.sendError(resourceInputStream != null ?
-                            HttpServletResponse.SC_CONFLICT : HttpServletResponse.SC_BAD_REQUEST);
+                    resp.sendError(resourceInputStream != null ? HttpServletResponse.SC_CONFLICT :
+                            HttpServletResponse.SC_BAD_REQUEST);
                 } catch (IllegalStateException e) {
                     // Already committed, ignore
                 }
@@ -1226,7 +1226,7 @@ public class DefaultServlet extends HttpServlet {
                     try {
                         response.setBufferSize(output);
                     } catch (IllegalStateException ignore) {
-                     // Content has already been written - this must be an include. Ignore the error and continue.
+                        // Content has already been written - this must be an include. Ignore the error and continue.
                     }
                     if (ostream != null) {
                         if (!checkSendfile(request, response, resource, contentLength, range)) {
@@ -2511,8 +2511,7 @@ public class DefaultServlet extends HttpServlet {
 
         if (headerValue.length() > 2 && (headerValue.charAt(0) == '"' || headerValue.charAt(2) == '"')) {
             boolean weakETag = headerValue.startsWith("W/\"");
-            if ((!weakETag && headerValue.charAt(0) != '"') ||
-                    headerValue.charAt(headerValue.length() - 1) != '"' ||
+            if ((!weakETag && headerValue.charAt(0) != '"') || headerValue.charAt(headerValue.length() - 1) != '"' ||
                     headerValue.indexOf('"', weakETag ? 3 : 1) != headerValue.length() - 1) {
                 // Not a single entity tag
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);

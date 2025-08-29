@@ -149,7 +149,7 @@ public class DeployTask extends AbstractCatalinaCommandTask {
                     if (fsInput != null) {
                         try {
                             fsInput.close();
-                        } catch (IOException ignore ) {
+                        } catch (IOException ignore) {
                             // Ignore
                         }
                     }

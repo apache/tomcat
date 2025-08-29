@@ -170,7 +170,7 @@ public abstract class AbstractReplicatedMap<K, V>
      * @param terminate          - Flag for whether to terminate this map that failed to start.
      */
     public AbstractReplicatedMap(MapOwner owner, Channel channel, long timeout, String mapContextName,
-                                 int initialCapacity, float loadFactor, int channelSendOptions, ClassLoader[] cls, boolean terminate) {
+            int initialCapacity, float loadFactor, int channelSendOptions, ClassLoader[] cls, boolean terminate) {
         innerMap = new ConcurrentHashMap<>(initialCapacity, loadFactor, 15);
         init(owner, channel, mapContextName, timeout, channelSendOptions, cls, terminate);
 
@@ -204,7 +204,7 @@ public abstract class AbstractReplicatedMap<K, V>
      * @param terminate          - Flag for whether to terminate this map that failed to start.
      */
     protected void init(MapOwner owner, Channel channel, String mapContextName, long timeout, int channelSendOptions,
-                        ClassLoader[] cls, boolean terminate) {
+            ClassLoader[] cls, boolean terminate) {
         long start = System.currentTimeMillis();
         if (log.isInfoEnabled()) {
             log.info(sm.getString("abstractReplicatedMap.init.start", mapContextName));
@@ -1261,7 +1261,7 @@ public abstract class AbstractReplicatedMap<K, V>
         int counter = 0;
         for (Entry<K,?> e : innerMap.entrySet()) {
             if (e != null) {
-                MapEntry<K, V> entry = innerMap.get(e.getKey());
+                MapEntry<K,V> entry = innerMap.get(e.getKey());
                 if (entry != null && entry.isActive() && entry.getValue() != null) {
                     counter++;
                 }
@@ -1435,11 +1435,8 @@ public abstract class AbstractReplicatedMap<K, V>
 
         @Override
         public String toString() {
-            return "MapEntry[key:" + getKey() + "; " +
-                    "value:" + getValue() + "; " +
-                    "primary:" + isPrimary() + "; " +
-                    "backup:" + isBackup() + "; " +
-                    "proxy:" + isProxy() + ";]";
+            return "MapEntry[key:" + getKey() + "; " + "value:" + getValue() + "; " + "primary:" + isPrimary() + "; " +
+                    "backup:" + isBackup() + "; " + "proxy:" + isProxy() + ";]";
         }
 
     }
@@ -1477,8 +1474,8 @@ public abstract class AbstractReplicatedMap<K, V>
 
         @Override
         public String toString() {
-            return "MapMessage[context=" + new String(mapId) + "; type=" + getTypeDesc() +
-                    "; key=" + key + "; value=" + value + ']';
+            return "MapMessage[context=" + new String(mapId) + "; type=" + getTypeDesc() + "; key=" + key + "; value=" +
+                    value + ']';
         }
 
         public String getTypeDesc() {
@@ -1515,7 +1512,7 @@ public abstract class AbstractReplicatedMap<K, V>
         }
 
         public MapMessage(byte[] mapId, int msgtype, boolean diff, Serializable key, Serializable value,
-                          byte[] diffvalue, Member primary, Member[] nodes) {
+                byte[] diffvalue, Member primary, Member[] nodes) {
             this.mapId = mapId;
             this.msgtype = msgtype;
             this.diff = diff;

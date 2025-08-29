@@ -221,8 +221,7 @@ public class SecurityListener implements LifecycleListener {
         if (allowedAgeDays >= 0) {
             String buildDateString = ServerInfo.getServerBuiltISO();
 
-            if (null == buildDateString || buildDateString.isEmpty() ||
-                    !Character.isDigit(buildDateString.charAt(0))) {
+            if (null == buildDateString || buildDateString.isEmpty() || !Character.isDigit(buildDateString.charAt(0))) {
                 log.warn(sm.getString("SecurityListener.buildDateUnreadable", buildDateString));
             } else {
                 try {

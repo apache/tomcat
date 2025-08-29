@@ -112,8 +112,7 @@ public class UserDatabaseRealm extends RealmBase {
      * Determines whether this Realm is configured to obtain the associated {@link UserDatabase} from the global JNDI
      * context or a local (web application) JNDI context.
      *
-     * @return {@code true} if a local JNDI context will be used, {@code false} if the global JNDI context will be
-     *             used
+     * @return {@code true} if a local JNDI context will be used, {@code false} if the global JNDI context will be used
      */
     public boolean getLocalJndiResource() {
         return localJndiResource;

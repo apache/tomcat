@@ -2343,7 +2343,7 @@ public abstract class WebappClassLoaderBase extends URLClassLoader
                 if (pkg != null) {
                     boolean sealCheck = true;
                     if (pkg.isSealed()) {
-                        if(codeBase != null) {
+                        if (codeBase != null) {
                             sealCheck = pkg.isSealed(codeBase);
                         } else {
                             sealCheck = false;

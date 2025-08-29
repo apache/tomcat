@@ -218,7 +218,7 @@ public class LockOutRealm extends CombinedRealm {
         // Check to see if user is locked
         // Otherwise, user has not, yet, exceeded lock thresholds
         return lockRecord.getFailures() >= failureCount &&
-            (System.currentTimeMillis() - lockRecord.getLastFailureTime()) / 1000 < lockOutTime;
+                (System.currentTimeMillis() - lockRecord.getLastFailureTime()) / 1000 < lockOutTime;
 
     }
 

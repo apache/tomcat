@@ -530,8 +530,7 @@ public class PageInfo {
     /*
      * isThreadSafe
      */
-    public void setIsThreadSafe(String value, Node n, ErrorDispatcher err)
-        throws JasperException {
+    public void setIsThreadSafe(String value, Node n, ErrorDispatcher err) throws JasperException {
 
         if ("true".equalsIgnoreCase(value)) {
             isThreadSafe = true;

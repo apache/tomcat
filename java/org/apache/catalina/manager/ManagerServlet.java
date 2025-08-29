@@ -373,8 +373,7 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
         }
         String config = request.getParameter("config");
         String tag = request.getParameter("tag");
-        boolean update = request.getParameter("update") != null
-            && request.getParameter("update").equals("true");
+        boolean update = request.getParameter("update") != null && request.getParameter("update").equals("true");
 
         // Prepare our output writer to generate the response message
         response.setContentType("text/plain;charset=" + Constants.CHARSET);
@@ -735,7 +734,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                             return;
                         }
                         if (!ExpandWar.copy(new File(config), new File(configBase, baseName + ".xml"))) {
-                            writer.println(smClient.getString("managerServlet.copyFail", new File(config), new File(configBase, baseName + ".xml")));
+                            writer.println(smClient.getString("managerServlet.copyFail", new File(config),
+                                    new File(configBase, baseName + ".xml")));
                             return;
                         }
                     }
@@ -909,7 +909,8 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                                 return;
                             }
                             if (!ExpandWar.copy(configFile, localConfigFile)) {
-                                writer.println(smClient.getString("managerServlet.copyFail", configFile, localConfigFile));
+                                writer.println(
+                                        smClient.getString("managerServlet.copyFail", configFile, localConfigFile));
                                 return;
                             }
                         }
