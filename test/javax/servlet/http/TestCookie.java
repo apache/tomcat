@@ -25,8 +25,8 @@ import org.junit.Test;
  * Basic tests for Cookie in default configuration.
  */
 public class TestCookie {
-    public static final BitSet CHAR;  // <any US-ASCII character (octets 0 - 127)>
-    public static final BitSet CTL;   // <any US-ASCII control character (octets 0 - 31) and DEL (127)>
+    public static final BitSet CHAR; // <any US-ASCII character (octets 0 - 127)>
+    public static final BitSet CTL; // <any US-ASCII control character (octets 0 - 31) and DEL (127)>
     public static final BitSet SEPARATORS;
     public static final BitSet TOKEN; // 1*<any CHAR except CTLs or separators>
 
@@ -166,7 +166,7 @@ public class TestCookie {
 
     @Test
     public void testClone() {
-        Cookie a = new Cookie("a","a");
+        Cookie a = new Cookie("a", "a");
         a.setComment("comment");
         a.setDomain("domain");
         a.setHttpOnly(true);

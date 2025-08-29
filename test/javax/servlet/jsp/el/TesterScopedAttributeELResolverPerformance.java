@@ -32,8 +32,7 @@ import org.junit.Test;
 public class TesterScopedAttributeELResolverPerformance {
 
     /*
-     * With the caching of NotFound responses this test takes ~20ms. Without the
-     * caching it takes ~6s.
+     * With the caching of NotFound responses this test takes ~20ms. Without the caching it takes ~6s.
      */
     @Test
     public void testGetValuePerformance() throws Exception {

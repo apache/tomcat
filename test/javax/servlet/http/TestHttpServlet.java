@@ -60,9 +60,8 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> resHeaders= new HashMap<>();
-        int rc = headUrl("http://localhost:" + getPort() + "/", new ByteChunk(),
-               resHeaders);
+        Map<String,List<String>> resHeaders = new HashMap<>();
+        int rc = headUrl("http://localhost:" + getPort() + "/", new ByteChunk(), resHeaders);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertEquals(LargeBodyServlet.RESPONSE_LENGTH, resHeaders.get("Content-Length").get(0));
@@ -75,16 +74,15 @@ public class TestHttpServlet extends TomcatBaseTest {
         private static final String RESPONSE_LENGTH = "12345678901";
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setHeader("content-length", RESPONSE_LENGTH);
         }
     }
 
 
     /*
-     * Verifies that the same Content-Length is returned for both GET and HEAD
-     * operations when a Servlet includes content from another Servlet
+     * Verifies that the same Content-Length is returned for both GET and HEAD operations when a Servlet includes
+     * content from another Servlet
      */
     @Test
     public void testBug57602() throws Exception {
@@ -103,7 +101,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> resHeaders= new CaseInsensitiveKeyMap<>();
+        Map<String,List<String>> resHeaders = new CaseInsensitiveKeyMap<>();
         String path = "http://localhost:" + getPort() + "/outer";
         ByteChunk out = new ByteChunk();
 
@@ -199,7 +197,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         // Headers should be the same (apart from Date)
         Assert.assertEquals(getHeaders.size(), headHeaders.size());
-        for (Map.Entry<String, List<String>> getHeader : getHeaders.entrySet()) {
+        for (Map.Entry<String,List<String>> getHeader : getHeaders.entrySet()) {
             String headerName = getHeader.getKey();
             Assert.assertTrue(headerName, headHeaders.containsKey(headerName));
             List<String> getValues = getHeader.getValue();
@@ -226,7 +224,7 @@ public class TestHttpServlet extends TomcatBaseTest {
     }
 
 
-    private void doTestDoOptions(Servlet servlet, String expectedAllow) throws Exception{
+    private void doTestDoOptions(Servlet servlet, String expectedAllow) throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
@@ -238,9 +236,9 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String,List<String>> resHeaders= new HashMap<>();
-        int rc = methodUrl("http://localhost:" + getPort() + "/", new ByteChunk(),
-               DEFAULT_CLIENT_TIMEOUT_MS, null, resHeaders, "OPTIONS");
+        Map<String,List<String>> resHeaders = new HashMap<>();
+        int rc = methodUrl("http://localhost:" + getPort() + "/", new ByteChunk(), DEFAULT_CLIENT_TIMEOUT_MS, null,
+                resHeaders, "OPTIONS");
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertEquals(expectedAllow, resHeaders.get("Allow").get(0));
@@ -266,9 +264,8 @@ public class TestHttpServlet extends TomcatBaseTest {
 
 
     /*
-     * See org.apache.coyote.http2.TestHttpServlet for the HTTP/2 version of
-     * this test. It was placed in that package because it needed access to
-     * package private classes.
+     * See org.apache.coyote.http2.TestHttpServlet for the HTTP/2 version of this test. It was placed in that package
+     * because it needed access to package private classes.
      */
 
 
@@ -296,7 +293,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         client.doRequest();
 
         if (isHttp09) {
-            Assert.assertTrue( client.getResponseBody(), client.getResponseBody().contains(" 400 "));
+            Assert.assertTrue(client.getResponseBody(), client.getResponseBody().contains(" 400 "));
         } else if (isHttp10) {
             Assert.assertTrue(client.getResponseLine(), client.isResponse400());
         } else {
@@ -369,7 +366,7 @@ public class TestHttpServlet extends TomcatBaseTest {
     private class Client extends SimpleHttpClient {
 
         Client(String request, boolean isHttp09) {
-            setRequest(new String[] {request});
+            setRequest(new String[] { request });
             setUseHttp09(isHttp09);
         }
 
@@ -412,8 +409,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
@@ -429,8 +425,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
@@ -444,8 +439,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
@@ -467,8 +461,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
 
@@ -479,9 +472,9 @@ public class TestHttpServlet extends TomcatBaseTest {
                 pw.write(new char[4 * 1024]);
             } else {
                 ServletOutputStream sos = resp.getOutputStream();
-                sos.write(new byte [4 * 1024]);
+                sos.write(new byte[4 * 1024]);
                 resp.resetBuffer();
-                sos.write(new byte [4 * 1024]);
+                sos.write(new byte[4 * 1024]);
             }
         }
     }
@@ -498,8 +491,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
 
@@ -513,10 +505,10 @@ public class TestHttpServlet extends TomcatBaseTest {
             } else {
                 ServletOutputStream sos = resp.getOutputStream();
                 resp.addHeader("aaa", "bbb");
-                sos.write(new byte [4 * 1024]);
+                sos.write(new byte[4 * 1024]);
                 resp.resetBuffer();
                 resp.addHeader("ccc", "ddd");
-                sos.write(new byte [4 * 1024]);
+                sos.write(new byte[4 * 1024]);
             }
         }
     }
@@ -533,8 +525,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             AsyncContext ac = req.startAsync(req, resp);
             ac.setTimeout(3000);
             WriteListener wListener = new NonBlockingWriteListener(ac, bytesToWrite);
@@ -580,8 +571,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
@@ -595,8 +585,7 @@ public class TestHttpServlet extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             doGet(req, resp);
         }
     }

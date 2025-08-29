@@ -40,9 +40,8 @@ public class TestHttpServletDoHeadInvalidWrite511ValidWrite1023 extends HttpServ
                 for (Boolean w : booleans) {
                     for (ResetType rt : ResetType.values()) {
                         for (Boolean f : booleans) {
-                            parameterSets.add(new Object[] {
-                                    base[0], base[1],
-                                    buf, w, Integer.valueOf(511), rt, Integer.valueOf(1023), f });
+                            parameterSets.add(new Object[] { base[0], base[1], buf, w, Integer.valueOf(511), rt,
+                                    Integer.valueOf(1023), f });
                         }
                     }
                 }
