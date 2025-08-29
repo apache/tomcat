@@ -46,7 +46,7 @@ public class DigestAuthenticator extends Authenticator {
         validateUsername(userName);
         validatePassword(userPassword);
 
-        Map<String, String> parameterMap = parseAuthenticateHeader(authenticateHeader);
+        Map<String,String> parameterMap = parseAuthenticateHeader(authenticateHeader);
         String realm = parameterMap.get("realm");
 
         validateRealm(userRealm, realm);
@@ -79,7 +79,8 @@ public class DigestAuthenticator extends Authenticator {
 
         try {
             challenge.append("response=\"");
-            challenge.append(calculateRequestDigest(requestUri, userName, userPassword, realm, nonce, messageQop, algorithm));
+            challenge.append(
+                    calculateRequestDigest(requestUri, userName, userPassword, realm, nonce, messageQop, algorithm));
             challenge.append("\",");
         }
 

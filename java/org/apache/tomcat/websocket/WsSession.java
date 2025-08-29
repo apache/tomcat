@@ -81,8 +81,8 @@ public class WsSession implements Session {
         // be sufficient to pass the validation tests.
         ServerEndpointConfig.Builder builder = ServerEndpointConfig.Builder.create(Object.class, "/");
         ServerEndpointConfig sec = builder.build();
-        SEC_CONFIGURATOR_USES_IMPL_DEFAULT = sec.getConfigurator().getClass()
-                .equals(DefaultServerEndpointConfigurator.class);
+        SEC_CONFIGURATOR_USES_IMPL_DEFAULT =
+                sec.getConfigurator().getClass().equals(DefaultServerEndpointConfigurator.class);
     }
 
     private final Endpoint localEndpoint;
@@ -92,14 +92,14 @@ public class WsSession implements Session {
     private final ClassLoader applicationClassLoader;
     private final WsWebSocketContainer webSocketContainer;
     private final URI requestUri;
-    private final Map<String, List<String>> requestParameterMap;
+    private final Map<String,List<String>> requestParameterMap;
     private final String queryString;
     private final Principal userPrincipal;
     private final EndpointConfig endpointConfig;
 
     private final List<Extension> negotiatedExtensions;
     private final String subProtocol;
-    private final Map<String, String> pathParameters;
+    private final Map<String,String> pathParameters;
     private final boolean secure;
     private final String httpSessionId;
     private final String id;
@@ -110,13 +110,13 @@ public class WsSession implements Session {
     private volatile MessageHandler binaryMessageHandler = null;
     private volatile MessageHandler.Whole<PongMessage> pongMessageHandler = null;
     private final AtomicReference<State> state = new AtomicReference<>(State.OPEN);
-    private final Map<String, Object> userProperties = new ConcurrentHashMap<>();
+    private final Map<String,Object> userProperties = new ConcurrentHashMap<>();
     private volatile int maxBinaryMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile int maxTextMessageBufferSize = Constants.DEFAULT_BUFFER_SIZE;
     private volatile long maxIdleTimeout = 0;
     private volatile long lastActiveRead = System.currentTimeMillis();
     private volatile long lastActiveWrite = System.currentTimeMillis();
-    private final Map<FutureToSendHandler, FutureToSendHandler> futures = new ConcurrentHashMap<>();
+    private final Map<FutureToSendHandler,FutureToSendHandler> futures = new ConcurrentHashMap<>();
     private volatile Long sessionCloseTimeoutExpiry;
 
 
@@ -139,7 +139,7 @@ public class WsSession implements Session {
      */
     public WsSession(ClientEndpointHolder clientEndpointHolder, WsRemoteEndpointImplBase wsRemoteEndpoint,
             WsWebSocketContainer wsWebSocketContainer, List<Extension> negotiatedExtensions, String subProtocol,
-            Map<String, String> pathParameters, boolean secure, ClientEndpointConfig clientEndpointConfig)
+            Map<String,String> pathParameters, boolean secure, ClientEndpointConfig clientEndpointConfig)
             throws DeploymentException {
         this.wsRemoteEndpoint = wsRemoteEndpoint;
         this.wsRemoteEndpoint.setSession(this);
@@ -201,9 +201,9 @@ public class WsSession implements Session {
      * @throws DeploymentException if an invalid encode is specified
      */
     public WsSession(WsRemoteEndpointImplBase wsRemoteEndpoint, WsWebSocketContainer wsWebSocketContainer,
-            URI requestUri, Map<String, List<String>> requestParameterMap, String queryString, Principal userPrincipal,
+            URI requestUri, Map<String,List<String>> requestParameterMap, String queryString, Principal userPrincipal,
             String httpSessionId, List<Extension> negotiatedExtensions, String subProtocol,
-            Map<String, String> pathParameters, boolean secure, ServerEndpointConfig serverEndpointConfig)
+            Map<String,String> pathParameters, boolean secure, ServerEndpointConfig serverEndpointConfig)
             throws DeploymentException {
 
         this.wsRemoteEndpoint = wsRemoteEndpoint;
@@ -269,8 +269,7 @@ public class WsSession implements Session {
         if (configurator.getClass().equals(DefaultServerEndpointConfigurator.class)) {
             return true;
         }
-        return SEC_CONFIGURATOR_USES_IMPL_DEFAULT &&
-            configurator.getClass().equals(Configurator.class);
+        return SEC_CONFIGURATOR_USES_IMPL_DEFAULT && configurator.getClass().equals(Configurator.class);
     }
 
 
@@ -633,9 +632,9 @@ public class WsSession implements Session {
             closeConnection();
         } else if (state.compareAndSet(State.OUTPUT_CLOSING, State.CLOSING)) {
             /*
-             * The local endpoint sent a close message at the same time as the remote endpoint. The local close is
-             * still being processed. Update the state so the local close process will also close the network
-             * connection once it has finished sending a close message.
+             * The local endpoint sent a close message at the same time as the remote endpoint. The local close is still
+             * being processed. Update the state so the local close process will also close the network connection once
+             * it has finished sending a close message.
              */
         } else if (state.compareAndSet(State.OUTPUT_CLOSED, State.CLOSED)) {
             /*
@@ -908,7 +907,7 @@ public class WsSession implements Session {
 
 
     @Override
-    public Map<String, List<String>> getRequestParameterMap() {
+    public Map<String,List<String>> getRequestParameterMap() {
         checkState();
         return requestParameterMap;
     }
@@ -934,7 +933,7 @@ public class WsSession implements Session {
 
 
     @Override
-    public Map<String, String> getPathParameters() {
+    public Map<String,String> getPathParameters() {
         checkState();
         return pathParameters;
     }
@@ -947,7 +946,7 @@ public class WsSession implements Session {
 
 
     @Override
-    public Map<String, Object> getUserProperties() {
+    public Map<String,Object> getUserProperties() {
         checkState();
         return userProperties;
     }

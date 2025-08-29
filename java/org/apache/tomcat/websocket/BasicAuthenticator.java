@@ -36,7 +36,7 @@ public class BasicAuthenticator extends Authenticator {
         validateUsername(userName);
         validatePassword(userPassword);
 
-        Map<String, String> parameterMap = parseAuthenticateHeader(authenticateHeader);
+        Map<String,String> parameterMap = parseAuthenticateHeader(authenticateHeader);
         String realm = parameterMap.get("realm");
 
         validateRealm(userRealm, realm);
