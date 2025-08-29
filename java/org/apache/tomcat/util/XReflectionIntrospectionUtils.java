@@ -25,8 +25,8 @@ final class XReflectionIntrospectionUtils {
     /**
      * Always throws {@link UnsupportedOperationException}
      *
-     * @param o     Unused
-     * @param name  Unused
+     * @param o    Unused
+     * @param name Unused
      *
      * @return Never returns normally
      */
