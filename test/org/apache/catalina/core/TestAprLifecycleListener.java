@@ -56,7 +56,8 @@ public class TestAprLifecycleListener {
     }
 
 
-    private void doTestMultipleServerInstancesUsingTomcatNativeLibrary(boolean reverseShutdownOrder, boolean ffm) throws Exception {
+    private void doTestMultipleServerInstancesUsingTomcatNativeLibrary(boolean reverseShutdownOrder, boolean ffm)
+            throws Exception {
         Path tmpDir = Paths.get(System.getProperty("tomcat.test.temp", "output/tmp"));
         Files.createDirectories(tmpDir);
 
@@ -66,7 +67,9 @@ public class TestAprLifecycleListener {
         tomcat1.setPort(0);
         TesterSupport.initSsl(tomcat1);
         TesterSupport.configureSSLImplementation(tomcat1,
-                ffm ? "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" : OpenSSLImplementation.class.getName(), true);
+                ffm ? "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" :
+                        OpenSSLImplementation.class.getName(),
+                true);
         tomcat1.init();
 
         Tomcat tomcat2 = new Tomcat();
@@ -75,7 +78,9 @@ public class TestAprLifecycleListener {
         tomcat2.setPort(0);
         TesterSupport.initSsl(tomcat2);
         TesterSupport.configureSSLImplementation(tomcat2,
-                ffm ? "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" : OpenSSLImplementation.class.getName(), true);
+                ffm ? "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" :
+                        OpenSSLImplementation.class.getName(),
+                true);
         tomcat2.init();
 
         // Start 1, then 2

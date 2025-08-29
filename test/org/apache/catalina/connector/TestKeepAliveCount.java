@@ -53,7 +53,7 @@ public class TestKeepAliveCount extends TomcatBaseTest {
 
         private synchronized void init() {
             if (init) {
-              return;
+                return;
             }
 
             Tomcat tomcat = getTomcatInstance();
@@ -84,7 +84,7 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             // @formatter:on
             setRequest(request);
             processRequest(false); // blocks until response has been read
-            boolean passed = (this.readLine()==null);
+            boolean passed = (this.readLine() == null);
             // Close the connection
             disconnect();
             reset();
@@ -114,11 +114,11 @@ public class TestKeepAliveCount extends TomcatBaseTest {
 
             setRequest(request);
 
-            for (int i=0; i<5; i++) {
+            for (int i = 0; i < 5; i++) {
                 processRequest(false); // blocks until response has been read
-                Assert.assertTrue(getResponseLine()!=null && getResponseLine().startsWith("HTTP/1.1 200 "));
+                Assert.assertTrue(getResponseLine() != null && getResponseLine().startsWith("HTTP/1.1 200 "));
             }
-            boolean passed = (this.readLine()==null);
+            boolean passed = (this.readLine() == null);
             // Close the connection
             disconnect();
             reset();

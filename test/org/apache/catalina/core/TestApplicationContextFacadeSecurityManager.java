@@ -40,23 +40,20 @@ import org.easymock.internal.LastControl;
 public final class TestApplicationContextFacadeSecurityManager extends SecurityManagerBaseTest {
 
     /**
-     * @return {@link Collection} of non-static, non-object, public {@link
-     * Method}s in {@link ApplicationContextFacade} to be run with the the Java
-     * 2 {@link SecurityManager} been enabled.
+     * @return {@link Collection} of non-static, non-object, public {@link Method}s in {@link ApplicationContextFacade}
+     *             to be run with the the Java 2 {@link SecurityManager} been enabled.
      */
     @Parameterized.Parameters(name = "{index}: method={0}")
     public static Collection<Method> publicApplicationContextFacadeMethods() {
         return Arrays.stream(ApplicationContextFacade.class.getMethods())
-                .filter(method -> !Modifier.isStatic(method.getModifiers()))
-                .filter(method -> {
+                .filter(method -> !Modifier.isStatic(method.getModifiers())).filter(method -> {
                     try {
                         Object.class.getMethod(method.getName(), method.getParameterTypes());
                         return false;
                     } catch (final NoSuchMethodException e) {
                         return true;
                     }
-                })
-                .collect(Collectors.toList());
+                }).collect(Collectors.toList());
     }
 
 
@@ -87,26 +84,21 @@ public final class TestApplicationContextFacadeSecurityManager extends SecurityM
 
 
     /**
-     * Test for
-     * <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=64735">Bug
-     * 64735</a> which confirms that {@link ApplicationContextFacade} behaves
-     * correctly when the Java 2 {@link SecurityManager} has been enabled.
+     * Test for <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=64735">Bug 64735</a> which confirms that
+     * {@link ApplicationContextFacade} behaves correctly when the Java 2 {@link SecurityManager} has been enabled.
      *
      * @throws NoSuchMethodException     Should never happen
      * @throws IllegalAccessException    Should never happen
      * @throws InvocationTargetException Should never happen
      */
     @Test
-    public void testBug64735()
-            throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void testBug64735() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Assert.assertTrue(SecurityUtil.isPackageProtectionEnabled());
 
         // Mock the ApplicationContext that we provide to the ApplicationContextFacade.
         final ApplicationContext mockAppContext = EasyMock.createMock(ApplicationContext.class);
         final Method expectedAppContextMethod =
-                ApplicationContext.class.getMethod(
-                        methodToTest.getName(),
-                        methodToTest.getParameterTypes());
+                ApplicationContext.class.getMethod(methodToTest.getName(), methodToTest.getParameterTypes());
 
         // Expect that only the provided method which is being tested will be called exactly once.
         final IExpectationSetters<Object> expectationSetters;
@@ -115,31 +107,21 @@ public final class TestApplicationContextFacadeSecurityManager extends SecurityM
             expectationSetters = EasyMock.expectLastCall();
         } else {
             expectationSetters =
-                    EasyMock.expect(expectedAppContextMethod.invoke(
-                            mockAppContext, getDefaultParams(methodToTest)));
+                    EasyMock.expect(expectedAppContextMethod.invoke(mockAppContext, getDefaultParams(methodToTest)));
         }
-        expectationSetters
-                .andAnswer(() -> {
-                    Assert.assertEquals(
-                            expectedAppContextMethod,
-                            LastControl.getCurrentInvocation().getMethod());
-                    return getDefaultValue(expectedAppContextMethod.getReturnType());
-                }).once();
+        expectationSetters.andAnswer(() -> {
+            Assert.assertEquals(expectedAppContextMethod, LastControl.getCurrentInvocation().getMethod());
+            return getDefaultValue(expectedAppContextMethod.getReturnType());
+        }).once();
         EasyMock.replay(mockAppContext);
         EasyMock.verifyUnexpectedCalls(mockAppContext);
 
         // Invoke the method on ApplicationContextFacade. Fail if any unexpected exceptions are
         // thrown.
         try {
-            methodToTest.invoke(
-                    new ApplicationContextFacade(mockAppContext),
-                    getDefaultParams(methodToTest));
+            methodToTest.invoke(new ApplicationContextFacade(mockAppContext), getDefaultParams(methodToTest));
         } catch (final IllegalAccessException | InvocationTargetException e) {
-            throw new AssertionError(
-                    "Failed to call " +
-                            methodToTest +
-                            " with SecurityManager enabled.",
-                    e);
+            throw new AssertionError("Failed to call " + methodToTest + " with SecurityManager enabled.", e);
         }
 
         // Verify that the method called through to the wrapped ApplicationContext correctly.

@@ -79,8 +79,7 @@ public class TestInputBuffer extends TomcatBaseTest {
     }
 
 
-    private void doUtf8BodyTest(String description, int[] input,
-            String expected) throws Exception {
+    private void doUtf8BodyTest(String description, int[] input, String expected) throws Exception {
 
         byte[] bytes = new byte[input.length];
         for (int i = 0; i < input.length; i++) {
@@ -88,8 +87,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         }
 
         ByteChunk bc = new ByteChunk();
-        int rc = postUrl(bytes, "http://localhost:" + getPort() + "/test", bc,
-                null);
+        int rc = postUrl(bytes, "http://localhost:" + getPort() + "/test", bc, null);
 
         if (expected == null) {
             Assert.assertEquals(description, HttpServletResponse.SC_OK, rc);
@@ -108,15 +106,13 @@ public class TestInputBuffer extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // Should use POST
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         }
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             req.setCharacterEncoding("UTF-8");
             Reader r = req.getReader();
 
@@ -145,8 +141,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             StringBuilder builder = new StringBuilder();
             try (BufferedReader reader = req.getReader()) {
                 String line;

@@ -68,8 +68,7 @@ public class TestResponse extends TomcatBaseTest {
             if (header.getKey() == null) {
                 // Expected if this is the response line
                 List<String> values = header.getValue();
-                if (values.size() == 1 &&
-                        values.get(0).startsWith("HTTP/1.1")) {
+                if (values.size() == 1 && values.get(0).startsWith("HTTP/1.1")) {
                     continue;
                 }
                 Assert.fail("Null header name detected for value " + values);
@@ -80,7 +79,7 @@ public class TestResponse extends TomcatBaseTest {
         int count = 0;
         for (String headerName : headers.keySet()) {
             if ("Set-Cookie".equals(headerName)) {
-                count ++;
+                count++;
             }
         }
         Assert.assertEquals(1, count);
@@ -90,8 +89,7 @@ public class TestResponse extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             HttpSession session = req.getSession(true);
             session.invalidate();
             req.getSession(true);
@@ -125,8 +123,7 @@ public class TestResponse extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             PrintWriter pw = resp.getWriter();
             resp.setHeader("Content-Type", "text/plain;charset=UTF-8");
 
@@ -169,8 +166,7 @@ public class TestResponse extends TomcatBaseTest {
 
         String result = resp.toAbsolute("./bar.html");
 
-        Assert.assertEquals("http://localhost:8080/level1/level2/bar.html",
-                result);
+        Assert.assertEquals("http://localhost:8080/level1/level2/bar.html", result);
     }
 
 
@@ -210,7 +206,7 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testBug53062e() throws Exception {
         Request req = new TesterRequest();
         Response resp = new Response();
@@ -228,8 +224,7 @@ public class TestResponse extends TomcatBaseTest {
 
         String result = resp.toAbsolute("bar.html");
 
-        Assert.assertEquals(
-                "http://localhost:8080/level1/level2/bar.html", result);
+        Assert.assertEquals("http://localhost:8080/level1/level2/bar.html", result);
     }
 
 
@@ -241,8 +236,7 @@ public class TestResponse extends TomcatBaseTest {
 
         String result = resp.toAbsolute("bar.html?x=/../");
 
-        Assert.assertEquals(
-                "http://localhost:8080/level1/level2/bar.html?x=/../", result);
+        Assert.assertEquals("http://localhost:8080/level1/level2/bar.html?x=/../", result);
     }
 
 
@@ -254,9 +248,7 @@ public class TestResponse extends TomcatBaseTest {
 
         String result = resp.toAbsolute("bar.html?x=/../../");
 
-        Assert.assertEquals(
-                "http://localhost:8080/level1/level2/bar.html?x=/../../",
-                result);
+        Assert.assertEquals("http://localhost:8080/level1/level2/bar.html?x=/../../", result);
     }
 
 
@@ -268,8 +260,7 @@ public class TestResponse extends TomcatBaseTest {
 
         String result = resp.toAbsolute("./.?x=/../../");
 
-        Assert.assertEquals(
-                "http://localhost:8080/level1/level2/?x=/../../", result);
+        Assert.assertEquals("http://localhost:8080/level1/level2/?x=/../../", result);
     }
 
 
@@ -293,9 +284,7 @@ public class TestResponse extends TomcatBaseTest {
 
         String result = resp.toAbsolute("./..?x=/../..");
 
-        Assert.assertEquals(
-                "http://localhost:8080/level1/?x=/../..",
-                result);
+        Assert.assertEquals("http://localhost:8080/level1/?x=/../..", result);
     }
 
 
@@ -307,8 +296,7 @@ public class TestResponse extends TomcatBaseTest {
 
         String result = resp.toAbsolute("bar.html#/../");
 
-        Assert.assertEquals(
-                "http://localhost:8080/level1/level2/bar.html#/../", result);
+        Assert.assertEquals("http://localhost:8080/level1/level2/bar.html#/../", result);
     }
 
 
@@ -320,8 +308,7 @@ public class TestResponse extends TomcatBaseTest {
 
         String result = resp.toAbsolute("bar.html#/../../");
 
-        Assert.assertEquals(
-                "http://localhost:8080/level1/level2/bar.html#/../../", result);
+        Assert.assertEquals("http://localhost:8080/level1/level2/bar.html#/../../", result);
     }
 
 
@@ -333,8 +320,7 @@ public class TestResponse extends TomcatBaseTest {
 
         String result = resp.toAbsolute("./.#/../../");
 
-        Assert.assertEquals(
-                "http://localhost:8080/level1/level2/#/../../", result);
+        Assert.assertEquals("http://localhost:8080/level1/level2/#/../../", result);
     }
 
 
@@ -505,7 +491,7 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testEncodeRedirectURL05() throws Exception {
         doTestEncodeRedirectURL("../../..", "throws IAE");
     }
@@ -611,7 +597,7 @@ public class TestResponse extends TomcatBaseTest {
         // Do test
         response.sendRedirect(input);
         String location = response.getHeader("Location");
-        Assert.assertEquals(expectedLocation,  location);
+        Assert.assertEquals(expectedLocation, location);
     }
 
 
@@ -711,7 +697,7 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
-    @Test(expected =  UnsupportedEncodingException.class)
+    @Test(expected = UnsupportedEncodingException.class)
     public void testSetCharacterEncoding06() throws IOException {
         Response response = setupResponse();
 
@@ -806,7 +792,7 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
-    @Test(expected =  UnsupportedEncodingException.class)
+    @Test(expected = UnsupportedEncodingException.class)
     public void testSetContentType05() throws IOException {
         Response response = setupResponse();
         response.getContext().addLocaleEncodingMappingParameter(Locale.UK.toLanguageTag(), UNKNOWN);
@@ -885,7 +871,7 @@ public class TestResponse extends TomcatBaseTest {
     }
 
 
-    @Test(expected =  UnsupportedEncodingException.class)
+    @Test(expected = UnsupportedEncodingException.class)
     public void testSetLocale05() throws IOException {
         Response response = setupResponse();
 
@@ -1003,12 +989,9 @@ public class TestResponse extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-            resp.setContentType("multipart/related;" +
-                    "boundary=1_4F50BD36_CDF8C28;" +
-                    "Start=\"<31671603.smil>\";" +
+            resp.setContentType("multipart/related;" + "boundary=1_4F50BD36_CDF8C28;" + "Start=\"<31671603.smil>\";" +
                     "Type=\"application/smil;charset=UTF-8\"");
 
             // Should be ISO-8859-1 because the charset in the above is part
@@ -1025,9 +1008,9 @@ public class TestResponse extends TomcatBaseTest {
 
     private static final class ErrorPageServlet extends HttpServlet {
         private static final long serialVersionUID = 1L;
+
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             if (resp.getStatus() == 404) {
                 resp.setStatus(202);
             } else {

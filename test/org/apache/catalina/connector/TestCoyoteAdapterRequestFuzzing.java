@@ -122,7 +122,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
         tomcat.start();
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
-        client.setRequest(new String[] {requestLine + CRLF, headers + CRLF});
+        client.setRequest(new String[] { requestLine + CRLF, headers + CRLF });
 
         client.connect();
         try {

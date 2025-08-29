@@ -60,26 +60,22 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
     @Test
     public void testSecurityAnnotationsSubclass1() throws Exception {
-        doTest(SubclassDenyAllServlet.class.getName(),
-                false, false, false,false);
+        doTest(SubclassDenyAllServlet.class.getName(), false, false, false, false);
     }
 
     @Test
     public void testSecurityAnnotationsSubclass2() throws Exception {
-        doTest(SubclassAllowAllServlet.class.getName(),
-                false, false, true, false);
+        doTest(SubclassAllowAllServlet.class.getName(), false, false, true, false);
     }
 
     @Test
     public void testSecurityAnnotationsMethods1() throws Exception {
-        doTest(MethodConstraintServlet.class.getName(),
-                false, false, false, false);
+        doTest(MethodConstraintServlet.class.getName(), false, false, false, false);
     }
 
     @Test
     public void testSecurityAnnotationsMethods2() throws Exception {
-        doTest(MethodConstraintServlet.class.getName(),
-                true, false, true, false);
+        doTest(MethodConstraintServlet.class.getName(), true, false, true, false);
     }
 
     @Test
@@ -154,9 +150,8 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc;
-        rc = getUrl("http://localhost:" + getPort() +
-                "/testStandardWrapper/securityAnnotationsWebXmlPriority",
-                bc, null, null);
+        rc = getUrl("http://localhost:" + getPort() + "/testStandardWrapper/securityAnnotationsWebXmlPriority", bc,
+                null, null);
 
         Assert.assertTrue(bc.getLength() > 0);
         Assert.assertEquals(403, rc);
@@ -168,8 +163,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc;
-        rc = getUrl("http://localhost:" + getPort() +
-                "/test/testStandardWrapper/securityAnnotationsMetaDataPriority",
+        rc = getUrl("http://localhost:" + getPort() + "/test/testStandardWrapper/securityAnnotationsMetaDataPriority",
                 bc, null, null);
 
         Assert.assertEquals("OK", bc.toString());
@@ -198,8 +192,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc;
-        rc = getUrl("http://localhost:" + getPort() + "/",
-                bc, null, null);
+        rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
 
         Assert.assertTrue(bc.getLength() > 0);
         Assert.assertEquals(403, rc);
@@ -217,16 +210,14 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc;
-        rc = getUrl("http://localhost:" + getPort() + "/protected.jsp",
-                bc, null, null);
+        rc = getUrl("http://localhost:" + getPort() + "/protected.jsp", bc, null, null);
 
         Assert.assertTrue(bc.getLength() > 0);
         Assert.assertEquals(403, rc);
 
         bc.recycle();
 
-        rc = getUrl("http://localhost:" + getPort() + "/unprotected.jsp",
-                bc, null, null);
+        rc = getUrl("http://localhost:" + getPort() + "/unprotected.jsp", bc, null, null);
 
         Assert.assertEquals(200, rc);
         Assert.assertTrue(bc.toString().contains("00-OK"));
@@ -247,8 +238,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         doTestRoleMapping("context");
     }
 
-    private void doTestRoleMapping(String realmContainer)
-            throws Exception {
+    private void doTestRoleMapping(String realmContainer) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -267,8 +257,9 @@ public class TestStandardWrapper extends TomcatBaseTest {
         ch.setAlgorithm("SHA");
         realm.setCredentialHandler(ch);
 
-        /* Attach the realm to the appropriate container, but role mapping must
-         * always succeed because it is evaluated at context level.
+        /*
+         * Attach the realm to the appropriate container, but role mapping must always succeed because it is evaluated
+         * at context level.
          */
         if (realmContainer.equals("engine")) {
             tomcat.getEngine().setRealm(realm);
@@ -301,21 +292,19 @@ public class TestStandardWrapper extends TomcatBaseTest {
         // This now tests RealmBase#hasResourcePermission() because we need a wrapper
         // to be passed from an authenticator
         ByteChunk bc = new ByteChunk();
-        Map<String, List<String>> reqHeaders = new HashMap<>();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
         List<String> authHeaders = new ArrayList<>();
         // testUser, testPwd
         authHeaders.add("Basic dGVzdFVzZXI6dGVzdFB3ZA==");
         reqHeaders.put("Authorization", authHeaders);
 
-        int rc = getUrl("http://localhost:" + getPort() + "/", bc, reqHeaders,
-                null);
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, reqHeaders, null);
 
         Assert.assertEquals("OK", bc.toString());
         Assert.assertEquals(200, rc);
     }
 
-    private void doTestSecurityAnnotationsAddServlet(boolean useCreateServlet)
-            throws Exception {
+    private void doTestSecurityAnnotationsAddServlet(boolean useCreateServlet) throws Exception {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -342,9 +331,8 @@ public class TestStandardWrapper extends TomcatBaseTest {
         }
     }
 
-    private void doTest(String servletClassName, boolean usePost,
-            boolean useRole, boolean expect200, boolean denyUncovered)
-            throws Exception {
+    private void doTest(String servletClassName, boolean usePost, boolean useRole, boolean expect200,
+            boolean denyUncovered) throws Exception {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -382,11 +370,9 @@ public class TestStandardWrapper extends TomcatBaseTest {
 
         int rc;
         if (usePost) {
-            rc = postUrl(null, "http://localhost:" + getPort() + "/", bc,
-                    reqHeaders, null);
+            rc = postUrl(null, "http://localhost:" + getPort() + "/", bc, reqHeaders, null);
         } else {
-            rc = getUrl("http://localhost:" + getPort() + "/", bc, reqHeaders,
-                    null);
+            rc = getUrl("http://localhost:" + getPort() + "/", bc, reqHeaders, null);
         }
 
         if (expect200) {
@@ -402,16 +388,14 @@ public class TestStandardWrapper extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setContentType("text/plain");
             resp.getWriter().print("OK");
         }
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             doGet(req, resp);
         }
     }
@@ -430,20 +414,13 @@ public class TestStandardWrapper extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
     }
 
-    @ServletSecurity(value= @HttpConstraint(EmptyRoleSemantic.PERMIT),
-        httpMethodConstraints = {
-            @HttpMethodConstraint(value="GET",
-                    emptyRoleSemantic = EmptyRoleSemantic.DENY)
-        }
-    )
+    @ServletSecurity(value = @HttpConstraint(EmptyRoleSemantic.PERMIT), httpMethodConstraints = {
+            @HttpMethodConstraint(value = "GET", emptyRoleSemantic = EmptyRoleSemantic.DENY) })
     public static class MethodConstraintServlet extends TestServlet {
         private static final long serialVersionUID = 1L;
     }
 
-    @ServletSecurity(httpMethodConstraints = {
-            @HttpMethodConstraint(value="POST",rolesAllowed = "testRole")
-        }
-    )
+    @ServletSecurity(httpMethodConstraints = { @HttpMethodConstraint(value = "POST", rolesAllowed = "testRole") })
     public static class UncoveredGetServlet extends TestServlet {
         private static final long serialVersionUID = 1L;
     }
@@ -469,8 +446,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         }
 
         @Override
-        public void onStartup(Set<Class<?>> c, ServletContext ctx)
-                throws ServletException {
+        public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {
             Servlet s;
 
             if (createServlet) {

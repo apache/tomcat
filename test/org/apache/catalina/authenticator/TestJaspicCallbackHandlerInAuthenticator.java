@@ -107,11 +107,9 @@ public class TestJaspicCallbackHandlerInAuthenticator {
         CallbackHandler callbackHandler = createCallbackHandler(null);
         Subject clientSubject = new Subject();
         CallerPrincipalCallback cpc = new CallerPrincipalCallback(clientSubject, "name");
-        GroupPrincipalCallback gpc1 = new GroupPrincipalCallback(clientSubject,
-                new String[] { "group1", "group2" });
+        GroupPrincipalCallback gpc1 = new GroupPrincipalCallback(clientSubject, new String[] { "group1", "group2" });
         callbackHandler.handle(new Callback[] { cpc, gpc1 });
-        GroupPrincipalCallback gpc2 = new GroupPrincipalCallback(clientSubject,
-                new String[] { "group3", "group4" });
+        GroupPrincipalCallback gpc2 = new GroupPrincipalCallback(clientSubject, new String[] { "group3", "group4" });
         callbackHandler.handle(new Callback[] { cpc, gpc2 });
         Set<Object> credentials = clientSubject.getPrivateCredentials();
         Assert.assertTrue(credentials.size() == 1);
@@ -132,12 +130,12 @@ public class TestJaspicCallbackHandlerInAuthenticator {
         container.setRealm(new TestRealm());
         ((Contained) callbackHandler).setContainer(container);
         Subject clientSubject = new Subject();
-        PasswordValidationCallback pvc1 = new PasswordValidationCallback(clientSubject, "name1",
-                "password".toCharArray());
+        PasswordValidationCallback pvc1 =
+                new PasswordValidationCallback(clientSubject, "name1", "password".toCharArray());
         callbackHandler.handle(new Callback[] { pvc1 });
         Assert.assertTrue(pvc1.getResult());
-        PasswordValidationCallback pvc2 = new PasswordValidationCallback(clientSubject, "name2",
-                "invalid".toCharArray());
+        PasswordValidationCallback pvc2 =
+                new PasswordValidationCallback(clientSubject, "name2", "invalid".toCharArray());
         callbackHandler.handle(new Callback[] { pvc2 });
         Assert.assertFalse(pvc2.getResult());
         Set<Object> credentials = clientSubject.getPrivateCredentials();
@@ -162,8 +160,7 @@ public class TestJaspicCallbackHandlerInAuthenticator {
     private static class TestAuthenticator extends AuthenticatorBase {
 
         @Override
-        protected boolean doAuthenticate(Request request, HttpServletResponse response)
-                throws IOException {
+        protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
             return false;
         }
 
@@ -189,7 +186,7 @@ public class TestJaspicCallbackHandlerInAuthenticator {
         @Override
         public Principal authenticate(String username, String password) {
             if (getPassword(username).equals(password)) {
-              return getPrincipal(username);
+                return getPrincipal(username);
             }
             return null;
         }

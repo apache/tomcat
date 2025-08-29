@@ -117,7 +117,8 @@ public class TestAsyncContextIoError extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
             AsyncContext ac = request.startAsync();
             ac.setTimeout(0);
 
@@ -203,7 +204,8 @@ public class TestAsyncContextIoError extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        protected void doGet(HttpServletRequest request, HttpServletResponse response)
+                throws ServletException, IOException {
             invocationCount.incrementAndGet();
         }
     }
