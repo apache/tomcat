@@ -49,8 +49,7 @@ public class TestVirtualContext extends TomcatBaseTest {
         // present. The listener affects the JVM, and thus not only the current,
         // but also the subsequent tests that are run in the same JVM. So it is
         // fair to add it in every test.
-        tomcat.getServer().addLifecycleListener(
-            new JreMemoryLeakPreventionListener());
+        tomcat.getServer().addLifecycleListener(new JreMemoryLeakPreventionListener());
     }
 
     @Test
@@ -60,36 +59,27 @@ public class TestVirtualContext extends TomcatBaseTest {
 
         File appDir = new File("test/webapp-virtual-webapp/src/main/webapp-a");
         // app dir is relative to server home
-        StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
-            appDir.getAbsolutePath());
+        StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
 
         ctx.setResources(new StandardRoot(ctx));
         File f1 = new File("test/webapp-virtual-webapp/target/classes");
         File f2 = new File("test/webapp-virtual-library/target/WEB-INF");
-        File f3 = new File(
-                "test/webapp-virtual-webapp/src/main/webapp-a/WEB-INF/classes");
-        File f4 = new File(
-                "test/webapp-virtual-webapp/src/main/webapp-b/WEB-INF/classes");
+        File f3 = new File("test/webapp-virtual-webapp/src/main/webapp-a/WEB-INF/classes");
+        File f4 = new File("test/webapp-virtual-webapp/src/main/webapp-b/WEB-INF/classes");
         File f5 = new File("test/webapp-virtual-webapp/src/main/misc");
         File f6 = new File("test/webapp-virtual-webapp/src/main/webapp-b");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
                 f1.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF",
-                f2.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/WEB-INF", f2.getAbsolutePath(),
+                null, "/");
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
                 f3.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
                 f4.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/other",
-                f5.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/",
-                f6.getAbsolutePath(), null, "/");
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/other", f5.getAbsolutePath(),
+                null, "/");
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/", f6.getAbsolutePath(), null,
+                "/");
 
         StandardJarScanner jarScanner = new StandardJarScanner();
         jarScanner.setScanAllDirectories(true);
@@ -98,77 +88,54 @@ public class TestVirtualContext extends TomcatBaseTest {
 
         tomcat.start();
 
-        assertPageContains("/test/classpathGetResourceAsStream.jsp?path=nonexistent",
-            "resourceAInWebInfClasses=true", 404);
+        assertPageContains("/test/classpathGetResourceAsStream.jsp?path=nonexistent", "resourceAInWebInfClasses=true",
+                404);
 
-        assertPageContains(
-            "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceA.properties",
-            "resourceAInWebInfClasses=true");
-        assertPageContains(
-            "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceA.properties",
-            "resourceAInWebInfClasses=true");
+        assertPageContains("/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceA.properties",
+                "resourceAInWebInfClasses=true");
+        assertPageContains("/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceA.properties",
+                "resourceAInWebInfClasses=true");
 
-        assertPageContains(
-            "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceB.properties",
-            "resourceBInTargetClasses=true");
-        assertPageContains(
-            "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceB.properties",
-            "resourceBInTargetClasses=true");
+        assertPageContains("/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceB.properties",
+                "resourceBInTargetClasses=true");
+        assertPageContains("/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceB.properties",
+                "resourceBInTargetClasses=true");
 
-        assertPageContains(
-            "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceC.properties",
-            "resourceCInDependentLibraryTargetClasses=true");
-        assertPageContains(
-            "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceC.properties",
-            "resourceCInDependentLibraryTargetClasses=true");
+        assertPageContains("/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceC.properties",
+                "resourceCInDependentLibraryTargetClasses=true");
+        assertPageContains("/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceC.properties",
+                "resourceCInDependentLibraryTargetClasses=true");
 
-        assertPageContains(
-            "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceD.properties",
-            "resourceDInPackagedJarInWebInfLib=true");
-        assertPageContains(
-            "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceD.properties",
-            "resourceDInPackagedJarInWebInfLib=true");
+        assertPageContains("/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceD.properties",
+                "resourceDInPackagedJarInWebInfLib=true");
+        assertPageContains("/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceD.properties",
+                "resourceDInPackagedJarInWebInfLib=true");
 
-        assertPageContains(
-            "/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceG.properties",
-            "resourceGInWebInfClasses=true");
-        assertPageContains(
-            "/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceG.properties",
-            "resourceGInWebInfClasses=true");
+        assertPageContains("/test/classpathGetResourceAsStream.jsp?path=rsrc/resourceG.properties",
+                "resourceGInWebInfClasses=true");
+        assertPageContains("/test/classpathGetResourceUrlThenGetStream.jsp?path=rsrc/resourceG.properties",
+                "resourceGInWebInfClasses=true");
 
         // test listing all possible paths for a classpath resource
         String allUrls =
-            getUrl(
-                "http://localhost:" + getPort() +
-                    "/test/classpathGetResources.jsp?path=rsrc/").toString();
-        Assert.assertTrue(
-            allUrls,
-            allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp-a/WEB-INF/classes/rsrc") > 0);
-        Assert.assertTrue(
-            allUrls,
-            allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp-b/WEB-INF/classes/rsrc") > 0);
-        Assert.assertTrue(
-            allUrls,
-            allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp-a/WEB-INF/lib/rsrc.jar!/rsrc") > 0);
-        Assert.assertTrue(
-            allUrls,
-            allUrls.indexOf("/test/webapp-virtual-webapp/target/classes/rsrc") > 0);
-        Assert.assertTrue(
-            allUrls,
-            allUrls.indexOf("/test/webapp-virtual-library/target/WEB-INF/classes/rsrc") > 0);
+                getUrl("http://localhost:" + getPort() + "/test/classpathGetResources.jsp?path=rsrc/").toString();
+        Assert.assertTrue(allUrls,
+                allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp-a/WEB-INF/classes/rsrc") > 0);
+        Assert.assertTrue(allUrls,
+                allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp-b/WEB-INF/classes/rsrc") > 0);
+        Assert.assertTrue(allUrls,
+                allUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp-a/WEB-INF/lib/rsrc.jar!/rsrc") > 0);
+        Assert.assertTrue(allUrls, allUrls.indexOf("/test/webapp-virtual-webapp/target/classes/rsrc") > 0);
+        Assert.assertTrue(allUrls, allUrls.indexOf("/test/webapp-virtual-library/target/WEB-INF/classes/rsrc") > 0);
 
         // check that there's no duplicate in the URLs
         String[] allUrlsArray = allUrls.split("\\s+");
-        Assert.assertEquals(new HashSet<>(Arrays.asList(allUrlsArray)).size(),
-            allUrlsArray.length);
+        Assert.assertEquals(new HashSet<>(Arrays.asList(allUrlsArray)).size(), allUrlsArray.length);
 
         String allRsrsc2ClasspathUrls =
-            getUrl(
-                "http://localhost:" + getPort() +
-                    "/test/classpathGetResources.jsp?path=rsrc-2/").toString();
-        Assert.assertTrue(
-            allRsrsc2ClasspathUrls,
-            allRsrsc2ClasspathUrls.indexOf("/test/webapp-virtual-webapp/src/main/webapp-b/WEB-INF/classes/rsrc-2") > 0);
+                getUrl("http://localhost:" + getPort() + "/test/classpathGetResources.jsp?path=rsrc-2/").toString();
+        Assert.assertTrue(allRsrsc2ClasspathUrls, allRsrsc2ClasspathUrls
+                .indexOf("/test/webapp-virtual-webapp/src/main/webapp-b/WEB-INF/classes/rsrc-2") > 0);
 
         // tests context.getRealPath
 
@@ -179,71 +146,39 @@ public class TestVirtualContext extends TomcatBaseTest {
 
         // Real paths depend on the OS and this test has to work on all
         // platforms so use File to convert the path to a platform specific form
-        File f = new File(
-            "test/webapp-virtual-webapp/src/main/webapp-a/rsrc/resourceF.properties");
-        assertPageContains(
-            "/test/contextGetRealPath.jsp?path=/rsrc/resourceF.properties",
-            f.getPath());
+        File f = new File("test/webapp-virtual-webapp/src/main/webapp-a/rsrc/resourceF.properties");
+        assertPageContains("/test/contextGetRealPath.jsp?path=/rsrc/resourceF.properties", f.getPath());
 
         // tests context.getResource then the content
 
-        assertPageContains("/test/contextGetResource.jsp?path=/nonexistent",
-            "resourceAInWebInfClasses=true", 404);
-        assertPageContains(
-            "/test/contextGetResource.jsp?path=/WEB-INF/classes/rsrc/resourceA.properties",
-            "resourceAInWebInfClasses=true");
-        assertPageContains(
-            "/test/contextGetResource.jsp?path=/WEB-INF/classes/rsrc/resourceG.properties",
-            "resourceGInWebInfClasses=true");
-        assertPageContains(
-            "/test/contextGetResource.jsp?path=/rsrc/resourceE.properties",
-            "resourceEInDependentLibraryTargetClasses=true");
-        assertPageContains(
-            "/test/contextGetResource.jsp?path=/other/resourceI.properties",
-            "resourceIInWebapp=true");
-        assertPageContains(
-            "/test/contextGetResource.jsp?path=/rsrc-2/resourceJ.properties",
-            "resourceJInWebapp=true");
+        assertPageContains("/test/contextGetResource.jsp?path=/nonexistent", "resourceAInWebInfClasses=true", 404);
+        assertPageContains("/test/contextGetResource.jsp?path=/WEB-INF/classes/rsrc/resourceA.properties",
+                "resourceAInWebInfClasses=true");
+        assertPageContains("/test/contextGetResource.jsp?path=/WEB-INF/classes/rsrc/resourceG.properties",
+                "resourceGInWebInfClasses=true");
+        assertPageContains("/test/contextGetResource.jsp?path=/rsrc/resourceE.properties",
+                "resourceEInDependentLibraryTargetClasses=true");
+        assertPageContains("/test/contextGetResource.jsp?path=/other/resourceI.properties", "resourceIInWebapp=true");
+        assertPageContains("/test/contextGetResource.jsp?path=/rsrc-2/resourceJ.properties", "resourceJInWebapp=true");
 
         String allRsrcPaths =
-            getUrl(
-                "http://localhost:" + getPort() +
-                    "/test/contextGetResourcePaths.jsp?path=/rsrc/").toString();
-        Assert.assertTrue(
-            allRsrcPaths,
-            allRsrcPaths.indexOf("/rsrc/resourceF.properties") > 0);
-        Assert.assertTrue(
-            allRsrcPaths,
-            allRsrcPaths.indexOf("/rsrc/resourceE.properties") > 0);
-        Assert.assertTrue(
-            allRsrcPaths,
-            allRsrcPaths.indexOf("/rsrc/resourceH.properties") > 0);
+                getUrl("http://localhost:" + getPort() + "/test/contextGetResourcePaths.jsp?path=/rsrc/").toString();
+        Assert.assertTrue(allRsrcPaths, allRsrcPaths.indexOf("/rsrc/resourceF.properties") > 0);
+        Assert.assertTrue(allRsrcPaths, allRsrcPaths.indexOf("/rsrc/resourceE.properties") > 0);
+        Assert.assertTrue(allRsrcPaths, allRsrcPaths.indexOf("/rsrc/resourceH.properties") > 0);
 
         // check that there's no duplicate in the URLs
         String[] allRsrcPathsArray = allRsrcPaths.split("\\s+");
-        Assert.assertEquals(new HashSet<>(Arrays.asList(allRsrcPathsArray)).size(),
-            allRsrcPathsArray.length);
+        Assert.assertEquals(new HashSet<>(Arrays.asList(allRsrcPathsArray)).size(), allRsrcPathsArray.length);
 
         String allRsrc2Paths =
-            getUrl(
-                "http://localhost:" + getPort() +
-                    "/test/contextGetResourcePaths.jsp?path=/rsrc-2/").toString();
-        Assert.assertTrue(
-            allRsrc2Paths,
-            allRsrc2Paths.indexOf("/rsrc-2/resourceJ.properties") > 0);
+                getUrl("http://localhost:" + getPort() + "/test/contextGetResourcePaths.jsp?path=/rsrc-2/").toString();
+        Assert.assertTrue(allRsrc2Paths, allRsrc2Paths.indexOf("/rsrc-2/resourceJ.properties") > 0);
 
-        assertPageContains(
-            "/test/testTlds.jsp",
-            "worldA");
-        assertPageContains(
-            "/test/testTlds.jsp",
-            "worldB");
-        assertPageContains(
-            "/test/testTlds.jsp",
-            "worldC");
-        assertPageContains(
-            "/test/testTlds.jsp",
-            "worldD");
+        assertPageContains("/test/testTlds.jsp", "worldA");
+        assertPageContains("/test/testTlds.jsp", "worldB");
+        assertPageContains("/test/testTlds.jsp", "worldC");
+        assertPageContains("/test/testTlds.jsp", "worldD");
     }
 
     @Test
@@ -252,32 +187,28 @@ public class TestVirtualContext extends TomcatBaseTest {
 
         File appDir = new File("test/webapp-virtual-webapp/src/main/webapp-a");
         // app dir is relative to server home
-        StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test",
-            appDir.getAbsolutePath());
+        StandardContext ctx = (StandardContext) tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());
         File tempFile = File.createTempFile("virtualWebInfClasses", null);
 
         File additionWebInfClasses = new File(tempFile.getAbsolutePath() + ".dir");
         Assert.assertTrue(additionWebInfClasses.mkdirs());
         File targetPackageForAnnotatedClass =
-            new File(additionWebInfClasses,
-                MyAnnotatedServlet.class.getPackage().getName().replace('.', '/'));
+                new File(additionWebInfClasses, MyAnnotatedServlet.class.getPackage().getName().replace('.', '/'));
         Assert.assertTrue(targetPackageForAnnotatedClass.mkdirs());
-        try (InputStream annotatedServletClassInputStream = this.getClass().getResourceAsStream(
-                MyAnnotatedServlet.class.getSimpleName() + ".class");
-                FileOutputStream annotatedServletClassOutputStream = new FileOutputStream(new File(
-                        targetPackageForAnnotatedClass, MyAnnotatedServlet.class.getSimpleName()
-                                + ".class"))) {
+        try (InputStream annotatedServletClassInputStream =
+                this.getClass().getResourceAsStream(MyAnnotatedServlet.class.getSimpleName() + ".class");
+                FileOutputStream annotatedServletClassOutputStream =
+                        new FileOutputStream(new File(targetPackageForAnnotatedClass,
+                                MyAnnotatedServlet.class.getSimpleName() + ".class"))) {
             IOTools.flow(annotatedServletClassInputStream, annotatedServletClassOutputStream);
         }
 
         ctx.setResources(new StandardRoot(ctx));
         File f1 = new File("test/webapp-virtual-webapp/target/classes");
         File f2 = new File("test/webapp-virtual-library/target/WEB-INF/classes");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
                 f1.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
                 f2.getAbsolutePath(), null, "/");
 
         tomcat.start();
@@ -290,14 +221,11 @@ public class TestVirtualContext extends TomcatBaseTest {
         // then test that if we configure StandardContext with the additional
         // path, the servlet is detected
         ctx.setResources(new StandardRoot(ctx));
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
                 f1.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
                 f2.getAbsolutePath(), null, "/");
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/WEB-INF/classes",
                 additionWebInfClasses.getAbsolutePath(), null, "/");
 
         tomcat.start();
@@ -307,26 +235,23 @@ public class TestVirtualContext extends TomcatBaseTest {
         Assert.assertTrue("Failed to clean up [" + tempFile + "]", tempFile.delete());
     }
 
-    private void assertPageContains(String pageUrl, String expectedBody)
-        throws IOException {
+    private void assertPageContains(String pageUrl, String expectedBody) throws IOException {
 
         assertPageContains(pageUrl, expectedBody, 200);
     }
 
-    private void assertPageContains(String pageUrl, String expectedBody,
-        int expectedStatus) throws IOException {
+    private void assertPageContains(String pageUrl, String expectedBody, int expectedStatus) throws IOException {
         ByteChunk res = new ByteChunk();
         // Note: With a read timeout of 3s the ASF CI buildbot was consistently
-        //       seeing failures with this test. The failures were due to the
-        //       JSP initialisation taking longer than the read timeout. The
-        //       root cause of this is the frequent poor IO performance of the
-        //       VM running the buildbot instance. Increasing this to 10s should
-        //       avoid these failures.
-        //       With the additional of Travis CI, failures continued to
-        //       observed with a 10s timeout. It was therefore increased to 20s
-        //       and then 30s.
-        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 30000,
-                null, null);
+        // seeing failures with this test. The failures were due to the
+        // JSP initialisation taking longer than the read timeout. The
+        // root cause of this is the frequent poor IO performance of the
+        // VM running the buildbot instance. Increasing this to 10s should
+        // avoid these failures.
+        // With the additional of Travis CI, failures continued to
+        // observed with a 10s timeout. It was therefore increased to 20s
+        // and then 30s.
+        int sc = getUrl("http://localhost:" + getPort() + pageUrl, res, 30000, null, null);
 
         Assert.assertEquals(expectedStatus, sc);
 

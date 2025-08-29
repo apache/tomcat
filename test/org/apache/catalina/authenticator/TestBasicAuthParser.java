@@ -106,8 +106,8 @@ public class TestBasicAuthParser {
     @Test
     public void testGoodCribBase64Big() throws Exception {
         // Our decoder accepts a long token without complaint.
-        final String USER_LONG =
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/AAAABBBBCCCCDDDD"; // 80 characters
+        // 80 characters
+        final String USER_LONG = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/AAAABBBBCCCCDDDD";
         final String BASE64_CRIB = "QUJDREVGR0hJSktMTU5PUFFSU1RVVldYWVphYmNkZWZnaGlqa2xtbm9wcXJzdHV2d3h5ejAxMjM0" +
                 "NTY3ODkrL0FBQUFCQkJCQ0NDQ0REREQ="; // no new line
         final BasicAuthHeader AUTH_HEADER = new BasicAuthHeader(NICE_METHOD, BASE64_CRIB);
