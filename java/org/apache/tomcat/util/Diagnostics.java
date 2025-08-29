@@ -76,34 +76,25 @@ public class Diagnostics {
 
     private static final Log log = LogFactory.getLog(Diagnostics.class);
 
-    private static final SimpleDateFormat timeformat =
-        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final SimpleDateFormat timeformat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
     /* Some platform MBeans */
-    private static final ClassLoadingMXBean classLoadingMXBean =
-        ManagementFactory.getClassLoadingMXBean();
-    private static final CompilationMXBean compilationMXBean =
-        ManagementFactory.getCompilationMXBean();
-    private static final OperatingSystemMXBean operatingSystemMXBean =
-        ManagementFactory.getOperatingSystemMXBean();
-    private static final RuntimeMXBean runtimeMXBean =
-        ManagementFactory.getRuntimeMXBean();
-    private static final ThreadMXBean threadMXBean =
-        ManagementFactory.getThreadMXBean();
+    private static final ClassLoadingMXBean classLoadingMXBean = ManagementFactory.getClassLoadingMXBean();
+    private static final CompilationMXBean compilationMXBean = ManagementFactory.getCompilationMXBean();
+    private static final OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+    private static final RuntimeMXBean runtimeMXBean = ManagementFactory.getRuntimeMXBean();
+    private static final ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 
     // XXX Not sure whether the following MBeans should better
     // be retrieved on demand, i.e. whether they can change
     // dynamically in the MBeanServer.
     private static final PlatformLoggingMXBean loggingMXBean =
-        ManagementFactory.getPlatformMXBean(PlatformLoggingMXBean.class);
-    private static final MemoryMXBean memoryMXBean =
-        ManagementFactory.getMemoryMXBean();
+            ManagementFactory.getPlatformMXBean(PlatformLoggingMXBean.class);
+    private static final MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
     private static final List<GarbageCollectorMXBean> garbageCollectorMXBeans =
-        ManagementFactory.getGarbageCollectorMXBeans();
-    private static final List<MemoryManagerMXBean> memoryManagerMXBeans =
-        ManagementFactory.getMemoryManagerMXBeans();
-    private static final List<MemoryPoolMXBean> memoryPoolMXBeans =
-        ManagementFactory.getMemoryPoolMXBeans();
+            ManagementFactory.getGarbageCollectorMXBeans();
+    private static final List<MemoryManagerMXBean> memoryManagerMXBeans = ManagementFactory.getMemoryManagerMXBeans();
+    private static final List<MemoryPoolMXBean> memoryPoolMXBeans = ManagementFactory.getMemoryPoolMXBeans();
 
     /**
      * Check whether thread contention monitoring is enabled.
@@ -146,8 +137,8 @@ public class Diagnostics {
         threadMXBean.setThreadCpuTimeEnabled(enable);
         boolean checkValue = threadMXBean.isThreadCpuTimeEnabled();
         if (enable != checkValue) {
-            log.error(sm.getString("diagnostics.setPropertyFail", "threadCpuTimeEnabled",
-                    Boolean.valueOf(enable), Boolean.valueOf(checkValue)));
+            log.error(sm.getString("diagnostics.setPropertyFail", "threadCpuTimeEnabled", Boolean.valueOf(enable),
+                    Boolean.valueOf(checkValue)));
         }
     }
 
@@ -167,8 +158,8 @@ public class Diagnostics {
         classLoadingMXBean.setVerbose(verbose);
         boolean checkValue = classLoadingMXBean.isVerbose();
         if (verbose != checkValue) {
-            log.error(sm.getString("diagnostics.setPropertyFail", "verboseClassLoading",
-                    Boolean.valueOf(verbose), Boolean.valueOf(checkValue)));
+            log.error(sm.getString("diagnostics.setPropertyFail", "verboseClassLoading", Boolean.valueOf(verbose),
+                    Boolean.valueOf(checkValue)));
         }
     }
 
@@ -176,15 +167,14 @@ public class Diagnostics {
      * Set logger level
      *
      * @param loggerName the name of the logger
-     * @param levelName the level to set
+     * @param levelName  the level to set
      */
     public static void setLoggerLevel(String loggerName, String levelName) {
         loggingMXBean.setLoggerLevel(loggerName, levelName);
         String checkValue = loggingMXBean.getLoggerLevel(loggerName);
         if (!checkValue.equals(levelName)) {
             String propertyName = "loggerLevel[" + loggerName + "]";
-            log.error(sm.getString("diagnostics.setPropertyFail", propertyName,
-                    levelName, checkValue));
+            log.error(sm.getString("diagnostics.setPropertyFail", propertyName, levelName, checkValue));
         }
     }
 
@@ -197,8 +187,8 @@ public class Diagnostics {
         memoryMXBean.setVerbose(verbose);
         boolean checkValue = memoryMXBean.isVerbose();
         if (verbose != checkValue) {
-            log.error(sm.getString("diagnostics.setPropertyFail", "verboseGarbageCollection",
-                    Boolean.valueOf(verbose), Boolean.valueOf(checkValue)));
+            log.error(sm.getString("diagnostics.setPropertyFail", "verboseGarbageCollection", Boolean.valueOf(verbose),
+                    Boolean.valueOf(checkValue)));
         }
     }
 
@@ -215,7 +205,7 @@ public class Diagnostics {
      * @param name name of the MemoryPoolMXBean or "all"
      */
     public static void resetPeakUsage(String name) {
-        for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
+        for (MemoryPoolMXBean mbean : memoryPoolMXBeans) {
             if (name.equals("all") || name.equals(mbean.getName())) {
                 mbean.resetPeakUsage();
             }
@@ -225,12 +215,13 @@ public class Diagnostics {
     /**
      * Set usage threshold in MemoryPoolMXBean
      *
-     * @param name name of the MemoryPoolMXBean
+     * @param name      name of the MemoryPoolMXBean
      * @param threshold the threshold to set
+     *
      * @return true if setting the threshold succeeded
      */
     public static boolean setUsageThreshold(String name, long threshold) {
-        for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
+        for (MemoryPoolMXBean mbean : memoryPoolMXBeans) {
             if (name.equals(mbean.getName())) {
                 try {
                     mbean.setUsageThreshold(threshold);
@@ -247,12 +238,13 @@ public class Diagnostics {
     /**
      * Set collection usage threshold in MemoryPoolMXBean
      *
-     * @param name name of the MemoryPoolMXBean
+     * @param name      name of the MemoryPoolMXBean
      * @param threshold the collection threshold to set
+     *
      * @return true if setting the threshold succeeded
      */
     public static boolean setCollectionUsageThreshold(String name, long threshold) {
-        for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
+        for (MemoryPoolMXBean mbean : memoryPoolMXBeans) {
             if (name.equals(mbean.getName())) {
                 try {
                     mbean.setCollectionUsageThreshold(threshold);
@@ -270,6 +262,7 @@ public class Diagnostics {
      * Formats the thread dump header for one thread.
      *
      * @param ti the ThreadInfo describing the thread
+     *
      * @return the formatted thread dump header
      */
     private static String getThreadDumpHeader(ThreadInfo ti) {
@@ -297,6 +290,7 @@ public class Diagnostics {
      * Formats the thread dump for one thread.
      *
      * @param ti the ThreadInfo describing the thread
+     *
      * @return the formatted thread dump
      */
     private static String getThreadDump(ThreadInfo ti) {
@@ -318,14 +312,15 @@ public class Diagnostics {
                 if (ti.getLockName() != null) {
                     sb.append(INDENT2 + "- waiting on (a ").append(ti.getLockName()).append(")");
                     if (ti.getLockOwnerName() != null) {
-                        sb.append(" owned by ").append(ti.getLockOwnerName()).append(" Id=").append(ti.getLockOwnerId());
+                        sb.append(" owned by ").append(ti.getLockOwnerName()).append(" Id=")
+                                .append(ti.getLockOwnerId());
                     }
                     sb.append(CRLF);
                 }
                 start = false;
             }
             if (monitorDepths[i] != null) {
-                MonitorInfo mi = (MonitorInfo)monitorDepths[i];
+                MonitorInfo mi = (MonitorInfo) monitorDepths[i];
                 sb.append(INDENT2 + "- locked (a ").append(mi.toString()).append(")").append(" index ");
                 sb.append(mi.getLockedStackDepth()).append(" frame ").append(mi.getLockedStackFrame().toString());
                 sb.append(CRLF);
@@ -339,6 +334,7 @@ public class Diagnostics {
      * Formats the thread dump for a list of threads.
      *
      * @param tinfos the ThreadInfo array describing the thread list
+     *
      * @return the formatted thread dump
      */
     private static String getThreadDump(ThreadInfo[] tinfos) {
@@ -351,17 +347,14 @@ public class Diagnostics {
     }
 
     /**
-     * Check if any threads are deadlocked. If any, print
-     * the thread dump for those threads.
+     * Check if any threads are deadlocked. If any, print the thread dump for those threads.
      *
-     * @return a deadlock message and the formatted thread dump
-     *         of the deadlocked threads
+     * @return a deadlock message and the formatted thread dump of the deadlocked threads
      */
     public static String findDeadlock() {
         long[] ids = threadMXBean.findDeadlockedThreads();
         if (ids != null) {
-            ThreadInfo[] tinfos = threadMXBean.getThreadInfo(threadMXBean.findDeadlockedThreads(),
-                                                true, true);
+            ThreadInfo[] tinfos = threadMXBean.getThreadInfo(threadMXBean.findDeadlockedThreads(), true, true);
             if (tinfos != null) {
                 return sm.getString("diagnostics.deadlockFound") + CRLF + getThreadDump(tinfos);
             }
@@ -370,8 +363,7 @@ public class Diagnostics {
     }
 
     /**
-     * Retrieves a formatted JVM thread dump.
-     * The default StringManager will be used.
+     * Retrieves a formatted JVM thread dump. The default StringManager will be used.
      *
      * @return the formatted JVM thread dump
      */
@@ -380,29 +372,27 @@ public class Diagnostics {
     }
 
     /**
-     * Retrieves a formatted JVM thread dump.
-     * The given list of locales will be used
-     * to retrieve a StringManager.
+     * Retrieves a formatted JVM thread dump. The given list of locales will be used to retrieve a StringManager.
      *
      * @param requestedLocales list of locales to use
+     *
      * @return the formatted JVM thread dump
      */
     public static String getThreadDump(Enumeration<Locale> requestedLocales) {
-        return getThreadDump(
-                StringManager.getManager(PACKAGE, requestedLocales));
+        return getThreadDump(StringManager.getManager(PACKAGE, requestedLocales));
     }
 
     /**
-     * Retrieve a JVM thread dump formatted
-     * using the given StringManager.
+     * Retrieve a JVM thread dump formatted using the given StringManager.
      *
      * @param requestedSm the StringManager to use
+     *
      * @return the formatted JVM thread dump
      */
     public static String getThreadDump(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
 
-        synchronized(timeformat) {
+        synchronized (timeformat) {
             sb.append(timeformat.format(new Date()));
         }
         sb.append(CRLF);
@@ -428,8 +418,10 @@ public class Diagnostics {
 
     /**
      * Format contents of a MemoryUsage object.
-     * @param name a text prefix used in formatting
+     *
+     * @param name  a text prefix used in formatting
      * @param usage the MemoryUsage object to format
+     *
      * @return the formatted contents
      */
     private static String formatMemoryUsage(String name, MemoryUsage usage) {
@@ -445,8 +437,7 @@ public class Diagnostics {
     }
 
     /**
-     * Retrieves a formatted JVM information text.
-     * The default StringManager will be used.
+     * Retrieves a formatted JVM information text. The default StringManager will be used.
      *
      * @return the formatted JVM information text
      */
@@ -455,11 +446,10 @@ public class Diagnostics {
     }
 
     /**
-     * Retrieves a formatted JVM information text.
-     * The given list of locales will be used
-     * to retrieve a StringManager.
+     * Retrieves a formatted JVM information text. The given list of locales will be used to retrieve a StringManager.
      *
      * @param requestedLocales list of locales to use
+     *
      * @return the formatted JVM information text
      */
     public static String getVMInfo(Enumeration<Locale> requestedLocales) {
@@ -467,17 +457,17 @@ public class Diagnostics {
     }
 
     /**
-     * Retrieve a JVM information text formatted
-     * using the given StringManager.
+     * Retrieve a JVM information text formatted using the given StringManager.
      *
      * @param requestedSm the StringManager to use
+     *
      * @return the formatted JVM information text
      */
     @SuppressWarnings("deprecation")
     public static String getVMInfo(StringManager requestedSm) {
         StringBuilder sb = new StringBuilder();
 
-        synchronized(timeformat) {
+        synchronized (timeformat) {
             sb.append(timeformat.format(new Date()));
         }
         sb.append(CRLF);
@@ -502,19 +492,25 @@ public class Diagnostics {
         sb.append(INDENT1 + "name: ").append(operatingSystemMXBean.getName()).append(CRLF);
         sb.append(INDENT1 + "version: ").append(operatingSystemMXBean.getVersion()).append(CRLF);
         sb.append(INDENT1 + "architecture: ").append(operatingSystemMXBean.getArch()).append(CRLF);
-        sb.append(INDENT1 + "availableProcessors: ").append(operatingSystemMXBean.getAvailableProcessors()).append(CRLF);
+        sb.append(INDENT1 + "availableProcessors: ").append(operatingSystemMXBean.getAvailableProcessors())
+                .append(CRLF);
         sb.append(INDENT1 + "systemLoadAverage: ").append(operatingSystemMXBean.getSystemLoadAverage()).append(CRLF);
         sb.append(CRLF);
 
         sb.append(requestedSm.getString("diagnostics.vmInfoThreadMxBean"));
         sb.append(":" + CRLF);
-        sb.append(INDENT1 + "isCurrentThreadCpuTimeSupported: ").append(threadMXBean.isCurrentThreadCpuTimeSupported()).append(CRLF);
+        sb.append(INDENT1 + "isCurrentThreadCpuTimeSupported: ").append(threadMXBean.isCurrentThreadCpuTimeSupported())
+                .append(CRLF);
         sb.append(INDENT1 + "isThreadCpuTimeSupported: ").append(threadMXBean.isThreadCpuTimeSupported()).append(CRLF);
         sb.append(INDENT1 + "isThreadCpuTimeEnabled: ").append(threadMXBean.isThreadCpuTimeEnabled()).append(CRLF);
-        sb.append(INDENT1 + "isObjectMonitorUsageSupported: ").append(threadMXBean.isObjectMonitorUsageSupported()).append(CRLF);
-        sb.append(INDENT1 + "isSynchronizerUsageSupported: ").append(threadMXBean.isSynchronizerUsageSupported()).append(CRLF);
-        sb.append(INDENT1 + "isThreadContentionMonitoringSupported: ").append(threadMXBean.isThreadContentionMonitoringSupported()).append(CRLF);
-        sb.append(INDENT1 + "isThreadContentionMonitoringEnabled: ").append(threadMXBean.isThreadContentionMonitoringEnabled()).append(CRLF);
+        sb.append(INDENT1 + "isObjectMonitorUsageSupported: ").append(threadMXBean.isObjectMonitorUsageSupported())
+                .append(CRLF);
+        sb.append(INDENT1 + "isSynchronizerUsageSupported: ").append(threadMXBean.isSynchronizerUsageSupported())
+                .append(CRLF);
+        sb.append(INDENT1 + "isThreadContentionMonitoringSupported: ")
+                .append(threadMXBean.isThreadContentionMonitoringSupported()).append(CRLF);
+        sb.append(INDENT1 + "isThreadContentionMonitoringEnabled: ")
+                .append(threadMXBean.isThreadContentionMonitoringEnabled()).append(CRLF);
         sb.append(CRLF);
 
         sb.append(requestedSm.getString("diagnostics.vmInfoThreadCounts"));
@@ -527,7 +523,7 @@ public class Diagnostics {
 
         sb.append(requestedSm.getString("diagnostics.vmInfoStartup"));
         sb.append(":" + CRLF);
-        for (String arg: runtimeMXBean.getInputArguments()) {
+        for (String arg : runtimeMXBean.getInputArguments()) {
             sb.append(INDENT1).append(arg).append(CRLF);
         }
         sb.append(CRLF);
@@ -553,30 +549,31 @@ public class Diagnostics {
         sb.append(":" + CRLF);
         sb.append(INDENT1 + "name: ").append(compilationMXBean.getName()).append(CRLF);
         sb.append(INDENT1 + "totalCompilationTime: ").append(compilationMXBean.getTotalCompilationTime()).append(CRLF);
-        sb.append(INDENT1 + "isCompilationTimeMonitoringSupported: ").append(compilationMXBean.isCompilationTimeMonitoringSupported()).append(CRLF);
+        sb.append(INDENT1 + "isCompilationTimeMonitoringSupported: ")
+                .append(compilationMXBean.isCompilationTimeMonitoringSupported()).append(CRLF);
         sb.append(CRLF);
 
-        for (MemoryManagerMXBean mbean: memoryManagerMXBeans) {
+        for (MemoryManagerMXBean mbean : memoryManagerMXBeans) {
             sb.append(requestedSm.getString("diagnostics.vmInfoMemoryManagers", mbean.getName()));
             sb.append(":" + CRLF);
             sb.append(INDENT1 + "isValid: ").append(mbean.isValid()).append(CRLF);
             sb.append(INDENT1 + "mbean.getMemoryPoolNames: " + CRLF);
             String[] names = mbean.getMemoryPoolNames();
             Arrays.sort(names);
-            for (String name: names) {
+            for (String name : names) {
                 sb.append(INDENT2).append(name).append(CRLF);
             }
             sb.append(CRLF);
         }
 
-        for (GarbageCollectorMXBean mbean: garbageCollectorMXBeans) {
+        for (GarbageCollectorMXBean mbean : garbageCollectorMXBeans) {
             sb.append(requestedSm.getString("diagnostics.vmInfoGarbageCollectors", mbean.getName()));
             sb.append(":" + CRLF);
             sb.append(INDENT1 + "isValid: ").append(mbean.isValid()).append(CRLF);
             sb.append(INDENT1 + "mbean.getMemoryPoolNames: " + CRLF);
             String[] names = mbean.getMemoryPoolNames();
             Arrays.sort(names);
-            for (String name: names) {
+            for (String name : names) {
                 sb.append(INDENT2).append(name).append(CRLF);
             }
             sb.append(INDENT1 + "getCollectionCount: ").append(mbean.getCollectionCount()).append(CRLF);
@@ -587,12 +584,13 @@ public class Diagnostics {
         sb.append(requestedSm.getString("diagnostics.vmInfoMemory"));
         sb.append(":" + CRLF);
         sb.append(INDENT1 + "isVerbose: ").append(memoryMXBean.isVerbose()).append(CRLF);
-        sb.append(INDENT1 + "getObjectPendingFinalizationCount: ").append(memoryMXBean.getObjectPendingFinalizationCount()).append(CRLF);
+        sb.append(INDENT1 + "getObjectPendingFinalizationCount: ")
+                .append(memoryMXBean.getObjectPendingFinalizationCount()).append(CRLF);
         sb.append(formatMemoryUsage("heap", memoryMXBean.getHeapMemoryUsage()));
         sb.append(formatMemoryUsage("non-heap", memoryMXBean.getNonHeapMemoryUsage()));
         sb.append(CRLF);
 
-        for (MemoryPoolMXBean mbean: memoryPoolMXBeans) {
+        for (MemoryPoolMXBean mbean : memoryPoolMXBeans) {
             sb.append(requestedSm.getString("diagnostics.vmInfoMemoryPools", mbean.getName()));
             sb.append(":" + CRLF);
             sb.append(INDENT1 + "isValid: ").append(mbean.isValid()).append(CRLF);
@@ -600,7 +598,7 @@ public class Diagnostics {
             sb.append(INDENT1 + "mbean.getMemoryManagerNames: " + CRLF);
             String[] names = mbean.getMemoryManagerNames();
             Arrays.sort(names);
-            for (String name: names) {
+            for (String name : names) {
                 sb.append(INDENT2).append(name).append(CRLF);
             }
             sb.append(INDENT1 + "isUsageThresholdSupported: ").append(mbean.isUsageThresholdSupported()).append(CRLF);
@@ -609,9 +607,11 @@ public class Diagnostics {
             } catch (UnsupportedOperationException ex) {
                 // IGNORE
             }
-            sb.append(INDENT1 + "isCollectionUsageThresholdSupported: ").append(mbean.isCollectionUsageThresholdSupported()).append(CRLF);
+            sb.append(INDENT1 + "isCollectionUsageThresholdSupported: ")
+                    .append(mbean.isCollectionUsageThresholdSupported()).append(CRLF);
             try {
-                sb.append(INDENT1 + "isCollectionUsageThresholdExceeded: ").append(mbean.isCollectionUsageThresholdExceeded()).append(CRLF);
+                sb.append(INDENT1 + "isCollectionUsageThresholdExceeded: ")
+                        .append(mbean.isCollectionUsageThresholdExceeded()).append(CRLF);
             } catch (UnsupportedOperationException ex) {
                 // IGNORE
             }
@@ -626,12 +626,14 @@ public class Diagnostics {
                 // IGNORE
             }
             try {
-                sb.append(INDENT1 + "getCollectionUsageThreshold: ").append(mbean.getCollectionUsageThreshold()).append(CRLF);
+                sb.append(INDENT1 + "getCollectionUsageThreshold: ").append(mbean.getCollectionUsageThreshold())
+                        .append(CRLF);
             } catch (UnsupportedOperationException ex) {
                 // IGNORE
             }
             try {
-                sb.append(INDENT1 + "getCollectionUsageThresholdCount: ").append(mbean.getCollectionUsageThresholdCount()).append(CRLF);
+                sb.append(INDENT1 + "getCollectionUsageThresholdCount: ")
+                        .append(mbean.getCollectionUsageThresholdCount()).append(CRLF);
             } catch (UnsupportedOperationException ex) {
                 // IGNORE
             }
@@ -647,7 +649,7 @@ public class Diagnostics {
         Map<String,String> props = runtimeMXBean.getSystemProperties();
         ArrayList<String> keys = new ArrayList<>(props.keySet());
         Collections.sort(keys);
-        for (String prop: keys) {
+        for (String prop : keys) {
             sb.append(INDENT1).append(prop).append(": ").append(props.get(prop)).append(CRLF);
         }
         sb.append(CRLF);
@@ -656,7 +658,7 @@ public class Diagnostics {
         sb.append(":" + CRLF);
         List<String> loggers = loggingMXBean.getLoggerNames();
         Collections.sort(loggers);
-        for (String logger: loggers) {
+        for (String logger : loggers) {
             sb.append(INDENT1).append(logger).append(": level=").append(loggingMXBean.getLoggerLevel(logger));
             sb.append(", parent=").append(loggingMXBean.getParentLoggerName(logger)).append(CRLF);
         }
