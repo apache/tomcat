@@ -26,8 +26,7 @@ import java.lang.foreign.MemorySegment;
 import java.lang.invoke.MethodHandle;
 
 /**
- * {@snippet lang=c :
- * DH *(*dh)(SSL *, int, int)
+ * {@snippet lang = c : * DH *(*dh)(SSL *, int, int)
  * }
  */
 @SuppressWarnings("javadoc")
@@ -37,18 +36,15 @@ public class SSL_CTX_set_tmp_dh_callback$dh {
         MemorySegment apply(MemorySegment _x0, int _x1, int _x2);
     }
 
-    private static final FunctionDescriptor $DESC = FunctionDescriptor.of(
-        openssl_h.C_POINTER,
-        openssl_h.C_POINTER,
-        openssl_h.C_INT,
-        openssl_h.C_INT
-    );
+    private static final FunctionDescriptor $DESC =
+            FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_INT, openssl_h.C_INT);
 
     public static FunctionDescriptor descriptor() {
         return $DESC;
     }
 
-    private static final MethodHandle UP$MH = openssl_h.upcallHandle(SSL_CTX_set_tmp_dh_callback$dh.Function.class, "apply", $DESC);
+    private static final MethodHandle UP$MH =
+            openssl_h.upcallHandle(SSL_CTX_set_tmp_dh_callback$dh.Function.class, "apply", $DESC);
 
     public static MemorySegment allocate(SSL_CTX_set_tmp_dh_callback$dh.Function fi, Arena scope) {
         return Linker.nativeLinker().upcallStub(UP$MH.bindTo(fi), $DESC, scope);
@@ -56,7 +52,7 @@ public class SSL_CTX_set_tmp_dh_callback$dh {
 
     private static final MethodHandle DOWN$MH = Linker.nativeLinker().downcallHandle($DESC);
 
-    public static MemorySegment invoke(MemorySegment funcPtr,MemorySegment _x0, int _x1, int _x2) {
+    public static MemorySegment invoke(MemorySegment funcPtr, MemorySegment _x0, int _x1, int _x2) {
         try {
             return (MemorySegment) DOWN$MH.invokeExact(funcPtr, _x0, _x1, _x2);
         } catch (Throwable ex$) {
