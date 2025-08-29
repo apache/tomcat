@@ -105,7 +105,9 @@ public class WsRemoteEndpointImplServer extends WsRemoteEndpointImplBase {
 
         /*
          * Special handling is required only when all of the following are true:
+         *
          * - A close message is being sent
+         *
          * - This thread currently holds the socketWrapper lock (i.e. the thread is current processing a socket event)
          *
          * Special handling is only possible if the socketWrapper lock is a ReentrantLock (it will be by default)
