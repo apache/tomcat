@@ -34,7 +34,7 @@ public class WsFrameClient extends WsFrameBase {
     private static final StringManager sm = StringManager.getManager(WsFrameClient.class);
 
     private final AsyncChannelWrapper channel;
-    private final CompletionHandler<Integer, Void> handler;
+    private final CompletionHandler<Integer,Void> handler;
     // Not final as it may need to be re-sized
     private volatile ByteBuffer response;
 
@@ -143,7 +143,7 @@ public class WsFrameClient extends WsFrameBase {
         return log;
     }
 
-    private class WsFrameClientCompletionHandler implements CompletionHandler<Integer, Void> {
+    private class WsFrameClientCompletionHandler implements CompletionHandler<Integer,Void> {
 
         @Override
         public void completed(Integer result, Void attachment) {

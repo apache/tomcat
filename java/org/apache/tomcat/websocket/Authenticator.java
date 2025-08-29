@@ -48,7 +48,7 @@ public abstract class Authenticator {
      *                 10.1.x
      */
     @Deprecated
-    public String getAuthorization(String requestUri, String authenticateHeader, Map<String, Object> userProperties)
+    public String getAuthorization(String requestUri, String authenticateHeader, Map<String,Object> userProperties)
             throws AuthenticationException {
         return getAuthorization(requestUri, authenticateHeader,
                 (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME),
@@ -92,7 +92,7 @@ public abstract class Authenticator {
      * @deprecated Use {@link Authenticator#parseAuthenticateHeader(String)}. Will be removed in Tomcat 10.1.x onwards
      */
     @Deprecated
-    public Map<String, String> parseWWWAuthenticateHeader(String authenticateHeader) {
+    public Map<String,String> parseWWWAuthenticateHeader(String authenticateHeader) {
         return parseAuthenticateHeader(authenticateHeader);
     }
 
@@ -104,10 +104,10 @@ public abstract class Authenticator {
      *
      * @return a map of authentication parameter names and values
      */
-    public Map<String, String> parseAuthenticateHeader(String authenticateHeader) {
+    public Map<String,String> parseAuthenticateHeader(String authenticateHeader) {
 
         Matcher m = pattern.matcher(authenticateHeader);
-        Map<String, String> parameterMap = new HashMap<>();
+        Map<String,String> parameterMap = new HashMap<>();
 
         while (m.find()) {
             String key = m.group(1);
