@@ -482,11 +482,11 @@ public class PEMFile {
 
             InvalidKeyException exception = new InvalidKeyException(sm.getString("pemFile.parseError", filename));
             if (keyAlgorithm == null) {
-                for (String algorithm : new String[] { "RSA", "DSA", "EC" }) {
+                for (String algorithm : new String[] { "RSA", "DSA", "EC", "ML-DSA" }) {
                     try {
                         return KeyFactory.getInstance(algorithm).generatePrivate(keySpec);
                     } catch (InvalidKeySpecException e) {
-                        exception.addSuppressed(e);
+                        exception.addSuppressed(new InvalidKeySpecException(sm.getString("pemFile.parseError.algorithm", algorithm), e));
                     }
                 }
             } else {
