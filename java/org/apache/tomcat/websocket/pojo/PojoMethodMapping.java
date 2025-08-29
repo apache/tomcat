@@ -229,7 +229,7 @@ public class PojoMethodMapping {
     }
 
 
-    public Object[] getOnOpenArgs(Map<String, String> pathParameters, Session session, EndpointConfig config)
+    public Object[] getOnOpenArgs(Map<String,String> pathParameters, Session session, EndpointConfig config)
             throws DecodeException {
         return buildArgs(onOpenParams, pathParameters, session, config, null, null);
     }
@@ -240,7 +240,7 @@ public class PojoMethodMapping {
     }
 
 
-    public Object[] getOnCloseArgs(Map<String, String> pathParameters, Session session, CloseReason closeReason)
+    public Object[] getOnCloseArgs(Map<String,String> pathParameters, Session session, CloseReason closeReason)
             throws DecodeException {
         return buildArgs(onCloseParams, pathParameters, session, null, null, closeReason);
     }
@@ -251,7 +251,7 @@ public class PojoMethodMapping {
     }
 
 
-    public Object[] getOnErrorArgs(Map<String, String> pathParameters, Session session, Throwable throwable)
+    public Object[] getOnErrorArgs(Map<String,String> pathParameters, Session session, Throwable throwable)
             throws DecodeException {
         return buildArgs(onErrorParams, pathParameters, session, null, throwable, null);
     }
@@ -262,7 +262,7 @@ public class PojoMethodMapping {
     }
 
 
-    public Set<MessageHandler> getMessageHandlers(Object pojo, Map<String, String> pathParameters, Session session,
+    public Set<MessageHandler> getMessageHandlers(Object pojo, Map<String,String> pathParameters, Session session,
             EndpointConfig config) {
         Set<MessageHandler> result = new HashSet<>();
         for (MessageHandlerInfo messageMethod : onMessage) {
@@ -314,7 +314,7 @@ public class PojoMethodMapping {
     }
 
 
-    private static Object[] buildArgs(PojoPathParam[] pathParams, Map<String, String> pathParameters, Session session,
+    private static Object[] buildArgs(PojoPathParam[] pathParams, Map<String,String> pathParameters, Session session,
             EndpointConfig config, Throwable throwable, CloseReason closeReason) throws DecodeException {
         Object[] result = new Object[pathParams.length];
         for (int i = 0; i < pathParams.length; i++) {
@@ -354,7 +354,7 @@ public class PojoMethodMapping {
         private int indexInputStream = -1;
         private int indexReader = -1;
         private int indexPrimitive = -1;
-        private final Map<Integer, PojoPathParam> indexPathParams = new HashMap<>();
+        private final Map<Integer,PojoPathParam> indexPathParams = new HashMap<>();
         private int indexPayload = -1;
         private DecoderMatch decoderMatch = null;
         private final long maxMessageSize;
@@ -574,11 +574,11 @@ public class PojoMethodMapping {
         }
 
 
-        public Set<MessageHandler> getMessageHandlers(Object pojo, Map<String, String> pathParameters, Session session,
+        public Set<MessageHandler> getMessageHandlers(Object pojo, Map<String,String> pathParameters, Session session,
                 EndpointConfig config) {
             Object[] params = new Object[m.getParameterTypes().length];
 
-            for (Map.Entry<Integer, PojoPathParam> entry : indexPathParams.entrySet()) {
+            for (Map.Entry<Integer,PojoPathParam> entry : indexPathParams.entrySet()) {
                 PojoPathParam pathParam = entry.getValue();
                 String valueString = pathParameters.get(pathParam.getName());
                 Object value;
@@ -630,8 +630,8 @@ public class PojoMethodMapping {
                         results.add(mh);
                     }
                 } else {
-                    MessageHandler mh = new PojoMessageHandlerWholePong(pojo, m, session, params, indexPong, false,
-                            indexSession);
+                    MessageHandler mh =
+                            new PojoMessageHandlerWholePong(pojo, m, session, params, indexPong, false, indexSession);
                     results.add(mh);
                 }
             } else {
