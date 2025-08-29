@@ -24,6 +24,7 @@ public enum CookiesWithoutEquals {
     IGNORE("ignore"),
     NAME("name");
     /*
+     * @formatter:off
      * There is no VALUE option since the Servlet specification does not permit the creation of a Cookie with a name
      * that is either null or the zero length string.
      *
@@ -55,9 +56,9 @@ public enum CookiesWithoutEquals {
      * For the user agent:
      *  - a name-value-pair without an equals sign is treated as the value of a cookie with an empty name.
      *  - both empty name and empty value are allowed but if both are empty the cookie will be ignored.
+     * @formatter:on
      *
-     * To see how RFC6265 arrived at his behaviour, see:
-     * https://github.com/httpwg/http-extensions/issues/159
+     * To see how RFC6265 arrived at his behaviour, see https://github.com/httpwg/http-extensions/issues/159
      *
      * Historically, the users agents settled on using a name-value-pair without an equals sign to indicate a cookie
      * with a value but no name. Tomcat did the opposite. That arose from addressing this bug:

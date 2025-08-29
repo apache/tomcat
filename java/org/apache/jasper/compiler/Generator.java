@@ -3060,7 +3060,7 @@ class Generator {
         /**
          * Determines whether a tag should be handled via nonstandard code (typically
          * faster). Considers both configuration and level of support within Tomcat.
-         *
+         * <p>
          * Note that Tomcat is free to ignore any case it cannot handle, as long as it
          * reports it accurately to the caller by returning false. For example, the
          * initial implementation for c:set excludes support for body content. c:set
