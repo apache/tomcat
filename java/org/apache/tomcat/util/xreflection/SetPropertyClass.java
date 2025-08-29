@@ -118,8 +118,7 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
 
     @Override
     public String toString() {
-        return "SetPropertyClass{" + "clazz=" + clazz.getName() +
-            '}';
+        return "SetPropertyClass{" + "clazz=" + clazz.getName() + '}';
     }
 
     public void addProperty(ReflectionProperty property) {
@@ -127,33 +126,32 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
     }
 
 
-
     public String generateSetPropertyMethod(ReflectionProperty property) {
-        //this property has a setProperty method
+        // this property has a setProperty method
         if (property.hasSetPropertySetter()) {
-            return "((" + this.getClazz().getName().replace('$','.') + ")" + OBJECT_VAR_NAME + ")." +
-                property.getSetMethod().getName() + "(" + NAME_VAR_NAME + ", " + VALUE_VAR_NAME + ");";
+            return "((" + this.getClazz().getName().replace('$', '.') + ")" + OBJECT_VAR_NAME + ")." +
+                    property.getSetMethod().getName() + "(" + NAME_VAR_NAME + ", " + VALUE_VAR_NAME + ");";
         }
 
-        //direct setter
+        // direct setter
         if (property.hasSetter()) {
-            return "((" + this.getClazz().getName().replace('$','.') + ")" + OBJECT_VAR_NAME + ")." +
-                property.getSetMethod().getName() + "(" + property.getConversion(VALUE_VAR_NAME) + ");";
+            return "((" + this.getClazz().getName().replace('$', '.') + ")" + OBJECT_VAR_NAME + ")." +
+                    property.getSetMethod().getName() + "(" + property.getConversion(VALUE_VAR_NAME) + ");";
         }
         return null;
     }
 
     public String generateGetPropertyMethod(ReflectionProperty property) {
-        //this property has a getProperty method
+        // this property has a getProperty method
         if (property.hasGetPropertyGetter()) {
-            return "result = ((" + this.getClazz().getName().replace('$','.') + ")" + OBJECT_VAR_NAME + ")." +
-                property.getGetMethod().getName() + "(" + NAME_VAR_NAME + ");";
+            return "result = ((" + this.getClazz().getName().replace('$', '.') + ")" + OBJECT_VAR_NAME + ")." +
+                    property.getGetMethod().getName() + "(" + NAME_VAR_NAME + ");";
         }
 
-        //direct getter
+        // direct getter
         if (property.hasGetter()) {
-            return "result = ((" + this.getClazz().getName().replace('$','.') + ")" + OBJECT_VAR_NAME + ")." +
-                property.getGetMethod().getName() + "();";
+            return "result = ((" + this.getClazz().getName().replace('$', '.') + ")" + OBJECT_VAR_NAME + ")." +
+                    property.getGetMethod().getName() + "();";
         }
         return null;
     }
@@ -239,10 +237,10 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
     private String getSetPropertyForExitStatement() {
 
         return (getParent() != null) ?
-            //invoke the parent if we have one
-            getParent().generateParentSetPropertyForMethodInvocation() :
-            //if we invoke setProperty, return true, return false otherwise
-            getGenericSetPropertyMethod() != null ? "true;" : "false;";
+                // invoke the parent if we have one
+                getParent().generateParentSetPropertyForMethodInvocation() :
+                // if we invoke setProperty, return true, return false otherwise
+                getGenericSetPropertyMethod() != null ? "true;" : "false;";
     }
 
     public String generateInvocationSetForPropertyCaseStatement(int level) {

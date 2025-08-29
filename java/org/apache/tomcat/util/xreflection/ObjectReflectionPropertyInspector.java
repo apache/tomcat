@@ -36,90 +36,71 @@ public final class ObjectReflectionPropertyInspector {
 
     public static void main(String... args) throws Exception {
         if (args.length == 0) {
-            System.err.println("Usage:\n\t"+
-                "org.apache.tomcat.util.xreflection.ObjectReflectionPropertyInspector" +
-                " <destination directory>"
-            );
+            System.err.println("Usage:\n\t" + "org.apache.tomcat.util.xreflection.ObjectReflectionPropertyInspector" +
+                    " <destination directory>");
             System.exit(1);
         }
 
         File outputDir = new File(args[0]);
         if (!outputDir.exists() || !outputDir.isDirectory()) {
-            System.err.println("Invalid output directory: "+ outputDir.getAbsolutePath());
+            System.err.println("Invalid output directory: " + outputDir.getAbsolutePath());
             System.exit(1);
         }
 
 
-        Set<SetPropertyClass> baseClasses = getKnownClasses()
-            .stream()
-            .map(ObjectReflectionPropertyInspector::processClass)
-            .collect(Collectors.toCollection(LinkedHashSet::new));
-        generateCode(
-            baseClasses,
-            "org.apache.tomcat.util",
-            outputDir,
-            "XReflectionIntrospectionUtils"
-        );
+        Set<SetPropertyClass> baseClasses =
+                getKnownClasses().stream().map(ObjectReflectionPropertyInspector::processClass)
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
+        generateCode(baseClasses, "org.apache.tomcat.util", outputDir, "XReflectionIntrospectionUtils");
     }
 
     private static Set<Class<?>> getKnownClasses() throws ClassNotFoundException {
-        return
-            Collections.unmodifiableSet(new LinkedHashSet<>(
-                    Arrays.asList(
-                        Class.forName("org.apache.catalina.authenticator.jaspic.SimpleAuthConfigProvider"),
-                        Class.forName("org.apache.catalina.authenticator.jaspic.PersistentProviderRegistrations$Property"),
-                        Class.forName("org.apache.catalina.authenticator.jaspic.PersistentProviderRegistrations$Provider"),
-                        Class.forName("org.apache.catalina.connector.Connector"),
-                        Class.forName("org.apache.catalina.core.ContainerBase"),
-                        Class.forName("org.apache.catalina.core.StandardContext"),
-                        Class.forName("org.apache.catalina.core.StandardEngine"),
-                        Class.forName("org.apache.catalina.core.StandardHost"),
-                        Class.forName("org.apache.catalina.core.StandardServer"),
-                        Class.forName("org.apache.catalina.core.StandardService"),
-                        Class.forName("org.apache.catalina.filters.AddDefaultCharsetFilter"),
-                        Class.forName("org.apache.catalina.filters.RestCsrfPreventionFilter"),
-                        Class.forName("org.apache.catalina.loader.ParallelWebappClassLoader"),
-                        Class.forName("org.apache.catalina.loader.WebappClassLoaderBase"),
-                        Class.forName("org.apache.catalina.realm.UserDatabaseRealm"),
-                        Class.forName("org.apache.catalina.valves.AccessLogValve"),
-                        Class.forName("org.apache.coyote.AbstractProtocol"),
-                        Class.forName("org.apache.coyote.ajp.AbstractAjpProtocol"),
-                        Class.forName("org.apache.coyote.ajp.AjpNio2Protocol"),
-                        Class.forName("org.apache.coyote.ajp.AjpNioProtocol"),
-                        Class.forName("org.apache.coyote.http11.AbstractHttp11JsseProtocol"),
-                        Class.forName("org.apache.coyote.http11.AbstractHttp11Protocol"),
-                        Class.forName("org.apache.coyote.http11.Http11Nio2Protocol"),
-                        Class.forName("org.apache.coyote.http11.Http11NioProtocol"),
-                        Class.forName("org.apache.tomcat.util.descriptor.web.ContextResource"),
-                        Class.forName("org.apache.tomcat.util.descriptor.web.ResourceBase"),
-                        Class.forName("org.apache.tomcat.util.modeler.AttributeInfo"),
-                        Class.forName("org.apache.tomcat.util.modeler.FeatureInfo"),
-                        Class.forName("org.apache.tomcat.util.modeler.ManagedBean"),
-                        Class.forName("org.apache.tomcat.util.modeler.OperationInfo"),
-                        Class.forName("org.apache.tomcat.util.modeler.ParameterInfo"),
-                        Class.forName("org.apache.tomcat.util.net.AbstractEndpoint"),
-                        Class.forName("org.apache.tomcat.util.net.Nio2Endpoint"),
-                        Class.forName("org.apache.tomcat.util.net.NioEndpoint"),
-                        Class.forName("org.apache.tomcat.util.net.SocketProperties")
-                    )
-                )
-            );
+        return Collections.unmodifiableSet(new LinkedHashSet<>(Arrays.asList(
+                Class.forName("org.apache.catalina.authenticator.jaspic.SimpleAuthConfigProvider"),
+                Class.forName("org.apache.catalina.authenticator.jaspic.PersistentProviderRegistrations$Property"),
+                Class.forName("org.apache.catalina.authenticator.jaspic.PersistentProviderRegistrations$Provider"),
+                Class.forName("org.apache.catalina.connector.Connector"),
+                Class.forName("org.apache.catalina.core.ContainerBase"),
+                Class.forName("org.apache.catalina.core.StandardContext"),
+                Class.forName("org.apache.catalina.core.StandardEngine"),
+                Class.forName("org.apache.catalina.core.StandardHost"),
+                Class.forName("org.apache.catalina.core.StandardServer"),
+                Class.forName("org.apache.catalina.core.StandardService"),
+                Class.forName("org.apache.catalina.filters.AddDefaultCharsetFilter"),
+                Class.forName("org.apache.catalina.filters.RestCsrfPreventionFilter"),
+                Class.forName("org.apache.catalina.loader.ParallelWebappClassLoader"),
+                Class.forName("org.apache.catalina.loader.WebappClassLoaderBase"),
+                Class.forName("org.apache.catalina.realm.UserDatabaseRealm"),
+                Class.forName("org.apache.catalina.valves.AccessLogValve"),
+                Class.forName("org.apache.coyote.AbstractProtocol"),
+                Class.forName("org.apache.coyote.ajp.AbstractAjpProtocol"),
+                Class.forName("org.apache.coyote.ajp.AjpNio2Protocol"),
+                Class.forName("org.apache.coyote.ajp.AjpNioProtocol"),
+                Class.forName("org.apache.coyote.http11.AbstractHttp11JsseProtocol"),
+                Class.forName("org.apache.coyote.http11.AbstractHttp11Protocol"),
+                Class.forName("org.apache.coyote.http11.Http11Nio2Protocol"),
+                Class.forName("org.apache.coyote.http11.Http11NioProtocol"),
+                Class.forName("org.apache.tomcat.util.descriptor.web.ContextResource"),
+                Class.forName("org.apache.tomcat.util.descriptor.web.ResourceBase"),
+                Class.forName("org.apache.tomcat.util.modeler.AttributeInfo"),
+                Class.forName("org.apache.tomcat.util.modeler.FeatureInfo"),
+                Class.forName("org.apache.tomcat.util.modeler.ManagedBean"),
+                Class.forName("org.apache.tomcat.util.modeler.OperationInfo"),
+                Class.forName("org.apache.tomcat.util.modeler.ParameterInfo"),
+                Class.forName("org.apache.tomcat.util.net.AbstractEndpoint"),
+                Class.forName("org.apache.tomcat.util.net.Nio2Endpoint"),
+                Class.forName("org.apache.tomcat.util.net.NioEndpoint"),
+                Class.forName("org.apache.tomcat.util.net.SocketProperties"))));
     }
 
-    //types of properties that IntrospectionUtils.setProperty supports
-    private static final Set<Class<?>> ALLOWED_TYPES = Collections.unmodifiableSet(new LinkedHashSet<>(
-        Arrays.asList(
-            Boolean.TYPE,
-            Integer.TYPE,
-            Long.TYPE,
-            String.class,
-            InetAddress.class
-        )
-    ));
-    private static final Map<Class<?>, SetPropertyClass> classes = new LinkedHashMap<>();
+    // types of properties that IntrospectionUtils.setProperty supports
+    private static final Set<Class<?>> ALLOWED_TYPES = Collections.unmodifiableSet(
+            new LinkedHashSet<>(Arrays.asList(Boolean.TYPE, Integer.TYPE, Long.TYPE, String.class, InetAddress.class)));
+    private static final Map<Class<?>,SetPropertyClass> classes = new LinkedHashMap<>();
 
-    public static void generateCode(Set<SetPropertyClass> baseClasses, String packageName, File location, String className) throws Exception {
-        String packageDirectory = packageName.replace('.','/');
+    public static void generateCode(Set<SetPropertyClass> baseClasses, String packageName, File location,
+            String className) throws Exception {
+        String packageDirectory = packageName.replace('.', '/');
         File sourceFileLocation = new File(location, packageDirectory);
         ReflectionLessCodeGenerator.generateCode(sourceFileLocation, className, packageName, baseClasses);
     }
@@ -130,17 +111,14 @@ public final class ObjectReflectionPropertyInspector {
     }
 
     private static boolean isAllowedSetMethod(Method method) {
-        return method.getName().startsWith("set") &&
-            method.getParameterTypes().length == 1 &&
-            ALLOWED_TYPES.contains(method.getParameterTypes()[0]) &&
-            !Modifier.isPrivate(method.getModifiers());
+        return method.getName().startsWith("set") && method.getParameterTypes().length == 1 &&
+                ALLOWED_TYPES.contains(method.getParameterTypes()[0]) && !Modifier.isPrivate(method.getModifiers());
     }
 
     private static boolean isAllowedGetMethod(Method method) {
         return (method.getName().startsWith("get") || method.getName().startsWith("is")) &&
-            method.getParameterTypes().length == 0 &&
-            ALLOWED_TYPES.contains(method.getReturnType()) &&
-            !Modifier.isPrivate(method.getModifiers());
+                method.getParameterTypes().length == 0 && ALLOWED_TYPES.contains(method.getReturnType()) &&
+                !Modifier.isPrivate(method.getModifiers());
     }
 
 
@@ -155,7 +133,8 @@ public final class ObjectReflectionPropertyInspector {
     }
 
     static Method findGetter(Class<?> declaringClass, String propertyName) {
-        for (String getterName : Arrays.asList("get" + IntrospectionUtils.capitalize(propertyName), "is" + propertyName)) {
+        for (String getterName : Arrays.asList("get" + IntrospectionUtils.capitalize(propertyName),
+                "is" + propertyName)) {
             try {
                 Method method = declaringClass.getMethod(getterName);
                 if (!Modifier.isPrivate(method.getModifiers())) {
@@ -201,8 +180,7 @@ public final class ObjectReflectionPropertyInspector {
         if (name == null || name.isEmpty()) {
             return name;
         }
-        if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) &&
-            Character.isUpperCase(name.charAt(0))) {
+        if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) && Character.isUpperCase(name.charAt(0))) {
             return name;
         }
         char[] chars = name.toCharArray();
@@ -220,13 +198,8 @@ public final class ObjectReflectionPropertyInspector {
                 Class<?> propertyType = method.getParameterTypes()[0];
                 Method getter = findGetter(clazz, propertyName);
                 Method setter = findSetter(clazz, propertyName, propertyType);
-                ReflectionProperty property = new ReflectionProperty(
-                    spc.getClazz().getName(),
-                    propertyName,
-                    propertyType,
-                    setter,
-                    getter
-                );
+                ReflectionProperty property =
+                        new ReflectionProperty(spc.getClazz().getName(), propertyName, propertyType, setter, getter);
                 spc.addProperty(property);
             } else if (isAllowedGetMethod(method)) {
                 boolean startsWithIs = method.getName().startsWith("is");
@@ -234,13 +207,8 @@ public final class ObjectReflectionPropertyInspector {
                 Class<?> propertyType = method.getReturnType();
                 Method getter = findGetter(clazz, propertyName);
                 Method setter = findSetter(clazz, propertyName, propertyType);
-                ReflectionProperty property = new ReflectionProperty(
-                    spc.getClazz().getName(),
-                    propertyName,
-                    propertyType,
-                    setter,
-                    getter
-                );
+                ReflectionProperty property =
+                        new ReflectionProperty(spc.getClazz().getName(), propertyName, propertyType, setter, getter);
                 spc.addProperty(property);
             }
         }
@@ -248,22 +216,11 @@ public final class ObjectReflectionPropertyInspector {
         final Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             if (isAllowedField(field)) {
-                Method getter = findGetter(
-                    field.getDeclaringClass(),
-                    IntrospectionUtils.capitalize(field.getName())
-                );
-                Method setter = findSetter(
-                    field.getDeclaringClass(),
-                    IntrospectionUtils.capitalize(field.getName()),
-                    field.getType()
-                );
-                ReflectionProperty property = new ReflectionProperty(
-                    spc.getClazz().getName(),
-                    field.getName(),
-                    field.getType(),
-                    setter,
-                    getter
-                );
+                Method getter = findGetter(field.getDeclaringClass(), IntrospectionUtils.capitalize(field.getName()));
+                Method setter = findSetter(field.getDeclaringClass(), IntrospectionUtils.capitalize(field.getName()),
+                        field.getType());
+                ReflectionProperty property = new ReflectionProperty(spc.getClazz().getName(), field.getName(),
+                        field.getType(), setter, getter);
                 spc.addProperty(property);
             }
         }
