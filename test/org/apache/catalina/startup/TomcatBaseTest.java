@@ -544,7 +544,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                         value.append(';');
                     }
                 }
-                out.println("PARAM/" + name + ": " + value);
+                out.println("PARAM:" + name + ": " + value);
             }
 
             out.println("SESSION-REQUESTED-ID: " +

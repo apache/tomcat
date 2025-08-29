@@ -121,6 +121,10 @@
         Refactor <code>WebResource</code> locking to use the new
         <code>KeyedReentrantReadWriteLock</code>. (markt)
       </scode>
+      <fix>
+        Fix handling of <code>QSA</code> and <code>QSD</code> flags in
+        <code>RewriteValve</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
