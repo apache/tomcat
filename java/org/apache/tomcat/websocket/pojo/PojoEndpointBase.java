@@ -42,11 +42,11 @@ public abstract class PojoEndpointBase extends Endpoint {
     private static final StringManager sm = StringManager.getManager(PojoEndpointBase.class);
 
     private Object pojo;
-    private final Map<String, String> pathParameters;
+    private final Map<String,String> pathParameters;
     private PojoMethodMapping methodMapping;
 
 
-    protected PojoEndpointBase(Map<String, String> pathParameters) {
+    protected PojoEndpointBase(Map<String,String> pathParameters) {
         this.pathParameters = pathParameters;
     }
 
