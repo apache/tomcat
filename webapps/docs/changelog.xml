@@ -133,6 +133,10 @@
         Ensure keys are handed out to OpenSSL even if <code>PEMFile</code>
         fails to process it, with appropriate logging. (remm)
       </fix>
+      <fix>
+        Add new <code>ML-DSA</code> key algorithm to <code>PEMFile</code>
+        and improve reporting when reading a key fails. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name = "Other">
