@@ -1716,12 +1716,6 @@
     <Bug pattern="VO_VOLATILE_INCREMENT " />
   </Match>
   <Match>
-    <!-- Monitor is used for a single condition. No need for loop. -->
-    <Class name="org.apache.tomcat.util.threads.InlineExecutorService" />
-    <Method name="awaitTermination" />
-    <Bug pattern="WA_NOT_IN_LOOP" />
-  </Match>
-  <Match>
     <!-- Random will be SecureRandom and will be used multiple times. -->
     <Class name="org.apache.tomcat.websocket.DigestAuthenticator"/>
     <Method name="getAuthorization"/>
