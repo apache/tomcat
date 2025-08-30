@@ -143,6 +143,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Handle spurious wake-ups during leader election for
+        <code>NonBlockingCoordinator</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name = "Other">
     <changelog>
       <scode>
