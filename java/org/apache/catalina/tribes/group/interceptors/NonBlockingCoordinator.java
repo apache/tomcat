@@ -238,14 +238,24 @@ public class NonBlockingCoordinator extends ChannelInterceptorBase {
                         new CoordinationEvent(CoordinationEvent.EVT_PROCESS_ELECT, this, "Election, sending request"));
                 sendElectionMsg(local, others[0], msg);
             } else {
-                try {
-                    coordMsgReceived.set(false);
-                    fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_WAIT_FOR_MSG, this,
-                            "Election, waiting for request"));
-                    electionMutex.wait(waitForCoordMsgTimeout);
-                } catch (InterruptedException x) {
-                    Thread.currentThread().interrupt();
-                }
+                coordMsgReceived.set(false);
+                fireInterceptorEvent(new CoordinationEvent(CoordinationEvent.EVT_WAIT_FOR_MSG, this,
+                        "Election, waiting for request"));
+                long timeout = waitForCoordMsgTimeout;
+                long timeoutEndNanos = System.nanoTime() + timeout * 1_000_000;
+                do {
+                    try {
+                        electionMutex.wait(timeout);
+                    } catch (InterruptedException x) {
+                        Thread.currentThread().interrupt();
+                    }
+                    timeout = (timeoutEndNanos - System.nanoTime()) / 1_000_000;
+                    /*
+                     * Spurious wake-ups are possible. Keep waiting if a) the condition we were waiting for hasn't
+                     * happened (i.e. notify() was not called) AND b) the timeout has not expired AND c) the thread was
+                     * not interrupted.
+                     */
+                } while (suggestedviewId == null && !coordMsgReceived.get() && timeout > 0 && !Thread.interrupted());
                 String msg;
                 if (suggestedviewId == null && !coordMsgReceived.get()) {
                     if (Thread.interrupted()) {
