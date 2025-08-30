@@ -141,6 +141,10 @@
         Add new <code>ML-DSA</code> key algorithm to <code>PEMFile</code>
         and improve reporting when reading a key fails. (remm)
       </fix>
+      <fix>
+        Fix possible early timeouts for network operations caused by a spurious
+        wake-up of a waiting thread. Found by Coverity Scan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
