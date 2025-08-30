@@ -1359,7 +1359,13 @@ public abstract class SocketWrapperBase<E> {
             synchronized (state) {
                 if (state.state == CompletionState.PENDING) {
                     try {
-                        state.wait(unit.toMillis(timeout));
+                        long timeoutExpiry = System.nanoTime() + unit.toNanos(timeout);
+                        long timeoutMillis = unit.toMillis(timeout);
+                         // Spurious wake-ups are possible. Keep waiting until state changes or timeout expires.
+                        while (state.state == CompletionState.PENDING && timeoutMillis > 0) {
+                            state.wait(unit.toMillis(timeout));
+                            timeoutMillis = (timeoutExpiry - System.nanoTime()) / 1_000_000;
+                        }
                         if (state.state == CompletionState.PENDING) {
                             if (handler != null && state.callHandler.compareAndSet(true, false)) {
                                 handler.failed(new SocketTimeoutException(getTimeoutMsg(read)), attachment);
