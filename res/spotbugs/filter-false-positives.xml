@@ -1677,12 +1677,6 @@
     <Bug code="SF" />
   </Match>
   <Match>
-  <!-- Single condition so fine -->
-    <Class name="org.apache.tomcat.util.net.SocketWrapperBase" />
-    <Method name="vectoredOperation"/>
-    <Bug pattern="WA_NOT_IN_LOOP" />
-  </Match>
-  <Match>
   <!-- Single condition so notify is fine -->
     <Class name="org.apache.tomcat.util.net.SocketWrapperBase$VectoredIOCompletionHandler" />
     <Or>
