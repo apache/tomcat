@@ -1606,12 +1606,6 @@
     <Bug code="ML"/>
   </Match>
   <Match>
-    <!-- Single condition so no need for wait to be in loop -->
-    <Class name="org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper"/>
-    <Method name="fillReadBuffer"/>
-    <Bug pattern="WA_NOT_IN_LOOP" />
-  </Match>
-  <Match>
     <!-- Single condition so notify() is OK -->
     <Class name="org.apache.tomcat.util.net.NioEndpoint$Poller"/>
     <Method name="processKey"/>
