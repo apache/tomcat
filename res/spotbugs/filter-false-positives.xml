@@ -1013,12 +1013,6 @@
     <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
   </Match>
   <Match>
-    <!-- Monitor is used for a single condition. -->
-    <Class name="org.apache.coyote.http2.WindowAllocationManager" />
-    <Method name="waitFor" />
-    <Bug pattern="WA_NOT_IN_LOOP" />
-  </Match>
-  <Match>
     <!-- Returning null is required by the EL specification -->
     <Class name="org.apache.el.lang.ELSupport" />
     <Method name="coerceToBoolean"/>
