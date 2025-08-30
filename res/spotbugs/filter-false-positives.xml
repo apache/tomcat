@@ -1724,15 +1724,6 @@
     <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
   </Match>
   <Match>
-    <!-- Single condition so no need for wait to be in loop -->
-    <Class name="org.apache.tomcat.util.net.Nio2Endpoint$Nio2SocketWrapper"/>
-    <Or>
-      <Method name="read"/>
-      <Method name="write"/>
-    </Or>
-    <Bug pattern="WA_NOT_IN_LOOP" />
-  </Match>
-  <Match>
     <!-- Single wait so no need for notifyAll() -->
     <Class name="org.apache.tomcat.util.net.Nio2Endpoint$Nio2SocketWrapper$VectoredIOCompletionHandler"/>
     <Or>
