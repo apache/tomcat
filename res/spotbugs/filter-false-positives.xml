@@ -659,11 +659,6 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
-    <Class name="org.apache.catalina.tribes.group.RpcChannel"/>
-    <Method name="send"/>
-    <Bug pattern="WA_NOT_IN_LOOP"/>
-  </Match>
-  <Match>
     <!-- Class lock is not an instance lock -->
     <Class name="org.apache.catalina.tribes.io.BufferPool" />
     <Field name="instance"/>

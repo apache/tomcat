@@ -145,6 +145,10 @@
         Handle spurious wake-ups during leader election for
         <code>NonBlockingCoordinator</code>. (markt)
       </fix>
+      <fix>
+        Handle spurious wake-ups during sending of messages by
+        <code>RpcChannel</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name = "Other">
