@@ -100,7 +100,11 @@ public class RpcChannel implements ChannelListener {
                 RpcMessage rmsg = new RpcMessage(rpcId, key.id, message);
                 channel.send(destination, rmsg, sendOptions);
                 if (rpcOptions != NO_REPLY) {
-                    collector.wait(timeout);
+                    long timeoutExpiry = System.nanoTime() + timeout * 1_000_000;
+                    while (collector.isComplete() && timeout > 0) {
+                        collector.wait(timeout);
+                        timeout = (timeoutExpiry - System.nanoTime()) / 1_000_000;
+                    }
                 }
             }
         } catch (InterruptedException ix) {
