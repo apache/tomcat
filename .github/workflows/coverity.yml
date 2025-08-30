@@ -20,6 +20,7 @@ jobs:
     - uses: vapier/coverity-scan-action@2068473c7bdf8c2fb984a6a40ae76ee7facd7a85
       with:
         project: 'Apache Tomcat'
+        version: 12.0.x - ${{ github.sha }}
         token: ${{ secrets.COVERITY_SCAN_TOKEN }}
         email: ${{ secrets.COVERITY_SCAN_EMAIL }}
         build_language: java
