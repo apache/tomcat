@@ -147,8 +147,13 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         ((StandardJarScanner) ctx.getJarScanner()).setScanClassPath(false);
         return ctx;
     }
-
-
+    public Context getProgrammaticRootContextWithManager() {
+        Context ctx = getProgrammaticRootContext();
+        if (ctx.getManager() == null) {
+            ctx.setManager(new StandardManager());
+        }
+        return ctx;
+    }
     /*
      * Sub-classes need to know port so they can connect
      */
