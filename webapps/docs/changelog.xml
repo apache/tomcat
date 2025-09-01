@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.10 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.11 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -172,24 +172,6 @@
         performance. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <scode>
-        Remove a number of unnecessary packages from the catalina-deployer.jar.
-        (markt)
-      </scode>
-      <fix>
-        <bug>69781</bug>: Fix concurrent access issues in the session
-        <code>FileStore</code> implementation that were causing lost sessions
-        when the store was used with the <code>PersistentValve</code>. Based on
-        pull request <pr>882</pr> by Aaron Ogburn. (markt)
-      </fix>
-      <scode>
-        Refactor <code>WebResource</code> locking to use the new
-        <code>KeyedReentrantReadWriteLock</code>. (markt)
-      </scode>
-      <fix>
-        Fix handling of <code>QSA</code> and <code>QSD</code> flags in
-        <code>RewriteValve</code>. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -208,22 +190,6 @@
         Remove NIO2 connector. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        <bug>69762</bug>: Additional overflow fix for HPACK decoding of
-        integers. Pull request <pr>880</pr> by Chenjp. (markt)
-      </fix>
-      <fix>
-        Ensure keys are handed out to OpenSSL even if <code>PEMFile</code>
-        fails to process it, with appropriate logging. (remm)
-      </fix>
-      <fix>
-        Add new <code>ML-DSA</code> key algorithm to <code>PEMFile</code>
-        and improve reporting when reading a key fails. (remm)
-      </fix>
-      <fix>
-        Fix possible early timeouts for network operations caused by a spurious
-        wake-up of a waiting thread. Found by Coverity Scan. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -263,14 +229,6 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Handle spurious wake-ups during leader election for
-        <code>NonBlockingCoordinator</code>. (markt)
-      </fix>
-      <fix>
-        Handle spurious wake-ups during sending of messages by
-        <code>RpcChannel</code>. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -309,17 +267,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <scode>
-        Review logging and include the full stack trace and exception message
-        by default rather then just the exception message when logging an error
-        or warning in response to an exception. (markt)
-      </scode>
-      <add>
-        Add escaping to log formatters to align with JSON formatter. (markt)
-      </add>
-      <update>
-        Update Checkstyle to 11.0.0. (markt)
-      </update>
     </changelog>
   </subsection>
 </section>
