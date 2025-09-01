@@ -30,6 +30,9 @@ public interface ErrorHandler {
 
     /**
      * Processes the given JSP parse error.
+     * <p>
+     * It is expected (and Jasper is coded based on this) that calls to this method will always result in a
+     * {@code JasperException} being thrown.
      *
      * @param fname     Name of the JSP file in which the parse error occurred
      * @param line      Parse error line number
@@ -43,6 +46,9 @@ public interface ErrorHandler {
 
     /**
      * Processes the given JSP parse error.
+     * <p>
+     * It is expected (and Jasper is coded based on this) that calls to this method will always result in a
+     * {@code JasperException} being thrown.
      *
      * @param msg       Parse error message
      * @param exception Parse exception
@@ -53,6 +59,9 @@ public interface ErrorHandler {
 
     /**
      * Processes the given javac compilation errors.
+     * <p>
+     * It is expected (and Jasper is coded based on this) that calls to this method will always result in a
+     * {@code JasperException} being thrown.
      *
      * @param details Array of JavacErrorDetail instances corresponding to the compilation errors
      *
@@ -62,6 +71,9 @@ public interface ErrorHandler {
 
     /**
      * Processes the given javac error report and exception.
+     * <p>
+     * It is expected (and Jasper is coded based on this) that calls to this method will always result in a
+     * {@code JasperException} being thrown.
      *
      * @param errorReport Compilation error report
      * @param exception   Compilation exception
