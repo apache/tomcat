@@ -14,76 +14,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.catalina.startup;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
 
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
 
 /**
- * Verification for STRICT_SERVLET_COMPLIANCE and web.xml parsing.
+ * Tests XML validation works on the Context.
  */
-public class TestStrictComplianceDeployment extends TomcatBaseTest {
-    private static final String STRICT_SERVLET_COMPLIANCE = "org.apache.catalina.STRICT_SERVLET_COMPLIANCE";
-    private static String originalPropertyValue;
-    @BeforeClass
-    public static void enableStrictServletCompliance() {
-        originalPropertyValue = System.getProperty(STRICT_SERVLET_COMPLIANCE);
-        System.setProperty(STRICT_SERVLET_COMPLIANCE, "true");
-    }
-
-    @AfterClass
-    public static void restoreStrictServletCompliance() {
-        if (originalPropertyValue == null) {
-            System.clearProperty(STRICT_SERVLET_COMPLIANCE);
-        } else {
-            System.setProperty(STRICT_SERVLET_COMPLIANCE, originalPropertyValue);
-        }
-    }
-
+public class TestXmlValidationUsingContext extends TomcatBaseTest {
     @Test
-    public void testWebAppDeployWithStrictComplianceWithSaxParseException() throws Exception {
+    public void contextValidationWithInvalidWebXml() throws Exception {
         File appDir = getTemporaryDirectory();
         File webInf = new File(appDir, "WEB-INF");
         Assert.assertTrue(webInf.isDirectory() || webInf.mkdirs());
         writeInvalidXml(new File(webInf, "web.xml"));
         Tomcat tomcat = getTomcatInstance();
-        Context ctx = tomcat.addWebapp(null,"", appDir.getAbsolutePath());
-
-        try(WebappLogCapture capture = attachWebappLogCapture(
-            ctx, Level.SEVERE,"org.apache.tomcat.util.digester.Digester")) {
-            tomcat.start();
-            Assert.assertTrue("A 'Parse error' was found in the logs.", capture.containsText("Parse error at line"));
-            Assert.assertTrue("A SAXParseException was found in the logs.", capture.hasException(org.xml.sax.SAXParseException.class));
-
-        }
+        Context ctx = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+        ctx.setXmlValidation(true);
+        ctx.setXmlNamespaceAware(true);
+        tomcat.start();
+        Assert.assertFalse("Context should not be available when web.xml is invalid and validation is enabled",
+            ctx.getState().isAvailable());
     }
 
     @Test
-    public void testWebAppDeployWithStrictComplianceNoSaxParseException() throws Exception {
+    public void contextValidationWithValidWebXml() throws Exception {
         File appDir = getTemporaryDirectory();
         File webInf = new File(appDir, "WEB-INF");
         Assert.assertTrue(webInf.isDirectory() || webInf.mkdirs());
         writeValidXml(new File(webInf, "web.xml"));
         Tomcat tomcat = getTomcatInstance();
-        Context ctx = tomcat.addWebapp(null,"", appDir.getAbsolutePath());
-
-        try(WebappLogCapture capture = attachWebappLogCapture(
-            ctx, Level.SEVERE,"org.apache.tomcat.util.digester.Digester")) {
-            tomcat.start();
-            Assert.assertFalse("A 'Parse error' was found in the logs.", capture.containsText("Parse error at line"));
-            Assert.assertFalse("A SAXParseException was found in the logs.", capture.hasException(org.xml.sax.SAXParseException.class));
-
-        }
+        Context ctx = tomcat.addWebapp(null, "", appDir.getAbsolutePath());
+        ctx.setXmlValidation(true);
+        ctx.setXmlNamespaceAware(true);
+        tomcat.start();
+        Assert.assertTrue("Context should be available when web.xml is valid and validation is enabled",
+            ctx.getState().isAvailable());
     }
+
     private void writeValidXml(File webXml) throws IOException {
         try (FileWriter fw = new FileWriter(webXml)) {
             fw.write(
@@ -108,5 +84,4 @@ public class TestStrictComplianceDeployment extends TomcatBaseTest {
                     """);
         }
     }
-
 }
