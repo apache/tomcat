@@ -42,7 +42,7 @@ public class TestXmlValidationUsingContext extends TomcatBaseTest {
         ctx.setXmlNamespaceAware(true);
         tomcat.start();
         Assert.assertFalse("Context should not be available when web.xml is invalid and validation is enabled",
-            ctx.getState().isAvailable());
+                ctx.getState().isAvailable());
     }
 
     @Test
@@ -57,31 +57,31 @@ public class TestXmlValidationUsingContext extends TomcatBaseTest {
         ctx.setXmlNamespaceAware(true);
         tomcat.start();
         Assert.assertTrue("Context should be available when web.xml is valid and validation is enabled",
-            ctx.getState().isAvailable());
+                ctx.getState().isAvailable());
     }
 
     private void writeValidXml(File webXml) throws IOException {
         try (FileWriter fw = new FileWriter(webXml)) {
             fw.write(
-                """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                             xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                                                 https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-                             version="6.0">
-                    </web-app>
-                    """);
+                    """
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                 xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                                                     https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+                                 version="6.0">
+                        </web-app>
+                        """);
         }
     }
     private void writeInvalidXml(File webXml) throws IOException {
         try (FileWriter fw = new FileWriter(webXml)) {
             fw.write(
-                """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <web-app>
-                    </web-app>
-                    """);
+                    """
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <web-app>
+                        </web-app>
+                        """);
         }
     }
 }
