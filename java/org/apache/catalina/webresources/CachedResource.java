@@ -296,7 +296,7 @@ public class CachedResource implements WebResource {
         if (cachedStrongETag == null) {
             byte[] buf = getContent();
             if (buf != null) {
-                buf = ConcurrentMessageDigest.digest("SHA-1", buf);
+                buf = ConcurrentMessageDigest.digestSHA256(buf);
                 cachedStrongETag = "\"" + HexUtils.toHexString(buf) + "\"";
             } else {
                 cachedStrongETag = webResource.getStrongETag();

@@ -852,8 +852,12 @@ public class TestWebdavServlet extends TomcatBaseTest {
         Assert.assertFalse(client.getResponseBody().contains("/myfolder/file4.txt"));
         Assert.assertTrue(client.getResponseBody().contains("/file7.txt"));
         Assert.assertTrue(client.getResponseBody().contains("Second-"));
-        Assert.assertTrue(client.getResponseBody().contains("d1dc021f456864e84f9a37b7a6f51c51301128a0"));
-        Assert.assertTrue(client.getResponseBody().contains("f3390fe2e5546dac3d1968970df1a222a3a39c00"));
+        // SHA-256 hash for "FOOBAR...FOOBAR" (repeats 3000 times)
+        Assert.assertTrue(client.getResponseBody().contains(
+                "bb94e8d310800b24310036b168aa5a946e27f9572b3d99f956f3a3ed2e7d3045"));
+        // SHA-256 hash for "FOOBAR"
+        Assert.assertTrue(client.getResponseBody().contains(
+                "24c422e681f1c1bd08286c7aaf5d23a5f088dcdb0b219806b3a9e579244f00c5"));
         String timeoutValue = client.getResponseBody().substring(client.getResponseBody().indexOf("Second-"));
         timeoutValue = timeoutValue.substring("Second-".length(), timeoutValue.indexOf('<'));
         Assert.assertTrue(Integer.valueOf(timeoutValue).intValue() <= 20);

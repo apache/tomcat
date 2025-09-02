@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.12 (markt)" rtext="in development">
+  <subsection name="Catlaina">
+    <changelog>
+      <update>
+        Change the digest used to calculate strong ETags (if enabled) for the
+        default Servlet from SHA-1 to SHA-256 to align with the recommendation
+        in RFC 9110 that hash functions used to generate strong ETags should be
+        collision resistant. (markt)
+      </update>
+    </changelog>
+  </subsection>
   <subsection name="Coyote">
     <changelog>
       <update>
