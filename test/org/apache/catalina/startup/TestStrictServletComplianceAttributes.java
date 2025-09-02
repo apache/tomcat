@@ -67,7 +67,8 @@ public class TestStrictServletComplianceAttributes extends TomcatBaseTest {
         Assert.assertFalse("All extension mapped servlets should be checked against welcome files under STRICT_SERVLET_COMPLIANCE.", ctx.isResourceOnlyServlet("jsp"));
 
         Manager manager = ctx.getManager();
-        if (manager instanceof ManagerBase managerBase) {
+        if (manager instanceof ManagerBase) {
+            ManagerBase managerBase = (ManagerBase) manager;
             Assert.assertTrue("ManagerBase.sessionActivityCheck should be true under STRICT", managerBase.getSessionActivityCheck());
             Assert.assertTrue("ManagerBase.sessionLastAccessAtStart should be true under STRICT", managerBase.getSessionLastAccessAtStart());
         }
