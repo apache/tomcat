@@ -63,24 +63,21 @@ public class TestXmlValidationUsingContext extends TomcatBaseTest {
     private void writeValidXml(File webXml) throws IOException {
         try (FileWriter fw = new FileWriter(webXml)) {
             fw.write(
-                    """
-                        <?xml version="1.0" encoding="UTF-8"?>
-                        <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-                                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee \
-                        http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
-                                 version="4.0">
-                        </web-app>""");
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                        "<web-app xmlns=\"http://xmlns.jcp.org/xml/ns/javaee\"\n" +
+                        "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+                        "         xsi:schemaLocation=\"http://xmlns.jcp.org/xml/ns/javaee " +
+                        "http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd\"\n" +
+                        "         version=\"4.0\">\n" +
+                        "</web-app>");
         }
     }
     private void writeInvalidXml(File webXml) throws IOException {
         try (FileWriter fw = new FileWriter(webXml)) {
             fw.write(
-                    """
-                        <?xml version="1.0" encoding="UTF-8"?>
-                        <web-app>
-                        </web-app>
-                        """);
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                    "<web-app>\n" +
+                    "</web-app>");
         }
     }
 }
