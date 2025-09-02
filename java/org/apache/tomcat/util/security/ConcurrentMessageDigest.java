@@ -38,6 +38,7 @@ public class ConcurrentMessageDigest {
 
     private static final String MD5 = "MD5";
     private static final String SHA1 = "SHA-1";
+    private static final String SHA256 = "SHA-256";
 
     private static final Map<String,Queue<MessageDigest>> queues = new ConcurrentHashMap<>();
 
@@ -58,6 +59,11 @@ public class ConcurrentMessageDigest {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(sm.getString("concurrentMessageDigest.noDigest"), e);
         }
+        try {
+            init(SHA256);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(sm.getString("concurrentMessageDigest.noDigest"), e);
+        }
     }
 
     public static byte[] digestMD5(byte[]... input) {
@@ -66,6 +72,10 @@ public class ConcurrentMessageDigest {
 
     public static byte[] digestSHA1(byte[]... input) {
         return digest(SHA1, input);
+    }
+
+    public static byte[] digestSHA256(byte[]... input) {
+        return digest(SHA256, input);
     }
 
     public static byte[] digest(String algorithm, byte[]... input) {
