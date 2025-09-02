@@ -172,6 +172,12 @@
         performance. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Change the digest used to calculate strong ETags (if enabled) for the
+        default Servlet from SHA-1 to SHA-256 to align with the recommendation
+        in RFC 9110 that hash functions used to generate strong ETags should be
+        collision resistant. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
