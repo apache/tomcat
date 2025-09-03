@@ -197,22 +197,22 @@ final class PoolImplUtils {
     static ChronoUnit toChronoUnit(final TimeUnit timeUnit) {
         // TODO when using Java >= 9: Use TimeUnit.toChronoUnit().
         switch (Objects.requireNonNull(timeUnit)) {
-        case NANOSECONDS:
-            return ChronoUnit.NANOS;
-        case MICROSECONDS:
-            return ChronoUnit.MICROS;
-        case MILLISECONDS:
-            return ChronoUnit.MILLIS;
-        case SECONDS:
-            return ChronoUnit.SECONDS;
-        case MINUTES:
-            return ChronoUnit.MINUTES;
-        case HOURS:
-            return ChronoUnit.HOURS;
-        case DAYS:
-            return ChronoUnit.DAYS;
-        default:
-            throw new IllegalArgumentException(timeUnit.toString());
+            case NANOSECONDS:
+                return ChronoUnit.NANOS;
+            case MICROSECONDS:
+                return ChronoUnit.MICROS;
+            case MILLISECONDS:
+                return ChronoUnit.MILLIS;
+            case SECONDS:
+                return ChronoUnit.SECONDS;
+            case MINUTES:
+                return ChronoUnit.MINUTES;
+            case HOURS:
+                return ChronoUnit.HOURS;
+            case DAYS:
+                return ChronoUnit.DAYS;
+            default:
+                throw new IllegalArgumentException(timeUnit.toString());
         }
     }
 

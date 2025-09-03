@@ -82,10 +82,10 @@ public class TestStandardContext extends TomcatBaseTest {
 
     // @formatter:off
     private static final String REQUEST =
-        "GET / HTTP/1.1" + CRLF +
-        "Host: anything" + CRLF +
-        "Connection: close" + CRLF +
-        CRLF;
+            "GET / HTTP/1.1" + CRLF +
+            "Host: anything" + CRLF +
+            "Connection: close" + CRLF +
+            CRLF;
     // @formatter:on
 
     @Test
@@ -742,12 +742,12 @@ public class TestStandardContext extends TomcatBaseTest {
                     content = new String(content.getBytes("UTF-8"), "ASCII");
 
                     request = new String[] { "POST http://localhost:" + getPort() + uri + " HTTP/1.1" + CRLF +
-                            "Host: localhost:" + getPort() + CRLF + "Connection: close" + CRLF +
-                            "Content-Type: multipart/form-data; boundary=" + boundary + CRLF + "Content-Length: " +
+                                "Host: localhost:" + getPort() + CRLF + "Connection: close" + CRLF +
+                                "Content-Type: multipart/form-data; boundary=" + boundary + CRLF + "Content-Length: " +
                             content.length() + CRLF + CRLF + content + CRLF };
                 } else {
                     request = new String[] { "GET http://localhost:" + getPort() + uri + " HTTP/1.1" + CRLF +
-                            "Host: localhost:" + getPort() + CRLF + "Connection: close" + CRLF + CRLF };
+                                "Host: localhost:" + getPort() + CRLF + "Connection: close" + CRLF + CRLF };
                 }
 
                 setRequest(request);

@@ -243,21 +243,21 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     private void configureHostRSA() {
         SSLHostConfig sslHostConfig = getSSLHostConfig();
         switch (storeType) {
-        case KEYSTORE: {
-            SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
-            sslHostConfigCertificateRsa.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_RSA_JKS));
-            sslHostConfigCertificateRsa.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
-            sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
-            break;
-        }
-        case PEM: {
-            SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
-            sslHostConfigCertificateRsa.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
-            sslHostConfigCertificateRsa.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
-            sslHostConfigCertificateRsa.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
-            sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
-            break;
-        }
+            case KEYSTORE: {
+                SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
+                sslHostConfigCertificateRsa.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_RSA_JKS));
+                sslHostConfigCertificateRsa.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
+                sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
+                break;
+            }
+            case PEM: {
+                SSLHostConfigCertificate sslHostConfigCertificateRsa = new SSLHostConfigCertificate(sslHostConfig, Type.RSA);
+                sslHostConfigCertificateRsa.setCertificateFile(getPath(TesterSupport.LOCALHOST_RSA_CERT_PEM));
+                sslHostConfigCertificateRsa.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_RSA_KEY_PEM));
+                sslHostConfigCertificateRsa.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
+                sslHostConfig.addCertificate(sslHostConfigCertificateRsa);
+                break;
+            }
         }
     }
 
@@ -265,21 +265,21 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
     private void configureHostEC() {
         SSLHostConfig sslHostConfig = getSSLHostConfig();
         switch (storeType) {
-        case KEYSTORE: {
-            SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
-            sslHostConfigCertificateEc.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_EC_JKS));
-            sslHostConfigCertificateEc.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
-            sslHostConfig.addCertificate(sslHostConfigCertificateEc);
-            break;
-        }
-        case PEM: {
-            SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
-            sslHostConfigCertificateEc.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
-            sslHostConfigCertificateEc.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
-            sslHostConfigCertificateEc.setCertificateKeyPassword(TesterSupport.JKS_PASS);
-            sslHostConfig.addCertificate(sslHostConfigCertificateEc);
-            break;
-        }
+            case KEYSTORE: {
+                SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
+                sslHostConfigCertificateEc.setCertificateKeystoreFile(getPath(TesterSupport.LOCALHOST_EC_JKS));
+                sslHostConfigCertificateEc.setCertificateKeystorePassword(TesterSupport.JKS_PASS);
+                sslHostConfig.addCertificate(sslHostConfigCertificateEc);
+                break;
+            }
+            case PEM: {
+                SSLHostConfigCertificate sslHostConfigCertificateEc = new SSLHostConfigCertificate(sslHostConfig, Type.EC);
+                sslHostConfigCertificateEc.setCertificateFile(getPath(TesterSupport.LOCALHOST_EC_CERT_PEM));
+                sslHostConfigCertificateEc.setCertificateKeyFile(getPath(TesterSupport.LOCALHOST_EC_KEY_PEM));
+                sslHostConfigCertificateEc.setCertificateKeyPassword(TesterSupport.JKS_PASS);
+                sslHostConfig.addCertificate(sslHostConfigCertificateEc);
+                break;
+            }
         }
     }
 

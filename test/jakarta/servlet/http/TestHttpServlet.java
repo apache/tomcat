@@ -321,12 +321,12 @@ public class TestHttpServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "TRACE / HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "X-aaa: a1, a2" + CRLF +
-                "X-aaa: a3" + CRLF +
-                "Cookie: c1-v1" + CRLF +
-                "Authorization: not-a-real-credential" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "X-aaa: a1, a2" + CRLF +
+                    "X-aaa: a3" + CRLF +
+                    "Cookie: c1-v1" + CRLF +
+                    "Authorization: not-a-real-credential" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.setUseContentLength(true);

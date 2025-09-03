@@ -74,7 +74,7 @@ public class ConnectCountTest extends DefaultTestCase {
             minfetch = Math.min(minfetch, t.nroffetch);
             maxfetch = Math.max(maxfetch, t.nroffetch);
             if (ConnectCountTest.this.printthread) {
-              System.out.println(t.getName()+" : Nr-of-fetch:"+t.nroffetch+ " Max fetch Time:"+t.maxwait/1000000f+"ms. :Max close time:"+t.cmax/1000000f+"ms.");
+                System.out.println(t.getName()+" : Nr-of-fetch:"+t.nroffetch+ " Max fetch Time:"+t.maxwait/1000000f+"ms. :Max close time:"+t.cmax/1000000f+"ms.");
             }
         }
         System.out.println("["+name+"] Max fetch:"+(maxfetch)+" Min fetch:"+(minfetch)+" Average fetch:"+
@@ -233,7 +233,7 @@ public class ConnectCountTest extends DefaultTestCase {
                 long now = System.currentTimeMillis();
                 while (ConnectCountTest.this.run) {
                     if ((System.currentTimeMillis()-now)>=ConnectCountTest.this.complete) {
-                      break;
+                        break;
                     }
                     long start = System.nanoTime();
                     Connection con = null;
@@ -251,7 +251,7 @@ public class ConnectCountTest extends DefaultTestCase {
                         nroffetch++;
                         try {
                             if (ConnectCountTest.this.sleep>0) {
-                              sleep(ConnectCountTest.this.sleep);
+                                sleep(ConnectCountTest.this.sleep);
                             }
                         } catch (InterruptedException x) {
                             interrupted();
@@ -259,7 +259,7 @@ public class ConnectCountTest extends DefaultTestCase {
                     } finally {
                         long cstart = System.nanoTime();
                         if (con!=null) {
-                          try {con.close();}catch(Exception x) {x.printStackTrace();}
+                            try {con.close();}catch(Exception x) {x.printStackTrace();}
                         }
                         long cdelta = System.nanoTime() - cstart;
                         totalcmax += cdelta;
@@ -275,14 +275,14 @@ public class ConnectCountTest extends DefaultTestCase {
             }
             if (System.getProperty("print-thread-stats")!=null) {
                 System.out.println("["+getName()+"] "+
-                    "\n\tMax time to retrieve connection:"+maxwait/1000000f+" ms."+
-                    "\n\tTotal time to retrieve connection:"+totalwait/1000000f+" ms."+
-                    "\n\tAverage time to retrieve connection:"+totalwait/1000000f/nroffetch+" ms."+
-                    "\n\tMax time to close connection:"+cmax/1000000f+" ms."+
-                    "\n\tTotal time to close connection:"+totalcmax/1000000f+" ms."+
-                    "\n\tAverage time to close connection:"+totalcmax/1000000f/nroffetch+" ms."+
-                    "\n\tRun time:"+totalruntime/1000000f+" ms."+
-                    "\n\tNr of fetch:"+nroffetch);
+                        "\n\tMax time to retrieve connection:"+maxwait/1000000f+" ms."+
+                        "\n\tTotal time to retrieve connection:"+totalwait/1000000f+" ms."+
+                        "\n\tAverage time to retrieve connection:"+totalwait/1000000f/nroffetch+" ms."+
+                        "\n\tMax time to close connection:"+cmax/1000000f+" ms."+
+                        "\n\tTotal time to close connection:"+totalcmax/1000000f+" ms."+
+                        "\n\tAverage time to close connection:"+totalcmax/1000000f/nroffetch+" ms."+
+                        "\n\tRun time:"+totalruntime/1000000f+" ms."+
+                        "\n\tNr of fetch:"+nroffetch);
             }
         }
     }

@@ -178,7 +178,7 @@ public class CompressionFilter extends GenericFilter {
             }
 
             Enumeration<String> e =
-                ((HttpServletRequest)request).getHeaders("Accept-Encoding");
+                    ((HttpServletRequest)request).getHeaders("Accept-Encoding");
             while (e.hasMoreElements()) {
                 String name = e.nextElement();
                 if (name.indexOf("gzip") != -1) {
@@ -197,7 +197,7 @@ public class CompressionFilter extends GenericFilter {
         if (supportCompression) {
             if (response instanceof HttpServletResponse) {
                 CompressionServletResponseWrapper wrappedResponse =
-                    new CompressionServletResponseWrapper((HttpServletResponse)response);
+                        new CompressionServletResponseWrapper((HttpServletResponse)response);
                 wrappedResponse.setDebugLevel(debug);
                 wrappedResponse.setCompressionThreshold(compressionThreshold);
                 wrappedResponse.setCompressionBuffer(compressionBuffer);

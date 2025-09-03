@@ -42,11 +42,20 @@ public class PoolPropertiesTest {
             switch (c) {
                 case '{':
                 case '(':
-                case '[': stack.add(Character.valueOf(c)); break;
-                case '}': Assert.assertEquals('{', stack.remove(stack.size() - 1).charValue()); break;
-                case ')': Assert.assertEquals('(', stack.remove(stack.size() - 1).charValue()); break;
-                case ']': Assert.assertEquals('[', stack.remove(stack.size() - 1).charValue()); break;
-                default: break;
+                case '[':
+                    stack.add(Character.valueOf(c));
+                    break;
+                case '}':
+                    Assert.assertEquals('{', stack.remove(stack.size() - 1).charValue());
+                    break;
+                case ')':
+                    Assert.assertEquals('(', stack.remove(stack.size() - 1).charValue());
+                    break;
+                case ']':
+                    Assert.assertEquals('[', stack.remove(stack.size() - 1).charValue());
+                    break;
+                default:
+                    break;
             }
         }
         Assert.assertEquals("All brackets should have been closed", 0, stack.size());

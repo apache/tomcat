@@ -210,7 +210,7 @@ public class TestSlowQueryReport extends DefaultTestCase {
             System.out.println("\tMessage: " + notification.getMessage());
             if (notification instanceof AttributeChangeNotification) {
                 AttributeChangeNotification acn =
-                    (AttributeChangeNotification) notification;
+                        (AttributeChangeNotification) notification;
                 System.out.println("\tAttributeName: " + acn.getAttributeName());
                 System.out.println("\tAttributeType: " + acn.getAttributeType());
                 System.out.println("\tNewValue: " + acn.getNewValue());

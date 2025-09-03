@@ -770,23 +770,23 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
                 node = new Node.Expression(qName, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             }
             case USE_BEAN_ACTION ->
-                node = new Node.UseBean(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                    node = new Node.UseBean(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case SET_PROPERTY_ACTION ->
-                node = new Node.SetProperty(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                    node = new Node.SetProperty(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case GET_PROPERTY_ACTION ->
-                node = new Node.GetProperty(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                    node = new Node.GetProperty(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case INCLUDE_ACTION ->
-                node = new Node.IncludeAction(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                    node = new Node.IncludeAction(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case FORWARD_ACTION ->
-                node = new Node.ForwardAction(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                    node = new Node.ForwardAction(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case PARAM_ACTION ->
-                node = new Node.ParamAction(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                    node = new Node.ParamAction(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case TEXT_ACTION -> node = new Node.JspText(qName, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case BODY_ACTION -> node = new Node.JspBody(qName, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case ATTRIBUTE_ACTION ->
-                node = new Node.NamedAttribute(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                    node = new Node.NamedAttribute(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case OUTPUT_ACTION ->
-                node = new Node.JspOutput(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                    node = new Node.JspOutput(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             case TAG_DIRECTIVE_ACTION -> {
                 if (!isTagFile) {
                     throw new SAXParseException(Localizer.getMessage("jsp.error.action.isnottagfile", localName),
@@ -830,7 +830,7 @@ class JspDocumentParser extends DefaultHandler2 implements TagConstants {
                 node = new Node.DoBodyAction(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             }
             case ELEMENT_ACTION ->
-                node = new Node.JspElement(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
+                    node = new Node.JspElement(qName, nonTaglibAttrs, nonTaglibXmlnsAttrs, taglibAttrs, start, current);
             default -> throw new SAXParseException(Localizer.getMessage("jsp.error.xml.badStandardAction", localName),
                     locator);
         }

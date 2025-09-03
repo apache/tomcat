@@ -1017,14 +1017,14 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     public void setDefaultTransactionIsolation(final int defaultTransactionIsolation) {
         assertInitializationAllowed();
         switch (defaultTransactionIsolation) {
-        case Connection.TRANSACTION_NONE:
-        case Connection.TRANSACTION_READ_COMMITTED:
-        case Connection.TRANSACTION_READ_UNCOMMITTED:
-        case Connection.TRANSACTION_REPEATABLE_READ:
-        case Connection.TRANSACTION_SERIALIZABLE:
-            break;
-        default:
-            throw new IllegalArgumentException(BAD_TRANSACTION_ISOLATION);
+            case Connection.TRANSACTION_NONE:
+            case Connection.TRANSACTION_READ_COMMITTED:
+            case Connection.TRANSACTION_READ_UNCOMMITTED:
+            case Connection.TRANSACTION_REPEATABLE_READ:
+            case Connection.TRANSACTION_SERIALIZABLE:
+                break;
+            default:
+                throw new IllegalArgumentException(BAD_TRANSACTION_ISOLATION);
         }
         this.defaultTransactionIsolation = defaultTransactionIsolation;
     }

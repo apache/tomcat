@@ -298,7 +298,7 @@ public abstract class FileUploadBase {
      *   storing the uploaded content.
      */
     public FileItemIterator getItemIterator(final RequestContext ctx)
-    throws FileUploadException, IOException {
+        throws FileUploadException, IOException {
         try {
             return new FileItemIteratorImpl(this, ctx);
         } catch (final FileUploadIOException e) {
@@ -408,7 +408,7 @@ public abstract class FileUploadBase {
             final int offset = headerPart.indexOf(CR, index);
             if (offset == -1  ||  offset + 1 >= headerPart.length()) {
                 throw new IllegalStateException(
-                    "Expected headers to be terminated by an empty line.");
+                            "Expected headers to be terminated by an empty line.");
             }
             if (headerPart.charAt(offset + 1) == LF) {
                 return offset;

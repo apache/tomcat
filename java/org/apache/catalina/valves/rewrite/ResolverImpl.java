@@ -86,11 +86,11 @@ public class ResolverImpl extends Resolver {
             case "HTTP_COOKIE" -> request.getHeader("cookie");
             case "HTTP_FORWARDED" -> request.getHeader("forwarded");
             case "HTTP_HOST" ->
-                // Don't look directly at the host header to handle:
-                // - Host name in HTTP/1.1 request line
-                // - HTTP/0.9 & HTTP/1.0 requests
-                // - HTTP/2 :authority pseudo header
-                request.getServerName();
+                    // Don't look directly at the host header to handle:
+                    // - Host name in HTTP/1.1 request line
+                    // - HTTP/0.9 & HTTP/1.0 requests
+                    // - HTTP/2 :authority pseudo header
+                    request.getServerName();
             case "HTTP_PROXY_CONNECTION" -> request.getHeader("proxy-connection");
             case "HTTP_ACCEPT" -> request.getHeader("accept");
             case "REMOTE_ADDR" -> request.getRemoteAddr();

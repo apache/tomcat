@@ -121,7 +121,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
         }
         //if we exchanged an object with another thread, wake it up.
         if (c!=null) {
-          c.countDown();
+            c.countDown();
         }
         //we have an unbounded queue, so always return true
         return true;
@@ -217,7 +217,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
             try {
                 boolean result = items[idx].remove(e);
                 if (result) {
-                  return result;
+                    return result;
                 }
             } finally {
                 lock.unlock();
@@ -257,7 +257,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
         for (int idx=0; idx<LOCK_COUNT; idx++) {
             boolean result = items[idx].contains(e);
             if (result) {
-              return result;
+                return result;
             }
         }
         return false;
@@ -444,9 +444,9 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
             } else if (latch!=null) {
                 boolean timedout = !latch.await(timeout, unit);
                 if (timedout) {
-                  throw new TimeoutException();
+                    throw new TimeoutException();
                 } else {
-                  return latch.getItem();
+                    return latch.getItem();
                 }
             } else {
                 throw new ExecutionException("ItemFuture incorrectly instantiated. Bug in the code?", new Exception());
@@ -529,7 +529,7 @@ public class MultiLockFairBlockingQueue<E> implements BlockingQueue<E> {
                 try {
                     boolean result = MultiLockFairBlockingQueue.this.items[idx].remove(elements[index]);
                     if (result) {
-                      break;
+                        break;
                     }
                 } finally {
                     lock.unlock();

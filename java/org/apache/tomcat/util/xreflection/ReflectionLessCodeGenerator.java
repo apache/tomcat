@@ -38,16 +38,16 @@ final class ReflectionLessCodeGenerator {
         //@formatter:off
         // begin - class
         StringBuilder code = new StringBuilder(AL20_HEADER)
-            .append("package ")
-            .append(packageName)
-            .append(';')
-            .append(System.lineSeparator())
-            .append(System.lineSeparator())
-            .append("final class ")
-            .append(className)
-            .append(" {")
-            .append(System.lineSeparator())
-            .append(System.lineSeparator());
+                .append("package ")
+                .append(packageName)
+                .append(';')
+                .append(System.lineSeparator())
+                .append(System.lineSeparator())
+                .append("final class ")
+                .append(className)
+                .append(" {")
+                .append(System.lineSeparator())
+                .append(System.lineSeparator());
 
         // begin - isEnabled method
         code.append(getIndent(1))
@@ -59,7 +59,7 @@ final class ReflectionLessCodeGenerator {
             .append(getIndent(1))
             .append('}')
             .append(System.lineSeparator())
-            .append(System.lineSeparator())
+                .append(System.lineSeparator())
         ;
         // end - isEnabled method
 
@@ -79,7 +79,7 @@ final class ReflectionLessCodeGenerator {
             .append(getIndent(1))
             .append('}')
             .append(System.lineSeparator())
-            .append(System.lineSeparator())
+                .append(System.lineSeparator())
             ;
         // end - getInetAddress method
 
@@ -102,7 +102,7 @@ final class ReflectionLessCodeGenerator {
             .append(System.lineSeparator())
             .append(getIndent(3))
             .append("switch (checkThisClass.getName()) {")
-            .append(System.lineSeparator());
+                .append(System.lineSeparator());
 
         // generate case statements for getPropertyInternal
         generateCaseStatementsForGetPropertyInternal(baseClasses, code);
@@ -123,7 +123,7 @@ final class ReflectionLessCodeGenerator {
             .append(System.lineSeparator())
             .append(getIndent(1))
             .append('}')
-            .append(System.lineSeparator());
+                .append(System.lineSeparator());
         // end - getPropertyInternal method
 
         // begin - getPropertyForXXX methods
@@ -150,7 +150,7 @@ final class ReflectionLessCodeGenerator {
             .append(System.lineSeparator())
             .append(getIndent(3))
             .append("switch (checkThisClass.getName()) {")
-            .append(System.lineSeparator());
+                .append(System.lineSeparator());
 
         // generate case statements for setPropertyInternal
         generateCaseStatementsForSetPropertyInternal(baseClasses, code);
@@ -171,7 +171,7 @@ final class ReflectionLessCodeGenerator {
             .append(System.lineSeparator())
             .append(getIndent(1))
             .append('}')
-            .append(System.lineSeparator());
+                .append(System.lineSeparator());
         // end - setPropertyInternal method
 
         // begin - setPropertyForXXX methods
@@ -179,7 +179,7 @@ final class ReflectionLessCodeGenerator {
         // end - setPropertyForXXX methods
 
         code.append('}')
-            .append(System.lineSeparator());
+                .append(System.lineSeparator());
         // end - class
         //@formatter:on
         File destination = new File(directory, className + ".java");

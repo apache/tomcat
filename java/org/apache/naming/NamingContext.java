@@ -598,11 +598,11 @@ public class NamingContext implements Context {
                 Object toBind = NamingManager.getStateToBind(obj, name, this, env);
                 switch (toBind) {
                     case @SuppressWarnings("unused") Context context ->
-                        entry = new NamingEntry(name.get(0), toBind, NamingEntry.CONTEXT);
+                            entry = new NamingEntry(name.get(0), toBind, NamingEntry.CONTEXT);
                     case @SuppressWarnings("unused") LinkRef linkRef ->
-                        entry = new NamingEntry(name.get(0), toBind, NamingEntry.LINK_REF);
+                            entry = new NamingEntry(name.get(0), toBind, NamingEntry.LINK_REF);
                     case @SuppressWarnings("unused") Reference reference ->
-                        entry = new NamingEntry(name.get(0), toBind, NamingEntry.REFERENCE);
+                            entry = new NamingEntry(name.get(0), toBind, NamingEntry.REFERENCE);
                     case Referenceable referenceable -> {
                         toBind = referenceable.getReference();
                         entry = new NamingEntry(name.get(0), toBind, NamingEntry.REFERENCE);

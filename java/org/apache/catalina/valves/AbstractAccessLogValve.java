@@ -1799,14 +1799,14 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
             case 's' -> new SessionAttributeElement(name);
             case 't' -> new DateAndTimeElement(name);
             case 'T' ->
-                // ms for milliseconds, us for microseconds, and s for seconds
-                switch (name) {
-                    case "ns" -> new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
-                    case "us" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
-                    case "ms" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
-                    case "fracsec" -> new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
-                    case null, default -> new ElapsedTimeElement(false, false);
-                };
+                    // ms for milliseconds, us for microseconds, and s for seconds
+                    switch (name) {
+                        case "ns" -> new ElapsedTimeElement(ElapsedTimeElement.Style.NANOSECONDS);
+                        case "us" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MICROSECONDS);
+                        case "ms" -> new ElapsedTimeElement(ElapsedTimeElement.Style.MILLISECONDS);
+                        case "fracsec" -> new ElapsedTimeElement(ElapsedTimeElement.Style.SECONDS_FRACTIONAL);
+                        case null, default -> new ElapsedTimeElement(false, false);
+                    };
             default -> new StringElement("???");
         };
     }
@@ -1937,13 +1937,13 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
                 switch (c) {
                     // Standard escapes for some control chars
                     case '\f' -> // dec 12
-                        dest.append("\\f");
+                            dest.append("\\f");
                     case '\n' -> // dec 10
-                        dest.append("\\n");
+                            dest.append("\\n");
                     case '\r' -> // dec 13
-                        dest.append("\\r");
+                            dest.append("\\r");
                     case '\t' -> // dec 09
-                        dest.append("\\t");
+                            dest.append("\\t");
                     // Unicode escape \\uXXXX
                     default -> {
                         dest.append("\\u");

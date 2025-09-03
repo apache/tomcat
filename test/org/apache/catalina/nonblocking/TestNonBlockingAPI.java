@@ -162,9 +162,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -178,9 +178,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String[] requestBody = new String[] {
                 "",
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -194,9 +194,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String[] requestBody = new String[] {
                 "1",
                 "4" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -210,9 +210,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String[] requestBody = new String[] {
                 "14",
                 CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -226,9 +226,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String[] requestBody = new String[] {
                 "14\r",
                 "\n" +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -242,8 +242,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String[] requestBody = new String[] {
                 "14" + CRLF,
                 "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -257,9 +257,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String[] requestBody = new String[] {
                 "14",
                 ";a=b" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -273,9 +273,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String[] requestBody = new String[] {
                 "14;",
                 "a=b" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -289,9 +289,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String[] requestBody = new String[] {
                 "14;a",
                 "=b" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -305,9 +305,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         String[] requestBody = new String[] {
                 "14;a=b",
                 CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -320,10 +320,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345",
+                    "012345",
                 "678901FINISHED" + CRLF +
-                "0" + CRLF +
-                CRLF
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -336,10 +336,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED",
+                    "012345678901FINISHED",
                 CRLF +
-                "0" + CRLF +
-                CRLF
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -352,10 +352,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED\r",
+                    "012345678901FINISHED\r",
                 "\n" +
-                "0" + CRLF +
-                CRLF
+                    "0" + CRLF +
+                    CRLF
                 };
         // @formatter:on
 
@@ -368,9 +368,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF,
+                    "012345678901FINISHED" + CRLF,
                 "0" + CRLF +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -383,10 +383,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0",
+                    "012345678901FINISHED" + CRLF +
+                    "0",
                 CRLF +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -399,11 +399,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" +
-                "\r",
+                    "012345678901FINISHED" + CRLF +
+                    "0" +
+                    "\r",
                 "\n" +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -416,9 +416,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" +
-                CRLF,
+                    "012345678901FINISHED" + CRLF +
+                    "0" +
+                    CRLF,
                 CRLF
                 };
         // @formatter:on
@@ -432,10 +432,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF,
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF,
                 TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + CRLF +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -448,11 +448,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                "x-te",
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    "x-te",
                 "st" + ": " + TRAILER_HEADER_VALUE + CRLF +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -465,11 +465,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                TRAILER_HEADER_NAME,
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME,
                 ": " + TRAILER_HEADER_VALUE + CRLF +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -482,11 +482,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                TRAILER_HEADER_NAME + ":",
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ":",
                 " " + TRAILER_HEADER_VALUE + CRLF +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -499,11 +499,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                TRAILER_HEADER_NAME + ": ",
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ": ",
                 TRAILER_HEADER_VALUE + CRLF +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -516,11 +516,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                TRAILER_HEADER_NAME + ": abc",
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ": abc",
                 "de" + CRLF +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -533,11 +533,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE,
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE,
                 CRLF +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -550,11 +550,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + "\r",
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + "\r",
                 "\n" +
-                CRLF
+                    CRLF
                 };
         // @formatter:on
 
@@ -567,9 +567,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" + CRLF +
-                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + CRLF,
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + CRLF,
                 CRLF
                 };
         // @formatter:on
@@ -583,10 +583,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         String[] requestBody = new String[] {
                 "14" + CRLF +
-                "012345678901FINISHED" + CRLF +
-                "0" +
-                CRLF +
-                "\r",
+                    "012345678901FINISHED" + CRLF +
+                    "0" +
+                    CRLF +
+                    "\r",
                 "\n"
                 };
         // @formatter:on
@@ -1832,11 +1832,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         doTestCanceledPost(new String[] {
                 "POST / HTTP/1.1" + CRLF +
-                "Host: localhost:" + CRLF +
-                "Transfer-Encoding: Chunked" + CRLF +
-                CRLF +
-                "10" + CRLF +
-                "This is 16 bytes" + CRLF
+                    "Host: localhost:" + CRLF +
+                    "Transfer-Encoding: Chunked" + CRLF +
+                    CRLF +
+                    "10" + CRLF +
+                    "This is 16 bytes" + CRLF
                 });
         // @formatter:on
     }
@@ -1847,10 +1847,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         doTestCanceledPost(new String[] {
                 "POST / HTTP/1.1" + CRLF +
-                "Host: localhost:" + CRLF +
-                "Content-Length: 100" + CRLF +
-                CRLF +
-                "This is 16 bytes"
+                    "Host: localhost:" + CRLF +
+                    "Content-Length: 100" + CRLF +
+                    CRLF +
+                    "This is 16 bytes"
                 });
         // @formatter:on
     }
@@ -2064,8 +2064,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET / HTTP/1.1" + CRLF +
-                "Host: localhost:" + CRLF +
-                CRLF
+                    "Host: localhost:" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();

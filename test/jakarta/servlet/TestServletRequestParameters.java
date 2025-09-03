@@ -52,13 +52,13 @@ public class TestServletRequestParameters extends ServletRequestParametersBaseTe
         // @formatter:off
         client.setRequest(new String[] {
                 "POST / HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: close" + CRLF +
-                "Transfer-Encoding: chunked" + CRLF +
-                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-                CRLF +
-                "0a" + CRLF +
-                "var1=val1&" + CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: close" + CRLF +
+                    "Transfer-Encoding: chunked" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                    CRLF +
+                    "0a" + CRLF +
+                    "var1=val1&" + CRLF
                 });
         // @formatter:on
 

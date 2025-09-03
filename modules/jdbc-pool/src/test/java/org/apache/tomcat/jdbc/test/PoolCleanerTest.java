@@ -32,7 +32,7 @@ public class PoolCleanerTest extends DefaultTestCase {
         int result = 0;
         for (Thread t : threadmap.keySet()) {
             if (t.getName().startsWith("Tomcat JDBC Pool Cleaner[")) {
-              result++;
+                result++;
             }
         }
         return result;

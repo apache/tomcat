@@ -40,22 +40,18 @@ public class TestJarContents {
     @BeforeClass
     public static void setup() {
         try {
-        empty = new File("test/webresources/dir3");
-        jar = new File("test/webresources/dir1.jar");
-
-        root = new TesterWebResourceRoot();
-
-        // Use empty dir for root of web app.
-        webResourceSet = new DirResourceSet(root, "/", empty.getAbsolutePath(), "/");
-        root.setMainResources(webResourceSet);
-
-        // If this JAR was in a web application, this is equivalent to how it
-        // would be added
-        test = new JarResourceSet(root, "/", jar.getAbsolutePath(), "/META-INF/resources");
-        test.setStaticOnly(true);
-        root.addJarResources(test);
-
-        testJarContentsObject = new JarContents(new JarFile("test/webresources/dir1.jar"));
+            empty = new File("test/webresources/dir3");
+            jar = new File("test/webresources/dir1.jar");
+            root = new TesterWebResourceRoot();
+            // Use empty dir for root of web app.
+            webResourceSet = new DirResourceSet(root, "/", empty.getAbsolutePath(), "/");
+            root.setMainResources(webResourceSet);
+            // If this JAR was in a web application, this is equivalent to how it
+            // would be added
+            test = new JarResourceSet(root, "/", jar.getAbsolutePath(), "/META-INF/resources");
+            test.setStaticOnly(true);
+            root.addJarResources(test);
+            testJarContentsObject = new JarContents(new JarFile("test/webresources/dir1.jar"));
 
         } catch (Exception e) {
             Assert.fail("Error happened while testing JarContents, " + e.getMessage());

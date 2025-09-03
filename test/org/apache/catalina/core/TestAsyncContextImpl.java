@@ -2820,8 +2820,8 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET / HTTP/1.1" + CRLF +
-                "Host: localhost:" + CRLF +
-                CRLF
+                    "Host: localhost:" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -2930,11 +2930,11 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // @formatter:off
         doTestCanceledPost(new String[] {
                 "POST / HTTP/1.1" + CRLF +
-                "Host: localhost:" + CRLF +
-                "Transfer-Encoding: Chunked" + CRLF +
-                CRLF +
-                "10" + CRLF +
-                "This is 16 bytes" + CRLF
+                    "Host: localhost:" + CRLF +
+                    "Transfer-Encoding: Chunked" + CRLF +
+                    CRLF +
+                    "10" + CRLF +
+                    "This is 16 bytes" + CRLF
                 });
         // @formatter:on
     }
@@ -2945,10 +2945,10 @@ public class TestAsyncContextImpl extends TomcatBaseTest {
         // @formatter:off
         doTestCanceledPost(new String[] {
                 "POST / HTTP/1.1" + CRLF +
-                "Host: localhost:" + CRLF +
-                "Content-Length: 100" + CRLF +
-                CRLF +
-                "This is 16 bytes"
+                    "Host: localhost:" + CRLF +
+                    "Content-Length: 100" + CRLF +
+                    CRLF +
+                    "This is 16 bytes"
                 });
         // @formatter:on
     }

@@ -34,7 +34,7 @@ public class QueryTimeoutInterceptor extends AbstractCreateStatementInterceptor 
         super.setProperties(properties);
         InterceptorProperty p = properties.get("queryTimeout");
         if (p!=null) {
-          timeout = p.getValueAsInt(timeout);
+            timeout = p.getValueAsInt(timeout);
         }
     }
 

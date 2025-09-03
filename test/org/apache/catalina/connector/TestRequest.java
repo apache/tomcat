@@ -170,34 +170,34 @@ public class TestRequest extends TomcatBaseTest {
                 if (ucChunkedHead) {
                     // @formatter:off
                     request[0] =
-                        "POST http://localhost:8080/test HTTP/1.1" + CRLF +
-                        "Host: localhost:8080" + CRLF +
-                        SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-                        "Transfer-Encoding: CHUNKED" + CRLF +
-                        "Connection: close" + CRLF +
-                        CRLF +
-                        "3" + CRLF +
-                        "a=1" + CRLF;
+                            "POST http://localhost:8080/test HTTP/1.1" + CRLF +
+                            "Host: localhost:8080" + CRLF +
+                            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                            "Transfer-Encoding: CHUNKED" + CRLF +
+                            "Connection: close" + CRLF +
+                            CRLF +
+                            "3" + CRLF +
+                            "a=1" + CRLF;
                     // @formatter:on
                 } else {
                     // @formatter:off
                     request[0] =
-                        "POST http://localhost:8080/test HTTP/1.1" + CRLF +
-                        "Host: localhost:8080" + CRLF +
-                        SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-                        "Transfer-Encoding: chunked" + CRLF +
-                        "Connection: close" + CRLF +
-                        CRLF +
-                        "3" + CRLF +
-                        "a=1" + CRLF;
+                            "POST http://localhost:8080/test HTTP/1.1" + CRLF +
+                            "Host: localhost:8080" + CRLF +
+                            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                            "Transfer-Encoding: chunked" + CRLF +
+                            "Connection: close" + CRLF +
+                            CRLF +
+                            "3" + CRLF +
+                            "a=1" + CRLF;
                     // @formatter:on
                 }
                 // @formatter:off
                 request[1] =
-                    "4" + CRLF +
-                    "&b=2" + CRLF +
-                    "0" + CRLF +
-                    CRLF;
+                        "4" + CRLF +
+                        "&b=2" + CRLF +
+                        "0" + CRLF +
+                        CRLF;
                 // @formatter:on
 
                 setRequest(request);
@@ -523,14 +523,14 @@ public class TestRequest extends TomcatBaseTest {
                 // Send specified request body using method
                 // @formatter:off
                 String[] request = {
-                     method + " http://localhost:" + getPort() + "/echo" +
+                        method + " http://localhost:" + getPort() + "/echo" +
                              (null == queryString ? "" : ("?" + queryString)) + " HTTP/1.1" + CRLF +
-                     "Host: localhost:" + getPort() + CRLF +
-                     (null == contentType ? "" : ("Content-Type: " + contentType + CRLF)) +
-                     "Connection: close" + CRLF +
-                     (null == requestBody ? "" : "Content-Length: " + requestBody.length() + CRLF) +
-                     CRLF +
-                     (null == requestBody ? "" : requestBody)
+                            "Host: localhost:" + getPort() + CRLF +
+                            (null == contentType ? "" : ("Content-Type: " + contentType + CRLF)) +
+                            "Connection: close" + CRLF +
+                            (null == requestBody ? "" : "Content-Length: " + requestBody.length() + CRLF) +
+                            CRLF +
+                            (null == requestBody ? "" : requestBody)
                 };
                 // @formatter:on
 

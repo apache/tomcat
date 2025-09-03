@@ -178,8 +178,8 @@ public class ConnectionPool {
             Future<PooledConnection> pcf = ((FairBlockingQueue<PooledConnection>)idle).pollAsync();
             return new ConnectionFuture(pcf);
         } else if (idle instanceof MultiLockFairBlockingQueue<?>) {
-                Future<PooledConnection> pcf = ((MultiLockFairBlockingQueue<PooledConnection>)idle).pollAsync();
-                return new ConnectionFuture(pcf);
+            Future<PooledConnection> pcf = ((MultiLockFairBlockingQueue<PooledConnection>)idle).pollAsync();
+            return new ConnectionFuture(pcf);
         } else {
             throw new SQLException("Connection pool is misconfigured, doesn't support async retrieval. Set the 'fair' property to 'true'");
         }
@@ -295,7 +295,7 @@ public class ConnectionPool {
         JdbcInterceptor handler = con.getHandler();
         if (handler==null) {
             if (jmxPool != null) {
-              con.createMBean();
+                con.createMBean();
             }
             //build the proxy handler
             handler = new ProxyConnection(this,con,getPoolProperties().isUseEquals());
@@ -389,7 +389,7 @@ public class ConnectionPool {
     protected void close(boolean force) {
         //are we already closed
         if (this.closed) {
-          return;
+            return;
         }
         //prevent other threads from entering
         this.closed = true;
@@ -408,9 +408,9 @@ public class ConnectionPool {
                 while (con != null) {
                     //close the connection
                     if (pool==idle) {
-                      release(con);
+                        release(con);
                     } else {
-                      abandon(con);
+                        abandon(con);
                     }
                     if (!pool.isEmpty()) {
                         con = pool.poll(1000, TimeUnit.MILLISECONDS);
@@ -424,11 +424,11 @@ public class ConnectionPool {
                 }
             }
             if (pool.isEmpty() && force && pool!=busy) {
-              pool = busy;
+                pool = busy;
             }
         }
         if (this.getPoolProperties().isJmxEnabled()) {
-          this.jmxPool = null;
+            this.jmxPool = null;
         }
         PoolProperties.InterceptorDefinition[] proxies = getPoolProperties().getJdbcInterceptorsAsArray();
         for (int i=0; i<proxies.length; i++) {
@@ -473,7 +473,7 @@ public class ConnectionPool {
 
         //create JMX MBean
         if (this.getPoolProperties().isJmxEnabled()) {
-          createMBean();
+            createMBean();
         }
 
         //Parse and create an initial set of interceptors. Letting them know the pool has started.
@@ -490,7 +490,7 @@ public class ConnectionPool {
             }catch (Exception x) {
                 log.error("Unable to inform interceptor of pool start.",x);
                 if (jmxPool!=null) {
-                  jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
+                    jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
                 }
                 close(true);
                 SQLException ex = new SQLException();
@@ -510,7 +510,7 @@ public class ConnectionPool {
             log.error("Unable to create initial connections of pool.", x);
             if (!poolProperties.isIgnoreExceptionOnPreLoad()) {
                 if (jmxPool!=null) {
-                  jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
+                    jmxPool.notify(org.apache.tomcat.jdbc.pool.jmx.ConnectionPool.NOTIFY_INIT, getStackTrace(x));
                 }
                 close(true);
                 throw x;
@@ -584,7 +584,7 @@ public class ConnectionPool {
      */
     protected void abandon(PooledConnection con) {
         if (con == null) {
-          return;
+            return;
         }
         try {
             con.lock();
@@ -613,10 +613,10 @@ public class ConnectionPool {
      */
     protected void suspect(PooledConnection con) {
         if (con == null) {
-          return;
+            return;
         }
         if (con.isSuspect()) {
-          return;
+            return;
         }
         try {
             con.lock();
@@ -639,7 +639,7 @@ public class ConnectionPool {
      */
     protected void release(PooledConnection con) {
         if (con == null) {
-          return;
+            return;
         }
         try {
             con.lock();
@@ -689,7 +689,7 @@ public class ConnectionPool {
                 PooledConnection result = borrowConnection(now, con, username, password);
                 borrowedCount.incrementAndGet();
                 if (result!=null) {
-                  return result;
+                    return result;
                 }
             }
 
@@ -767,10 +767,10 @@ public class ConnectionPool {
         //no connections where available we'll create one
         PooledConnection con = create(false);
         if (username!=null) {
-          con.getAttributes().put(PooledConnection.PROP_USER, username);
+            con.getAttributes().put(PooledConnection.PROP_USER, username);
         }
         if (password!=null) {
-          con.getAttributes().put(PooledConnection.PROP_PASSWORD, password);
+            con.getAttributes().put(PooledConnection.PROP_PASSWORD, password);
         }
         boolean error = false;
         try {
@@ -925,12 +925,12 @@ public class ConnectionPool {
                 if (this.getPoolProperties().getRollbackOnReturn()) {
                     boolean autocommit = con.getConnection().getAutoCommit();
                     if (!autocommit) {
-                      con.getConnection().rollback();
+                        con.getConnection().rollback();
                     }
                 } else if (this.getPoolProperties().getCommitOnReturn()) {
                     boolean autocommit = con.getConnection().getAutoCommit();
                     if (!autocommit) {
-                      con.getConnection().commit();
+                        con.getConnection().commit();
                     }
                 }
             }
@@ -950,19 +950,19 @@ public class ConnectionPool {
      */
     protected boolean shouldClose(PooledConnection con, int action) {
         if (con.getConnectionVersion() < getPoolVersion()) {
-          return true;
+            return true;
         }
         if (con.isDiscarded()) {
-          return true;
+            return true;
         }
         if (isClosed()) {
-          return true;
+            return true;
         }
         if (!con.validate(action)) {
-          return true;
+            return true;
         }
         if (!terminateTransaction(con)) {
-          return true;
+            return true;
         }
         return false;
     }
@@ -979,7 +979,7 @@ public class ConnectionPool {
         if (con.isMaxAgeExpired()) {
             try {
                 if (log.isDebugEnabled()) {
-                  log.debug( "Connection ["+this+"] expired because of maxAge, trying to reconnect" );
+                    log.debug( "Connection ["+this+"] expired because of maxAge, trying to reconnect" );
                 }
                 con.reconnect();
                 reconnectedCount.incrementAndGet();
@@ -1060,10 +1060,10 @@ public class ConnectionPool {
      */
     protected boolean shouldAbandon() {
         if (!poolProperties.isRemoveAbandoned()) {
-          return false;
+            return false;
         }
         if (poolProperties.getAbandonWhenPercentageFull()==0) {
-          return true;
+            return true;
         }
         float used = busy.size();
         float max  = poolProperties.getMaxActive();
@@ -1077,7 +1077,7 @@ public class ConnectionPool {
     public void checkAbandoned() {
         try {
             if (busy.isEmpty()) {
-              return;
+                return;
             }
             Iterator<PooledConnection> locked = busy.iterator();
             int sto = getPoolProperties().getSuspectTimeout();
@@ -1089,7 +1089,7 @@ public class ConnectionPool {
                     //the con has been returned to the pool or released
                     //ignore it
                     if (idle.contains(con) || con.isReleased()) {
-                      continue;
+                        continue;
                     }
                     long time = con.getTimestamp();
                     long now = System.currentTimeMillis();
@@ -1105,7 +1105,7 @@ public class ConnectionPool {
                 } finally {
                     con.unlock();
                     if (setToNull) {
-                      con = null;
+                        con = null;
                     }
                 }
             } //while
@@ -1130,7 +1130,7 @@ public class ConnectionPool {
 
         try {
             if (idle.isEmpty()) {
-              return;
+                return;
             }
             long now = System.currentTimeMillis();
             Iterator<PooledConnection> unlocked = idle.iterator();
@@ -1141,7 +1141,7 @@ public class ConnectionPool {
                     con.lock();
                     //the con been taken out, we can't clean it up
                     if (busy.contains(con)) {
-                      continue;
+                        continue;
                     }
                     long time = con.getTimestamp();
                     if (shouldReleaseIdle(now, con, time)) {
@@ -1155,7 +1155,7 @@ public class ConnectionPool {
                 } finally {
                     con.unlock();
                     if (setToNull) {
-                      con = null;
+                        con = null;
                     }
                 }
             } //while
@@ -1172,9 +1172,9 @@ public class ConnectionPool {
 
     protected boolean shouldReleaseIdle(long now, PooledConnection con, long time) {
         if (con.getConnectionVersion() < getPoolVersion()) {
-          return true;
+            return true;
         } else {
-          return (con.getReleaseTime()>0) && ((now - time) > con.getReleaseTime()) && (getSize()>getPoolProperties().getMinIdle());
+            return (con.getReleaseTime()>0) && ((now - time) > con.getReleaseTime()) && (getSize()>getPoolProperties().getMinIdle());
         }
     }
 
@@ -1193,7 +1193,7 @@ public class ConnectionPool {
     public void testAllIdle(boolean checkMaxAgeOnly) {
         try {
             if (idle.isEmpty()) {
-              return;
+                return;
             }
             Iterator<PooledConnection> unlocked = idle.iterator();
             while (unlocked.hasNext()) {
@@ -1202,7 +1202,7 @@ public class ConnectionPool {
                     con.lock();
                     //the con been taken out, we can't clean it up
                     if (busy.contains(con)) {
-                      continue;
+                        continue;
                     }
 
                     boolean release;
@@ -1266,7 +1266,7 @@ public class ConnectionPool {
      */
     protected PooledConnection create(boolean incrementCounter) {
         if (incrementCounter) {
-          size.incrementAndGet();
+            size.incrementAndGet();
         }
         PooledConnection con = new PooledConnection(getPoolProperties(), this);
         return con;
@@ -1465,7 +1465,7 @@ public class ConnectionPool {
             PooledConnection pc = this.pc!=null?this.pc:pcFuture.get(timeout,unit);
             if (pc!=null) {
                 if (result!=null) {
-                  return result;
+                    return result;
                 }
                 if (configured.compareAndSet(false, true)) {
                     try {
@@ -1483,7 +1483,7 @@ public class ConnectionPool {
                     latch.await(timeout,unit); //this shouldn't block for long
                 }
                 if (result==null) {
-                  throw new ExecutionException(cause);
+                    throw new ExecutionException(cause);
                 }
                 return result;
             } else {
@@ -1603,11 +1603,11 @@ public class ConnectionPool {
                 try {
                     if (pool.getPoolProperties().isRemoveAbandoned()
                             || pool.getPoolProperties().getSuspectTimeout() > 0) {
-                      pool.checkAbandoned();
+                        pool.checkAbandoned();
                     }
                     if (pool.getPoolProperties().getMinIdle() < pool.idle
                             .size()) {
-                      pool.checkIdle();
+                        pool.checkIdle();
                     }
                     if (pool.getPoolProperties().isTestWhileIdle()) {
                         pool.testAllIdle(false);

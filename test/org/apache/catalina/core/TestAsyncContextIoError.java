@@ -69,9 +69,9 @@ public class TestAsyncContextIoError extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /async HTTP/1.1" + CRLF +
-                 "Host: localhost:" + getPort() + CRLF +
-                 CRLF
-                 });
+                     "Host: localhost:" + getPort() + CRLF +
+                     CRLF
+        });
         // @formatter:on
         client.connect();
         client.sendRequest();

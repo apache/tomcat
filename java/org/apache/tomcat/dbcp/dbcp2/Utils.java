@@ -39,7 +39,7 @@ import org.apache.tomcat.dbcp.pool2.PooledObject;
 public final class Utils {
 
     private static final ResourceBundle messages = ResourceBundle
-        .getBundle(Utils.class.getPackage().getName() + ".LocalStrings");
+            .getBundle(Utils.class.getPackage().getName() + ".LocalStrings");
 
     /**
      * Any SQL_STATE starting with this value is considered a fatal disconnect.

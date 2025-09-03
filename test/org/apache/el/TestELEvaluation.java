@@ -169,7 +169,7 @@ public class TestELEvaluation {
         } else {
             Assert.assertTrue(msg, i1 > 0);
             Assert.assertTrue(msg, i2 < 0);
-         }
+        }
     }
 
     @Test

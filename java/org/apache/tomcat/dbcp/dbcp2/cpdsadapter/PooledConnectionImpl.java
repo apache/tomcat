@@ -259,7 +259,7 @@ final class PooledConnectionImpl
      * @since 2.4.0
      */
     protected PStmtKey createKey(final String sql, final int resultSetType, final int resultSetConcurrency, final int resultSetHoldability,
-        final StatementType statementType) {
+            final StatementType statementType) {
         return new PStmtKey(sql, getCatalogOrNull(), getSchemaOrNull(), resultSetType, resultSetConcurrency, resultSetHoldability, statementType);
     }
 

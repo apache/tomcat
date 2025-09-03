@@ -108,7 +108,7 @@ public class TestWebRuleSet {
         parse(new WebXml(), "web-1ordering.xml", false, true);
         parse(new WebXml(), "web-2ordering.xml", false, false);
         parse(new WebXml(), "web-1ordering.xml", false, true);
-}
+    }
 
     @Test
     public void testLifecycleMethodsDefinitions() throws Exception {

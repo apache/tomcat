@@ -86,9 +86,9 @@ public class TestStatusTransformer extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /index.html HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -103,9 +103,9 @@ public class TestStatusTransformer extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 requestline + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();

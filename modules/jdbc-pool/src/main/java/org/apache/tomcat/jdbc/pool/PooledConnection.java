@@ -165,14 +165,14 @@ public class PooledConnection implements PooledConnectionMBean {
     public boolean shouldForceReconnect(String username, String password) {
 
         if (!getPoolProperties().isAlternateUsernameAllowed()) {
-          return false;
+            return false;
         }
 
         if (username==null) {
-          username = poolProperties.getUsername();
+            username = poolProperties.getUsername();
         }
         if (password==null) {
-          password = poolProperties.getPassword();
+            password = poolProperties.getPassword();
         }
 
         String storedUsr = (String)getAttributes().get(PROP_USER);
@@ -184,14 +184,14 @@ public class PooledConnection implements PooledConnectionMBean {
         noChangeInCredentials = noChangeInCredentials && ((password==null && storedPwd==null) || (password!=null && password.equals(storedPwd)));
 
         if (username==null) {
-          getAttributes().remove(PROP_USER);
+            getAttributes().remove(PROP_USER);
         } else {
-          getAttributes().put(PROP_USER, username);
+            getAttributes().put(PROP_USER, username);
         }
         if (password==null) {
-          getAttributes().remove(PROP_PASSWORD);
+            getAttributes().remove(PROP_PASSWORD);
         } else {
-          getAttributes().put(PROP_PASSWORD, password);
+            getAttributes().put(PROP_PASSWORD, password);
         }
 
         return !noChangeInCredentials;
@@ -208,7 +208,7 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     public void connect() throws SQLException {
         if (released.get()) {
-          throw new SQLException("A connection once released, can't be reestablished.");
+            throw new SQLException("A connection once released, can't be reestablished.");
         }
         if (connection != null) {
             try {
@@ -233,16 +233,16 @@ public class PooledConnection implements PooledConnectionMBean {
         if (poolProperties.getJdbcInterceptors()==null || poolProperties.getJdbcInterceptors().indexOf(ConnectionState.class.getName())<0 ||
                 poolProperties.getJdbcInterceptors().indexOf(ConnectionState.class.getSimpleName())<0) {
             if (poolProperties.getDefaultTransactionIsolation()!=DataSourceFactory.UNKNOWN_TRANSACTIONISOLATION) {
-              connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
+                connection.setTransactionIsolation(poolProperties.getDefaultTransactionIsolation());
             }
             if (poolProperties.getDefaultReadOnly()!=null) {
-              connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
+                connection.setReadOnly(poolProperties.getDefaultReadOnly().booleanValue());
             }
             if (poolProperties.getDefaultAutoCommit()!=null) {
-              connection.setAutoCommit(poolProperties.getDefaultAutoCommit().booleanValue());
+                connection.setAutoCommit(poolProperties.getDefaultAutoCommit().booleanValue());
             }
             if (poolProperties.getDefaultCatalog()!=null) {
-              connection.setCatalog(poolProperties.getDefaultCatalog());
+                connection.setCatalog(poolProperties.getDefaultCatalog());
             }
         }
         this.discarded = false;
@@ -335,10 +335,10 @@ public class PooledConnection implements PooledConnectionMBean {
         }
         Properties properties = PoolUtilities.clone(poolProperties.getDbProperties());
         if (usr != null) {
-          properties.setProperty(PROP_USER, usr);
+            properties.setProperty(PROP_USER, usr);
         }
         if (pwd != null) {
-          properties.setProperty(PROP_PASSWORD, pwd);
+            properties.setProperty(PROP_PASSWORD, pwd);
         }
 
         try {
@@ -427,7 +427,7 @@ public class PooledConnection implements PooledConnectionMBean {
         xaConnection = null;
         lastConnected = -1;
         if (finalize) {
-          parent.finalize(this);
+            parent.finalize(this);
         }
     }
 
@@ -455,17 +455,17 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     private boolean doValidate(int action) {
         if (action == VALIDATE_BORROW && poolProperties.isTestOnBorrow()) {
-          return true;
+            return true;
         } else if (action == VALIDATE_RETURN && poolProperties.isTestOnReturn()) {
-          return true;
+            return true;
         } else if (action == VALIDATE_IDLE && poolProperties.isTestWhileIdle()) {
-          return true;
+            return true;
         } else if (action == VALIDATE_INIT && poolProperties.isTestOnConnect()) {
-          return true;
+            return true;
         } else if (action == VALIDATE_INIT && poolProperties.getInitSQL()!=null) {
-          return true;
+            return true;
         } else {
-          return false;
+            return false;
         }
     }
 
@@ -506,9 +506,9 @@ public class PooledConnection implements PooledConnectionMBean {
         //Don't bother validating if already have recently enough
         long now = System.currentTimeMillis();
         if (validateAction!=VALIDATE_INIT &&
-            poolProperties.getValidationInterval() > 0 &&
-            (now - this.lastValidated) <
-            poolProperties.getValidationInterval()) {
+                poolProperties.getValidationInterval() > 0 &&
+                (now - this.lastValidated) <
+                poolProperties.getValidationInterval()) {
             return true;
         }
 
@@ -538,7 +538,7 @@ public class PooledConnection implements PooledConnectionMBean {
             boolean transactionCommitted = false;
             int validationQueryTimeout = poolProperties.getValidationQueryTimeout();
             if (validationQueryTimeout < 0) {
-              validationQueryTimeout = 0;
+                validationQueryTimeout = 0;
             }
             try {
                 if (connection.isValid(validationQueryTimeout)) {
@@ -587,7 +587,7 @@ public class PooledConnection implements PooledConnectionMBean {
                 log.debug("Unable to validate object:",ex);
             }
             if (stmt!=null) {
-              try { stmt.close();} catch (Exception ignore2){/*NOOP*/}
+                try { stmt.close();} catch (Exception ignore2){/*NOOP*/}
             }
 
         } finally {
@@ -702,7 +702,7 @@ public class PooledConnection implements PooledConnectionMBean {
      */
     public void setDiscarded(boolean discarded) {
         if (this.discarded && !discarded) {
-          throw new IllegalStateException("Unable to change the state once the connection has been discarded");
+            throw new IllegalStateException("Unable to change the state once the connection has been discarded");
         }
         this.discarded = discarded;
     }
@@ -854,7 +854,7 @@ public class PooledConnection implements PooledConnectionMBean {
 
     public void createMBean() {
         if (oname != null) {
-          return;
+            return;
         }
         String keyprop = ",connections=PooledConnection["+connectionIndex.getAndIncrement()+"]";
         oname = JmxUtil.registerJmx(parent.getJmxPool().getObjectName(), keyprop, this);

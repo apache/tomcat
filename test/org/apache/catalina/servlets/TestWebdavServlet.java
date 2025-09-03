@@ -225,8 +225,8 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPFIND /bug66609/ HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -314,11 +314,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -329,11 +329,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /file2.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
                 });
         // @formatter:on
         client.connect();
@@ -344,9 +344,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPFIND / HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -357,11 +357,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPPATCH /file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + PROPPATCH_PROPNAME.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                PROPPATCH_PROPNAME
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + PROPPATCH_PROPNAME.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    PROPPATCH_PROPNAME
                 });
         // @formatter:on
         client.connect();
@@ -373,11 +373,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPFIND /file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + PROPFIND_PROPNAME.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                PROPFIND_PROPNAME
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + PROPFIND_PROPNAME.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    PROPFIND_PROPNAME
                 });
         // @formatter:on
         client.connect();
@@ -388,11 +388,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPFIND /file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + PROPFIND_PROP.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                PROPFIND_PROP
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + PROPFIND_PROP.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    PROPFIND_PROP
                 });
         // @formatter:on
         client.connect();
@@ -405,10 +405,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "MOVE /file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Destination: /file3.txt" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Destination: /file3.txt" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -418,11 +418,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPFIND /file3.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + PROPFIND_PROP.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                PROPFIND_PROP
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + PROPFIND_PROP.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    PROPFIND_PROP
                 });
         // @formatter:on
         client.connect();
@@ -461,11 +461,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -476,12 +476,12 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] {
                 "PUT /file2.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 12" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 12" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -495,11 +495,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /file12.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + String.valueOf(sb.length()) + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                sb.toString()
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + String.valueOf(sb.length()) + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    sb.toString()
                 });
         // @formatter:on
         client.connect();
@@ -509,9 +509,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "MKCOL /myfolder HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -521,11 +521,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /myfolder/file3.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -536,9 +536,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPFIND / HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -550,11 +550,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
                 });
         // @formatter:on
         client.connect();
@@ -573,11 +573,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /myfolder/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -587,12 +587,12 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // Same but provide the lock token
         // @formatter:off
         client.setRequest(new String[] {"PUT /myfolder/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "If: </myfolder/> (" + lockToken + ")" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "If: </myfolder/> (" + lockToken + ")" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -603,11 +603,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder/file5.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
                 });
         // @formatter:on
         client.connect();
@@ -617,10 +617,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "UNLOCK /myfolder/file5.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Lock-Token: <my:locktoken>" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Lock-Token: <my:locktoken>" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -632,10 +632,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "UNLOCK /myfolder/file5.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Lock-Token: " + lockToken + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Lock-Token: " + lockToken + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -645,11 +645,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder/file5.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
                 });
         // @formatter:on
         client.connect();
@@ -667,11 +667,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
                 });
         // @formatter:on
         client.connect();
@@ -684,11 +684,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] {
                 "PUT /myfolder/file5.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -699,12 +699,12 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /myfolder/file5.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "If: (" + lockTokenFile + ")" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "If: (" + lockTokenFile + ")" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -715,10 +715,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "DELETE /myfolder/file5.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "If: (" + lockTokenFile + ")" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: (" + lockTokenFile + ")" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -728,11 +728,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /myfolder/file5.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -743,12 +743,12 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Timeout: Second-20" + CRLF +
-                "Content-Length: " + LOCK_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Timeout: Second-20" + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
                 });
         // @formatter:on
         client.connect();
@@ -767,10 +767,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "COPY /myfolder/file5.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Destination: http://localhost:" + getPort() + "/myfolder/file6.txt"  + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Destination: http://localhost:" + getPort() + "/myfolder/file6.txt"  + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -781,10 +781,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] {
                 "COPY /myfolder HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Destination: /myfolder2"  + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Destination: /myfolder2"  + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -795,10 +795,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "DELETE /myfolder/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "If: (" + lockToken + ")" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: (" + lockToken + ")" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -809,10 +809,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "COPY /myfolder/file5.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Destination: http://localhost:" + getPort() + "/file7.txt"  + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Destination: http://localhost:" + getPort() + "/file7.txt"  + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -826,11 +826,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /file6.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + String.valueOf(sb2.length()) +  CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                sb2.toString()
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + String.valueOf(sb2.length()) +  CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    sb2.toString()
                 });
         // @formatter:on
         client.connect();
@@ -841,9 +841,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPFIND / HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -866,10 +866,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "UNLOCK /myfolder/ HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Lock-Token: " + lockToken + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Lock-Token: " + lockToken + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -880,9 +880,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "DELETE /myfolder HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -892,9 +892,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "DELETE /myfolder2 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -903,9 +903,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         // @formatter:off
         client.setRequest(new String[] { "PROPFIND / HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -943,11 +943,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /aaa/file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -958,10 +958,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "COPY /aaa/file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Destination: http://localhost:" + getPort() + "/aaa/file2.txt"  + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Destination: http://localhost:" + getPort() + "/aaa/file2.txt"  + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -972,10 +972,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "MOVE /aaa/file2.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Destination: http://localhost:" + getPort() + "/aaa/file3.txt"  + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Destination: http://localhost:" + getPort() + "/aaa/file3.txt"  + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -986,10 +986,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "COPY /aaa/file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Destination: http://localhost:" + getPort() + "/file1.txt"  + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Destination: http://localhost:" + getPort() + "/file1.txt"  + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1000,16 +1000,16 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "MOVE /aaa/file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Destination: http://localhost:" + getPort() + "/file1.txt"  + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Destination: http://localhost:" + getPort() + "/file1.txt"  + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_FORBIDDEN, client.getStatusCode());
-}
+    }
 
 
     @Test
@@ -1034,9 +1034,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "MKCOL /myfolder HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1047,9 +1047,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] {
                 "MKCOL /myfolder/myfolder2/ HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1059,9 +1059,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "MKCOL /myfolder/myfolder3 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1071,9 +1071,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "MKCOL /myfolder/myfolder2/myfolder4 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1083,9 +1083,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "MKCOL /myfolder/myfolder2/myfolder4/myfolder5 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1096,11 +1096,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] {
                 "PUT /file1.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -1111,11 +1111,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] {
                 "PUT /myfolder/myfolder3/file2.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -1125,11 +1125,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /myfolder/myfolder2/myfolder4/file3.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -1140,11 +1140,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_SHARED_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_SHARED_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_SHARED_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_SHARED_BODY
                 });
         // @formatter:on
         client.connect();
@@ -1162,12 +1162,12 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder/myfolder2/myfolder4/myfolder5 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "If: (" + lockToken + ")" + CRLF +
-                "Content-Length: " + LOCK_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: (" + lockToken + ")" + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
                 });
         // @formatter:on
         client.connect();
@@ -1179,11 +1179,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Timeout: Infinite" + CRLF +
-                "If: (" + lockToken + ")" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Timeout: Infinite" + CRLF +
+                    "If: (" + lockToken + ")" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1193,11 +1193,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder/myfolder2/myfolder4 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_SHARED_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_SHARED_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_SHARED_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_SHARED_BODY
                 });
         // @formatter:on
         client.connect();
@@ -1216,11 +1216,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder/myfolder2/myfolder4 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_SHARED_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_SHARED_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_SHARED_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_SHARED_BODY
                 });
         // @formatter:on
         client.connect();
@@ -1239,9 +1239,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPFIND / HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1257,11 +1257,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -1271,12 +1271,12 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "If: (" + lockToken + ")" + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: (" + lockToken + ")" + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -1286,12 +1286,12 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "If: </myfolder/myfolder2/myfolder4/myfolder5> (" + lockToken + ")" + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: </myfolder/myfolder2/myfolder4/myfolder5> (" + lockToken + ")" + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -1301,10 +1301,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "UNLOCK /myfolder/myfolder3 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Lock-Token: " + lockToken2 + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Lock-Token: " + lockToken2 + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1315,10 +1315,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "UNLOCK /myfolder/myfolder2/myfolder4/myfolder5 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Lock-Token: " + lockToken2 + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Lock-Token: " + lockToken2 + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1328,10 +1328,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "UNLOCK /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Lock-Token: " + lockToken3 + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Lock-Token: " + lockToken3 + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1342,11 +1342,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] {
                 "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -1357,10 +1357,10 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] {
                 "UNLOCK /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Lock-Token: " + lockToken + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Lock-Token: " + lockToken + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1371,12 +1371,12 @@ public class TestWebdavServlet extends TomcatBaseTest {
 
         client.setRequest(new String[] {
                 "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: 12" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT  +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: 12" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT  +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -1386,9 +1386,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPFIND / HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -1429,11 +1429,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder/myfolder3 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_BODY
                 });
         // @formatter:on
         client.connect();
@@ -1451,11 +1451,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder/myfolder7 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_SHARED_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_SHARED_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_SHARED_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_SHARED_BODY
                 });
         // @formatter:on
         client.connect();
@@ -1473,11 +1473,11 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "LOCK /myfolder/myfolder7/myfolder8 HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + LOCK_SHARED_BODY.length() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                LOCK_SHARED_BODY
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + LOCK_SHARED_BODY.length() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    LOCK_SHARED_BODY
                 });
         // @formatter:on
         client.connect();
@@ -1495,15 +1495,15 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "If: </myfolder/myfolder3/myfolder6> (<urn:uuid:5e1e2275b1cd9c17845e7e08>)" + // Obvious wrong token
-                " </myfolder/myfolder7/myfolder8/myfolder9> (" + lockToken + " " + lockToken2 + " " + lockToken3 + ")" + // lockToken is not there
-                " </myfolder/myfolder2/myfolder4> (<urn:uuid:7329872398754923752> [W/\"4-1729375899470\"])" + // Not locked
-                " </myfolder/myfolder7/myfolder8> (" + lockToken + ")" + CRLF + // lockToken is not there
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: </myfolder/myfolder3/myfolder6> (<urn:uuid:5e1e2275b1cd9c17845e7e08>)" + // Obvious wrong token
+                    " </myfolder/myfolder7/myfolder8/myfolder9> (" + lockToken + " " + lockToken2 + " " + lockToken3 + ")" + // lockToken is not there
+                    " </myfolder/myfolder2/myfolder4> (<urn:uuid:7329872398754923752> [W/\"4-1729375899470\"])" + // Not locked
+                    " </myfolder/myfolder7/myfolder8> (" + lockToken + ")" + CRLF + // lockToken is not there
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -1513,15 +1513,15 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PUT /myfolder/myfolder2/myfolder4/myfolder5/file4.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "If: </myfolder/myfolder3/myfolder6> (<urn:uuid:5e1e2275b1cd9c17845e7e08>)" + // Obvious wrong token
-                " </myfolder/myfolder2/myfolder4> (<urn:uuid:7329872398754923752> [W/\"4-1729375899470\"])" + // Not locked
-                " </myfolder/myfolder7/myfolder8> (" + lockToken + ")" + // lockToken is not there
-                " </myfolder/myfolder7/myfolder8/myfolder9> (" + lockToken2 + " " + lockToken3 + ")" + CRLF + // Correct
-                "Content-Length: 6" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF +
-                CONTENT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "If: </myfolder/myfolder3/myfolder6> (<urn:uuid:5e1e2275b1cd9c17845e7e08>)" + // Obvious wrong token
+                    " </myfolder/myfolder2/myfolder4> (<urn:uuid:7329872398754923752> [W/\"4-1729375899470\"])" + // Not locked
+                    " </myfolder/myfolder7/myfolder8> (" + lockToken + ")" + // lockToken is not there
+                    " </myfolder/myfolder7/myfolder8/myfolder9> (" + lockToken2 + " " + lockToken3 + ")" + CRLF + // Correct
+                    "Content-Length: 6" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF +
+                    CONTENT
                 });
         // @formatter:on
         client.connect();
@@ -1554,9 +1554,9 @@ public class TestWebdavServlet extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "PROPFIND / HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();

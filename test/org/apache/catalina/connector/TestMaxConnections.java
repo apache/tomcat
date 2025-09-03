@@ -96,8 +96,8 @@ public class TestMaxConnections extends TomcatBaseTest {
             String[] request = new String[1];
             // @formatter:off
             request[0] =
-                "GET /test HTTP/1.0" + CRLF +
-                CRLF;
+                    "GET /test HTTP/1.0" + CRLF +
+                    CRLF;
             // @formatter:on
             setRequest(request);
             boolean passed = false;

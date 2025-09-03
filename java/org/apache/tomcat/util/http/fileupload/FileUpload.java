@@ -31,7 +31,7 @@ package org.apache.tomcat.util.http.fileupload;
  * else.</p>
  */
 public class FileUpload
-    extends FileUploadBase {
+        extends FileUploadBase {
 
     /**
      * The factory to use to create new form items.

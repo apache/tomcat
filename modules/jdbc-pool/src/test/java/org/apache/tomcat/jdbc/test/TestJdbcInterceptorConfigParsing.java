@@ -62,9 +62,9 @@ public class TestJdbcInterceptorConfigParsing {
     @Test
     public void testWhitespace() throws Exception {
         String interceptorConfig = "FirstInterceptor ; \n" +
-            "SecondInterceptor (parm1  = value1 , parm2= value2 ) ; \n\n" +
-            "\t org.cyb.ThirdInterceptor(parm1=value1);  \n" +
-            "EmptyParmValInterceptor(parm1=  )";
+                "SecondInterceptor (parm1  = value1 , parm2= value2 ) ; \n\n" +
+                "\t org.cyb.ThirdInterceptor(parm1=value1);  \n" +
+                "EmptyParmValInterceptor(parm1=  )";
         PoolProperties props = new PoolProperties();
         props.setJdbcInterceptors(interceptorConfig);
         InterceptorDefinition[] interceptorDefs = props.getJdbcInterceptorsAsArray();

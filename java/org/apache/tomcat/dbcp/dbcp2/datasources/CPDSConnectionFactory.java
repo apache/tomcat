@@ -86,7 +86,7 @@ final class CPDSConnectionFactory
      */
     CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
             final Duration validationQueryTimeoutDuration, final boolean rollbackAfterValidation, final String userName,
-        final char[] userPassword) {
+            final char[] userPassword) {
         this.cpds = cpds;
         this.validationQuery = validationQuery;
         this.validationQueryTimeoutDuration = validationQueryTimeoutDuration;
@@ -114,7 +114,7 @@ final class CPDSConnectionFactory
      * @since 2.10.0
      */
     CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery, final Duration validationQueryTimeoutDuration,
-        final boolean rollbackAfterValidation, final String userName, final String userPassword) {
+            final boolean rollbackAfterValidation, final String userName, final String userPassword) {
         this(cpds, validationQuery, validationQueryTimeoutDuration, rollbackAfterValidation, userName, Utils.toCharArray(userPassword));
     }
 
@@ -141,7 +141,7 @@ final class CPDSConnectionFactory
     @Deprecated
     CPDSConnectionFactory(final ConnectionPoolDataSource cpds, final String validationQuery,
             final int validationQueryTimeoutSeconds, final boolean rollbackAfterValidation, final String userName,
-        final char[] userPassword) {
+            final char[] userPassword) {
         this.cpds = cpds;
         this.validationQuery = validationQuery;
         this.validationQueryTimeoutDuration = Duration.ofSeconds(validationQueryTimeoutSeconds);

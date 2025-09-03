@@ -797,7 +797,7 @@ public class AjpProcessor extends AbstractProcessor {
                 // nothing
                 case Constants.SC_A_SSL_CERT ->
                     // SSL certificate extraction is lazy, moved to JkCoyoteHandler
-                    requestHeaderMessage.getBytes(certificates);
+                        requestHeaderMessage.getBytes(certificates);
                 case Constants.SC_A_SSL_CIPHER -> {
                     requestHeaderMessage.getBytes(tmpMB);
                     request.setAttribute(SSLSupport.CIPHER_SUITE_KEY, tmpMB.toString());
@@ -807,7 +807,7 @@ public class AjpProcessor extends AbstractProcessor {
                     request.setAttribute(SSLSupport.SESSION_ID_KEY, tmpMB.toString());
                 }
                 case Constants.SC_A_SSL_KEY_SIZE ->
-                    request.setAttribute(SSLSupport.KEY_SIZE_KEY, Integer.valueOf(requestHeaderMessage.getInt()));
+                        request.setAttribute(SSLSupport.KEY_SIZE_KEY, Integer.valueOf(requestHeaderMessage.getInt()));
                 case Constants.SC_A_STORED_METHOD -> requestHeaderMessage.getBytes(request.method());
                 case Constants.SC_A_SECRET -> {
                     requestHeaderMessage.getBytes(tmpMB);

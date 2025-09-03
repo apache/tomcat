@@ -79,7 +79,7 @@ public interface PooledObjectFactory<T> {
    *
    * @see #destroyObject
    */
-  void activateObject(PooledObject<T> p) throws Exception;
+    void activateObject(PooledObject<T> p) throws Exception;
 
   /**
    * Destroys an instance no longer needed by the pool, using the default (NORMAL)
@@ -101,7 +101,7 @@ public interface PooledObjectFactory<T> {
    * @see #validateObject
    * @see ObjectPool#invalidateObject
    */
-  void destroyObject(PooledObject<T> p) throws Exception;
+    void destroyObject(PooledObject<T> p) throws Exception;
 
   /**
    * Destroys an instance no longer needed by the pool, using the provided
@@ -118,9 +118,9 @@ public interface PooledObjectFactory<T> {
    * @see DestroyMode
    * @since 2.9.0
    */
-  default void destroyObject(final PooledObject<T> p, final DestroyMode destroyMode) throws Exception {
-      destroyObject(p);
-  }
+    default void destroyObject(final PooledObject<T> p, final DestroyMode destroyMode) throws Exception {
+        destroyObject(p);
+    }
 
   /**
    * Creates an instance that can be served by the pool and wrap it in a
@@ -130,7 +130,7 @@ public interface PooledObjectFactory<T> {
    * @throws Exception if there is a problem creating a new instance,
    *    this will be propagated to the code requesting an object.
    */
-  PooledObject<T> makeObject() throws Exception;
+    PooledObject<T> makeObject() throws Exception;
 
   /**
    * Uninitializes an instance to be returned to the idle object pool.
@@ -141,7 +141,7 @@ public interface PooledObjectFactory<T> {
    *
    * @see #destroyObject
    */
-  void passivateObject(PooledObject<T> p) throws Exception;
+    void passivateObject(PooledObject<T> p) throws Exception;
 
   /**
    * Ensures that the instance is safe to be returned by the pool.
@@ -150,5 +150,5 @@ public interface PooledObjectFactory<T> {
    * @return {@code false} if {@code obj} is not valid and should
    *         be dropped from the pool, {@code true} otherwise.
    */
-  boolean validateObject(PooledObject<T> p);
+    boolean validateObject(PooledObject<T> p);
 }

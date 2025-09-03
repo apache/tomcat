@@ -240,31 +240,31 @@ public class BasicDataSourceFactory implements ObjectFactory {
             value = value.toUpperCase(Locale.ROOT);
             int level = PoolableConnectionFactory.UNKNOWN_TRANSACTION_ISOLATION;
             switch (value) {
-            case "NONE":
-                level = Connection.TRANSACTION_NONE;
-                break;
-            case "READ_COMMITTED":
-                level = Connection.TRANSACTION_READ_COMMITTED;
-                break;
-            case "READ_UNCOMMITTED":
-                level = Connection.TRANSACTION_READ_UNCOMMITTED;
-                break;
-            case "REPEATABLE_READ":
-                level = Connection.TRANSACTION_REPEATABLE_READ;
-                break;
-            case "SERIALIZABLE":
-                level = Connection.TRANSACTION_SERIALIZABLE;
-                break;
-            default:
-                try {
-                    level = Integer.parseInt(value);
-                } catch (final NumberFormatException e) {
-                    System.err.println("Could not parse defaultTransactionIsolation: " + value);
-                    System.err.println("WARNING: defaultTransactionIsolation not set");
-                    System.err.println("using default value of database driver");
-                    level = PoolableConnectionFactory.UNKNOWN_TRANSACTION_ISOLATION;
-                }
-                break;
+                case "NONE":
+                    level = Connection.TRANSACTION_NONE;
+                    break;
+                case "READ_COMMITTED":
+                    level = Connection.TRANSACTION_READ_COMMITTED;
+                    break;
+                case "READ_UNCOMMITTED":
+                    level = Connection.TRANSACTION_READ_UNCOMMITTED;
+                    break;
+                case "REPEATABLE_READ":
+                    level = Connection.TRANSACTION_REPEATABLE_READ;
+                    break;
+                case "SERIALIZABLE":
+                    level = Connection.TRANSACTION_SERIALIZABLE;
+                    break;
+                default:
+                    try {
+                        level = Integer.parseInt(value);
+                    } catch (final NumberFormatException e) {
+                        System.err.println("Could not parse defaultTransactionIsolation: " + value);
+                        System.err.println("WARNING: defaultTransactionIsolation not set");
+                        System.err.println("using default value of database driver");
+                        level = PoolableConnectionFactory.UNKNOWN_TRANSACTION_ISOLATION;
+                    }
+                    break;
             }
             dataSource.setDefaultTransactionIsolation(level);
         });

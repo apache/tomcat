@@ -126,7 +126,7 @@ public class TestMemoryUserDatabase {
             @Override
             public void run() {
                 for(int i=0; i<10; ++i) {
-                  db.createUser("newUser-" + Thread.currentThread().getName() + "-" + i, "x", null);
+                    db.createUser("newUser-" + Thread.currentThread().getName() + "-" + i, "x", null);
                 }
             }
         };
@@ -134,7 +134,7 @@ public class TestMemoryUserDatabase {
         int numThreads = 100;
         Thread[] threads = new Thread[numThreads + 1];
         for(int i=0; i<numThreads; ++i) {
-          threads[i] = new Thread(job);
+            threads[i] = new Thread(job);
         }
 
         // Let's
@@ -151,11 +151,11 @@ public class TestMemoryUserDatabase {
         ++numThreads;
 
         for(int i=0; i<numThreads; ++i) {
-          threads[i].start();
+            threads[i].start();
         }
 
         for(int i=0; i<numThreads; ++i) {
-          threads[i].join();
+            threads[i].join();
         }
 
         // Remove all those extra users
@@ -163,7 +163,7 @@ public class TestMemoryUserDatabase {
         for(; users.hasNext();) {
             User user = users.next();
             if(user.getUsername().startsWith("newUser")) {
-              db.removeUser(user);
+                db.removeUser(user);
             }
         }
 

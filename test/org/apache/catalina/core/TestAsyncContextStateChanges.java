@@ -114,8 +114,8 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET / HTTP/1.1" + CRLF +
-                "Host: localhost:" + CRLF +
-                CRLF});
+                    "Host: localhost:" + CRLF +
+                    CRLF});
         // @formatter:on
         client.connect();
         client.sendRequest();

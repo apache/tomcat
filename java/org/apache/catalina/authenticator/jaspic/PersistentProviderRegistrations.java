@@ -120,13 +120,13 @@ public final class PersistentProviderRegistrations {
         try (OutputStream fos = new FileOutputStream(configFileNew);
                 Writer writer = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
             writer.write("""
-                <?xml version='1.0' encoding='utf-8'?>
-                <jaspic-providers
-                    xmlns="http://tomcat.apache.org/xml"
-                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                    xsi:schemaLocation="http://tomcat.apache.org/xml jaspic-providers.xsd"
-                    version="1.0">
-                """);
+                    <?xml version='1.0' encoding='utf-8'?>
+                    <jaspic-providers
+                        xmlns="http://tomcat.apache.org/xml"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://tomcat.apache.org/xml jaspic-providers.xsd"
+                        version="1.0">
+                    """);
             for (Provider provider : providers.providers) {
                 writer.write("  <provider");
                 writeOptional("className", provider.getClassName(), writer);
