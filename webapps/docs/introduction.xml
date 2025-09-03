@@ -227,7 +227,7 @@ do let us know.</p>
     </p>
     <p>
       For advanced configuration information, see the
-      <a href="https://tomcat.apache.org/tomcat-9.0-doc/RUNNING.txt">
+      <a href="https://tomcat.apache.org/tomcat-11.0-doc/RUNNING.txt">
         RUNNING.txt
       </a> file.
     </p>
