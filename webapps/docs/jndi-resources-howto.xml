@@ -744,23 +744,6 @@ Transport.send(message);]]></source>
     <p>For the additional JAR to be visible to Tomcat, it is necessary for the
     Tomcat instance to be restarted.</p>
 
-
-    <h5>Example Application</h5>
-
-    <p>The <code>/examples</code> application included with Tomcat contains
-    an example of utilizing this resource factory.  It is accessed via the
-    "JSP Examples" link.  The source code for the servlet that actually
-    sends the mail message is in
-    <code>/WEB-INF/classes/SendMailServlet.java</code>.</p>
-
-    <p><strong>WARNING</strong> - The default configuration assumes that there
-    is an SMTP server listing on port 25 on <code>localhost</code>. If this is
-    not the case, edit the
-    <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
-    this web application and modify the parameter value for the
-    <code>mail.smtp.host</code> parameter to be the host name of an SMTP server
-    on your network.</p>
-
   </subsection>
 
   <subsection name="JDBC Data Sources">
