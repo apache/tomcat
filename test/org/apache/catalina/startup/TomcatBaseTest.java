@@ -37,6 +37,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -75,6 +76,7 @@ import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 import org.apache.tomcat.util.scan.StandardJarScanner;
 
@@ -1059,5 +1061,34 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             ctx.addLifecycleListener(l);
         }
         return webappLogCapture;
+    }
+
+    /**
+     * Returns the localized key in a LocalStrings.properties file.
+     *
+     * @param packagePath The package that contains LocalStrings.properties, e.g. 'org.apache.catalina.startup'
+     * @param key           The key to find, e.g. 'versionLoggerListener.serverInfo.server.built'
+     * @param locale        The locale to use, e.g. Locale.ENGLISH
+     * @return The prefix before the first argument placeholder and if no placeholder, returns the whole formatted string.
+     */
+    public static String getKeyFromPropertiesFile(String packagePath, String key, Locale locale) {
+        StringManager sm;
+        if (locale != null) {
+            sm = StringManager.getManager(packagePath, locale);
+        } else {
+            sm = StringManager.getManager(packagePath);
+        }
+
+        String formatted = sm.getString(key, "XXX");
+        int insertIndex = formatted.indexOf("XXX");
+        return (insertIndex == -1) ? formatted : formatted.substring(0, insertIndex);
+    }
+    public static String getKeyFromPropertiesFile(String packagePath, String key) {
+        return getKeyFromPropertiesFile(packagePath, key, Locale.getDefault());
+    }
+    public static String getKeyFromPropertiesFile(StringManager sm, String key) {
+        String formatted = sm.getString(key, "XXX");
+        int insertIndex = formatted.indexOf("XXX");
+        return (insertIndex == -1) ? formatted : formatted.substring(0, insertIndex);
     }
 }
