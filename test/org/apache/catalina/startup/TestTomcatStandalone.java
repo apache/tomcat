@@ -160,128 +160,136 @@ public class TestTomcatStandalone extends LoggingBaseTest {
 
     @Test
     public void testStandalone() throws Exception {
+        try (TomcatBaseTest.LogCapture logCapture = TomcatBaseTest.attachLogCapture(java.util.logging.Level.ALL,
+                     org.apache.catalina.startup.VersionLoggerListener.class.getName())) {
+            // Test embedded with pseudo standalone
+            Tomcat tomcat = new Tomcat();
+            tomcat.init(new ServerXml());
 
-        // Test embedded with pseudo standalone
+            // No file system docBase required
+            Context ctx = tomcat.addContext("", null);
 
-        Tomcat tomcat = new Tomcat();
-        tomcat.init(new ServerXml());
+            Tomcat.addServlet(ctx, "myServlet", new HelloWorld());
+            ctx.addServletMappingDecoded("/", "myServlet");
 
-        // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
-
-        Tomcat.addServlet(ctx, "myServlet", new HelloWorld());
-        ctx.addServletMappingDecoded("/", "myServlet");
-
-        tomcat.start();
-        // Emulate Tomcat main thread
-        new Thread() {
-            @Override
-            public void run() {
-                tomcat.getServer().await();
-                try {
-                    tomcat.stop();
-                } catch (LifecycleException e) {
+            tomcat.start();
+            // Emulate Tomcat main thread
+            new Thread() {
+                @Override
+                public void run() {
+                    tomcat.getServer().await();
+                    try {
+                        tomcat.stop();
+                    } catch (LifecycleException e) {
+                    }
                 }
-            }
-        }.start();
-        InetAddress localAddress = null;
-        Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
-        while (networkInterfaces.hasMoreElements()) {
-            NetworkInterface ni = networkInterfaces.nextElement();
-            if (!ni.isLoopback() && ni.isUp()) {
-                Enumeration<InetAddress> addresses = ni.getInetAddresses();
-                while (addresses.hasMoreElements()) {
-                    InetAddress address = addresses.nextElement();
-                    if (address instanceof Inet4Address) {
-                        localAddress = address;
+            }.start();
+
+            assertVersionLoggerListenerOutput(logCapture);
+            InetAddress localAddress = null;
+            Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces();
+            while (networkInterfaces.hasMoreElements()) {
+                NetworkInterface ni = networkInterfaces.nextElement();
+                if (!ni.isLoopback() && ni.isUp()) {
+                    Enumeration<InetAddress> addresses = ni.getInetAddresses();
+                    while (addresses.hasMoreElements()) {
+                        InetAddress address = addresses.nextElement();
+                        if (address instanceof Inet4Address) {
+                            localAddress = address;
+                        }
                     }
                 }
             }
-        }
 
-        ByteChunk res = TomcatBaseTest.getUrl("http://localhost:" + tomcat.getConnector().getLocalPort() + "/");
-        Assert.assertEquals("Hello world", res.toString());
+            ByteChunk res = TomcatBaseTest.getUrl("http://localhost:" + tomcat.getConnector().getLocalPort() + "/");
+            Assert.assertEquals("Hello world", res.toString());
 
-        // Use the shutdown command
-        if (localAddress != null) {
-            // Don't listen to non loopback
-            Exception ex = null;
-            try (Socket s = new Socket(localAddress, 8005)) {
+            // Use the shutdown command
+            if (localAddress != null) {
+                // Don't listen to non loopback
+                Exception ex = null;
+                try (Socket s = new Socket(localAddress, 8005)) {
+                    s.getOutputStream().write("GOAWAY".getBytes(StandardCharsets.ISO_8859_1));
+                } catch (Exception e) {
+                    ex = e;
+                }
+                Assert.assertNotNull(ex);
+            }
+
+            try (Socket s = new Socket(InetAddress.getLoopbackAddress(), 8005)) {
+                // Bad command
                 s.getOutputStream().write("GOAWAY".getBytes(StandardCharsets.ISO_8859_1));
-            } catch (Exception e) {
-                ex = e;
             }
-            Assert.assertNotNull(ex);
-        }
+            Thread.sleep(100);
+            Assert.assertEquals(LifecycleState.STARTED, tomcat.getService().getState());
 
-        try (Socket s = new Socket(InetAddress.getLoopbackAddress(), 8005)) {
-            // Bad command
-            s.getOutputStream().write("GOAWAY".getBytes(StandardCharsets.ISO_8859_1));
-        }
-        Thread.sleep(100);
-        Assert.assertEquals(LifecycleState.STARTED, tomcat.getService().getState());
-
-        try (Socket s = new Socket(InetAddress.getLoopbackAddress(), 8005)) {
-            s.getOutputStream().write("SHUTDOWN".getBytes(StandardCharsets.ISO_8859_1));
-        }
-        Thread.sleep(100);
-        Assert.assertNotEquals(LifecycleState.STARTED, tomcat.getService().getState());
-
-        // Second separate test, real standalone using Catalina
-        // This is done in one single test to avoid possible problems with the shutdown port
-
-        // Add descriptor to deploy
-        File descriptorsFolder = new File(getTemporaryDirectory(), "conf/Catalina/localhost");
-        descriptorsFolder.mkdirs();
-        try (FileOutputStream os = new FileOutputStream(new File(descriptorsFolder, "test.xml"))) {
-            os.write(TEST_WEBAPP_CONTEXT_XML.getBytes(StandardCharsets.UTF_8));
-        }
-
-        Catalina catalina = new Catalina();
-        catalina.setAwait(true);
-        // Embedded code generation uses Catalina, so it is the best spot to test it as well
-        File generatedCodeLocation = new File(getTemporaryDirectory(), "generated");
-        new Thread() {
-            @Override
-            public void run() {
-                String[] args = { "start", "-generateCode", generatedCodeLocation.getAbsolutePath() };
-                catalina.load(args);
-                catalina.start();
+            try (Socket s = new Socket(InetAddress.getLoopbackAddress(), 8005)) {
+                s.getOutputStream().write("SHUTDOWN".getBytes(StandardCharsets.ISO_8859_1));
             }
-        }.start();
+            Thread.sleep(100);
+            Assert.assertNotEquals(LifecycleState.STARTED, tomcat.getService().getState());
 
-        Service service = null;
-        int i = 0;
-        while (i < 500 && (service == null || service.getState() != LifecycleState.STARTED)) {
-            Server server = catalina.getServer();
-            if (server != null && catalina.getServer().findServices().length > 0) {
-                service = catalina.getServer().findServices()[0];
+            // Second separate test, real standalone using Catalina
+            // This is done in one single test to avoid possible problems with the shutdown port
+
+            // Add descriptor to deploy
+            File descriptorsFolder = new File(getTemporaryDirectory(), "conf/Catalina/localhost");
+            descriptorsFolder.mkdirs();
+            try (FileOutputStream os = new FileOutputStream(new File(descriptorsFolder, "test.xml"))) {
+                os.write(TEST_WEBAPP_CONTEXT_XML.getBytes(StandardCharsets.UTF_8));
             }
-            Thread.sleep(10);
-            i++;
-        }
-        Assert.assertNotNull(service);
 
-        Connector connector = service.findConnectors()[0];
-        res = TomcatBaseTest.getUrl("http://localhost:" + connector.getLocalPort() + "/");
-        Assert.assertTrue(res.toString().contains("404"));
+            Catalina catalina = new Catalina();
+            catalina.setAwait(true);
+            // Embedded code generation uses Catalina, so it is the best spot to test it as well
+            File generatedCodeLocation = new File(getTemporaryDirectory(), "generated");
+            new Thread() {
+                @Override
+                public void run() {
+                    String[] args = {"start", "-generateCode", generatedCodeLocation.getAbsolutePath()};
+                    catalina.load(args);
+                    catalina.start();
+                }
+            }.start();
 
-        File codeFolder = new File(generatedCodeLocation, "catalinaembedded");
-        File generatedLoader = new File(codeFolder, "DigesterGeneratedCodeLoader.java");
-        File generatedServerXml = new File(codeFolder, "ServerXml.java");
-        Assert.assertTrue(generatedLoader.exists());
-        Assert.assertTrue(generatedServerXml.exists());
-
-        (new Catalina()).stopServer();
-        i = 0;
-        while (true) {
-            Assert.assertTrue(i++ < 100);
-            if (service.getState() != LifecycleState.STARTED) {
-                break;
+            Service service = null;
+            int i = 0;
+            while (i < 500 && (service == null || service.getState() != LifecycleState.STARTED)) {
+                Server server = catalina.getServer();
+                if (server != null && catalina.getServer().findServices().length > 0) {
+                    service = catalina.getServer().findServices()[0];
+                }
+                Thread.sleep(10);
+                i++;
             }
-            Thread.sleep(10);
-        }
+            Assert.assertNotNull(service);
 
+            Connector connector = service.findConnectors()[0];
+            res = TomcatBaseTest.getUrl("http://localhost:" + connector.getLocalPort() + "/");
+            Assert.assertTrue(res.toString().contains("404"));
+
+            File codeFolder = new File(generatedCodeLocation, "catalinaembedded");
+            File generatedLoader = new File(codeFolder, "DigesterGeneratedCodeLoader.java");
+            File generatedServerXml = new File(codeFolder, "ServerXml.java");
+            Assert.assertTrue(generatedLoader.exists());
+            Assert.assertTrue(generatedServerXml.exists());
+
+            (new Catalina()).stopServer();
+            i = 0;
+            while (true) {
+                Assert.assertTrue(i++ < 100);
+                if (service.getState() != LifecycleState.STARTED) {
+                    break;
+                }
+                Thread.sleep(10);
+            }
+
+        }
+    }
+    private void assertVersionLoggerListenerOutput(TomcatBaseTest.LogCapture logCapture) {
+        Assert.assertTrue("Missing server version line in VersionLoggerListener output.", logCapture.containsText("Server version name:"));
+        Assert.assertTrue("Missing server number line in VersionLoggerListener output.", logCapture.containsText("Server version number:"));
+        Assert.assertTrue("Missing server built line in VersionLoggerListener output.", logCapture.containsText("Server built:"));
     }
 
 }
