@@ -105,6 +105,16 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.12 (markt)" rtext="in development">
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Add hybrid PQC support to OpenSSL, based on code from
+        <code>mod_ssl</code>. Using this OpenSSL specific code path,
+        additional PQC certificates defined with type <code>MLDSA</code> are
+        added to contexts which use classic certificates. (jfclere/remm)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.11 (markt)" rtext="release in progress">
   <subsection name="Catalina">
