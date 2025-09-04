@@ -874,7 +874,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
-    private boolean addCertificate(SSLHostConfigCertificate certificate, Arena localArena) throws Exception {
+    public boolean addCertificate(SSLHostConfigCertificate certificate, Arena localArena) throws Exception {
         int index = getCertificateIndex(certificate);
         // Load Server key and certificate
         if (certificate.getCertificateFile() != null) {

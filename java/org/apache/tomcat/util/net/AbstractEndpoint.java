@@ -55,6 +55,7 @@ import org.apache.tomcat.util.collections.SynchronizedStack;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.StoreType;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.LimitLatch;
@@ -396,6 +397,25 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
 
+        boolean useHybridSslContext = false;
+        Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
+        if (sslHostConfig.getProtocols().contains(Constants.SSL_PROTO_TLSv1_3) && OpenSSLStatus.isAvailable()) {
+            // If TLS 1.3 is enabled, check if a hybrid scheme using a single SSL context
+            // should be attempted
+            boolean nonMldsaFound = false;
+            boolean mldsaFound = false;
+            for (SSLHostConfigCertificate certificate : certificates) {
+                if (certificate.getType().equals(SSLHostConfigCertificate.Type.MLDSA)) {
+                    mldsaFound = true;
+                } else {
+                    nonMldsaFound = true;
+                }
+            }
+            if (mldsaFound && nonMldsaFound) {
+                useHybridSslContext = true;
+            }
+        }
+
         boolean firstCertificate = true;
         for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
             SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
@@ -423,8 +443,21 @@ public abstract class AbstractEndpoint<S, U> {
                 certificate.setSslContextGenerated(sslContext);
             }
 
+            // If using a hybrid scheme, add any MLDSA certificates to all other SSL contexts
+            if (useHybridSslContext && !certificate.getType().equals(SSLHostConfigCertificate.Type.MLDSA)) {
+                for (SSLHostConfigCertificate certificateToAdd : sslHostConfig.getCertificates(true)) {
+                    // Add additional certificate to all non MLDSA contexts
+                    if (certificateToAdd.getType().equals(SSLHostConfigCertificate.Type.MLDSA)) {
+                        if (!sslUtil.addSecondCertificate(sslContext, certificateToAdd)) {
+                            throw new IllegalArgumentException(sm.getString("endpoint.errorCreatingSSLContext"));
+                        }
+                    }
+                }
+            }
+
             logCertificate(certificate);
         }
+
     }
 
 

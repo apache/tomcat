@@ -196,6 +196,12 @@
         Remove NIO2 connector. (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Add hybrid PQC support to OpenSSL, based on code from
+        <code>mod_ssl</code>. Using this OpenSSL specific code path,
+        additional PQC certificates defined with type <code>MLDSA</code> are
+        added to contexts which use classic certificates. (jfclere/remm)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Jasper">

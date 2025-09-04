@@ -318,7 +318,8 @@ public class SSLHostConfigCertificate implements Serializable {
         UNDEFINED,
         RSA(Authentication.RSA),
         DSA(Authentication.DSS),
-        EC(Authentication.ECDH, Authentication.ECDSA);
+        EC(Authentication.ECDH, Authentication.ECDSA),
+        MLDSA;
 
         private final Set<Authentication> compatibleAuthentications;
 
