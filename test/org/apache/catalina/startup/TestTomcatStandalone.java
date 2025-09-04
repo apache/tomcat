@@ -287,9 +287,9 @@ public class TestTomcatStandalone extends LoggingBaseTest {
         }
     }
     private void assertVersionLoggerListenerOutput(TomcatBaseTest.LogCapture logCapture) {
-        Assert.assertTrue("Missing server version line in VersionLoggerListener output.", logCapture.containsText("Server version name:"));
-        Assert.assertTrue("Missing server number line in VersionLoggerListener output.", logCapture.containsText("Server version number:"));
-        Assert.assertTrue("Missing server built line in VersionLoggerListener output.", logCapture.containsText("Server built:"));
+        Assert.assertTrue("Missing server version line in VersionLoggerListener output.", logCapture.containsText(TomcatBaseTest.getKeyFromPropertiesFile("org.apache.catalina.startup", "versionLoggerListener.serverInfo.server.version")));
+        Assert.assertTrue("Missing server number line in VersionLoggerListener output.", logCapture.containsText(TomcatBaseTest.getKeyFromPropertiesFile("org.apache.catalina.startup", "versionLoggerListener.serverInfo.server.number")));
+        Assert.assertTrue("Missing server built line in VersionLoggerListener output.", logCapture.containsText(TomcatBaseTest.getKeyFromPropertiesFile("org.apache.catalina.startup", "versionLoggerListener.serverInfo.server.built")));
     }
 
 }
