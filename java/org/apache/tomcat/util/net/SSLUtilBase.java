@@ -268,6 +268,11 @@ public abstract class SSLUtilBase implements SSLUtil {
         return sslContext;
     }
 
+    @Override
+    public void addcertSSLContext(SSLContext context, SSLHostConfigCertificate certificate) {
+        return; /* Do nothing for the moment */
+    }
+
 
     @Override
     public void configureSessionContext(SSLSessionContext sslSessionContext) {

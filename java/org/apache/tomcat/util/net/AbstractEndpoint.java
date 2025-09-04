@@ -397,12 +397,16 @@ public abstract class AbstractEndpoint<S, U> {
     protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
 
         boolean firstCertificate = true;
+        SSLContext oldctx = null;
         for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
             SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
             if (firstCertificate) {
                 firstCertificate = false;
                 sslHostConfig.setEnabledProtocols(sslUtil.getEnabledProtocols());
                 sslHostConfig.setEnabledCiphers(sslUtil.getEnabledCiphers());
+            } else {
+                /* with openssl we need to add the certificatte to the context */
+                sslUtil.addcertSSLContext(oldctx, certificate);
             }
 
             SSLContext sslContext = certificate.getSslContext();
@@ -416,6 +420,7 @@ public abstract class AbstractEndpoint<S, U> {
             if (sslContext == null || sslContext == sslContextGenerated) {
                 try {
                     sslContext = sslUtil.createSSLContext(negotiableProtocols);
+                    oldctx = sslContext;
                 } catch (Exception e) {
                     throw new IllegalArgumentException(sm.getString("endpoint.errorCreatingSSLContext"), e);
                 }

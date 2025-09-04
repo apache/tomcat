@@ -90,4 +90,6 @@ public interface SSLUtil {
          */
         String getNegotiatedProtocol();
     }
+
+    void addcertSSLContext(SSLContext context, SSLHostConfigCertificate certificate);
 }

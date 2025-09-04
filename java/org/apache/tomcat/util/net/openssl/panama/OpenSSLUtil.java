@@ -21,6 +21,7 @@ import java.security.KeyException;
 import java.security.KeyStoreException;
 import java.util.List;
 import java.util.Set;
+import java.lang.foreign.Arena;
 
 import javax.net.ssl.KeyManager;
 
@@ -70,6 +71,16 @@ public class OpenSSLUtil extends SSLUtilBase {
     @Override
     public SSLContext createSSLContextInternal(List<String> negotiableProtocols) throws Exception {
         return new OpenSSLContext(certificate, negotiableProtocols);
+    }
+
+    @Override
+    public void addcertSSLContext(SSLContext context, SSLHostConfigCertificate certificate) {
+        OpenSSLContext ctx = (OpenSSLContext) context;
+        try (var localArena = Arena.ofConfined()) {
+            ctx.addCertificate(certificate, localArena);
+        } catch (Exception e) {
+            System.out.println("addcertSSLContext: " + e);
+        }
     }
 
 
