@@ -398,13 +398,12 @@ public abstract class AbstractEndpoint<S, U> {
     protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
 
         boolean useHybridSslContext = false;
-        Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
         if (sslHostConfig.getProtocols().contains(Constants.SSL_PROTO_TLSv1_3) && OpenSSLStatus.isAvailable()) {
             // If TLS 1.3 is enabled, check if a hybrid scheme using a single SSL context
             // should be attempted
             boolean nonMldsaFound = false;
             boolean mldsaFound = false;
-            for (SSLHostConfigCertificate certificate : certificates) {
+            for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
                 if (certificate.getType().equals(SSLHostConfigCertificate.Type.MLDSA)) {
                     mldsaFound = true;
                 } else {
