@@ -136,4 +136,14 @@ public class OpenSSLUtil extends SSLUtilBase {
         }
     }
 
+    @Override
+    public boolean addSecondCertificate(SSLContext context, SSLHostConfigCertificate certificate) {
+        try {
+            ((OpenSSLContext) context).addCertificate(certificate);
+            return true;
+        } catch (Exception e) {
+            throw new IllegalArgumentException(sm.getString("openssl.secondCertificateError"), e);
+        }
+    }
+
 }
