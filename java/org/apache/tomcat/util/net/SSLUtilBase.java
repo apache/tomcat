@@ -269,7 +269,7 @@ public abstract class SSLUtilBase implements SSLUtil {
     }
 
     @Override
-    public void addcertSSLContext(SSLContext context, SSLHostConfigCertificate certificate) {
+    public void addSecondCertificate(SSLContext context, SSLHostConfigCertificate certificate) {
         return; /* Do nothing for the moment */
     }
 

@@ -406,7 +406,7 @@ public abstract class AbstractEndpoint<S, U> {
                 sslHostConfig.setEnabledCiphers(sslUtil.getEnabledCiphers());
             } else {
                 /* with openssl we need to add the certificatte to the context */
-                sslUtil.addcertSSLContext(oldctx, certificate);
+                sslUtil.addSecondCertificate(oldctx, certificate);
             }
 
             SSLContext sslContext = certificate.getSslContext();

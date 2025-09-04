@@ -91,5 +91,11 @@ public interface SSLUtil {
         String getNegotiatedProtocol();
     }
 
-    void addcertSSLContext(SSLContext context, SSLHostConfigCertificate certificate);
+    /**
+     * The add the certificate to the sslcontext like -dcert cert and -dkey key of openssl s_server
+     *
+     * @param sslContext  The SSL context
+     * @param certificate The SSLHostConfigCertificate
+     */
+    void addSecondCertificate(SSLContext context, SSLHostConfigCertificate certificate);
 }
