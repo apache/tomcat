@@ -37,7 +37,6 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -952,18 +951,14 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     }
 
     /**
-     * Captures webapp-scoped logs (e.g. ContextConfig/Digester) during the
-     * CONFIGURE_START phase of a {@link Context}.
+     * Captures logs for the given logger names in the current ClassLoader.
      */
-    public static class WebappLogCapture implements LifecycleListener, AutoCloseable {
-        private final Level level;
-        private final String[] loggerNames;
-        private final List<LogRecord> logRecords = Collections.synchronizedList(new ArrayList<>());
-        private final Map<Logger, Level> previousLevelsOfLoggersMap = new IdentityHashMap<>();
-        private final List<Logger> attachedLoggers = new CopyOnWriteArrayList<>();
-        private volatile boolean installed = false;
-
-        private final Handler handler = new Handler() {
+    public static class LogCapture implements AutoCloseable {
+        protected final Level level;
+        protected final String[] loggerNames;
+        protected final List<LogRecord> logRecords = Collections.synchronizedList(new ArrayList<>());
+        protected final Map<Logger, Level> previousLevelsOfLoggersMap = new IdentityHashMap<>();
+        protected final Handler handler = new Handler() {
             @Override
             public void publish(LogRecord record) {
                 logRecords.add(record);
@@ -978,38 +973,17 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 logRecords.clear();
             }
         };
-        public WebappLogCapture(Level level, String... loggerNames) {
-            this.level = level == null ? Level.ALL : level;
+        public LogCapture(Level level, String... loggerNames) {
+            this.level = (level == null ? Level.ALL : level);
             this.loggerNames = loggerNames;
         }
 
-        @Override
-        public void close() throws Exception {
-            for (Logger l : attachedLoggers) {
-                try {
-                    l.removeHandler(handler);
-                } catch (Throwable ignore) {
-                }
-                try {
-                    l.setLevel(previousLevelsOfLoggersMap.get(l));
-                } catch (Throwable ignore) {
-                }
-            }
-            attachedLoggers.clear();
-            previousLevelsOfLoggersMap.clear();
-        }
-
-        @Override
-        public void lifecycleEvent(LifecycleEvent event) {
-            if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType()) && !installed) {
-                installed = true;
-                for (String name : loggerNames) {
-                    Logger logger = Logger.getLogger(name);
-                    previousLevelsOfLoggersMap.put(logger, logger.getLevel());
-                    logger.addHandler(handler);
-                    logger.setLevel(level);
-                    attachedLoggers.add(logger);
-                }
+        public void attach() {
+            for (String name : loggerNames) {
+                Logger logger = Logger.getLogger(name);
+                previousLevelsOfLoggersMap.put(logger, logger.getLevel());
+                logger.addHandler(handler);
+                logger.setLevel(level);
             }
         }
 
@@ -1030,6 +1004,46 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
                 }
             }
             return false;
+        }
+
+        @Override
+        public void close() throws Exception {
+            for (Logger l : previousLevelsOfLoggersMap.keySet()) {
+                try {
+                    l.removeHandler(handler);
+                } catch (Throwable ignore) {
+                }
+                try {
+                    l.setLevel(previousLevelsOfLoggersMap.get(l));
+                } catch (Throwable ignore) {
+                }
+            }
+            previousLevelsOfLoggersMap.clear();
+        }
+    }
+
+    public static LogCapture attachLogCapture(Level level, String... loggerNames) {
+        LogCapture logCapture = new LogCapture(level, loggerNames);
+        logCapture.attach();
+        return logCapture;
+    }
+
+    /**
+     * Captures webapp-scoped logs (e.g. ContextConfig/Digester) during the
+     * CONFIGURE_START phase of a {@link Context}.
+     */
+    public static class WebappLogCapture extends LogCapture implements LifecycleListener {
+        private volatile boolean installed = false;
+        public WebappLogCapture(Level level, String... loggerNames) {
+            super(level, loggerNames);
+        }
+
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType()) && !installed) {
+                installed = true;
+                this.attach();
+            }
         }
     }
 
