@@ -94,7 +94,7 @@ public interface SSLUtil {
     /**
      * The add the certificate to the sslcontext like -dcert cert and -dkey key of openssl s_server
      *
-     * @param sslContext  The SSL context
+     * @param context  The SSL context
      * @param certificate The SSLHostConfigCertificate
      */
     void addSecondCertificate(SSLContext context, SSLHostConfigCertificate certificate);
