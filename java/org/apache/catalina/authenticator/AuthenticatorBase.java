@@ -149,6 +149,12 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     protected boolean alwaysUseSession = false;
 
     /**
+     * Should we allow reauthentication from SSO? The original authentication (and the SSO session) may have been
+     * established via a weaker authentication mechanism.
+     */
+    protected boolean allowSsoReauthentication = false;
+
+    /**
      * Should we cache authenticated Principals if the request is part of an HTTP session?
      */
     protected boolean cache = true;
@@ -236,6 +242,14 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
     public void setAllowCorsPreflight(String allowCorsPreflight) {
         this.allowCorsPreflight = AllowCorsPreflight.valueOf(allowCorsPreflight.trim().toUpperCase(Locale.ENGLISH));
+    }
+
+    public boolean getAllowSsoReauthentication() {
+        return allowSsoReauthentication;
+    }
+
+    public void setAllowSsoReauthentication(boolean allowSsoReauthentication) {
+        this.allowSsoReauthentication = allowSsoReauthentication;
     }
 
     public boolean getAlwaysUseSession() {
