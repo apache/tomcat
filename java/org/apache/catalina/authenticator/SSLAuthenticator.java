@@ -115,6 +115,8 @@ public class SSLAuthenticator extends AuthenticatorBase {
 
     @Override
     protected String getAuthMethod() {
+        return HttpServletRequest.CLIENT_CERT_AUTH;
+    }
 
 
     @Override
