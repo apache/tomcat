@@ -49,6 +49,17 @@ public class SSLAuthenticator extends AuthenticatorBase {
 
     private final Log log = LogFactory.getLog(SSLAuthenticator.class); // must not be static
 
+    private boolean allowSsoReauthentication = false;
+
+    public boolean getAllowSsoReauthentication() {
+        return allowSsoReauthentication;
+    }
+
+    public void setAllowSsoReauthentication(boolean allowSsoReauthentication) {
+        this.allowSsoReauthentication = allowSsoReauthentication;
+    }
+
+
     /**
      * Authenticate the user by checking for the existence of a certificate chain, validating it against the trust
      * manager for the connector and then validating the user's identity against the configured Realm.
@@ -64,12 +75,9 @@ public class SSLAuthenticator extends AuthenticatorBase {
         // NOTE: We don't try to reauthenticate using any existing SSO session,
         // because that will only work if the original authentication was
         // BASIC or FORM, which are less secure than the CLIENT-CERT auth-type
-        // specified for this webapp
-        //
-        // Change to true below to allow previous FORM or BASIC authentications
-        // to authenticate users for this webapp
-        // TODO make this a configurable attribute (in SingleSignOn??)
-        if (checkForCachedAuthentication(request, response, false)) {
+        // specified for this webapp. This behaviour may be modified by setting
+        // the allowSsoReauthentication property.
+        if (checkForCachedAuthentication(request, response, allowSsoReauthentication)) {
             return true;
         }
 
@@ -107,8 +115,6 @@ public class SSLAuthenticator extends AuthenticatorBase {
 
     @Override
     protected String getAuthMethod() {
-        return HttpServletRequest.CLIENT_CERT_AUTH;
-    }
 
 
     @Override
