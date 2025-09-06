@@ -101,7 +101,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 //give the object to the thread instead of adding it to the pool
                 c.setItem(e);
                 if (isLinux) {
-                  c.countDown();
+                    c.countDown();
                 }
             } else {
                 //we always add first, so that the most recently used object will be given out
@@ -112,7 +112,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         }
         //if we exchanged an object with another thread, wake it up.
         if (!isLinux && c!=null) {
-          c.countDown();
+            c.countDown();
         }
         //we have an unbounded queue, so always return true
         return true;
@@ -450,9 +450,9 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             } else if (latch!=null) {
                 boolean timedout = !latch.await(timeout, unit);
                 if (timedout) {
-                  throw new TimeoutException();
+                    throw new TimeoutException();
                 } else {
-                  return latch.getItem();
+                    return latch.getItem();
                 }
             } else {
                 throw new ExecutionException("ItemFuture incorrectly instantiated. Bug in the code?", new Exception());

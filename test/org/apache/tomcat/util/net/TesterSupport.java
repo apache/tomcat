@@ -182,7 +182,7 @@ public final class TesterSupport {
         try {
             SSLContext sc;
             if (TLSV13_AVAILABLE) {
-                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
+                sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
             } else {
                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);
             }
@@ -323,7 +323,7 @@ public final class TesterSupport {
 
     protected static boolean checkLastClientAuthRequestedIssuers() {
         if (lastRequestedIssuers == null || lastRequestedIssuers.length != 1) {
-          return false;
+            return false;
         }
         return (new X500Principal(clientAuthExpectedIssuer)).equals(
                     new X500Principal(lastRequestedIssuers[0].getName()));
@@ -367,9 +367,9 @@ public final class TesterSupport {
             // Report the number of bytes read
             resp.setContentType("text/plain");
             if (contentOK) {
-              resp.getWriter().print("OK-" + read);
+                resp.getWriter().print("OK-" + read);
             } else {
-              resp.getWriter().print("CONTENT-MISMATCH-" + read);
+                resp.getWriter().print("CONTENT-MISMATCH-" + read);
             }
         }
     }

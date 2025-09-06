@@ -98,7 +98,7 @@ final class EvictionTimer {
          * @param ref the reference to track.
          */
         private WeakRunner(final WeakReference<R> ref) {
-           this.ref = ref;
+            this.ref = ref;
         }
 
         @Override
@@ -118,8 +118,8 @@ final class EvictionTimer {
 
     /** Keys are weak references to tasks, values are runners managed by executor. */
     private static final HashMap<
-        WeakReference<BaseGenericObjectPool<?>.Evictor>,
-        WeakRunner<BaseGenericObjectPool<?>.Evictor>> TASK_MAP = new HashMap<>(); // @GuardedBy("EvictionTimer.class")
+            WeakReference<BaseGenericObjectPool<?>.Evictor>,
+            WeakRunner<BaseGenericObjectPool<?>.Evictor>> TASK_MAP = new HashMap<>(); // @GuardedBy("EvictionTimer.class")
 
     /**
      * Removes the specified eviction task from the timer.

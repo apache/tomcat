@@ -122,10 +122,10 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sslConnectorCiphers HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -136,10 +136,10 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sslConnectorCerts HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -150,10 +150,10 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sslConnectorTrustedCerts HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -165,10 +165,10 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sslReload HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -179,10 +179,10 @@ public class TestManagerWebappSsl extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sslConnectorCerts HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();

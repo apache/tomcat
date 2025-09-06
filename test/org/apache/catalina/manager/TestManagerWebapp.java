@@ -90,9 +90,9 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/html HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -102,10 +102,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/html HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -116,10 +116,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/status HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -130,10 +130,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/jmxproxy HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -144,10 +144,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -158,10 +158,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/sessions?path=/manager HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -172,10 +172,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/resources HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -186,10 +186,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/serverinfo HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -200,10 +200,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/vminfo HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -214,10 +214,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/threaddump HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -228,10 +228,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/list HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -293,10 +293,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/deploy?war=" + URLEncoder.QUERY.encode(appDir.getAbsolutePath(), StandardCharsets.UTF_8) + " HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -307,9 +307,9 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -320,10 +320,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/stop?path=/examples HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -333,9 +333,9 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -345,10 +345,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/start?path=/examples HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -358,9 +358,9 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -371,10 +371,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/save HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -384,10 +384,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/save?path=/examples HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -407,10 +407,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/reload?path=/examples HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -420,10 +420,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/list HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -434,9 +434,9 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -447,10 +447,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/list HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -461,10 +461,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/undeploy?path=/examples HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -474,10 +474,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/list HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();
@@ -488,10 +488,10 @@ public class TestManagerWebapp extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET /manager/text/findleaks?statusLine=true HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Authorization: " + basicHeader + CRLF +
-                "Connection: Close" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    "Authorization: " + basicHeader + CRLF +
+                    "Connection: Close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.connect();

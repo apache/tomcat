@@ -1075,7 +1075,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 case NONE -> SSL_VERIFY_NONE();
                 case REQUIRE -> SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
                 case OPTIONAL ->
-                    certificateVerificationOptionalNoCA ? OpenSSLContext.OPTIONAL_NO_CA : SSL_VERIFY_PEER();
+                        certificateVerificationOptionalNoCA ? OpenSSLContext.OPTIONAL_NO_CA : SSL_VERIFY_PEER();
             };
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             int value = switch (mode) {

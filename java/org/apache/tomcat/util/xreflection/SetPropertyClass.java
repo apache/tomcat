@@ -159,13 +159,13 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
     public String generateSetPropertyForMethod() {
         //@formatter:off
         StringBuilder code = new StringBuilder(ReflectionLessCodeGenerator.getIndent(1))
-            .append(generatesSetPropertyForMethodHeader())
-            .append(System.lineSeparator())
-            .append(ReflectionLessCodeGenerator.getIndent(2))
-            .append("switch (")
-            .append(NAME_VAR_NAME)
-            .append(") {")
-            .append(System.lineSeparator());
+                .append(generatesSetPropertyForMethodHeader())
+                .append(System.lineSeparator())
+                .append(ReflectionLessCodeGenerator.getIndent(2))
+                .append("switch (")
+                .append(NAME_VAR_NAME)
+                .append(") {")
+                .append(System.lineSeparator());
 
         // case statements for each property
         for (ReflectionProperty property : getProperties()) {
@@ -175,14 +175,14 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
                     .append("case \"")
                     .append(property.getPropertyName())
                     .append("\" : ")
-                    .append(System.lineSeparator());
+                        .append(System.lineSeparator());
 
                 code.append(ReflectionLessCodeGenerator.getIndent(4))
                     .append(invocation)
                     .append(System.lineSeparator())
                     .append(ReflectionLessCodeGenerator.getIndent(4))
                     .append("return true;")
-                    .append(System.lineSeparator());
+                        .append(System.lineSeparator());
 
             } else {
                 code.append(ReflectionLessCodeGenerator.getIndent(3)).append("//no set")
@@ -195,18 +195,18 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         // end switch statement
         code.append(ReflectionLessCodeGenerator.getIndent(2))
             .append('}')
-            .append(System.lineSeparator());
+                .append(System.lineSeparator());
 
         // we have a generic setProperty(String, String) method, invoke it
         if (getGenericSetPropertyMethod() != null) {
             ReflectionProperty p = new ReflectionProperty(
-                clazz.getName(),
-                "property",
-                String.class,
-                getGenericSetPropertyMethod(),
-                null
+                    clazz.getName(),
+                    "property",
+                    String.class,
+                    getGenericSetPropertyMethod(),
+                    null
             );
-           code.append(ReflectionLessCodeGenerator.getIndent(2))
+            code.append(ReflectionLessCodeGenerator.getIndent(2))
                .append("if (")
                .append(SETP_VAR_NAME)
                .append(") {")
@@ -219,7 +219,7 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
                .append(System.lineSeparator())
                .append(ReflectionLessCodeGenerator.getIndent(2))
                .append('}')
-               .append(System.lineSeparator());
+                    .append(System.lineSeparator());
         }
 
         // invoke parent or return false
@@ -228,7 +228,7 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
             .append(getSetPropertyForExitStatement())
             .append(System.lineSeparator())
             .append(ReflectionLessCodeGenerator.getIndent(1))
-            .append('}');
+                .append('}');
 
         return code.toString();
         //@formatter:on
@@ -246,14 +246,14 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
     public String generateInvocationSetForPropertyCaseStatement(int level) {
         //@formatter:off
         StringBuilder code = new StringBuilder(ReflectionLessCodeGenerator.getIndent(level))
-            .append("case \"")
-            .append(getClazz().getName())
-            .append("\" : ")
-            .append(System.lineSeparator())
-            .append(ReflectionLessCodeGenerator.getIndent(level+1))
-            .append("return ")
-            .append(generateParentSetPropertyForMethodInvocation())
-            .append(System.lineSeparator());
+                .append("case \"")
+                .append(getClazz().getName())
+                .append("\" : ")
+                .append(System.lineSeparator())
+                .append(ReflectionLessCodeGenerator.getIndent(level+1))
+                .append("return ")
+                .append(generateParentSetPropertyForMethodInvocation())
+                .append(System.lineSeparator());
         return code.toString();
         //@formatter:on
     }
@@ -273,7 +273,7 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
             .append(VALUE_VAR_NAME)
             .append(", ")
             .append(SETP_VAR_NAME)
-            .append(");");
+                .append(");");
         return methodInvocation.toString();
         //@formatter:on
     }
@@ -293,7 +293,7 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
             .append(VALUE_VAR_NAME)
             .append(", boolean ")
             .append(SETP_VAR_NAME)
-            .append(") {");
+                .append(") {");
         return methodInvocation.toString();
         //@formatter:on
     }
@@ -301,17 +301,17 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
     public String generateInvocationGetForPropertyCaseStatement(int level) {
         //@formatter:off
         StringBuilder code = new StringBuilder(ReflectionLessCodeGenerator.getIndent(level))
-            .append("case \"")
-            .append(getClazz().getName())
-            .append("\" : ")
-            .append(System.lineSeparator())
-            .append(ReflectionLessCodeGenerator.getIndent(level+1))
-            .append("result = ")
-            .append(generateParentGetPropertyForMethodInvocation())
-            .append(System.lineSeparator())
-            .append(ReflectionLessCodeGenerator.getIndent(level+1))
-            .append("break;")
-            .append(System.lineSeparator());
+                .append("case \"")
+                .append(getClazz().getName())
+                .append("\" : ")
+                .append(System.lineSeparator())
+                .append(ReflectionLessCodeGenerator.getIndent(level+1))
+                .append("result = ")
+                .append(generateParentGetPropertyForMethodInvocation())
+                .append(System.lineSeparator())
+                .append(ReflectionLessCodeGenerator.getIndent(level+1))
+                .append("break;")
+                .append(System.lineSeparator());
         return code.toString();
         //@formatter:on
     }
@@ -327,7 +327,7 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
             .append(OBJECT_VAR_NAME)
             .append(", ")
             .append(NAME_VAR_NAME)
-            .append(");");
+                .append(");");
         return methodInvocation.toString();
         //@formatter:on
     }
@@ -343,7 +343,7 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
             .append(OBJECT_VAR_NAME)
             .append(", String ")
             .append(NAME_VAR_NAME)
-            .append(") {");
+                .append(") {");
         return methodInvocation.toString();
         //@formatter:on
     }
@@ -359,16 +359,16 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
     public String generateGetPropertyForMethod() {
         //@formatter:off
         StringBuilder code = new StringBuilder(ReflectionLessCodeGenerator.getIndent(1))
-            .append(generatesGetPropertyForMethodHeader())
-            .append(System.lineSeparator())
-            .append(ReflectionLessCodeGenerator.getIndent(2))
-            .append("Object result = null;")
-            .append(System.lineSeparator())
-            .append(ReflectionLessCodeGenerator.getIndent(2))
-            .append("switch (")
-            .append(NAME_VAR_NAME)
-            .append(") {")
-            .append(System.lineSeparator());
+                .append(generatesGetPropertyForMethodHeader())
+                .append(System.lineSeparator())
+                .append(ReflectionLessCodeGenerator.getIndent(2))
+                .append("Object result = null;")
+                .append(System.lineSeparator())
+                .append(ReflectionLessCodeGenerator.getIndent(2))
+                .append("switch (")
+                .append(NAME_VAR_NAME)
+                .append(") {")
+                .append(System.lineSeparator());
 
         // case statements for each property
         for (ReflectionProperty property : getProperties()) {
@@ -378,14 +378,14 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
                     .append("case \"")
                     .append(property.getPropertyName())
                     .append("\" : ")
-                    .append(System.lineSeparator());
+                        .append(System.lineSeparator());
 
                 code.append(ReflectionLessCodeGenerator.getIndent(4))
                     .append(invocation)
                     .append(System.lineSeparator())
                     .append(ReflectionLessCodeGenerator.getIndent(4))
                     .append("break;")
-                    .append(System.lineSeparator());
+                        .append(System.lineSeparator());
             } else {
                 code.append(ReflectionLessCodeGenerator.getIndent(3)).append("//no get")
                     .append(IntrospectionUtils.capitalize(property.getPropertyName())).append(" method found on this class")
@@ -396,7 +396,7 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
         // end switch statement
         code.append(ReflectionLessCodeGenerator.getIndent(2))
             .append('}')
-            .append(System.lineSeparator());
+                .append(System.lineSeparator());
 
         // invoke parent or return null
         code.append(ReflectionLessCodeGenerator.getIndent(2))
@@ -408,16 +408,16 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
             .append(System.lineSeparator())
             .append(ReflectionLessCodeGenerator.getIndent(2))
             .append('}')
-            .append(System.lineSeparator());
+                .append(System.lineSeparator());
 
         // we have a generic getProperty(String, String) method, invoke it
         if (getGenericGetPropertyMethod() != null) {
             ReflectionProperty p = new ReflectionProperty(
-                clazz.getName(),
-                "property",
-                String.class,
-                null,
-                getGenericGetPropertyMethod()
+                    clazz.getName(),
+                    "property",
+                    String.class,
+                    null,
+                    getGenericGetPropertyMethod()
             );
             code.append(ReflectionLessCodeGenerator.getIndent(2))
                 .append("if (result == null) {")
@@ -427,14 +427,14 @@ public final class SetPropertyClass implements Comparable<SetPropertyClass> {
                 .append(System.lineSeparator())
                 .append(ReflectionLessCodeGenerator.getIndent(2))
                 .append('}')
-                .append(System.lineSeparator());
+                    .append(System.lineSeparator());
         }
         code.append(ReflectionLessCodeGenerator.getIndent(2))
             .append("return result;")
             .append(System.lineSeparator())
             .append(ReflectionLessCodeGenerator.getIndent(1))
             .append('}')
-            .append(System.lineSeparator());
+                .append(System.lineSeparator());
 
         return code.toString();
         //@formatter:on

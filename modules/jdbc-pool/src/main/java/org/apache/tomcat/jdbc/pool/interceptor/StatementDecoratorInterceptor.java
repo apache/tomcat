@@ -127,7 +127,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
      */
     protected Object createDecorator(Object proxy, Method method, Object[] args,
                                      Object statement, Constructor<?> constructor, String sql)
-    throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        throws InstantiationException, IllegalAccessException, InvocationTargetException {
         Object result = null;
         StatementProxy<Statement> statementProxy =
                 new StatementProxy<>((Statement)statement,sql);
@@ -215,15 +215,15 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             boolean close = compare(CLOSE_VAL, method);
             // allow close to be called multiple times
             if (close && closed) {
-              return null;
+                return null;
             }
             // are we calling isClosed?
             if (compare(ISCLOSED_VAL, method)) {
-              return Boolean.valueOf(closed);
+                return Boolean.valueOf(closed);
             }
             // if we are calling anything else, bail out
             if (closed) {
-              throw new SQLException("Statement closed.");
+                throw new SQLException("Statement closed.");
             }
             if (compare(GETCONNECTION_VAL,method)){
                 return connection;

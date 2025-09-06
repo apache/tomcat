@@ -124,7 +124,7 @@ public class TestTomcat extends TomcatBaseTest {
 
         @Override
         public void doGet(HttpServletRequest req, HttpServletResponse res)
-        throws IOException {
+            throws IOException {
             URL url = req.getServletContext().getResource("/WEB-INF/web.xml");
 
             res.getWriter().write("The URL obtained for /WEB-INF/web.xml was ");
@@ -261,7 +261,7 @@ public class TestTomcat extends TomcatBaseTest {
         tomcat.start();
         log.info("Tomcat started in [" + (System.currentTimeMillis() - t0)
                 + "] ms");
-     }
+    }
 
 
     /*
@@ -339,7 +339,7 @@ public class TestTomcat extends TomcatBaseTest {
         File appDir = new File(getBuildDirectory(), "webapps" + contextPath);
         // app dir is relative to server home
         Context ctx =
-            tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
+                tomcat.addWebapp(null, "/examples", appDir.getAbsolutePath());
         ctx.addApplicationListener(WsContextListener.class.getName());
 
         Tomcat.addServlet(ctx, "testGetResource", new GetResource());
@@ -493,7 +493,7 @@ public class TestTomcat extends TomcatBaseTest {
                 .getName());
     }
 
-        @Test
+    @Test
     public void testGetDefaultContextPerAddContext() {
         Tomcat tomcat = getTomcatInstance();
 

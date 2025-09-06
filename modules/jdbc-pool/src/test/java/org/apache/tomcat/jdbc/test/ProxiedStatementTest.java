@@ -64,7 +64,7 @@ public class ProxiedStatementTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             Statement statement = con.prepareStatement("sql", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT)) {
+                Statement statement = con.prepareStatement("sql", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT)) {
             Assert.assertThrows("Throwing exception on execute", SQLException.class, statement::getResultSet);
         }
     }
@@ -74,7 +74,7 @@ public class ProxiedStatementTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             Statement statement = con.prepareStatement("sql", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT)) {
+                Statement statement = con.prepareStatement("sql", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT)) {
             Assert.assertThrows("Throwing exception on execute", SQLException.class, () -> statement.executeQuery(""));
         }
     }
@@ -84,7 +84,7 @@ public class ProxiedStatementTest extends DefaultTestCase {
         this.datasource.setDriverClassName(Driver.class.getName());
         this.datasource.setUrl("jdbc:tomcat:test");
         try (Connection con = this.datasource.getConnection();
-             Statement statement = con.prepareStatement("sql", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT)) {
+                Statement statement = con.prepareStatement("sql", ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY, ResultSet.HOLD_CURSORS_OVER_COMMIT)) {
             Assert.assertThrows("Throwing exception on execute", SQLException.class, statement::getGeneratedKeys);
         }
     }

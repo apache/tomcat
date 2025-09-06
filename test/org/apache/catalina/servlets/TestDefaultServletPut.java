@@ -143,11 +143,11 @@ public class TestDefaultServletPut extends TomcatBaseTest {
         // @formatter:off
         putClient.setRequest(new String[] {
                 "PUT /test.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + START_LEN + CRLF +
-                CRLF +
-                START_TEXT
-                });
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + START_LEN + CRLF +
+                    CRLF +
+                    START_TEXT
+        });
         // @formatter:on
         putClient.connect();
         putClient.processRequest(false);
@@ -161,12 +161,12 @@ public class TestDefaultServletPut extends TomcatBaseTest {
         // @formatter:off
         putClient.setRequest(new String[] {
                 "PUT /test.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                contentRangeHeader +
-                "Content-Length: " + PATCH_LEN + CRLF +
-                CRLF +
-                PATCH_TEXT
-                });
+                    "Host: localhost:" + getPort() + CRLF +
+                    contentRangeHeader +
+                    "Content-Length: " + PATCH_LEN + CRLF +
+                    CRLF +
+                    PATCH_TEXT
+        });
         // @formatter:on
         putClient.processRequest(false);
         if (contentRangeHeaderValid == null) {

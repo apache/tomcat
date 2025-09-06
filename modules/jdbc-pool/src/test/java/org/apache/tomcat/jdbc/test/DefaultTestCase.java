@@ -92,11 +92,11 @@ public abstract class DefaultTestCase {
                         }
                     }
                 }
-                   if (get!=null) {
-                       Object value = get.invoke(datasource.getPoolProperties(), new Object[0]);
-                       if (value!=null) {
-                           p.setProperty(dbcpProperty, value.toString());
-                       }
+                if (get!=null) {
+                    Object value = get.invoke(datasource.getPoolProperties(), new Object[0]);
+                    if (value!=null) {
+                        p.setProperty(dbcpProperty, value.toString());
+                    }
                 }
             }
             tDatasource = BasicDataSourceFactory.createDataSource(p);

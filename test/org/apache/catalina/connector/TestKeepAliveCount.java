@@ -79,8 +79,8 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             String[] request = new String[1];
             // @formatter:off
             request[0] =
-                "GET /test HTTP/1.0" + CRLF +
-                CRLF;
+                    "GET /test HTTP/1.0" + CRLF +
+                    CRLF;
             // @formatter:on
             setRequest(request);
             processRequest(false); // blocks until response has been read
@@ -105,11 +105,11 @@ public class TestKeepAliveCount extends TomcatBaseTest {
             String[] request = new String[1];
             // @formatter:off
             request[0] =
-                "GET /test HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Keep-Alive" + CRLF +
-                "Keep-Alive: 300"+ CRLF +
-                CRLF;
+                    "GET /test HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Keep-Alive" + CRLF +
+                    "Keep-Alive: 300"+ CRLF +
+                    CRLF;
             // @formatter:on
 
             setRequest(request);

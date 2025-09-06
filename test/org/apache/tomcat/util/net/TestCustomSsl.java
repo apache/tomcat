@@ -74,7 +74,7 @@ public class TestCustomSsl extends TomcatBaseTest {
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
-            "/examples/servlets/servlet/HelloWorldExample");
+                "/examples/servlets/servlet/HelloWorldExample");
         Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
     }
 }

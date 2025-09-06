@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.net.openssl.panama;
 
 import java.io.IOException;
+import java.lang.foreign.Arena;
 import java.security.KeyException;
 import java.security.KeyStoreException;
 import java.util.List;
@@ -103,6 +104,23 @@ public class OpenSSLUtil extends SSLUtilBase {
                 return null;
             }
             throw e;
+        }
+    }
+
+
+    @Override
+    public boolean addSecondCertificate(SSLContext context, SSLHostConfigCertificate certificate) {
+        try (var localArena = Arena.ofConfined()) {
+            try {
+                if (((OpenSSLContext) context).addCertificate(certificate, localArena)) {
+                    return true;
+                } else {
+                    log.warn(sm.getString("openssl.secondCertificateError"));
+                    return false;
+                }
+            } catch (Exception e) {
+                throw new IllegalArgumentException(sm.getString("openssl.secondCertificateError"), e);
+            }
         }
     }
 

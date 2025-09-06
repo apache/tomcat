@@ -47,7 +47,7 @@ public class TesterMulticast {
     static {
         InetAddress result = null;
         try {
-             result = InetAddress.getByName(ADDRESS);
+            result = InetAddress.getByName(ADDRESS);
         } catch (UnknownHostException e) {
             // deal with later
         }

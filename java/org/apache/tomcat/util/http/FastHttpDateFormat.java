@@ -75,8 +75,10 @@ public final class FastHttpDateFormat {
 
     /**
      * Formatter cache.
+     * <p>
+     * Note: This needs to be a ConcurrentHashMap for correct operation so declare it as such (rather than as Map).
      */
-    private static final Map<Long,String> formatCache = new ConcurrentHashMap<>(CACHE_SIZE);
+    private static final ConcurrentHashMap<Long,String> formatCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
 
     /**

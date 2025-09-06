@@ -179,7 +179,7 @@ public class TestWsServerContainer extends WebSocketBaseTest {
         configTemplateMatchMapField.setAccessible(true);
         @SuppressWarnings("unchecked")
         Map<Integer, ConcurrentSkipListMap<String, Object>> configTemplateMatchMap =
-            (Map<Integer, ConcurrentSkipListMap<String, Object>>) configTemplateMatchMapField.get(sc);
+                (Map<Integer, ConcurrentSkipListMap<String, Object>>) configTemplateMatchMapField.get(sc);
 
         ConcurrentSkipListMap<String, Object> newSkipListMap = new ConcurrentSkipListMap<>();
 

@@ -158,7 +158,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         }
 
         processLogContent(content);
-}
+    }
 
 
     private int countLogLines(String content) {

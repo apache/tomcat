@@ -114,11 +114,9 @@
     <module name="SingleLineJavadoc"/>
 
     <!-- Miscellaneous -->
-    <!-- ~1700 errors
     <module name="Indentation">
         <property name="lineWrappingIndentation" value="8"/>
     </module>
-    -->
 
     <!-- Modifiers -->
     <module name="ModifierOrder"/>

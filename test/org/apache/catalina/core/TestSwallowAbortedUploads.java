@@ -279,12 +279,12 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
                 // @formatter:off
                 request = new String[] {
                         "POST http://localhost:" + getPort() + URI + " HTTP/1.1" + CRLF
-                        + "Host: localhost:" + getPort() + CRLF
-                        + "Connection: close" + CRLF
-                        + "Content-Type: multipart/form-data; boundary=" + boundary + CRLF
-                        + "Content-Length: " + content.length() + CRLF
-                        + CRLF
-                        + content + CRLF
+                            + "Host: localhost:" + getPort() + CRLF
+                            + "Connection: close" + CRLF
+                            + "Content-Type: multipart/form-data; boundary=" + boundary + CRLF
+                            + "Content-Length: " + content.length() + CRLF
+                            + CRLF
+                            + content + CRLF
                         };
                 // @formatter:on
 
@@ -374,11 +374,11 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
                 // @formatter:off
                 request = new String[] {
                         "POST http://localhost:" + getPort() + URI + " HTTP/1.1" + CRLF
-                        + "Host: localhost:" + getPort() + CRLF
-                        + "Connection: close" + CRLF
-                        + "Content-Length: " + content.length() + CRLF
-                        + CRLF
-                        + content + CRLF };
+                            + "Host: localhost:" + getPort() + CRLF
+                            + "Connection: close" + CRLF
+                            + "Content-Length: " + content.length() + CRLF
+                            + CRLF
+                            + content + CRLF };
                 // @formatter:on
 
                 setRequest(request);

@@ -19,7 +19,6 @@ package org.apache.catalina.servlets;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,6 +39,7 @@ import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 @RunWith(Parameterized.class)
 public class TestDefaultServletRangeRequests extends TomcatBaseTest {
@@ -58,7 +58,7 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         try (FileInputStream is = new FileInputStream(index)) {
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             IOTools.flow(is, os);
-            strongETag = "\"" + HexUtils.toHexString(MessageDigest.getInstance("SHA-1").digest(os.toByteArray())) + "\"";
+            strongETag = "\"" + HexUtils.toHexString(ConcurrentMessageDigest.digestSHA256(os.toByteArray())) + "\"";
         } catch (Exception e) {
         }
 

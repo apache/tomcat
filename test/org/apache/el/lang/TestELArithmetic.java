@@ -27,7 +27,7 @@ import org.junit.Test;
 public class TestELArithmetic {
     private static final String a = "1.1";
     private static final BigInteger b =
-        new BigInteger("1000000000000000000000");
+            new BigInteger("1000000000000000000000");
 
     @Test
     public void testAdd01() throws Exception {

@@ -183,8 +183,8 @@ public class TestCoyoteAdapterCanonicalization extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "GET " + requestURI + " HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                CRLF
+                    "Host: localhost" + CRLF +
+                    CRLF
                 });
         // @formatter:on
         client.setResponseBodyEncoding(StandardCharsets.UTF_8);

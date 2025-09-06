@@ -113,7 +113,7 @@ public class FileItemStreamImpl implements FileItemStream {
                         throws IOException {
                     itemStream.close(true);
                     final FileSizeLimitExceededException e =
-                        new FileSizeLimitExceededException(
+                            new FileSizeLimitExceededException(
                             String.format("The field %s exceeds its maximum permitted size of %s bytes.",
                                    fieldName, Long.valueOf(pSizeMax)),
                             pCount, pSizeMax);

@@ -800,7 +800,7 @@ public class MultipartStream {
                 nextChunk = true;
             } else {
                 throw new MalformedStreamException(
-                "Unexpected characters follow a boundary");
+                        "Unexpected characters follow a boundary");
             }
         } catch (final FileUploadIOException e) {
             // wraps a SizeException, re-throw as it will be unwrapped later

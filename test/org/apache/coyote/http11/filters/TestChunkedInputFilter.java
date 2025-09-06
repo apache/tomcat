@@ -119,22 +119,23 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         // @formatter:off
         String[] request = new String[] {
-            "POST /echo-params.jsp HTTP/1.1" + CRLF +
-            "Host: any" + CRLF +
-            "Transfer-encoding: chunked" + CRLF +
-            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-            "Connection: close" + CRLF +
-            CRLF +
-            "3" + (chunkHeaderUsesCRLF ? CRLF : SimpleHttpClient.LF) +
-            "a=0" + (chunkUsesCRLF ? CRLF : SimpleHttpClient.LF) +
-            "4" + CRLF +
-            "&b=1" + CRLF +
-            "0" + CRLF +
-            "x-trailer1: Test", "Value1" +
-            (firstheaderUsesCRLF ? CRLF : SimpleHttpClient.LF) +
-            "x-trailer2: TestValue2" +
-            (secondheaderUsesCRLF ? CRLF : SimpleHttpClient.LF) +
-            (endUsesCRLF ? CRLF : SimpleHttpClient.LF) };
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                    "Host: any" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "3" + (chunkHeaderUsesCRLF ? CRLF : SimpleHttpClient.LF) +
+                    "a=0" + (chunkUsesCRLF ? CRLF : SimpleHttpClient.LF) +
+                    "4" + CRLF +
+                    "&b=1" + CRLF +
+                    "0" + CRLF +
+                    "x-trailer1: Test", "Value1" +
+                    (firstheaderUsesCRLF ? CRLF : SimpleHttpClient.LF) +
+                    "x-trailer2: TestValue2" +
+                    (secondheaderUsesCRLF ? CRLF : SimpleHttpClient.LF) +
+                    (endUsesCRLF ? CRLF : SimpleHttpClient.LF)
+        };
         // @formatter:on
 
         TrailerClient client =
@@ -232,20 +233,20 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         // @formatter:off
         String[] request = new String[] {
-            "POST /echo-params.jsp HTTP/1.1" + CRLF +
-            "Host: any" + CRLF +
-            "Transfer-encoding: chunked" + CRLF +
-            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-            "Connection: close" + CRLF +
-            CRLF +
-            "3" + CRLF +
-            "a=0" + CRLF +
-            "4" + CRLF +
-            "&b=1" + CRLF +
-            "0" + CRLF +
-            trailerHeader + CRLF +
-            CRLF
-            };
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                    "Host: any" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "3" + CRLF +
+                    "a=0" + CRLF +
+                    "4" + CRLF +
+                    "&b=1" + CRLF +
+                    "0" + CRLF +
+                    trailerHeader + CRLF +
+                    CRLF
+        };
         // @formatter:on
 
         TrailerClient client =
@@ -303,19 +304,19 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         // @formatter:off
         String[] request = new String[] {
-            "POST /echo-params.jsp HTTP/1.1" + CRLF +
-            "Host: any" + CRLF +
-            "Transfer-encoding: chunked" + CRLF +
-            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-            "Connection: close" + CRLF +
-            CRLF +
-            "3" + extName + extValue.toString() + CRLF +
-            "a=0" + CRLF +
-            "4" + CRLF +
-            "&b=1" + CRLF +
-            "0" + CRLF +
-            CRLF
-            };
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                    "Host: any" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "3" + extName + extValue.toString() + CRLF +
+                    "a=0" + CRLF +
+                    "4" + CRLF +
+                    "&b=1" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+        };
         // @formatter:on
 
         TrailerClient client =
@@ -347,18 +348,18 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         // @formatter:off
         String request =
-            "POST /echo-params.jsp HTTP/1.1" + CRLF +
-            "Host: any" + CRLF +
-            "Transfer-encoding: chunked" + CRLF +
-            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-            "Connection: close" + CRLF +
-            CRLF +
-            "3" + CRLF +
-            "a=0" + CRLF +
-            "4" + CRLF +
-            "&b=1" + CRLF +
-            "0" + CRLF +
-            CRLF;
+                "POST /echo-params.jsp HTTP/1.1" + CRLF +
+                "Host: any" + CRLF +
+                "Transfer-encoding: chunked" + CRLF +
+                SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                "Connection: close" + CRLF +
+                CRLF +
+                "3" + CRLF +
+                "a=0" + CRLF +
+                "4" + CRLF +
+                "&b=1" + CRLF +
+                "0" + CRLF +
+                CRLF;
         // @formatter:on
 
         TrailerClient client =
@@ -522,20 +523,20 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         // @formatter:off
         String[] request = new String[] {
-            "POST / HTTP/1.1" + CRLF +
-            "Host: localhost" + CRLF +
-            "Transfer-encoding: chunked" + CRLF +
-            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-            "Connection: close" + CRLF +
-            CRLF +
-            "3" + CRLF +
-            "a=0" + CRLF +
-            "4" + CRLF +
-            "&b=1" + CRLF +
-            "0" + CRLF +
-            "x@trailer: Test" + CRLF +
-            CRLF
-            };
+                "POST / HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "3" + CRLF +
+                    "a=0" + CRLF +
+                    "4" + CRLF +
+                    "&b=1" + CRLF +
+                    "0" + CRLF +
+                    "x@trailer: Test" + CRLF +
+                    CRLF
+        };
         // @formatter:on
 
         TrailerClient client = new TrailerClient(tomcat.getConnector().getLocalPort());
@@ -710,12 +711,12 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         // @formatter:off
         String[] request = new String[] {
-            "POST / HTTP/1.1" + CRLF +
-            "Host: localhost" + CRLF +
-            "Transfer-encoding: chunked" + CRLF +
-            CRLF +
-            "3" + CRLF
-            };
+                "POST / HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    CRLF +
+                    "3" + CRLF
+        };
         // @formatter:on
 
         TrailerClient client = new TrailerClient(tomcat.getConnector().getLocalPort());
@@ -769,15 +770,15 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         // @formatter:off
         String[] request = new String[] {
-            "GET / HTTP/1.1" + CRLF +
-            "Host: localhost" + CRLF +
-            "Transfer-encoding: chunked" + CRLF +
-            CRLF +
-            "20" + CRLF +
-            "01234567890123456789012345678901" + CRLF +
-            "0" + CRLF +
-            CRLF
-            };
+                "GET / HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    CRLF +
+                    "20" + CRLF +
+                    "01234567890123456789012345678901" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+        };
         // @formatter:on
 
         TrailerClient client = new TrailerClient(tomcat.getConnector().getLocalPort());
@@ -829,9 +830,9 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
                        /*
                         * After the first line, look for a pause of at least 800ms between reads.
                         */
-                       if ((thisRead - lastRead) > TimeUnit.MILLISECONDS.toNanos(800)) {
-                           pauseCount++;
-                       }
+                        if ((thisRead - lastRead) > TimeUnit.MILLISECONDS.toNanos(800)) {
+                            pauseCount++;
+                        }
                     }
                     lastRead = thisRead;
                     lineCount++;
@@ -933,27 +934,27 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         // @formatter:off
         String[] request = new String[] {
-            "POST /test HTTP/1.1" + CRLF +
-            "Host: any" + CRLF +
-            "Transfer-encoding: chunked" + CRLF +
-            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-            "Connection: close" + CRLF +
-            CRLF +
-            "7" + CRLF +
-            "DATA01\n", CRLF +
-            "7", CRLF +
-            "DATA02\n" + CRLF,
-            "7" + CRLF +
-            // Split the CRLF between writes
-            "DATA03\n" + SimpleHttpClient.CR,
-            SimpleHttpClient.LF +
-            "7" + CRLF +
-            "DATA04\n", CRLF +
-            "13" + CRLF,
-            "DATA05DATA05DATA05\n" + CRLF +
-            "0" + CRLF +
-            CRLF
-            };
+                "POST /test HTTP/1.1" + CRLF +
+                    "Host: any" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "7" + CRLF +
+                    "DATA01\n", CRLF +
+                    "7", CRLF +
+                    "DATA02\n" + CRLF,
+                "7" + CRLF +
+                    // Split the CRLF between writes
+                    "DATA03\n" + SimpleHttpClient.CR,
+                SimpleHttpClient.LF +
+                    "7" + CRLF +
+                    "DATA04\n", CRLF +
+                    "13" + CRLF,
+                "DATA05DATA05DATA05\n" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+        };
         // @formatter:on
 
         ReadLineClient client = new ReadLineClient(tomcat.getConnector().getLocalPort());
@@ -987,27 +988,27 @@ public class TestChunkedInputFilter extends TomcatBaseTest {
 
         // @formatter:off
         String[] request = new String[] {
-            "POST /test HTTP/1.1" + CRLF +
-            "Host: any" + CRLF +
-            "Transfer-encoding: chunked" + CRLF +
-            SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
-            "Connection: close" + CRLF +
-            CRLF +
-            "7" + CRLF +
-            "DATA01\n", CRLF +
-            "7", CRLF +
-            "DATA02\n" + CRLF,
-            "7" + CRLF +
-            // Split the CRLF between writes
-            "DATA03\n" + SimpleHttpClient.CR,
-            SimpleHttpClient.LF +
-            "7" + CRLF +
-            "DATA04\n", CRLF +
-            "13" + CRLF,
-            "DATA05DATA05DATA05\n" + CRLF +
-            "0" + CRLF +
-            CRLF
-            };
+                "POST /test HTTP/1.1" + CRLF +
+                    "Host: any" + CRLF +
+                    "Transfer-encoding: chunked" + CRLF +
+                    SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING +
+                    "Connection: close" + CRLF +
+                    CRLF +
+                    "7" + CRLF +
+                    "DATA01\n", CRLF +
+                    "7", CRLF +
+                    "DATA02\n" + CRLF,
+                "7" + CRLF +
+                // Split the CRLF between writes
+                    "DATA03\n" + SimpleHttpClient.CR,
+                SimpleHttpClient.LF +
+                    "7" + CRLF +
+                    "DATA04\n", CRLF +
+                    "13" + CRLF,
+                "DATA05DATA05DATA05\n" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+        };
         // @formatter:on
 
         ReadLineClient client = new ReadLineClient(tomcat.getConnector().getLocalPort());

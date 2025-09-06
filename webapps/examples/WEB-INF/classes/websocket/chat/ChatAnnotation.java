@@ -118,7 +118,7 @@ public class ChatAnnotation {
             }
 
         } while (queueHasMessagesToBeSent);
-     }
+    }
 
 
     private static void broadcast(String msg) {

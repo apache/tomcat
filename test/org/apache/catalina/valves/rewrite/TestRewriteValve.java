@@ -725,7 +725,7 @@ public class TestRewriteValve extends TomcatBaseTest {
             Map<String, List<String>> reqHead = new HashMap<>();
             reqHead.put("\"\"", Arrays.asList(new String[]{"Test"}));
             doTestRewriteEx("RewriteCond %{HTTP:} .+\nRewriteRule .* - [F]", "",
-                null, null, null, false, resHead, reqHead);
+                    null, null, null, false, resHead, reqHead);
         } finally {
             HttpURLConnection.setFollowRedirects(originalValue);
         }
@@ -891,9 +891,9 @@ public class TestRewriteValve extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         int rc = methodUrl("http://localhost:" + getPort() + request, res, DEFAULT_CLIENT_TIMEOUT_MS,
-            reqHead,
-            resHead,
-            "GET", true);
+                reqHead,
+                resHead,
+                "GET", true);
         res.setCharset(StandardCharsets.UTF_8);
 
         if (expectedURI == null) {

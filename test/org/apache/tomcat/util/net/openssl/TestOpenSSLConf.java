@@ -151,7 +151,7 @@ public class TestOpenSSLConf extends TomcatBaseTest {
         } else {
             Class<?> memorySegmentClass = Class.forName("java.lang.foreign.MemorySegment");
             Object ssxCtxSegment = memorySegmentClass.getMethod("ofAddress", Long.TYPE)
-                .invoke(null, sslHostConfig.getOpenSslContext());
+                    .invoke(null, sslHostConfig.getOpenSslContext());
             Method getCiphersMethod = Class.forName("org.apache.tomcat.util.net.openssl.panama.OpenSSLContext")
                     .getDeclaredMethod("getCiphers", memorySegmentClass);
             getCiphersMethod.setAccessible(true);

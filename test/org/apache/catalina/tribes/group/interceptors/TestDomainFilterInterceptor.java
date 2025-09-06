@@ -74,10 +74,10 @@ public class TestDomainFilterInterceptor {
             threads[i] = t;
         }
         for (Thread thread : threads) {
-          thread.start();
+            thread.start();
         }
         for (Thread thread : threads) {
-          thread.join();
+            thread.join();
         }
         System.out.println("All channels started.");
         for (int i=listeners.length-1; i>=0; i-- ) {
@@ -98,7 +98,7 @@ public class TestDomainFilterInterceptor {
     }
 
     public static class TestMbrListener
-        implements MembershipListener {
+            implements MembershipListener {
         public String name = null;
         public TestMbrListener(String name) {
             this.name = name;

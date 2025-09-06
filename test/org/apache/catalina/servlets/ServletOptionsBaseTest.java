@@ -79,7 +79,7 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
 
         // app dir is relative to server home
         org.apache.catalina.Context ctx =
-            tomcat.addWebapp(null, "/webdav", docBase.getAbsolutePath());
+                tomcat.addWebapp(null, "/webdav", docBase.getAbsolutePath());
 
         Wrapper w = Tomcat.addServlet(ctx, "servlet", createServlet());
         w.addInitParameter("listings", Boolean.toString(listings));
@@ -98,9 +98,9 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 "OPTIONS /webdav/" + url + " HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
 
@@ -116,9 +116,9 @@ public abstract class ServletOptionsBaseTest extends TomcatBaseTest {
         // @formatter:off
         client.setRequest(new String[] {
                 method + " /webdav/" + url + " HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Connection: close" + CRLF +
-                CRLF
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Connection: close" + CRLF +
+                    CRLF
                 });
         // @formatter:on
 

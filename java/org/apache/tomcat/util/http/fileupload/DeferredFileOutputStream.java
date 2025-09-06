@@ -34,7 +34,7 @@ import java.io.OutputStream;
  * to store it to file (to avoid memory issues).
  */
 public class DeferredFileOutputStream
-    extends ThresholdingOutputStream
+        extends ThresholdingOutputStream
 {
     // ----------------------------------------------------------- Data members
 

@@ -226,7 +226,7 @@ public class TesterEchoServer {
                     }
                 } else {
                     // Default is echo
-                   w.write(msg);
+                    w.write(msg);
                 }
             } catch (IOException ioe) {
                 // Should not happen

@@ -111,7 +111,7 @@ public class TestGroupChannelMemberArrival {
     }
 
     public static class TestMbrListener
-        implements MembershipListener {
+            implements MembershipListener {
         public String name = null;
         public TestMbrListener(String name) {
             this.name = name;
