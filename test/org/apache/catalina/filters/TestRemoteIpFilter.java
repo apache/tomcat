@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,6 +38,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.util.NetMaskSet;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -886,5 +888,68 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     private void doTestPattern(Pattern pattern, String input, boolean expectedMatch) {
         boolean match = pattern.matcher(input).matches();
         Assert.assertEquals(input, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
+    }
+
+    @Test
+    public void testInvokeAllowedRemoteAddrWithNullRemoteIpHeaderCidr() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("internalProxies", "");
+        filterDef.addInitParameter("trustedProxies", "");
+        filterDef.addInitParameter("internalProxiesCidr", "192.168.0.0/24");
+        filterDef.addInitParameter("trustedProxiesCidr", "203.0.113.0/24");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
+        filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        Assert.assertNull("x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        Assert.assertNull("x-forwarded-by must be null", actualXForwardedBy);
+
+        String actualRemoteAddr = actualRequest.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "192.168.0.10", actualRemoteAddr);
+
+        String actualRemoteHost = actualRequest.getRemoteHost();
+        Assert.assertEquals("remoteHost", "remote-host-original-value", actualRemoteHost);
+    }
+
+    @Test
+    public void testInternalProxiesCidr() throws Exception {
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        remoteIpFilter.setInternalProxiesCidr("192.168.0.0/24,223.168.0.0/24");
+        NetMaskSet internalProxiesCidr = remoteIpFilter.getInternalProxiesCidr();
+
+        doTestNetMaskSet(internalProxiesCidr, "192.168.0.0", true);
+        doTestNetMaskSet(internalProxiesCidr, "192.168.0.1", true);
+        doTestNetMaskSet(internalProxiesCidr, "193.168.1.0", false);
+        doTestNetMaskSet(internalProxiesCidr, "223.168.0.0", true);
+        doTestNetMaskSet(internalProxiesCidr, "223.168.0.123", true);
+        doTestNetMaskSet(internalProxiesCidr, "223.168.1.123", false);
+    }
+
+    @Test
+    public void testInternalProxiesCidrWithNull() throws Exception {
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        try {
+            // Multiple invalid CIDR formats
+            remoteIpFilter.setInternalProxiesCidr("192.168.0.0/33,2001:db8::/129");
+            Assert.fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passes - exception was thrown as expected
+            Assert.assertNotNull("Exception message should not be null", e.getMessage());
+        }    }
+
+    private void doTestNetMaskSet(NetMaskSet netMaskSet, String remoteIp, boolean expectedMatch) throws UnknownHostException {
+        boolean match = netMaskSet.contains(remoteIp);
+        Assert.assertEquals(remoteIp, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
     }
 }

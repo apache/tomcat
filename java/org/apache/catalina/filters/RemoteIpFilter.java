@@ -42,6 +42,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
+import org.apache.catalina.util.NetMaskSet;
 import org.apache.catalina.util.RequestUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -656,6 +657,10 @@ public class RemoteIpFilter extends GenericFilter {
 
     protected static final String INTERNAL_PROXIES_PARAMETER = "internalProxies";
 
+    protected static final String INTERNAL_PROXIES_CIDR_PARAMETER = "internalProxiesCidr";
+
+    protected static final String TRUSTED_PROXIES_CIDR_PARAMETER = "trustedProxiesCidr";
+
     // Log must be non-static as loggers are created per class-loader and this
     // Filter may be used in multiple class loaders
     private transient Log log = LogFactory.getLog(RemoteIpFilter.class);
@@ -703,6 +708,16 @@ public class RemoteIpFilter extends GenericFilter {
             "0:0:0:0:0:0:0:1|::1|" + "fe[89ab]\\p{XDigit}:.*|" + "f[cd]\\p{XDigit}{2}+:.*");
 
     /**
+     * CIDR notation for internal proxies
+     */
+    private NetMaskSet internalProxiesCidr = null;
+
+    /**
+     * CIDR notation for trusted proxies
+     */
+    private NetMaskSet trustedProxiesCidr = null;
+
+    /**
      * @see #setProtocolHeader(String)
      */
     private String protocolHeader = "X-Forwarded-Proto";
@@ -742,9 +757,9 @@ public class RemoteIpFilter extends GenericFilter {
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        boolean isInternal = internalProxies != null && internalProxies.matcher(request.getRemoteAddr()).matches();
+        boolean isInternal = isInternalProxy(request.getRemoteAddr());
 
-        if (isInternal || (trustedProxies != null && trustedProxies.matcher(request.getRemoteAddr()).matches())) {
+        if (isInternal || isTrustedProxy(request.getRemoteAddr())) {
             String remoteIp = null;
             Deque<String> proxiesHeaderValue = new ArrayDeque<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
@@ -766,9 +781,10 @@ public class RemoteIpFilter extends GenericFilter {
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 remoteIp = currentRemoteIp;
-                if (internalProxies != null && internalProxies.matcher(currentRemoteIp).matches()) {
+
+                if (isInternalProxy(currentRemoteIp)) {
                     // do nothing, internalProxies IPs are not appended to the
-                } else if (trustedProxies != null && trustedProxies.matcher(currentRemoteIp).matches()) {
+                } else if (isTrustedProxy(currentRemoteIp)) {
                     proxiesHeaderValue.addFirst(currentRemoteIp);
                 } else {
                     idx--; // decrement idx because break statement doesn't do it
@@ -877,11 +893,50 @@ public class RemoteIpFilter extends GenericFilter {
         } else {
             if (log.isTraceEnabled()) {
                 log.trace("Skip RemoteIpFilter for request " + request.getRequestURI() + " with originalRemoteAddr '" +
-                        request.getRemoteAddr() + "'");
+                    request.getRemoteAddr() + "'");
             }
             chain.doFilter(request, response);
         }
 
+    }
+
+    /**
+     * Checks if the given IP address is from an internal proxy.
+     *
+     * @param remoteIp The IP address to check
+     * @return {@code true} if the IP address is from an internal proxy, otherwise {@code false}
+     */
+    private boolean isInternalProxy(String remoteIp) {
+        if (internalProxies != null && internalProxies.matcher(remoteIp).matches()) {
+            return true;
+        }
+        return checkIsCidr(internalProxiesCidr, remoteIp);
+    }
+
+    /**
+     * Checks if the given IP address is from a trusted proxy.
+     *
+     * @param remoteIp The IP address to check
+     * @return {@code true} if the IP address is from a trusted proxy, otherwise {@code false}
+     */
+    private boolean isTrustedProxy(String remoteIp) {
+        if (trustedProxies != null && trustedProxies.matcher(remoteIp).matches()) {
+            return true;
+        }
+
+        return checkIsCidr(trustedProxiesCidr, remoteIp);
+    }
+
+    private boolean checkIsCidr(NetMaskSet netMaskSet, String remoteIp) {
+        if (netMaskSet == null) {
+            return false;
+        }
+        try {
+            return netMaskSet.contains(remoteIp);
+        } catch (UnknownHostException uhe) {
+            log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), uhe);
+        }
+        return false;
     }
 
     /*
@@ -951,6 +1006,14 @@ public class RemoteIpFilter extends GenericFilter {
         return internalProxies;
     }
 
+    public NetMaskSet getInternalProxiesCidr() {
+        return internalProxiesCidr;
+    }
+
+    public NetMaskSet getTrustedProxiesCidr() {
+        return trustedProxiesCidr;
+    }
+
     public String getProtocolHeader() {
         return protocolHeader;
     }
@@ -994,6 +1057,10 @@ public class RemoteIpFilter extends GenericFilter {
             setInternalProxies(getInitParameter(INTERNAL_PROXIES_PARAMETER));
         }
 
+        if (getInitParameter(INTERNAL_PROXIES_CIDR_PARAMETER) != null) {
+            setInternalProxiesCidr(getInitParameter(INTERNAL_PROXIES_CIDR_PARAMETER));
+        }
+
         if (getInitParameter(PROTOCOL_HEADER_PARAMETER) != null) {
             setProtocolHeader(getInitParameter(PROTOCOL_HEADER_PARAMETER));
         }
@@ -1028,6 +1095,10 @@ public class RemoteIpFilter extends GenericFilter {
 
         if (getInitParameter(TRUSTED_PROXIES_PARAMETER) != null) {
             setTrustedProxies(getInitParameter(TRUSTED_PROXIES_PARAMETER));
+        }
+
+        if (getInitParameter(TRUSTED_PROXIES_CIDR_PARAMETER) != null) {
+            setTrustedProxiesCidr(getInitParameter(TRUSTED_PROXIES_CIDR_PARAMETER));
         }
 
         if (getInitParameter(HTTP_SERVER_PORT_PARAMETER) != null) {
@@ -1130,6 +1201,58 @@ public class RemoteIpFilter extends GenericFilter {
             this.internalProxies = null;
         } else {
             this.internalProxies = Pattern.compile(internalProxies);
+        }
+    }
+
+    /**
+     * <p>
+     * CIDR notation that defines the internal proxies.
+     * </p>
+     * <p>
+     * If this is set, it will be used instead of the regex pattern for internal proxies.
+     * </p>
+     *
+     * @param internalProxiesCidr The CIDR notation
+     */
+    public void setInternalProxiesCidr(String internalProxiesCidr) {
+        if (internalProxiesCidr == null || internalProxiesCidr.isEmpty()) {
+            this.internalProxiesCidr = null;
+        } else {
+            this.internalProxiesCidr = new NetMaskSet();
+            List<String> errors = this.internalProxiesCidr.addAll(internalProxiesCidr);
+            if (!errors.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for (String error : errors) {
+                    sb.append(error).append("; ");
+                }
+                throw new IllegalArgumentException(sm.getString("remoteIpFilter.invalidNetMask", sb.toString()));
+            }
+        }
+    }
+
+    /**
+     * <p>
+     * CIDR notation defining proxies that are trusted when they appear in the {@link #remoteIpHeader} header.
+     * </p>
+     * <p>
+     * If this is set, it will be used instead of the regex pattern for trusted proxies.
+     * </p>
+     *
+     * @param trustedProxiesCidr The trusted proxies in CIDR notation
+     */
+    public void setTrustedProxiesCidr(String trustedProxiesCidr) {
+        if (trustedProxiesCidr == null || trustedProxiesCidr.isEmpty()) {
+            this.trustedProxiesCidr = null;
+        } else {
+            this.trustedProxiesCidr = new NetMaskSet();
+            List<String> errors = this.trustedProxiesCidr.addAll(trustedProxiesCidr);
+            if (!errors.isEmpty()) {
+                StringBuilder sb = new StringBuilder();
+                for (String error : errors) {
+                    sb.append(error).append("; ");
+                }
+                throw new IllegalArgumentException(sm.getString("remoteIpFilter.invalidNetMask", sb.toString()));
+            }
         }
     }
 
