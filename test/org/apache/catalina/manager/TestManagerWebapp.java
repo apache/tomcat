@@ -21,7 +21,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 import javax.servlet.http.HttpServletResponse;
@@ -282,7 +281,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         SimpleHttpClient client = new SimpleHttpClient() {
             // 10s default too low for some CI systems
             @Override
-            public void connect() throws UnknownHostException, IOException {
+            public void connect() throws IOException {
                 connect(30000, 30000);
             }
 
@@ -403,7 +402,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         File serverXml = new File(tomcat.getServer().getCatalinaBase(), Catalina.SERVER_XML);
         Assert.assertTrue(serverXml.canRead());
         addDeleteOnTearDown(serverXml);
-        String serverXmlDump = "";
+        String serverXmlDump;
         try (FileReader reader = new FileReader(serverXml); StringWriter writer = new StringWriter()) {
             IOTools.flow(reader, writer);
             serverXmlDump = writer.toString();
@@ -548,7 +547,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         tomcat.start();
         SimpleHttpClient client = new SimpleHttpClient() {
             @Override
-            public void connect() throws UnknownHostException, IOException {
+            public void connect() throws IOException {
                 connect(30000, 30000);
             }
 
