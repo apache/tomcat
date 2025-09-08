@@ -55,6 +55,8 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.ContainerEvent;
+import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -1092,5 +1094,51 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         String formatted = sm.getString(key, "XXX");
         int insertIndex = formatted.indexOf("XXX");
         return (insertIndex == -1) ? formatted : formatted.substring(0, insertIndex);
+    }
+
+    /**
+     * Injects a {@link LifecycleListener} to a {@link Context} of a {@link Container} that sends {@code ADD_CHILD_EVENT}.
+     * Useful when deploying with the Manager / HostConfig.
+     */
+    //TODO: make it generic to set other fields in the context as well like Valve, xmlValidation etc
+    public static class ContainerInjector implements ContainerListener, AutoCloseable {
+
+        private final Container container;
+        private final String contextPathToTest;
+        private final LifecycleListener listener;
+        private volatile boolean installed = false;
+
+        private ContainerInjector(Container container,
+                               String contextPathToTest,
+                               LifecycleListener listener) {
+            this.container = container;
+            this.contextPathToTest = contextPathToTest;
+            this.listener = listener;
+            container.addContainerListener(this);
+        }
+
+        public static ContainerInjector inject(Container container,
+                                            String contextPathToTest,
+                                            LifecycleListener listener) {
+            return new ContainerInjector(container, contextPathToTest, listener);
+        }
+
+        @Override
+        public void containerEvent(ContainerEvent event) {
+            if (Container.ADD_CHILD_EVENT.equals(event.getType()) && !installed) {
+                Object data = event.getData();
+                if (data instanceof Context ctx) {
+                    if (ctx.getPath().equals(contextPathToTest)) {
+                        ctx.addLifecycleListener(listener);
+                        installed = true;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void close() {
+            container.removeContainerListener(this);
+        }
     }
 }
