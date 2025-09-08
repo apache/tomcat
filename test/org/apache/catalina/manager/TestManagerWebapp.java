@@ -29,8 +29,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
-import org.apache.catalina.Container;
-import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -532,74 +530,66 @@ public class TestManagerWebapp extends TomcatBaseTest {
         HostConfig hostConfig = new HostConfig();
         ctx.getParent().addLifecycleListener(hostConfig);
 
-        ContainerListener containerListener = event -> {
-            if (Container.ADD_CHILD_EVENT.equals(event.getType())) {
-                Container child = (Container) event.getData();
-                if (child instanceof Context c) {
-                    if ("/examples".equals(c.getPath())) {
-                        c.addLifecycleListener(new FailOnceListener());
-                    }
+        try (TomcatBaseTest.ContainerInjector ignored =
+                 TomcatBaseTest.ContainerInjector.inject(ctx.getParent(), "/examples", new FailOnceListener())) {
+
+            tomcat.start();
+            SimpleHttpClient client = new SimpleHttpClient() {
+                @Override
+                public void connect() throws IOException {
+                    connect(30000, 30000);
                 }
-            }
-        };
-        ctx.getParent().addContainerListener(containerListener);
 
-        tomcat.start();
-        SimpleHttpClient client = new SimpleHttpClient() {
-            @Override
-            public void connect() throws IOException {
-                connect(30000, 30000);
-            }
+                @Override
+                public boolean isResponseBodyOK() {
+                    return true;
+                }
+            };
 
-            @Override
-            public boolean isResponseBodyOK() {
-                return true;
-            }
-        };
+            appDir = new File(webappDir, "examples");
+            client.setPort(getPort());
+            String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
 
-        appDir = new File(webappDir, "examples");
-        client.setPort(getPort());
-        String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
+            client.setRequest(new String[]{
+                    "GET /manager/text/deploy?war=" + URLEncoder.QUERY.encode(appDir.getAbsolutePath(), StandardCharsets.UTF_8) + " HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Authorization: " + basicHeader + CRLF +
+                        "Connection: Close" + CRLF + CRLF
+            });
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
-        client.setRequest(new String[] {
-                "GET /manager/text/deploy?war=" + URLEncoder.QUERY.encode(appDir.getAbsolutePath(), StandardCharsets.UTF_8) + " HTTP/1.1" + CRLF +
-                    "Host: localhost" + CRLF +
-                    "Authorization: " + basicHeader + CRLF +
-                    "Connection: Close" + CRLF + CRLF
-        });
-        client.connect();
-        client.processRequest(true);
-        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+            client.setRequest(new String[]{
+                    "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Connection: Close" + CRLF + CRLF
+            });
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, client.getStatusCode());
 
-        client.setRequest(new String[] {
-                "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
-                    "Host: localhost" + CRLF +
-                    "Connection: Close" + CRLF + CRLF
-        });
-        client.connect();
-        client.processRequest(true);
-        Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, client.getStatusCode());
+            client.setRequest(new String[]{
+                    "GET /manager/text/start?path=/examples HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Authorization: " + basicHeader + CRLF +
+                        "Connection: Close" + CRLF + CRLF
+            });
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
-        client.setRequest(new String[] {
-                "GET /manager/text/start?path=/examples HTTP/1.1" + CRLF +
-                    "Host: localhost" + CRLF +
-                    "Authorization: " + basicHeader + CRLF +
-                    "Connection: Close" + CRLF + CRLF
-        });
-        client.connect();
-        client.processRequest(true);
-        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+            client.setRequest(new String[]{
+                    "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Connection: Close" + CRLF + CRLF
+            });
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
-        client.setRequest(new String[] {
-                "GET /examples/servlets/servlet/RequestInfoExample HTTP/1.1" + CRLF +
-                    "Host: localhost" + CRLF +
-                    "Connection: Close" + CRLF + CRLF
-        });
-        client.connect();
-        client.processRequest(true);
-        Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-
-        tomcat.stop();
+            tomcat.stop();
+        }
     }
 
     private static class FailOnceListener implements LifecycleListener {
