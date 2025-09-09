@@ -1261,6 +1261,15 @@
       not the full chain.</p>
     </attribute>
 
+    <attribute name="groups" required="false">
+      <p>JSSE only.</p>
+      <p>Allows only allowing certain named groups. The value should be a case
+      sensitive comma separated list of the names of the groups.</p>
+      <p>. If not specified, the default named groups of the provider will be
+      used, and any named groups specified by the client will be passed to it.
+      </p>
+    </attribute>
+
     <attribute name="honorCipherOrder" required="false">
       <p>Set to <code>true</code> to enforce the server's cipher order
       (from the <code>ciphers</code> setting) instead of allowing

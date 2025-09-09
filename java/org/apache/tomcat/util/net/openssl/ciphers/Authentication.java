@@ -29,5 +29,6 @@ public enum Authentication {
     GOST01 /* GOST R 34.10-2001 */,
     FZA /* Fortezza */,
     SRP /* Secure Remote Password */,
+    MLDSA /* ML-DSA */,
     ANY /* TLS 1.3 */
 }
