@@ -531,40 +531,16 @@ public class TestManagerWebapp extends TomcatBaseTest {
         ctx.getParent().addLifecycleListener(hostConfig);
 
         File appRoot = new File(webappDir, "bug57700");
-        File webInf = new File(appRoot, "WEB-INF");
-        Assert.assertTrue(webInf.mkdirs() && webInf.isDirectory());
-        try (PrintWriter out = new PrintWriter(new File(appRoot, "index.html"), StandardCharsets.UTF_8)) {
-            out.println("ok");
-        }
-        try (PrintWriter out = new PrintWriter(new File(webInf, "web.xml"), StandardCharsets.UTF_8)) {
-            out.println("""
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
-                             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                             xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                                                 https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-                             version="6.0">
-                      <servlet>
-                        <servlet-name>default</servlet-name>
-                        <servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
-                        <init-param>
-                          <param-name>listings</param-name>
-                          <param-value>false</param-value>
-                        </init-param>
-                      </servlet>
-                      <servlet-mapping>
-                        <servlet-name>default</servlet-name>
-                        <url-pattern>/</url-pattern>
-                      </servlet-mapping>
-                    </web-app>
-                    """);
-        }
+        Assert.assertTrue(appRoot.mkdirs() && appRoot.isDirectory());
         addDeleteOnTearDown(appRoot);
 
         try (TomcatBaseTest.ContainerInjector ignored =
                  TomcatBaseTest.ContainerInjector.inject(ctx.getParent(),
                      c -> c.getPath().equals("/bug57700"),
-                     c -> c.addLifecycleListener(new FailOnceListener()))) {
+                     c -> {
+                         c.addLifecycleListener(new FailOnceListener());
+                         Tomcat.initWebappDefaults(c);
+                     })) {
 
             tomcat.start();
             SimpleHttpClient client = new SimpleHttpClient() {
@@ -593,7 +569,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
             Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
             client.setRequest(new String[]{
-                    "GET /bug57700/index.html HTTP/1.1" + CRLF +
+                    "GET /bug57700 HTTP/1.1" + CRLF +
                         "Host: localhost" + CRLF +
                         "Connection: Close" + CRLF + CRLF
             });
@@ -612,13 +588,13 @@ public class TestManagerWebapp extends TomcatBaseTest {
             Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
 
             client.setRequest(new String[]{
-                    "GET /bug57700/index.html HTTP/1.1" + CRLF +
+                    "GET /bug57700 HTTP/1.1" + CRLF +
                         "Host: localhost" + CRLF +
                         "Connection: Close" + CRLF + CRLF
             });
             client.connect();
             client.processRequest(true);
-            Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+            Assert.assertEquals(HttpServletResponse.SC_FOUND, client.getStatusCode());
 
             client.setRequest(new String[] {
                     "GET /manager/text/undeploy?path=/bug57700 HTTP/1.1" + CRLF +
