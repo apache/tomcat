@@ -1113,21 +1113,28 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         private final Predicate<Context> filter;
         private final Consumer<Context> action;
         private volatile boolean installed = false;
+        private String containerEvent = Container.ADD_CHILD_EVENT;
 
-        private ContainerInjector(Container container, Predicate<Context> filter, Consumer<Context> action) {
+        private ContainerInjector(Container container, Predicate<Context> filter, Consumer<Context> action, String containerEvent) {
             this.container = container;
             this.filter = filter;
             this.action = action;
+            if (containerEvent != null) {
+                this.containerEvent = containerEvent;
+            }
             container.addContainerListener(this);
         }
 
         public static ContainerInjector inject(Container container, Predicate<Context> filter, Consumer<Context> action) {
-            return new ContainerInjector(container, filter, action);
+            return new ContainerInjector(container, filter, action, null);
+        }
+        public static ContainerInjector inject(Container container, Predicate<Context> filter, Consumer<Context> action, String containerEvent) {
+            return new ContainerInjector(container, filter, action, containerEvent);
         }
 
         @Override
         public void containerEvent(ContainerEvent event) {
-            if (Container.ADD_CHILD_EVENT.equals(event.getType()) && !installed) {
+            if (this.containerEvent.equals(event.getType()) && !installed) {
                 Object data = event.getData();
                 if (data instanceof Context ctx) {
                     if (filter != null && filter.test(ctx)) {
