@@ -955,6 +955,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         protected final String[] loggerNames;
         protected final List<LogRecord> logRecords = Collections.synchronizedList(new ArrayList<>());
         protected final Map<Logger, Level> previousLevelsOfLoggersMap = new IdentityHashMap<>();
+        private volatile boolean installed = false;
         protected final Handler handler = new Handler() {
             @Override
             public void publish(LogRecord record) {
@@ -976,11 +977,14 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         }
 
         public void attach() {
-            for (String name : loggerNames) {
-                Logger logger = Logger.getLogger(name);
-                previousLevelsOfLoggersMap.put(logger, logger.getLevel());
-                logger.addHandler(handler);
-                logger.setLevel(level);
+            if (!installed) {
+                for (String name : loggerNames) {
+                    Logger logger = Logger.getLogger(name);
+                    previousLevelsOfLoggersMap.put(logger, logger.getLevel());
+                    logger.addHandler(handler);
+                    logger.setLevel(level);
+                }
+                installed = true;
             }
         }
 
@@ -1030,15 +1034,18 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
      * CONFIGURE_START phase of a {@link Context}.
      */
     public static class WebappLogCapture extends LogCapture implements LifecycleListener {
-        private volatile boolean installed = false;
+        private String lifecycleEvent = Lifecycle.CONFIGURE_START_EVENT;
+        public WebappLogCapture(String lifecycleEvent, Level level, String... loggerNames) {
+            this(level, loggerNames);
+            this.lifecycleEvent = lifecycleEvent;
+        }
         public WebappLogCapture(Level level, String... loggerNames) {
             super(level, loggerNames);
         }
 
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
-            if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType()) && !installed) {
-                installed = true;
+            if (this.lifecycleEvent.equals(event.getType())) {
                 this.attach();
             }
         }
