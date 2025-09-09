@@ -531,7 +531,9 @@ public class TestManagerWebapp extends TomcatBaseTest {
         ctx.getParent().addLifecycleListener(hostConfig);
 
         try (TomcatBaseTest.ContainerInjector ignored =
-                 TomcatBaseTest.ContainerInjector.inject(ctx.getParent(), "/examples", new FailOnceListener())) {
+                 TomcatBaseTest.ContainerInjector.inject(ctx.getParent(),
+                     c -> c.getPath().equals("/examples"),
+                     c -> c.addLifecycleListener(new FailOnceListener()))) {
 
             tomcat.start();
             SimpleHttpClient client = new SimpleHttpClient() {
