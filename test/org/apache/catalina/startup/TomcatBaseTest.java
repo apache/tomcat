@@ -1138,7 +1138,8 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         public void containerEvent(ContainerEvent event) {
             if (this.containerEvent.equals(event.getType()) && !installed) {
                 Object data = event.getData();
-                if (data instanceof Context ctx) {
+                if (data instanceof Context) {
+                    Context ctx = (Context) data;
                     if (filter != null && filter.test(ctx)) {
                         action.accept(ctx);
                         installed = true;
