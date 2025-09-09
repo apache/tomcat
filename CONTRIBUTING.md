@@ -43,7 +43,7 @@ the issues marked 'Beginner', link below. Please note that the Beginner keyword
 is pretty new to the project, so if there aren't any issues in the filter feel
 free to ask on the [dev list](https://tomcat.apache.org/lists.html#tomcat-dev).
 
-* [Beginner issues](https://bz.apache.org/bugzilla/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&bug_status=NEEDINFO&keywords=Beginner&keywords_type=allwords&list_id=160824&product=Tomcat%207&product=Tomcat%208.5&product=Tomcat%209&query_format=advanced) -
+* [Beginner issues](https://bz.apache.org/bugzilla/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&bug_status=NEEDINFO&keywords=Beginner&keywords_type=allwords&list_id=217383&product=Tomcat%2010&product=Tomcat%2011&product=Tomcat%209&query_format=advanced) -
 issues which should only require a few lines of code, and a test or two to
 resolve.
 
