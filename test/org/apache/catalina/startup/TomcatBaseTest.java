@@ -39,6 +39,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -1101,27 +1103,22 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
      * Injects a {@link LifecycleListener} to a {@link Context} of a {@link Container} that sends {@code ADD_CHILD_EVENT}.
      * Useful when deploying with the Manager / HostConfig.
      */
-    //TODO: make it generic to set other fields in the context as well like Valve, xmlValidation etc
     public static class ContainerInjector implements ContainerListener, AutoCloseable {
 
         private final Container container;
-        private final String contextPathToTest;
-        private final LifecycleListener listener;
+        private final Predicate<Context> filter;
+        private final Consumer<Context> action;
         private volatile boolean installed = false;
 
-        private ContainerInjector(Container container,
-                               String contextPathToTest,
-                               LifecycleListener listener) {
+        private ContainerInjector(Container container, Predicate<Context> filter, Consumer<Context> action) {
             this.container = container;
-            this.contextPathToTest = contextPathToTest;
-            this.listener = listener;
+            this.filter = filter;
+            this.action = action;
             container.addContainerListener(this);
         }
 
-        public static ContainerInjector inject(Container container,
-                                            String contextPathToTest,
-                                            LifecycleListener listener) {
-            return new ContainerInjector(container, contextPathToTest, listener);
+        public static ContainerInjector inject(Container container, Predicate<Context> filter, Consumer<Context> action) {
+            return new ContainerInjector(container, filter, action);
         }
 
         @Override
@@ -1129,8 +1126,8 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             if (Container.ADD_CHILD_EVENT.equals(event.getType()) && !installed) {
                 Object data = event.getData();
                 if (data instanceof Context ctx) {
-                    if (ctx.getPath().equals(contextPathToTest)) {
-                        ctx.addLifecycleListener(listener);
+                    if (filter != null && filter.test(ctx)) {
+                        action.accept(ctx);
                         installed = true;
                     }
                 }
