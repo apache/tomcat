@@ -264,6 +264,24 @@ public class TLSClientHelloExtractor {
     }
 
 
+    public List<Group> getClientSupportedGroups() {
+        if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
+            return clientSupportedGroups;
+        } else {
+            throw new IllegalStateException(sm.getString("sniExtractor.tooEarly"));
+        }
+    }
+
+
+    public List<SignatureAlgorithm> getClientSignatureAlgorithms() {
+        if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
+            return clientSignatureAlgorithms;
+        } else {
+            throw new IllegalStateException(sm.getString("sniExtractor.tooEarly"));
+        }
+    }
+
+
     private static ExtractorResult handleIncompleteRead(ByteBuffer bb) {
         if (bb.limit() == bb.capacity()) {
             // Buffer not big enough
