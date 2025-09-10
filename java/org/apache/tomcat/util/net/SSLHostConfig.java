@@ -111,8 +111,6 @@ public class SSLHostConfig implements Serializable {
     // Values <0 mean use the implementation default
     private int sessionCacheSize = -1;
     private int sessionTimeout = 86400;
-    private String groups = null;
-    private LinkedHashSet<Group> groupList = null;
     // JSSE
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
     private boolean revocationEnabled = false;
@@ -124,6 +122,8 @@ public class SSLHostConfig implements Serializable {
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
     private transient KeyStore truststore = null;
+    private String groups = null;
+    private LinkedHashSet<Group> groupList = null;
     // OpenSSL
     private String certificateRevocationListPath;
     private String caCertificateFile;
