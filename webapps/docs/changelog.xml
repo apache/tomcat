@@ -276,6 +276,10 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Documentation. Clarify the purpose of the <code>maxPostSize</code>
+        attribute of the <code>Connector</code> element. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
