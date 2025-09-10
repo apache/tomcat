@@ -807,7 +807,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    void sendClientPreface() throws IOException {
+    protected void sendClientPreface() throws IOException {
         os.write(Http2Parser.CLIENT_PREFACE_START);
         os.write(EMPTY_SETTINGS_FRAME);
         os.flush();
