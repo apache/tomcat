@@ -486,7 +486,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         // Make sure that constrained resources are not cached by web proxies
         // or browsers as caching can provide a security hole
-        if (constraints != null && disableProxyCaching && !"POST".equalsIgnoreCase(request.getMethod())) {
+        if (constraints != null && disableProxyCaching && !"POST".equals(request.getMethod())) {
             if (securePagesWithPragma) {
                 // Note: These can cause problems with downloading files with IE
                 response.setHeader("Pragma", "No-cache");

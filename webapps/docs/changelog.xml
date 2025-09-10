@@ -113,6 +113,10 @@
         in RFC 9110 that hash functions used to generate strong ETags should be
         collision resistant. (markt)
       </update>
+      <fix>
+        HTTP methods are case-sensitive so always use case sensitive comparisons
+        when comparing HTTP methods. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
