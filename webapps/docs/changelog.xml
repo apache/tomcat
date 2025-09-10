@@ -119,6 +119,10 @@
         Correct a regression in the fix for <bug>69781</bug> that broke
         <code>FileStore</code>. (markt)
       </fix>
+      <fix>
+        HTTP methods are case-sensitive so always use case sensitive comparisons
+        when comparing HTTP methods. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">

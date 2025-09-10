@@ -590,7 +590,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         String method = saved.getMethod();
         MimeHeaders rmh = request.getCoyoteRequest().getMimeHeaders();
         rmh.recycle();
-        boolean cacheable = "GET".equalsIgnoreCase(method) || "HEAD".equalsIgnoreCase(method);
+        boolean cacheable = "GET".equals(method) || "HEAD".equals(method);
         Iterator<String> names = saved.getHeaderNames();
         while (names.hasNext()) {
             String name = names.next();
@@ -624,7 +624,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
             // If no content type specified, use default for POST
             String savedContentType = saved.getContentType();
-            if (savedContentType == null && "POST".equalsIgnoreCase(method)) {
+            if (savedContentType == null && "POST".equals(method)) {
                 savedContentType = Globals.CONTENT_TYPE_FORM_URL_ENCODING;
             }
 
