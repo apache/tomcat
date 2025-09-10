@@ -501,7 +501,7 @@ public class SSIServletExternalResolver implements SSIExternalResolver {
              * Make an assumption that an empty response is a failure. This is a problem if a truly empty file were
              * included, but not sure how else to tell.
              */
-            if (retVal.isEmpty() && !req.getMethod().equalsIgnoreCase("HEAD")) {
+            if (retVal.isEmpty() && !req.getMethod().equals("HEAD")) {
                 throw new IOException(sm.getString("ssiServletExternalResolver.noFile", path));
             }
             return retVal;

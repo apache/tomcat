@@ -605,7 +605,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             }
 
             int bodySize = 0;
-            if ("PUT".equalsIgnoreCase(request.getMethod())) {
+            if ("PUT".equals(request.getMethod())) {
                 InputStream is = request.getInputStream();
                 int read = 0;
                 byte[] buffer = new byte[8192];
