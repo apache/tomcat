@@ -503,7 +503,9 @@ public class TestManagerWebapp extends TomcatBaseTest {
 
         tomcat.stop();
     }
-    /**
+
+
+    /*
      * Test case for <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=57700">Bug 57700</a>.
      */
     @Test
@@ -534,7 +536,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         Assert.assertTrue(appRoot.mkdirs() && appRoot.isDirectory());
         addDeleteOnTearDown(appRoot);
 
-        try (TomcatBaseTest.ContainerInjector ignored =
+        try (@SuppressWarnings("unused") TomcatBaseTest.ContainerInjector ignored =
                  TomcatBaseTest.ContainerInjector.inject(ctx.getParent(),
                      c -> c.getPath().equals("/bug57700"),
                      c -> {
