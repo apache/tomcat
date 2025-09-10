@@ -129,6 +129,14 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="Web applications">
+    <changelog>
+      <fix>
+        Documentation. Clarify the purpose of the <code>maxPostSize</code>
+        attribute of the <code>Connector</code> element. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.109 (remm)" rtext="release in progress">
   <subsection name="Catalina">

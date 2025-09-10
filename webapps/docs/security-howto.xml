@@ -310,9 +310,9 @@
       <a href="config/filter.html">FailedRequestFilter</a>.</p>
 
       <p>The <strong>maxPostSize</strong> attribute controls the maximum size
-      of a POST request that will be parsed for parameters. The parameters are
-      cached for the duration of the request so this is limited to 2 MiB by
-      default to reduce exposure to a DoS attack.</p>
+      of data from a POST request that will be parsed for request parameters.
+      The parameters are cached for the duration of the request so this is
+      limited to 2 MiB by default to reduce exposure to a DoS attack.</p>
 
       <p>The <strong>maxSavePostSize</strong> attribute controls the saving of
       the request body during FORM and CLIENT-CERT authentication and HTTP/1.1

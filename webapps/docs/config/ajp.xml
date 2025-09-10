@@ -204,10 +204,19 @@
     </attribute>
 
     <attribute name="maxPostSize" required="false">
-      <p>The maximum size in bytes of the POST which will be handled by
-      the container FORM URL parameter parsing. The limit can be disabled by
-      setting this attribute to a value less than zero. If not specified, this
-      attribute is set to 2097152 (2 MiB). Note that the
+      <p>This is the maximum number of request body bytes that will be converted
+      into request parameters by Tomcat. This limit only applies in specific
+      circumstances and is <strong>not</strong> a general limit on request body
+      size for POST requests. The limit only applies when Tomcat is processing
+      the request body for parameters as per section 3.1.1
+      (<code>application/x-www-form-urlencoded</code>) or section 3.2
+      (<code>multipart/form-data</code>) of the Servlet specification. In the
+      <code>multipart/form-data</code> case, the limit only applies to the data
+      used to generate the parameters that are made available through the
+      <code>getParameter()</code> family of methods.</p>
+      <p>The limit can be disabled by setting this attribute to a value less
+      than zero. If not specified, this attribute is set to 2097152 (2 MiB).
+      Note that the
       <a href="filter.html#Failed_Request_Filter"><code>FailedRequestFilter</code></a>
       can be used to reject requests that exceed this limit.</p>
     </attribute>
