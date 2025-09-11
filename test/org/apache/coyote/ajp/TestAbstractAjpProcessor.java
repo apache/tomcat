@@ -41,6 +41,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
 public class TestAbstractAjpProcessor extends TomcatBaseTest {
@@ -710,12 +711,12 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
     @Test
     public void testZeroLengthRequestBodyGetA() throws Exception {
-        doTestZeroLengthRequestBody("GET", true);
+        doTestZeroLengthRequestBody(Method.GET, true);
     }
 
     @Test
     public void testZeroLengthRequestBodyGetB() throws Exception {
-        doTestZeroLengthRequestBody("GET", false);
+        doTestZeroLengthRequestBody(Method.GET, false);
     }
 
     @Test
@@ -1107,7 +1108,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             response.setCharacterEncoding("UTF-8");
 
             try (PrintWriter w = response.getWriter()) {
-                w.println("Method: " + (isPost ? "POST" : "GET") + ". Reading request body...");
+                w.println("Method: " + (isPost ? "POST" : Method.GET) + ". Reading request body...");
                 w.println("Request Body length in bytes: " + readCount);
             }
         }

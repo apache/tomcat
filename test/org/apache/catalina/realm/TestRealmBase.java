@@ -36,6 +36,7 @@ import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.http.Method;
 
 public class TestRealmBase {
 
@@ -692,7 +693,7 @@ public class TestRealmBase {
         context.addConstraint(deleteConstraint);
 
         // All users should be able to perform a GET
-        request.setMethod("GET");
+        request.setMethod(Method.GET);
 
         SecurityConstraint[] constraintsGet =
                 mapRealm.findSecurityConstraints(request, context);

@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http2.HpackEncoder.State;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -324,7 +325,7 @@ public class TestHttp2Limits extends Http2TestBase {
     private void populateHeadersPayload(ByteBuffer headersPayload, List<String[]> customHeaders, String path)
             throws Exception {
         MimeHeaders headers = new MimeHeaders();
-        headers.addValue(":method").setString("GET");
+        headers.addValue(":method").setString(Method.GET);
         headers.addValue(":scheme").setString("http");
         headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());

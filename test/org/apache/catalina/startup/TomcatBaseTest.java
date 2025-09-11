@@ -79,6 +79,7 @@ import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 import org.apache.tomcat.util.scan.StandardJarScanner;
@@ -653,7 +654,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
     public static int getUrl(String path, ByteChunk out, boolean followRedirects)
             throws IOException {
-        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, null, "GET", followRedirects);
+        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, null, Method.GET, followRedirects);
     }
 
     public static int headUrl(String path, ByteChunk out, Map<String, List<String>> resHead)
@@ -669,7 +670,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     public static int getUrl(String path, ByteChunk out, int readTimeout,
             Map<String, List<String>> reqHead, Map<String, List<String>> resHead)
             throws IOException {
-        return methodUrl(path, out, readTimeout, reqHead, resHead, "GET");
+        return methodUrl(path, out, readTimeout, reqHead, resHead, Method.GET);
     }
 
     public static int methodUrl(String path, ByteChunk out, int readTimeout,

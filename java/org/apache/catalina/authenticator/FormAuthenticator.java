@@ -42,6 +42,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 
 /**
@@ -303,7 +304,7 @@ public class FormAuthenticator extends AuthenticatorBase {
                 // the landing page
                 String uri = request.getContextPath() + landingPage;
                 SavedRequest saved = new SavedRequest();
-                saved.setMethod("GET");
+                saved.setMethod(Method.GET);
                 saved.setRequestURI(uri);
                 saved.setDecodedRequestURI(uri);
                 request.getSessionInternal(true).setNote(Constants.FORM_REQUEST_NOTE, saved);
@@ -328,7 +329,7 @@ public class FormAuthenticator extends AuthenticatorBase {
                 // the landing page
                 String uri = request.getContextPath() + landingPage;
                 SavedRequest saved = new SavedRequest();
-                saved.setMethod("GET");
+                saved.setMethod(Method.GET);
                 saved.setRequestURI(uri);
                 saved.setDecodedRequestURI(uri);
                 session.setNote(Constants.FORM_REQUEST_NOTE, saved);
@@ -448,7 +449,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
         // Always use GET for the login page, regardless of the method used
         String oldMethod = request.getMethod();
-        request.getCoyoteRequest().setMethod("GET");
+        request.getCoyoteRequest().setMethod(Method.GET);
 
         RequestDispatcher disp = context.getServletContext().getRequestDispatcher(loginPage);
         try {
@@ -590,7 +591,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         String method = saved.getMethod();
         MimeHeaders rmh = request.getCoyoteRequest().getMimeHeaders();
         rmh.recycle();
-        boolean cacheable = "GET".equals(method) || "HEAD".equals(method);
+        boolean cacheable = Method.GET.equals(method) || "HEAD".equals(method);
         Iterator<String> names = saved.getHeaderNames();
         while (names.hasNext()) {
             String name = names.next();

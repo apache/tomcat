@@ -30,6 +30,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.apache.tomcat.util.http.Method;
 import org.easymock.EasyMock;
 
 public class TestRestCsrfPreventionFilter {
@@ -37,8 +38,6 @@ public class TestRestCsrfPreventionFilter {
     private static final String NONCE = "nonce";
 
     private static final String INVALID_NONCE = "invalid-nonce";
-
-    private static final String GET_METHOD = "GET";
 
     private static final String POST_METHOD = "POST";
 
@@ -74,7 +73,7 @@ public class TestRestCsrfPreventionFilter {
 
     @Test
     public void testGetRequestNoSessionNoNonce() throws Exception {
-        setRequestExpectations(GET_METHOD, null, null);
+        setRequestExpectations(Method.GET, null, null);
         filter.doFilter(request, response, filterChain);
         verifyContinueChain();
     }
@@ -112,7 +111,7 @@ public class TestRestCsrfPreventionFilter {
 
     @Test
     public void testGetFetchRequestSessionNoNonce() throws Exception {
-        setRequestExpectations(GET_METHOD, session, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE);
+        setRequestExpectations(Method.GET, session, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE);
         EasyMock.expect(session.getAttribute(Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME)).andReturn(null);
         session.setAttribute(Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME, NONCE);
         EasyMock.expectLastCall();
@@ -130,7 +129,7 @@ public class TestRestCsrfPreventionFilter {
 
     @Test
     public void testGetFetchRequestSessionNonce() throws Exception {
-        setRequestExpectations(GET_METHOD, session, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE);
+        setRequestExpectations(Method.GET, session, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE);
         EasyMock.expect(session.getAttribute(Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME)).andReturn(NONCE);
         EasyMock.replay(session);
         filter.doFilter(request, response, filterChain);
@@ -221,7 +220,7 @@ public class TestRestCsrfPreventionFilter {
 
     @Test
     public void testGETRequestFetchNonceAsParameter() throws Exception {
-        setRequestExpectations(GET_METHOD, null, null, new String[] { Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE },
+        setRequestExpectations(Method.GET, null, null, new String[] { Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE },
                 ACCEPTED_PATH1);
         filter.setPathsAcceptingParams(ACCEPTED_PATHS);
         filter.doFilter(request, response, filterChain);

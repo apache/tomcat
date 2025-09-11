@@ -45,6 +45,7 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.http.Method;
 
 @RunWith(Parameterized.class)
 public class TestAuthenticatorBaseCorsPreflight extends TomcatBaseTest {
@@ -53,7 +54,7 @@ public class TestAuthenticatorBaseCorsPreflight extends TomcatBaseTest {
     private static final String EMPTY_ORIGIN = "";
     private static final String INVALID_ORIGIN = "http://%20";
     private static final String SAME_ORIGIN = "http://localhost";
-    private static final String ALLOWED_METHOD = "GET";
+    private static final String ALLOWED_METHOD = Method.GET;
     private static final String BLOCKED_METHOD = "POST";
     private static final String EMPTY_METHOD = "";
 
@@ -71,8 +72,8 @@ public class TestAuthenticatorBaseCorsPreflight extends TomcatBaseTest {
                 Boolean.FALSE });
         parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", SAME_ORIGIN, ALLOWED_METHOD,
                 Boolean.FALSE });
-        parameterSets.add(
-                new Object[] { AllowCorsPreflight.ALWAYS, "/*", "GET", ALLOWED_ORIGIN, ALLOWED_METHOD, Boolean.FALSE });
+        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", Method.GET, ALLOWED_ORIGIN, ALLOWED_METHOD,
+                Boolean.FALSE });
         parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", ALLOWED_ORIGIN, BLOCKED_METHOD,
                 Boolean.FALSE });
         parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", ALLOWED_ORIGIN, EMPTY_METHOD,

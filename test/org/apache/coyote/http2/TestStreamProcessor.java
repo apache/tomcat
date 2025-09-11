@@ -40,6 +40,7 @@ import org.apache.catalina.connector.ResponseFacade;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 
 public class TestStreamProcessor extends Http2TestBase {
 
@@ -137,7 +138,7 @@ public class TestStreamProcessor extends Http2TestBase {
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
         List<Header> headers = new ArrayList<>(3);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/index.html"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
@@ -192,7 +193,7 @@ public class TestStreamProcessor extends Http2TestBase {
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
         List<Header> headers = new ArrayList<>(3);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/noContent"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
@@ -281,7 +282,7 @@ public class TestStreamProcessor extends Http2TestBase {
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
         List<Header> headers = new ArrayList<>(5);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/index.html"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
@@ -326,7 +327,7 @@ public class TestStreamProcessor extends Http2TestBase {
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/index^html"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
@@ -370,7 +371,7 @@ public class TestStreamProcessor extends Http2TestBase {
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/index.html?foo=[]"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
@@ -416,7 +417,7 @@ public class TestStreamProcessor extends Http2TestBase {
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/index.html?foo=[]"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
@@ -523,7 +524,7 @@ public class TestStreamProcessor extends Http2TestBase {
         ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
         List<Header> headers = new ArrayList<>(3);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/compression"));
         headers.add(new Header(":authority", "localhost:" + getPort()));

@@ -59,6 +59,7 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.http.Method;
 
 /**
  * Test case for {@link Request}.
@@ -400,7 +401,7 @@ public class TestRequest extends TomcatBaseTest {
         Bug48692Client client = new Bug48692Client();
 
         // Make sure GET works properly
-        client.doRequest("GET", "foo=bar", null, null, false);
+        client.doRequest(Method.GET, "foo=bar", null, null, false);
 
         Assert.assertTrue("Non-200 response for GET request", client.isResponse200());
         Assert.assertEquals("Incorrect response for GET request", "foo=bar", client.getResponseBody());
