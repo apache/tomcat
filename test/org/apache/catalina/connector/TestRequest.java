@@ -429,7 +429,7 @@ public class TestRequest extends TomcatBaseTest {
         client.reset();
 
         // PUT without POST-style parsing
-        client.doRequest("PUT", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", false);
+        client.doRequest(Method.PUT, "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", false);
 
         Assert.assertTrue("Non-200 response for PUT/noparse request", client.isResponse200());
         Assert.assertEquals("Incorrect response for PUT request", "bar=foo,foo=bar", client.getResponseBody());
@@ -437,7 +437,7 @@ public class TestRequest extends TomcatBaseTest {
         client.reset();
 
         // PUT with POST-style parsing
-        client.doRequest("PUT", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
+        client.doRequest(Method.PUT, "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
 
         Assert.assertTrue("Non-200 response for PUT request", client.isResponse200());
         Assert.assertEquals("Incorrect response for PUT/parse request", "bar=baz,bar=foo,foo=bar,foo=baz",

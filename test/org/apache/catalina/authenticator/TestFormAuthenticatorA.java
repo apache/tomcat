@@ -178,7 +178,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
         FormAuthClientSelectedMethods client = new FormAuthClientSelectedMethods(true, true, true, true);
 
         // First request for protected resource gets the login page
-        client.doResourceRequest("PUT", true,
+        client.doResourceRequest(Method.PUT, true,
                 "/test?" + SelectedMethodsServlet.PARAM + "=" + SelectedMethodsServlet.VALUE, null);
         Assert.assertTrue(client.getResponseLine(), client.isResponse200());
         Assert.assertTrue(client.isResponseBodyOK());
@@ -604,7 +604,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
             SecurityConstraint constraint = new SecurityConstraint();
             SecurityCollection collection = new SecurityCollection();
             collection.setName("Protect PUT");
-            collection.addMethod("PUT");
+            collection.addMethod(Method.PUT);
             collection.addPatternDecoded("/test");
             constraint.addCollection(collection);
             constraint.addAuthRole("tomcat");
