@@ -216,7 +216,7 @@ public final class CGIServlet extends HttpServlet {
     static {
         DEFAULT_SUPER_METHODS.add(Method.HEAD);
         DEFAULT_SUPER_METHODS.add(Method.OPTIONS);
-        DEFAULT_SUPER_METHODS.add("TRACE");
+        DEFAULT_SUPER_METHODS.add(Method.TRACE);
 
         if (JrePlatform.IS_WINDOWS) {
             DEFAULT_CMD_LINE_ARGUMENTS_DECODED_PATTERN = Pattern.compile("[\\w\\Q-.\\/:\\E]+");

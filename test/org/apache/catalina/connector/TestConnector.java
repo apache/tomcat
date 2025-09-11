@@ -203,7 +203,7 @@ public class TestConnector extends TomcatBaseTest {
 
         boolean foundTrace = false;
         for (String header : respHeaders.get("Allow")) {
-            if (header.contains("TRACE")) {
+            if (header.contains(Method.TRACE)) {
                 foundTrace = true;
                 break;
             }

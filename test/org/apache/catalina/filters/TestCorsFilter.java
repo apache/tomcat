@@ -860,7 +860,7 @@ public class TestCorsFilter {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         TesterHttpServletResponse response = new TesterHttpServletResponse();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTP_TOMCAT_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "TRACE");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.TRACE);
         request.setMethod(Method.OPTIONS);
         CorsFilter corsFilter = new CorsFilter();
         corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());

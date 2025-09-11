@@ -814,14 +814,14 @@ public class CoyoteAdapter implements Adapter {
         }
 
         // Filter TRACE method
-        if (!connector.getAllowTrace() && "TRACE".equals(req.getMethod())) {
+        if (!connector.getAllowTrace() && Method.TRACE.equals(req.getMethod())) {
             Wrapper wrapper = request.getWrapper();
             StringBuilder header = null;
             if (wrapper != null) {
                 String[] methods = wrapper.getServletMethods();
                 if (methods != null) {
                     for (String method : methods) {
-                        if ("TRACE".equals(method)) {
+                        if (Method.TRACE.equals(method)) {
                             continue;
                         }
                         if (header == null) {
