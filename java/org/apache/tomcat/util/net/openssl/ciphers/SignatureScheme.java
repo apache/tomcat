@@ -19,45 +19,47 @@ package org.apache.tomcat.util.net.openssl.ciphers;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum SignatureAlgorithm {
+public enum SignatureScheme {
 
     // RSASSA-PKCS1-v1_5 algorithms
-    rsa_pkcs1_sha256(0x0401),
-    rsa_pkcs1_sha384(0x0501),
-    rsa_pkcs1_sha512(0x0601),
+    rsa_pkcs1_sha256(0x0401, Authentication.RSA),
+    rsa_pkcs1_sha384(0x0501, Authentication.RSA),
+    rsa_pkcs1_sha512(0x0601, Authentication.RSA),
 
     // ECDSA algorithms
-    ecdsa_secp256r1_sha256(0x0403),
-    ecdsa_secp384r1_sha384(0x0503),
-    ecdsa_secp521r1_sha512(0x0603),
+    ecdsa_secp256r1_sha256(0x0403, Authentication.ECDSA),
+    ecdsa_secp384r1_sha384(0x0503, Authentication.ECDSA),
+    ecdsa_secp521r1_sha512(0x0603, Authentication.ECDSA),
 
     // RSASSA-PSS algorithms with public key OID rsaEncryption
-    rsa_pss_rsae_sha256(0x0804),
-    rsa_pss_rsae_sha384(0x0805),
-    rsa_pss_rsae_sha512(0x0806),
+    rsa_pss_rsae_sha256(0x0804, Authentication.RSA),
+    rsa_pss_rsae_sha384(0x0805, Authentication.RSA),
+    rsa_pss_rsae_sha512(0x0806, Authentication.RSA),
 
     // EdDSA algorithms
-    ed25519(0x0807),
-    ed448(0x0808),
+    ed25519(0x0807, Authentication.EdDSA),
+    ed448(0x0808, Authentication.EdDSA),
 
     // RSASSA-PSS algorithms with public key OID RSASSA-PSS
-    rsa_pss_pss_sha256(0x0809),
-    rsa_pss_pss_sha384(0x080a),
-    rsa_pss_pss_sha512(0x080b),
+    rsa_pss_pss_sha256(0x0809, Authentication.RSA),
+    rsa_pss_pss_sha384(0x080a, Authentication.RSA),
+    rsa_pss_pss_sha512(0x080b, Authentication.RSA),
 
     // Legacy algorithms
-    rsa_pkcs1_sha1(0x0201),
-    ecdsa_sha1(0x0203),
+    rsa_pkcs1_sha1(0x0201, Authentication.RSA),
+    ecdsa_sha1(0x0203, Authentication.ECDSA),
 
     // ML-DSA algorithms
-    mldsa44(0x0904),
-    mldsa65(0x0905),
-    mldsa87(0x0906);
+    mldsa44(0x0904, Authentication.MLDSA),
+    mldsa65(0x0905, Authentication.MLDSA),
+    mldsa87(0x0906, Authentication.MLDSA);
 
     private final int id;
+    private final Authentication auth;
 
-    SignatureAlgorithm(int id) {
+    SignatureScheme(int id, Authentication auth) {
         this.id = id;
+        this.auth = auth;
     }
 
     /**
@@ -67,10 +69,17 @@ public enum SignatureAlgorithm {
         return this.id;
     }
 
-    private static final Map<Integer,SignatureAlgorithm> idMap = new HashMap<>();
+    /**
+     * @return the auth
+     */
+    public Authentication getAuth() {
+        return this.auth;
+    }
+
+    private static final Map<Integer,SignatureScheme> idMap = new HashMap<>();
 
     static {
-        for (SignatureAlgorithm group : values()) {
+        for (SignatureScheme group : values()) {
             int id = group.getId();
 
             if (id > 0 && id < 0xFFFF) {
@@ -80,7 +89,7 @@ public enum SignatureAlgorithm {
     }
 
 
-    public static SignatureAlgorithm valueOf(int groupId) {
+    public static SignatureScheme valueOf(int groupId) {
         return idMap.get(Integer.valueOf(groupId));
     }
 }

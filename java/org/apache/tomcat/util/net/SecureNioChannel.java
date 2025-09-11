@@ -42,7 +42,7 @@ import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
 import org.apache.tomcat.util.net.TLSClientHelloExtractor.ExtractorResult;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.net.openssl.ciphers.Group;
-import org.apache.tomcat.util.net.openssl.ciphers.SignatureAlgorithm;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureScheme;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -275,7 +275,7 @@ public class SecureNioChannel extends NioChannel {
         List<Cipher> clientRequestedCiphers = null;
         List<String> clientRequestedApplicationProtocols = null;
         List<Group> clientSupportedGroups = null;
-        List<SignatureAlgorithm> clientSignatureAlgorithms = null;
+        List<SignatureScheme> clientSignatureSchemes = null;
         switch (extractor.getResult()) {
             case COMPLETE:
                 hostName = extractor.getSNIValue();
@@ -284,7 +284,7 @@ public class SecureNioChannel extends NioChannel {
             case NOT_PRESENT:
                 clientRequestedCiphers = extractor.getClientRequestedCiphers();
                 clientSupportedGroups = extractor.getClientSupportedGroups();
-                clientSignatureAlgorithms = extractor.getClientSignatureAlgorithms();
+                clientSignatureSchemes = extractor.getClientSignatureSchemes();
                 break;
             case NEED_READ:
                 return SelectionKey.OP_READ;
@@ -309,7 +309,7 @@ public class SecureNioChannel extends NioChannel {
         }
 
         createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols,
-                extractor.getClientRequestedProtocols(), clientSupportedGroups, clientSignatureAlgorithms);
+                extractor.getClientRequestedProtocols(), clientSupportedGroups, clientSignatureSchemes);
 
         // Populate additional TLS attributes obtained from the handshake that
         // aren't available from the session
@@ -930,7 +930,7 @@ public class SecureNioChannel extends NioChannel {
 
     protected void createSSLEngine(String hostName, List<Cipher> clientRequestedCiphers,
             List<String> clientRequestedApplicationProtocols, List<String> clientRequestedProtocols,
-            List<Group> clientSupportedGroups, List<SignatureAlgorithm> clientSignatureAlgorithms) {
+            List<Group> clientSupportedGroups, List<SignatureScheme> clientSignatureAlgorithms) {
         sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols,
                 clientRequestedProtocols, clientSupportedGroups, clientSignatureAlgorithms);
     }
