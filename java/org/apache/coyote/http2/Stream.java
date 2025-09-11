@@ -371,8 +371,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
         switch (name) {
             case ":method": {
-                if (coyoteRequest.method().isNull()) {
-                    coyoteRequest.method().setString(value);
+                if (coyoteRequest.getMethod() == null) {
+                    coyoteRequest.setMethod(value);
                 } else {
                     throw new HpackException(
                             sm.getString("stream.header.duplicate", getConnectionId(), getIdAsString(), ":method"));
@@ -552,8 +552,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final boolean receivedEndOfHeaders() throws ConnectionException {
-        if (coyoteRequest.method().isNull() || coyoteRequest.scheme().isNull() ||
-                !coyoteRequest.method().equals("CONNECT") && coyoteRequest.requestURI().isNull()) {
+        if (coyoteRequest.getMethod() == null || coyoteRequest.scheme().isNull() ||
+                !"CONNECT".equals(coyoteRequest.getMethod()) && coyoteRequest.requestURI().isNull()) {
             throw new ConnectionException(sm.getString("stream.header.required", getConnectionId(), getIdAsString()),
                     Http2Error.PROTOCOL_ERROR);
         }
@@ -862,7 +862,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             return;
         }
         // Set the special HTTP/2 headers
-        request.getMimeHeaders().addValue(":method").duplicate(request.method());
+        request.getMimeHeaders().addValue(":method").setString(request.getMethod());
         request.getMimeHeaders().addValue(":scheme").duplicate(request.scheme());
         StringBuilder path = new StringBuilder(request.requestURI().toString());
         if (!request.queryString().isNull()) {

@@ -131,6 +131,10 @@
         additional PQC certificates defined with type <code>MLDSA</code> are
         added to contexts which use classic certificates. (jfclere/remm)
       </update>
+      <add>
+        Optimize the conversion of HTTP method from byte form to String form.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Web applications">

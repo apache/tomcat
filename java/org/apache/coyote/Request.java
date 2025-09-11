@@ -29,6 +29,7 @@ import javax.servlet.ReadListener;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookies;
@@ -300,8 +301,34 @@ public final class Request {
         return schemeMB;
     }
 
+    /**
+     * Get a MessageBytes instance that holds the current request's HTTP method.
+     *
+     * @return a MessageBytes instance that holds the current request's HTTP method.
+     *
+     * @deprecated Use {@link #getMethod()}, {@link Request#setMethod(String)} and {@link #setMethod(byte[], int, int)}
+     */
+    @Deprecated
     public MessageBytes method() {
         return methodMB;
+    }
+
+    public void setMethod(String method) {
+        methodMB.setString(method);
+    }
+
+    public void setMethod(byte[] buf, int start, int len) {
+        String method = Method.bytesToString(buf, start, len);
+        if (method == null) {
+            methodMB.setBytes(buf, start, len);
+            method = methodMB.toStringType();
+        } else {
+            methodMB.setString(method);
+        }
+    }
+
+    public String getMethod() {
+        return methodMB.toStringType();
     }
 
     public MessageBytes requestURI() {

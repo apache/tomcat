@@ -502,7 +502,7 @@ public class Http11Processor extends AbstractProcessor {
         // Transfer the minimal information required for the copy of the Request
         // that is passed to the HTTP upgrade process
         dest.decodedURI().duplicate(source.decodedURI());
-        dest.method().duplicate(source.method());
+        dest.setMethod(source.getMethod());
         dest.getMimeHeaders().duplicate(source.getMimeHeaders());
         dest.requestURI().duplicate(source.requestURI());
         dest.queryString().duplicate(source.queryString());
@@ -901,8 +901,7 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        MessageBytes methodMB = request.method();
-        boolean head = methodMB.equals("HEAD");
+        boolean head = "HEAD".equals(request.getMethod());
         if (head) {
             // Any entity body, if present, should not be sent
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);

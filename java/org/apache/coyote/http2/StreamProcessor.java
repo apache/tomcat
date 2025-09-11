@@ -522,8 +522,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         HttpParser httpParser = ((AbstractHttp11Protocol<?>) handler.getProtocol().getHttp11Protocol()).getHttpParser();
 
         // Method name must be a token
-        String method = request.method().toString();
-        if (!HttpParser.isToken(method)) {
+        if (!HttpParser.isToken(request.getMethod())) {
             return false;
         }
 
