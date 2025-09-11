@@ -293,7 +293,7 @@ public class ApplicationPushBuilder implements PushBuilder {
 
         org.apache.coyote.Request pushTarget = new org.apache.coyote.Request();
 
-        pushTarget.method().setString(method);
+        pushTarget.setMethod(method);
         // The next three are implied by the Javadoc getPath()
         pushTarget.serverName().setString(baseRequest.getServerName());
         pushTarget.setServerPort(baseRequest.getServerPort());

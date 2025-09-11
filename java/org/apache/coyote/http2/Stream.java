@@ -862,7 +862,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             return;
         }
         // Set the special HTTP/2 headers
-        request.getMimeHeaders().addValue(":method").duplicate(request.method());
+        request.getMimeHeaders().addValue(":method").setString(request.getMethod());
         request.getMimeHeaders().addValue(":scheme").duplicate(request.scheme());
         StringBuilder path = new StringBuilder(request.requestURI().toString());
         if (!request.queryString().isNull()) {
