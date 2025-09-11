@@ -55,6 +55,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.http.Method;
 
 public class TestStandardWrapper extends TomcatBaseTest {
 
@@ -420,7 +421,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
     }
 
     @ServletSecurity(value = @HttpConstraint(EmptyRoleSemantic.PERMIT), httpMethodConstraints = {
-            @HttpMethodConstraint(value = "GET", emptyRoleSemantic = EmptyRoleSemantic.DENY) })
+            @HttpMethodConstraint(value = Method.GET, emptyRoleSemantic = EmptyRoleSemantic.DENY) })
     public static class MethodConstraintServlet extends TestServlet {
         private static final long serialVersionUID = 1L;
     }

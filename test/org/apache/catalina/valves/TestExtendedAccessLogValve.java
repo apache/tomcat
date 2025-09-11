@@ -41,6 +41,7 @@ import org.apache.catalina.Host;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.Method;
 
 @RunWith(Parameterized.class)
 public class TestExtendedAccessLogValve extends TomcatBaseTest {
@@ -207,7 +208,7 @@ public class TestExtendedAccessLogValve extends TomcatBaseTest {
         if ("time".equals(fieldId)) {
             Assert.assertTrue("Invalid time format", isTimeFormat(value));
         } else if ("cs-method".equals(fieldId)) {
-            Assert.assertEquals("GET", value);
+            Assert.assertEquals(Method.GET, value);
         } else if (fieldId.startsWith("c-ip")) {
             // IPv4 with optional port
             Assert.assertTrue(value.matches("^\\d{1,3}(\\.\\d{1,3}){3}(:\\d+)?$"));

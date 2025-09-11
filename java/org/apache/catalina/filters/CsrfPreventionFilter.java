@@ -41,6 +41,7 @@ import javax.servlet.http.HttpSession;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.Method;
 
 /**
  * Provides basic CSRF protection for a web application. The filter assumes that:
@@ -446,7 +447,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     protected boolean skipNonceCheck(HttpServletRequest request) {
-        if (!Constants.METHOD_GET.equals(request.getMethod())) {
+        if (!Method.GET.equals(request.getMethod())) {
             return false;
         }
 

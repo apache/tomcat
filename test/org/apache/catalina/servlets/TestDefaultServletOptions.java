@@ -26,13 +26,15 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import org.apache.tomcat.util.http.Method;
+
 @RunWith(Parameterized.class)
 public class TestDefaultServletOptions extends ServletOptionsBaseTest {
 
     @Parameters
     public static Collection<Object[]> inputs() {
         String[] urls = new String[] { COLLECTION_NAME, FILE_NAME, UNKNOWN_NAME };
-        String[] methods = new String[] { "GET", "POST", "HEAD", "TRACE", "PUT", "DELETE" };
+        String[] methods = new String[] { Method.GET, "POST", "HEAD", "TRACE", "PUT", "DELETE" };
 
         List<Object[]> result = new ArrayList<>();
 

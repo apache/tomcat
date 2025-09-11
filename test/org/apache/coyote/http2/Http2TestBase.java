@@ -61,6 +61,7 @@ import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.net.TesterSupport;
@@ -222,7 +223,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void buildGetRequest(byte[] frameHeader, ByteBuffer headersPayload, byte[] padding, int streamId,
             String url) {
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", url));
         headers.add(new Header(":authority", "localhost:" + getPort()));
@@ -260,7 +261,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void buildSimpleGetRequestPart1(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
         List<Header> headers = new ArrayList<>(3);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
 

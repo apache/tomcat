@@ -38,6 +38,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.parser.MediaType;
@@ -566,7 +567,7 @@ public class CorsFilter extends GenericFilter {
                     return CORSRequestType.PRE_FLIGHT;
                 }
                 return CORSRequestType.ACTUAL;
-            case "GET":
+            case Method.GET:
             case "HEAD":
                 return CORSRequestType.SIMPLE;
             case "POST":

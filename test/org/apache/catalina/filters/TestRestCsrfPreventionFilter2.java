@@ -45,12 +45,12 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.http.Method;
 
 public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     private static final boolean USE_COOKIES = true;
     private static final boolean NO_COOKIES = !USE_COOKIES;
 
-    private static final String METHOD_GET = "GET";
     private static final String METHOD_POST = "POST";
 
     private static final String HTTP_PREFIX = "http://localhost:";
@@ -121,7 +121,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     }
 
     private void testClearGet() throws Exception {
-        doTest(METHOD_GET, LIST_CUSTOMERS, CREDENTIALS, null, NO_COOKIES, HttpServletResponse.SC_OK,
+        doTest(Method.GET, LIST_CUSTOMERS, CREDENTIALS, null, NO_COOKIES, HttpServletResponse.SC_OK,
                 CUSTOMERS_LIST_RESPONSE, null, false, null);
     }
 
@@ -131,7 +131,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     }
 
     private void testGetFirstFetch() throws Exception {
-        doTest(METHOD_GET, LIST_CUSTOMERS, CREDENTIALS, null, NO_COOKIES, HttpServletResponse.SC_OK,
+        doTest(Method.GET, LIST_CUSTOMERS, CREDENTIALS, null, NO_COOKIES, HttpServletResponse.SC_OK,
                 CUSTOMERS_LIST_RESPONSE, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE, true, null);
     }
 
@@ -152,7 +152,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     }
 
     private void testGetSecondFetch() throws Exception {
-        doTest(METHOD_GET, LIST_CUSTOMERS, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_OK,
+        doTest(Method.GET, LIST_CUSTOMERS, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_OK,
                 CUSTOMERS_LIST_RESPONSE, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE, true, validNonce);
     }
 
@@ -199,7 +199,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         int rc;
-        if (METHOD_GET.equals(method)) {
+        if (Method.GET.equals(method)) {
             rc = getUrl(HTTP_PREFIX + getPort() + uri, bc, reqHeaders, respHeaders);
         } else {
             rc = postUrl(body, HTTP_PREFIX + getPort() + uri, bc, reqHeaders, respHeaders);
