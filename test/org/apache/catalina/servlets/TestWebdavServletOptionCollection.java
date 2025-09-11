@@ -37,7 +37,7 @@ public class TestWebdavServletOptionCollection extends ServletOptionsBaseTest {
 
     @Parameters
     public static Collection<Object[]> inputs() {
-        String[] methods = new String[] { Method.GET, Method.POST, Method.HEAD, "TRACE", Method.PUT, "DELETE",
+        String[] methods = new String[] { Method.GET, Method.POST, Method.HEAD, "TRACE", Method.PUT, Method.DELETE,
                 "MKCOL", "LOCK", "UNLOCK", "COPY", "MOVE", "PROPFIND", "PROPPATCH" };
 
         List<Object[]> result = new ArrayList<>();
