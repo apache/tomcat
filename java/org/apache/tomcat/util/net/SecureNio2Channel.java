@@ -45,6 +45,8 @@ import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.TLSClientHelloExtractor.ExtractorResult;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
+import org.apache.tomcat.util.net.openssl.ciphers.Group;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureScheme;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -404,6 +406,8 @@ public class SecureNio2Channel extends Nio2Channel {
         String hostName = null;
         List<Cipher> clientRequestedCiphers = null;
         List<String> clientRequestedApplicationProtocols = null;
+        List<Group> clientSupportedGroups = null;
+        List<SignatureScheme> clientSignatureSchemes = null;
         switch (extractor.getResult()) {
             case COMPLETE:
                 hostName = extractor.getSNIValue();
@@ -411,6 +415,8 @@ public class SecureNio2Channel extends Nio2Channel {
                 //$FALL-THROUGH$ to set the client requested ciphers
             case NOT_PRESENT:
                 clientRequestedCiphers = extractor.getClientRequestedCiphers();
+                clientSupportedGroups = extractor.getClientSupportedGroups();
+                clientSignatureSchemes = extractor.getClientSignatureSchemes();
                 break;
             case NEED_READ:
                 sc.read(netInBuffer, AbstractEndpoint.toTimeout(endpoint.getConnectionTimeout()), TimeUnit.MILLISECONDS,
@@ -436,7 +442,16 @@ public class SecureNio2Channel extends Nio2Channel {
             log.trace(sm.getString("channel.nio.ssl.sniHostName", sc, hostName));
         }
 
-        sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols);
+        try {
+            AbstractJsseEndpoint.clientRequestedProtocolsThreadLocal.set(extractor.getClientRequestedProtocols());
+            AbstractJsseEndpoint.clientSupportedGroupsThreadLocal.set(clientSupportedGroups);
+            AbstractJsseEndpoint.clientSignatureSchemesThreadLocal.set(clientSignatureSchemes);
+            sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols);
+        } finally {
+            AbstractJsseEndpoint.clientRequestedProtocolsThreadLocal.set(null);
+            AbstractJsseEndpoint.clientSupportedGroupsThreadLocal.set(null);
+            AbstractJsseEndpoint.clientSignatureSchemesThreadLocal.set(null);
+        }
 
         // Populate additional TLS attributes obtained from the handshake that
         // aren't available from the session

@@ -39,14 +39,14 @@ public class Jre20Compat extends Jre19Compat {
         try {
             c1 = Class.forName("javax.net.ssl.SSLParameters");
             m1 = c1.getMethod("setNamedGroups", String[].class);
-        } catch (ClassNotFoundException e) {
+        } catch (NoSuchMethodException e) {
             // Must be pre-Java 20
             log.debug(sm.getString("jre20Compat.javaPre20"), e);
         } catch (ReflectiveOperationException e) {
             // Should never happen
             log.error(sm.getString("jre20Compat.unexpected"), e);
         }
-        supported = (c1 != null);
+        supported = (m1 != null);
         setNamedGroupsMethod = m1;
     }
 
@@ -57,7 +57,7 @@ public class Jre20Compat extends Jre19Compat {
     @Override
     public void setNamedGroupsMethod(Object sslParameters, String[] names) {
         try {
-            setNamedGroupsMethod.invoke(sslParameters, (Object[]) names);
+            setNamedGroupsMethod.invoke(sslParameters, (Object) names);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
             throw new UnsupportedOperationException(e);
         }
