@@ -188,7 +188,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 preAuthenticate();
 
                 hconn.setDoOutput(true);
-                hconn.setRequestMethod("PUT");
+                hconn.setRequestMethod(Method.PUT);
                 if (contentType != null) {
                     hconn.setRequestProperty("Content-Type", contentType);
                 }

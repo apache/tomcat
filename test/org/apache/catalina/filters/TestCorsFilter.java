@@ -237,7 +237,7 @@ public class TestCorsFilter {
     public void testDoFilterPreflight() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type");
         request.setMethod("OPTIONS");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
@@ -269,7 +269,7 @@ public class TestCorsFilter {
     public void testDoFilterPreflightAnyOrigin() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type");
         request.setMethod("OPTIONS");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
@@ -301,7 +301,7 @@ public class TestCorsFilter {
     public void testDoFilterPreflightInvalidOrigin() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "http://www.example.com");
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type");
         request.setMethod("OPTIONS");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
@@ -317,7 +317,7 @@ public class TestCorsFilter {
     public void testDoFilterPreflightNegativeMaxAge() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type");
         request.setMethod("OPTIONS");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
@@ -343,7 +343,7 @@ public class TestCorsFilter {
     public void testDoFilterPreflightWithCredentials() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type");
         request.setMethod("OPTIONS");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
@@ -370,7 +370,7 @@ public class TestCorsFilter {
     public void testDoFilterPreflightWithoutCredentialsAndSpecificOrigin() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type");
         request.setMethod("OPTIONS");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
@@ -627,7 +627,7 @@ public class TestCorsFilter {
     public void testNotSimple() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type");
         request.setMethod("OPTIONS");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
@@ -739,7 +739,7 @@ public class TestCorsFilter {
     public void testCheckActualRequestType() throws ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTP_TOMCAT_APACHE_ORG);
-        request.setMethod("PUT");
+        request.setMethod(Method.PUT);
         CorsFilter corsFilter = new CorsFilter();
         corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());
         CorsFilter.CORSRequestType requestType = corsFilter.checkRequestType(request);
@@ -772,7 +772,7 @@ public class TestCorsFilter {
     public void testCheckPreFlightRequestType() throws ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTP_TOMCAT_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "Content-Type");
         request.setMethod("OPTIONS");
         CorsFilter corsFilter = new CorsFilter();
@@ -820,7 +820,7 @@ public class TestCorsFilter {
     public void testCheckPreFlightRequestTypeNoHeaders() throws ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTP_TOMCAT_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setMethod("OPTIONS");
         CorsFilter corsFilter = new CorsFilter();
         corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());
@@ -880,7 +880,7 @@ public class TestCorsFilter {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         TesterHttpServletResponse response = new TesterHttpServletResponse();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "X-ANSWER");
         request.setMethod("OPTIONS");
         CorsFilter corsFilter = new CorsFilter();
@@ -901,7 +901,7 @@ public class TestCorsFilter {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         TesterHttpServletResponse response = new TesterHttpServletResponse();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTP_TOMCAT_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "Origin");
         request.setMethod("OPTIONS");
         CorsFilter corsFilter = new CorsFilter();
@@ -916,7 +916,7 @@ public class TestCorsFilter {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         TesterHttpServletResponse response = new TesterHttpServletResponse();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "www.ebay.com");
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setMethod("OPTIONS");
         CorsFilter corsFilter = new CorsFilter();
         corsFilter.init(TesterFilterConfigs.getSecureFilterConfig());
@@ -933,7 +933,7 @@ public class TestCorsFilter {
     public void testCheckPreFlightRequestTypeEmptyHeaders() throws ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTP_TOMCAT_APACHE_ORG);
-        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, "PUT");
+        request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD, Method.PUT);
         request.setHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS, "");
         request.setMethod("OPTIONS");
         CorsFilter corsFilter = new CorsFilter();
@@ -1023,7 +1023,7 @@ public class TestCorsFilter {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         TesterHttpServletResponse response = new TesterHttpServletResponse();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "http://tomcat.apache.org");
-        request.setMethod("PUT");
+        request.setMethod(Method.PUT);
         CorsFilter corsFilter = new CorsFilter();
         corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());
         corsFilter.doFilter(request, response, filterChain);

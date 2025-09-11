@@ -27,7 +27,7 @@ import org.apache.tomcat.util.http.Method;
         httpMethodConstraints={
                 @HttpMethodConstraint(value=Method.POST,
                         rolesAllowed=TestRealmBase.ROLE1),
-                @HttpMethodConstraint(value="PUT",
+                @HttpMethodConstraint(value=Method.PUT,
                         rolesAllowed=SecurityConstraint.ROLE_ALL_ROLES),
                 @HttpMethodConstraint(value="TRACE",
                         rolesAllowed=SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS)})
