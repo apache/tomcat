@@ -27,7 +27,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-public class Jre21Compat extends Jre19Compat {
+public class Jre21Compat extends Jre20Compat {
 
     private static final Log log = LogFactory.getLog(Jre21Compat.class);
     private static final StringManager sm = StringManager.getManager(Jre21Compat.class);

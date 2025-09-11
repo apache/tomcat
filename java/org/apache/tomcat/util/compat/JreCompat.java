@@ -47,6 +47,7 @@ public class JreCompat {
     private static final JreCompat instance;
     private static final boolean graalAvailable;
     private static final boolean jre19Available;
+    private static final boolean jre20Available;
     private static final boolean jre21Available;
     private static final boolean jre22Available;
 
@@ -74,21 +75,31 @@ public class JreCompat {
             instance = new Jre22Compat();
             jre22Available = true;
             jre21Available = true;
+            jre20Available = true;
             jre19Available = true;
         } else if (Jre21Compat.isSupported()) {
             instance = new Jre21Compat();
             jre22Available = false;
             jre21Available = true;
+            jre20Available = true;
+            jre19Available = true;
+        } else if (Jre20Compat.isSupported()) {
+            instance = new Jre20Compat();
+            jre22Available = false;
+            jre21Available = false;
+            jre20Available = true;
             jre19Available = true;
         } else if (Jre19Compat.isSupported()) {
             instance = new Jre19Compat();
             jre22Available = false;
             jre21Available = false;
+            jre20Available = false;
             jre19Available = true;
         } else {
             instance = new JreCompat();
             jre22Available = false;
             jre21Available = false;
+            jre20Available = false;
             jre19Available = false;
         }
     }
@@ -106,6 +117,11 @@ public class JreCompat {
 
     public static boolean isJre19Available() {
         return jre19Available;
+    }
+
+
+    public static boolean isJre20Available() {
+        return jre20Available;
     }
 
 
@@ -338,4 +354,14 @@ public class JreCompat {
             }
         }
     }
+
+    /**
+     * TLS groups configuration from JSSE API in Java 20.
+     * @param sslParameters the parameters object
+     * @param names the names of the groups to enable
+     */
+    public void setNamedGroupsMethod(Object sslParameters, String[] names) {
+        throw new UnsupportedOperationException(sm.getString("jreCompat.noNamedGroups"));
+    }
+
 }

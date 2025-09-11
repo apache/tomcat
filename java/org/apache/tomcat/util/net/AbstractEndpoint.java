@@ -52,11 +52,13 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.collections.SynchronizedStack;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.StoreType;
-import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
+import org.apache.tomcat.util.net.openssl.ciphers.Group;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureAlgorithm;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.LimitLatch;
 import org.apache.tomcat.util.threads.ResizableExecutor;
@@ -397,24 +399,6 @@ public abstract class AbstractEndpoint<S, U> {
      */
     protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
 
-        boolean useHybridSslContext = false;
-        if (sslHostConfig.getProtocols().contains(Constants.SSL_PROTO_TLSv1_3) && OpenSSLStatus.isAvailable()) {
-            // If TLS 1.3 is enabled, check if a hybrid scheme using a single SSL context
-            // should be attempted
-            boolean nonMldsaFound = false;
-            boolean mldsaFound = false;
-            for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
-                if (certificate.getType().equals(SSLHostConfigCertificate.Type.MLDSA)) {
-                    mldsaFound = true;
-                } else {
-                    nonMldsaFound = true;
-                }
-            }
-            if (mldsaFound && nonMldsaFound) {
-                useHybridSslContext = true;
-            }
-        }
-
         boolean firstCertificate = true;
         for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
             SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
@@ -440,18 +424,6 @@ public abstract class AbstractEndpoint<S, U> {
                 }
 
                 certificate.setSslContextGenerated(sslContext);
-            }
-
-            // If using a hybrid scheme, add any MLDSA certificates to all other SSL contexts
-            if (useHybridSslContext && !certificate.getType().equals(SSLHostConfigCertificate.Type.MLDSA)) {
-                for (SSLHostConfigCertificate certificateToAdd : sslHostConfig.getCertificates(true)) {
-                    // Add additional certificate to all non MLDSA contexts
-                    if (certificateToAdd.getType().equals(SSLHostConfigCertificate.Type.MLDSA)) {
-                        if (!sslUtil.addSecondCertificate(sslContext, certificateToAdd)) {
-                            throw new IllegalArgumentException(sm.getString("endpoint.errorCreatingSSLContext"));
-                        }
-                    }
-                }
             }
 
             logCertificate(certificate);
@@ -534,10 +506,12 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers,
-            List<String> clientRequestedApplicationProtocols) {
+            List<String> clientRequestedApplicationProtocols, List<String> clientRequestedProtocols,
+            List<Group> clientSupportedGroups, List<SignatureAlgorithm> clientSignatureAlgorithms) {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
 
-        SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers);
+        SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers,
+                clientRequestedProtocols, clientSignatureAlgorithms);
 
         SSLContext sslContext = certificate.getSslContext();
         if (sslContext == null) {
@@ -563,6 +537,23 @@ public abstract class AbstractEndpoint<S, U> {
                 sslParameters.setApplicationProtocols(commonProtocolsArray);
             }
         }
+        // Merge server groups with the client groups
+        if (JreCompat.isJre20Available()) {
+            List<String> supportedGroups = new ArrayList<>();
+            LinkedHashSet<Group> serverSupportedGroups = sslHostConfig.getGroupList();
+            if (serverSupportedGroups != null) {
+                for (Group group : clientSupportedGroups) {
+                    if (serverSupportedGroups.contains(group)) {
+                        supportedGroups.add(group.toString());
+                    }
+                }
+            } else {
+                for (Group group : clientSupportedGroups) {
+                    supportedGroups.add(group.toString());
+                }
+            }
+            JreCompat.getInstance().setNamedGroupsMethod(sslParameters, supportedGroups.toArray(new String[0]));
+        }
         switch (sslHostConfig.getCertificateVerification()) {
             case NONE:
                 sslParameters.setNeedClientAuth(false);
@@ -583,11 +574,24 @@ public abstract class AbstractEndpoint<S, U> {
     }
 
 
-    private SSLHostConfigCertificate selectCertificate(SSLHostConfig sslHostConfig, List<Cipher> clientCiphers) {
+    private SSLHostConfigCertificate selectCertificate(SSLHostConfig sslHostConfig, List<Cipher> clientCiphers,
+            List<String> clientRequestedProtocols, List<SignatureAlgorithm> clientSignatureAlgorithms) {
 
         Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
         if (certificates.size() == 1) {
             return certificates.iterator().next();
+        }
+
+        // Use signature algorithm for cipher matching with TLS 1.3
+        if ((clientRequestedProtocols.contains(Constants.SSL_PROTO_TLSv1_3)) &&
+                sslHostConfig.getProtocols().contains(Constants.SSL_PROTO_TLSv1_3)) {
+            for (SignatureAlgorithm signatureAlgorithm : clientSignatureAlgorithms) {
+                for (SSLHostConfigCertificate certificate : certificates) {
+                    if (certificate.getType().isCompatibleWith(signatureAlgorithm)) {
+                        return certificate;
+                    }
+                }
+            }
         }
 
         LinkedHashSet<Cipher> serverCiphers = sslHostConfig.getCipherList();
