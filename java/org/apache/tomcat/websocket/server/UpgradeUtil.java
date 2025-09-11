@@ -38,6 +38,7 @@ import jakarta.websocket.Extension;
 import jakarta.websocket.HandshakeResponse;
 import jakarta.websocket.server.ServerEndpointConfig;
 
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 import org.apache.tomcat.websocket.Constants;
@@ -74,7 +75,7 @@ public class UpgradeUtil {
         return ((request instanceof HttpServletRequest) &&
                 (response instanceof HttpServletResponse) && headerContainsToken((HttpServletRequest) request,
                         Constants.UPGRADE_HEADER_NAME, Constants.UPGRADE_HEADER_VALUE) &&
-                "GET".equals(((HttpServletRequest) request).getMethod()));
+                Method.GET.equals(((HttpServletRequest) request).getMethod()));
     }
 
 

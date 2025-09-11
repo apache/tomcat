@@ -45,6 +45,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.Method;
 
 /*
  * Implementation note:
@@ -893,7 +894,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         int rc = methodUrl("http://localhost:" + getPort() + request, res, DEFAULT_CLIENT_TIMEOUT_MS,
                 reqHead,
                 resHead,
-                "GET", true);
+                Method.GET, true);
         res.setCharset(StandardCharsets.UTF_8);
 
         if (expectedURI == null) {
@@ -944,7 +945,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         ByteChunk res = new ByteChunk();
         Map<String, List<String>> resHead = new HashMap<>();
         int rc = methodUrl("http://localhost:" + getPort() + request, res, DEFAULT_CLIENT_TIMEOUT_MS, null, resHead,
-                "GET", false);
+                Method.GET, false);
         res.setCharset(StandardCharsets.UTF_8);
 
         if (expectedURI == null) {
@@ -986,7 +987,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         reqHead.put("cookie", Arrays.asList("test=data"));
         ByteChunk res = new ByteChunk();
         int rc = methodUrl("http://localhost:" + getPort() + "/source/cookieTest", res, DEFAULT_CLIENT_TIMEOUT_MS,
-                reqHead, null, "GET", false);
+                reqHead, null, Method.GET, false);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 

@@ -44,6 +44,7 @@ import jakarta.servlet.http.MappingMatch;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.http.Method;
 
 /**
  * <p>
@@ -1367,7 +1368,7 @@ public class ExpiresFilter extends FilterBase {
 
         // Don't add cache headers unless the request is a GET or a HEAD request
         String method = request.getMethod();
-        if (!"GET".equals(method) && !"HEAD".equals(method)) {
+        if (!Method.GET.equals(method) && !"HEAD".equals(method)) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.invalidMethod", request.getRequestURI(), method));
             }

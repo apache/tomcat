@@ -44,6 +44,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 /*
@@ -108,7 +109,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
 
     @Test
     public void testGetWithCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.GET, Method.GET, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
 
@@ -118,7 +119,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
     // Bug 53584
     @Test
     public void testGetNoServerCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.GET, Method.GET, NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
     }
 
 
@@ -128,7 +129,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
 
     @Test
     public void testGetNoClientCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.GET, Method.GET, NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
 
@@ -137,18 +138,18 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
 
     @Test
     public void testNoChangedSessidWithCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_FREEZE_SESSID);
+        doTest(Method.GET, Method.GET, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_FREEZE_SESSID);
     }
 
     @Test
     public void testNoChangedSessidWithoutCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_FREEZE_SESSID);
+        doTest(Method.GET, Method.GET, NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_FREEZE_SESSID);
     }
 
     @Test
     public void testTimeoutWithoutCookies() throws Exception {
         String protectedUri =
-                doTest("GET", "GET", NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_FREEZE_SESSID);
+                doTest(Method.GET, Method.GET, NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_FREEZE_SESSID);
 
         // Force session to expire one second from now
         Context context = (Context) getTomcatInstance().getHost().findChildren()[0];
@@ -160,13 +161,13 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
         // then try to continue using the expired session to get the
         // protected resource once more.
         // should get login challenge or timeout status 408
-        doTestProtected("GET", protectedUri, NO_100_CONTINUE, FormAuthClient.LOGIN_REQUIRED, 1);
+        doTestProtected(Method.GET, protectedUri, NO_100_CONTINUE, FormAuthClient.LOGIN_REQUIRED, 1);
     }
 
     // HTTP 1.0 test
     @Test
     public void testGetWithCookiesHttp10() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID,
+        doTest(Method.GET, Method.GET, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID,
                 CLIENT_USE_HTTP_10);
     }
 
@@ -193,7 +194,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
 
         // Third request - the login was successful so
         // follow the redirect to the protected resource
-        client.doResourceRequest("GET", true, redirectUri, null);
+        client.doResourceRequest(Method.GET, true, redirectUri, null);
         Assert.assertTrue(client.isResponse200());
         Assert.assertTrue(client.isResponseBodyOK());
         String newSessionId = client.getSessionId();
@@ -400,7 +401,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
                 } else {
                     requestHead.append(PROTECTED_RELATIVE_PATH).append(resourceUri);
                 }
-                if ("GET".equals(method)) {
+                if (Method.GET.equals(method)) {
                     requestHead.append("?role=bar");
                 }
             }

@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
 
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
 final class Hpack {
@@ -60,7 +61,7 @@ final class Hpack {
         HeaderField[] fields = new HeaderField[62];
         // note that zero is not used
         fields[1] = new HeaderField(":authority", null);
-        fields[2] = new HeaderField(":method", "GET");
+        fields[2] = new HeaderField(":method", Method.GET);
         fields[3] = new HeaderField(":method", "POST");
         fields[4] = new HeaderField(":path", "/");
         fields[5] = new HeaderField(":path", "/index.html");

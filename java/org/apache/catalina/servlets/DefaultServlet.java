@@ -75,6 +75,7 @@ import org.apache.catalina.util.URLEncoder;
 import org.apache.catalina.webresources.CachedResource;
 import org.apache.tomcat.util.buf.B2CConverter;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.parser.ContentRange;
 import org.apache.tomcat.util.http.parser.EntityTag;
@@ -1550,7 +1551,7 @@ public class DefaultServlet extends HttpServlet {
             return FULL;
         }
 
-        if (!"GET".equals(request.getMethod()) || !isRangeRequestsSupported()) {
+        if (!Method.GET.equals(request.getMethod()) || !isRangeRequestsSupported()) {
             // RFC 9110 - Section 14.2: GET is the only method for which range handling is defined.
             // Otherwise MUST ignore a Range header field
             return FULL;
@@ -2241,7 +2242,7 @@ public class DefaultServlet extends HttpServlet {
             WebResource resource) {
 
         String method = request.getMethod();
-        if (!"GET".equals(method) && !"HEAD".equals(method)) {
+        if (!Method.GET.equals(method) && !"HEAD".equals(method)) {
             return true;
         }
 
@@ -2349,7 +2350,7 @@ public class DefaultServlet extends HttpServlet {
             // 304 Not Modified.
             // For every other method, 412 Precondition Failed is sent
             // back.
-            if ("GET".equals(request.getMethod()) || "HEAD".equals(request.getMethod())) {
+            if (Method.GET.equals(request.getMethod()) || "HEAD".equals(request.getMethod())) {
                 response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                 response.setHeader("ETag", resourceETag);
             } else {
