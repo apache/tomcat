@@ -36,6 +36,7 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.Method;
 
 /**
  * Test cases for {@link Connector}.
@@ -196,7 +197,7 @@ public class TestConnector extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         Map<String,List<String>> respHeaders = new HashMap<>();
-        int rc = methodUrl("http://localhost:" + getPort() + "/index.html", bc, 30000, null, respHeaders, "OPTIONS");
+        int rc = methodUrl("http://localhost:" + getPort() + "/index.html", bc, 30000, null, respHeaders, Method.OPTIONS);
 
         Assert.assertEquals(200, rc);
 

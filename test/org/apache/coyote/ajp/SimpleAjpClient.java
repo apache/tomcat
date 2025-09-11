@@ -76,7 +76,7 @@ public class SimpleAjpClient {
     public void setMethod(String method) {
         method = method.toUpperCase(Locale.ENGLISH);
         switch (method) {
-            case "OPTIONS":
+            case Method.OPTIONS:
                 this.method = 1;
                 break;
             case Method.GET:
@@ -165,7 +165,7 @@ public class SimpleAjpClient {
     public String getMethod() {
         switch (method) {
             case 1:
-                return "OPTIONS";
+                return Method.OPTIONS;
             case 2:
                 return Method.GET;
             case 3:
