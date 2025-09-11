@@ -566,7 +566,7 @@ public class CorsFilter extends GenericFilter {
                 }
                 return CORSRequestType.ACTUAL;
             case Method.GET:
-            case "HEAD":
+            case Method.HEAD:
                 return CORSRequestType.SIMPLE;
             case Method.POST:
                 String mediaType = MediaType.parseMediaTypeOnly(request.getContentType());

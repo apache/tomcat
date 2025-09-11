@@ -2314,7 +2314,7 @@ public class DefaultServlet extends HttpServlet {
             WebResource resource) {
 
         String method = request.getMethod();
-        if (!Method.GET.equals(method) && !"HEAD".equals(method)) {
+        if (!Method.GET.equals(method) && !Method.HEAD.equals(method)) {
             return true;
         }
 
@@ -2422,7 +2422,7 @@ public class DefaultServlet extends HttpServlet {
             // 304 Not Modified.
             // For every other method, 412 Precondition Failed is sent
             // back.
-            if (Method.GET.equals(request.getMethod()) || "HEAD".equals(request.getMethod())) {
+            if (Method.GET.equals(request.getMethod()) || Method.HEAD.equals(request.getMethod())) {
                 response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                 response.setHeader("ETag", resourceETag);
             } else {
