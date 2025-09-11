@@ -776,6 +776,16 @@ public class openssl_h {
         return SSL_CTRL_SET_GROUPS;
     }
 
+    private static final int SSL_CTRL_SET_GROUPS_LIST = (int) 92L;
+
+    /**
+     * {@snippet lang = c : * #define SSL_CTRL_SET_GROUPS_LIST 92
+     * }
+     */
+    public static int SSL_CTRL_SET_GROUPS_LIST() {
+        return SSL_CTRL_SET_GROUPS_LIST;
+    }
+
     private static final int SSL_CTRL_SET_DH_AUTO = (int) 118L;
 
     /**
