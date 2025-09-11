@@ -108,7 +108,7 @@ public final class Constants {
     // Translates integer codes to names of HTTP methods
     private static final String[] methodTransArray =
             { Method.OPTIONS, Method.GET, Method.HEAD, Method.POST, Method.PUT, Method.OPTIONS, Method.TRACE, Method.TRACE, Method.PROPPATCH, Method.MKCOL, Method.COPY,
-                    Method.MOVE, Method.LOCK, "UNLOCK", "ACL", "REPORT", "VERSION-CONTROL", "CHECKIN", "CHECKOUT", "UNCHECKOUT",
+                    Method.MOVE, Method.LOCK, Method.UNLOCK, "ACL", "REPORT", "VERSION-CONTROL", "CHECKIN", "CHECKOUT", "UNCHECKOUT",
                     "SEARCH", "MKWORKSPACE", "UPDATE", "LABEL", "MERGE", "BASELINE-CONTROL", "MKACTIVITY" };
 
     /**
