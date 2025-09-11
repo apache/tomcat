@@ -43,7 +43,7 @@ import org.apache.tomcat.util.net.NioEndpoint.NioSocketWrapper;
 import org.apache.tomcat.util.net.TLSClientHelloExtractor.ExtractorResult;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.net.openssl.ciphers.Group;
-import org.apache.tomcat.util.net.openssl.ciphers.SignatureAlgorithm;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureScheme;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -277,7 +277,7 @@ public class SecureNioChannel extends NioChannel {
         List<Cipher> clientRequestedCiphers = null;
         List<String> clientRequestedApplicationProtocols = null;
         List<Group> clientSupportedGroups = null;
-        List<SignatureAlgorithm> clientSignatureAlgorithms = null;
+        List<SignatureScheme> clientSignatureSchemes = null;
         switch (extractor.getResult()) {
             case COMPLETE:
                 hostName = extractor.getSNIValue();
@@ -286,7 +286,7 @@ public class SecureNioChannel extends NioChannel {
             case NOT_PRESENT:
                 clientRequestedCiphers = extractor.getClientRequestedCiphers();
                 clientSupportedGroups = extractor.getClientSupportedGroups();
-                clientSignatureAlgorithms = extractor.getClientSignatureAlgorithms();
+                clientSignatureSchemes = extractor.getClientSignatureSchemes();
                 break;
             case NEED_READ:
                 return SelectionKey.OP_READ;
@@ -313,12 +313,12 @@ public class SecureNioChannel extends NioChannel {
         try {
             AbstractJsseEndpoint.clientRequestedProtocolsThreadLocal.set(extractor.getClientRequestedProtocols());
             AbstractJsseEndpoint.clientSupportedGroupsThreadLocal.set(clientSupportedGroups);
-            AbstractJsseEndpoint.clientSignatureAlgorithmsThreadLocal.set(clientSignatureAlgorithms);
+            AbstractJsseEndpoint.clientSignatureSchemesThreadLocal.set(clientSignatureSchemes);
             sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols);
         } finally {
             AbstractJsseEndpoint.clientRequestedProtocolsThreadLocal.set(null);
             AbstractJsseEndpoint.clientSupportedGroupsThreadLocal.set(null);
-            AbstractJsseEndpoint.clientSignatureAlgorithmsThreadLocal.set(null);
+            AbstractJsseEndpoint.clientSignatureSchemesThreadLocal.set(null);
         }
 
         // Populate additional TLS attributes obtained from the handshake that

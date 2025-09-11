@@ -32,13 +32,14 @@ import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.net.openssl.ciphers.Group;
-import org.apache.tomcat.util.net.openssl.ciphers.SignatureAlgorithm;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureScheme;
 
 public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
 
+    // Thread local use to pass additional arguments to createSSLEngine without changing the protected method signature
     static final ThreadLocal<List<String>> clientRequestedProtocolsThreadLocal = new ThreadLocal<>();
     static final ThreadLocal<List<Group>> clientSupportedGroupsThreadLocal = new ThreadLocal<>();
-    static final ThreadLocal<List<SignatureAlgorithm>> clientSignatureAlgorithmsThreadLocal = new ThreadLocal<>();
+    static final ThreadLocal<List<SignatureScheme>> clientSignatureSchemesThreadLocal = new ThreadLocal<>();
 
     private String sslImplementationName = null;
     private int sniParseLimit = 64 * 1024;
@@ -128,12 +129,12 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
             List<String> clientRequestedApplicationProtocols) {
         List<String> clientRequestedProtocols = clientRequestedProtocolsThreadLocal.get();
         List<Group> clientSupportedGroups = clientSupportedGroupsThreadLocal.get();
-        List<SignatureAlgorithm> clientSignatureAlgorithms = clientSignatureAlgorithmsThreadLocal.get();
+        List<SignatureScheme> clientSignatureSchemes = clientSignatureSchemesThreadLocal.get();
 
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
 
         SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers,
-                clientRequestedProtocols, clientSignatureAlgorithms);
+                clientRequestedProtocols, clientSignatureSchemes);
 
         SSLContext sslContext = certificate.getSslContext();
         if (sslContext == null) {
@@ -197,7 +198,7 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
 
 
     private SSLHostConfigCertificate selectCertificate(SSLHostConfig sslHostConfig, List<Cipher> clientCiphers,
-            List<String> clientRequestedProtocols, List<SignatureAlgorithm> clientSignatureAlgorithms) {
+            List<String> clientRequestedProtocols, List<SignatureScheme> clientSignatureSchemes) {
 
         Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
         if (certificates.size() == 1) {
@@ -207,9 +208,9 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
         // Use signature algorithm for cipher matching with TLS 1.3
         if ((clientRequestedProtocols.contains(Constants.SSL_PROTO_TLSv1_3)) &&
                 sslHostConfig.getProtocols().contains(Constants.SSL_PROTO_TLSv1_3)) {
-            for (SignatureAlgorithm signatureAlgorithm : clientSignatureAlgorithms) {
+            for (SignatureScheme signatureScheme : clientSignatureSchemes) {
                 for (SSLHostConfigCertificate certificate : certificates) {
-                    if (certificate.getType().isCompatibleWith(signatureAlgorithm)) {
+                    if (certificate.getType().isCompatibleWith(signatureScheme)) {
                         return certificate;
                     }
                 }
