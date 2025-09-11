@@ -99,7 +99,6 @@ public class SecureNio2Channel extends Nio2Channel {
         handshakeWriteCompletionHandler = new HandshakeWriteCompletionHandler();
     }
 
-
     private class HandshakeReadCompletionHandler implements CompletionHandler<Integer,SocketWrapperBase<Nio2Channel>> {
         @Override
         public void completed(Integer result, SocketWrapperBase<Nio2Channel> attachment) {
