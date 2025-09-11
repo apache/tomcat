@@ -79,17 +79,17 @@ public enum SignatureScheme {
     private static final Map<Integer,SignatureScheme> idMap = new HashMap<>();
 
     static {
-        for (SignatureScheme group : values()) {
-            int id = group.getId();
+        for (SignatureScheme scheme : values()) {
+            int id = scheme.getId();
 
             if (id > 0 && id < 0xFFFF) {
-                idMap.put(Integer.valueOf(id), group);
+                idMap.put(Integer.valueOf(id), scheme);
             }
         }
     }
 
 
-    public static SignatureScheme valueOf(int groupId) {
-        return idMap.get(Integer.valueOf(groupId));
+    public static SignatureScheme valueOf(int schemeId) {
+        return idMap.get(Integer.valueOf(schemeId));
     }
 }
