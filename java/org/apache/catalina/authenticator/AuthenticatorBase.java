@@ -610,7 +610,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         if (allowCorsPreflight != AllowCorsPreflight.NEVER) {
             // First check to see if this is a CORS Preflight request
             // This is a subset of the tests in CorsFilter.checkRequestType
-            if ("OPTIONS".equals(request.getMethod())) {
+            if (Method.OPTIONS.equals(request.getMethod())) {
                 String originHeader = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
                 if (originHeader != null && !originHeader.isEmpty() && RequestUtil.isValidOrigin(originHeader) &&
                         !RequestUtil.isSameOrigin(request, originHeader)) {

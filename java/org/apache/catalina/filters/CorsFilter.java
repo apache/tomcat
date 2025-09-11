@@ -406,7 +406,7 @@ public class CorsFilter extends GenericFilter {
             response.addHeader(RESPONSE_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS, exposedHeadersString);
         }
 
-        if ("OPTIONS".equals(method)) {
+        if (Method.OPTIONS.equals(method)) {
             // For an OPTIONS request, the response will vary based on the
             // value or absence of the following headers. Hence, they need to be
             // included in the Vary header.
@@ -555,7 +555,7 @@ public class CorsFilter extends GenericFilter {
             return CORSRequestType.INVALID_CORS;
         }
         switch (method) {
-            case "OPTIONS":
+            case Method.OPTIONS:
                 String accessControlRequestMethodHeader =
                         request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
                 if (accessControlRequestMethodHeader != null) {
