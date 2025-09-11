@@ -298,7 +298,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         hconn.setDoInput(true);
         hconn.setUseCaches(false);
         hconn.setDoOutput(false);
-        hconn.setRequestMethod("OPTIONS");
+        hconn.setRequestMethod(Method.OPTIONS);
         hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
 
         // Establish the connection with the server

@@ -62,27 +62,27 @@ public class TestAuthenticatorBaseCorsPreflight extends TomcatBaseTest {
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] { AllowCorsPreflight.NEVER, "/*", "OPTIONS", null, null, Boolean.FALSE });
-        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", null, null, Boolean.FALSE });
-        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", ALLOWED_ORIGIN, ALLOWED_METHOD,
+        parameterSets.add(new Object[] { AllowCorsPreflight.NEVER, "/*", Method.OPTIONS, null, null, Boolean.FALSE });
+        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", Method.OPTIONS, null, null, Boolean.FALSE });
+        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", Method.OPTIONS, ALLOWED_ORIGIN, ALLOWED_METHOD,
                 Boolean.TRUE });
-        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", EMPTY_ORIGIN, ALLOWED_METHOD,
+        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", Method.OPTIONS, EMPTY_ORIGIN, ALLOWED_METHOD,
                 Boolean.FALSE });
-        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", INVALID_ORIGIN, ALLOWED_METHOD,
+        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", Method.OPTIONS, INVALID_ORIGIN, ALLOWED_METHOD,
                 Boolean.FALSE });
-        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", SAME_ORIGIN, ALLOWED_METHOD,
+        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", Method.OPTIONS, SAME_ORIGIN, ALLOWED_METHOD,
                 Boolean.FALSE });
         parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", Method.GET, ALLOWED_ORIGIN, ALLOWED_METHOD,
                 Boolean.FALSE });
-        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", ALLOWED_ORIGIN, BLOCKED_METHOD,
+        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", Method.OPTIONS, ALLOWED_ORIGIN, BLOCKED_METHOD,
                 Boolean.FALSE });
-        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", ALLOWED_ORIGIN, EMPTY_METHOD,
+        parameterSets.add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", Method.OPTIONS, ALLOWED_ORIGIN, EMPTY_METHOD,
                 Boolean.FALSE });
         parameterSets
-                .add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", "OPTIONS", ALLOWED_ORIGIN, null, Boolean.FALSE });
-        parameterSets.add(new Object[] { AllowCorsPreflight.FILTER, "/*", "OPTIONS", ALLOWED_ORIGIN, ALLOWED_METHOD,
+                .add(new Object[] { AllowCorsPreflight.ALWAYS, "/*", Method.OPTIONS, ALLOWED_ORIGIN, null, Boolean.FALSE });
+        parameterSets.add(new Object[] { AllowCorsPreflight.FILTER, "/*", Method.OPTIONS, ALLOWED_ORIGIN, ALLOWED_METHOD,
                 Boolean.TRUE });
-        parameterSets.add(new Object[] { AllowCorsPreflight.FILTER, "/x", "OPTIONS", ALLOWED_ORIGIN, ALLOWED_METHOD,
+        parameterSets.add(new Object[] { AllowCorsPreflight.FILTER, "/x", Method.OPTIONS, ALLOWED_ORIGIN, ALLOWED_METHOD,
                 Boolean.FALSE });
 
         return parameterSets;
