@@ -112,7 +112,7 @@ public class SimpleAjpClient {
             case Method.MOVE:
                 this.method = 12;
                 break;
-            case "LOCK":
+            case Method.LOCK:
                 this.method = 13;
                 break;
             case "UNLOCK":
@@ -189,7 +189,7 @@ public class SimpleAjpClient {
             case 12:
                 return Method.MOVE;
             case 13:
-                return "LOCK";
+                return Method.LOCK;
             case 14:
                 return "UNLOCK";
             case 15:
