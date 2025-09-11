@@ -218,7 +218,7 @@ public final class CGIServlet extends HttpServlet {
 
     static {
         DEFAULT_SUPER_METHODS.add(Method.HEAD);
-        DEFAULT_SUPER_METHODS.add("OPTIONS");
+        DEFAULT_SUPER_METHODS.add(Method.OPTIONS);
         DEFAULT_SUPER_METHODS.add("TRACE");
 
         if (JrePlatform.IS_WINDOWS) {
