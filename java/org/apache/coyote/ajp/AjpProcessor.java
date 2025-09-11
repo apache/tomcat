@@ -48,6 +48,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
@@ -908,7 +909,7 @@ public class AjpProcessor extends AbstractProcessor {
         // Responses with certain status codes and/or methods are not permitted to include a response body.
         int statusCode = response.getStatus();
         if (statusCode < 200 || statusCode == 204 || statusCode == 205 || statusCode == 304 ||
-                "HEAD".equals(request.getMethod())) {
+                Method.HEAD.equals(request.getMethod())) {
             // No entity body
             swallowResponse = true;
         }

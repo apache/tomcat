@@ -33,6 +33,7 @@ import org.apache.coyote.CloseNowException;
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharsetHolder;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -227,7 +228,7 @@ public class OutputBuffer extends Writer {
         // AND
         // - some content has been written OR this is NOT a HEAD request
         if (!coyoteResponse.isCommitted() && coyoteResponse.getContentLengthLong() == -1 &&
-                (bb.remaining() > 0 || !"HEAD".equals(coyoteResponse.getRequest().getMethod()))) {
+                (bb.remaining() > 0 || !Method.HEAD.equals(coyoteResponse.getRequest().getMethod()))) {
             coyoteResponse.setContentLength(bb.remaining());
         }
 

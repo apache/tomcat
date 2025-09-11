@@ -586,7 +586,7 @@ public class FormAuthenticator extends AuthenticatorBase {
         String method = saved.getMethod();
         MimeHeaders rmh = request.getCoyoteRequest().getMimeHeaders();
         rmh.recycle();
-        boolean cacheable = Method.GET.equals(method) || "HEAD".equals(method);
+        boolean cacheable = Method.GET.equals(method) || Method.HEAD.equals(method);
         Iterator<String> names = saved.getHeaderNames();
         while (names.hasNext()) {
             String name = names.next();

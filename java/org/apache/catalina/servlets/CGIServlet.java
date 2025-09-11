@@ -217,7 +217,7 @@ public final class CGIServlet extends HttpServlet {
     private static final String ALLOW_ANY_PATTERN = ".*";
 
     static {
-        DEFAULT_SUPER_METHODS.add("HEAD");
+        DEFAULT_SUPER_METHODS.add(Method.HEAD);
         DEFAULT_SUPER_METHODS.add("OPTIONS");
         DEFAULT_SUPER_METHODS.add("TRACE");
 
@@ -734,8 +734,8 @@ public final class CGIServlet extends HttpServlet {
             // does not contain an unencoded "=" this is an indexed query.
             // The parsed query string becomes the command line parameters
             // for the cgi command.
-            if (enableCmdLineArguments && (Method.GET.equals(req.getMethod()) || req.getMethod().equals(Method.POST) ||
-                    req.getMethod().equals("HEAD"))) {
+            if (enableCmdLineArguments && (Method.GET.equals(req.getMethod()) || Method.POST.equals(req.getMethod()) ||
+                    Method.HEAD.equals(req.getMethod()))) {
                 String qs;
                 if (isIncluded) {
                     qs = (String) req.getAttribute(RequestDispatcher.INCLUDE_QUERY_STRING);

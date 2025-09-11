@@ -46,6 +46,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.http.parser.Priority;
@@ -364,7 +365,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
             case ":method": {
                 if (coyoteRequest.getMethod() == null) {
                     coyoteRequest.setMethod(value);
-                    if ("HEAD".equals(value)) {
+                    if (Method.HEAD.equals(value)) {
                         configureVoidOutputFilter();
                     }
                 } else {
