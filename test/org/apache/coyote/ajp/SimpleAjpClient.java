@@ -91,7 +91,7 @@ public class SimpleAjpClient {
             case Method.PUT:
                 this.method = 5;
                 break;
-            case "DELETE":
+            case Method.DELETE:
                 this.method = 6;
                 break;
             case "TRACE":
@@ -175,7 +175,7 @@ public class SimpleAjpClient {
             case 5:
                 return Method.PUT;
             case 6:
-                return "DELETE";
+                return Method.DELETE;
             case 7:
                 return "TRACE";
             case 8:
