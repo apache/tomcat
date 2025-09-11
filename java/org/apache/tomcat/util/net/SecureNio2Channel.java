@@ -44,6 +44,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteBufferUtils;
 import org.apache.tomcat.util.net.TLSClientHelloExtractor.ExtractorResult;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
+import org.apache.tomcat.util.net.openssl.ciphers.Group;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureScheme;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -97,8 +99,10 @@ public class SecureNio2Channel extends Nio2Channel {
     }
 
     protected void createSSLEngine(String hostName, List<Cipher> clientRequestedCiphers,
-            List<String> clientRequestedApplicationProtocols) {
-        sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols);
+            List<String> clientRequestedApplicationProtocols, List<String> clientRequestedProtocols,
+            List<Group> clientSupportedGroups, List<SignatureScheme> clientSignatureAlgorithms) {
+        sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols,
+                clientRequestedProtocols, clientSupportedGroups, clientSignatureAlgorithms);
     }
 
 
@@ -407,6 +411,8 @@ public class SecureNio2Channel extends Nio2Channel {
         String hostName = null;
         List<Cipher> clientRequestedCiphers = null;
         List<String> clientRequestedApplicationProtocols = null;
+        List<Group> clientSupportedGroups = null;
+        List<SignatureScheme> clientSignatureSchemes = null;
         switch (extractor.getResult()) {
             case COMPLETE:
                 hostName = extractor.getSNIValue();
@@ -414,6 +420,8 @@ public class SecureNio2Channel extends Nio2Channel {
                 //$FALL-THROUGH$ to set the client requested ciphers
             case NOT_PRESENT:
                 clientRequestedCiphers = extractor.getClientRequestedCiphers();
+                clientSupportedGroups = extractor.getClientSupportedGroups();
+                clientSignatureSchemes = extractor.getClientSignatureSchemes();
                 break;
             case NEED_READ:
                 sc.read(netInBuffer, AbstractEndpoint.toTimeout(endpoint.getConnectionTimeout()), TimeUnit.MILLISECONDS,
@@ -439,7 +447,8 @@ public class SecureNio2Channel extends Nio2Channel {
             log.trace(sm.getString("channel.nio.ssl.sniHostName", sc, hostName));
         }
 
-        createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols);
+        createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols,
+                extractor.getClientRequestedProtocols(), clientSupportedGroups, clientSignatureSchemes);
 
         // Populate additional TLS attributes obtained from the handshake that
         // aren't available from the session
