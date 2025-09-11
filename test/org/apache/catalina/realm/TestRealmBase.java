@@ -733,7 +733,7 @@ public class TestRealmBase {
 
         // Only users with application roles (role1 or role2 so user1 or user2)
         // should be able to perform a PUT.
-        request.setMethod("PUT");
+        request.setMethod(Method.PUT);
 
         SecurityConstraint[] constraintsPut =
                 mapRealm.findSecurityConstraints(request, context);
