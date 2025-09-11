@@ -160,6 +160,9 @@
                resourceName="UserDatabase"/>
       </Realm>
 
+      <!-- LowerCaseHeaders valve makes http headers case insensitive, but retains original spelling --> 
+      <Valve className="org.apache.catalina.valves.LowerCaseHeadersValve" />
+
       <Host name="localhost"  appBase="webapps"
             unpackWARs="true" autoDeploy="true">
 
