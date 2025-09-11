@@ -63,6 +63,7 @@ import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
+import org.apache.tomcat.util.net.openssl.ciphers.Group;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_alpn_select_cb$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_cert_verify_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_tmp_dh_callback$dh;
@@ -258,6 +259,26 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // Set int pem_password_cb(char *buf, int size, int rwflag, void *u) callback
             SSL_CTX_set_default_passwd_cb(sslCtx, pem_password_cb.allocate(new PasswordCallback(null), contextArena));
+
+            // Set server groups
+            if (sslHostConfig.getGroupList() != null) {
+                StringBuilder sb = new StringBuilder();
+                boolean first = true;
+                for (Group group : sslHostConfig.getGroupList()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(':');
+                    }
+                    sb.append(group.toString());
+                }
+                try (var localArena = Arena.ofConfined()) {
+                    if (SSL_CTX_set1_groups_list(sslCtx, localArena.allocateFrom(sb.toString())) <= 0) {
+                        logLastError("openssl.errorSettingGroups");
+                        // Consider this is not fatal
+                    }
+                }
+            }
 
             if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {
                 alpn = true;
