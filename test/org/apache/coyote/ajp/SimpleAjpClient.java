@@ -115,7 +115,7 @@ public class SimpleAjpClient {
             case Method.LOCK:
                 this.method = 13;
                 break;
-            case "UNLOCK":
+            case Method.UNLOCK:
                 this.method = 14;
                 break;
             case "ACL":
@@ -191,7 +191,7 @@ public class SimpleAjpClient {
             case 13:
                 return Method.LOCK;
             case 14:
-                return "UNLOCK";
+                return Method.UNLOCK;
             case 15:
                 return "ACL";
             case 16:
