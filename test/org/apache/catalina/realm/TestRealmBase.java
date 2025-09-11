@@ -713,7 +713,7 @@ public class TestRealmBase {
 
         // Only user1 should be able to perform a POST as only that user has
         // role1.
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
 
         SecurityConstraint[] constraintsPost =
                 mapRealm.findSecurityConstraints(request, context);

@@ -376,7 +376,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             byte[] padding, boolean withTrailers, int streamId) {
 
         MimeHeaders headers = new MimeHeaders();
-        headers.addValue(":method").setString("POST");
+        headers.addValue(":method").setString(Method.POST);
         headers.addValue(":scheme").setString("http");
         headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());

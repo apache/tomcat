@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -49,7 +50,7 @@ public class TestFlowControl extends Http2TestBase {
             ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
             MimeHeaders headers = new MimeHeaders();
-            headers.addValue(":method").setString("POST");
+            headers.addValue(":method").setString(Method.POST);
             headers.addValue(":scheme").setString("http");
             headers.addValue(":path").setString("/path-does-not-exist");
             headers.addValue(":authority").setString("localhost:" + getPort());
