@@ -70,7 +70,7 @@
     </tbody>
 </table>
 
-<form method="get" action="<%=request.getContextPath()%>/html">
+<form method="GET" action="<%=request.getContextPath()%>/html">
   <p style="text-align: center;">
     <input type="submit" value="Return to main page" />
   </p>
