@@ -34,6 +34,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.apache.tomcat.util.http.Method;
 
 
 public class TestApplicationDispatcher extends TomcatBaseTest {
@@ -122,7 +123,7 @@ public class TestApplicationDispatcher extends TomcatBaseTest {
             resp.setCharacterEncoding(StandardCharsets.UTF_8);
             PrintWriter pw = resp.getWriter();
 
-            if ("POST".equals(req.getAttribute(RequestDispatcher.ERROR_METHOD)) && "GET".equals(req.getMethod())) {
+            if ("POST".equals(req.getAttribute(RequestDispatcher.ERROR_METHOD)) && Method.GET.equals(req.getMethod())) {
                 pw.print("OK");
             } else {
                 pw.print("FAIL");

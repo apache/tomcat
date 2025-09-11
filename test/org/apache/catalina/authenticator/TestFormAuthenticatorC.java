@@ -29,6 +29,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 /*
@@ -89,7 +90,7 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
 
     @Test
     public void testPostWithContinueAndCookies() throws Exception {
-        doTest("POST", "GET", USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest("POST", Method.GET, USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // Bug 49779
@@ -104,7 +105,7 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
 
     @Test
     public void testPostWithContinueNoServerCookies() throws Exception {
-        doTest("POST", "GET", USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+        doTest("POST", Method.GET, USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // variant of Bug 49779
@@ -120,12 +121,12 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
 
     @Test
     public void testGetNoClientCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.GET, Method.GET, NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     @Test
     public void testPostWithContinueNoClientCookies() throws Exception {
-        doTest("POST", "GET", USE_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest("POST", Method.GET, USE_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // variant of Bug 49779
@@ -303,7 +304,7 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
                 } else {
                     requestHead.append(PROTECTED_RELATIVE_PATH).append(resourceUri);
                 }
-                if ("GET".equals(method)) {
+                if (Method.GET.equals(method)) {
                     requestHead.append("?role=bar");
                 }
             }

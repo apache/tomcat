@@ -34,6 +34,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.http.Method;
 
 public class TestHttp11InputBuffer extends TomcatBaseTest {
 
@@ -552,7 +553,7 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
     public void testInvalidMethod() {
 
         String[] request = new String[1];
-        request[0] = "GET" + (char) 0 + " /test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" +
+        request[0] = Method.GET + (char) 0 + " /test HTTP/1.1" + CRLF + "Host: localhost:8080" + CRLF + "Connection: close" +
                 CRLF + CRLF;
 
         InvalidClient client = new InvalidClient(request);

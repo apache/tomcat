@@ -23,6 +23,8 @@ import java.util.Locale;
 
 import javax.net.SocketFactory;
 
+import org.apache.tomcat.util.http.Method;
+
 /**
  * AJP client that is not (yet) a full AJP client implementation as it just provides the functionality required for the
  * unit tests. The client uses blocking IO throughout.
@@ -77,7 +79,7 @@ public class SimpleAjpClient {
             case "OPTIONS":
                 this.method = 1;
                 break;
-            case "GET":
+            case Method.GET:
                 this.method = 2;
                 break;
             case "HEAD":
@@ -165,7 +167,7 @@ public class SimpleAjpClient {
             case 1:
                 return "OPTIONS";
             case 2:
-                return "GET";
+                return Method.GET;
             case 3:
                 return "HEAD";
             case 4:

@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.net.URLConnection;
 
 import org.apache.catalina.util.IOTools;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
@@ -198,7 +199,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 }
             } else {
                 hconn.setDoOutput(false);
-                hconn.setRequestMethod("GET");
+                hconn.setRequestMethod(Method.GET);
             }
             hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
 

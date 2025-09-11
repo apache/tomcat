@@ -29,6 +29,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 /*
@@ -89,7 +90,7 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
 
     @Test
     public void testPostNoContinueWithCookies() throws Exception {
-        doTest("POST", "GET", NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest("POST", Method.GET, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // Bug 49779
@@ -104,7 +105,7 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
 
     @Test
     public void testPostNoContinueNoServerCookies() throws Exception {
-        doTest("POST", "GET", NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+        doTest("POST", Method.GET, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // variant of Bug 49779
@@ -120,7 +121,7 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
 
     @Test
     public void testPostNoContinueNoClientCookies() throws Exception {
-        doTest("POST", "GET", NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest("POST", Method.GET, NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // variant of Bug 49779
@@ -298,7 +299,7 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
                 } else {
                     requestHead.append(PROTECTED_RELATIVE_PATH).append(resourceUri);
                 }
-                if ("GET".equals(method)) {
+                if (Method.GET.equals(method)) {
                     requestHead.append("?role=bar");
                 }
             }

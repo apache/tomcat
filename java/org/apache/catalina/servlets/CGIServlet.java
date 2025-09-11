@@ -58,6 +58,7 @@ import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JrePlatform;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -370,7 +371,7 @@ public final class CGIServlet extends HttpServlet {
                 }
             }
         } else {
-            cgiMethods.add("GET");
+            cgiMethods.add(Method.GET);
             cgiMethods.add("POST");
         }
 
@@ -733,7 +734,7 @@ public final class CGIServlet extends HttpServlet {
             // does not contain an unencoded "=" this is an indexed query.
             // The parsed query string becomes the command line parameters
             // for the cgi command.
-            if (enableCmdLineArguments && (req.getMethod().equals("GET") || req.getMethod().equals("POST") ||
+            if (enableCmdLineArguments && (Method.GET.equals(req.getMethod()) || req.getMethod().equals("POST") ||
                     req.getMethod().equals("HEAD"))) {
                 String qs;
                 if (isIncluded) {
