@@ -103,7 +103,7 @@ public class SimpleAjpClient {
             case Method.PROPPATCH:
                 this.method = 9;
                 break;
-            case "MKCOL":
+            case Method.MKCOL:
                 this.method = 10;
                 break;
             case "COPY":
@@ -183,7 +183,7 @@ public class SimpleAjpClient {
             case 9:
                 return Method.PROPPATCH;
             case 10:
-                return "MKCOL";
+                return Method.MKCOL;
             case 11:
                 return "COPY";
             case 12:
