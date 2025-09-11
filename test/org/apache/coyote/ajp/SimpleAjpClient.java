@@ -109,7 +109,7 @@ public class SimpleAjpClient {
             case Method.COPY:
                 this.method = 11;
                 break;
-            case "MOVE":
+            case Method.MOVE:
                 this.method = 12;
                 break;
             case "LOCK":
@@ -187,7 +187,7 @@ public class SimpleAjpClient {
             case 11:
                 return Method.COPY;
             case 12:
-                return "MOVE";
+                return Method.MOVE;
             case 13:
                 return "LOCK";
             case 14:
