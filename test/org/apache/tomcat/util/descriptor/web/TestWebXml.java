@@ -32,6 +32,7 @@ import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.descriptor.XmlErrorHandler;
 import org.apache.tomcat.util.descriptor.XmlIdentifiers;
 import org.apache.tomcat.util.digester.Digester;
+import org.apache.tomcat.util.http.Method;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -304,7 +305,7 @@ public class TestWebXml {
         SecurityCollection collection = new SecurityCollection();
         collection.setName("dummy");
         collection.addPatternDecoded("/*");
-        collection.addMethod("DELETE");
+        collection.addMethod(Method.DELETE);
         sc.addCollection(collection);
         webXmlDefaultFragment.addSecurityConstraint(sc);
 
