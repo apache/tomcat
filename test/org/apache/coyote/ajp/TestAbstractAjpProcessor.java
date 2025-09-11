@@ -487,7 +487,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     @Test
     public void testSmallBody() throws Exception {
         RequestDescriptor desc = new RequestDescriptor();
-        desc.putRequestInfo("REQUEST-METHOD", "PUT");
+        desc.putRequestInfo("REQUEST-METHOD", Method.PUT);
         desc.putRequestInfo("REQUEST-CONTENT-LENGTH", "100");
         desc.putRequestInfo("REQUEST-BODY-SIZE", "100");
         desc.putRequestInfo("REQUEST-URI", "/testSmallBody");
@@ -497,7 +497,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     @Test
     public void testLargeBody() throws Exception {
         RequestDescriptor desc = new RequestDescriptor();
-        desc.putRequestInfo("REQUEST-METHOD", "PUT");
+        desc.putRequestInfo("REQUEST-METHOD", Method.PUT);
         desc.putRequestInfo("REQUEST-CONTENT-LENGTH", "10000");
         desc.putRequestInfo("REQUEST-BODY-SIZE", "10000");
         desc.putRequestInfo("REQUEST-URI", "/testLargeBody");

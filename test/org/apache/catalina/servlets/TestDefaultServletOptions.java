@@ -34,7 +34,7 @@ public class TestDefaultServletOptions extends ServletOptionsBaseTest {
     @Parameters
     public static Collection<Object[]> inputs() {
         String[] urls = new String[] { COLLECTION_NAME, FILE_NAME, UNKNOWN_NAME };
-        String[] methods = new String[] { Method.GET, Method.POST, "HEAD", "TRACE", "PUT", "DELETE" };
+        String[] methods = new String[] { Method.GET, Method.POST, "HEAD", "TRACE", Method.PUT, "DELETE" };
 
         List<Object[]> result = new ArrayList<>();
 

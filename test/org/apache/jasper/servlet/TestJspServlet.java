@@ -32,6 +32,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.apache.tomcat.util.http.Method;
 
 public class TestJspServlet  extends TomcatBaseTest {
 
@@ -60,7 +61,7 @@ public class TestJspServlet  extends TomcatBaseTest {
 
         // When using JaCoCo, the CI system seems to need a longer timeout
         int rc = methodUrl("http://localhost:" + getPort() + "/test/bug56568",
-                new ByteChunk(), 30000, null, null, "PUT");
+                new ByteChunk(), 30000, null, null, Method.PUT);
 
         // Make sure we get the original 500 response and not a 405 response
         // which would indicate that error.jsp is complaining about being called
@@ -74,7 +75,7 @@ public class TestJspServlet  extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         int rc = methodUrl("http://localhost:" + getPort() + "/test/jsp/error.jsp",
-                new ByteChunk(), 500000, null, null, "PUT");
+                new ByteChunk(), 500000, null, null, Method.PUT);
 
         // Make sure we get a 200 response and not a 405 response
         // which would indicate that error.jsp is complaining about being called
@@ -88,7 +89,7 @@ public class TestJspServlet  extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         int rc = methodUrl("http://localhost:" + getPort() + "/test/jsp/test.jsp",
-                new ByteChunk(), 500000, null, null, "PUT");
+                new ByteChunk(), 500000, null, null, Method.PUT);
 
         // Make sure we get a 405 response which indicates that test.jsp is
         // complaining about being called with the PUT method.
