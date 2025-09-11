@@ -31,6 +31,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.Method;
 
 public class TestDefaultServletRfc9110Section14 extends TomcatBaseTest {
 
@@ -63,7 +64,7 @@ public class TestDefaultServletRfc9110Section14 extends TomcatBaseTest {
         Assert.assertTrue("Range requests is turn on, header `Accept-Ranges: bytes` is expected",
                 responseHeaders.containsKey("Accept-Ranges") && responseHeaders.get("Accept-Ranges").contains("bytes"));
 
-        rc = methodUrl(path, responseBody, DEFAULT_CLIENT_TIMEOUT_MS, requestHeaders, responseHeaders, "HEAD");
+        rc = methodUrl(path, responseBody, DEFAULT_CLIENT_TIMEOUT_MS, requestHeaders, responseHeaders, Method.HEAD);
         Assert.assertEquals("Range requests is turn on, SC_OK of HEAD is expected", HttpServletResponse.SC_OK, rc);
         Assert.assertTrue("Range requests is turn on, header `Accept-Ranges: bytes` is expected",
                 responseHeaders.containsKey("Accept-Ranges") && responseHeaders.get("Accept-Ranges").contains("bytes"));

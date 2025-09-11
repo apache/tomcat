@@ -41,6 +41,7 @@ import org.apache.coyote.http2.Http2TestBase;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.tomcat.util.http.Method;
 
 /*
  * Split into multiple tests as a single test takes so long it impacts the time
@@ -245,7 +246,7 @@ public class HttpServletDoHeadBaseTest extends Http2TestBase {
             int adjustedBufferSize = bufferSize;
             boolean resetBufferSize = false;
 
-            if (JreCompat.isJre19Available() && "HEAD".equals(req.getMethod()) && useWriter &&
+            if (JreCompat.isJre19Available() && Method.HEAD.equals(req.getMethod()) && useWriter &&
                     resetType != ResetType.NONE) {
                 /*
                  * Using legacy (non-legacy isn't available until Servlet 6.0 / Tomcat 10.1.x) HEAD handling with a

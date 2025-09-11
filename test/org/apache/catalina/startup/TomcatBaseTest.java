@@ -669,7 +669,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
     public static int headUrl(String path, ByteChunk out, Map<String, List<String>> resHead)
             throws IOException {
-        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, "HEAD");
+        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, Method.HEAD);
     }
 
     public static int getUrl(String path, ByteChunk out, Map<String, List<String>> reqHead,

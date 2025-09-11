@@ -1425,7 +1425,7 @@ public class ExpiresFilter extends FilterBase {
 
         // Don't add cache headers unless the request is a GET or a HEAD request
         String method = request.getMethod();
-        if (!Method.GET.equals(method) && !"HEAD".equals(method)) {
+        if (!Method.GET.equals(method) && !Method.HEAD.equals(method)) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("expiresFilter.invalidMethod", request.getRequestURI(), method));
             }

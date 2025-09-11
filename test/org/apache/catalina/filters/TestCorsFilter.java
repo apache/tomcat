@@ -110,7 +110,7 @@ public class TestCorsFilter {
     public void testDoFilterSimpleHEAD() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
-        request.setMethod("HEAD");
+        request.setMethod(Method.HEAD);
         TesterHttpServletResponse response = new TesterHttpServletResponse();
 
         CorsFilter corsFilter = new CorsFilter();
