@@ -133,10 +133,15 @@
   <subsection name="Coyote">
     <changelog>
       <update>
-        Add hybrid PQC support to OpenSSL, based on code from
-        <code>mod_ssl</code>. Using this OpenSSL specific code path,
-        additional PQC certificates defined with type <code>MLDSA</code> are
-        added to contexts which use classic certificates. (jfclere/remm)
+        Add specific certificate selection code for TLS 1.3 supporting post
+        quantum cryptography. Certificates defined with type
+        <code>MLDSA</code> will be selected depending on the TLS client hello.
+        (remm)
+      </update>
+      <update>
+        Add <code>groups</code> attribute on <code>SSLHostConfig</code>
+        allowing to restrict which groups can be enabled on the SSL engine.
+        (remm)
       </update>
       <add>
         Optimize the conversion of HTTP method from byte form to String form.

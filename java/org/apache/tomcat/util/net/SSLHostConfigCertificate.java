@@ -30,6 +30,7 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureAlgorithm;
 import org.apache.tomcat.util.res.StringManager;
 
 public class SSLHostConfigCertificate implements Serializable {
@@ -318,7 +319,7 @@ public class SSLHostConfigCertificate implements Serializable {
         RSA(Authentication.RSA),
         DSA(Authentication.DSS),
         EC(Authentication.ECDH, Authentication.ECDSA),
-        MLDSA;
+        MLDSA(Authentication.MLDSA);
 
         private final Set<Authentication> compatibleAuthentications;
 
@@ -332,6 +333,11 @@ public class SSLHostConfigCertificate implements Serializable {
         public boolean isCompatibleWith(Authentication au) {
             return compatibleAuthentications.contains(au);
         }
+
+        public boolean isCompatibleWith(SignatureAlgorithm al) {
+            return al.toString().toUpperCase().startsWith(toString());
+        }
+
     }
 
     enum StoreType {
