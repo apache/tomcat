@@ -642,7 +642,7 @@ public class AjpProcessor extends AbstractProcessor {
         byte methodCode = requestHeaderMessage.getByte();
         if (methodCode != Constants.SC_M_JK_STORED) {
             String methodName = Constants.getMethodForCode(methodCode - 1);
-            request.method().setString(methodName);
+            request.setMethod(methodName);
         }
 
         requestHeaderMessage.getBytes(request.protocol());
@@ -810,7 +810,11 @@ public class AjpProcessor extends AbstractProcessor {
                 }
                 case Constants.SC_A_SSL_KEY_SIZE ->
                     request.setAttribute(SSLSupport.KEY_SIZE_KEY, Integer.valueOf(requestHeaderMessage.getInt()));
-                case Constants.SC_A_STORED_METHOD -> requestHeaderMessage.getBytes(request.method());
+                case Constants.SC_A_STORED_METHOD -> {
+                    requestHeaderMessage.getBytes(tmpMB);
+                    ByteChunk tmpBC = tmpMB.getByteChunk();
+                    request.setMethod(tmpBC.getBytes(), tmpBC.getStart(), tmpBC.getLength());
+                }
                 case Constants.SC_A_SECRET -> {
                     requestHeaderMessage.getBytes(tmpMB);
                     if (secret != null && !secret.isEmpty()) {
@@ -904,7 +908,7 @@ public class AjpProcessor extends AbstractProcessor {
         // Responses with certain status codes and/or methods are not permitted to include a response body.
         int statusCode = response.getStatus();
         if (statusCode < 200 || statusCode == 204 || statusCode == 205 || statusCode == 304 ||
-                request.method().equals("HEAD")) {
+                "HEAD".equals(request.getMethod())) {
             // No entity body
             swallowResponse = true;
         }
