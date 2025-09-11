@@ -100,9 +100,9 @@ public class SecureNio2Channel extends Nio2Channel {
 
     protected void createSSLEngine(String hostName, List<Cipher> clientRequestedCiphers,
             List<String> clientRequestedApplicationProtocols, List<String> clientRequestedProtocols,
-            List<Group> clientSupportedGroups, List<SignatureScheme> clientSignatureAlgorithms) {
+            List<Group> clientSupportedGroups, List<SignatureScheme> clientSignatureSchemes) {
         sslEngine = endpoint.createSSLEngine(hostName, clientRequestedCiphers, clientRequestedApplicationProtocols,
-                clientRequestedProtocols, clientSupportedGroups, clientSignatureAlgorithms);
+                clientRequestedProtocols, clientSupportedGroups, clientSignatureSchemes);
     }
 
 
