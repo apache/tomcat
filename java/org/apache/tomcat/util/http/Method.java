@@ -18,6 +18,16 @@ package org.apache.tomcat.util.http;
 
 public class Method {
 
+    /*
+     * This class was originally created to hold the bytes to String conversion method. It turns out that these
+     * constants are just as much of a benefit to performance - if used consistently.
+     *
+     * If the String constants for the methods are used throughout the code-base, that allows String.equals() to use the
+     * 'same object shortcut' when checking if a request is (or is not) using a particular method. That is faster than a
+     * character by character comparison. That results in a further performance improvement that is as big - or possibly
+     * slightly bigger - than the improvement obtained by using the optimised conversion.
+     */
+
     // Standard HTTP methods supported by HttpServlet
     public static final String GET = "GET";
     public static final String POST = "POST";
@@ -44,7 +54,7 @@ public class Method {
      * ISO-8859-1 encoded representation of an HTTP method. The method is not validated as being a token, but only valid
      * HTTP method names will be returned.
      * <p>
-     * Doing in this way is ~10x faster than using MessageBytes.toStringType() saving ~40ns per request which is ~1% of
+     * Doing it this way is ~10x faster than using MessageBytes.toStringType() saving ~40ns per request which is ~1% of
      * the processing time for a minimal "Hello World" type servlet. For non-standard methods there is an additional
      * overhead of ~2.5ns per request.
      * <p>
