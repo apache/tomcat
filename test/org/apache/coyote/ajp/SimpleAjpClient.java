@@ -97,7 +97,7 @@ public class SimpleAjpClient {
             case Method.TRACE:
                 this.method = 7;
                 break;
-            case "PROPFIND":
+            case Method.PROPFIND:
                 this.method = 8;
                 break;
             case "PROPPATCH":
@@ -179,7 +179,7 @@ public class SimpleAjpClient {
             case 7:
                 return Method.TRACE;
             case 8:
-                return "PROPFIND";
+                return Method.PROPFIND;
             case 9:
                 return "PROPPATCH";
             case 10:
