@@ -85,7 +85,7 @@ public class SimpleAjpClient {
             case "HEAD":
                 this.method = 3;
                 break;
-            case "POST":
+            case Method.POST:
                 this.method = 4;
                 break;
             case "PUT":
@@ -171,7 +171,7 @@ public class SimpleAjpClient {
             case 3:
                 return "HEAD";
             case 4:
-                return "POST";
+                return Method.POST;
             case 5:
                 return "PUT";
             case 6:

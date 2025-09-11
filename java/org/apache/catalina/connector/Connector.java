@@ -43,6 +43,7 @@ import org.apache.tomcat.util.buf.CharsetUtil;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.compat.JreCompat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
@@ -229,7 +230,7 @@ public class Connector extends LifecycleMBeanBase {
      * Comma-separated list of HTTP methods that will be parsed according to POST-style rules for
      * application/x-www-form-urlencoded request bodies.
      */
-    protected String parseBodyMethods = "POST";
+    protected String parseBodyMethods = Method.POST;
 
     /**
      * A Set of methods determined by {@link #parseBodyMethods}.

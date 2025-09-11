@@ -620,7 +620,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
             // If no content type specified, use default for POST
             String savedContentType = saved.getContentType();
-            if (savedContentType == null && "POST".equals(method)) {
+            if (savedContentType == null && Method.POST.equals(method)) {
                 savedContentType = Globals.CONTENT_TYPE_FORM_URL_ENCODING;
             }
 
