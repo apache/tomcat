@@ -617,7 +617,7 @@ public class CoyoteAdapter implements Adapter {
         MessageBytes decodedURI = req.decodedURI();
 
         // Filter CONNECT method
-        if ("CONNECT".equals(req.getMethod())) {
+        if (Method.CONNECT.equals(req.getMethod())) {
             response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, sm.getString("coyoteAdapter.connect"));
         } else {
             // No URI for CONNECT requests
