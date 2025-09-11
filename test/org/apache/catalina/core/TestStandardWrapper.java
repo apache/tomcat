@@ -426,7 +426,7 @@ public class TestStandardWrapper extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
     }
 
-    @ServletSecurity(httpMethodConstraints = { @HttpMethodConstraint(value = "POST", rolesAllowed = "testRole") })
+    @ServletSecurity(httpMethodConstraints = { @HttpMethodConstraint(value = Method.POST, rolesAllowed = "testRole") })
     public static class UncoveredGetServlet extends TestServlet {
         private static final long serialVersionUID = 1L;
     }

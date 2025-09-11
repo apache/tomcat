@@ -59,7 +59,7 @@ public class TestSecurityConstraint {
         POST_ONLY = new SecurityConstraint();
         POST_ONLY.addAuthRole(ROLE1);
         SecurityCollection scPostOnly = new SecurityCollection();
-        scPostOnly.addMethod("POST");
+        scPostOnly.addMethod(Method.POST);
         scPostOnly.addPatternDecoded(URL_PATTERN);
         scPostOnly.setName("POST_ONLY");
         POST_ONLY.addCollection(scPostOnly);
@@ -75,7 +75,7 @@ public class TestSecurityConstraint {
         POST_OMIT = new SecurityConstraint();
         POST_OMIT.addAuthRole(ROLE1);
         SecurityCollection scPostOmit = new SecurityCollection();
-        scPostOmit.addOmittedMethod("POST");
+        scPostOmit.addOmittedMethod(Method.POST);
         scPostOmit.addPatternDecoded(URL_PATTERN);
         scPostOmit.setName("POST_OMIT");
         POST_OMIT.addCollection(scPostOmit);
@@ -145,14 +145,14 @@ public class TestSecurityConstraint {
         // Example 13-5
         // @ServletSecurity((httpMethodConstraints = {
         //     @HttpMethodConstraint(value = Method.GET, rolesAllowed = "R1"),
-        //     @HttpMethodConstraint(value = "POST", rolesAllowed = "R1",
+        //     @HttpMethodConstraint(value = Method.POST, rolesAllowed = "R1",
         //     transportGuarantee = TransportGuarantee.CONFIDENTIAL)
         // })
         hmces.clear();
         hmces.add(new HttpMethodConstraintElement(Method.GET,
                 new HttpConstraintElement(
                         ServletSecurity.TransportGuarantee.NONE, ROLE1)));
-        hmces.add(new HttpMethodConstraintElement("POST",
+        hmces.add(new HttpMethodConstraintElement(Method.POST,
                 new HttpConstraintElement(
                         ServletSecurity.TransportGuarantee.CONFIDENTIAL,
                         ROLE1)));
@@ -170,7 +170,7 @@ public class TestSecurityConstraint {
             if (Method.GET.equals(method)) {
                 Assert.assertEquals(ServletSecurity.TransportGuarantee.NONE.name(),
                         result[i].getUserConstraint());
-            } else if ("POST".equals(method)) {
+            } else if (Method.POST.equals(method)) {
                 Assert.assertEquals(ServletSecurity.TransportGuarantee.CONFIDENTIAL.name(),
                         result[i].getUserConstraint());
             } else {
@@ -322,7 +322,7 @@ public class TestSecurityConstraint {
         // Should list POST as an omitted method
         Assert.assertEquals(0, sc.findMethods().length);
         Assert.assertEquals(1, sc.findOmittedMethods().length);
-        Assert.assertEquals("POST", sc.findOmittedMethods()[0]);
+        Assert.assertEquals(Method.POST, sc.findOmittedMethods()[0]);
     }
 
 
@@ -358,7 +358,7 @@ public class TestSecurityConstraint {
         // Should list POST as an method
         Assert.assertEquals(0, sc.findOmittedMethods().length);
         Assert.assertEquals(1, sc.findMethods().length);
-        Assert.assertEquals("POST", sc.findMethods()[0]);
+        Assert.assertEquals(Method.POST, sc.findMethods()[0]);
     }
 
 
@@ -400,7 +400,7 @@ public class TestSecurityConstraint {
         HashSet<String> omittedMethods = new HashSet<>();
         omittedMethods.addAll(Arrays.asList(sc.findOmittedMethods()));
         Assert.assertTrue(omittedMethods.remove(Method.GET));
-        Assert.assertTrue(omittedMethods.remove("POST"));
+        Assert.assertTrue(omittedMethods.remove(Method.POST));
     }
 
 
@@ -429,7 +429,7 @@ public class TestSecurityConstraint {
         // Should list POST as a method
         Assert.assertEquals(1, sc.findMethods().length);
         Assert.assertEquals(0, sc.findOmittedMethods().length);
-        Assert.assertEquals("POST", sc.findMethods()[0]);
+        Assert.assertEquals(Method.POST, sc.findMethods()[0]);
     }
 
 

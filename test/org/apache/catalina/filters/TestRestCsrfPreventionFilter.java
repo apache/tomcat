@@ -39,8 +39,6 @@ public class TestRestCsrfPreventionFilter {
 
     private static final String INVALID_NONCE = "invalid-nonce";
 
-    private static final String POST_METHOD = "POST";
-
     public static final String ACCEPTED_PATH1 = "/accepted/index1.jsp";
 
     public static final String ACCEPTED_PATH2 = "/accepted/index2.jsp";
@@ -80,32 +78,32 @@ public class TestRestCsrfPreventionFilter {
 
     @Test
     public void testPostRequestNoSessionNoNonce() throws Exception {
-        setRequestExpectations(POST_METHOD, null, null);
+        setRequestExpectations(Method.POST, null, null);
         filter.doFilter(request, response, filterChain);
         verifyDenyResponse(HttpServletResponse.SC_FORBIDDEN);
     }
 
     @Test
     public void testPostRequestSessionNoNonce1() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null);
+        setRequestExpectations(Method.POST, session, null);
         testPostRequestHeaderScenarios(null, true);
     }
 
     @Test
     public void testPostRequestSessionNoNonce2() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null);
+        setRequestExpectations(Method.POST, session, null);
         testPostRequestHeaderScenarios(NONCE, true);
     }
 
     @Test
     public void testPostRequestSessionInvalidNonce() throws Exception {
-        setRequestExpectations(POST_METHOD, session, INVALID_NONCE);
+        setRequestExpectations(Method.POST, session, INVALID_NONCE);
         testPostRequestHeaderScenarios(NONCE, true);
     }
 
     @Test
     public void testPostRequestSessionValidNonce() throws Exception {
-        setRequestExpectations(POST_METHOD, session, NONCE);
+        setRequestExpectations(Method.POST, session, NONCE);
         testPostRequestHeaderScenarios(NONCE, false);
     }
 
@@ -123,7 +121,7 @@ public class TestRestCsrfPreventionFilter {
 
     @Test
     public void testPostFetchRequestSessionNoNonce() throws Exception {
-        setRequestExpectations(POST_METHOD, session, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE);
+        setRequestExpectations(Method.POST, session, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE);
         testPostRequestHeaderScenarios(null, true);
     }
 
@@ -139,13 +137,13 @@ public class TestRestCsrfPreventionFilter {
 
     @Test
     public void testPostFetchRequestSessionNonce() throws Exception {
-        setRequestExpectations(POST_METHOD, session, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE);
+        setRequestExpectations(Method.POST, session, Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE);
         testPostRequestHeaderScenarios(NONCE, true);
     }
 
     @Test
     public void testPostRequestCustomDenyStatus() throws Exception {
-        setRequestExpectations(POST_METHOD, null, null);
+        setRequestExpectations(Method.POST, null, null);
         filter.setDenyStatus(HttpServletResponse.SC_BAD_REQUEST);
         filter.doFilter(request, response, filterChain);
         verifyDenyResponse(HttpServletResponse.SC_BAD_REQUEST);
@@ -153,67 +151,67 @@ public class TestRestCsrfPreventionFilter {
 
     @Test
     public void testPostRequestValidNonceAsParameterValidPath1() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE }, ACCEPTED_PATH1);
+        setRequestExpectations(Method.POST, session, null, new String[] { NONCE }, ACCEPTED_PATH1);
         testPostRequestParamsScenarios(NONCE, false, true);
     }
 
     @Test
     public void testPostRequestValidNonceAsParameterValidPath2() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE }, ACCEPTED_PATH2);
+        setRequestExpectations(Method.POST, session, null, new String[] { NONCE }, ACCEPTED_PATH2);
         testPostRequestParamsScenarios(NONCE, false, true);
     }
 
     @Test
     public void testPostRequestInvalidNonceAsParameterValidPath() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null, new String[] { INVALID_NONCE }, ACCEPTED_PATH1);
+        setRequestExpectations(Method.POST, session, null, new String[] { INVALID_NONCE }, ACCEPTED_PATH1);
         testPostRequestParamsScenarios(NONCE, true, true);
     }
 
     @Test
     public void testPostRequestValidNonceAsParameterInvalidPath() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE }, ACCEPTED_PATH1 + "blah");
+        setRequestExpectations(Method.POST, session, null, new String[] { NONCE }, ACCEPTED_PATH1 + "blah");
         testPostRequestParamsScenarios(NONCE, true, true);
     }
 
     @Test
     public void testPostRequestValidNonceAsParameterNoPath() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE }, ACCEPTED_PATH1);
+        setRequestExpectations(Method.POST, session, null, new String[] { NONCE }, ACCEPTED_PATH1);
         testPostRequestParamsScenarios(NONCE, true, false);
     }
 
     @Test
     public void testPostRequestValidNonceAsParameterNoNonceInSession() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE }, ACCEPTED_PATH1);
+        setRequestExpectations(Method.POST, session, null, new String[] { NONCE }, ACCEPTED_PATH1);
         testPostRequestParamsScenarios(null, true, true);
     }
 
     @Test
     public void testPostRequestValidNonceAsParameterInvalidNonceAsHeader() throws Exception {
-        setRequestExpectations(POST_METHOD, session, INVALID_NONCE, new String[] { NONCE }, ACCEPTED_PATH1);
+        setRequestExpectations(Method.POST, session, INVALID_NONCE, new String[] { NONCE }, ACCEPTED_PATH1);
         testPostRequestParamsScenarios(NONCE, true, true);
     }
 
     @Test
     public void testPostRequestNoNonceAsParameterAndHeaderValidPath() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null, null, ACCEPTED_PATH1);
+        setRequestExpectations(Method.POST, session, null, null, ACCEPTED_PATH1);
         testPostRequestParamsScenarios(NONCE, true, true);
     }
 
     @Test
     public void testPostRequestMultipleValidNoncesAsParameterValidPath() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE, NONCE }, ACCEPTED_PATH1);
+        setRequestExpectations(Method.POST, session, null, new String[] { NONCE, NONCE }, ACCEPTED_PATH1);
         testPostRequestParamsScenarios(NONCE, false, true);
     }
 
     @Test
     public void testPostRequestMultipleNoncesAsParameterValidPath() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null, new String[] { NONCE, INVALID_NONCE }, ACCEPTED_PATH1);
+        setRequestExpectations(Method.POST, session, null, new String[] { NONCE, INVALID_NONCE }, ACCEPTED_PATH1);
         testPostRequestParamsScenarios(NONCE, true, true);
     }
 
     @Test
     public void testPostRequestMultipleInvalidNoncesAsParameterValidPath() throws Exception {
-        setRequestExpectations(POST_METHOD, session, null, new String[] { INVALID_NONCE, INVALID_NONCE },
+        setRequestExpectations(Method.POST, session, null, new String[] { INVALID_NONCE, INVALID_NONCE },
                 ACCEPTED_PATH1);
         testPostRequestParamsScenarios(NONCE, true, true);
     }

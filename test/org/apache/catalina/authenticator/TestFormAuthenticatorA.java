@@ -186,7 +186,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
         client.reset();
 
         // Second request replies to the login challenge
-        client.doResourceRequest("POST", true, "/test/j_security_check", FormAuthClientBase.LOGIN_REPLY);
+        client.doResourceRequest(Method.POST, true, "/test/j_security_check", FormAuthClientBase.LOGIN_REPLY);
         Assert.assertTrue("login failed " + client.getResponseLine(), client.isResponse303());
         Assert.assertTrue(client.isResponseBodyOK());
         String redirectUri = client.getRedirectUri();
@@ -296,7 +296,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
         // Third request - the login was successful so
         // follow the redirect to the protected resource
         client.doResourceRequest(redirectMethod, true, redirectUri, null);
-        if ("POST".equals(redirectMethod)) {
+        if (Method.POST.equals(redirectMethod)) {
             client.setUseContinue(useContinue);
         }
         Assert.assertTrue(client.isResponse200());
@@ -376,7 +376,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
 
         protected void doLoginRequest(String loginUri) throws Exception {
 
-            doResourceRequest("POST", true, PROTECTED_RELATIVE_PATH + loginUri, LOGIN_REPLY);
+            doResourceRequest(Method.POST, true, PROTECTED_RELATIVE_PATH + loginUri, LOGIN_REPLY);
         }
 
         /*
@@ -428,7 +428,7 @@ public class TestFormAuthenticatorA extends TomcatBaseTest {
             }
 
             // finally, for posts only, deal with the request content
-            if ("POST".equals(method)) {
+            if (Method.POST.equals(method)) {
                 if (requestTail == null) {
                     requestTail = "role=bar";
                 }

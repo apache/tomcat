@@ -19,7 +19,6 @@ package org.apache.catalina.core;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -76,6 +75,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.FilterDef;
 import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.http.Method;
 
 
 public class TestStandardContext extends TomcatBaseTest {
@@ -512,7 +512,7 @@ public class TestStandardContext extends TomcatBaseTest {
 
             // Add a constraint with uncovered methods
             HttpConstraintElement hce = new HttpConstraintElement(TransportGuarantee.NONE, "tomcat");
-            HttpMethodConstraintElement hmce = new HttpMethodConstraintElement("POST", hce);
+            HttpMethodConstraintElement hmce = new HttpMethodConstraintElement(Method.POST, hce);
             Set<HttpMethodConstraintElement> hmces = new HashSet<>();
             hmces.add(hmce);
             ServletSecurityElement sse = new ServletSecurityElement(hmces);
@@ -985,7 +985,7 @@ public class TestStandardContext extends TomcatBaseTest {
     }
 
 
-    @ServletSecurity(value = @HttpConstraint(ServletSecurity.EmptyRoleSemantic.DENY), httpMethodConstraints = @HttpMethodConstraint("POST"))
+    @ServletSecurity(value = @HttpConstraint(ServletSecurity.EmptyRoleSemantic.DENY), httpMethodConstraints = @HttpMethodConstraint(Method.POST))
     public static class Foo extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
@@ -1010,7 +1010,7 @@ public class TestStandardContext extends TomcatBaseTest {
         context.setName("context");
         context.setParent(host);
 
-        Method m = StandardContext.class.getDeclaredMethod("getNamingContextName");
+        java.lang.reflect.Method m = StandardContext.class.getDeclaredMethod("getNamingContextName");
         m.setAccessible(true);
         String result = (String) m.invoke(context);
 

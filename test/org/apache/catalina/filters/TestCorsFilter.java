@@ -81,7 +81,7 @@ public class TestCorsFilter {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
         request.setContentType("text/plain");
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         TesterHttpServletResponse response = new TesterHttpServletResponse();
 
         CorsFilter corsFilter = new CorsFilter();
@@ -137,7 +137,7 @@ public class TestCorsFilter {
     public void testDoFilterSimpleSpecificHeader() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         request.setContentType("text/plain");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
 
@@ -207,7 +207,7 @@ public class TestCorsFilter {
     public void testDoFilterSimpleWithExposedHeaders() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTPS_WWW_APACHE_ORG);
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         request.setContentType("text/plain");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
 
@@ -399,7 +399,7 @@ public class TestCorsFilter {
     public void testDoFilterNoOrigin() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
 
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         request.setContentType("text/plain");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
 
@@ -457,7 +457,7 @@ public class TestCorsFilter {
 
         TesterHttpServletRequest request = new TesterHttpServletRequest();
 
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, origin);
         request.setScheme(scheme);
         request.setServerName(host);
@@ -489,7 +489,7 @@ public class TestCorsFilter {
     public void testDoFilterInvalidCORSOriginNotAllowed() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "www.google.com");
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         TesterHttpServletResponse response = new TesterHttpServletResponse();
 
         CorsFilter corsFilter = new CorsFilter();
@@ -506,7 +506,7 @@ public class TestCorsFilter {
     public void testDoFilterNullOriginAllowedByDefault() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
 
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         request.setContentType("text/plain");
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "null");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
@@ -529,7 +529,7 @@ public class TestCorsFilter {
     public void testDoFilterNullOriginAllowedByConfiguration() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
 
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         request.setContentType("text/plain");
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "null");
         TesterHttpServletResponse response = new TesterHttpServletResponse();
@@ -723,7 +723,7 @@ public class TestCorsFilter {
     public void testCheckSimpleRequestTypePost() throws ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTP_TOMCAT_APACHE_ORG);
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         CorsFilter corsFilter = new CorsFilter();
         corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());
         CorsFilter.CORSRequestType requestType = corsFilter.checkRequestType(request);
@@ -755,7 +755,7 @@ public class TestCorsFilter {
     public void testCheckActualRequestTypeMethodPOSTNotSimpleHeaders() throws ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, TesterFilterConfigs.HTTP_TOMCAT_APACHE_ORG);
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         request.setContentType("application/json");
         CorsFilter corsFilter = new CorsFilter();
         corsFilter.init(TesterFilterConfigs.getDefaultFilterConfig());
@@ -1057,7 +1057,7 @@ public class TestCorsFilter {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
         TesterHttpServletResponse response = new TesterHttpServletResponse();
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "https://tomcat.apache.org");
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         CorsFilter corsFilter = new CorsFilter();
         corsFilter.init(TesterFilterConfigs.getSpecificOriginFilterConfig());
         corsFilter.doFilter(request, response, filterChain);
@@ -1315,7 +1315,7 @@ public class TestCorsFilter {
     public void testContentTypeWithParameter() throws IOException, ServletException {
         TesterHttpServletRequest request = new TesterHttpServletRequest();
 
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
         request.setContentType("text/plain;charset=UTF-8");
         request.setHeader(CorsFilter.REQUEST_HEADER_ORIGIN, "null");
         TesterHttpServletResponse response = new TesterHttpServletResponse();

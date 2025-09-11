@@ -636,7 +636,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         validateCpong(ajpClient.cping());
 
         ajpClient.setUri("/test/echo-params.jsp");
-        ajpClient.setMethod("POST");
+        ajpClient.setMethod(Method.POST);
         TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
         forwardMessage.addHeader(0xA008, "9");
         if (multipleCL) {
@@ -723,12 +723,12 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
     @Test
     public void testZeroLengthRequestBodyPostA() throws Exception {
-        doTestZeroLengthRequestBody("POST", true);
+        doTestZeroLengthRequestBody(Method.POST, true);
     }
 
     @Test
     public void testZeroLengthRequestBodyPostB() throws Exception {
-        doTestZeroLengthRequestBody("POST", false);
+        doTestZeroLengthRequestBody(Method.POST, false);
     }
 
     private void doTestZeroLengthRequestBody(String method, boolean callAvailable) throws Exception {
@@ -1110,7 +1110,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             response.setCharacterEncoding("UTF-8");
 
             try (PrintWriter w = response.getWriter()) {
-                w.println("Method: " + (isPost ? "POST" : Method.GET) + ". Reading request body...");
+                w.println("Method: " + (isPost ? Method.POST : Method.GET) + ". Reading request body...");
                 w.println("Request Body length in bytes: " + readCount);
             }
         }

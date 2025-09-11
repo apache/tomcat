@@ -55,7 +55,7 @@ public class TestAuthenticatorBaseCorsPreflight extends TomcatBaseTest {
     private static final String INVALID_ORIGIN = "http://%20";
     private static final String SAME_ORIGIN = "http://localhost";
     private static final String ALLOWED_METHOD = Method.GET;
-    private static final String BLOCKED_METHOD = "POST";
+    private static final String BLOCKED_METHOD = Method.POST;
     private static final String EMPTY_METHOD = "";
 
     @Parameterized.Parameters(name = "{index}: input[{0}]")
