@@ -391,7 +391,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     @Test
     public void testMethod() throws Exception {
         RequestDescriptor desc = new RequestDescriptor();
-        desc.putRequestInfo("REQUEST-METHOD", "LOCK");
+        desc.putRequestInfo("REQUEST-METHOD", Method.LOCK);
         desc.putRequestInfo("REQUEST-URI", "/testMethod");
         doSnoopTest(desc);
     }
@@ -468,7 +468,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         desc.putRequestInfo("REQUEST-REMOTE-HOST", "MYCLIENT");
         desc.putRequestInfo("REQUEST-REMOTE-ADDR", "10.1.2.3");
         desc.putRequestInfo("REQUEST-REMOTE-PORT", "34567");
-        desc.putRequestInfo("REQUEST-METHOD", "LOCK");
+        desc.putRequestInfo("REQUEST-METHOD", Method.LOCK);
         desc.putRequestInfo("REQUEST-URI", "/a/b/c");
         desc.putRequestInfo("REQUEST-PROTOCOL", "HTTP/1.x");
         desc.putRequestInfo("REQUEST-IS-SECURE", "true");
