@@ -58,7 +58,7 @@ import org.apache.tomcat.util.net.Acceptor.AcceptorState;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.StoreType;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.net.openssl.ciphers.Group;
-import org.apache.tomcat.util.net.openssl.ciphers.SignatureAlgorithm;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureScheme;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.threads.LimitLatch;
 import org.apache.tomcat.util.threads.ResizableExecutor;
@@ -507,11 +507,11 @@ public abstract class AbstractEndpoint<S, U> {
 
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers,
             List<String> clientRequestedApplicationProtocols, List<String> clientRequestedProtocols,
-            List<Group> clientSupportedGroups, List<SignatureAlgorithm> clientSignatureAlgorithms) {
+            List<Group> clientSupportedGroups, List<SignatureScheme> clientSignatureSchemes) {
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
 
         SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers,
-                clientRequestedProtocols, clientSignatureAlgorithms);
+                clientRequestedProtocols, clientSignatureSchemes);
 
         SSLContext sslContext = certificate.getSslContext();
         if (sslContext == null) {
@@ -575,7 +575,7 @@ public abstract class AbstractEndpoint<S, U> {
 
 
     private SSLHostConfigCertificate selectCertificate(SSLHostConfig sslHostConfig, List<Cipher> clientCiphers,
-            List<String> clientRequestedProtocols, List<SignatureAlgorithm> clientSignatureAlgorithms) {
+            List<String> clientRequestedProtocols, List<SignatureScheme> clientSignatureSchemes) {
 
         Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
         if (certificates.size() == 1) {
@@ -585,9 +585,9 @@ public abstract class AbstractEndpoint<S, U> {
         // Use signature algorithm for cipher matching with TLS 1.3
         if ((clientRequestedProtocols.contains(Constants.SSL_PROTO_TLSv1_3)) &&
                 sslHostConfig.getProtocols().contains(Constants.SSL_PROTO_TLSv1_3)) {
-            for (SignatureAlgorithm signatureAlgorithm : clientSignatureAlgorithms) {
+            for (SignatureScheme signatureScheme : clientSignatureSchemes) {
                 for (SSLHostConfigCertificate certificate : certificates) {
-                    if (certificate.getType().isCompatibleWith(signatureAlgorithm)) {
+                    if (certificate.getType().isCompatibleWith(signatureScheme)) {
                         return certificate;
                     }
                 }

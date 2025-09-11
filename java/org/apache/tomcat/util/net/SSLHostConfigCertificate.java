@@ -31,7 +31,7 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
-import org.apache.tomcat.util.net.openssl.ciphers.SignatureAlgorithm;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureScheme;
 import org.apache.tomcat.util.res.StringManager;
 
 public class SSLHostConfigCertificate implements Serializable {
@@ -319,7 +319,7 @@ public class SSLHostConfigCertificate implements Serializable {
 
         UNDEFINED,
         RSA(Authentication.RSA),
-        DSA(Authentication.DSS),
+        DSA(Authentication.DSS, Authentication.EdDSA),
         EC(Authentication.ECDH, Authentication.ECDSA),
         MLDSA(Authentication.MLDSA);
 
@@ -336,8 +336,8 @@ public class SSLHostConfigCertificate implements Serializable {
             return compatibleAuthentications.contains(au);
         }
 
-        public boolean isCompatibleWith(SignatureAlgorithm al) {
-            return al.toString().toUpperCase().startsWith(toString());
+        public boolean isCompatibleWith(SignatureScheme scheme) {
+            return compatibleAuthentications.contains(scheme.getAuth());
         }
 
     }
