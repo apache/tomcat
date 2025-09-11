@@ -212,10 +212,10 @@ public class TestSecurityConstraint {
 
         // Example 13-7
         // @ServletSecurity(value = @HttpConstraint(rolesAllowed = "R1"),
-        //     httpMethodConstraints = @HttpMethodConstraint(value="TRACE",
+        //     httpMethodConstraints = @HttpMethodConstraint(value=Method.TRACE,
         //         emptyRoleSemantic = EmptyRoleSemantic.DENY))
         hmces.clear();
-        hmces.add(new HttpMethodConstraintElement("TRACE",
+        hmces.add(new HttpMethodConstraintElement(Method.TRACE,
                 new HttpConstraintElement(EmptyRoleSemantic.DENY)));
         element = new ServletSecurityElement(
                 new HttpConstraintElement(
@@ -228,12 +228,12 @@ public class TestSecurityConstraint {
         for (int i = 0; i < 2; i++) {
             Assert.assertTrue(result[i].findCollections()[0].findPattern(URL_PATTERN));
             if (result[i].findCollections()[0].findMethods().length == 1) {
-                Assert.assertEquals("TRACE",
+                Assert.assertEquals(Method.TRACE,
                         result[i].findCollections()[0].findMethods()[0]);
                 Assert.assertTrue(result[i].getAuthConstraint());
                 Assert.assertEquals(0, result[i].findAuthRoles().length);
             } else if (result[i].findCollections()[0].findOmittedMethods().length == 1) {
-                Assert.assertEquals("TRACE",
+                Assert.assertEquals(Method.TRACE,
                         result[i].findCollections()[0].findOmittedMethods()[0]);
                 Assert.assertTrue(result[i].getAuthConstraint());
                 Assert.assertEquals(1, result[i].findAuthRoles().length);

@@ -29,7 +29,7 @@ import org.apache.tomcat.util.http.Method;
                         rolesAllowed=TestRealmBase.ROLE1),
                 @HttpMethodConstraint(value=Method.PUT,
                         rolesAllowed=SecurityConstraint.ROLE_ALL_ROLES),
-                @HttpMethodConstraint(value="TRACE",
+                @HttpMethodConstraint(value=Method.TRACE,
                         rolesAllowed=SecurityConstraint.ROLE_ALL_AUTHENTICATED_USERS)})
 public class TesterServletSecurity01 {
     // Class is NO-OP. It is only used to 'host' the annotation.

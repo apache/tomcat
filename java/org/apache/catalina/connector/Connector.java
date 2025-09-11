@@ -566,7 +566,7 @@ public class Connector extends LifecycleMBeanBase {
             methodSet.addAll(Arrays.asList(StringUtils.splitCommaSeparated(methods)));
         }
 
-        if (methodSet.contains("TRACE")) {
+        if (methodSet.contains(Method.TRACE)) {
             throw new IllegalArgumentException(sm.getString("coyoteConnector.parseBodyMethodNoTrace"));
         }
 

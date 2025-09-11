@@ -752,7 +752,7 @@ public class TestRealmBase {
                 request, response, constraintsPut, null));
 
         // Any authenticated user should be able to perform a TRACE.
-        request.setMethod("TRACE");
+        request.setMethod(Method.TRACE);
 
         SecurityConstraint[] constraintsTrace =
                 mapRealm.findSecurityConstraints(request, context);
