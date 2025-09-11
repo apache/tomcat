@@ -28,10 +28,16 @@ import java.util.Set;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 
-import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
+import org.apache.tomcat.util.net.openssl.ciphers.Group;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureAlgorithm;
 
 public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
+
+    static final ThreadLocal<List<String>> clientRequestedProtocolsThreadLocal = new ThreadLocal<>();
+    static final ThreadLocal<List<Group>> clientSupportedGroupsThreadLocal = new ThreadLocal<>();
+    static final ThreadLocal<List<SignatureAlgorithm>> clientSignatureAlgorithmsThreadLocal = new ThreadLocal<>();
 
     private String sslImplementationName = null;
     private int sniParseLimit = 64 * 1024;
@@ -84,24 +90,6 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
     @Override
     protected void createSSLContext(SSLHostConfig sslHostConfig) throws IllegalArgumentException {
 
-        boolean useHybridSslContext = false;
-        if (sslHostConfig.getProtocols().contains(Constants.SSL_PROTO_TLSv1_3) && OpenSSLStatus.isAvailable()) {
-            // If TLS 1.3 is enabled, check if a hybrid scheme using a single SSL context
-            // should be attempted
-            boolean nonMldsaFound = false;
-            boolean mldsaFound = false;
-            for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
-                if (certificate.getType().equals(SSLHostConfigCertificate.Type.MLDSA)) {
-                    mldsaFound = true;
-                } else {
-                    nonMldsaFound = true;
-                }
-            }
-            if (mldsaFound && nonMldsaFound) {
-                useHybridSslContext = true;
-            }
-        }
-
         boolean firstCertificate = true;
         for (SSLHostConfigCertificate certificate : sslHostConfig.getCertificates(true)) {
             SSLUtil sslUtil = sslImplementation.getSSLUtil(certificate);
@@ -129,18 +117,6 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
                 certificate.setSslContextGenerated(sslContext);
             }
 
-            // If using a hybrid scheme, add any MLDSA certificates to all other SSL contexts
-            if (useHybridSslContext && !certificate.getType().equals(SSLHostConfigCertificate.Type.MLDSA)) {
-                for (SSLHostConfigCertificate certificateToAdd : sslHostConfig.getCertificates(true)) {
-                    // Add additional certificate to all non MLDSA contexts
-                    if (certificateToAdd.getType().equals(SSLHostConfigCertificate.Type.MLDSA)) {
-                        if (!sslUtil.addSecondCertificate(sslContext, certificateToAdd)) {
-                            throw new IllegalArgumentException(sm.getString("endpoint.errorCreatingSSLContext"));
-                        }
-                    }
-                }
-            }
-
             logCertificate(certificate);
         }
 
@@ -149,9 +125,14 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
 
     protected SSLEngine createSSLEngine(String sniHostName, List<Cipher> clientRequestedCiphers,
             List<String> clientRequestedApplicationProtocols) {
+        List<String> clientRequestedProtocols = clientRequestedProtocolsThreadLocal.get();
+        List<Group> clientSupportedGroups = clientSupportedGroupsThreadLocal.get();
+        List<SignatureAlgorithm> clientSignatureAlgorithms = clientSignatureAlgorithmsThreadLocal.get();
+
         SSLHostConfig sslHostConfig = getSSLHostConfig(sniHostName);
 
-        SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers);
+        SSLHostConfigCertificate certificate = selectCertificate(sslHostConfig, clientRequestedCiphers,
+                clientRequestedProtocols, clientSignatureAlgorithms);
 
         SSLContext sslContext = certificate.getSslContext();
         if (sslContext == null) {
@@ -165,18 +146,34 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
 
         SSLParameters sslParameters = engine.getSSLParameters();
         sslParameters.setUseCipherSuitesOrder(sslHostConfig.getHonorCipherOrder());
-        if (clientRequestedApplicationProtocols != null && clientRequestedApplicationProtocols.size() > 0 &&
-                negotiableProtocols.size() > 0) {
+        if (clientRequestedApplicationProtocols != null && !clientRequestedApplicationProtocols.isEmpty() &&
+                !negotiableProtocols.isEmpty()) {
             // Only try to negotiate if both client and server have at least
             // one protocol in common
             // Note: Tomcat does not explicitly negotiate http/1.1
-            // TODO: Is this correct? Should it change?
             List<String> commonProtocols = new ArrayList<>(negotiableProtocols);
             commonProtocols.retainAll(clientRequestedApplicationProtocols);
-            if (commonProtocols.size() > 0) {
+            if (!commonProtocols.isEmpty()) {
                 String[] commonProtocolsArray = commonProtocols.toArray(new String[0]);
                 sslParameters.setApplicationProtocols(commonProtocolsArray);
             }
+        }
+        // Merge server groups with the client groups
+        if (JreCompat.isJre20Available()) {
+            List<String> supportedGroups = new ArrayList<>();
+            LinkedHashSet<Group> serverSupportedGroups = sslHostConfig.getGroupList();
+            if (serverSupportedGroups != null) {
+                for (Group group : clientSupportedGroups) {
+                    if (serverSupportedGroups.contains(group)) {
+                        supportedGroups.add(group.toString());
+                    }
+                }
+            } else {
+                for (Group group : clientSupportedGroups) {
+                    supportedGroups.add(group.toString());
+                }
+            }
+            JreCompat.getInstance().setNamedGroupsMethod(sslParameters, supportedGroups.toArray(new String[0]));
         }
         switch (sslHostConfig.getCertificateVerification()) {
             case NONE:
@@ -198,11 +195,24 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
     }
 
 
-    private SSLHostConfigCertificate selectCertificate(SSLHostConfig sslHostConfig, List<Cipher> clientCiphers) {
+    private SSLHostConfigCertificate selectCertificate(SSLHostConfig sslHostConfig, List<Cipher> clientCiphers,
+            List<String> clientRequestedProtocols, List<SignatureAlgorithm> clientSignatureAlgorithms) {
 
         Set<SSLHostConfigCertificate> certificates = sslHostConfig.getCertificates(true);
         if (certificates.size() == 1) {
             return certificates.iterator().next();
+        }
+
+        // Use signature algorithm for cipher matching with TLS 1.3
+        if ((clientRequestedProtocols.contains(Constants.SSL_PROTO_TLSv1_3)) &&
+                sslHostConfig.getProtocols().contains(Constants.SSL_PROTO_TLSv1_3)) {
+            for (SignatureAlgorithm signatureAlgorithm : clientSignatureAlgorithms) {
+                for (SSLHostConfigCertificate certificate : certificates) {
+                    if (certificate.getType().isCompatibleWith(signatureAlgorithm)) {
+                        return certificate;
+                    }
+                }
+            }
         }
 
         LinkedHashSet<Cipher> serverCiphers = sslHostConfig.getCipherList();

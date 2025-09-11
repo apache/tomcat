@@ -38,6 +38,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
+import org.apache.tomcat.util.net.openssl.ciphers.Group;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -108,6 +109,8 @@ public class SSLHostConfig implements Serializable {
     // Values <0 mean use the implementation default
     private int sessionCacheSize = -1;
     private int sessionTimeout = 86400;
+    private String groups = null;
+    private LinkedHashSet<Group> groupList = null;
     // JSSE
     private String keyManagerAlgorithm = KeyManagerFactory.getDefaultAlgorithm();
     private boolean revocationEnabled = false;
@@ -522,7 +525,42 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * @return the configured named groups
+     */
+    public String getGroups() {
+        return groups;
+    }
+
+
+    /**
+     * Set the enabled named groups.
+     * @param groupsString the case sensitive comma separated list of groups
+     */
+    public void setGroups(String groupsString) {
+        if (groupsString != null) {
+            LinkedHashSet<Group> groupList = new LinkedHashSet<>();
+            String[] groupNames = groupsString.split(",");
+            for (String groupName : groupNames) {
+                Group group = Group.valueOf(groupName.trim());
+                groupList.add(group);
+            }
+            this.groups = groupsString;
+            this.groupList = groupList;
+        }
+    }
+
+
+    /**
+     * @return the groupList
+     */
+    public LinkedHashSet<Group> getGroupList() {
+        return this.groupList;
+    }
+
+
     // ---------------------------------- JSSE specific configuration properties
+
 
     public void setKeyManagerAlgorithm(String keyManagerAlgorithm) {
         setProperty("keyManagerAlgorithm", Type.JSSE);
