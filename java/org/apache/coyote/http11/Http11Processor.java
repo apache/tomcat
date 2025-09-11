@@ -55,6 +55,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.http.parser.TokenList;
@@ -890,7 +891,7 @@ public class Http11Processor extends AbstractProcessor {
             }
         }
 
-        boolean head = "HEAD".equals(request.getMethod());
+        boolean head = Method.HEAD.equals(request.getMethod());
         if (head) {
             // Any entity body, if present, should not be sent
             outputBuffer.addActiveFilter(outputFilters[Constants.VOID_FILTER]);
