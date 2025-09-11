@@ -100,7 +100,7 @@ public class SimpleAjpClient {
             case Method.PROPFIND:
                 this.method = 8;
                 break;
-            case "PROPPATCH":
+            case Method.PROPPATCH:
                 this.method = 9;
                 break;
             case "MKCOL":
@@ -181,7 +181,7 @@ public class SimpleAjpClient {
             case 8:
                 return Method.PROPFIND;
             case 9:
-                return "PROPPATCH";
+                return Method.PROPPATCH;
             case 10:
                 return "MKCOL";
             case 11:
