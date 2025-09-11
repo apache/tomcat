@@ -65,7 +65,7 @@ public class RequestInfo {
     // This is useful for long-running requests only
 
     public String getMethod() {
-        return req.method().toString();
+        return req.getMethod();
     }
 
     public String getCurrentUri() {

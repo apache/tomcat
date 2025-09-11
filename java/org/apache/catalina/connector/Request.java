@@ -2163,7 +2163,7 @@ public class Request implements HttpServletRequest {
 
     @Override
     public String getMethod() {
-        return coyoteRequest.method().toStringType();
+        return coyoteRequest.getMethod();
     }
 
 

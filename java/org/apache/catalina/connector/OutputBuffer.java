@@ -238,8 +238,8 @@ public class OutputBuffer extends Writer {
         // - the content length has not been explicitly set
         // AND
         // - some content has been written OR this is NOT a HEAD request
-        if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1) &&
-                ((bb.remaining() > 0 || !coyoteResponse.getRequest().method().equals("HEAD")))) {
+        if (!coyoteResponse.isCommitted() && coyoteResponse.getContentLengthLong() == -1 &&
+                (bb.remaining() > 0 || !"HEAD".equals(coyoteResponse.getRequest().getMethod()))) {
             coyoteResponse.setContentLength(bb.remaining());
         }
 

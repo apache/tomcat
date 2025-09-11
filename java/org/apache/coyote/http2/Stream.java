@@ -368,8 +368,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
         switch (name) {
             case ":method": {
-                if (coyoteRequest.method().isNull()) {
-                    coyoteRequest.method().setString(value);
+                if (coyoteRequest.getMethod() == null) {
+                    coyoteRequest.setMethod(value);
                     if ("HEAD".equals(value)) {
                         configureVoidOutputFilter();
                     }
@@ -552,8 +552,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final boolean receivedEndOfHeaders() throws ConnectionException {
-        if (coyoteRequest.method().isNull() || coyoteRequest.scheme().isNull() ||
-                !coyoteRequest.method().equals("CONNECT") && coyoteRequest.requestURI().isNull()) {
+        if (coyoteRequest.getMethod() == null || coyoteRequest.scheme().isNull() ||
+                !"CONNECT".equals(coyoteRequest.getMethod()) && coyoteRequest.requestURI().isNull()) {
             throw new ConnectionException(sm.getString("stream.header.required", getConnectionId(), getIdAsString()),
                     Http2Error.PROTOCOL_ERROR);
         }

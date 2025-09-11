@@ -394,8 +394,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 chr = byteBuffer.get();
                 if (chr == Constants.SP || chr == Constants.HT) {
                     space = true;
-                    request.method().setBytes(byteBuffer.array(), parsingRequestLineStart,
-                            pos - parsingRequestLineStart);
+                    request.setMethod(byteBuffer.array(), parsingRequestLineStart, pos - parsingRequestLineStart);
                 } else if (!HttpParser.isToken(chr)) {
                     // Avoid unknown protocol triggering an additional error
                     request.protocol().setString(Constants.HTTP_11);

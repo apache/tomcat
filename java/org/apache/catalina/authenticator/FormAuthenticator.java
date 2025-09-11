@@ -448,7 +448,7 @@ public class FormAuthenticator extends AuthenticatorBase {
 
         // Always use GET for the login page, regardless of the method used
         String oldMethod = request.getMethod();
-        request.getCoyoteRequest().method().setString("GET");
+        request.getCoyoteRequest().setMethod("GET");
 
         RequestDispatcher disp = context.getServletContext().getRequestDispatcher(loginPage);
         try {
@@ -464,7 +464,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
         } finally {
             // Restore original method so that it is written into access log
-            request.getCoyoteRequest().method().setString(oldMethod);
+            request.getCoyoteRequest().setMethod(oldMethod);
         }
     }
 
@@ -632,7 +632,7 @@ public class FormAuthenticator extends AuthenticatorBase {
             request.getCoyoteRequest().setContentType(contentType);
         }
 
-        request.getCoyoteRequest().method().setString(method);
+        request.getCoyoteRequest().setMethod(method);
         // The method, URI, queryString and protocol are normally stored as
         // bytes in the HttpInputBuffer and converted lazily to String. At this
         // point, the method has already been set as String in the line above
