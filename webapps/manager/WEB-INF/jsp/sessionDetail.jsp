@@ -102,7 +102,7 @@
      </tr>
    </table>
 
-   <form method="post" action="<%= submitUrl %>">
+   <form method="POST" action="<%= submitUrl %>">
      <div>
        <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
        <input type="hidden" name="action" value="sessionDetail" />
@@ -149,7 +149,7 @@
    %>
            <tr>
                <td align="center">
-                   <form method="post" action="<%= submitUrl %>">
+                   <form method="POST" action="<%= submitUrl %>">
                        <div>
                            <input type="hidden" name="action" value="removeSessionAttribute" />
                            <input type="hidden" name="sessionId" value="<%= currentSessionId %>" />
@@ -175,7 +175,7 @@
    </table>
 <% } // endif%>
 
-<form method="post" action="<%=submitUrl%>">
+<form method="POST" action="<%=submitUrl%>">
   <p style="text-align: center;">
     <input type="submit" value="Return to session list" />
   </p>
