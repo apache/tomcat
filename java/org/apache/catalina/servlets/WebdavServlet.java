@@ -62,6 +62,7 @@ import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.WebdavIfHeader;
 import org.w3c.dom.Document;
@@ -175,17 +176,6 @@ import org.xml.sax.SAXException;
 public class WebdavServlet extends DefaultServlet implements PeriodicEventListener {
 
     private static final long serialVersionUID = 1L;
-
-
-    // -------------------------------------------------------------- Constants
-
-    private static final String METHOD_PROPFIND = "PROPFIND";
-    private static final String METHOD_PROPPATCH = "PROPPATCH";
-    private static final String METHOD_MKCOL = "MKCOL";
-    private static final String METHOD_COPY = "COPY";
-    private static final String METHOD_MOVE = "MOVE";
-    private static final String METHOD_LOCK = "LOCK";
-    private static final String METHOD_UNLOCK = "UNLOCK";
 
 
     /**
@@ -570,19 +560,19 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             log("[" + method + "] " + path);
         }
 
-        if (method.equals(METHOD_PROPFIND)) {
+        if (Method.PROPFIND.equals(method)) {
             doPropfind(req, resp);
-        } else if (method.equals(METHOD_PROPPATCH)) {
+        } else if (Method.PROPPATCH.equals(method)) {
             doProppatch(req, resp);
-        } else if (method.equals(METHOD_MKCOL)) {
+        } else if (Method.MKCOL.equals(method)) {
             doMkcol(req, resp);
-        } else if (method.equals(METHOD_COPY)) {
+        } else if (Method.COPY.equals(method)) {
             doCopy(req, resp);
-        } else if (method.equals(METHOD_MOVE)) {
+        } else if (Method.MOVE.equals(method)) {
             doMove(req, resp);
-        } else if (method.equals(METHOD_LOCK)) {
+        } else if (Method.LOCK.equals(method)) {
             doLock(req, resp);
-        } else if (method.equals(METHOD_UNLOCK)) {
+        } else if (Method.UNLOCK.equals(method)) {
             doUnlock(req, resp);
         } else {
             // DefaultServlet processing
