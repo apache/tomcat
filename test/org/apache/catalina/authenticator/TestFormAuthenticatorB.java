@@ -90,13 +90,13 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
 
     @Test
     public void testPostNoContinueWithCookies() throws Exception {
-        doTest("POST", Method.GET, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.GET, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // Bug 49779
     @Test
     public void testPostNoContinuePostRedirectWithCookies() throws Exception {
-        doTest("POST", "POST", NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.POST, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
 
@@ -105,13 +105,13 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
 
     @Test
     public void testPostNoContinueNoServerCookies() throws Exception {
-        doTest("POST", Method.GET, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.GET, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // variant of Bug 49779
     @Test
     public void testPostNoContinuePostRedirectNoServerCookies() throws Exception {
-        doTest("POST", "POST", NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.POST, NO_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
     }
 
 
@@ -121,13 +121,13 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
 
     @Test
     public void testPostNoContinueNoClientCookies() throws Exception {
-        doTest("POST", Method.GET, NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.GET, NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // variant of Bug 49779
     @Test
     public void testPostNoContinuePostRedirectNoClientCookies() throws Exception {
-        doTest("POST", "POST", NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.POST, NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
 
@@ -194,7 +194,7 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
         // Third request - the login was successful so
         // follow the redirect to the protected resource
         client.doResourceRequest(redirectMethod, true, redirectUri, null);
-        if ("POST".equals(redirectMethod)) {
+        if (Method.POST.equals(redirectMethod)) {
             client.setUseContinue(useContinue);
         }
         Assert.assertTrue(client.isResponse200());
@@ -274,7 +274,7 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
 
         protected void doLoginRequest(String loginUri) throws Exception {
 
-            doResourceRequest("POST", true, PROTECTED_RELATIVE_PATH + loginUri, LOGIN_REPLY);
+            doResourceRequest(Method.POST, true, PROTECTED_RELATIVE_PATH + loginUri, LOGIN_REPLY);
         }
 
         /*
@@ -326,7 +326,7 @@ public class TestFormAuthenticatorB extends TomcatBaseTest {
             }
 
             // finally, for posts only, deal with the request content
-            if ("POST".equals(method)) {
+            if (Method.POST.equals(method)) {
                 if (requestTail == null) {
                     requestTail = "role=bar";
                 }

@@ -51,8 +51,6 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     private static final boolean USE_COOKIES = true;
     private static final boolean NO_COOKIES = !USE_COOKIES;
 
-    private static final String METHOD_POST = "POST";
-
     private static final String HTTP_PREFIX = "http://localhost:";
     private static final String CONTEXT_PATH_LOGIN = "";
     private static final String URI_PROTECTED = "/services/*";
@@ -126,7 +124,7 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     }
 
     private void testClearPost() throws Exception {
-        doTest(METHOD_POST, REMOVE_CUSTOMER, CREDENTIALS, null, NO_COOKIES, HttpServletResponse.SC_FORBIDDEN, null,
+        doTest(Method.POST, REMOVE_CUSTOMER, CREDENTIALS, null, NO_COOKIES, HttpServletResponse.SC_FORBIDDEN, null,
                 null, true, Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
     }
 
@@ -136,18 +134,18 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     }
 
     private void testValidPost() throws Exception {
-        doTest(METHOD_POST, REMOVE_CUSTOMER, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_OK,
+        doTest(Method.POST, REMOVE_CUSTOMER, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_OK,
                 CUSTOMER_REMOVED_RESPONSE, validNonce, false, null);
     }
 
     private void testInvalidPost() throws Exception {
-        doTest(METHOD_POST, REMOVE_CUSTOMER, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null,
+        doTest(Method.POST, REMOVE_CUSTOMER, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null,
                 Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE, true, Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
-        doTest(METHOD_POST, REMOVE_CUSTOMER, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null,
+        doTest(Method.POST, REMOVE_CUSTOMER, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null,
                 INVALID_NONCE_1, true, Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
-        doTest(METHOD_POST, REMOVE_CUSTOMER, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null,
+        doTest(Method.POST, REMOVE_CUSTOMER, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null,
                 INVALID_NONCE_2, true, Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
-        doTest(METHOD_POST, REMOVE_CUSTOMER, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null,
+        doTest(Method.POST, REMOVE_CUSTOMER, CREDENTIALS, null, USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null,
                 null, true, Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
     }
 
@@ -159,11 +157,11 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
     private void testValidPostWithRequestParams() throws Exception {
         String validBody = Constants.CSRF_REST_NONCE_HEADER_NAME + "=" + validNonce;
         String invalidbody = Constants.CSRF_REST_NONCE_HEADER_NAME + "=" + INVALID_NONCE_1;
-        doTest(METHOD_POST, REMOVE_CUSTOMER, CREDENTIALS, validBody.getBytes(StandardCharsets.ISO_8859_1), USE_COOKIES,
+        doTest(Method.POST, REMOVE_CUSTOMER, CREDENTIALS, validBody.getBytes(StandardCharsets.ISO_8859_1), USE_COOKIES,
                 HttpServletResponse.SC_OK, CUSTOMER_REMOVED_RESPONSE, null, false, null);
-        doTest(METHOD_POST, ADD_CUSTOMER, CREDENTIALS, validBody.getBytes(StandardCharsets.ISO_8859_1), USE_COOKIES,
+        doTest(Method.POST, ADD_CUSTOMER, CREDENTIALS, validBody.getBytes(StandardCharsets.ISO_8859_1), USE_COOKIES,
                 HttpServletResponse.SC_OK, CUSTOMER_ADDED_RESPONSE, null, false, null);
-        doTest(METHOD_POST, REMOVE_CUSTOMER, CREDENTIALS, invalidbody.getBytes(StandardCharsets.ISO_8859_1),
+        doTest(Method.POST, REMOVE_CUSTOMER, CREDENTIALS, invalidbody.getBytes(StandardCharsets.ISO_8859_1),
                 USE_COOKIES, HttpServletResponse.SC_OK, CUSTOMER_REMOVED_RESPONSE, validNonce, false, null);
     }
 
@@ -172,13 +170,13 @@ public class TestRestCsrfPreventionFilter2 extends TomcatBaseTest {
         String invalidbody1 = Constants.CSRF_REST_NONCE_HEADER_NAME + "=" + INVALID_NONCE_1;
         String invalidbody2 =
                 Constants.CSRF_REST_NONCE_HEADER_NAME + "=" + Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE;
-        doTest(METHOD_POST, REMOVE_ALL_CUSTOMERS, CREDENTIALS, validBody.getBytes(StandardCharsets.ISO_8859_1),
+        doTest(Method.POST, REMOVE_ALL_CUSTOMERS, CREDENTIALS, validBody.getBytes(StandardCharsets.ISO_8859_1),
                 USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null, null, true,
                 Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
-        doTest(METHOD_POST, REMOVE_CUSTOMER, CREDENTIALS, invalidbody1.getBytes(StandardCharsets.ISO_8859_1),
+        doTest(Method.POST, REMOVE_CUSTOMER, CREDENTIALS, invalidbody1.getBytes(StandardCharsets.ISO_8859_1),
                 USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null, null, true,
                 Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
-        doTest(METHOD_POST, REMOVE_CUSTOMER, CREDENTIALS, invalidbody2.getBytes(StandardCharsets.ISO_8859_1),
+        doTest(Method.POST, REMOVE_CUSTOMER, CREDENTIALS, invalidbody2.getBytes(StandardCharsets.ISO_8859_1),
                 USE_COOKIES, HttpServletResponse.SC_FORBIDDEN, null, null, true,
                 Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
     }

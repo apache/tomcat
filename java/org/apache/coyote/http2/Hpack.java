@@ -62,7 +62,7 @@ final class Hpack {
         // note that zero is not used
         fields[1] = new HeaderField(":authority", null);
         fields[2] = new HeaderField(":method", Method.GET);
-        fields[3] = new HeaderField(":method", "POST");
+        fields[3] = new HeaderField(":method", Method.POST);
         fields[4] = new HeaderField(":path", "/");
         fields[5] = new HeaderField(":path", "/index.html");
         fields[6] = new HeaderField(":scheme", "http");

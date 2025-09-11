@@ -372,7 +372,7 @@ public final class CGIServlet extends HttpServlet {
             }
         } else {
             cgiMethods.add(Method.GET);
-            cgiMethods.add("POST");
+            cgiMethods.add(Method.POST);
         }
 
         if (getServletConfig().getInitParameter("cmdLineArgumentsEncoded") != null) {
@@ -564,7 +564,7 @@ public final class CGIServlet extends HttpServlet {
             CGIRunner cgi = new CGIRunner(cgiEnv.getCommand(), cgiEnv.getEnvironment(), cgiEnv.getWorkingDirectory(),
                     cgiEnv.getParameters());
 
-            if ("POST".equals(req.getMethod())) {
+            if (Method.POST.equals(req.getMethod())) {
                 cgi.setInput(req.getInputStream());
             }
             cgi.setResponse(res);
@@ -734,7 +734,7 @@ public final class CGIServlet extends HttpServlet {
             // does not contain an unencoded "=" this is an indexed query.
             // The parsed query string becomes the command line parameters
             // for the cgi command.
-            if (enableCmdLineArguments && (Method.GET.equals(req.getMethod()) || req.getMethod().equals("POST") ||
+            if (enableCmdLineArguments && (Method.GET.equals(req.getMethod()) || req.getMethod().equals(Method.POST) ||
                     req.getMethod().equals("HEAD"))) {
                 String qs;
                 if (isIncluded) {

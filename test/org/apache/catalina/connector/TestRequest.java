@@ -378,7 +378,7 @@ public class TestRequest extends TomcatBaseTest {
         // Make sure POST works properly
         //
         // POST with separate GET and POST parameters
-        client.doRequest("POST", "foo=bar", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz", true);
+        client.doRequest(Method.POST, "foo=bar", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz", true);
 
         Assert.assertTrue("Non-200 response for POST request", client.isResponse200());
         Assert.assertEquals("Incorrect response for POST request", "bar=baz,foo=bar", client.getResponseBody());
@@ -386,7 +386,7 @@ public class TestRequest extends TomcatBaseTest {
         client.reset();
 
         // POST with overlapping GET and POST parameters
-        client.doRequest("POST", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
+        client.doRequest(Method.POST, "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
 
         Assert.assertTrue("Non-200 response for POST request", client.isResponse200());
         Assert.assertEquals("Incorrect response for POST request", "bar=baz,bar=foo,foo=bar,foo=baz",
@@ -556,7 +556,7 @@ public class TestRequest extends TomcatBaseTest {
         URL postURL;
         postURL = URI.create(query).toURL();
         HttpURLConnection conn = (HttpURLConnection) postURL.openConnection();
-        conn.setRequestMethod("POST");
+        conn.setRequestMethod(Method.POST);
 
         conn.setDoInput(true);
         conn.setDoOutput(true);

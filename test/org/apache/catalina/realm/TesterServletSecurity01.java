@@ -21,10 +21,11 @@ import jakarta.servlet.annotation.HttpMethodConstraint;
 import jakarta.servlet.annotation.ServletSecurity;
 
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.http.Method;
 
 @ServletSecurity(value=@HttpConstraint,
         httpMethodConstraints={
-                @HttpMethodConstraint(value="POST",
+                @HttpMethodConstraint(value=Method.POST,
                         rolesAllowed=TestRealmBase.ROLE1),
                 @HttpMethodConstraint(value="PUT",
                         rolesAllowed=SecurityConstraint.ROLE_ALL_ROLES),
