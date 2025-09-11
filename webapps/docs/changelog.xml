@@ -211,6 +211,10 @@
         (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Optimize the conversion of HTTP method from byte form to String form.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">

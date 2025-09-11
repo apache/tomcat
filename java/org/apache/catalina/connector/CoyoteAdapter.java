@@ -592,7 +592,7 @@ public class CoyoteAdapter implements Adapter {
 
         // Check for ping OPTIONS * request
         if (undecodedURI.equals("*")) {
-            if (req.method().equals("OPTIONS")) {
+            if ("OPTIONS".equals(req.getMethod())) {
                 StringBuilder allow = new StringBuilder();
                 allow.append("GET, HEAD, POST, PUT, DELETE, OPTIONS");
                 // Trace if allowed
@@ -611,7 +611,7 @@ public class CoyoteAdapter implements Adapter {
         MessageBytes decodedURI = req.decodedURI();
 
         // Filter CONNECT method
-        if (req.method().equals("CONNECT")) {
+        if ("CONNECT".equals(req.getMethod())) {
             response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, sm.getString("coyoteAdapter.connect"));
         } else {
             // No URI for CONNECT requests
@@ -810,7 +810,7 @@ public class CoyoteAdapter implements Adapter {
         }
 
         // Filter TRACE method
-        if (!connector.getAllowTrace() && req.method().equals("TRACE")) {
+        if (!connector.getAllowTrace() && "TRACE".equals(req.getMethod())) {
             Wrapper wrapper = request.getWrapper();
             StringBuilder header = null;
             if (wrapper != null) {
