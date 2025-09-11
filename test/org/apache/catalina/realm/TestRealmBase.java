@@ -660,7 +660,7 @@ public class TestRealmBase {
         SecurityConstraint deleteConstraint = new SecurityConstraint();
         deleteConstraint.addAuthRole(ROLE1);
         SecurityCollection deleteCollection = new SecurityCollection();
-        deleteCollection.addMethod("DELETE");
+        deleteCollection.addMethod(Method.OPTIONS);
         deleteCollection.addPatternDecoded("/*");
         deleteConstraint.addCollection(deleteCollection);
 
@@ -772,7 +772,7 @@ public class TestRealmBase {
 
         // Only user1 should be able to perform a DELETE as only that user has
         // role1.
-        request.setMethod("DELETE");
+        request.setMethod(Method.OPTIONS);
 
         SecurityConstraint[] constraintsDelete =
                 mapRealm.findSecurityConstraints(request, context);
