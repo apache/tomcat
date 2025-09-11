@@ -106,7 +106,7 @@ public class SimpleAjpClient {
             case Method.MKCOL:
                 this.method = 10;
                 break;
-            case "COPY":
+            case Method.COPY:
                 this.method = 11;
                 break;
             case "MOVE":
@@ -185,7 +185,7 @@ public class SimpleAjpClient {
             case 10:
                 return Method.MKCOL;
             case 11:
-                return "COPY";
+                return Method.COPY;
             case 12:
                 return "MOVE";
             case 13:
