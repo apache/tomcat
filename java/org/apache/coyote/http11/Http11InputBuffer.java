@@ -906,11 +906,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 // skipLine() will handle the error
                 return skipLine(false);
             }
-
-            // chr is next byte of header name. Convert to lowercase.
-            if (chr >= Constants.A && chr <= Constants.Z) {
-                byteBuffer.put(pos, (byte) (chr - Constants.LC_OFFSET));
-            }
         }
 
         // Skip the line and ignore the header
