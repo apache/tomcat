@@ -81,11 +81,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
     private static final String defaultProtocol = "TLS";
 
-    private static final int SSL_AIDX_RSA = 0;
-    private static final int SSL_AIDX_DSA = 1;
-    private static final int SSL_AIDX_ECC = 3;
-    private static final int SSL_AIDX_MAX = 4;
-
     public static final int SSL_PROTOCOL_NONE = 0;
     public static final int SSL_PROTOCOL_SSLV2 = 1;
     public static final int SSL_PROTOCOL_SSLV3 = (1 << 1);
