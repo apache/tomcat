@@ -107,7 +107,7 @@
 <section name="Tomcat 10.1.47 (schultz)" rtext="in development">
 </section>
 <section name="Tomcat 10.1.46 (schultz)" rtext="release in progress">
-  <subsection name="Catlaina">
+  <subsection name="Catalina">
     <changelog>
       <update>
         Change the digest used to calculate strong ETags (if enabled) for the
