@@ -875,7 +875,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     public boolean addCertificate(SSLHostConfigCertificate certificate, Arena localArena) throws Exception {
-        int index = getCertificateIndex(certificate);
         // Load Server key and certificate
         if (certificate.getCertificateFile() != null) {
             // Pick right key password
@@ -1027,8 +1026,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     logLastError("openssl.errorPrivateKeyCheck");
                     return false;
                 }
-                // Try to read DH parameters from the (first) SSLCertificateFile
-                if (index == SSL_AIDX_RSA) {
+                // Try to read DH parameters from the SSLCertificateFile
+                if (certificate.getType() == Type.RSA) {
                     BIO_reset(certificateBIO);
                     if (!openssl_h_Compatibility.BORINGSSL) {
                         if (!openssl_h_Compatibility.OPENSSL3) {
@@ -1246,23 +1245,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
         }
         return true;
-    }
-
-
-    private static int getCertificateIndex(SSLHostConfigCertificate certificate) {
-        int result;
-        // If the type is undefined there will only be one certificate (enforced
-        // in SSLHostConfig) so use the RSA slot.
-        if (certificate.getType() == Type.RSA || certificate.getType() == Type.UNDEFINED) {
-            result = SSL_AIDX_RSA;
-        } else if (certificate.getType() == Type.EC) {
-            result = SSL_AIDX_ECC;
-        } else if (certificate.getType() == Type.DSA) {
-            result = SSL_AIDX_DSA;
-        } else {
-            result = SSL_AIDX_MAX;
-        }
-        return result;
     }
 
 
