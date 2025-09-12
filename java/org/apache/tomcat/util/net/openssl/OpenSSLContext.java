@@ -494,7 +494,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             result = SSL.SSL_AIDX_RSA;
         } else if (certificate.getType() == Type.EC) {
             result = SSL.SSL_AIDX_ECC;
-        } else if (certificate.getType() == Type.DSA) {
+        } else if (certificate.getType() == Type.DSA || certificate.getType() == Type.MLDSA) {
             result = SSL.SSL_AIDX_DSA;
         } else {
             result = SSL.SSL_AIDX_MAX;
