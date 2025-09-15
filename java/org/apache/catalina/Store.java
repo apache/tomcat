@@ -75,6 +75,8 @@ public interface Store {
      * <p>
      * Implementations should expect, and correctly handle, concurrent calls to any method but in particular calls to
      * {@code #load(String)}, {@code #save(Session)} and {@code #remove(String)} for the same session.
+     * <p>
+     * The session ID is user provided so stores must treat it as untrusted data.
      *
      * @param id Session identifier of the session to load
      *
