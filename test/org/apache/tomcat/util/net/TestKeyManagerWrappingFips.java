@@ -93,6 +93,8 @@ public class TestKeyManagerWrappingFips {
     }
 
     private static final class DummyKeyStoreProvider extends Provider {
+        private static final long serialVersionUID = 1L;
+
         DummyKeyStoreProvider(String name, String info, String algorithm) {
             super(name, 1.0, info);
             put("KeyStore." + algorithm, DummyKeyStoreSpi.class.getName());
@@ -172,6 +174,8 @@ public class TestKeyManagerWrappingFips {
     }
 
     private static final class DummyKeyManagerFactoryProvider extends Provider {
+        private static final long serialVersionUID = 1L;
+
         DummyKeyManagerFactoryProvider(String name, String info, String algorithm) {
             super(name, 1.0, info);
             put("KeyManagerFactory." + algorithm, DummyKeyManagerFactorySpi.class.getName());
