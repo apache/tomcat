@@ -189,6 +189,11 @@
     limited in scope (e.g. via security constraints) such that users with access
     to the functionality are unable to imapct the security of either the web
     application or the Tomcat instance on which it is running.</p>
+
+    <p>Consider using the
+    <a href="config/filter.html#CORS_Filter">CORS filter</a> and/or the
+    <a href="config/filter.html#CSRF_Prevention_Filter">CSRF prevention
+    filter</a> with deployed web applications.</p>
   </section>
 
   <section name="Security manager">
@@ -604,7 +609,9 @@
 
     <p>The WebDAV servlet enables edit functionality for web application
     content. If the WebDAV servlet is enabled, the WebDAV functionality should
-    be appropriately secured.</p>
+    be appropriately secured. This should include CORS protection if it is
+    expected that any legitimate users will access the web application via a
+    browser.</p>
 
     <p>When configuring security constraints, care should be taken if the URL
     pattern for one or more constraints covers any segment of the URL that
