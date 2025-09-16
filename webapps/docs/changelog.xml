@@ -137,6 +137,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Cluster">
+    <changelog>
+      <fix>
+        Prevent the channel configuration (sender, receiver, membership service)
+        from being changed unless the channel is fully stopped. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Web applications">
     <changelog>
       <fix>
