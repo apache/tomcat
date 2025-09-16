@@ -100,6 +100,9 @@ import org.xml.sax.SAXException;
  * functionality. In particular, administrators should be aware that security constraints apply only to the request URL.
  * Security constraints do not apply to any destination URL associated with the WebDAV operation (such as COPY or MOVE).
  * <p>
+ * If WebDAV functionality is included in a web application where legitimate users may access it via a browser, it is
+ * recommended that the application include CORS protection.
+ * <p>
  * To enable WebDAV for a context add the following to web.xml:
  *
  * <pre>
