@@ -96,7 +96,9 @@ public interface SSLUtil {
      * @param context the existing context
      * @param certificate the second certificate to add
      * @return true if supported by the context
+     * @deprecated Unused. This method will be removed in Tomcat 12.
      */
+    @Deprecated
     default boolean addSecondCertificate(SSLContext context, SSLHostConfigCertificate certificate) {
         return false;
     }
