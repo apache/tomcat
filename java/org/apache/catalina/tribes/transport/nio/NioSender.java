@@ -33,8 +33,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * This class is NOT thread safe and should never be used with more than one thread at a time This is a state machine,
- * handled by the process method States are:
+ * This class is NOT thread safe and should never be used with more than one thread at a time. This is a state machine,
+ * handled by the process method. States are:
  * <ul>
  * <li>NOT_CONNECTED -&gt; connect() -&gt; CONNECTED</li>
  * <li>CONNECTED -&gt; setMessage() -&gt; READY TO WRITE</li>
@@ -42,6 +42,7 @@ import org.apache.juli.logging.LogFactory;
  * <li>READY_TO_READ -&gt; read() -&gt; READY_TO_READ | TRANSFER_COMPLETE</li>
  * <li>TRANSFER_COMPLETE -&gt; CONNECTED</li>
  * </ul>
+ * Thread-safety / synchronisation is managed by ParallelNioSender
  */
 public class NioSender extends AbstractSender {
 
@@ -220,7 +221,7 @@ public class NioSender extends AbstractSender {
     }
 
     @Override
-    public synchronized void connect() throws IOException {
+    public void connect() throws IOException {
         if (connecting || isConnected()) {
             return;
         }
@@ -357,28 +358,26 @@ public class NioSender extends AbstractSender {
 
     public void setMessage(byte[] data, int offset, int length) throws IOException {
         if (data != null) {
-            synchronized (this) {
-                current = data;
-                remaining = length;
-                ackbuf.clear();
-                if (writebuf != null) {
-                    writebuf.clear();
-                } else {
-                    writebuf = getBuffer(length);
-                }
-                if (writebuf.capacity() < length) {
-                    writebuf = getBuffer(length);
-                }
+            current = data;
+            remaining = length;
+            ackbuf.clear();
+            if (writebuf != null) {
+                writebuf.clear();
+            } else {
+                writebuf = getBuffer(length);
+            }
+            if (writebuf.capacity() < length) {
+                writebuf = getBuffer(length);
+            }
 
-                // TODO use ByteBuffer.wrap to avoid copying the data.
-                writebuf.put(data, offset, length);
-                writebuf.flip();
-                if (isConnected()) {
-                    if (isUdpBased()) {
-                        dataChannel.register(getSelector(), SelectionKey.OP_WRITE, this);
-                    } else {
-                        socketChannel.register(getSelector(), SelectionKey.OP_WRITE, this);
-                    }
+            // TODO use ByteBuffer.wrap to avoid copying the data.
+            writebuf.put(data, offset, length);
+            writebuf.flip();
+            if (isConnected()) {
+                if (isUdpBased()) {
+                    dataChannel.register(getSelector(), SelectionKey.OP_WRITE, this);
+                } else {
+                    socketChannel.register(getSelector(), SelectionKey.OP_WRITE, this);
                 }
             }
         }
