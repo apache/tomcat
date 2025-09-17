@@ -42,6 +42,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
@@ -423,7 +424,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
     /**
      * The MIME mappings for this web application, keyed by extension.
      */
-    private final Map<String,String> mimeMappings = new HashMap<>();
+    private final ConcurrentMap<String,String> mimeMappings = new ConcurrentHashMap<>();
 
 
     /**
@@ -2827,12 +2828,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     @Override
     public void addMimeMapping(String extension, String mimeType) {
-
-        synchronized (mimeMappings) {
-            mimeMappings.put(extension.toLowerCase(Locale.ENGLISH), mimeType);
-        }
+        mimeMappings.put(extension.toLowerCase(Locale.ENGLISH), mimeType);
         fireContainerEvent("addMimeMapping", extension);
-
     }
 
 
@@ -3106,9 +3103,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     @Override
     public String[] findMimeMappings() {
-        synchronized (mimeMappings) {
-            return mimeMappings.keySet().toArray(new String[0]);
-        }
+        return mimeMappings.keySet().toArray(new String[0]);
     }
 
 
@@ -3403,12 +3398,8 @@ public class StandardContext extends ContainerBase implements Context, Notificat
 
     @Override
     public void removeMimeMapping(String extension) {
-
-        synchronized (mimeMappings) {
-            mimeMappings.remove(extension);
-        }
+        mimeMappings.remove(extension);
         fireContainerEvent("removeMimeMapping", extension);
-
     }
 
 
