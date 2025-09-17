@@ -219,7 +219,7 @@ public class UserDatabaseRealm extends RealmBase {
                                 containerLog.error(sm.getString("userDatabaseRealm.noNamingContext"));
                                 return null;
                             }
-                            context = getServer().getGlobalNamingContext();
+                            context = server.getGlobalNamingContext();
                         }
                         database = (UserDatabase) context.lookup(resourceName);
                     } catch (Throwable t) {
