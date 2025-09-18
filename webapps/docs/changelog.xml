@@ -292,6 +292,9 @@
         Documentation. Clarify the purpose of the <code>maxPostSize</code>
         attribute of the <code>Connector</code> element. (markt)
       </fix>
+      <fix>
+        Avoid NPE in manager webapp displaying certificate information. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
