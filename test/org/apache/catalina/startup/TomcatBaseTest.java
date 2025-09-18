@@ -973,7 +973,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             }
         };
         public LogCapture(Level level, String... loggerNames) {
-            this.level = (level == null ? Level.ALL : level);
+            this.level = level;
             this.loggerNames = loggerNames;
         }
 
@@ -981,9 +981,11 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             if (!installed) {
                 for (String name : loggerNames) {
                     Logger logger = Logger.getLogger(name);
-                    previousLevelsOfLoggersMap.put(logger, logger.getLevel());
                     logger.addHandler(handler);
-                    logger.setLevel(level);
+                    if (level != null) {
+                        previousLevelsOfLoggersMap.put(logger, logger.getLevel());
+                        logger.setLevel(level);
+                    }
                 }
                 installed = true;
             }
