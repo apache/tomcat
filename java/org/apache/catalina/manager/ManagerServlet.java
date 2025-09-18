@@ -1627,12 +1627,16 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                         if (alias == null) {
                             alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
                         }
-                        X509Certificate[] certs = sslContext.getCertificateChain(alias);
-                        if (certs == null) {
-                            certList.add(smClient.getString("managerServlet.certsNotAvailable"));
+                        if (sslContext == null) {
+                            certList.add(smClient.getString("managerServlet.certsNotLoaded"));
                         } else {
-                            for (Certificate cert : certs) {
-                                certList.add(cert.toString());
+                            X509Certificate[] certs = sslContext.getCertificateChain(alias);
+                            if (certs == null) {
+                                certList.add(smClient.getString("managerServlet.certsNotAvailable"));
+                            } else {
+                                for (Certificate cert : certs) {
+                                    certList.add(cert.toString());
+                                }
                             }
                         }
                         result.put(name, certList);
@@ -1660,14 +1664,18 @@ public class ManagerServlet extends HttpServlet implements ContainerServlet {
                     String name = connector.toString() + "-" + sslHostConfig.getHostName();
                     List<String> certList = new ArrayList<>();
                     SSLContext sslContext = sslHostConfig.getCertificates().iterator().next().getSslContext();
-                    X509Certificate[] certs = sslContext.getAcceptedIssuers();
-                    if (certs == null) {
-                        certList.add(smClient.getString("managerServlet.certsNotAvailable"));
-                    } else if (certs.length == 0) {
-                        certList.add(smClient.getString("managerServlet.trustedCertsNotConfigured"));
+                    if (sslContext == null) {
+                        certList.add(smClient.getString("managerServlet.certsNotLoaded"));
                     } else {
-                        for (Certificate cert : certs) {
-                            certList.add(cert.toString());
+                        X509Certificate[] certs = sslContext.getAcceptedIssuers();
+                        if (certs == null) {
+                            certList.add(smClient.getString("managerServlet.certsNotAvailable"));
+                        } else if (certs.length == 0) {
+                            certList.add(smClient.getString("managerServlet.trustedCertsNotConfigured"));
+                        } else {
+                            for (Certificate cert : certs) {
+                                certList.add(cert.toString());
+                            }
                         }
                     }
                     result.put(name, certList);
