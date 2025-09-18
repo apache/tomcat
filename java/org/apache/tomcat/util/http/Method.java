@@ -156,4 +156,9 @@ public class Method {
 
         return null;
     }
+
+
+    private Method() {
+        // Utility class - hide default constructor
+    }
 }
