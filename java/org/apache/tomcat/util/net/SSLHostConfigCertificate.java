@@ -344,8 +344,7 @@ public class SSLHostConfigCertificate implements Serializable {
             return compatibleAuthentications.contains(scheme.getAuth());
         }
 
-        @Override
-        public String toString() {
+        public String getKeyType() {
             if (keyType != null) {
                 return keyType;
             }
