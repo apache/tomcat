@@ -321,11 +321,17 @@ public class SSLHostConfigCertificate implements Serializable {
         RSA(Authentication.RSA),
         DSA(Authentication.DSS, Authentication.EdDSA),
         EC(Authentication.ECDH, Authentication.ECDSA),
-        MLDSA(Authentication.MLDSA);
+        MLDSA("ML-DSA", Authentication.MLDSA);
 
+        private final String keyType;
         private final Set<Authentication> compatibleAuthentications;
 
         Type(Authentication... authentications) {
+            this(null, authentications);
+        }
+
+        Type(String keyType, Authentication... authentications) {
+            this.keyType = keyType;
             compatibleAuthentications = new HashSet<>();
             if (authentications != null) {
                 compatibleAuthentications.addAll(Arrays.asList(authentications));
@@ -338,6 +344,14 @@ public class SSLHostConfigCertificate implements Serializable {
 
         public boolean isCompatibleWith(SignatureScheme scheme) {
             return compatibleAuthentications.contains(scheme.getAuth());
+        }
+
+        @Override
+        public String toString() {
+            if (keyType != null) {
+                return keyType;
+            }
+            return super.toString();
         }
 
     }
