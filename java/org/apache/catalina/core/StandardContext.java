@@ -3963,7 +3963,7 @@ public class StandardContext extends ContainerBase implements Context, Notificat
         // Put them these listeners after the ones defined in web.xml and/or
         // annotations then overwrite the list of instances with the new, full
         // list.
-        eventListeners.addAll(Arrays.asList(getApplicationEventListeners()));
+        eventListeners.addAll(applicationEventListenersList);
         setApplicationEventListeners(eventListeners.toArray());
         for (Object lifecycleListener : getApplicationLifecycleListeners()) {
             lifecycleListeners.add(lifecycleListener);
