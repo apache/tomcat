@@ -532,7 +532,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         Iterator<Type> iter = candidateTypes.iterator();
         while (result == null && iter.hasNext()) {
-            result = keyManager.chooseServerAlias(iter.next().toString(), null, null);
+            result = keyManager.chooseServerAlias(iter.next().getKeyType(), null, null);
         }
 
         return result;
