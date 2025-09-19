@@ -139,6 +139,10 @@
         Optimize the conversion of HTTP method from byte form to String form.
         (markt)
       </add>
+      <fix>
+        Store HTTP request headers using the original case for the header name
+        rather than forcing it to lower case. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Cluster">
