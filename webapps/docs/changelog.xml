@@ -117,6 +117,10 @@
         HTTP methods are case-sensitive so always use case sensitive comparisons
         when comparing HTTP methods. (markt)
       </fix>
+      <fix>
+        <bug>69814</bug>: Ensure that <code>HttpSession.isNew()</code> returns
+        <code>false</code> once the client has joined the session. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
