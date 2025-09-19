@@ -82,7 +82,12 @@ public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
      * @param map Map whose contents are duplicated in the new map
      */
     public ParameterMap(Map<K,V> map) {
-        delegatedMap = new LinkedHashMap<>(map);
+        // Unroll loop for performance - https://bz.apache.org/bugzilla/show_bug.cgi?id=69820
+        int mapSize = map.size();
+        delegatedMap = new LinkedHashMap<>((int) (mapSize * 1.5));
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            delegatedMap.put(entry.getKey(), entry.getValue());
+        }
         unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
     }
 
@@ -95,7 +100,12 @@ public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
      * @param map Map whose contents are duplicated in the new map
      */
     public ParameterMap(ParameterMap<K,V> map) {
-        delegatedMap = new LinkedHashMap<>(map.delegatedMap);
+        // Unroll loop for performance - https://bz.apache.org/bugzilla/show_bug.cgi?id=69820
+        int mapSize = map.size();
+        delegatedMap = new LinkedHashMap<>((int) (mapSize * 1.5));
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            delegatedMap.put(entry.getKey(), entry.getValue());
+        }
         unmodifiableDelegatedMap = Collections.unmodifiableMap(delegatedMap);
     }
 
