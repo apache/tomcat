@@ -19,7 +19,6 @@ package org.apache.coyote.http2;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CountDownLatch;
 
 import jakarta.servlet.ServletException;
@@ -125,7 +124,7 @@ public class TestStandardSessionIntegrationHttp2 extends Http2TestBase {
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setContentType("text/plain");
-            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setCharacterEncoding("UTF-8");
             PrintWriter pw = resp.getWriter();
 
             boolean pass = true;
