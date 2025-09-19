@@ -2566,6 +2566,8 @@ public class Request implements HttpServletRequest {
             }
             if (session != null) {
                 session.access();
+                // The client has chosen to join the session
+                session.setNew(false);
                 return session;
             }
         }
