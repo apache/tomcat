@@ -186,6 +186,9 @@
         <bug>69814</bug>: Ensure that <code>HttpSession.isNew()</code> returns
         <code>false</code> once the client has joined the session. (markt)
       </fix>
+      <fix>
+        Further performance improvements for ParameterMap. (jengebr/markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
