@@ -33,10 +33,6 @@ public class HttpHeaderParser {
     private static final byte SP = (byte) ' ';
     private static final byte HT = (byte) '\t';
     private static final byte COLON = (byte) ':';
-    private static final byte A = (byte) 'A';
-    private static final byte a = (byte) 'a';
-    private static final byte Z = (byte) 'Z';
-    private static final byte LC_OFFSET = A - a;
 
     private final HeaderDataSource source;
     private final MimeHeaders headers;
@@ -149,11 +145,6 @@ public class HttpHeaderParser {
                 source.getHeaderByteBuffer().position(source.getHeaderByteBuffer().position() - 1);
                 // skipLine() will handle the error
                 return skipLine();
-            }
-
-            // chr is next byte of header name. Convert to lowercase.
-            if (chr >= A && chr <= Z) {
-                source.getHeaderByteBuffer().put(pos, (byte) (chr - LC_OFFSET));
             }
         }
 
