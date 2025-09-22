@@ -366,7 +366,7 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 // just skipping blank lines)
                 if (parsingRequestLinePhase == 0) {
                     parsingRequestLinePhase = 1;
-                    request.setStartTimeNanos(System.nanoTime());
+                    request.markStartTime();
                 }
                 chr = byteBuffer.get();
             } while (chr == Constants.CR || chr == Constants.LF);

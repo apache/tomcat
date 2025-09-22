@@ -378,7 +378,7 @@ public class AjpProcessor extends AbstractProcessor {
                     setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
                     break;
                 }
-                request.setStartTimeNanos(System.nanoTime());
+                request.markStartTime();
             } catch (IOException ioe) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 break;
