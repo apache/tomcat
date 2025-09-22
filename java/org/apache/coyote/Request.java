@@ -727,17 +727,19 @@ public final class Request {
         return System.currentTimeMillis() - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNanos);
     }
 
+    public long getStartTimeNanos() {
+        return startTimeNanos;
+    }
+
     /**
      * @param startTime time
      *
-     * @deprecated This setter will be removed in Tomcat 11
+     * @deprecated This setter will be removed in Tomcat 11. Use {@link #markStartTime()}.
      */
     @Deprecated
     public void setStartTime(long startTime) {
-    }
-
-    public long getStartTimeNanos() {
-        return startTimeNanos;
+        startTimeNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(startTime - System.currentTimeMillis());
+        startInstant = Instant.now();
     }
 
     /**
