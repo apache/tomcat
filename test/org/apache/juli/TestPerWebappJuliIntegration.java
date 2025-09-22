@@ -154,6 +154,6 @@ public class TestPerWebappJuliIntegration extends TomcatBaseTest {
                 Thread.sleep(100);
             }
         } while (++deadlineCounter < 3);
-        return files.isEmpty() ? null : files.getFirst();
+        return files.isEmpty() ? null : files.get(0);
     }
 }
