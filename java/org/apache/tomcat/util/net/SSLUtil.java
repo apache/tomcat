@@ -91,15 +91,4 @@ public interface SSLUtil {
         String getNegotiatedProtocol();
     }
 
-    /**
-     * Add a second certificate to an existing context, to enable hybrid TLS 1.3 handshakes.
-     * @param context the existing context
-     * @param certificate the second certificate to add
-     * @return true if supported by the context
-     * @deprecated Unused. This method will be removed in Tomcat 12.
-     */
-    @Deprecated
-    default boolean addSecondCertificate(SSLContext context, SSLHostConfigCertificate certificate) {
-        return false;
-    }
 }
