@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -161,6 +162,7 @@ public final class Request {
     private long bytesRead = 0;
     // Time of the request - useful to avoid repeated calls to System.currentTime
     private long startTimeNanos = -1;
+    private Instant startInstant = null;
     private long threadId = 0;
     private int available = 0;
 
@@ -702,6 +704,11 @@ public final class Request {
 
     public void markStartTime() {
         startTimeNanos = System.nanoTime();
+        startInstant = Instant.now();
+    }
+
+    public Instant getStartInstant() {
+        return startInstant;
     }
 
     public long getThreadId() {
@@ -812,6 +819,7 @@ public final class Request {
         allDataReadEventSent.set(false);
 
         startTimeNanos = -1;
+        startInstant = null;
         threadId = 0;
 
         if (hook instanceof NonPipeliningProcessor) {
