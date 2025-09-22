@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -149,6 +150,7 @@ public final class Request {
     private long bytesRead = 0;
     // Time of the request - useful to avoid repeated calls to System.currentTime
     private long startTime = -1;
+    private Instant startInstant = null;
     private long threadId = 0;
     private int available = 0;
 
@@ -703,10 +705,16 @@ public final class Request {
     @Deprecated
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+        startInstant = Instant.now();
     }
 
     public void markStartTime() {
         startTime = System.currentTimeMillis();
+        startInstant = Instant.now();
+    }
+
+    public Instant getStartInstant() {
+        return startInstant;
     }
 
     public long getThreadId() {
@@ -808,6 +816,7 @@ public final class Request {
         allDataReadEventSent.set(false);
 
         startTime = -1;
+        startInstant = null;
         threadId = 0;
 
         if (hook instanceof NonPipeliningProcessor) {
