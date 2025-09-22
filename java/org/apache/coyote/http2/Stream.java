@@ -161,7 +161,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         this.coyoteResponse.setOutputBuffer(http2OutputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
         this.coyoteRequest.protocol().setString("HTTP/2.0");
-        this.coyoteRequest.setStartTimeNanos(System.nanoTime());
+        this.coyoteRequest.markStartTime();
     }
 
 
