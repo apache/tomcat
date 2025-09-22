@@ -696,11 +696,9 @@ public final class Request {
     }
 
     /**
-     * Set the start time using the value provided by {@code System.currentTimeMillis()}.
+     * @param startTime time
      *
-     * @param startTime The value returned from {@code System.currentTimeMillis()} at the point the requests started.
-     *
-     * @deprecated Unused. Will be removed in Tomcat 12 onwards. Use {@link #markStartTime()}.
+     * @deprecated This setter will be removed in Tomcat 11. Use {@link #markStartTime()}.
      */
     @Deprecated
     public void setStartTime(long startTime) {
