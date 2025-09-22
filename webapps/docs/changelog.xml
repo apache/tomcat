@@ -105,20 +105,8 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 10.1.47 (schultz)" rtext="in development">
-</section>
-<section name="Tomcat 10.1.46 (schultz)" rtext="release in progress">
   <subsection name="Catalina">
     <changelog>
-      <update>
-        Change the digest used to calculate strong ETags (if enabled) for the
-        default Servlet from SHA-1 to SHA-256 to align with the recommendation
-        in RFC 9110 that hash functions used to generate strong ETags should be
-        collision resistant. (markt)
-      </update>
-      <fix>
-        Correct a regression in the fix for <bug>69781</bug> that broke
-        <code>FileStore</code>. (markt)
-      </fix>
       <fix>
         HTTP methods are case-sensitive so always use case sensitive comparisons
         when comparing HTTP methods. (markt)
@@ -172,6 +160,32 @@
       <fix>
         Avoid NPE in manager webapp displaying certificate information. (remm)
       </fix>
+    </changelog>
+  </subsection>
+</section>
+<section name="Tomcat 10.1.46 (schultz)" rtext="2025-09-12">
+  <subsection name="Catalina">
+    <changelog>
+      <update>
+        Change the digest used to calculate strong ETags (if enabled) for the
+        default Servlet from SHA-1 to SHA-256 to align with the recommendation
+        in RFC 9110 that hash functions used to generate strong ETags should be
+        collision resistant. (markt)
+      </update>
+      <fix>
+        Correct a regression in the fix for <bug>69781</bug> that broke
+        <code>FileStore</code>. (markt)
+      </fix>
+    </changelog>
+  </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <update>
+        Add hybrid PQC support to OpenSSL, based on code from
+        <code>mod_ssl</code>. Using this OpenSSL specific code path,
+        additional PQC certificates defined with type <code>MLDSA</code> are
+        added to contexts which use classic certificates. (jfclere/remm)
+      </update>
     </changelog>
   </subsection>
 </section>
