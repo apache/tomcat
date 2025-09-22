@@ -700,8 +700,20 @@ public final class Request {
         return startTimeNanos;
     }
 
+    /**
+     * Set the start time using the value provided by {@code System.nanoTime()}.
+     *
+     * @param startTimeNanos The value returned from {@code System.nanoTime()} at the point the requests started.
+     *
+     * @deprecated Unused. Will be removed in Tomcat 12 onwards. Use {@link #markStartTime()}.
+     */
+    @Deprecated
     public void setStartTimeNanos(long startTimeNanos) {
         this.startTimeNanos = startTimeNanos;
+    }
+
+    public void markStartTime() {
+        startTimeNanos = System.nanoTime();
     }
 
     public long getThreadId() {
