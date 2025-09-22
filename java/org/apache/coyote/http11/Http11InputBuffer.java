@@ -343,8 +343,6 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                         wrapper.setReadTimeout(keepAliveTimeout);
                     }
                     if (!fill(false)) {
-                        // A read is pending, so no longer in initial state
-                        parsingRequestLinePhase = 1;
                         return false;
                     }
                     // At least one byte of the request has been received.
@@ -366,8 +364,9 @@ public class Http11InputBuffer implements InputBuffer, ApplicationBufferHandler 
                 }
                 // Set the start time once we start reading data (even if it is
                 // just skipping blank lines)
-                if (request.getStartTime() < 0) {
-                    request.setStartTime(System.currentTimeMillis());
+                if (parsingRequestLinePhase == 0) {
+                    parsingRequestLinePhase = 1;
+                    request.markStartTime();
                 }
                 chr = byteBuffer.get();
             } while (chr == Constants.CR || chr == Constants.LF);

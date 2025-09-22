@@ -1083,9 +1083,9 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         // Set the socket wrapper so the access log can read the socket related
         // information (e.g. client IP)
         setSocketWrapper(socketWrapper);
-        // Setup the minimal request information
-        request.setStartTime(System.currentTimeMillis());
-        // Setup the minimal response information
+        // Set up the minimal request information
+        request.markStartTime();
+        // Set up the minimal response information
         response.setStatus(400);
         response.setError();
         getAdapter().log(request, response, 0);
