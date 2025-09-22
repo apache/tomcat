@@ -54,6 +54,9 @@ public class TLSClientHelloExtractor {
 
     private static final int TLS_EXTENSION_SERVER_NAME = 0;
     private static final int TLS_EXTENSION_SUPPORTED_GROUPS = 10;
+    // Note: Signature algorithms is the name of the extension
+    // Starting with TLS 1.3, this contains signature schemes
+    // For TLS before 1.3, this contains signature algorithms
     private static final int TLS_EXTENSION_SIGNATURE_ALGORITHMS = 13;
     private static final int TLS_EXTENSION_ALPN = 16;
     private static final int TLS_EXTENSION_SUPPORTED_VERSION = 43;
@@ -170,7 +173,7 @@ public class TLSClientHelloExtractor {
                         readSupportedGroups(netInBuffer, clientSupportedGroups);
                         break;
                     case TLS_EXTENSION_SIGNATURE_ALGORITHMS:
-                        readSignatureAlgorithms(netInBuffer, clientSignatureSchemes);
+                        readSignatureSchemes(netInBuffer, clientSignatureSchemes);
                         break;
                     case TLS_EXTENSION_ALPN:
                         readAlpnExtension(netInBuffer, clientRequestedApplicationProtocols);
@@ -478,15 +481,15 @@ public class TLSClientHelloExtractor {
     }
 
 
-    private static void readSignatureAlgorithms(ByteBuffer bb, List<SignatureScheme> signatureAlgorithms) {
+    private static void readSignatureSchemes(ByteBuffer bb, List<SignatureScheme> signatureSchemes) {
         // First 2 bytes are size of the signature algorithm list
         int toRead = bb.getChar() / 2;
         // Then the list of protocols
         for (int i = 0; i < toRead; i++) {
             char id = bb.getChar();
-            SignatureScheme signatureAlgorithm = SignatureScheme.valueOf(id);
-            if (signatureAlgorithm != null) {
-                signatureAlgorithms.add(signatureAlgorithm);
+            SignatureScheme signatureScheme = SignatureScheme.valueOf(id);
+            if (signatureScheme != null) {
+                signatureSchemes.add(signatureScheme);
             }
         }
     }
