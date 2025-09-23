@@ -1782,7 +1782,8 @@
     <attribute name="type" required="false">
       <p>The type of certificate. This is used to identify the ciphers that are
       compatible with the certificate. It must be one of <code>UNDEFINED</code>,
-      <code>RSA</code>, <code>DSA</code> or <code>EC</code>. If only one
+      <code>RSA</code>, <code>DSA</code>, <code>EC</code> or <code>MLDSA</code>.
+      If only one
       <strong>Certificate</strong> is nested within a <code>SSLHostConfig</code>
       then this attribute is not required and will default to
       <code>UNDEFINED</code>. If multiple <strong>Certificate</strong>s are
