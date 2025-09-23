@@ -20,7 +20,6 @@ import java.io.CharArrayWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -125,7 +124,7 @@ public class JsonAccessLogValve extends AccessLogValve {
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             buf.write(ch);
         }
     }
@@ -257,12 +256,12 @@ public class JsonAccessLogValve extends AccessLogValve {
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             buf.append('"').append(attributeName).append('"').append(':');
             if (quoteValue) {
                 buf.append('"');
             }
-            delegate.addElement(buf, date, request, response, time);
+            delegate.addElement(buf, request, response, time);
             if (quoteValue) {
                 buf.append('"');
             }
