@@ -124,6 +124,10 @@
       <fix>
         Further performance improvements for ParameterMap. (jengebr/markt)
       </fix>
+      <scode>
+        Refactor access log time stamps to be based on the <code>Instant</code>
+        request processing starts. (markt)
+      </scode>
     </changelog>
   </subsection>
   <subsection name="Coyote">
