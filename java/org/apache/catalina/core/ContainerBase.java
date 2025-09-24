@@ -877,18 +877,25 @@ public abstract class ContainerBase extends LifecycleMBeanBase implements Contai
 
     @Override
     public void logAccess(Request request, Response response, long time, boolean useDefault) {
+        logAccessNanos(request, response, TimeUnit.MILLISECONDS.toNanos(time), useDefault);
+    }
+
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void logAccessNanos(Request request, Response response, long time, boolean useDefault) {
 
         boolean logged = false;
 
         if (getAccessLog() != null) {
-            getAccessLog().log(request, response, time);
+            getAccessLog().logNanos(request, response, time);
             logged = true;
         }
 
         if (getParent() != null) {
             // No need to use default logger once request/response has been logged
             // once
-            getParent().logAccess(request, response, time, (useDefault && !logged));
+            getParent().logAccessNanos(request, response, time, (useDefault && !logged));
         }
     }
 

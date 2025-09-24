@@ -16,6 +16,8 @@
  */
 package org.apache.coyote;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.tomcat.util.net.SocketEvent;
 
 /**
@@ -74,12 +76,29 @@ public interface Adapter {
 
     /**
      * Callback to allow logging access outside of the execution of the regular service.
+     * <p>
+     * Note: As of Tomcat 10.1.x, this method will expect nanoseconds rather than milliseconds.
      *
      * @param req  the request object
      * @param res  the response object
      * @param time time taken to process the request/response in milliseconds (use 0 if not known)
      */
     void log(Request req, Response res, long time);
+
+    /**
+     * Callback to allow logging access outside of the execution of the regular service.
+     *
+     * @param req  the request object
+     * @param res  the response object
+     * @param time time taken to process the request/response in nanoseconds (use 0 if not known)
+     *
+     * @deprecated This will be removed in Tomcat 10.1.x and the {@link #log(Request, Response, long)} method changed to
+     *                 expect nanoseconds.
+     */
+    @Deprecated
+    default void logNanos(Request req, Response res, long time) {
+        log(req, res, TimeUnit.NANOSECONDS.toMillis(time));
+    }
 
     /**
      * Assert that request and response have been recycled. If they have not then log a warning and force a recycle.

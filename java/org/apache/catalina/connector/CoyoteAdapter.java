@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
@@ -110,6 +111,7 @@ public class CoyoteAdapter implements Adapter {
 
     // -------------------------------------------------------- Adapter Methods
 
+    @SuppressWarnings("deprecation")
     @Override
     public boolean asyncDispatch(org.apache.coyote.Request req, org.apache.coyote.Response res, SocketEvent status)
             throws Exception {
@@ -283,9 +285,9 @@ public class CoyoteAdapter implements Adapter {
                 }
                 Context context = request.getContext();
                 if (context != null) {
-                    context.logAccess(request, response, time, false);
+                    context.logAccessNanos(request, response, time, false);
                 } else {
-                    log(req, res, time);
+                    logNanos(req, res, time);
                 }
             }
 
@@ -302,6 +304,7 @@ public class CoyoteAdapter implements Adapter {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public void service(org.apache.coyote.Request req, org.apache.coyote.Response res) throws Exception {
 
@@ -406,12 +409,12 @@ public class CoyoteAdapter implements Adapter {
                 // Log via the host or engine in that case.
                 long time = System.nanoTime() - req.getStartTimeNanos();
                 if (context != null) {
-                    context.logAccess(request, response, time, false);
+                    context.logAccessNanos(request, response, time, false);
                 } else if (response.isError()) {
                     if (host != null) {
-                        host.logAccess(request, response, time, false);
+                        host.logAccessNanos(request, response, time, false);
                     } else {
-                        connector.getService().getContainer().logAccess(request, response, time, false);
+                        connector.getService().getContainer().logAccessNanos(request, response, time, false);
                     }
                 }
             }
@@ -451,6 +454,13 @@ public class CoyoteAdapter implements Adapter {
 
     @Override
     public void log(org.apache.coyote.Request req, org.apache.coyote.Response res, long time) {
+        logNanos(req, res, TimeUnit.MILLISECONDS.toNanos(time));
+    }
+
+
+    @Deprecated
+    @Override
+    public void logNanos(org.apache.coyote.Request req, org.apache.coyote.Response res, long time) {
 
         Request request = (Request) req.getNote(ADAPTER_NOTES);
         Response response = (Response) res.getNote(ADAPTER_NOTES);
@@ -482,13 +492,13 @@ public class CoyoteAdapter implements Adapter {
             Host host = request.mappingData.host;
             if (context != null) {
                 logged = true;
-                context.logAccess(request, response, time, true);
+                context.logAccessNanos(request, response, time, true);
             } else if (host != null) {
                 logged = true;
-                host.logAccess(request, response, time, true);
+                host.logAccessNanos(request, response, time, true);
             }
             if (!logged) {
-                connector.getService().getContainer().logAccess(request, response, time, true);
+                connector.getService().getContainer().logAccessNanos(request, response, time, true);
             }
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
@@ -518,7 +528,7 @@ public class CoyoteAdapter implements Adapter {
         if (messageKey != null) {
             // Log this request, as it has probably skipped the access log.
             // The log() method will take care of recycling.
-            log(req, res, 0L);
+            logNanos(req, res, 0L);
 
             if (connector.getState().isAvailable()) {
                 if (log.isInfoEnabled()) {
@@ -607,7 +617,7 @@ public class CoyoteAdapter implements Adapter {
                 }
                 res.setHeader("Allow", allow.toString());
                 // Access log entry as processing won't reach AccessLogValve
-                connector.getService().getContainer().logAccess(request, response, 0, true);
+                connector.getService().getContainer().logAccessNanos(request, response, 0, true);
                 return false;
             } else {
                 response.sendError(400, sm.getString("coyoteAdapter.invalidURI"));
@@ -809,7 +819,7 @@ public class CoyoteAdapter implements Adapter {
                 redirectPath = redirectPath + "?" + query;
             }
             response.sendRedirect(redirectPath);
-            request.getContext().logAccess(request, response, 0, true);
+            request.getContext().logAccessNanos(request, response, 0, true);
             return false;
         }
 

@@ -663,6 +663,12 @@ public abstract class AbstractAccessLogValve extends ValveBase implements Access
 
     @Override
     public void log(Request request, Response response, long time) {
+        logNanos(request, response, TimeUnit.MILLISECONDS.toNanos(time));
+    }
+
+
+    @Override
+    public void logNanos(Request request, Response response, long time) {
         if (!getState().isAvailable() || !getEnabled() || logElements == null ||
                 condition != null && null != request.getRequest().getAttribute(condition) ||
                 conditionIf != null && null == request.getRequest().getAttribute(conditionIf)) {

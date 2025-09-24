@@ -18,6 +18,7 @@ package org.apache.catalina;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import javax.management.ObjectName;
 
@@ -427,14 +428,35 @@ public interface Container extends Lifecycle {
     /**
      * Log a request/response that was destined for this container but has been handled earlier in the processing chain
      * so that the request/response still appears in the correct access logs.
+     * <p>
+     * Note: As of Tomcat 10.1.x, this method will expect nanoseconds rather than milliseconds.
+     *
+     * @param request    Request (associated with the response) to log
+     * @param response   Response (associated with the request) to log
+     * @param time       Time taken to process the request/response in milliseconds (use 0 if not known)
+     * @param useDefault Flag that indicates that the request/response should be logged in the engine's default access
+     *                       log
+     */
+    void logAccess(Request request, Response response, long time, boolean useDefault);
+
+
+    /**
+     * Log a request/response that was destined for this container but has been handled earlier in the processing chain
+     * so that the request/response still appears in the correct access logs.
      *
      * @param request    Request (associated with the response) to log
      * @param response   Response (associated with the request) to log
      * @param time       Time taken to process the request/response in nanoseconds (use 0 if not known)
      * @param useDefault Flag that indicates that the request/response should be logged in the engine's default access
      *                       log
+     *
+     * @deprecated This will be removed in Tomcat 10.1.x and the {@link #logAccess(Request, Response, long, boolean)}
+     *                 method changed to expect nanoseconds.
      */
-    void logAccess(Request request, Response response, long time, boolean useDefault);
+    @Deprecated
+    default void logAccessNanos(Request request, Response response, long time, boolean useDefault) {
+        logAccess(request, response, TimeUnit.NANOSECONDS.toMillis(time), useDefault);
+    }
 
 
     /**

@@ -18,6 +18,7 @@ package org.apache.catalina.core;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.connector.Request;
@@ -44,8 +45,14 @@ public class AccessLogAdapter implements AccessLog {
 
     @Override
     public void log(Request request, Response response, long time) {
+        logNanos(request, response, TimeUnit.MILLISECONDS.toNanos(time));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void logNanos(Request request, Response response, long time) {
         for (AccessLog log : logs) {
-            log.log(request, response, time);
+            log.logNanos(request, response, time);
         }
     }
 
