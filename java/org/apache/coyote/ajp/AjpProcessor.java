@@ -329,6 +329,7 @@ public class AjpProcessor extends AbstractProcessor {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public SocketState service(SocketWrapperBase<?> socket) throws IOException {
 
@@ -435,7 +436,7 @@ public class AjpProcessor extends AbstractProcessor {
                     // 500 - Internal Server Error
                     response.setStatus(500);
                     setErrorState(ErrorState.CLOSE_CLEAN, t);
-                    getAdapter().log(request, response, 0);
+                    getAdapter().logNanos(request, response, 0);
                 }
             }
 
@@ -641,6 +642,7 @@ public class AjpProcessor extends AbstractProcessor {
     /**
      * After reading the request headers, we have to setup the request filters.
      */
+    @SuppressWarnings("deprecation")
     private void prepareRequest() {
 
         // Translate the HTTP method code to a String.
@@ -888,7 +890,7 @@ public class AjpProcessor extends AbstractProcessor {
         parseHost(valueMB);
 
         if (!getErrorState().isIoAllowed()) {
-            getAdapter().log(request, response, 0);
+            getAdapter().logNanos(request, response, 0);
         }
     }
 

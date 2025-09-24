@@ -1088,6 +1088,6 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
         // Set up the minimal response information
         response.setStatus(400);
         response.setError();
-        getAdapter().log(request, response, 0);
+        getAdapter().logNanos(request, response, 0);
     }
 }

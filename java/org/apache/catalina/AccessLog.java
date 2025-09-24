@@ -16,6 +16,8 @@
  */
 package org.apache.catalina;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
@@ -57,12 +59,29 @@ public interface AccessLog {
 
     /**
      * Add the request/response to the access log using the specified processing time.
+     * <p>
+     * Note: As of Tomcat 10.1.x, this method will expect nanoseconds rather than milliseconds.
      *
      * @param request  Request (associated with the response) to log
      * @param response Response (associated with the request) to log
      * @param time     Time taken to process the request/response in milliseconds (use 0 if not known)
      */
     void log(Request request, Response response, long time);
+
+    /**
+     * Add the request/response to the access log using the specified processing time.
+     *
+     * @param request  Request (associated with the response) to log
+     * @param response Response (associated with the request) to log
+     * @param time     Time taken to process the request/response in nanoseconds (use 0 if not known)
+     *
+     * @deprecated This will be removed in Tomcat 10.1.x and the {@link #log(Request, Response, long)} method changed to
+     *                 expect nanoseconds.
+     */
+    @Deprecated
+    default void logNanos(Request request, Response response, long time) {
+        log(request, response, TimeUnit.NANOSECONDS.toMillis(time));
+    }
 
     /**
      * Should this valve use request attributes for IP address, hostname, protocol and port used for the request? The

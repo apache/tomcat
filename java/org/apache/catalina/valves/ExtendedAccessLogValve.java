@@ -144,11 +144,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 ThreadLocal.withInitial(() -> new ElementTimestampStruct("yyyy-MM-dd"));
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             ElementTimestampStruct eds = currentDate.get();
             long millis = eds.currentTimestamp.getTime();
-            if (date.getTime() > (millis + INTERVAL - 1) || date.getTime() < millis) {
-                eds.currentTimestamp.setTime(date.getTime() - (date.getTime() % INTERVAL));
+            long epochMilli = request.getCoyoteRequest().getStartInstant().toEpochMilli();
+            if (epochMilli > (millis + INTERVAL - 1) || epochMilli < millis) {
+                eds.currentTimestamp.setTime(epochMilli - (epochMilli % INTERVAL));
                 eds.currentTimestampString = eds.currentTimestampFormat.format(eds.currentTimestamp);
             }
             buf.append(eds.currentTimestampString);
@@ -163,11 +164,12 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 ThreadLocal.withInitial(() -> new ElementTimestampStruct("HH:mm:ss"));
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             ElementTimestampStruct eds = currentTime.get();
             long millis = eds.currentTimestamp.getTime();
-            if (date.getTime() > (millis + INTERVAL - 1) || date.getTime() < millis) {
-                eds.currentTimestamp.setTime(date.getTime() - (date.getTime() % INTERVAL));
+            long epochMilli = request.getCoyoteRequest().getStartInstant().toEpochMilli();
+            if (epochMilli > (millis + INTERVAL - 1) || epochMilli < millis) {
+                eds.currentTimestamp.setTime(epochMilli - (epochMilli % INTERVAL));
                 eds.currentTimestampString = eds.currentTimestampFormat.format(eds.currentTimestamp);
             }
             buf.append(eds.currentTimestampString);
@@ -182,7 +184,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             wrap(request.getHeader(header), buf);
         }
     }
@@ -195,7 +197,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             wrap(response.getHeader(header), buf);
         }
     }
@@ -208,7 +210,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             wrap(request.getContext().getServletContext().getAttribute(attribute), buf);
         }
     }
@@ -221,7 +223,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             StringBuilder value = new StringBuilder();
             boolean first = true;
             Cookie[] c = request.getCookies();
@@ -254,7 +256,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             if (null != response) {
                 Iterator<String> iter = response.getHeaders(header).iterator();
                 if (iter.hasNext()) {
@@ -286,7 +288,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             wrap(request.getAttribute(attribute), buf);
         }
     }
@@ -299,7 +301,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             HttpSession session = null;
             if (request != null) {
                 session = request.getSession(false);
@@ -328,7 +330,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         }
 
         @Override
-        public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
             String parameterValue;
             try {
                 parameterValue = request.getParameter(parameter);
@@ -509,7 +511,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             if (tokenizer.hasSubToken()) {
                 String nextToken = tokenizer.getToken();
                 if ("taken".equals(nextToken)) {
-                    return new ElapsedTimeElement(false);
+                    return new ElapsedTimeElement(false, false);
                 }
             } else {
                 return new TimeElement();
@@ -533,7 +535,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             } else if ("dns".equals(nextToken)) {
                 return new AccessLogElement() {
                     @Override
-                    public void addElement(CharArrayWriter buf, Date date, Request request, Response response,
+                    public void addElement(CharArrayWriter buf, Request request, Response response,
                             long time) {
                         String value;
                         try {
@@ -572,7 +574,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                     } else if ("query".equals(token)) {
                         return new AccessLogElement() {
                             @Override
-                            public void addElement(CharArrayWriter buf, Date date, Request request, Response response,
+                            public void addElement(CharArrayWriter buf, Request request, Response response,
                                     long time) {
                                 String query = request.getQueryString();
                                 if (query != null) {
@@ -586,7 +588,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 } else {
                     return new AccessLogElement() {
                         @Override
-                        public void addElement(CharArrayWriter buf, Date date, Request request, Response response,
+                        public void addElement(CharArrayWriter buf, Request request, Response response,
                                 long time) {
                             String query = request.getQueryString();
                             buf.append(request.getRequestURI());
@@ -684,77 +686,77 @@ public class ExtendedAccessLogValve extends AccessLogValve {
         if ("authType".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     wrap(request.getAuthType(), buf);
                 }
             };
         } else if ("remoteUser".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     wrap(request.getRemoteUser(), buf);
                 }
             };
         } else if ("requestedSessionId".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     wrap(request.getRequestedSessionId(), buf);
                 }
             };
         } else if ("requestedSessionIdFromCookie".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     wrap(String.valueOf(request.isRequestedSessionIdFromCookie()), buf);
                 }
             };
         } else if ("requestedSessionIdValid".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     wrap(String.valueOf(request.isRequestedSessionIdValid()), buf);
                 }
             };
         } else if ("contentLength".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     wrap(String.valueOf(request.getContentLengthLong()), buf);
                 }
             };
         } else if ("characterEncoding".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     wrap(request.getCharacterEncoding(), buf);
                 }
             };
         } else if ("locale".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     wrap(request.getLocale(), buf);
                 }
             };
         } else if ("protocol".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     wrap(request.getProtocol(), buf);
                 }
             };
         } else if ("scheme".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     buf.append(request.getScheme());
                 }
             };
         } else if ("secure".equals(parameter)) {
             return new AccessLogElement() {
                 @Override
-                public void addElement(CharArrayWriter buf, Date date, Request request, Response response, long time) {
+                public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                     wrap(Boolean.valueOf(request.isSecure()), buf);
                 }
             };

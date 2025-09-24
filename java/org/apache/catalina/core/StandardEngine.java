@@ -219,13 +219,14 @@ public class StandardEngine extends ContainerBase implements Engine {
      * default host and then the default host's ROOT context. If still none is found, return the default NoOp access
      * log.
      */
+    @SuppressWarnings("deprecation")
     @Override
-    public void logAccess(Request request, Response response, long time, boolean useDefault) {
+    public void logAccessNanos(Request request, Response response, long time, boolean useDefault) {
 
         boolean logged = false;
 
         if (getAccessLog() != null) {
-            accessLog.log(request, response, time);
+            accessLog.logNanos(request, response, time);
             logged = true;
         }
 
@@ -268,7 +269,7 @@ public class StandardEngine extends ContainerBase implements Engine {
                 }
             }
 
-            newDefaultAccessLog.log(request, response, time);
+            newDefaultAccessLog.logNanos(request, response, time);
         }
     }
 

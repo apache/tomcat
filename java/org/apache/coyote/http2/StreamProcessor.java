@@ -469,6 +469,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public final SocketState service(SocketWrapperBase<?> socket) throws IOException {
         try {
@@ -476,7 +477,7 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
                 adapter.service(request, response);
             } else {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                adapter.log(request, response, 0);
+                adapter.logNanos(request, response, 0);
                 setErrorState(ErrorState.CLOSE_CLEAN, null);
             }
         } catch (Exception e) {

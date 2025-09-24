@@ -248,6 +248,7 @@ public class Http11Processor extends AbstractProcessor {
     }
 
 
+    @SuppressWarnings("deprecation")
     @Override
     public SocketState service(SocketWrapperBase<?> socketWrapper) throws IOException {
         RequestInfo rp = request.getRequestProcessor();
@@ -355,7 +356,7 @@ public class Http11Processor extends AbstractProcessor {
                             response.setHeader("Connection", "Upgrade");
                             response.setHeader("Upgrade", requestedProtocol);
                             action(ActionCode.CLOSE, null);
-                            getAdapter().log(request, response, 0);
+                            getAdapter().logNanos(request, response, 0);
 
                             // Continue processing using new protocol
                             InternalHttpUpgradeHandler upgradeHandler = upgradeProtocol
@@ -425,7 +426,7 @@ public class Http11Processor extends AbstractProcessor {
                     // 500 - Internal Server Error
                     response.setStatus(500);
                     setErrorState(ErrorState.CLOSE_CLEAN, t);
-                    getAdapter().log(request, response, 0);
+                    getAdapter().logNanos(request, response, 0);
                 }
             }
 
@@ -787,7 +788,7 @@ public class Http11Processor extends AbstractProcessor {
         parseHost(hostValueMB);
 
         if (!getErrorState().isIoAllowed()) {
-            getAdapter().log(request, response, 0);
+            getAdapter().logNanos(request, response, 0);
         }
     }
 

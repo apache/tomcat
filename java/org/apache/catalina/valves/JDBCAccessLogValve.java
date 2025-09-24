@@ -24,6 +24,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 
@@ -435,6 +436,12 @@ public class JDBCAccessLogValve extends ValveBase implements AccessLog {
 
     @Override
     public void log(Request request, Response response, long time) {
+        logNanos(request, response, TimeUnit.MILLISECONDS.toNanos(time));
+    }
+
+    @Override
+    public void logNanos(Request request, Response response, long time) {
+
         if (!getState().isAvailable()) {
             return;
         }
