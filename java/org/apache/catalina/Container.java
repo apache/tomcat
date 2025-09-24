@@ -430,7 +430,7 @@ public interface Container extends Lifecycle {
      *
      * @param request    Request (associated with the response) to log
      * @param response   Response (associated with the request) to log
-     * @param time       Time taken to process the request/response in milliseconds (use 0 if not known)
+     * @param time       Time taken to process the request/response in nanoseconds (use 0 if not known)
      * @param useDefault Flag that indicates that the request/response should be logged in the engine's default access
      *                       log
      */

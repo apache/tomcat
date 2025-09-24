@@ -19,6 +19,7 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 
@@ -44,7 +45,7 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
 
     @Override
     public void log(Request request, Response response, long time) {
-        entries.add(new Entry(request.getRequestURI(), response.getStatus(), time));
+        entries.add(new Entry(request.getRequestURI(), response.getStatus(), TimeUnit.NANOSECONDS.toMillis(time)));
     }
 
     @Override
