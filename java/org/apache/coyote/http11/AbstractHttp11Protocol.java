@@ -562,7 +562,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
     public boolean isTrailerHeaderAllowed(String headerName) {
-        return allowedTrailerHeaders.contains(headerName);
+        return allowedTrailerHeaders.contains(headerName.trim().toLowerCase(Locale.ENGLISH));
     }
 
     public String getAllowedTrailerHeaders() {

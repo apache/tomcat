@@ -122,6 +122,9 @@
         Refactor access log time stamps to be based on the <code>Instant</code>
         request processing starts. (markt)
       </scode>
+      <fix>
+        Fix a case-sensitivity issue in the trailer header allow list. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
