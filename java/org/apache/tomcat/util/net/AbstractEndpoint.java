@@ -540,17 +540,24 @@ public abstract class AbstractEndpoint<S, U> {
         List<String> supportedGroups = new ArrayList<>();
         LinkedHashSet<Group> serverSupportedGroups = sslHostConfig.getGroupList();
         if (serverSupportedGroups != null) {
-            for (Group group : clientSupportedGroups) {
-                if (serverSupportedGroups.contains(group)) {
+            if (!clientSupportedGroups.isEmpty()) {
+                for (Group group : clientSupportedGroups) {
+                    if (serverSupportedGroups.contains(group)) {
+                        supportedGroups.add(group.toString());
+                    }
+                }
+            } else {
+                for (Group group : serverSupportedGroups) {
                     supportedGroups.add(group.toString());
                 }
             }
-        } else {
+            sslParameters.setNamedGroups(supportedGroups.toArray(new String[0]));
+        } else if (!clientSupportedGroups.isEmpty()) {
             for (Group group : clientSupportedGroups) {
                 supportedGroups.add(group.toString());
             }
+            sslParameters.setNamedGroups(supportedGroups.toArray(new String[0]));
         }
-        sslParameters.setNamedGroups(supportedGroups.toArray(new String[0]));
         switch (sslHostConfig.getCertificateVerification()) {
             case NONE:
                 sslParameters.setNeedClientAuth(false);
