@@ -275,14 +275,11 @@ public class CrawlerSessionManagerValve extends ValveBase {
     }
 
     private String getClientIdentifier(Request request) {
-        return getClientIdentifierDefault(request.getHost(), request.getContext(), request.getRemoteAddr());
-    }
-
-    private String getClientIdentifierDefault(Host host, Context context, String clientIp) {
-        StringBuilder result = new StringBuilder(clientIp);
+        StringBuilder result = new StringBuilder(request.getRemoteAddr());
         if (isHostAware) {
-            result.append('-').append(host.getName());
+            result.append('-').append(request.getHost().getName());
         }
+        Context context = request.getContext();
         if (isContextAware && context != null) {
             result.append(context.getName());
         }
