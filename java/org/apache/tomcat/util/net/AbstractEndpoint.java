@@ -539,7 +539,6 @@ public abstract class AbstractEndpoint<S, U> {
         }
         // Merge server groups with the client groups
         if (JreCompat.isJre20Available()) {
-            // Merge server groups with the client groups
             List<String> supportedGroups = new ArrayList<>();
             LinkedHashSet<Group> serverSupportedGroups = sslHostConfig.getGroupList();
             if (serverSupportedGroups != null) {
