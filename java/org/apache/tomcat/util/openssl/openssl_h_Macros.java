@@ -433,6 +433,41 @@ public class openssl_h_Macros {
 
 
     /**
+     * Set list of groups in preference order.
+     * {@snippet lang = c :
+     * # define SSL_set1_groups_list(s, str) \
+     *          SSL_ctrl(s,SSL_CTRL_SET_GROUPS_LIST,0,(char *)(str))
+     * }
+     *
+     * @param sslCtx     the SSL context
+     * @param groupsList the groups list as a String
+     *
+     * @return > 0 if successful
+     */
+    public static long SSL_CTX_set1_groups_list(MemorySegment sslCtx, MemorySegment groupsList) {
+        if (openssl_h_Compatibility.BORINGSSL) {
+            class Holder {
+                static final String NAME = "SSL_CTX_set1_groups_list";
+                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER,
+                        openssl_h.C_POINTER);
+                static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
+            }
+            var mh$ = Holder.MH;
+            try {
+                if (openssl_h.TRACE_DOWNCALLS) {
+                    openssl_h.traceDowncall(Holder.NAME, sslCtx, groupsList);
+                }
+                return (long) mh$.invokeExact(sslCtx, groupsList);
+            } catch (Throwable ex$) {
+                throw new AssertionError("should not reach here", ex$);
+            }
+        } else {
+            return SSL_CTX_ctrl(sslCtx, SSL_CTRL_SET_GROUPS_LIST(), 0, groupsList);
+        }
+    }
+
+
+    /**
      * Pass a path from which certificates are loaded into the store.
      * {@snippet lang = c : # define X509_LOOKUP_add_dir(x,name,type) \
      *    X509_LOOKUP_ctrl((x),X509_L_ADD_DIR,(name),(long)(type),NULL)

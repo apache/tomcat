@@ -58,6 +58,7 @@ import org.apache.catalina.util.IOTools;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.compat.JrePlatform;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
 
@@ -216,9 +217,9 @@ public final class CGIServlet extends HttpServlet {
     private static final String ALLOW_ANY_PATTERN = ".*";
 
     static {
-        DEFAULT_SUPER_METHODS.add("HEAD");
-        DEFAULT_SUPER_METHODS.add("OPTIONS");
-        DEFAULT_SUPER_METHODS.add("TRACE");
+        DEFAULT_SUPER_METHODS.add(Method.HEAD);
+        DEFAULT_SUPER_METHODS.add(Method.OPTIONS);
+        DEFAULT_SUPER_METHODS.add(Method.TRACE);
 
         if (JrePlatform.IS_WINDOWS) {
             DEFAULT_CMD_LINE_ARGUMENTS_DECODED_PATTERN = Pattern.compile("[\\w\\Q-.\\/:\\E]+");
@@ -364,8 +365,8 @@ public final class CGIServlet extends HttpServlet {
                 }
             }
         } else {
-            cgiMethods.add("GET");
-            cgiMethods.add("POST");
+            cgiMethods.add(Method.GET);
+            cgiMethods.add(Method.POST);
         }
 
         if (getServletConfig().getInitParameter("cmdLineArgumentsEncoded") != null) {
@@ -557,7 +558,7 @@ public final class CGIServlet extends HttpServlet {
             CGIRunner cgi = new CGIRunner(cgiEnv.getCommand(), cgiEnv.getEnvironment(), cgiEnv.getWorkingDirectory(),
                     cgiEnv.getParameters());
 
-            if ("POST".equals(req.getMethod())) {
+            if (Method.POST.equals(req.getMethod())) {
                 cgi.setInput(req.getInputStream());
             }
             cgi.setResponse(res);
@@ -727,8 +728,8 @@ public final class CGIServlet extends HttpServlet {
             // does not contain an unencoded "=" this is an indexed query.
             // The parsed query string becomes the command line parameters
             // for the cgi command.
-            if (enableCmdLineArguments && (req.getMethod().equals("GET") || req.getMethod().equals("POST") ||
-                    req.getMethod().equals("HEAD"))) {
+            if (enableCmdLineArguments && (Method.GET.equals(req.getMethod()) || Method.POST.equals(req.getMethod()) ||
+                    Method.HEAD.equals(req.getMethod()))) {
                 String qs;
                 if (isIncluded) {
                     qs = (String) req.getAttribute(RequestDispatcher.INCLUDE_QUERY_STRING);

@@ -70,6 +70,7 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -500,7 +501,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         // Make sure that constrained resources are not cached by web proxies
         // or browsers as caching can provide a security hole
-        if (constraints != null && disableProxyCaching && !"POST".equalsIgnoreCase(request.getMethod())) {
+        if (constraints != null && disableProxyCaching && !Method.POST.equals(request.getMethod())) {
             if (securePagesWithPragma) {
                 // Note: These can cause problems with downloading files with IE
                 response.setHeader("Pragma", "No-cache");
@@ -623,7 +624,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         if (allowCorsPreflight != AllowCorsPreflight.NEVER) {
             // First check to see if this is a CORS Preflight request
             // This is a subset of the tests in CorsFilter.checkRequestType
-            if ("OPTIONS".equals(request.getMethod())) {
+            if (Method.OPTIONS.equals(request.getMethod())) {
                 String originHeader = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
                 if (originHeader != null && !originHeader.isEmpty() && RequestUtil.isValidOrigin(originHeader) &&
                         !RequestUtil.isSameOrigin(request, originHeader)) {

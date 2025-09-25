@@ -23,6 +23,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
@@ -423,7 +424,7 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
 
         tomcat.start();
 
-        Exception writeEx = null;
+        SocketException writeEx = null;
         Exception readEx = null;
         String responseLine = null;
 
@@ -442,7 +443,8 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
                     writer.write("10\r\n");
                     writer.write("0123456789ABCDEF\r\n");
                 }
-            } catch (Exception e) {
+                writer.flush();
+            } catch (SocketException e) {
                 writeEx = e;
             }
 
@@ -453,6 +455,17 @@ public class TestSwallowAbortedUploads extends TomcatBaseTest {
                 responseLine = reader.readLine();
             } catch (IOException ioe) {
                 readEx = ioe;
+            }
+
+            // If no exception was thrown during the big write,
+            // write once more because the close may have not been observed
+            if (limit && writeEx == null) {
+                try {
+                    writer.write("1\r\n");
+                    writer.flush();
+                } catch (SocketException e) {
+                    writeEx = e;
+                }
             }
         }
 

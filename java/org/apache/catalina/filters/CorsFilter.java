@@ -37,6 +37,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.ResponseUtil;
 import org.apache.tomcat.util.http.parser.MediaType;
@@ -404,7 +405,7 @@ public class CorsFilter extends GenericFilter {
             response.addHeader(RESPONSE_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS, exposedHeadersString);
         }
 
-        if ("OPTIONS".equals(method)) {
+        if (Method.OPTIONS.equals(method)) {
             // For an OPTIONS request, the response will vary based on the
             // value or absence of the following headers. Hence, they need to be
             // included in the Vary header.
@@ -553,7 +554,7 @@ public class CorsFilter extends GenericFilter {
             return CORSRequestType.INVALID_CORS;
         }
         switch (method) {
-            case "OPTIONS":
+            case Method.OPTIONS:
                 String accessControlRequestMethodHeader =
                         request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
                 if (accessControlRequestMethodHeader != null) {
@@ -563,10 +564,10 @@ public class CorsFilter extends GenericFilter {
                     return CORSRequestType.PRE_FLIGHT;
                 }
                 return CORSRequestType.ACTUAL;
-            case "GET":
-            case "HEAD":
+            case Method.GET:
+            case Method.HEAD:
                 return CORSRequestType.SIMPLE;
-            case "POST":
+            case Method.POST:
                 String mediaType = MediaType.parseMediaTypeOnly(request.getContentType());
                 if (mediaType == null || SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES.contains(mediaType)) {
                     return CORSRequestType.SIMPLE;

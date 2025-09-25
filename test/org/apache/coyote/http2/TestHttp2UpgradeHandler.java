@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.startup.Tomcat;
+import org.apache.tomcat.util.http.Method;
 
 public class TestHttp2UpgradeHandler extends Http2TestBase {
 
@@ -130,7 +131,7 @@ public class TestHttp2UpgradeHandler extends Http2TestBase {
 
         openClientConnection();
 
-        byte[] upgradeRequest = ((usePost ? "POST" : "GET") + " /" + (useReader ? "?useReader=true " : " ") +
+        byte[] upgradeRequest = ((usePost ? Method.POST : Method.GET) + " /" + (useReader ? "?useReader=true " : " ") +
                 "HTTP/1.1\r\n" + "Host: localhost:" + getPort() + "\r\n" + "Content-Length: 18\r\n" +
                 "Connection: Upgrade,HTTP2-Settings\r\n" + "Upgrade: h2c\r\n" + EMPTY_HTTP2_SETTINGS_HEADER + "\r\n" +
                 "Small request body").getBytes(StandardCharsets.ISO_8859_1);

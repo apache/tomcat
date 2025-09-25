@@ -39,6 +39,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -56,6 +58,8 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.ContainerEvent;
+import org.apache.catalina.ContainerListener;
 import org.apache.catalina.Context;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -76,6 +80,7 @@ import org.apache.catalina.webresources.StandardRoot;
 import org.apache.coyote.http11.Http11NioProtocol;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.scan.StandardJarScanFilter;
 import org.apache.tomcat.util.scan.StandardJarScanner;
@@ -592,7 +597,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             }
 
             int bodySize = 0;
-            if ("PUT".equalsIgnoreCase(request.getMethod())) {
+            if (Method.PUT.equals(request.getMethod())) {
                 InputStream is = request.getInputStream();
                 int read = 0;
                 byte[] buffer = new byte[8192];
@@ -650,12 +655,12 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
 
     public static int getUrl(String path, ByteChunk out, boolean followRedirects)
             throws IOException {
-        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, null, "GET", followRedirects);
+        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, null, Method.GET, followRedirects);
     }
 
     public static int headUrl(String path, ByteChunk out, Map<String, List<String>> resHead)
             throws IOException {
-        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, "HEAD");
+        return methodUrl(path, out, DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, Method.HEAD);
     }
 
     public static int getUrl(String path, ByteChunk out, Map<String, List<String>> reqHead,
@@ -666,7 +671,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
     public static int getUrl(String path, ByteChunk out, int readTimeout,
             Map<String, List<String>> reqHead, Map<String, List<String>> resHead)
             throws IOException {
-        return methodUrl(path, out, readTimeout, reqHead, resHead, "GET");
+        return methodUrl(path, out, readTimeout, reqHead, resHead, Method.GET);
     }
 
     public static int methodUrl(String path, ByteChunk out, int readTimeout,
@@ -948,6 +953,7 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         protected final String[] loggerNames;
         protected final List<LogRecord> logRecords = Collections.synchronizedList(new ArrayList<>());
         protected final Map<Logger, Level> previousLevelsOfLoggersMap = new IdentityHashMap<>();
+        private volatile boolean installed = false;
         protected final Handler handler = new Handler() {
             @Override
             public void publish(LogRecord record) {
@@ -964,16 +970,21 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
             }
         };
         public LogCapture(Level level, String... loggerNames) {
-            this.level = (level == null ? Level.ALL : level);
+            this.level = level;
             this.loggerNames = loggerNames;
         }
 
         public void attach() {
-            for (String name : loggerNames) {
-                Logger logger = Logger.getLogger(name);
-                previousLevelsOfLoggersMap.put(logger, logger.getLevel());
-                logger.addHandler(handler);
-                logger.setLevel(level);
+            if (!installed) {
+                for (String name : loggerNames) {
+                    Logger logger = Logger.getLogger(name);
+                    logger.addHandler(handler);
+                    if (level != null) {
+                        previousLevelsOfLoggersMap.put(logger, logger.getLevel());
+                        logger.setLevel(level);
+                    }
+                }
+                installed = true;
             }
         }
 
@@ -1023,15 +1034,18 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
      * CONFIGURE_START phase of a {@link Context}.
      */
     public static class WebappLogCapture extends LogCapture implements LifecycleListener {
-        private volatile boolean installed = false;
+        private String lifecycleEvent = Lifecycle.CONFIGURE_START_EVENT;
+        public WebappLogCapture(String lifecycleEvent, Level level, String... loggerNames) {
+            this(level, loggerNames);
+            this.lifecycleEvent = lifecycleEvent;
+        }
         public WebappLogCapture(Level level, String... loggerNames) {
             super(level, loggerNames);
         }
 
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
-            if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType()) && !installed) {
-                installed = true;
+            if (this.lifecycleEvent.equals(event.getType())) {
                 this.attach();
             }
         }
@@ -1090,5 +1104,53 @@ public abstract class TomcatBaseTest extends LoggingBaseTest {
         String formatted = sm.getString(key, "XXX");
         int insertIndex = formatted.indexOf("XXX");
         return (insertIndex == -1) ? formatted : formatted.substring(0, insertIndex);
+    }
+
+    /**
+     * Injects a {@link LifecycleListener} to a {@link Context} of a {@link Container} that sends {@code ADD_CHILD_EVENT}.
+     * Useful when deploying with the Manager / HostConfig.
+     */
+    public static class ContainerInjector implements ContainerListener, AutoCloseable {
+
+        private final Container container;
+        private final Predicate<Context> filter;
+        private final Consumer<Context> action;
+        private volatile boolean installed = false;
+        private String containerEvent = Container.ADD_CHILD_EVENT;
+
+        private ContainerInjector(Container container, Predicate<Context> filter, Consumer<Context> action, String containerEvent) {
+            this.container = container;
+            this.filter = filter;
+            this.action = action;
+            if (containerEvent != null) {
+                this.containerEvent = containerEvent;
+            }
+            container.addContainerListener(this);
+        }
+
+        public static ContainerInjector inject(Container container, Predicate<Context> filter, Consumer<Context> action) {
+            return new ContainerInjector(container, filter, action, null);
+        }
+        public static ContainerInjector inject(Container container, Predicate<Context> filter, Consumer<Context> action, String containerEvent) {
+            return new ContainerInjector(container, filter, action, containerEvent);
+        }
+
+        @Override
+        public void containerEvent(ContainerEvent event) {
+            if (this.containerEvent.equals(event.getType()) && !installed) {
+                Object data = event.getData();
+                if (data instanceof Context ctx) {
+                    if (filter != null && filter.test(ctx)) {
+                        action.accept(ctx);
+                        installed = true;
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void close() {
+            container.removeContainerListener(this);
+        }
     }
 }

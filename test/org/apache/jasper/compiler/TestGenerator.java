@@ -733,6 +733,10 @@ public class TestGenerator extends TomcatBaseTest {
         }
     }
 
+    @Test
+    public void testLambdaScriptlets() throws Exception {
+        doTestJsp("lambda.jsp");
+    }
 
     @Test
     public void testInfoConflictNone() throws Exception {

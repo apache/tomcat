@@ -106,7 +106,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         configureHostEC();
 
         // Configure cipher suite that requires an RSA certificate on the server
-        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl(true);
         clientSSLSocketFactory.setCipher(new String[] {"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"});
 
         doTest(false);
@@ -123,7 +123,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         configureHostRSA();
 
         // Configure cipher suite that requires an RSA certificate on the server
-        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl(true);
         clientSSLSocketFactory.setCipher(new String[] {"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"});
 
         doTest(false);
@@ -140,7 +140,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         configureHostEC();
 
         // Configure cipher suite that requires an EC certificate on the server
-        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl(true);
         clientSSLSocketFactory.setCipher(new String[] {"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"});
 
         doTest(false);
@@ -157,7 +157,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         configureHostRSA();
 
         // Configure cipher suite that requires an EC certificate on the server
-        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl(true);
         clientSSLSocketFactory.setCipher(new String[] {"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"});
 
         doTest(false);
@@ -169,7 +169,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         configureHostRSA();
 
         // Configure cipher suite that requires an RSA certificate on the server
-        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl(true);
         clientSSLSocketFactory.setCipher(new String[] {"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"});
 
         doTest(false);
@@ -181,7 +181,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         configureHostRSA();
 
         // Configure cipher suite that requires an EC certificate on the server
-        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl(true);
         clientSSLSocketFactory.setCipher(new String[] {"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"});
 
         doTest(false);
@@ -193,7 +193,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         configureHostRSA();
 
         // Configure cipher suite that requires an EC certificate on the server
-        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl(true);
         clientSSLSocketFactory.setCipher(new String[] {
                 "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384",
                 "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"});
@@ -207,7 +207,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         configureHostEC();
 
         // Configure cipher suite that requires an RSA certificate on the server
-        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl(true);
         clientSSLSocketFactory.setCipher(new String[] {"TLS_DHE_RSA_WITH_AES_256_GCM_SHA384"});
 
         doTest(false);
@@ -219,7 +219,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         configureHostEC();
 
         // Configure cipher suite that requires an EC certificate on the server
-        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl(true);
         clientSSLSocketFactory.setCipher(new String[] {"TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"});
 
         doTest(false);
@@ -231,7 +231,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
         configureHostEC();
 
         // Configure cipher suite that requires an RSA certificate on the server
-        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl();
+        ClientSSLSocketFactory clientSSLSocketFactory = TesterSupport.configureClientSsl(true);
         clientSSLSocketFactory.setCipher(new String[] {
                 "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384",
                 "TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384"});
@@ -292,7 +292,7 @@ public class TestSSLHostConfigCompat extends TomcatBaseTest {
 
     private void doTest(boolean configureClientSsl) throws Exception {
         if (configureClientSsl) {
-            TesterSupport.configureClientSsl();
+            TesterSupport.configureClientSsl(true);
         }
 
         Tomcat tomcat = getTomcatInstance();

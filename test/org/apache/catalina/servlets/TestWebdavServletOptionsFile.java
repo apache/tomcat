@@ -26,6 +26,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import org.apache.tomcat.util.http.Method;
+
 /*
  * Split into multiple tests as a single test takes so long it impacts the time
  * of an entire test run.
@@ -35,8 +37,8 @@ public class TestWebdavServletOptionsFile extends ServletOptionsBaseTest {
 
     @Parameters
     public static Collection<Object[]> inputs() {
-        String[] methods = new String[] { "GET", "POST", "HEAD", "TRACE", "PUT", "DELETE",
-                "MKCOL", "LOCK", "UNLOCK", "COPY", "MOVE", "PROPFIND", "PROPPATCH" };
+        String[] methods = new String[] { Method.GET, Method.POST, Method.HEAD, Method.TRACE, Method.PUT, Method.DELETE,
+                Method.MKCOL, Method.LOCK, Method.UNLOCK, Method.COPY, Method.MOVE, Method.PROPFIND, Method.PROPPATCH };
 
         List<Object[]> result = new ArrayList<>();
 

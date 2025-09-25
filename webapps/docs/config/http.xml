@@ -205,11 +205,19 @@
     </attribute>
 
     <attribute name="maxPostSize" required="false">
-      <p>The maximum size in bytes of the POST which will be handled by
-      the container FORM URL parameter parsing. The limit can be disabled by
-      setting this attribute to a value less than zero. Requests that exceed
-      this limit will be rejected. If not specified, this attribute is set to
-      2097152 (2 MiB).</p>
+      <p>This is the maximum number of request body bytes that will be converted
+      into request parameters by Tomcat. This limit only applies in specific
+      circumstances and is <strong>not</strong> a general limit on request body
+      size for POST requests. The limit only applies when Tomcat is processing
+      the request body for parameters as per section 3.1.1
+      (<code>application/x-www-form-urlencoded</code>) or section 3.2
+      (<code>multipart/form-data</code>) of the Servlet specification. In the
+      <code>multipart/form-data</code> case, the limit only applies to the data
+      used to generate the parameters that are made available through the
+      <code>getParameter()</code> family of methods.</p>
+      <p>The limit can be disabled by setting this attribute to a value less
+      than zero. Requests that exceed this limit will be rejected. If not
+      specified, this attribute is set to 2097152 (2 MiB).</p>
     </attribute>
 
     <attribute name="maxSavePostSize" required="false">
@@ -1261,6 +1269,15 @@
       not the full chain.</p>
     </attribute>
 
+    <attribute name="groups" required="false">
+      <p>JSSE only.</p>
+      <p>Allows only allowing certain named groups. The value should be a case
+      sensitive comma separated list of the names of the groups.</p>
+      <p>. If not specified, the default named groups of the provider will be
+      used, and any named groups specified by the client will be passed to it.
+      </p>
+    </attribute>
+
     <attribute name="honorCipherOrder" required="false">
       <p>Set to <code>true</code> to enforce the server's cipher order
       (from the <code>ciphers</code> setting) instead of allowing
@@ -1542,7 +1559,8 @@
     <attribute name="type" required="false">
       <p>The type of certificate. This is used to identify the ciphers that are
       compatible with the certificate. It must be one of <code>UNDEFINED</code>,
-      <code>RSA</code>, <code>DSA</code> or <code>EC</code>. If only one
+      <code>RSA</code>, <code>DSA</code>, <code>EC</code> or <code>MLDSA</code>.
+      If only one
       <strong>Certificate</strong> is nested within a <code>SSLHostConfig</code>
       then this attribute is not required and will default to
       <code>UNDEFINED</code>. If multiple <strong>Certificate</strong>s are

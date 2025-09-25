@@ -59,10 +59,12 @@ import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate.Type;
+import org.apache.tomcat.util.net.SSLUtilBase;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.OpenSSLUtil;
+import org.apache.tomcat.util.net.openssl.ciphers.Group;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_alpn_select_cb$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_cert_verify_callback$cb;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_tmp_dh_callback$dh;
@@ -80,11 +82,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     private static final Cleaner cleaner = Cleaner.create();
 
     private static final String defaultProtocol = "TLS";
-
-    private static final int SSL_AIDX_RSA = 0;
-    private static final int SSL_AIDX_DSA = 1;
-    private static final int SSL_AIDX_ECC = 3;
-    private static final int SSL_AIDX_MAX = 4;
 
     public static final int SSL_PROTOCOL_NONE = 0;
     public static final int SSL_PROTOCOL_SSLV2 = 1;
@@ -263,6 +260,26 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
             // Set int pem_password_cb(char *buf, int size, int rwflag, void *u) callback
             SSL_CTX_set_default_passwd_cb(sslCtx, pem_password_cb.allocate(new PasswordCallback(null), contextArena));
+
+            // Set server groups
+            if (sslHostConfig.getGroupList() != null) {
+                StringBuilder sb = new StringBuilder();
+                boolean first = true;
+                for (Group group : sslHostConfig.getGroupList()) {
+                    if (first) {
+                        first = false;
+                    } else {
+                        sb.append(':');
+                    }
+                    sb.append(group.toString());
+                }
+                try (var localArena = Arena.ofConfined()) {
+                    if (SSL_CTX_set1_groups_list(sslCtx, localArena.allocateFrom(sb.toString())) <= 0) {
+                        logLastError("openssl.errorSettingGroups");
+                        // Consider this is not fatal
+                    }
+                }
+            }
 
             if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {
                 alpn = true;
@@ -875,7 +892,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
 
     public boolean addCertificate(SSLHostConfigCertificate certificate, Arena localArena) throws Exception {
-        int index = getCertificateIndex(certificate);
         // Load Server key and certificate
         if (certificate.getCertificateFile() != null) {
             // Pick right key password
@@ -1027,8 +1043,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                     logLastError("openssl.errorPrivateKeyCheck");
                     return false;
                 }
-                // Try to read DH parameters from the (first) SSLCertificateFile
-                if (index == SSL_AIDX_RSA) {
+                // Try to read DH parameters from the SSLCertificateFile
+                if (certificate.getType() == Type.RSA) {
                     BIO_reset(certificateBIO);
                     if (!openssl_h_Compatibility.BORINGSSL) {
                         if (!openssl_h_Compatibility.OPENSSL3) {
@@ -1165,7 +1181,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             String alias = certificate.getCertificateKeyAlias();
             X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
             if (alias == null) {
-                alias = "tomcat";
+                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
             }
             X509Certificate[] chain = x509KeyManager.getCertificateChain(alias);
             if (chain == null) {
@@ -1249,23 +1265,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
-    private static int getCertificateIndex(SSLHostConfigCertificate certificate) {
-        int result;
-        // If the type is undefined there will only be one certificate (enforced
-        // in SSLHostConfig) so use the RSA slot.
-        if (certificate.getType() == Type.RSA || certificate.getType() == Type.UNDEFINED) {
-            result = SSL_AIDX_RSA;
-        } else if (certificate.getType() == Type.EC) {
-            result = SSL_AIDX_ECC;
-        } else if (certificate.getType() == Type.DSA) {
-            result = SSL_AIDX_DSA;
-        } else {
-            result = SSL_AIDX_MAX;
-        }
-        return result;
-    }
-
-
     /*
      * Find a valid alias when none was specified in the config.
      */
@@ -1286,7 +1285,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
 
         Iterator<Type> iter = candidateTypes.iterator();
         while (result == null && iter.hasNext()) {
-            result = keyManager.chooseServerAlias(iter.next().toString(), null, null);
+            result = keyManager.chooseServerAlias(iter.next().getKeyType(), null, null);
         }
 
         return result;
@@ -1346,7 +1345,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         X509KeyManager x509KeyManager = certificate.getCertificateKeyManager();
         if (x509KeyManager != null) {
             if (alias == null) {
-                alias = "tomcat";
+                alias = SSLUtilBase.DEFAULT_KEY_ALIAS;
             }
             chain = x509KeyManager.getCertificateChain(alias);
             if (chain == null) {

@@ -178,10 +178,14 @@ public final class TesterSupport {
     }
 
     public static ClientSSLSocketFactory configureClientSsl() {
+        return configureClientSsl(false);
+    }
+
+    public static ClientSSLSocketFactory configureClientSsl(boolean forceTls12) {
         ClientSSLSocketFactory clientSSLSocketFactory = null;
         try {
             SSLContext sc;
-            if (TLSV13_AVAILABLE) {
+            if (TLSV13_AVAILABLE && !forceTls12) {
                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
             } else {
                 sc = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_2);

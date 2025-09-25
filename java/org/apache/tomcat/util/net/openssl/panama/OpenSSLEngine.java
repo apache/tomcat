@@ -56,6 +56,7 @@ import static org.apache.tomcat.util.openssl.openssl_h_Macros.*;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.Asn1Parser;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
@@ -1307,7 +1308,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             // Content-Length: ocspRequestData.length
             byte[] ocspRequestData = buf.reinterpret(requestLength, localArena, null).toArray(ValueLayout.JAVA_BYTE);
             connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
+            connection.setRequestMethod(Method.POST);
             connection.setDoInput(true);
             connection.setDoOutput(true);
             connection.setFixedLengthStreamingMode(requestLength);

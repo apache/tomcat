@@ -39,6 +39,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
+import org.apache.tomcat.util.net.openssl.ciphers.Group;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -121,6 +122,8 @@ public class SSLHostConfig implements Serializable {
     private String truststoreProvider = System.getProperty("javax.net.ssl.trustStoreProvider");
     private String truststoreType = System.getProperty("javax.net.ssl.trustStoreType");
     private transient KeyStore truststore = null;
+    private String groups = null;
+    private LinkedHashSet<Group> groupList = null;
     // OpenSSL
     private String certificateRevocationListPath;
     private String caCertificateFile;
@@ -524,7 +527,42 @@ public class SSLHostConfig implements Serializable {
     }
 
 
+    /**
+     * @return the configured named groups
+     */
+    public String getGroups() {
+        return groups;
+    }
+
+
+    /**
+     * Set the enabled named groups.
+     * @param groupsString the case sensitive comma separated list of groups
+     */
+    public void setGroups(String groupsString) {
+        if (groupsString != null) {
+            LinkedHashSet<Group> groupList = new LinkedHashSet<>();
+            String[] groupNames = groupsString.split(",");
+            for (String groupName : groupNames) {
+                Group group = Group.valueOf(groupName.trim());
+                groupList.add(group);
+            }
+            this.groups = groupsString;
+            this.groupList = groupList;
+        }
+    }
+
+
+    /**
+     * @return the groupList
+     */
+    public LinkedHashSet<Group> getGroupList() {
+        return this.groupList;
+    }
+
+
     // ---------------------------------- JSSE specific configuration properties
+
 
     public void setKeyManagerAlgorithm(String keyManagerAlgorithm) {
         setProperty("keyManagerAlgorithm", Type.JSSE);

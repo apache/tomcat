@@ -42,6 +42,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.collections.CaseInsensitiveKeyMap;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.net.TesterSupport.SimpleServlet;
 
 public class TestHttpServlet extends TomcatBaseTest {
@@ -238,7 +239,7 @@ public class TestHttpServlet extends TomcatBaseTest {
 
         Map<String,List<String>> resHeaders = new HashMap<>();
         int rc = methodUrl("http://localhost:" + getPort() + "/", new ByteChunk(), DEFAULT_CLIENT_TIMEOUT_MS, null,
-                resHeaders, "OPTIONS");
+                resHeaders, Method.OPTIONS);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
         Assert.assertEquals(expectedAllow, resHeaders.get("Allow").get(0));

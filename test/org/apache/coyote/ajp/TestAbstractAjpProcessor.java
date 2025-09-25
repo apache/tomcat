@@ -41,6 +41,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
 public class TestAbstractAjpProcessor extends TomcatBaseTest {
@@ -390,7 +391,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     @Test
     public void testMethod() throws Exception {
         RequestDescriptor desc = new RequestDescriptor();
-        desc.putRequestInfo("REQUEST-METHOD", "LOCK");
+        desc.putRequestInfo("REQUEST-METHOD", Method.LOCK);
         desc.putRequestInfo("REQUEST-URI", "/testMethod");
         doSnoopTest(desc);
     }
@@ -467,7 +468,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         desc.putRequestInfo("REQUEST-REMOTE-HOST", "MYCLIENT");
         desc.putRequestInfo("REQUEST-REMOTE-ADDR", "10.1.2.3");
         desc.putRequestInfo("REQUEST-REMOTE-PORT", "34567");
-        desc.putRequestInfo("REQUEST-METHOD", "LOCK");
+        desc.putRequestInfo("REQUEST-METHOD", Method.LOCK);
         desc.putRequestInfo("REQUEST-URI", "/a/b/c");
         desc.putRequestInfo("REQUEST-PROTOCOL", "HTTP/1.x");
         desc.putRequestInfo("REQUEST-IS-SECURE", "true");
@@ -484,7 +485,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     @Test
     public void testSmallBody() throws Exception {
         RequestDescriptor desc = new RequestDescriptor();
-        desc.putRequestInfo("REQUEST-METHOD", "PUT");
+        desc.putRequestInfo("REQUEST-METHOD", Method.PUT);
         desc.putRequestInfo("REQUEST-CONTENT-LENGTH", "100");
         desc.putRequestInfo("REQUEST-BODY-SIZE", "100");
         desc.putRequestInfo("REQUEST-URI", "/testSmallBody");
@@ -494,7 +495,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
     @Test
     public void testLargeBody() throws Exception {
         RequestDescriptor desc = new RequestDescriptor();
-        desc.putRequestInfo("REQUEST-METHOD", "PUT");
+        desc.putRequestInfo("REQUEST-METHOD", Method.PUT);
         desc.putRequestInfo("REQUEST-CONTENT-LENGTH", "10000");
         desc.putRequestInfo("REQUEST-BODY-SIZE", "10000");
         desc.putRequestInfo("REQUEST-URI", "/testLargeBody");
@@ -633,7 +634,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
         validateCpong(ajpClient.cping());
 
         ajpClient.setUri("/test/echo-params.jsp");
-        ajpClient.setMethod("POST");
+        ajpClient.setMethod(Method.POST);
         TesterAjpMessage forwardMessage = ajpClient.createForwardMessage();
         forwardMessage.addHeader(0xA008, "9");
         if (multipleCL) {
@@ -710,22 +711,22 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
 
     @Test
     public void testZeroLengthRequestBodyGetA() throws Exception {
-        doTestZeroLengthRequestBody("GET", true);
+        doTestZeroLengthRequestBody(Method.GET, true);
     }
 
     @Test
     public void testZeroLengthRequestBodyGetB() throws Exception {
-        doTestZeroLengthRequestBody("GET", false);
+        doTestZeroLengthRequestBody(Method.GET, false);
     }
 
     @Test
     public void testZeroLengthRequestBodyPostA() throws Exception {
-        doTestZeroLengthRequestBody("POST", true);
+        doTestZeroLengthRequestBody(Method.POST, true);
     }
 
     @Test
     public void testZeroLengthRequestBodyPostB() throws Exception {
-        doTestZeroLengthRequestBody("POST", false);
+        doTestZeroLengthRequestBody(Method.POST, false);
     }
 
     private void doTestZeroLengthRequestBody(String method, boolean callAvailable) throws Exception {
@@ -1107,7 +1108,7 @@ public class TestAbstractAjpProcessor extends TomcatBaseTest {
             response.setCharacterEncoding("UTF-8");
 
             try (PrintWriter w = response.getWriter()) {
-                w.println("Method: " + (isPost ? "POST" : "GET") + ". Reading request body...");
+                w.println("Method: " + (isPost ? Method.POST : Method.GET) + ". Reading request body...");
                 w.println("Request Body length in bytes: " + readCount);
             }
         }

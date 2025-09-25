@@ -29,6 +29,7 @@ import org.apache.catalina.startup.SimpleHttpClient;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 /*
@@ -89,13 +90,13 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
 
     @Test
     public void testPostWithContinueAndCookies() throws Exception {
-        doTest("POST", "GET", USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.GET, USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // Bug 49779
     @Test
     public void testPostWithContinuePostRedirectWithCookies() throws Exception {
-        doTest("POST", "POST", USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.POST, USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
 
@@ -104,13 +105,13 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
 
     @Test
     public void testPostWithContinueNoServerCookies() throws Exception {
-        doTest("POST", "GET", USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.GET, USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // variant of Bug 49779
     @Test
     public void testPostWithContinuePostRedirectNoServerCookies() throws Exception {
-        doTest("POST", "POST", USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.POST, USE_100_CONTINUE, CLIENT_USE_COOKIES, SERVER_NO_COOKIES, SERVER_CHANGE_SESSID);
     }
 
 
@@ -120,18 +121,18 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
 
     @Test
     public void testGetNoClientCookies() throws Exception {
-        doTest("GET", "GET", NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.GET, Method.GET, NO_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     @Test
     public void testPostWithContinueNoClientCookies() throws Exception {
-        doTest("POST", "GET", USE_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.GET, USE_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
     // variant of Bug 49779
     @Test
     public void testPostWithContinuePostRedirectNoClientCookies() throws Exception {
-        doTest("POST", "POST", USE_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
+        doTest(Method.POST, Method.POST, USE_100_CONTINUE, CLIENT_NO_COOKIES, SERVER_USE_COOKIES, SERVER_CHANGE_SESSID);
     }
 
 
@@ -198,7 +199,7 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
         // Third request - the login was successful so
         // follow the redirect to the protected resource
         client.doResourceRequest(redirectMethod, true, redirectUri, null);
-        if ("POST".equals(redirectMethod)) {
+        if (Method.POST.equals(redirectMethod)) {
             client.setUseContinue(useContinue);
         }
         Assert.assertTrue(client.isResponse200());
@@ -278,7 +279,7 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
 
         protected void doLoginRequest(String loginUri) throws Exception {
 
-            doResourceRequest("POST", true, PROTECTED_RELATIVE_PATH + loginUri, LOGIN_REPLY);
+            doResourceRequest(Method.POST, true, PROTECTED_RELATIVE_PATH + loginUri, LOGIN_REPLY);
         }
 
         /*
@@ -303,7 +304,7 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
                 } else {
                     requestHead.append(PROTECTED_RELATIVE_PATH).append(resourceUri);
                 }
-                if ("GET".equals(method)) {
+                if (Method.GET.equals(method)) {
                     requestHead.append("?role=bar");
                 }
             }
@@ -330,7 +331,7 @@ public class TestFormAuthenticatorC extends TomcatBaseTest {
             }
 
             // finally, for posts only, deal with the request content
-            if ("POST".equals(method)) {
+            if (Method.POST.equals(method)) {
                 if (requestTail == null) {
                     requestTail = "role=bar";
                 }

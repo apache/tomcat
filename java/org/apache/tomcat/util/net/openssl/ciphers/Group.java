@@ -36,9 +36,9 @@ public enum Group {
     ffdhe8192(0x0104),
 
     // Post-Quantum Key Exchange
-    mlkem512(0x0200),
-    mlkem768(0x0201),
-    mlkem1024(0x0202),
+    MLKEM512(0x0200),
+    MLKEM768(0x0201),
+    MLKEM1024(0x0202),
 
     // Hybrid Key Exchange
     SecP256r1MLKEM768(0x11EB),

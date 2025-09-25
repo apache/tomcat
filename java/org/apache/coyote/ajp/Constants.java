@@ -19,6 +19,8 @@ package org.apache.coyote.ajp;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.tomcat.util.http.Method;
+
 /**
  * Constants.
  *
@@ -105,8 +107,8 @@ public final class Constants {
 
     // Translates integer codes to names of HTTP methods
     private static final String[] methodTransArray =
-            { "OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "TRACE", "PROPFIND", "PROPPATCH", "MKCOL", "COPY",
-                    "MOVE", "LOCK", "UNLOCK", "ACL", "REPORT", "VERSION-CONTROL", "CHECKIN", "CHECKOUT", "UNCHECKOUT",
+            { Method.OPTIONS, Method.GET, Method.HEAD, Method.POST, Method.PUT, Method.OPTIONS, Method.TRACE, Method.TRACE, Method.PROPPATCH, Method.MKCOL, Method.COPY,
+                    Method.MOVE, Method.LOCK, Method.UNLOCK, "ACL", "REPORT", "VERSION-CONTROL", "CHECKIN", "CHECKOUT", "UNCHECKOUT",
                     "SEARCH", "MKWORKSPACE", "UPDATE", "LABEL", "MERGE", "BASELINE-CONTROL", "MKACTIVITY" };
 
     /**

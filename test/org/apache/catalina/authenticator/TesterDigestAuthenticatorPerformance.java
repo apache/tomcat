@@ -39,6 +39,7 @@ import org.apache.catalina.filters.TesterHttpServletResponse;
 import org.apache.catalina.startup.TesterMapRealm;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 /*
@@ -50,7 +51,6 @@ public class TesterDigestAuthenticatorPerformance {
     private static String USER = "user";
     private static String PWD = "pwd";
     private static String ROLE = "role";
-    private static String METHOD = "GET";
     private static String URI = "/protected";
     private static String CONTEXT_PATH = "/foo";
     private static String CLIENT_AUTH_HEADER = "authorization";
@@ -158,7 +158,7 @@ public class TesterDigestAuthenticatorPerformance {
         private DigestAuthenticator authenticator;
 
         private static final String A1 = USER + ":" + REALM + ":" + PWD;
-        private static final String A2 = METHOD + ":" + CONTEXT_PATH + URI;
+        private static final String A2 = Method.GET + ":" + CONTEXT_PATH + URI;
 
         private static final String DIGEST_A1 =
                 HexUtils.toHexString(ConcurrentMessageDigest.digest("MD5", A1.getBytes(StandardCharsets.UTF_8)));
@@ -269,7 +269,7 @@ public class TesterDigestAuthenticatorPerformance {
 
         @Override
         public String getMethod() {
-            return METHOD;
+            return Method.GET;
         }
 
         @Override

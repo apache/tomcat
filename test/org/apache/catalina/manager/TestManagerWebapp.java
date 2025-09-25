@@ -21,7 +21,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -31,6 +30,9 @@ import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleEvent;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.authenticator.TestBasicAuthParser.BasicAuthHeader;
 import org.apache.catalina.realm.MemoryRealm;
 import org.apache.catalina.realm.MessageDigestCredentialHandler;
@@ -42,6 +44,7 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.storeconfig.StoreConfigLifecycleListener;
 import org.apache.catalina.util.IOTools;
 import org.apache.catalina.util.URLEncoder;
+
 
 public class TestManagerWebapp extends TomcatBaseTest {
 
@@ -276,7 +279,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         SimpleHttpClient client = new SimpleHttpClient() {
             // 10s default too low for some CI systems
             @Override
-            public void connect() throws UnknownHostException, IOException {
+            public void connect() throws IOException {
                 connect(30000, 30000);
             }
 
@@ -397,7 +400,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         File serverXml = new File(tomcat.getServer().getCatalinaBase(), Catalina.SERVER_XML);
         Assert.assertTrue(serverXml.canRead());
         addDeleteOnTearDown(serverXml);
-        String serverXmlDump = "";
+        String serverXmlDump;
         try (FileReader reader = new FileReader(serverXml); StringWriter writer = new StringWriter()) {
             IOTools.flow(reader, writer);
             serverXmlDump = writer.toString();
@@ -501,4 +504,125 @@ public class TestManagerWebapp extends TomcatBaseTest {
         tomcat.stop();
     }
 
+
+    /*
+     * Test case for <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=57700">Bug 57700</a>.
+     */
+    @Test
+    public void testBug57700() throws Exception {
+        ignoreTearDown = true;
+        Tomcat tomcat = getTomcatInstance();
+        tomcat.setAddDefaultWebXmlToWebapp(false);
+        File configFile = new File(getTemporaryDirectory(), "tomcat-users-manager-lifecycle.xml");
+        try (PrintWriter writer = new PrintWriter(configFile)) {
+            writer.write(CONFIG);
+        }
+        addDeleteOnTearDown(configFile);
+
+        MemoryRealm memoryRealm = new MemoryRealm();
+        memoryRealm.setCredentialHandler(new MessageDigestCredentialHandler());
+        memoryRealm.setPathname(configFile.getAbsolutePath());
+        tomcat.getEngine().setRealm(memoryRealm);
+
+        File webappDir = new File(getBuildDirectory(), "webapps");
+
+        File appDir = new File(webappDir, "manager");
+        Context ctx = tomcat.addWebapp(null, "/manager", appDir.getAbsolutePath());
+
+        HostConfig hostConfig = new HostConfig();
+        ctx.getParent().addLifecycleListener(hostConfig);
+
+        File appRoot = new File(webappDir, "bug57700");
+        Assert.assertTrue(appRoot.mkdirs() && appRoot.isDirectory());
+        addDeleteOnTearDown(appRoot);
+
+        try (@SuppressWarnings("unused") TomcatBaseTest.ContainerInjector ignored =
+                 TomcatBaseTest.ContainerInjector.inject(ctx.getParent(),
+                     c -> c.getPath().equals("/bug57700"),
+                     c -> {
+                         c.addLifecycleListener(new FailOnceListener());
+                         Tomcat.initWebappDefaults(c);
+                     })) {
+
+            tomcat.start();
+            SimpleHttpClient client = new SimpleHttpClient() {
+                @Override
+                public void connect() throws IOException {
+                    connect(30000, 30000);
+                }
+
+                @Override
+                public boolean isResponseBodyOK() {
+                    return true;
+                }
+            };
+
+            client.setPort(getPort());
+            String basicHeader = (new BasicAuthHeader("Basic", "admin", "sekr3t")).getHeader().toString();
+
+            client.setRequest(new String[]{
+                    "GET /manager/text/deploy?war=" + URLEncoder.QUERY.encode(appRoot.getAbsolutePath(), StandardCharsets.UTF_8) + " HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Authorization: " + basicHeader + CRLF +
+                        "Connection: Close" + CRLF + CRLF
+            });
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+            client.setRequest(new String[]{
+                    "GET /bug57700 HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Connection: Close" + CRLF + CRLF
+            });
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_NOT_FOUND, client.getStatusCode());
+
+            client.setRequest(new String[]{
+                    "GET /manager/text/start?path=/bug57700 HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Authorization: " + basicHeader + CRLF +
+                        "Connection: Close" + CRLF + CRLF
+            });
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+            client.setRequest(new String[]{
+                    "GET /bug57700 HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Connection: Close" + CRLF + CRLF
+            });
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_FOUND, client.getStatusCode());
+
+            client.setRequest(new String[] {
+                    "GET /manager/text/undeploy?path=/bug57700 HTTP/1.1" + CRLF +
+                        "Host: localhost" + CRLF +
+                        "Authorization: " + basicHeader + CRLF +
+                        "Connection: Close" + CRLF +
+                        CRLF
+            });
+            client.connect();
+            client.processRequest(true);
+            Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
+
+            tomcat.stop();
+        }
+    }
+
+    private static class FailOnceListener implements LifecycleListener {
+        private volatile boolean firstRun = true;
+        @Override
+        public void lifecycleEvent(LifecycleEvent event) {
+            if (event.getLifecycle() instanceof Context) {
+                if (Lifecycle.CONFIGURE_START_EVENT.equals(event.getType()) && firstRun) {
+                    firstRun = false;
+                    throw new RuntimeException("Configuration failure in first run only");
+                }
+            }
+        }
+    }
 }

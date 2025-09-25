@@ -18,6 +18,7 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -32,6 +33,7 @@ import jakarta.servlet.ServletConnection;
 import org.apache.tomcat.util.buf.CharsetHolder;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookies;
@@ -160,6 +162,7 @@ public final class Request {
     private long bytesRead = 0;
     // Time of the request - useful to avoid repeated calls to System.currentTime
     private long startTimeNanos = -1;
+    private Instant startInstant = null;
     private long threadId = 0;
     private int available = 0;
 
@@ -312,8 +315,34 @@ public final class Request {
         return schemeMB;
     }
 
+    /**
+     * Get a MessageBytes instance that holds the current request's HTTP method.
+     *
+     * @return a MessageBytes instance that holds the current request's HTTP method.
+     *
+     * @deprecated Use {@link #getMethod()}, {@link Request#setMethod(String)} and {@link #setMethod(byte[], int, int)}
+     */
+    @Deprecated
     public MessageBytes method() {
         return methodMB;
+    }
+
+    public void setMethod(String method) {
+        methodMB.setString(method);
+    }
+
+    public void setMethod(byte[] buf, int start, int len) {
+        String method = Method.bytesToString(buf, start, len);
+        if (method == null) {
+            methodMB.setBytes(buf, start, len);
+            method = methodMB.toStringType();
+        } else {
+            methodMB.setString(method);
+        }
+    }
+
+    public String getMethod() {
+        return methodMB.toStringType();
     }
 
     public MessageBytes requestURI() {
@@ -673,8 +702,13 @@ public final class Request {
         return startTimeNanos;
     }
 
-    public void setStartTimeNanos(long startTimeNanos) {
-        this.startTimeNanos = startTimeNanos;
+    public void markStartTime() {
+        startTimeNanos = System.nanoTime();
+        startInstant = Instant.now();
+    }
+
+    public Instant getStartInstant() {
+        return startInstant;
     }
 
     public long getThreadId() {
@@ -785,6 +819,7 @@ public final class Request {
         allDataReadEventSent.set(false);
 
         startTimeNanos = -1;
+        startInstant = null;
         threadId = 0;
 
         if (hook instanceof NonPipeliningProcessor) {

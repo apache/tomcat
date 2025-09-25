@@ -178,6 +178,24 @@
         in RFC 9110 that hash functions used to generate strong ETags should be
         collision resistant. (markt)
       </update>
+      <fix>
+        HTTP methods are case-sensitive so always use case sensitive comparisons
+        when comparing HTTP methods. (markt)
+      </fix>
+      <fix>
+        <bug>69814</bug>: Ensure that <code>HttpSession.isNew()</code> returns
+        <code>false</code> once the client has joined the session. (markt)
+      </fix>
+      <fix>
+        Further performance improvements for ParameterMap. (jengebr/markt)
+      </fix>
+      <scode>
+        Refactor access log time stamps to be based on the <code>Instant</code>
+        request processing starts. (markt)
+      </scode>
+      <fix>
+        Fix a case-sensitivity issue in the trailer header allow list. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -195,13 +213,26 @@
       <update>
         Remove NIO2 connector. (remm)
       </update>
-      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <update>
-        Add hybrid PQC support to OpenSSL, based on code from
-        <code>mod_ssl</code>. Using this OpenSSL specific code path,
-        additional PQC certificates defined with type <code>MLDSA</code> are
-        added to contexts which use classic certificates. (jfclere/remm)
+        Add specific certificate selection code for TLS 1.3 supporting post
+        quantum cryptography. Certificates defined with type
+        <code>MLDSA</code> will be selected depending on the TLS client hello.
+        (remm)
       </update>
+      <update>
+        Add <code>groups</code> attribute on <code>SSLHostConfig</code>
+        allowing to restrict which groups can be enabled on the SSL engine.
+        (remm)
+      </update>
+      <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Optimize the conversion of HTTP method from byte form to String form.
+        (markt)
+      </add>
+      <fix>
+        Store HTTP request headers using the original case for the header name
+        rather than forcing it to lower case. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -241,6 +272,10 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Prevent the channel configuration (sender, receiver, membership service)
+        from being changed unless the channel is fully stopped. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -271,6 +306,13 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Documentation. Clarify the purpose of the <code>maxPostSize</code>
+        attribute of the <code>Connector</code> element. (markt)
+      </fix>
+      <fix>
+        Avoid NPE in manager webapp displaying certificate information. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

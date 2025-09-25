@@ -64,6 +64,7 @@ import org.apache.tomcat.PeriodicEventListener;
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.http.ConcurrentDateFormat;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.WebdavIfHeader;
 import org.w3c.dom.Document;
@@ -98,6 +99,9 @@ import org.xml.sax.SAXException;
  * users with access to WebDAV functionality. Care is required if using security constraints to further limit WebDAV
  * functionality. In particular, administrators should be aware that security constraints apply only to the request URL.
  * Security constraints do not apply to any destination URL associated with the WebDAV operation (such as COPY or MOVE).
+ * <p>
+ * If WebDAV functionality is included in a web application where legitimate users may access it via a browser, it is
+ * recommended that the application include CORS protection.
  * <p>
  * To enable WebDAV for a context add the following to web.xml:
  *
@@ -178,17 +182,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
     @Serial
     private static final long serialVersionUID = 1L;
-
-
-    // -------------------------------------------------------------- Constants
-
-    private static final String METHOD_PROPFIND = "PROPFIND";
-    private static final String METHOD_PROPPATCH = "PROPPATCH";
-    private static final String METHOD_MKCOL = "MKCOL";
-    private static final String METHOD_COPY = "COPY";
-    private static final String METHOD_MOVE = "MOVE";
-    private static final String METHOD_LOCK = "LOCK";
-    private static final String METHOD_UNLOCK = "UNLOCK";
 
 
     /**
@@ -574,13 +567,13 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
         }
 
         switch (method) {
-            case METHOD_PROPFIND -> doPropfind(req, resp);
-            case METHOD_PROPPATCH -> doProppatch(req, resp);
-            case METHOD_MKCOL -> doMkcol(req, resp);
-            case METHOD_COPY -> doCopy(req, resp);
-            case METHOD_MOVE -> doMove(req, resp);
-            case METHOD_LOCK -> doLock(req, resp);
-            case METHOD_UNLOCK -> doUnlock(req, resp);
+            case Method.PROPFIND -> doPropfind(req, resp);
+            case Method.PROPPATCH -> doProppatch(req, resp);
+            case Method.MKCOL -> doMkcol(req, resp);
+            case Method.COPY -> doCopy(req, resp);
+            case Method.MOVE -> doMove(req, resp);
+            case Method.LOCK -> doLock(req, resp);
+            case Method.UNLOCK -> doUnlock(req, resp);
             // DefaultServlet processing
             default -> super.service(req, resp);
         }

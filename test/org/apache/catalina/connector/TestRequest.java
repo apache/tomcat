@@ -57,6 +57,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.EncodedSolidusHandling;
 import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
+import org.apache.tomcat.util.http.Method;
 
 /**
  * Test case for {@link Request}.
@@ -366,7 +367,7 @@ public class TestRequest extends TomcatBaseTest {
         Bug48692Client client = new Bug48692Client();
 
         // Make sure GET works properly
-        client.doRequest("GET", "foo=bar", null, null, false);
+        client.doRequest(Method.GET, "foo=bar", null, null, false);
 
         Assert.assertTrue("Non-200 response for GET request", client.isResponse200());
         Assert.assertEquals("Incorrect response for GET request", "foo=bar", client.getResponseBody());
@@ -377,7 +378,7 @@ public class TestRequest extends TomcatBaseTest {
         // Make sure POST works properly
         //
         // POST with separate GET and POST parameters
-        client.doRequest("POST", "foo=bar", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz", true);
+        client.doRequest(Method.POST, "foo=bar", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz", true);
 
         Assert.assertTrue("Non-200 response for POST request", client.isResponse200());
         Assert.assertEquals("Incorrect response for POST request", "bar=baz,foo=bar", client.getResponseBody());
@@ -385,7 +386,7 @@ public class TestRequest extends TomcatBaseTest {
         client.reset();
 
         // POST with overlapping GET and POST parameters
-        client.doRequest("POST", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
+        client.doRequest(Method.POST, "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
 
         Assert.assertTrue("Non-200 response for POST request", client.isResponse200());
         Assert.assertEquals("Incorrect response for POST request", "bar=baz,bar=foo,foo=bar,foo=baz",
@@ -394,7 +395,7 @@ public class TestRequest extends TomcatBaseTest {
         client.reset();
 
         // PUT without POST-style parsing
-        client.doRequest("PUT", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", false);
+        client.doRequest(Method.PUT, "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", false);
 
         Assert.assertTrue("Non-200 response for PUT/noparse request", client.isResponse200());
         Assert.assertEquals("Incorrect response for PUT request", "bar=foo,foo=bar", client.getResponseBody());
@@ -402,7 +403,7 @@ public class TestRequest extends TomcatBaseTest {
         client.reset();
 
         // PUT with POST-style parsing
-        client.doRequest("PUT", "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
+        client.doRequest(Method.PUT, "foo=bar&bar=foo", Globals.CONTENT_TYPE_FORM_URL_ENCODING, "bar=baz&foo=baz", true);
 
         Assert.assertTrue("Non-200 response for PUT request", client.isResponse200());
         Assert.assertEquals("Incorrect response for PUT/parse request", "bar=baz,bar=foo,foo=bar,foo=baz",
@@ -555,7 +556,7 @@ public class TestRequest extends TomcatBaseTest {
         URL postURL;
         postURL = URI.create(query).toURL();
         HttpURLConnection conn = (HttpURLConnection) postURL.openConnection();
-        conn.setRequestMethod("POST");
+        conn.setRequestMethod(Method.POST);
 
         conn.setDoInput(true);
         conn.setDoOutput(true);

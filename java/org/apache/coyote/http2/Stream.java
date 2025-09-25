@@ -47,6 +47,7 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Host;
 import org.apache.tomcat.util.http.parser.Priority;
@@ -161,7 +162,7 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         this.coyoteResponse.setOutputBuffer(http2OutputBuffer);
         this.coyoteRequest.setResponse(coyoteResponse);
         this.coyoteRequest.protocol().setString("HTTP/2.0");
-        this.coyoteRequest.setStartTimeNanos(System.nanoTime());
+        this.coyoteRequest.markStartTime();
     }
 
 
@@ -363,9 +364,9 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
         switch (name) {
             case ":method": {
-                if (coyoteRequest.method().isNull()) {
-                    coyoteRequest.method().setString(value);
-                    if ("HEAD".equals(value)) {
+                if (coyoteRequest.getMethod() == null) {
+                    coyoteRequest.setMethod(value);
+                    if (Method.HEAD.equals(value)) {
                         configureVoidOutputFilter();
                     }
                 } else {
@@ -547,8 +548,8 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
 
 
     final boolean receivedEndOfHeaders() throws ConnectionException {
-        if (coyoteRequest.method().isNull() || coyoteRequest.scheme().isNull() ||
-                !coyoteRequest.method().equals("CONNECT") && coyoteRequest.requestURI().isNull()) {
+        if (coyoteRequest.getMethod() == null || coyoteRequest.scheme().isNull() ||
+                !Method.CONNECT.equals(coyoteRequest.getMethod()) && coyoteRequest.requestURI().isNull()) {
             throw new ConnectionException(sm.getString("stream.header.required", getConnectionId(), getIdAsString()),
                     Http2Error.PROTOCOL_ERROR);
         }

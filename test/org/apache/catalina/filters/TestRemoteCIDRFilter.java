@@ -123,6 +123,96 @@ public class TestRemoteCIDRFilter extends TomcatBaseTest {
         }
     }
 
+    @Test
+    public void testAllowDenySetAsNull() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        tomcat.start();
+
+        TestRemoteIpFilter.MockFilterChain filterChain = new TestRemoteIpFilter.MockFilterChain();
+
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("allow", null);
+        filterDef.addInitParameter("deny", null);
+        Filter filter = createTestFilter(filterDef, RemoteCIDRFilter.class, root, "*");
+
+        String ipAddr;
+        Request request;
+        TesterResponse response;
+        int expected;
+
+        for (int i = 0; i < 256; i++) {
+            for (int j = 0; j < 256; j += 11) {
+                ipAddr = String.format("192.168.%s.%s", Integer.valueOf(i), Integer.valueOf(j));
+                request = new TestRemoteIpFilter.MockHttpServletRequest(ipAddr);
+                response = new TestRateLimitFilter.TesterResponseWithStatus();
+                expected = HttpServletResponse.SC_FORBIDDEN;
+                filter.doFilter(request, response, filterChain);
+                Assert.assertEquals(expected, response.getStatus());
+            }
+        }
+
+        // Check getters
+        Assert.assertEquals("", ((RemoteCIDRFilter) filter).getAllow());
+        Assert.assertEquals("", ((RemoteCIDRFilter) filter).getDeny());
+    }
+
+    @Test
+    public void testAllowDenySetAsEmptyString() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        tomcat.start();
+
+        TestRemoteIpFilter.MockFilterChain filterChain = new TestRemoteIpFilter.MockFilterChain();
+
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("allow", "");
+        filterDef.addInitParameter("deny", "");
+        Filter filter = createTestFilter(filterDef, RemoteCIDRFilter.class, root, "*");
+
+        String ipAddr;
+        Request request;
+        TesterResponse response;
+        int expected;
+
+        for (int i = 0; i < 256; i++) {
+            for (int j = 0; j < 256; j += 11) {
+                ipAddr = String.format("192.168.%s.%s", Integer.valueOf(i), Integer.valueOf(j));
+                request = new TestRemoteIpFilter.MockHttpServletRequest(ipAddr);
+                response = new TestRateLimitFilter.TesterResponseWithStatus();
+                expected = HttpServletResponse.SC_FORBIDDEN;
+                filter.doFilter(request, response, filterChain);
+                Assert.assertEquals(expected, response.getStatus());
+            }
+        }
+
+        // Check getters
+        Assert.assertEquals("", ((RemoteCIDRFilter) filter).getAllow());
+        Assert.assertEquals("", ((RemoteCIDRFilter) filter).getDeny());
+    }
+
+    @Test(expected = ServletException.class)
+    public void testAllowInvalid() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        tomcat.start();
+
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("allow", "this is not valid");
+        createTestFilter(filterDef, RemoteCIDRFilter.class, root, "*");
+    }
+
+    @Test(expected = ServletException.class)
+    public void testDenyInvalid() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        Context root = tomcat.addContext("", TEMP_DIR);
+        tomcat.start();
+
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("deny", "this is not valid");
+        createTestFilter(filterDef, RemoteCIDRFilter.class, root, "*");
+    }
+
     private Filter createTestFilter(FilterDef filterDef, Class<?> testFilterClass, Context root, String urlPattern)
             throws ServletException {
 

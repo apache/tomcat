@@ -28,6 +28,7 @@ import java.net.URISyntaxException;
 import java.net.URLConnection;
 
 import org.apache.catalina.util.IOTools;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
@@ -187,7 +188,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 preAuthenticate();
 
                 hconn.setDoOutput(true);
-                hconn.setRequestMethod("PUT");
+                hconn.setRequestMethod(Method.PUT);
                 if (contentType != null) {
                     hconn.setRequestProperty("Content-Type", contentType);
                 }
@@ -198,7 +199,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
                 }
             } else {
                 hconn.setDoOutput(false);
-                hconn.setRequestMethod("GET");
+                hconn.setRequestMethod(Method.GET);
             }
             hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
 
@@ -297,7 +298,7 @@ public abstract class AbstractCatalinaTask extends BaseRedirectorHelperTask {
         hconn.setDoInput(true);
         hconn.setUseCaches(false);
         hconn.setDoOutput(false);
-        hconn.setRequestMethod("OPTIONS");
+        hconn.setRequestMethod(Method.OPTIONS);
         hconn.setRequestProperty("User-Agent", "Catalina-Ant-Task/1.0");
 
         // Establish the connection with the server

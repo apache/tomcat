@@ -48,6 +48,7 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.net.AbstractEndpoint.Handler.SocketState;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
@@ -379,7 +380,7 @@ public class AjpProcessor extends AbstractProcessor {
                     setErrorState(ErrorState.CLOSE_CONNECTION_NOW, null);
                     break;
                 }
-                request.setStartTimeNanos(System.nanoTime());
+                request.markStartTime();
             } catch (IOException ioe) {
                 setErrorState(ErrorState.CLOSE_CONNECTION_NOW, ioe);
                 break;
@@ -641,7 +642,7 @@ public class AjpProcessor extends AbstractProcessor {
         byte methodCode = requestHeaderMessage.getByte();
         if (methodCode != Constants.SC_M_JK_STORED) {
             String methodName = Constants.getMethodForCode(methodCode - 1);
-            request.method().setString(methodName);
+            request.setMethod(methodName);
         }
 
         requestHeaderMessage.getBytes(request.protocol());
@@ -808,7 +809,11 @@ public class AjpProcessor extends AbstractProcessor {
                 }
                 case Constants.SC_A_SSL_KEY_SIZE ->
                         request.setAttribute(SSLSupport.KEY_SIZE_KEY, Integer.valueOf(requestHeaderMessage.getInt()));
-                case Constants.SC_A_STORED_METHOD -> requestHeaderMessage.getBytes(request.method());
+                case Constants.SC_A_STORED_METHOD -> {
+                    requestHeaderMessage.getBytes(tmpMB);
+                    ByteChunk tmpBC = tmpMB.getByteChunk();
+                    request.setMethod(tmpBC.getBytes(), tmpBC.getStart(), tmpBC.getLength());
+                }
                 case Constants.SC_A_SECRET -> {
                     requestHeaderMessage.getBytes(tmpMB);
                     if (secret != null && !secret.isEmpty()) {
@@ -902,7 +907,7 @@ public class AjpProcessor extends AbstractProcessor {
         // Responses with certain status codes and/or methods are not permitted to include a response body.
         int statusCode = response.getStatus();
         if (statusCode < 200 || statusCode == 204 || statusCode == 205 || statusCode == 304 ||
-                request.method().equals("HEAD")) {
+                Method.HEAD.equals(request.getMethod())) {
             // No entity body
             swallowResponse = true;
         }

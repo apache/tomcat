@@ -30,7 +30,7 @@ import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.net.openssl.ciphers.Group;
-import org.apache.tomcat.util.net.openssl.ciphers.SignatureAlgorithm;
+import org.apache.tomcat.util.net.openssl.ciphers.SignatureScheme;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -48,12 +48,15 @@ public class TLSClientHelloExtractor {
     private final List<String> clientRequestedApplicationProtocols;
     private final List<String> clientRequestedProtocols;
     private final List<Group> clientSupportedGroups;
-    private final List<SignatureAlgorithm> clientSignatureAlgorithms;
+    private final List<SignatureScheme> clientSignatureSchemes;
 
     private static final int TLS_RECORD_HEADER_LEN = 5;
 
     private static final int TLS_EXTENSION_SERVER_NAME = 0;
     private static final int TLS_EXTENSION_SUPPORTED_GROUPS = 10;
+    // Note: Signature algorithms is the name of the extension
+    // Starting with TLS 1.3, this contains signature schemes
+    // For TLS before 1.3, this contains signature algorithms
     private static final int TLS_EXTENSION_SIGNATURE_ALGORITHMS = 13;
     private static final int TLS_EXTENSION_ALPN = 16;
     private static final int TLS_EXTENSION_SUPPORTED_VERSION = 43;
@@ -84,7 +87,7 @@ public class TLSClientHelloExtractor {
         List<String> clientRequestedApplicationProtocols = new ArrayList<>();
         List<String> clientRequestedProtocols = new ArrayList<>();
         List<Group> clientSupportedGroups = new ArrayList<>();
-        List<SignatureAlgorithm> clientSignatureAlgorithms = new ArrayList<>();
+        List<SignatureScheme> clientSignatureSchemes = new ArrayList<>();
         String sniValue = null;
         try {
             // Switch to read mode.
@@ -170,7 +173,7 @@ public class TLSClientHelloExtractor {
                         readSupportedGroups(netInBuffer, clientSupportedGroups);
                         break;
                     case TLS_EXTENSION_SIGNATURE_ALGORITHMS:
-                        readSignatureAlgorithms(netInBuffer, clientSignatureAlgorithms);
+                        readSignatureSchemes(netInBuffer, clientSignatureSchemes);
                         break;
                     case TLS_EXTENSION_ALPN:
                         readAlpnExtension(netInBuffer, clientRequestedApplicationProtocols);
@@ -197,12 +200,12 @@ public class TLSClientHelloExtractor {
             this.sniValue = sniValue;
             this.clientRequestedProtocols = clientRequestedProtocols;
             this.clientSupportedGroups = clientSupportedGroups;
-            this.clientSignatureAlgorithms = clientSignatureAlgorithms;
+            this.clientSignatureSchemes = clientSignatureSchemes;
             if (log.isTraceEnabled()) {
                 log.trace("TLS Client Hello: " + clientRequestedCiphers + " Names " + clientRequestedCipherNames +
                         " Protocols " + clientRequestedApplicationProtocols + " sniValue " + sniValue +
                         " clientRequestedProtocols " + clientRequestedProtocols + " clientSupportedGroups " + clientSupportedGroups +
-                        " clientSignatureAlgorithms " + clientSignatureAlgorithms);
+                        " clientSignatureSchemes " + clientSignatureSchemes);
             }
             // Whatever happens, return the buffer to its original state
             netInBuffer.limit(limit);
@@ -258,6 +261,24 @@ public class TLSClientHelloExtractor {
     public List<String> getClientRequestedProtocols() {
         if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
             return clientRequestedProtocols;
+        } else {
+            throw new IllegalStateException(sm.getString("sniExtractor.tooEarly"));
+        }
+    }
+
+
+    public List<Group> getClientSupportedGroups() {
+        if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
+            return clientSupportedGroups;
+        } else {
+            throw new IllegalStateException(sm.getString("sniExtractor.tooEarly"));
+        }
+    }
+
+
+    public List<SignatureScheme> getClientSignatureSchemes() {
+        if (result == ExtractorResult.COMPLETE || result == ExtractorResult.NOT_PRESENT) {
+            return clientSignatureSchemes;
         } else {
             throw new IllegalStateException(sm.getString("sniExtractor.tooEarly"));
         }
@@ -449,15 +470,15 @@ public class TLSClientHelloExtractor {
     }
 
 
-    private static void readSignatureAlgorithms(ByteBuffer bb, List<SignatureAlgorithm> signatureAlgorithms) {
+    private static void readSignatureSchemes(ByteBuffer bb, List<SignatureScheme> signatureSchemes) {
         // First 2 bytes are size of the signature algorithm list
         int toRead = bb.getChar() / 2;
         // Then the list of protocols
         for (int i = 0; i < toRead; i++) {
             char id = bb.getChar();
-            SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.valueOf(id);
-            if (signatureAlgorithm != null) {
-                signatureAlgorithms.add(signatureAlgorithm);
+            SignatureScheme signatureScheme = SignatureScheme.valueOf(id);
+            if (signatureScheme != null) {
+                signatureSchemes.add(signatureScheme);
             }
         }
     }

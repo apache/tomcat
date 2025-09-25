@@ -18,11 +18,34 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
-    <inspection_tool class="AutoBoxing" enabled="true" level="WARNING" enabled_by_default="true">
-      <option name="ignoreAddedToCollection" value="false" />
-    </inspection_tool>
-    <inspection_tool class="AutoUnboxing" enabled="true" level="WARNING" enabled_by_default="true" />
-    <inspection_tool class="UnnecessaryBoxing" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="UnnecessaryUnboxing" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="ControlFlowStatementWithoutBraces" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="ForCanBeForeach" enabled="true" level="WEAK_WARNING" enabled_by_default="true"/>
+    <inspection_tool class="FieldMayBeFinal" enabled="true" level="WEAK_WARNING" enabled_by_default="true"/>
+    <inspection_tool class="RedundantModifier" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnnecessarySemicolon" enabled="true" level="WEAK_WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnnecessaryParentheses" enabled="true" level="WEAK_WARNING" enabled_by_default="true"/>
+    <inspection_tool class="StaticAccessedFromInstance" enabled="true" level="WEAK_WARNING" enabled_by_default="true"/>
+    <inspection_tool class="SerializableHasSerialVersionUIDField" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="override" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="NonSynchronizedMethodOverridesSynchronizedMethod" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="resource" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="IOResourceOpenedButNotSafelyClosed" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="SocketOpenedButNotSafelyClosed" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="ChannelOpenedButNotSafelyClosed" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnusedImport" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnusedDeclaration" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnusedAssignment" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="RedundantThrows" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="DuplicateThrows" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="RedundantCast" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="StatementWithEmptyBody" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="EmptyMethod" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnnecessaryBoxing" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnnecessaryUnboxing" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="BoxingBoxedValue" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="AutoUnboxing" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="FinalizeNotProtected" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="FinalizeDeclaration" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="FinalizeCalledExplicitly" enabled="true" level="WARNING" enabled_by_default="true"/>
   </profile>
 </component>

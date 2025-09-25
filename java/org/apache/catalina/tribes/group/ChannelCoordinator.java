@@ -273,7 +273,10 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         return membershipService;
     }
 
-    public void setClusterReceiver(ChannelReceiver clusterReceiver) {
+    public synchronized void setClusterReceiver(ChannelReceiver clusterReceiver) {
+        if (startLevel != 0) {
+            throw new IllegalStateException(sm.getString("channelCoordinator.invalidState.notStopped"));
+        }
         if (clusterReceiver != null) {
             this.clusterReceiver = clusterReceiver;
             this.clusterReceiver.setMessageListener(this);
@@ -285,11 +288,17 @@ public class ChannelCoordinator extends ChannelInterceptorBase implements Messag
         }
     }
 
-    public void setClusterSender(ChannelSender clusterSender) {
+    public synchronized void setClusterSender(ChannelSender clusterSender) {
+        if (startLevel != 0) {
+            throw new IllegalStateException(sm.getString("channelCoordinator.invalidState.notStopped"));
+        }
         this.clusterSender = clusterSender;
     }
 
-    public void setMembershipService(MembershipService membershipService) {
+    public synchronized void setMembershipService(MembershipService membershipService) {
+        if (startLevel != 0) {
+            throw new IllegalStateException(sm.getString("channelCoordinator.invalidState.notStopped"));
+        }
         this.membershipService = membershipService;
         this.membershipService.setMembershipListener(this);
     }

@@ -584,6 +584,7 @@ class Http2UpgradeHandler extends AbstractStream implements InternalHttpUpgradeH
                     se.getError(), se.getMessage()));
         }
 
+        // Treat a sent reset like a received reset and increment the overhead count
         increaseOverheadCount(FrameType.RST, getProtocol().getOverheadResetFactor());
 
         // Write a RST frame

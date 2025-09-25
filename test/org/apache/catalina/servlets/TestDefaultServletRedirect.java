@@ -41,6 +41,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.Method;
 
 
 @RunWith(Parameterized.class)
@@ -80,7 +81,7 @@ public class TestDefaultServletRedirect extends TomcatBaseTest {
         Map<String, List<String>> headers = new HashMap<>();
         // Should be redirected
         int rc = methodUrl("http://localhost:" + getPort() + "/test/jsp", out, DEFAULT_CLIENT_TIMEOUT_MS,
-                null, headers, "GET", false);
+                null, headers, Method.GET, false);
 
         Assert.assertEquals("Unexpected status code", redirectStatus, rc);
     }
