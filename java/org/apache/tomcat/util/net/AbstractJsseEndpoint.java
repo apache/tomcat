@@ -164,17 +164,24 @@ public abstract class AbstractJsseEndpoint<S, U> extends AbstractEndpoint<S,U> {
             List<String> supportedGroups = new ArrayList<>();
             LinkedHashSet<Group> serverSupportedGroups = sslHostConfig.getGroupList();
             if (serverSupportedGroups != null) {
-                for (Group group : clientSupportedGroups) {
-                    if (serverSupportedGroups.contains(group)) {
+                if (!clientSupportedGroups.isEmpty()) {
+                    for (Group group : clientSupportedGroups) {
+                        if (serverSupportedGroups.contains(group)) {
+                            supportedGroups.add(group.toString());
+                        }
+                    }
+                } else {
+                    for (Group group : serverSupportedGroups) {
                         supportedGroups.add(group.toString());
                     }
                 }
-            } else {
+                JreCompat.getInstance().setNamedGroupsMethod(sslParameters, supportedGroups.toArray(new String[0]));
+            } else if (!clientSupportedGroups.isEmpty()) {
                 for (Group group : clientSupportedGroups) {
                     supportedGroups.add(group.toString());
                 }
+                JreCompat.getInstance().setNamedGroupsMethod(sslParameters, supportedGroups.toArray(new String[0]));
             }
-            JreCompat.getInstance().setNamedGroupsMethod(sslParameters, supportedGroups.toArray(new String[0]));
         }
         switch (sslHostConfig.getCertificateVerification()) {
             case NONE:
