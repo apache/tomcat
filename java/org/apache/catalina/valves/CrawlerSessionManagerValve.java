@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import jakarta.servlet.ServletException;
@@ -58,6 +59,8 @@ public class CrawlerSessionManagerValve extends ValveBase {
     private boolean isHostAware = true;
 
     private boolean isContextAware = true;
+
+    private Function<Request,String> clientIdentifierFunction = this::getClientIdentifier;
 
 
     /**
@@ -162,6 +165,15 @@ public class CrawlerSessionManagerValve extends ValveBase {
         this.isContextAware = isContextAware;
     }
 
+    /**
+     * Specify the clientIdentifier function that will be used to identify unique clients. The default is to use the
+     * client IP address, optionally combined with the host name and context name.
+     *
+     * @param clientIdentifierFunction The new function used to build identifiers for clients.
+     */
+    public void setClientIdentifierFunction(Function<Request,String> clientIdentifierFunction) {
+        this.clientIdentifierFunction = clientIdentifierFunction;
+    }
 
     @Override
     protected void initInternal() throws LifecycleException {
@@ -184,7 +196,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
         boolean isBot = false;
         String sessionId = null;
         String clientIp = request.getRemoteAddr();
-        String clientIdentifier = getClientIdentifier(host, request.getContext(), clientIp);
+        String clientIdentifier = clientIdentifierFunction.apply(request);
 
         if (log.isTraceEnabled()) {
             log.trace(request.hashCode() + ": ClientIdentifier=" + clientIdentifier + ", RequestedSessionId=" +
@@ -262,12 +274,12 @@ public class CrawlerSessionManagerValve extends ValveBase {
         }
     }
 
-
-    private String getClientIdentifier(Host host, Context context, String clientIp) {
-        StringBuilder result = new StringBuilder(clientIp);
+    private String getClientIdentifier(Request request) {
+        StringBuilder result = new StringBuilder(request.getRemoteAddr());
         if (isHostAware) {
-            result.append('-').append(host.getName());
+            result.append('-').append(request.getHost().getName());
         }
+        Context context = request.getContext();
         if (isContextAware && context != null) {
             result.append(context.getName());
         }
