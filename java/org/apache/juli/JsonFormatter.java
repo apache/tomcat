@@ -65,14 +65,7 @@ public class JsonFormatter extends OneLineFormatter {
 
         // Thread
         sb.append("\"thread\": \"");
-        final String threadName = Thread.currentThread().getName();
-        if (threadName != null && threadName.startsWith(AsyncFileHandler.THREAD_PREFIX)) {
-            // If using the async handler can't get the thread name from the
-            // current thread.
-            sb.append(getThreadName(record.getLongThreadID()));
-        } else {
-            sb.append(threadName);
-        }
+        sb.append(resolveThreadName(record));
         sb.append("\", ");
 
         // Source
