@@ -50,12 +50,12 @@ public class OneLineFormatter extends Formatter {
     /**
      * The size of our global date format cache
      */
-    private static final int globalCacheSize = 30;
+    private static final int GLOBAL_CACHE_SIZE = 30;
 
     /**
      * The size of our thread local date format cache
      */
-    private static final int localCacheSize = 5;
+    private static final int LOCAL_CACHE_SIZE = 5;
 
     /**
      * Thread local date format cache.
@@ -99,9 +99,9 @@ public class OneLineFormatter extends Formatter {
             cachedTimeFormat = timeFormat;
         }
 
-        final DateFormatCache globalDateCache = new DateFormatCache(globalCacheSize, cachedTimeFormat, null);
+        final DateFormatCache globalDateCache = new DateFormatCache(GLOBAL_CACHE_SIZE, cachedTimeFormat, null);
         localDateCache =
-                ThreadLocal.withInitial(() -> new DateFormatCache(localCacheSize, cachedTimeFormat, globalDateCache));
+                ThreadLocal.withInitial(() -> new DateFormatCache(LOCAL_CACHE_SIZE, cachedTimeFormat, globalDateCache));
     }
 
 
@@ -129,14 +129,7 @@ public class OneLineFormatter extends Formatter {
         // Thread
         sb.append(' ');
         sb.append('[');
-        final String threadName = Thread.currentThread().getName();
-        if (threadName != null && threadName.startsWith(AsyncFileHandler.THREAD_PREFIX)) {
-            // If using the async handler can't get the thread name from the
-            // current thread.
-            sb.append(getThreadName(record.getLongThreadID()));
-        } else {
-            sb.append(threadName);
-        }
+        sb.append(resolveThreadName(record));
         sb.append(']');
 
         // Source
@@ -162,6 +155,17 @@ public class OneLineFormatter extends Formatter {
         }
 
         return sb.toString();
+    }
+
+    protected String resolveThreadName(LogRecord record) {
+        final String threadName = Thread.currentThread().getName();
+        if (threadName != null && threadName.startsWith(AsyncFileHandler.THREAD_PREFIX)) {
+            // If using the async handler can't get the thread name from the
+            // current thread.
+            return getThreadName(record.getLongThreadID());
+        } else {
+            return threadName;
+        }
     }
 
     protected void addTimestamp(StringBuilder buf, long timestamp) {
