@@ -262,6 +262,9 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             SSL_CTX_set_default_passwd_cb(sslCtx, pem_password_cb.allocate(new PasswordCallback(null), contextArena));
 
             // Set server groups
+            // Note: It is also possible to override setSSLParameters in OpenSSLEngine to set the final
+            //  list of groups per connection, but this is less efficient than setting the configured
+            //  group list on the SSL context and letting OpenSSL figure it out.
             if (sslHostConfig.getGroupList() != null) {
                 StringBuilder sb = new StringBuilder();
                 boolean first = true;
