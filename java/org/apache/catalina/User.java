@@ -26,8 +26,6 @@ import java.util.Iterator;
  * {@link Group}s through which they inherit additional security roles, and is optionally assigned a set of specific
  * {@link Role}s.
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public interface User extends Principal {

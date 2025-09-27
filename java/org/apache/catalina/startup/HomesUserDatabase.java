@@ -25,8 +25,6 @@ import java.util.Map;
 /**
  * Concrete implementation of the <code>UserDatabase</code> interface considers all directories in a directory whose
  * pathname is specified to our constructor to be "home" directories for those users.
- *
- * @author Craig R. McClanahan
  */
 public final class HomesUserDatabase implements UserDatabase {
 

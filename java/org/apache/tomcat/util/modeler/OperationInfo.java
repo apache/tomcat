@@ -28,8 +28,6 @@ import javax.management.MBeanParameterInfo;
  * <p>
  * Internal configuration information for an <code>Operation</code> descriptor.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class OperationInfo extends FeatureInfo {
 

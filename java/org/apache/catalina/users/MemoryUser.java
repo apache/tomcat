@@ -27,8 +27,6 @@ import org.apache.tomcat.util.security.Escape;
  * {@link UserDatabase}.
  * </p>
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  *
  * @deprecated Use {@link GenericUser} instead.

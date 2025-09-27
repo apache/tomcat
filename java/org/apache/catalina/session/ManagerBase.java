@@ -55,8 +55,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Minimal implementation of the <b>Manager</b> interface that supports no session persistence or distributable
  * capabilities. This class may be subclassed to create more sophisticated Manager implementations.
- *
- * @author Craig R. McClanahan
  */
 public abstract class ManagerBase extends LifecycleMBeanBase implements Manager {
 

@@ -58,8 +58,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implementation of a request processor which delegates the processing to a Coyote processor.
- *
- * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
 public class CoyoteAdapter implements Adapter {

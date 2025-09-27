@@ -142,8 +142,6 @@ import org.apache.tomcat.util.threads.ScheduledThreadPoolExecutor;
 /**
  * Standard implementation of the <b>Context</b> interface. Each child container must be a Wrapper implementation to
  * process the requests directed to a particular servlet.
- *
- * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
 public class StandardContext extends ContainerBase implements Context, NotificationEmitter {

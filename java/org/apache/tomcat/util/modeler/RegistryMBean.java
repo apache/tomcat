@@ -25,8 +25,6 @@ import javax.management.ObjectName;
  * Interface for modeler MBeans. This is the main entry point into modeler. It provides methods to create and manipulate
  * model mbeans and simplify their use. Starting with version 1.1, this is no longer a singleton and the static methods
  * are strongly deprecated. In a container environment we can expect different applications to use different registries.
- *
- * @author Craig R. McClanahan
  * @author Costin Manolache
  *
  * @since 1.1

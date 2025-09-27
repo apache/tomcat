@@ -45,8 +45,6 @@ import org.apache.juli.logging.LogFactory;
  * directories will be added to the class loader's repositories.</li>
  * <li><code>ClassLoader</code> instance that should become the parent of the new class loader.</li>
  * </ul>
- *
- * @author Craig R. McClanahan
  */
 public final class ClassLoaderFactory {
 

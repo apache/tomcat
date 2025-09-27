@@ -18,8 +18,6 @@ package org.apache.catalina;
 
 /**
  * Global constants that are applicable to multiple packages within Catalina.
- *
- * @author Craig R. McClanahan
  */
 public final class Globals {
 

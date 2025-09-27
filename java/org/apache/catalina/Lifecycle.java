@@ -75,8 +75,6 @@ package org.apache.catalina;
  *
  * The {@link LifecycleEvent}s fired during state changes are defined in the methods that trigger the changed. No
  * {@link LifecycleEvent}s are fired if the attempted transition is not valid.
- *
- * @author Craig R. McClanahan
  */
 public interface Lifecycle {
 

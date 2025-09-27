@@ -22,8 +22,6 @@ import javax.management.MBeanAttributeInfo;
  * <p>
  * Internal configuration information for an <code>Attribute</code> descriptor.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class AttributeInfo extends FeatureInfo {
     private static final long serialVersionUID = -2511626862303972143L;

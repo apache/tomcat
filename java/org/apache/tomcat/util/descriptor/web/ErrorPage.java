@@ -24,8 +24,6 @@ import org.apache.tomcat.util.buf.UDecoder;
 /**
  * Representation of an error page element for a web application, as represented in a <code>&lt;error-page&gt;</code>
  * element in the deployment descriptor.
- *
- * @author Craig R. McClanahan
  */
 public class ErrorPage extends XmlEncodingBase implements Serializable {
 

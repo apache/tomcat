@@ -118,8 +118,6 @@ import org.apache.tomcat.util.threads.InlineExecutorService;
  * </tr>
  * </table>
  * Subclasses that fire additional events should document them in the class comments of the implementation class.
- *
- * @author Craig R. McClanahan
  */
 public abstract class ContainerBase extends LifecycleMBeanBase implements Container {
 

@@ -65,8 +65,6 @@ import org.apache.tomcat.util.modeler.Util;
 /**
  * Standard implementation of the <b>Wrapper</b> interface that represents an individual servlet definition. No child
  * Containers are allowed, and the parent Container must be a Context.
- *
- * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
 public class StandardWrapper extends ContainerBase implements ServletConfig, Wrapper, NotificationEmitter {

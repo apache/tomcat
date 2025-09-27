@@ -66,8 +66,6 @@ import org.apache.tomcat.util.digester.Digester;
  * requirements of the <code>GenericPrincipal</code> constructor. It does not actually perform the functionality
  * required of a <code>Realm</code> implementation.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     // We need to extend MemoryRealm to avoid class cast

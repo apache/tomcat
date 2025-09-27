@@ -53,8 +53,6 @@ import org.apache.juli.logging.Log;
  * authentication instead of denial.
  * <p>
  * This Valve may be attached to any Container, depending on the granularity of the filtering you wish to perform.
- *
- * @author Craig R. McClanahan
  */
 public abstract class RequestFilterValve extends ValveBase {
 

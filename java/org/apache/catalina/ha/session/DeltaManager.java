@@ -50,8 +50,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * <b>IMPLEMENTATION NOTE </b>: Correct behavior of session storing and reloading depends upon external calls to the
  * <code>start()</code> and <code>stop()</code> methods of this class at the correct times.
- *
- * @author Craig R. McClanahan
  * @author Peter Rossbach
  */
 public class DeltaManager extends ClusterManagerBase {

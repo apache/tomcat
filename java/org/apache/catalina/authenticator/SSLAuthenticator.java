@@ -42,8 +42,6 @@ import org.apache.tomcat.util.net.SSLHostConfig.CertificateVerification;
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of authentication that utilizes SSL certificates to identify
  * client users.
- *
- * @author Craig R. McClanahan
  */
 public class SSLAuthenticator extends AuthenticatorBase {
 

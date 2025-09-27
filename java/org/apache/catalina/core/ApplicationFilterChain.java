@@ -40,8 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Implementation of <code>jakarta.servlet.FilterChain</code> used to manage the execution of a set of filters for a
  * particular request. When the set of defined filters has all been executed, the next call to <code>doFilter()</code>
  * will execute the servlet's <code>service()</code> method itself.
- *
- * @author Craig R. McClanahan
  */
 public final class ApplicationFilterChain implements FilterChain {
 

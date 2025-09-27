@@ -206,8 +206,6 @@ public final class CGIServlet extends HttpServlet {
     private static final Log log = LogFactory.getLog(CGIServlet.class);
     private static final StringManager sm = StringManager.getManager(CGIServlet.class);
 
-    /* some vars below copied from Craig R. McClanahan's InvokerServlet */
-
     private static final long serialVersionUID = 1L;
 
     private static final Set<String> DEFAULT_SUPER_METHODS = new HashSet<>();
@@ -290,9 +288,6 @@ public final class CGIServlet extends HttpServlet {
 
     /**
      * Sets instance variables.
-     * <P>
-     * Modified from Craig R. McClanahan's InvokerServlet
-     * </P>
      *
      * @param config a <code>ServletConfig</code> object containing the servlet's configuration and initialization
      *                   parameters
@@ -397,9 +392,6 @@ public final class CGIServlet extends HttpServlet {
 
     /**
      * Logs important Servlet API and container information.
-     * <p>
-     * Based on SnoopAllServlet by Craig R. McClanahan
-     * </p>
      *
      * @param req HttpServletRequest object used as source of information
      */

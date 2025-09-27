@@ -49,8 +49,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Implementation of a <code>jakarta.servlet.FilterConfig</code> useful in managing the filter instances instantiated
  * when a web application is first started.
- *
- * @author Craig R. McClanahan
  */
 public final class ApplicationFilterConfig implements FilterConfig, Serializable {
 

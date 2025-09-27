@@ -25,8 +25,6 @@ import java.io.IOException;
  * A <b>Store</b> is the abstraction of a Catalina component that provides persistent storage and loading of Sessions
  * and their associated user data. Implementations are free to save and load the Sessions to any media they wish, but it
  * is assumed that saved Sessions are persistent across server or context restarts.
- *
- * @author Craig R. McClanahan
  */
 public interface Store {
 

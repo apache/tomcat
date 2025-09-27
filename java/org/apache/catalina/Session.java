@@ -26,8 +26,6 @@ import jakarta.servlet.http.HttpSession;
 /**
  * A <b>Session</b> is the Catalina-internal facade for an <code>HttpSession</code> that is used to maintain state
  * information between requests for a particular user of a web application.
- *
- * @author Craig R. McClanahan
  */
 public interface Session {
 

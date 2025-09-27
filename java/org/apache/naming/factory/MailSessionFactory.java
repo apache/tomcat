@@ -54,8 +54,6 @@ import jakarta.mail.Session;
  *           mail.smtp.host="mail.mycompany.com"
  *           /&gt;
  * </pre>
- *
- * @author Craig R. McClanahan
  */
 public class MailSessionFactory implements ObjectFactory {
 
