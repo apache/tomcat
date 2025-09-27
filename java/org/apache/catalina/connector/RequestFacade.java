@@ -48,8 +48,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Facade class that wraps a Coyote request object. All methods are delegated to the wrapped request.
- *
- * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
 @SuppressWarnings("deprecation")

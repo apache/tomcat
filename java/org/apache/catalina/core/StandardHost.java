@@ -49,8 +49,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 /**
  * Standard implementation of the <b>Host</b> interface. Each child container must be a Context implementation to
  * process the requests directed to a particular web application.
- *
- * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
 public class StandardHost extends ContainerBase implements Host {

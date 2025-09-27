@@ -45,8 +45,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * This listener must only be nested within {@link Server} elements.
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public class GlobalResourcesLifecycleListener implements LifecycleListener {

@@ -30,8 +30,6 @@ import org.apache.naming.StringManager;
 /**
  * Concrete implementation of the <code>UserDatabase</code> interface that processes the <code>/etc/passwd</code> file
  * on a Unix system.
- *
- * @author Craig R. McClanahan
  */
 public final class PasswdUserDatabase implements UserDatabase {
 

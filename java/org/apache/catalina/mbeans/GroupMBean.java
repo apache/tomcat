@@ -35,8 +35,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.Group</code> component.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class GroupMBean extends BaseModelMBean {
 

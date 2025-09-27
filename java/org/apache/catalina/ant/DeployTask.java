@@ -32,8 +32,6 @@ import org.apache.tools.ant.BuildException;
 /**
  * Ant task that implements the <code>/deploy</code> command, supported by the Tomcat manager application.
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public class DeployTask extends AbstractCatalinaCommandTask {

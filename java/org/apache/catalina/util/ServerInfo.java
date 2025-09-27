@@ -25,8 +25,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Simple utility module to make it easy to plug in the server identifier when integrating Tomcat.
- *
- * @author Craig R. McClanahan
  */
 public class ServerInfo {
 

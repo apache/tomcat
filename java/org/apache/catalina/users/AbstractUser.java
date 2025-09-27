@@ -25,8 +25,6 @@ import org.apache.catalina.User;
  * Convenience base class for {@link User} implementations.
  * </p>
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public abstract class AbstractUser implements User {

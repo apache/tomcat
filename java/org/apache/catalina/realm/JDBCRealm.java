@@ -39,7 +39,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  * ugly connection logic use the <code>DataSourceRealm</code>.
  * </p>
  *
- * @author Craig R. McClanahan
  * @author Carson McDonald
  * @author Ignacio Ortega
  *

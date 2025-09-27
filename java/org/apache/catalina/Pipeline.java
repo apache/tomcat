@@ -31,8 +31,6 @@ import java.util.Set;
  * that will always be executed last. Other Valves will be executed in the order that they were added, before the basic
  * Valve is executed.
  * </p>
- *
- * @author Craig R. McClanahan
  * @author Peter Donald
  */
 public interface Pipeline extends Contained {

@@ -22,8 +22,6 @@ import org.apache.tomcat.util.digester.RuleSet;
 /**
  * <strong>RuleSet</strong> for processing the contents of a Host definition element. This <code>RuleSet</code> does NOT
  * include any rules for nested Context which should be added via instances of <code>ContextRuleSet</code>.
- *
- * @author Craig R. McClanahan
  */
 public class HostRuleSet implements RuleSet {
 

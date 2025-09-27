@@ -53,8 +53,6 @@ import javax.naming.spi.ObjectFactory;
  *           mail.smtp.host="mail.mycompany.com"
  *           /&gt;
  * </pre>
- *
- * @author Craig R. McClanahan
  */
 public class MailSessionFactory implements ObjectFactory {
 

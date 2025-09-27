@@ -33,8 +33,6 @@ import org.apache.tomcat.util.modeler.Registry;
  * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.users.DataSourceUserDatabase</code>
  * component.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class DataSourceUserDatabaseMBean extends BaseModelMBean {
 

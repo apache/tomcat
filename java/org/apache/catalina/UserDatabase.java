@@ -23,8 +23,6 @@ import java.util.Iterator;
  * along with definitions of corresponding {@link Role}s, and referenced by a {@link Realm} for authentication and
  * access control.
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public interface UserDatabase {

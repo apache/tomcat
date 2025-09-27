@@ -135,7 +135,6 @@ import org.ietf.jgss.GSSName;
  * </ul>
  *
  * @author John Holman
- * @author Craig R. McClanahan
  */
 public class JNDIRealm extends RealmBase {
 

@@ -25,8 +25,6 @@ import java.util.Map;
 /**
  * Representation of an application resource reference, as represented in an <code>&lt;res-env-ref&gt;</code> element in
  * the deployment descriptor.
- *
- * @author Craig R. McClanahan
  */
 public class ContextTransaction implements Serializable {
 

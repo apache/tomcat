@@ -27,8 +27,6 @@ import org.apache.catalina.connector.Request;
 /**
  * An <b>Authenticator</b> is a component (usually a Valve or Container) that provides some sort of authentication
  * service.
- *
- * @author Craig R. McClanahan
  */
 public interface Authenticator {
 

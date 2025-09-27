@@ -23,8 +23,6 @@ import javax.management.MBeanParameterInfo;
  * <p>
  * Internal configuration information for a <code>Parameter</code> descriptor.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class ParameterInfo extends FeatureInfo {
     private static final long serialVersionUID = 2222796006787664020L;

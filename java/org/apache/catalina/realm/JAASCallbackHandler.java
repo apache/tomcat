@@ -42,8 +42,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <code>javax.security.auth.callback.NameCallback</code> and
  * <code>javax.security.auth.callback.PasswordCallback</code>.
  * </p>
- *
- * @author Craig R. McClanahan
  * @author Andrew R. Jaquith
  */
 public class JAASCallbackHandler implements CallbackHandler {

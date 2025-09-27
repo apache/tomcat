@@ -31,8 +31,6 @@ import java.io.IOException;
  * <li>Must allow a call to <code>stop()</code> to be followed by a call to <code>start()</code> on the same
  * <code>Manager</code> instance.
  * </ul>
- *
- * @author Craig R. McClanahan
  */
 public interface Manager {
 

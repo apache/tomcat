@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="craigmcc@apache.org">Craig R. McClanahan</author>
         <title>Manager App How-To</title>
     </properties>
 

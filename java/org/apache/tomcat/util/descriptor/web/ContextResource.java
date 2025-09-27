@@ -20,8 +20,6 @@ package org.apache.tomcat.util.descriptor.web;
 /**
  * Representation of a resource reference for a web application, as represented in a <code>&lt;resource-ref&gt;</code>
  * element in the deployment descriptor.
- *
- * @author Craig R. McClanahan
  * @author Peter Rossbach (pero@apache.org)
  */
 public class ContextResource extends ResourceBase {

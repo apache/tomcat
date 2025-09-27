@@ -42,8 +42,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Public utility methods in support of the server side MBeans implementation.
- *
- * @author Craig R. McClanahan
  * @author Amy Roh
  */
 public class MBeanUtils {

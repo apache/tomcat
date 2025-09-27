@@ -25,8 +25,6 @@ import org.apache.catalina.valves.CrawlerSessionManagerValve;
 
 /**
  * Manifest constants for the <code>org.apache.catalina.session</code> package.
- *
- * @author Craig R. McClanahan
  */
 
 @SuppressWarnings("deprecation")

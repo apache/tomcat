@@ -75,8 +75,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <li><b>debug</b> - The debugging detail level that controls the amount of information that is logged by this servlet.
  * Default is zero.
  * </ul>
- *
- * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
 public class HostManagerServlet extends HttpServlet implements ContainerServlet {

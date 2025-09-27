@@ -37,8 +37,6 @@ import javax.servlet.UnavailableException;
  * <p>
  * Child Containers are not allowed on Wrapper implementations, so the <code>addChild()</code> method should throw an
  * <code>IllegalArgumentException</code>.
- *
- * @author Craig R. McClanahan
  */
 public interface Wrapper extends Container {
 

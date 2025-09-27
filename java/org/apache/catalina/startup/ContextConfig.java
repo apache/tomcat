@@ -118,8 +118,6 @@ import org.xml.sax.SAXParseException;
 /**
  * Startup event listener for a <b>Context</b> that configures the properties of that Context, and the associated
  * defined servlets.
- *
- * @author Craig R. McClanahan
  */
 public class ContextConfig implements LifecycleListener {
 

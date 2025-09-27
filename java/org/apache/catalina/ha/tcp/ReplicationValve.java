@@ -59,8 +59,6 @@ import org.apache.tomcat.util.res.StringManager;
  * primaryIndicator=true, then the request attribute <i>org.apache.catalina.ha.tcp.isPrimarySession.</i> is set true,
  * when request processing is at sessions primary node.
  * </p>
- *
- * @author Craig R. McClanahan
  * @author Peter Rossbach
  */
 public class ReplicationValve extends ValveBase implements ClusterValve {

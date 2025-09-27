@@ -85,8 +85,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * <b>USAGE CONSTRAINT</b>: This Valve is only useful when processing HTTP requests. Requests of any other type will
  * simply be passed through.
- *
- * @author Craig R. McClanahan
  */
 public abstract class AuthenticatorBase extends ValveBase implements Authenticator, RegistrationListener {
 

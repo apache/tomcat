@@ -47,8 +47,6 @@ import org.apache.juli.logging.LogFactory;
  * the specific fully qualified host name of that virtual host. <br>
  * The jvmRoute should be set directly like any other property. Using the System property <b>jvmRoute</b> is deprecated
  * and will be removed in Tomcat 10.1 onwards.
- *
- * @author Craig R. McClanahan
  */
 public class StandardEngine extends ContainerBase implements Engine {
 

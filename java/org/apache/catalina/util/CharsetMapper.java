@@ -30,8 +30,6 @@ import org.apache.tomcat.util.compat.JreCompat;
  * text (or generating output text) when the Content-Type header does not include one. You can customize the behavior of
  * this class by modifying the mapping data it loads, or by subclassing it (to change the algorithm) and then using your
  * own version for a particular web application.
- *
- * @author Craig R. McClanahan
  */
 public class CharsetMapper {
 

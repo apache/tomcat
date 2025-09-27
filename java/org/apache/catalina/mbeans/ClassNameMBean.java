@@ -26,8 +26,6 @@ package org.apache.catalina.mbeans;
  * </p>
  *
  * @param <T> The type that this bean represents.
- *
- * @author Craig R. McClanahan
  */
 public class ClassNameMBean<T> extends BaseCatalinaMBean<T> {
 

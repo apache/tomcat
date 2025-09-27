@@ -126,8 +126,6 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * For extended attributes coming from a getAttribute() call, it is you responsibility to ensure there are no newline or
  * control characters.
  * </p>
- *
- * @author Craig R. McClanahan
  * @author Jason Brittain
  * @author Remy Maucherat
  * @author Takayuki Kaneko

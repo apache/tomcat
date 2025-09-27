@@ -30,8 +30,6 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Concrete implementation of <code>RequestFilterValve</code> that filters based on the string representation of the
  * remote client's IP address optionally combined with the server connector port number.
- *
- * @author Craig R. McClanahan
  */
 public final class RemoteAddrValve extends RequestFilterValve {
 

@@ -60,8 +60,6 @@ import org.apache.juli.logging.LogFactory;
  * <li><strong>${arguments}</strong> - Command line arguments to be passed to the application's <code>main()</code>
  * method.</li>
  * </ul>
- *
- * @author Craig R. McClanahan
  */
 public final class Tool {
 

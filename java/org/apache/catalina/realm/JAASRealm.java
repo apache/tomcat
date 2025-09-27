@@ -114,8 +114,6 @@ import org.apache.tomcat.util.file.ConfigurationSource;
  * <code>JAASCallbackHandler</code> will digest the password prior to passing it back to the
  * <code>LoginModule</code></li>
  * </ul>
- *
- * @author Craig R. McClanahan
  * @author Yoav Shapira
  */
 public class JAASRealm extends RealmBase {

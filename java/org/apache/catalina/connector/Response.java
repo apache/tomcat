@@ -70,7 +70,6 @@ import org.apache.tomcat.util.security.Escape;
  * Wrapper object for the Coyote response.
  *
  * @author Remy Maucherat
- * @author Craig R. McClanahan
  */
 public class Response implements HttpServletResponse {
 

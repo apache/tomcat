@@ -67,8 +67,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * <b>IMPLEMENTATION NOTE</b>: If you add fields to this class, you must make sure that you carry them over in the
  * read/writeObject methods so that this class is properly serialized.
- *
- * @author Craig R. McClanahan
  * @author Sean Legassick
  * @author <a href="mailto:jon@latchkey.com">Jon S. Stevens</a>
  */
@@ -1552,8 +1550,6 @@ public class StandardSession implements HttpSession, Session, Serializable {
 /**
  * This class is a dummy implementation of the <code>HttpSessionContext</code> interface, to conform to the requirement
  * that such an object be returned when <code>HttpSession.getSessionContext()</code> is called.
- *
- * @author Craig R. McClanahan
  *
  * @deprecated As of Java Servlet API 2.1 with no replacement. The interface will be removed in a future version of this
  *                 API.

@@ -66,8 +66,6 @@ import org.apache.tomcat.util.threads.TaskThreadFactory;
 /**
  * Standard implementation of the <b>Server</b> interface, available for use (but not required) when deploying and
  * starting Catalina.
- *
- * @author Craig R. McClanahan
  */
 public final class StandardServer extends LifecycleMBeanBase implements Server {
 

@@ -31,8 +31,6 @@ import javax.management.NotificationFilter;
  * <code>BaseModelMBean</code> to construct attribute change notification event filters when a filter is not supplied by
  * the application.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class BaseAttributeFilter implements NotificationFilter {
 

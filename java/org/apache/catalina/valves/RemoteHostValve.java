@@ -28,8 +28,6 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Concrete implementation of <code>RequestFilterValve</code> that filters based on the remote client's host name
  * optionally combined with the server connector port number.
- *
- * @author Craig R. McClanahan
  */
 public final class RemoteHostValve extends RequestFilterValve {
 

@@ -40,8 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
  * register the corresponding user and make it available for management). All the MBeans created for users, groups and
  * roles are then discarded when save is invoked.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class SparseUserDatabaseMBean extends BaseModelMBean {
 
