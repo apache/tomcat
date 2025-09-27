@@ -83,8 +83,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Standard implementation of <code>ServletContext</code> that represents a web application's execution environment. An
  * instance of this class is associated with each instance of <code>StandardContext</code>.
- *
- * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
 public class ApplicationContext implements ServletContext {

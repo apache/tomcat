@@ -125,9 +125,6 @@ import org.ietf.jgss.GSSException;
 
 /**
  * Wrapper object for the Coyote request.
- *
- * @author Remy Maucherat
- * @author Craig R. McClanahan
  */
 public class Request implements HttpServletRequest {
 

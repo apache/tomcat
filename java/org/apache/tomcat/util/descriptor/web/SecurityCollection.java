@@ -31,8 +31,6 @@ import org.apache.tomcat.util.buf.UDecoder;
  * <b>WARNING</b>: It is assumed that instances of this class will be created and modified only within the context of a
  * single thread, before the instance is made visible to the remainder of the application. After that, only read access
  * is expected. Therefore, none of the read and write access within this class is synchronized.
- *
- * @author Craig R. McClanahan
  */
 public class SecurityCollection extends XmlEncodingBase implements Serializable {
 

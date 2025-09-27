@@ -23,8 +23,6 @@ import java.util.EventObject;
 
 /**
  * General event for notifying listeners of significant changes on a Session.
- *
- * @author Craig R. McClanahan
  */
 public final class SessionEvent extends EventObject {
 

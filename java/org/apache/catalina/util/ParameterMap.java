@@ -33,8 +33,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @param <K> The type of Key
  * @param <V> The type of Value
- *
- * @author Craig R. McClanahan
  */
 public final class ParameterMap<K, V> implements Map<K,V>, Serializable {
 

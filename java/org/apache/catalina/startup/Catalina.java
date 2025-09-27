@@ -65,8 +65,6 @@ import org.xml.sax.InputSource;
  * <li><b>start</b> - Start an instance of Catalina.</li>
  * <li><b>stop</b> - Stop the currently running instance of Catalina.</li>
  * </ul>
- *
- * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
 public class Catalina {

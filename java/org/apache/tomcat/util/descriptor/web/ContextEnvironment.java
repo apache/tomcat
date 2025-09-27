@@ -22,8 +22,6 @@ import java.io.Serial;
 /**
  * Representation of an application environment entry, as represented in an <code>&lt;env-entry&gt;</code> element in
  * the deployment descriptor.
- *
- * @author Craig R. McClanahan
  */
 public class ContextEnvironment extends ResourceBase {
 

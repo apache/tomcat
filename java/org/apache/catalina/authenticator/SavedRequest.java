@@ -36,8 +36,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * <p>
  * <b>IMPLEMENTATION NOTE</b> - It is assumed that this object is accessed only from the context of a single thread, so
  * no synchronization around internal collection classes is performed.
- *
- * @author Craig R. McClanahan
  */
 public final class SavedRequest implements Serializable {
 

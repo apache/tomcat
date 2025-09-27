@@ -25,8 +25,6 @@ import org.apache.catalina.connector.Request;
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation that checks only security constraints not involving user
  * authentication.
- *
- * @author Craig R. McClanahan
  */
 public final class NonLoginAuthenticator extends AuthenticatorBase {
 

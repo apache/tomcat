@@ -59,8 +59,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationRequest</code> is duplicated in <code>ApplicationHttpRequest</code>. Make sure that you keep these
  * two classes in synchronization when making changes!
- *
- * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
 class ApplicationHttpRequest extends HttpServletRequestWrapper {

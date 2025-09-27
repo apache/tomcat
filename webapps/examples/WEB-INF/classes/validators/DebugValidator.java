@@ -31,8 +31,6 @@ import jakarta.servlet.jsp.tagext.ValidationMessage;
  * <code>$CATALINA_HOME/logs/catalina.out</code>).  To utilize it, simply
  * include a <code>taglib</code> directive for this tag library at the top
  * of your JSP page.
- *
- * @author Craig McClanahan
  */
 public class DebugValidator extends TagLibraryValidator {
 

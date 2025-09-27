@@ -26,8 +26,6 @@ import org.apache.catalina.mapper.Mapper;
  * <p>
  * A given JVM can contain any number of Service instances; however, they are completely independent of each other and
  * share only the basic JVM facilities and classes on the system class path.
- *
- * @author Craig R. McClanahan
  */
 public interface Service extends Lifecycle {
 

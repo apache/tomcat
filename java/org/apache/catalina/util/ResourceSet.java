@@ -30,8 +30,6 @@ import org.apache.tomcat.util.res.StringManager;
  * modifications. When first created, a <code>ResourceMap</code> is not locked.
  *
  * @param <T> The type of elements in the Set
- *
- * @author Craig R. McClanahan
  */
 public final class ResourceSet<T> extends HashSet<T> {
 

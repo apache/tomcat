@@ -37,8 +37,6 @@ import java.util.regex.Pattern;
  * <p>
  * The child containers attached to a Host are generally implementations of Context (representing an individual servlet
  * context).
- *
- * @author Craig R. McClanahan
  */
 public interface Host extends Container {
 

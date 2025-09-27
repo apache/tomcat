@@ -21,8 +21,6 @@ import org.apache.tomcat.util.digester.RuleSet;
 
 /**
  * <strong>RuleSet</strong> for processing the contents of a Context definition element.
- *
- * @author Craig R. McClanahan
  */
 public class ContextRuleSet implements RuleSet {
 

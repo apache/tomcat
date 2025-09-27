@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
     <author email="yoavs@apache.org">Yoav Shapira</author>
     <title>The HTTP Connector</title>
   </properties>

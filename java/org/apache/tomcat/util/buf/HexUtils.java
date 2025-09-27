@@ -21,8 +21,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Tables useful when converting byte arrays to and from strings of hexadecimal digits. Code from Ajp11, from Apache's
  * JServ.
- *
- * @author Craig R. McClanahan
  */
 public final class HexUtils {
 

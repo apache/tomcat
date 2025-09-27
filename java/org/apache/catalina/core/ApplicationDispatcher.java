@@ -54,8 +54,6 @@ import org.apache.tomcat.util.res.StringManager;
  * resource. This implementation allows application level servlets to wrap the request and/or response objects that are
  * passed on to the called resource, as long as the wrapping classes extend
  * <code>jakarta.servlet.ServletRequestWrapper</code> and <code>jakarta.servlet.ServletResponseWrapper</code>.
- *
- * @author Craig R. McClanahan
  */
 final class ApplicationDispatcher implements AsyncDispatcher, RequestDispatcher {
 

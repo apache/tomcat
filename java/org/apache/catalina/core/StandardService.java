@@ -46,8 +46,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Standard implementation of the <code>Service</code> interface. The associated Container is generally an instance of
  * Engine, but this is not required.
- *
- * @author Craig R. McClanahan
  */
 
 public class StandardService extends LifecycleMBeanBase implements Service {

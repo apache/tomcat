@@ -38,8 +38,6 @@ import org.apache.juli.logging.LogFactory;
  * <p>
  * <b>IMPLEMENTATION NOTE</b>: Correct behavior of session storing and reloading depends upon external calls to the
  * {@link Lifecycle#start()} and {@link Lifecycle#stop()} methods of this class at the correct times.
- *
- * @author Craig R. McClanahan
  */
 public abstract class PersistentManagerBase extends ManagerBase implements StoreManager {
 

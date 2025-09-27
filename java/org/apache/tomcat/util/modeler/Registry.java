@@ -45,8 +45,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Registry for modeler MBeans. This is the main entry point into modeler. It provides methods to create and manipulate
  * model mbeans and simplify their use. This class is itself a mbean.
- *
- * @author Craig R. McClanahan
  * @author Costin Manolache
  */
 public class Registry implements RegistryMBean, MBeanRegistration {

@@ -25,8 +25,6 @@ import javax.management.MBeanParameterInfo;
  * <p>
  * Internal configuration information for a <code>Parameter</code> descriptor.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class ParameterInfo extends FeatureInfo {
     @Serial

@@ -40,8 +40,6 @@ import org.apache.juli.logging.LogFactory;
  * regular execution of the container. The purpose of this roundabout approach is to keep the Catalina internal classes
  * (and any other classes they depend on, such as an XML parser) out of the system class path and therefore not visible
  * to application level classes.
- *
- * @author Craig R. McClanahan
  * @author Remy Maucherat
  */
 public final class Bootstrap {

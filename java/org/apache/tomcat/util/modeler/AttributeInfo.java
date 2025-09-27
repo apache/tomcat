@@ -24,8 +24,6 @@ import javax.management.MBeanAttributeInfo;
  * <p>
  * Internal configuration information for an <code>Attribute</code> descriptor.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class AttributeInfo extends FeatureInfo {
     @Serial

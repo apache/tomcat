@@ -22,8 +22,6 @@ import java.io.Serial;
 /**
  * General purpose exception that is thrown to indicate a lifecycle related problem. Such exceptions should generally be
  * considered fatal to the operation of the application containing this component.
- *
- * @author Craig R. McClanahan
  */
 public final class LifecycleException extends Exception {
 

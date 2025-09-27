@@ -47,8 +47,6 @@ import org.apache.juli.logging.LogFactory;
  * <code>org.apache.catalina.filter.RequestDumperFilter</code> logger is directed to a dedicated file and that the
  * <code>org.apache.juli.VerbatimFormatter</code> is used.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class RequestDumperFilter extends GenericFilter {
 

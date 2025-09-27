@@ -61,8 +61,6 @@ import org.apache.tomcat.util.http.CookieProcessor;
  * The child containers attached to a Context are generally implementations of Wrapper (representing individual servlet
  * definitions).
  * <p>
- *
- * @author Craig R. McClanahan
  */
 public interface Context extends Container, ContextBind {
 
