@@ -103,7 +103,6 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * instrumentation of system or container classes or classes in other web apps.
  *
  * @author Remy Maucherat
- * @author Craig R. McClanahan
  */
 public abstract class WebappClassLoaderBase extends URLClassLoader
         implements Lifecycle, InstrumentableClassLoader, WebappProperties {

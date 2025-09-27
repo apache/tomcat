@@ -29,8 +29,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Startup event listener for an <b>Engine</b> that configures the properties of that Engine, and the associated defined
  * contexts.
- *
- * @author Craig R. McClanahan
  */
 public class EngineConfig implements LifecycleListener {
 

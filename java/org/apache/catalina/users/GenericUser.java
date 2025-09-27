@@ -31,8 +31,6 @@ import org.apache.catalina.UserDatabase;
  * </p>
  *
  * @param <UD> The specific type of UserDase with which this role is associated
- *
- * @author Craig R. McClanahan
  */
 public class GenericUser<UD extends UserDatabase> extends AbstractUser {
 

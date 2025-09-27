@@ -20,8 +20,6 @@ import org.apache.tomcat.util.http.Method;
 
 /**
  * Manifest constants for this Java package.
- *
- * @author Craig R. McClanahan
  */
 public final class Constants {
 

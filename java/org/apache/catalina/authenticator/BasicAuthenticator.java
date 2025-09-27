@@ -34,8 +34,6 @@ import org.apache.tomcat.util.buf.MessageBytes;
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP BASIC Authentication, as outlined in RFC 7617: "The
  * 'Basic' HTTP Authentication Scheme"
- *
- * @author Craig R. McClanahan
  */
 public class BasicAuthenticator extends AuthenticatorBase {
 

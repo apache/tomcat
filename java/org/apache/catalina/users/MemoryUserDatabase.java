@@ -57,8 +57,6 @@ import org.xml.sax.Attributes;
  * This class does not enforce what, in an RDBMS, would be called referential integrity. Concurrent modifications may
  * result in inconsistent data such as a User retaining a reference to a Role that has been removed from the database.
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 /*

@@ -44,8 +44,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Valve that implements the default basic behavior for the <code>StandardWrapper</code> container implementation.
- *
- * @author Craig R. McClanahan
  */
 final class StandardWrapperValve extends ValveBase {
 

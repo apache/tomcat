@@ -30,8 +30,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * execute servlets.  In the web application deployment descriptor,
  * this servlet must be mapped to correspond to the link in the
  * "index.html" file.
- *
- * @author Craig R. McClanahan &lt;Craig.McClanahan@eng.sun.com>
  */
 
 public final class Hello extends HttpServlet {

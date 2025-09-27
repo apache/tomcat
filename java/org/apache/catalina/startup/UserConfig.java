@@ -40,8 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
  * a web application in a directory with the specified name in their home directories. The context path of each deployed
  * application will be set to <code>~xxxxx</code>, where xxxxx is the username of the owning user for that web
  * application
- *
- * @author Craig R. McClanahan
  */
 public final class UserConfig implements LifecycleListener {
 

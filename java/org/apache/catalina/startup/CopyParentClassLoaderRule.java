@@ -27,8 +27,6 @@ import org.xml.sax.Attributes;
 /**
  * Rule that copies the <code>parentClassLoader</code> property from the next-to-top item on the stack (which must be a
  * <code>Container</code>) to the top item on the stack (which must also be a <code>Container</code>).
- *
- * @author Craig R. McClanahan
  */
 public class CopyParentClassLoaderRule extends Rule {
 

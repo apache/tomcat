@@ -25,8 +25,6 @@ import java.io.Serial;
  * <code>&lt;message-destination&gt;</code> element in the deployment descriptor.
  * </p>
  *
- * @author Craig R. McClanahan
- *
  * @since Tomcat 5.0
  */
 public class MessageDestination extends ResourceBase {

@@ -29,8 +29,6 @@ import jakarta.servlet.http.HttpSessionListener;
  * introduced in the 2.3 version of the Servlet API. This listener merely
  * documents the occurrence of such events in the application log associated
  * with our servlet context.
- *
- * @author Craig R. McClanahan
  */
 public final class SessionListener implements ServletContextListener,
         HttpSessionAttributeListener, HttpSessionListener {

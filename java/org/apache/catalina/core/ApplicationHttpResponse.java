@@ -33,8 +33,6 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationResponse</code> is duplicated in <code>ApplicationHttpResponse</code>. Make sure that you keep these
  * two classes in synchronization when making changes!
- *
- * @author Craig R. McClanahan
  */
 class ApplicationHttpResponse extends HttpServletResponseWrapper {
 

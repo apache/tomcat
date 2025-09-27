@@ -24,8 +24,6 @@ import org.apache.tomcat.util.buf.UDecoder;
 /**
  * Representation of a login configuration element for a web application, as represented in a
  * <code>&lt;login-config&gt;</code> element in the deployment descriptor.
- *
- * @author Craig R. McClanahan
  */
 public class LoginConfig extends XmlEncodingBase implements Serializable {
 

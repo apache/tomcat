@@ -39,7 +39,6 @@ import org.apache.tomcat.util.res.StringManager;
  * JSSESupport. Concrete implementation class for JSSE Support classes.
  *
  * @author EKR
- * @author Craig R. McClanahan Parts cribbed from JSSECertCompat Parts cribbed from CertificatesValve
  */
 public class JSSESupport implements SSLSupport, SSLSessionManager {
 

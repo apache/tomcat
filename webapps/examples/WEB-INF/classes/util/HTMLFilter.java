@@ -18,8 +18,6 @@ package util;
 
 /**
  * HTML filter utility.
- *
- * @author Craig R. McClanahan
  * @author Tim Tye
  */
 public final class HTMLFilter {

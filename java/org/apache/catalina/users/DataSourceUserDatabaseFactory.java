@@ -40,8 +40,6 @@ import javax.sql.DataSource;
  * <li><strong>dataSourceName</strong> - JNDI name of the DataSource, which must be located in the same Context
  * environment as the UserDatabase</li>
  * </ul>
- *
- * @author Craig R. McClanahan
  */
 public class DataSourceUserDatabaseFactory implements ObjectFactory {
 

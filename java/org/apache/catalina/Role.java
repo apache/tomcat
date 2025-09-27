@@ -26,8 +26,6 @@ import java.security.Principal;
  * <code>Principals</code>.
  * </p>
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public interface Role extends Principal {

@@ -38,8 +38,6 @@ import jakarta.servlet.ServletResponse;
  *     subsequently defined filters, and logs the result to the servlet
  *     context log for this application.
  * </ul>
- *
- * @author Craig McClanahan
  */
 public final class ExampleFilter extends GenericFilter {
 

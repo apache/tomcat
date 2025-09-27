@@ -23,24 +23,10 @@
   &project;
 
   <properties>
-    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
     <title>Table of Contents</title>
   </properties>
 
 <body>
-
-
-<section name="Preface">
-
-<p>This manual includes contributions from many members of the Tomcat Project
-developer community.  The following authors have provided significant content:
-</p>
-<ul>
-<li>Craig R. McClanahan
-    (<a href="mailto:craigmcc@apache.org">craigmcc@apache.org</a>)</li>
-</ul>
-
-</section>
 
 
 <section name="Table of Contents">

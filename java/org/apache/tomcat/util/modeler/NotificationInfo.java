@@ -27,8 +27,6 @@ import javax.management.MBeanNotificationInfo;
  * <p>
  * Internal configuration information for a <code>Notification</code> descriptor.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class NotificationInfo extends FeatureInfo {
 

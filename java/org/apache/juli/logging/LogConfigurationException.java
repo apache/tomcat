@@ -24,8 +24,6 @@ import java.io.Serial;
  * An exception that is thrown only if a suitable <code>LogFactory</code> or <code>Log</code> instance cannot be created
  * by the corresponding factory methods.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class LogConfigurationException extends RuntimeException {
 

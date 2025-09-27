@@ -34,8 +34,6 @@ import org.xml.sax.Attributes;
  * <strong>RuleSet</strong> for processing the contents of a web application deployment descriptor
  * (<code>/WEB-INF/web.xml</code>) resource.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class WebRuleSet implements RuleSet {
 

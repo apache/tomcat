@@ -40,8 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Concrete implementation of the <b>Store</b> interface that utilizes a file per saved Session in a configured
  * directory. Sessions that are saved are still subject to being expired based on inactivity.
- *
- * @author Craig R. McClanahan
  */
 public final class FileStore extends StoreBase {
 

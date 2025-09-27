@@ -32,8 +32,6 @@ package org.apache.catalina;
  * <p>
  * If used, an Engine is always the top level Container in a Catalina hierarchy. Therefore, the implementation's
  * <code>setParent()</code> method should throw <code>IllegalArgumentException</code>.
- *
- * @author Craig R. McClanahan
  */
 public interface Engine extends Container {
 

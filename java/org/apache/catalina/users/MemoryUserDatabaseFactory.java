@@ -41,8 +41,6 @@ import javax.naming.spi.ObjectFactory;
  * to which it is stored. [conf/tomcat-users.xml]</li>
  * </ul>
  *
- * @author Craig R. McClanahan
- *
  * @since 4.1
  */
 public class MemoryUserDatabaseFactory implements ObjectFactory {

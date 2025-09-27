@@ -34,8 +34,6 @@ import org.ietf.jgss.GSSCredential;
 /**
  * Generic implementation of <strong>java.security.Principal</strong> that is available for use by <code>Realm</code>
  * implementations.
- *
- * @author Craig R. McClanahan
  */
 public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
