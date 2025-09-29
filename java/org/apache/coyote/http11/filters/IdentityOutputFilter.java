@@ -25,8 +25,6 @@ import org.apache.coyote.http11.OutputFilter;
 
 /**
  * Identity output filter.
- *
- * @author Remy Maucherat
  */
 public class IdentityOutputFilter implements OutputFilter {
 

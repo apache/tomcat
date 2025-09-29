@@ -20,8 +20,6 @@ import java.io.Serial;
 
 /**
  * Represents a reference address to a resource environment.
- *
- * @author Remy Maucherat
  */
 public class ResourceEnvRef extends AbstractRef {
 

@@ -39,8 +39,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Chunked input filter. Parses chunked data according to <a href=
  * "http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1">http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.6.1</a><br>
- *
- * @author Remy Maucherat
  */
 public class ChunkedInputFilter implements InputFilter, ApplicationBufferHandler, HeaderDataSource {
 

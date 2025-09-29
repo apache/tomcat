@@ -44,8 +44,6 @@ import org.apache.tomcat.util.res.StringManager;
  * The buffer used by Tomcat request. This is a derivative of the Tomcat 3.3 OutputBuffer, adapted to handle input
  * instead of output. This allows complete recycling of the facade objects (the ServletInputStream and the
  * BufferedReader).
- *
- * @author Remy Maucherat
  */
 public class InputBuffer extends Reader implements ByteChunk.ByteInputChannel, ApplicationBufferHandler {
 

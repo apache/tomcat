@@ -31,8 +31,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This class implements a String cache for ByteChunk and CharChunk.
- *
- * @author Remy Maucherat
  */
 public class StringCache {
 

@@ -23,8 +23,6 @@ import java.security.Principal;
 /**
  * Generic implementation of <strong>java.security.Principal</strong> that is used to represent principals authenticated
  * at the protocol handler level.
- *
- * @author Remy Maucherat
  */
 public class CoyotePrincipal implements Principal, Serializable {
 

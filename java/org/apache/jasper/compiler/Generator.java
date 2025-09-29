@@ -61,7 +61,7 @@ import org.xml.sax.Attributes;
  *
  * @author Anil K. Vijendran, Danno Ferrin, Mandar Raje, Rajiv Mordani, Pierre Delisle
  * @author Tomcat 4.1.x and Tomcat 5: Kin-man Chung, Jan Luehe, Shawn Bayern, Mark Roth, Denis Benoit
- * @author Tomcat 6.x: Jacob Hookom, Remy Maucherat
+ * @author Tomcat 6.x: Jacob Hookom
  */
 class Generator {
 

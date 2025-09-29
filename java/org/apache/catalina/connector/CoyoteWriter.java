@@ -21,8 +21,6 @@ import java.io.PrintWriter;
 
 /**
  * Coyote implementation of the servlet writer.
- *
- * @author Remy Maucherat
  */
 public class CoyoteWriter extends PrintWriter {
 

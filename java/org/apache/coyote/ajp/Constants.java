@@ -23,8 +23,6 @@ import org.apache.tomcat.util.http.Method;
 
 /**
  * Constants.
- *
- * @author Remy Maucherat
  */
 public final class Constants {
 

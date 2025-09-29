@@ -25,7 +25,6 @@ import org.apache.jasper.JasperException;
  * Repository of {page, request, session, application}-scoped beans
  *
  * @author Mandar Raje
- * @author Remy Maucherat
  */
 public class BeanRepository {
 

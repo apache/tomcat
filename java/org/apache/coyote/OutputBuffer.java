@@ -22,8 +22,6 @@ import java.nio.ByteBuffer;
 /**
  * Output buffer. This class is used internally by the protocol implementation. All writes from higher level code should
  * happen via Response.doWrite().
- *
- * @author Remy Maucherat
  */
 public interface OutputBuffer {
 

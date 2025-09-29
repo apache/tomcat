@@ -26,7 +26,6 @@ import java.io.Serial;
  * @author dac@sun.com
  * @author James Todd [gonzo@sun.com]
  * @author Costin Manolache
- * @author Remy Maucherat
  */
 public final class CharChunk extends AbstractChunk implements CharSequence {
 

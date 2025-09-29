@@ -34,8 +34,6 @@ import org.apache.naming.StringManager;
  * <p>
  * Object factory for resource links.
  * </p>
- *
- * @author Remy Maucherat
  */
 public class ResourceLinkFactory implements ObjectFactory {
 

@@ -29,8 +29,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Identity input filter.
- *
- * @author Remy Maucherat
  */
 public class IdentityInputFilter implements InputFilter, ApplicationBufferHandler {
 

@@ -46,7 +46,6 @@ import org.apache.tomcat.util.http.MimeHeaders;
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of FORM BASED Authentication, as described in the Servlet API
  * Specification.
- * @author Remy Maucherat
  */
 public class FormAuthenticator extends AuthenticatorBase {
 

@@ -54,7 +54,6 @@ import org.apache.tomcat.util.res.StringManager;
  * This class loader is configured via the Resources children of its Context prior to calling <code>start()</code>. When
  * a new class is required, these Resources will be consulted first to locate the class. If it is not present, the
  * system class loader will be used instead.
- * @author Remy Maucherat
  */
 public class WebappLoader extends LifecycleMBeanBase implements Loader {
 
