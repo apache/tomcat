@@ -321,6 +321,9 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Update Byte Buddy to 1.17.7. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
