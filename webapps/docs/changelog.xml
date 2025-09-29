@@ -105,7 +105,7 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.12 (markt)" rtext="in development">
-  <subsection name="Catlaina">
+  <subsection name="Catalina">
     <changelog>
       <update>
         Change the digest used to calculate strong ETags (if enabled) for the
