@@ -21,8 +21,6 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Constants.
- *
- * @author Remy Maucherat
  */
 public final class Constants {
 

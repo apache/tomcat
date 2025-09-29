@@ -24,8 +24,6 @@ import org.apache.tomcat.util.buf.HexUtils;
  * The 128 bit MD5 hash is converted into a 32 character long String. Each character of the String is the hexadecimal
  * representation of 4 bits of the digest.
  *
- * @author Remy Maucherat
- *
  * @deprecated Unused. Use {@link HexUtils} instead. Will be removed in Tomcat 11.
  */
 @Deprecated

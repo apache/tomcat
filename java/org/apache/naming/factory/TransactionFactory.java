@@ -23,8 +23,6 @@ import org.apache.naming.TransactionRef;
 
 /**
  * Object factory for User transactions.
- *
- * @author Remy Maucherat
  */
 public class TransactionFactory extends FactoryBase {
 

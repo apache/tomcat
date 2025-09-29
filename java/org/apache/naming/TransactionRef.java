@@ -18,8 +18,6 @@ package org.apache.naming;
 
 /**
  * Represents a reference address to a transaction.
- *
- * @author Remy Maucherat
  */
 public class TransactionRef extends AbstractRef {
 

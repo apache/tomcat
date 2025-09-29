@@ -54,7 +54,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implementation of a Coyote connector.
- * @author Remy Maucherat
  */
 public class Connector extends LifecycleMBeanBase {
 

@@ -30,8 +30,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Utility class to read the bootstrap Catalina configuration.
- *
- * @author Remy Maucherat
  */
 public class CatalinaProperties {
 

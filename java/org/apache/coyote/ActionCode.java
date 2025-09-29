@@ -22,8 +22,6 @@ package org.apache.coyote;
  *
  * @see ProtocolHandler
  * @see ActionHook
- *
- * @author Remy Maucherat
  */
 public enum ActionCode {
 

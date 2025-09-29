@@ -29,7 +29,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Coyote implementation of the servlet output stream.
  *
  * @author Costin Manolache
- * @author Remy Maucherat
  */
 public class CoyoteOutputStream extends ServletOutputStream {
 

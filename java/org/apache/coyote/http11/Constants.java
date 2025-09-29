@@ -20,8 +20,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Constants.
- *
- * @author Remy Maucherat
  */
 public final class Constants {
 

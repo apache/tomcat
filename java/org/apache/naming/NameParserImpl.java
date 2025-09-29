@@ -23,8 +23,6 @@ import javax.naming.NamingException;
 
 /**
  * Parses names.
- *
- * @author Remy Maucherat
  */
 public class NameParserImpl implements NameParser {
 

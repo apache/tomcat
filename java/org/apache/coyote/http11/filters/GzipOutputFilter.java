@@ -30,8 +30,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Gzip output filter.
- *
- * @author Remy Maucherat
  */
 public class GzipOutputFilter implements OutputFilter {
 

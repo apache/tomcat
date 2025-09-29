@@ -20,8 +20,6 @@ import org.apache.coyote.Response;
 
 /**
  * Output filter.
- *
- * @author Remy Maucherat
  */
 public interface OutputFilter extends HttpOutputBuffer {
 

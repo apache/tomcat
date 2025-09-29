@@ -38,8 +38,6 @@ import org.apache.naming.SelectorContext;
  * package name. More detail about this can be found in the JNDI documentation :
  * {@link javax.naming.spi.NamingManager#getURLContext(String, java.util.Hashtable)}.</li>
  * </ul>
- *
- * @author Remy Maucherat
  */
 public class javaURLContextFactory implements ObjectFactory, InitialContextFactory {
 

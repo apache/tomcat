@@ -25,8 +25,6 @@ import jakarta.servlet.ServletContext;
 
 /**
  * Facade for the <b>StandardWrapper</b> object.
- *
- * @author Remy Maucherat
  */
 public final class StandardWrapperFacade implements ServletConfig {
 

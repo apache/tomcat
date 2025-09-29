@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="remm@apache.org">Remy Maucherat</author>
     <author email="yoavs@apache.org">Yoav Shapira</author>
     <title>Documentation Index</title>
   </properties>

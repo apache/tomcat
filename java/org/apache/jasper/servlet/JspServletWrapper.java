@@ -55,7 +55,6 @@ import org.apache.tomcat.Jar;
  *
  * @author Anil K. Vijendran
  * @author Harish Prabandham
- * @author Remy Maucherat
  * @author Kin-man Chung
  * @author Glenn Nielsen
  * @author Tim Fennell

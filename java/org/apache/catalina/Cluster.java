@@ -23,7 +23,6 @@ package org.apache.catalina;
  * sending information in the Cluster and <code>ClusterInfo</code> used for receiving information in the Cluster.
  *
  * @author Bip Thelin
- * @author Remy Maucherat
  */
 public interface Cluster extends Contained {
 

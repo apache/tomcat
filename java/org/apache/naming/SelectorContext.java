@@ -31,8 +31,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Catalina JNDI Context implementation.
- *
- * @author Remy Maucherat
  */
 public class SelectorContext implements Context {
 
