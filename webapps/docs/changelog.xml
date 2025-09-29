@@ -202,6 +202,9 @@
       <add>
         Improvements to Japanese translations provided by tak7iji. (markt)
       </add>
+      <update>
+        Minor refactoring in JULI loggers. Patch provided by minjund. (schultz)
+      </update>
     </changelog>
   </subsection>
 </section>
