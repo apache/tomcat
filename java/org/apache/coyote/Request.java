@@ -23,7 +23,6 @@ import java.nio.charset.Charset;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ReadListener;
@@ -150,7 +149,7 @@ public final class Request {
 
     private long bytesRead = 0;
     // Time of the request - useful to avoid repeated calls to System.currentTime
-    private long startTimeNanos = -1;
+    private long startTime = -1;
     private Instant startInstant = null;
     private long threadId = 0;
     private int available = 0;
@@ -693,11 +692,7 @@ public final class Request {
     }
 
     public long getStartTime() {
-        return System.currentTimeMillis() - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNanos);
-    }
-
-    public long getStartTimeNanos() {
-        return startTimeNanos;
+        return startTime;
     }
 
     /**
@@ -707,12 +702,12 @@ public final class Request {
      */
     @Deprecated
     public void setStartTime(long startTime) {
-        startTimeNanos = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(startTime - System.currentTimeMillis());
+        this.startTime = startTime;
         startInstant = Instant.now();
     }
 
     public void markStartTime() {
-        startTimeNanos = System.nanoTime();
+        startTime = System.currentTimeMillis();
         startInstant = Instant.now();
     }
 
@@ -818,7 +813,7 @@ public final class Request {
         }
         allDataReadEventSent.set(false);
 
-        startTimeNanos = -1;
+        startTime = -1;
         startInstant = null;
         threadId = 0;
 
