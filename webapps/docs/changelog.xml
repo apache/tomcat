@@ -177,6 +177,9 @@
       <update>
         Update Checkstyle to 11.1.0. (markt)
       </update>
+      <update>
+        Update SpotBugs to 4.9.6. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
