@@ -21,7 +21,6 @@ import org.apache.tomcat.util.digester.RuleSet;
 
 /**
  * <strong>RuleSet</strong> for processing the JNDI Enterprise Naming Context resource declaration elements.
- * @author Remy Maucherat
  */
 public class NamingRuleSet implements RuleSet {
 

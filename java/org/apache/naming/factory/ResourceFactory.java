@@ -25,8 +25,6 @@ import org.apache.naming.StringManager;
 
 /**
  * Object factory for Resources.
- *
- * @author Remy Maucherat
  */
 public class ResourceFactory extends FactoryBase {
 

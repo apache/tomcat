@@ -27,8 +27,6 @@ import org.apache.tomcat.util.net.ApplicationBufferHandler;
 
 /**
  * Void input filter, which returns -1 when attempting a read. Used with a GET, HEAD, or a similar request.
- *
- * @author Remy Maucherat
  */
 public class VoidInputFilter implements InputFilter {
 

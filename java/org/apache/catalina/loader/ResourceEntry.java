@@ -18,8 +18,6 @@ package org.apache.catalina.loader;
 
 /**
  * Resource entry.
- *
- * @author Remy Maucherat
  */
 public class ResourceEntry {
 

@@ -19,8 +19,6 @@ package org.apache.naming;
 
 /**
  * Represents a binding in a NamingContext.
- *
- * @author Remy Maucherat
  */
 public class NamingEntry {
 

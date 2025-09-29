@@ -32,8 +32,6 @@ import javax.naming.NamingException;
  * <li>Thread context class loader with object bound to the same NamingContext</li>
  * </ul>
  * The objects are typically Catalina Server or Context objects.
- *
- * @author Remy Maucherat
  */
 public class ContextBindings {
 

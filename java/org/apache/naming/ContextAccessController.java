@@ -21,8 +21,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Handles the access control on the JNDI contexts.
- *
- * @author Remy Maucherat
  */
 public class ContextAccessController {
 

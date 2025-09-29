@@ -102,8 +102,6 @@ import org.apache.tomcat.util.threads.ThreadPoolExecutor;
  * <strong>IMPLEMENTATION NOTE</strong> - As of 8.0, this class loader implements {@link InstrumentableClassLoader},
  * permitting web application classes to instrument other classes in the same web application. It does not permit
  * instrumentation of system or container classes or classes in other web apps.
- *
- * @author Remy Maucherat
  */
 public abstract class WebappClassLoaderBase extends URLClassLoader
         implements Lifecycle, InstrumentableClassLoader, WebappProperties {

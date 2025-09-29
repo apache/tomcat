@@ -24,8 +24,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Input filter interface.
- *
- * @author Remy Maucherat
  */
 public interface InputFilter extends InputBuffer {
 

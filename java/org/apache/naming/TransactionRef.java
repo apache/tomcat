@@ -20,8 +20,6 @@ import java.io.Serial;
 
 /**
  * Represents a reference address to a transaction.
- *
- * @author Remy Maucherat
  */
 public class TransactionRef extends AbstractRef {
 
