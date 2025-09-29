@@ -27,8 +27,6 @@ import org.apache.naming.StringManager;
 
 /**
  * Object factory for EJBs.
- *
- * @author Remy Maucherat
  */
 public class EjbFactory extends FactoryBase {
 

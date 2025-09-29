@@ -22,8 +22,6 @@ import java.io.IOException;
 
 /**
  * Coyote implementation of the buffered reader.
- *
- * @author Remy Maucherat
  */
 public class CoyoteReader extends BufferedReader {
 

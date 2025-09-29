@@ -35,8 +35,6 @@ import org.apache.catalina.connector.Response;
  * perform. Note that internally, some async requests may require multiple serial requests to complete what - to the
  * user - appears as a single request.
  * </p>
- *
- * @author Remy Maucherat
  */
 public class SemaphoreValve extends ValveBase {
 

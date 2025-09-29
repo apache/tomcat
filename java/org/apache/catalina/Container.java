@@ -61,7 +61,6 @@ import org.apache.juli.logging.Log;
  * <li><b>Resources</b> - JNDI directory context enabling access to static resources, enabling custom linkages to
  * existing server components when Catalina is embedded in a larger server.
  * </ul>
- * @author Remy Maucherat
  */
 public interface Container extends Lifecycle {
 

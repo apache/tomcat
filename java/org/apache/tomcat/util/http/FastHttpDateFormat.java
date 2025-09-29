@@ -26,8 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class to generate HTTP dates.
- *
- * @author Remy Maucherat
  */
 public final class FastHttpDateFormat {
 

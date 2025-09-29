@@ -144,7 +144,6 @@ import org.apache.tomcat.util.security.Escape;
  * <li><b>debug</b> - The debugging detail level that controls the amount of information that is logged by this servlet.
  * Default is zero.
  * </ul>
- * @author Remy Maucherat
  */
 public class ManagerServlet extends HttpServlet implements ContainerServlet {
 

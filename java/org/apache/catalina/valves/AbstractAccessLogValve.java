@@ -127,7 +127,6 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * control characters.
  * </p>
  * @author Jason Brittain
- * @author Remy Maucherat
  * @author Takayuki Kaneko
  * @author Peter Rossbach
  */

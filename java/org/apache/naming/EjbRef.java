@@ -20,8 +20,6 @@ import javax.naming.StringRefAddr;
 
 /**
  * Represents a reference address to an EJB.
- *
- * @author Remy Maucherat
  */
 public class EjbRef extends AbstractRef {
 

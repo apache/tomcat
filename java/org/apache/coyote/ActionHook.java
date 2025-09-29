@@ -22,8 +22,6 @@ package org.apache.coyote;
  * coyote connectors. Some standard actions are defined in ActionCode, however custom actions are permitted. The param
  * object can be used to pass and return information related with the action. This interface is typically implemented by
  * ProtocolHandlers, and the param is usually a Request or Response object.
- *
- * @author Remy Maucherat
  */
 public interface ActionHook {
 

@@ -37,8 +37,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Facade class that wraps a Coyote response object. All methods are delegated to the wrapped response.
- *
- * @author Remy Maucherat
  */
 @SuppressWarnings("deprecation")
 public class ResponseFacade implements HttpServletResponse {

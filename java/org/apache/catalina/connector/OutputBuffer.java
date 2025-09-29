@@ -45,7 +45,6 @@ import org.apache.tomcat.util.res.StringManager;
  * the state handling (which in Coyote is mostly the Processor's responsibility).
  *
  * @author Costin Manolache
- * @author Remy Maucherat
  */
 public class OutputBuffer extends Writer {
 

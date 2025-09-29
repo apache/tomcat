@@ -41,8 +41,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This servlet will display a complete status of the HTTP/1.1 connector.
- *
- * @author Remy Maucherat
  */
 public class StatusManagerServlet extends HttpServlet implements NotificationListener {
 

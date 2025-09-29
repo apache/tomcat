@@ -24,8 +24,6 @@ import javax.naming.NamingException;
 
 /**
  * Naming enumeration implementation.
- *
- * @author Remy Maucherat
  */
 public class NamingContextEnumeration implements NamingEnumeration<NameClassPair> {
 

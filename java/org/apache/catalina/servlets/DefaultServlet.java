@@ -137,7 +137,6 @@ import org.xml.sax.ext.EntityResolver2;
  * Then a request to <code>/context/static/images/tomcat.jpg</code> will succeed while a request to
  * <code>/context/images/tomcat2.jpg</code> will fail.
  * </p>
- * @author Remy Maucherat
  */
 public class DefaultServlet extends HttpServlet {
 

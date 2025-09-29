@@ -41,8 +41,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Mapper, which implements the servlet API mapping rules (which are derived from the HTTP rules).
- *
- * @author Remy Maucherat
  */
 public final class Mapper {
 

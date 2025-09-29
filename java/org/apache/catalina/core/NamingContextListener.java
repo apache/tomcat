@@ -78,8 +78,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Helper class used to initialize and populate the JNDI context associated with each context and server.
- *
- * @author Remy Maucherat
  */
 public class NamingContextListener implements LifecycleListener, ContainerListener, PropertyChangeListener {
 

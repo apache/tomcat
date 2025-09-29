@@ -32,7 +32,6 @@ import org.apache.juli.logging.LogFactory;
  * JSP page
  *
  * @author Kin-man Chung
- * @author Remy Maucherat
  */
 
 public class JspConfig {

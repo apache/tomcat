@@ -51,8 +51,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Facade object which masks the internal <code>ApplicationContext</code> object from the web application.
- *
- * @author Remy Maucherat
  */
 public class ApplicationContextFacade implements ServletContext {
 
