@@ -333,6 +333,9 @@
       <update>
         Update Jsign to 7.2. (markt)
       </update>
+      <add>
+        Improvements to Russian translations by usmazat. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
