@@ -196,6 +196,10 @@
       <fix>
         Fix a case-sensitivity issue in the trailer header allow list. (markt)
       </fix>
+      <fix>
+        Be proactive in cleaning up temporary files after a failed multi-part
+        upload rather than waiting for GC to do it. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
