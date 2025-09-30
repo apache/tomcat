@@ -459,7 +459,7 @@ public class TLSClientHelloExtractor {
     private static void readSupportedGroups(ByteBuffer bb, List<Group> groups) {
         // First 2 bytes are size of the group list
         int toRead = bb.getChar() / 2;
-        // Then the list of protocols
+        // Then the list of groups
         for (int i = 0; i < toRead; i++) {
             char id = bb.getChar();
             Group group = Group.valueOf(id);
@@ -473,7 +473,7 @@ public class TLSClientHelloExtractor {
     private static void readSignatureSchemes(ByteBuffer bb, List<SignatureScheme> signatureSchemes) {
         // First 2 bytes are size of the signature algorithm list
         int toRead = bb.getChar() / 2;
-        // Then the list of protocols
+        // Then the list of schemes
         for (int i = 0; i < toRead; i++) {
             char id = bb.getChar();
             SignatureScheme signatureScheme = SignatureScheme.valueOf(id);
