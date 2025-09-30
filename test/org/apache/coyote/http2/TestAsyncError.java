@@ -49,10 +49,12 @@ public class TestAsyncError extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
+        AsyncErrorServlet asyncErrorServlet = new AsyncErrorServlet();
+
         Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
-        Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncErrorServlet());
+        Wrapper w = Tomcat.addServlet(ctxt, "async", asyncErrorServlet);
         w.setAsyncSupported(true);
         ctxt.addServletMappingDecoded("/async", "async");
         tomcat.start();
@@ -81,12 +83,12 @@ public class TestAsyncError extends Http2TestBase {
         sendRst(3, Http2Error.CANCEL.getCode());
 
         int count = 0;
-        while (count < 50 && TestListener.getErrorCount() == 0) {
+        while (count < 50 && asyncErrorServlet.getErrorCount() == 0) {
             count++;
             Thread.sleep(100);
         }
 
-        Assert.assertEquals(1, TestListener.getErrorCount());
+        Assert.assertEquals(1, asyncErrorServlet.getErrorCount());
     }
 
 
@@ -94,11 +96,16 @@ public class TestAsyncError extends Http2TestBase {
 
         private static final long serialVersionUID = 1L;
 
+        private TestListener testListener = new TestListener();
+
+        int getErrorCount() {
+            return testListener.getErrorCount();
+        }
+
         @Override
         protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             final AsyncContext asyncContext = req.startAsync();
-            TestListener testListener = new TestListener();
             asyncContext.addListener(testListener);
 
             MessageGenerator msgGenerator = new MessageGenerator(resp);
@@ -139,9 +146,9 @@ public class TestAsyncError extends Http2TestBase {
 
     private static final class TestListener implements AsyncListener {
 
-        private static final AtomicInteger errorCount = new AtomicInteger(0);
+        private final AtomicInteger errorCount = new AtomicInteger(0);
 
-        public static int getErrorCount() {
+        public int getErrorCount() {
             return errorCount.get();
         }
 
