@@ -172,6 +172,11 @@
         performance. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <add>
+        Add CIDR support for the configuration of internal and trusted proxies
+        for the <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">

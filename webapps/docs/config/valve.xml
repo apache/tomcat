@@ -1190,12 +1190,13 @@
       </attribute>
 
       <attribute name="internalProxies" required="false">
-        <p>Regular expression (using <code>java.util.regex</code>) that a
-        proxy&apos;s IP address must match to be considered an internal proxy.
-        Internal proxies that appear in the <strong>remoteIpHeader</strong> will
-        be trusted and will not appear in the <strong>proxiesHeader</strong>
-        value. If not specified the default value of <code>
-        10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|100\.6[4-9]{1}\.\d{1,3}\.\d{1,3}|100\.[7-9]{1}\d{1}\.\d{1,3}\.\d{1,3}|100\.1[0-1]{1}\d{1}\.\d{1,3}\.\d{1,3}|100\.12[0-7]{1}\.\d{1,3}\.\d{1,3}|172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}|172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}|0:0:0:0:0:0:0:1|::1|fe[89ab]\p{XDigit}:.*|"f[cd]\p{XDigit}{2}+:.*
+        <p>Either a comma separated list of CIDR blocks or a single regular
+        expression that a proxy&apos;s IP address must match to be considered an
+        internal proxy. Internal proxies that appear in the
+        <strong>remoteIpHeader</strong> will be trusted and will not appear in
+        the <strong>proxiesHeader</strong> value. If not specified the default
+        value of <code>10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16,
+        169.254.0.0/16, 100.64.0.0/10, 127.0.0.0/8, ::1/128, fe80::/10, fc00::/7
         </code> will be used.</p>
       </attribute>
 
@@ -1216,11 +1217,12 @@
       </attribute>
 
       <attribute name="trustedProxies" required="false">
-        <p>Regular expression (using <code>java.util.regex</code>) that a
-        proxy&apos;s IP address must match to be considered an trusted proxy.
-        Trusted proxies that appear in the <strong>remoteIpHeader</strong> will
-        be trusted and will appear in the <strong>proxiesHeader</strong> value.
-        If not specified, no proxies will be trusted.</p>
+        <p>Either a comma separated list of CIDR blocks or a single regular
+        expression that a proxy&apos;s IP address must match to be considered a
+        trusted proxy. Trusted proxies that appear in the
+        <strong>remoteIpHeader</strong> will be trusted and will appear in the
+        <strong>proxiesHeader</strong> value. If not specified, no proxies will
+        be trusted.</p>
       </attribute>
 
       <attribute name="protocolHeader" required="false">
