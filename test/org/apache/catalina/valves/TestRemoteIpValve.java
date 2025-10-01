@@ -17,6 +17,7 @@
 package org.apache.catalina.valves;
 
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.util.NetMaskSet;
 import org.apache.tomcat.util.buf.StringUtils;
 
 /**
@@ -1178,6 +1180,14 @@ public class TestRemoteIpValve {
     @Test
     public void testInternalProxies() throws Exception {
         RemoteIpValve remoteIpValve = new RemoteIpValve();
+        // Regex equivalent of default
+        remoteIpValve.setInternalProxies("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
+                "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" + "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" +
+                "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.6[4-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+                "100\\.[7-9]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.1[0-1]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+                "100\\.12[0-7]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+                "172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+                "0:0:0:0:0:0:0:1|::1|" + "fe[89ab]\\p{XDigit}:.*|" + "f[cd]\\p{XDigit}{2}+:.*");
         Pattern internalProxiesPattern = Pattern.compile(remoteIpValve.getInternalProxies());
 
         doTestPattern(internalProxiesPattern, "8.8.8.8", false);
@@ -1220,5 +1230,72 @@ public class TestRemoteIpValve {
     private void doTestPattern(Pattern pattern, String input, boolean expectedMatch) {
         boolean match = pattern.matcher(input).matches();
         Assert.assertEquals(input, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
+    }
+
+    @Test
+    public void testInvokeAllowedRemoteAddrWithNullRemoteIpHeaderCidr() throws Exception {
+        // PREPARE
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setInternalProxies("");
+        remoteIpValve.setTrustedProxies("");
+        remoteIpValve.setInternalProxies("192.168.0.0/24");
+        remoteIpValve.setTrustedProxies("203.0.113.0/24");
+        remoteIpValve.setRemoteIpHeader("x-forwarded-for");
+        remoteIpValve.setProxiesHeader("x-forwarded-by");
+
+        RemoteAddrAndHostTrackerValve remoteAddrAndHostTrackerValve = new RemoteAddrAndHostTrackerValve();
+        remoteIpValve.setNext(remoteAddrAndHostTrackerValve);
+
+        Request request = new MockRequest(new org.apache.coyote.Request());
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+
+        // TEST
+        remoteIpValve.invoke(request, null);
+
+        // VERIFY
+        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        Assert.assertNull("x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        Assert.assertNull("x-forwarded-by must be null", actualXForwardedBy);
+
+        String actualRemoteAddr = remoteAddrAndHostTrackerValve.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "192.168.0.10", actualRemoteAddr);
+
+        String actualRemoteHost = remoteAddrAndHostTrackerValve.getRemoteHost();
+        Assert.assertEquals("remoteHost", "remote-host-original-value", actualRemoteHost);
+    }
+
+    @Test
+    public void testInternalProxiesCidr() throws Exception {
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        remoteIpValve.setInternalProxies("192.168.0.0/24,223.168.0.0/24");
+        NetMaskSet internalProxiesCidr = NetMaskSet.parse(remoteIpValve.getInternalProxies());
+
+        doTestNetMaskSet(internalProxiesCidr, "192.168.0.0", true);
+        doTestNetMaskSet(internalProxiesCidr, "192.168.0.1", true);
+        doTestNetMaskSet(internalProxiesCidr, "193.168.1.0", false);
+        doTestNetMaskSet(internalProxiesCidr, "223.168.0.0", true);
+        doTestNetMaskSet(internalProxiesCidr, "223.168.0.123", true);
+        doTestNetMaskSet(internalProxiesCidr, "223.168.1.123", false);
+    }
+
+    @Test
+    public void testInternalProxiesCidrWithNull() throws Exception {
+        RemoteIpValve remoteIpValve = new RemoteIpValve();
+        try {
+            // Multiple invalid CIDR formats
+            remoteIpValve.setInternalProxies("192.168.0.0/33,2001:db8::/129");
+            Assert.fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passes - exception was thrown as expected
+            Assert.assertNotNull("Exception message should not be null", e.getMessage());
+        }
+    }
+
+    private void doTestNetMaskSet(NetMaskSet netMaskSet, String remoteIp, boolean expectedMatch) throws UnknownHostException {
+        boolean match = netMaskSet.contains(remoteIp);
+        Assert.assertEquals(remoteIp, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
     }
 }

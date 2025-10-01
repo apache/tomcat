@@ -105,6 +105,15 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.13 (markt)" rtext="in development">
+  <subsection name="Catalina">
+    <changelog>
+      <add>
+        Add CIDR support for the configuration of internal and trusted proxies
+        for the <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>.
+        (markt)
+      </add>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.12 (markt)" rtext="release in progress">
   <subsection name="Catalina">

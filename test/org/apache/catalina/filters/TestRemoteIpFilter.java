@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,6 +49,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.NetMaskSet;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -842,8 +844,16 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     }
 
     @Test
-    public void testInternalProxies() throws Exception {
+    public void testInternalProxiesRegex() throws Exception {
         RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        // Regex equivalent of default
+        remoteIpFilter.setInternalProxies("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
+                "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" + "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" +
+                "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.6[4-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+                "100\\.[7-9]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.1[0-1]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+                "100\\.12[0-7]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+                "172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
+                "0:0:0:0:0:0:0:1|::1|" + "fe[89ab]\\p{XDigit}:.*|" + "f[cd]\\p{XDigit}{2}+:.*");
         @SuppressWarnings("deprecation")
         Pattern internalProxiesPattern = Pattern.compile(remoteIpFilter.getInternalProxiesAsString());
 
@@ -887,5 +897,96 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     private void doTestPattern(Pattern pattern, String input, boolean expectedMatch) {
         boolean match = pattern.matcher(input).matches();
         Assert.assertEquals(input, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
+    }
+
+    @Test
+    public void testInvokeAllowedRemoteAddrWithNullRemoteIpHeaderCidr() throws Exception {
+        // PREPARE
+        FilterDef filterDef = new FilterDef();
+        filterDef.addInitParameter("internalProxies", "192.168.0.0/24");
+        filterDef.addInitParameter("trustedProxies", "203.0.113.0/24");
+        filterDef.addInitParameter("remoteIpHeader", "x-forwarded-for");
+        filterDef.addInitParameter("proxiesHeader", "x-forwarded-by");
+
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.setRemoteAddr("192.168.0.10");
+        request.setRemoteHost("remote-host-original-value");
+
+        // TEST
+        HttpServletRequest actualRequest = testRemoteIpFilter(filterDef, request).getRequest();
+
+        // VERIFY
+        String actualXForwardedFor = request.getHeader("x-forwarded-for");
+        Assert.assertNull("x-forwarded-for must be null", actualXForwardedFor);
+
+        String actualXForwardedBy = request.getHeader("x-forwarded-by");
+        Assert.assertNull("x-forwarded-by must be null", actualXForwardedBy);
+
+        String actualRemoteAddr = actualRequest.getRemoteAddr();
+        Assert.assertEquals("remoteAddr", "192.168.0.10", actualRemoteAddr);
+
+        String actualRemoteHost = actualRequest.getRemoteHost();
+        Assert.assertEquals("remoteHost", "remote-host-original-value", actualRemoteHost);
+    }
+
+    @Test
+    public void testInternalProxiesCidrWithNull() throws Exception {
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        try {
+            // Multiple invalid CIDR formats
+            remoteIpFilter.setInternalProxies("192.168.0.0/33,2001:db8::/129");
+            Assert.fail("Expected IllegalArgumentException was not thrown");
+        } catch (IllegalArgumentException e) {
+            // Test passes - exception was thrown as expected
+            Assert.assertNotNull("Exception message should not be null", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testInternalProxiesCidr() throws Exception {
+        RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
+        @SuppressWarnings("deprecation")
+        NetMaskSet netMaskSet = NetMaskSet.parse(remoteIpFilter.getInternalProxiesAsString());
+
+        doTestNetMaskSet(netMaskSet, "8.8.8.8", false);
+        doTestNetMaskSet(netMaskSet, "100.62.0.0", false);
+        doTestNetMaskSet(netMaskSet, "100.63.255.255", false);
+        doTestNetMaskSet(netMaskSet, "100.64.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.65.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.68.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.72.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.88.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.95.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.102.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.110.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.126.0.0", true);
+        doTestNetMaskSet(netMaskSet, "100.127.255.255", true);
+        doTestNetMaskSet(netMaskSet, "100.128.0.0", false);
+        doTestNetMaskSet(netMaskSet, "100.130.0.0", false);
+        // Bug 69600 - IPv6 RFC 4193 Unique Local IPv6 Unicast Addresses
+        doTestNetMaskSet(netMaskSet, "fe79:ffff:ffff:ffff:ffff:ffff:ffff:ffff", false);
+        doTestNetMaskSet(netMaskSet, "fe80:0000:0000:0000:0000:0000:0000:0000", true);
+        doTestNetMaskSet(netMaskSet, "fe80::", true);
+        doTestNetMaskSet(netMaskSet, "fe80:0000:0000:0000:0000:0000:0000:0001", true);
+        doTestNetMaskSet(netMaskSet, "fe80::1", true);
+        doTestNetMaskSet(netMaskSet, "fe80:1234:5678:9abc:def0:1234:5678:9abc", true);
+        doTestNetMaskSet(netMaskSet, "febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff", true);
+        doTestNetMaskSet(netMaskSet, "fec0:0000:0000:0000:0000:0000:0000:0000", false);
+        doTestNetMaskSet(netMaskSet, "fec0::", false);
+        // Bug 69600 - IPv6 RFC 4291 Link Local IPv6 Unicast Addresses
+        doTestNetMaskSet(netMaskSet, "fbff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", false);
+        doTestNetMaskSet(netMaskSet, "fc00:0000:0000:0000:0000:0000:0000:0000", true);
+        doTestNetMaskSet(netMaskSet, "fc00::", true);
+        doTestNetMaskSet(netMaskSet, "fc00:0000:0000:0000:0000:0000:0000:0001", true);
+        doTestNetMaskSet(netMaskSet, "fc00::1", true);
+        doTestNetMaskSet(netMaskSet, "fc00:1234:5678:9abc:def0:1234:5678:9abc", true);
+        doTestNetMaskSet(netMaskSet, "fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff", true);
+        doTestNetMaskSet(netMaskSet, "fe00:0000:0000:0000:0000:0000:0000:0000", false);
+        doTestNetMaskSet(netMaskSet, "fe00::", false);
+    }
+
+    private void doTestNetMaskSet(NetMaskSet netMaskSet, String remoteIp, boolean expectedMatch) throws UnknownHostException {
+        boolean match = netMaskSet.contains(remoteIp);
+        Assert.assertEquals(remoteIp, Boolean.valueOf(expectedMatch), Boolean.valueOf(match));
     }
 }

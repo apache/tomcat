@@ -554,7 +554,7 @@
                type="java.lang.String"/>
 
     <attribute name="internalProxies"
-               description="Regular expression that matches IP addresses of internal proxies"
+               description="Either a comma separated list of CIDR blocks or a single regular expression that matches the IP addresses of internal proxies."
                type="java.lang.String"/>
 
     <attribute name="portHeader"
@@ -587,7 +587,7 @@
                writeable="false"/>
 
     <attribute name="trustedProxies"
-               description="Regular expression that matches IP addresses of trusted proxies"
+               description="Either a comma separated list of CIDR blocks or a single regular expression that matches the IP addresses of trusted proxies."
                type="java.lang.String"/>
 
   </mbean>

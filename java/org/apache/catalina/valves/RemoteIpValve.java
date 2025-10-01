@@ -30,6 +30,7 @@ import org.apache.catalina.AccessLog;
 import org.apache.catalina.Globals;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
+import org.apache.catalina.util.NetMaskSet;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.StringUtils;
@@ -90,18 +91,12 @@ import org.apache.tomcat.util.http.parser.Host;
  * </tr>
  * <tr>
  * <td>internalProxies</td>
- * <td>Regular expression that matches the IP addresses of internal proxies. If they appear in the
- * <code>remoteIpHeader</code> value, they will be trusted and will not appear in the <code>proxiesHeader</code>
- * value</td>
+ * <td>Either a comma separated list of CIDR blocks or a single regular expression that matches the IP addresses of
+ * internal proxies. If they appear in the <code>remoteIpHeader</code> value, they will be trusted and will not appear
+ * in the <code>proxiesHeader</code> value</td>
  * <td>RemoteIPInternalProxy</td>
- * <td>Regular expression (in the syntax supported by {@link java.util.regex.Pattern java.util.regex})</td>
- * <td>10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|
- * 169\.254\.\d{1,3}\.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|
- * 100\.6[4-9]{1}\.\d{1,3}\.\d{1,3}|100\.[7-9]{1}\d{1}\.\d{1,3}\.\d{1,3}|
- * 100\.1[0-1]{1}\d{1}\.\d{1,3}\.\d{1,3}|100\.12[0-7]{1}\.\d{1,3}\.\d{1,3}|
- * 172\.1[6-9]{1}\.\d{1,3}\.\d{1,3}|172\.2[0-9]{1}\.\d{1,3}\.\d{1,3}| 172\.3[0-1]{1}\.\d{1,3}\.\d{1,3}|
- * 0:0:0:0:0:0:0:1|::1 <br>
- * By default, 10/8, 192.168/16, 169.254/16, 127/8, 100.64/10, 172.16/12, and ::1 are allowed.</td>
+ * <td>Comma separated list of CIDR blocks or a single regular expression {@link Pattern}</td>
+ * <td>10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16,100.64.0.0/10,127.0.0.0/8,::1/128,fe80::/10,fc00::/7</td>
  * </tr>
  * <tr>
  * <td>proxiesHeader</td>
@@ -113,10 +108,11 @@ import org.apache.tomcat.util.http.parser.Host;
  * </tr>
  * <tr>
  * <td>trustedProxies</td>
- * <td>Regular expression that matches the IP addresses of trusted proxies. If they appear in the
- * <code>remoteIpHeader</code> value, they will be trusted and will appear in the <code>proxiesHeader</code> value</td>
+ * <td>Either a comma separated list of CIDR blocks or a single regular expression that matches the IP addresses of
+ * internal proxies. If they appear in the <code>remoteIpHeader</code> value, they will be trusted and will appear in
+ * the <code>proxiesHeader</code> value</td>
  * <td>RemoteIPTrustedProxy</td>
- * <td>Regular expression (in the syntax supported by {@link java.util.regex.Pattern java.util.regex})</td>
+ * <td>Comma separated list of CIDR blocks or a single regular expression {@link Pattern}</td>
  * <td>&nbsp;</td>
  * </tr>
  * <tr>
@@ -154,14 +150,6 @@ import org.apache.tomcat.util.http.parser.Host;
  * <p>
  * This Valve may be attached to any Container, depending on the granularity of the filtering you wish to perform.
  * </p>
- * <p>
- * <strong>Regular expression vs. IP address blocks:</strong> <code>mod_remoteip</code> allows to use address blocks
- * (e.g. <code>192.168/16</code>) to configure <code>RemoteIPInternalProxy</code> and <code>RemoteIPTrustedProxy</code>
- * ; as Tomcat doesn't have a library similar to <a href=
- * "https://apr.apache.org/docs/apr/1.3/group__apr__network__io.html#gb74d21b8898b7c40bf7fd07ad3eb993d">apr_ipsubnet_test</a>,
- * <code>RemoteIpValve</code> uses regular expression to configure <code>internalProxies</code> and
- * <code>trustedProxies</code> in the same fashion as {@link RequestFilterValve} does.
- * </p>
  * <hr>
  * <p>
  * <strong>Sample with internal proxies</strong>
@@ -172,7 +160,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * <code>
  * &lt;Valve
  *   className="org.apache.catalina.valves.RemoteIpValve"
- *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
+ *   internalProxies="192.168.0.10/31"
  *   remoteIpHeader="x-forwarded-for"
  *   proxiesHeader="x-forwarded-by"
  *   protocolHeader="x-forwarded-proto"
@@ -234,7 +222,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * <code>
  * &lt;Valve
  *   className="org.apache.catalina.valves.RemoteIpValve"
- *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
+ *   internalProxies="192.168.0.10/31"
  *   remoteIpHeader="x-forwarded-for"
  *   proxiesHeader="x-forwarded-by"
  *   trustedProxies="proxy1|proxy2"
@@ -277,7 +265,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * <code>
  * &lt;Valve
  *   className="org.apache.catalina.valves.RemoteIpValve"
- *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
+ *   internalProxies="192.168.0.10/31"
  *   remoteIpHeader="x-forwarded-for"
  *   proxiesHeader="x-forwarded-by"
  *   trustedProxies="proxy1|proxy2"
@@ -321,7 +309,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * <code>
  * &lt;Valve
  *   className="org.apache.catalina.valves.RemoteIpValve"
- *   internalProxies="192\.168\.0\.10|192\.168\.0\.11"
+ *   internalProxies="192.168.0.10/31"
  *   remoteIpHeader="x-forwarded-for"
  *   proxiesHeader="x-forwarded-by"
  *   trustedProxies="proxy1|proxy2"
@@ -357,9 +345,7 @@ import org.apache.tomcat.util.http.parser.Host;
  * </p>
  */
 public class RemoteIpValve extends ValveBase {
-    /**
-     * Logger
-     */
+
     private static final Log log = LogFactory.getLog(RemoteIpValve.class);
 
     private String hostHeader = null;
@@ -381,15 +367,16 @@ public class RemoteIpValve extends ValveBase {
     private boolean changeLocalPort = false;
 
     /**
-     * @see #setInternalProxies(String)
+     * Regular expression pattern for internal proxies.
      */
-    private Pattern internalProxies = Pattern.compile("10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" +
-            "192\\.168\\.\\d{1,3}\\.\\d{1,3}|" + "169\\.254\\.\\d{1,3}\\.\\d{1,3}|" +
-            "127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.6[4-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
-            "100\\.[7-9]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" + "100\\.1[0-1]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|" +
-            "100\\.12[0-7]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
-            "172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|" + "172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|" +
-            "0:0:0:0:0:0:0:1|::1|" + "fe[89ab]\\p{XDigit}:.*|" + "f[cd]\\p{XDigit}{2}+:.*");
+    private Pattern internalProxiesRegex = null;
+
+    /**
+     * CIDR notation for internal proxies.
+     */
+    private NetMaskSet internalProxiesCidr =
+            NetMaskSet.parse("10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16,100.64.0.0/10,127.0.0.0/8," +
+                    "::1/128,fe80::/10,fc00::/7");
 
     /**
      * @see #setProtocolHeader(String)
@@ -417,9 +404,14 @@ public class RemoteIpValve extends ValveBase {
     private boolean requestAttributesEnabled = true;
 
     /**
-     * @see RemoteIpValve#setTrustedProxies(String)
+     * Regular expression notation for trusted proxies.
      */
-    private Pattern trustedProxies = null;
+    private Pattern trustedProxiesRegex = null;
+
+    /**
+     * CIDR notation for trusted proxies.
+     */
+    private NetMaskSet trustedProxiesCidr = null;
 
 
     /**
@@ -495,15 +487,18 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
-     * @see #setInternalProxies(String)
+     * Obtain the currently configured internal proxies.
      *
-     * @return Regular expression that defines the internal proxies
+     * @return The currently configured internal proxies.
      */
     public String getInternalProxies() {
-        if (internalProxies == null) {
+        if (internalProxiesCidr != null) {
+            return internalProxiesCidr.toString();
+        } else if (internalProxiesRegex != null) {
+            return internalProxiesRegex.toString();
+        } else {
             return null;
         }
-        return internalProxies.toString();
     }
 
     /**
@@ -552,15 +547,18 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
-     * @see #setTrustedProxies(String)
+     * Obtain the currently configured trusted proxies.
      *
-     * @return Regular expression that defines the trusted proxies
+     * @return The currently configured trusted proxies.
      */
     public String getTrustedProxies() {
-        if (trustedProxies == null) {
+        if (trustedProxiesCidr != null) {
+            return trustedProxiesCidr.toString();
+        } else if (trustedProxiesRegex != null) {
+            return trustedProxiesRegex.toString();
+        } else {
             return null;
         }
-        return trustedProxies.toString();
     }
 
     @Override
@@ -575,9 +573,10 @@ public class RemoteIpValve extends ValveBase {
         final int originalLocalPort = request.getLocalPort();
         final String originalProxiesHeader = request.getHeader(proxiesHeader);
         final String originalRemoteIpHeader = request.getHeader(remoteIpHeader);
-        boolean isInternal = internalProxies != null && internalProxies.matcher(originalRemoteAddr).matches();
 
-        if (isInternal || (trustedProxies != null && trustedProxies.matcher(originalRemoteAddr).matches())) {
+        boolean isInternal = isInternalProxy(originalRemoteAddr);
+
+        if (isInternal || isTrustedProxy(originalRemoteAddr)) {
             String remoteIp = null;
             Deque<String> proxiesHeaderValue = new ArrayDeque<>();
             StringBuilder concatRemoteIpHeaderValue = new StringBuilder();
@@ -599,9 +598,9 @@ public class RemoteIpValve extends ValveBase {
             for (idx = remoteIpHeaderValue.length - 1; idx >= 0; idx--) {
                 String currentRemoteIp = remoteIpHeaderValue[idx];
                 remoteIp = currentRemoteIp;
-                if (internalProxies != null && internalProxies.matcher(currentRemoteIp).matches()) {
+                if (isInternalProxy(currentRemoteIp)) {
                     // do nothing, internalProxies IPs are not appended to the
-                } else if (trustedProxies != null && trustedProxies.matcher(currentRemoteIp).matches()) {
+                } else if (isTrustedProxy(currentRemoteIp)) {
                     proxiesHeaderValue.addFirst(currentRemoteIp);
                 } else {
                     idx--; // decrement idx because break statement doesn't do it
@@ -746,6 +745,47 @@ public class RemoteIpValve extends ValveBase {
         }
     }
 
+    /**
+     * Checks if the given IP address is from an internal proxy.
+     *
+     * @param remoteIp The IP address to check
+     *
+     * @return {@code true} if the IP address is from an internal proxy, otherwise {@code false}
+     */
+    private boolean isInternalProxy(String remoteIp) {
+        if (internalProxiesRegex != null && internalProxiesRegex.matcher(remoteIp).matches()) {
+            return true;
+        }
+        return checkIsCidr(internalProxiesCidr, remoteIp);
+    }
+
+    /**
+     * Checks if the given IP address is from a trusted proxy.
+     *
+     * @param remoteIp The IP address to check
+     *
+     * @return {@code true} if the IP address is from a trusted proxy, otherwise {@code false}
+     */
+    private boolean isTrustedProxy(String remoteIp) {
+        if (trustedProxiesRegex != null && trustedProxiesRegex.matcher(remoteIp).matches()) {
+            return true;
+        }
+
+        return checkIsCidr(trustedProxiesCidr, remoteIp);
+    }
+
+    private boolean checkIsCidr(NetMaskSet netMaskSet, String remoteIp) {
+        if (netMaskSet == null) {
+            return false;
+        }
+        try {
+            return netMaskSet.contains(remoteIp);
+        } catch (UnknownHostException uhe) {
+            log.debug(sm.getString("remoteIpFilter.invalidRemoteAddress", remoteIp), uhe);
+        }
+        return false;
+    }
+
     /*
      * Considers the value to be secure if it exclusively holds forwards for {@link #protocolHeaderHttpsValue}.
      */
@@ -814,21 +854,20 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
-     * <p>
-     * Regular expression that defines the internal proxies.
-     * </p>
-     * <p>
-     * Default value :
-     * 10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|169\.254.\d{1,3}.\d{1,3}|127\.\d{1,3}\.\d{1,3}\.\d{1,3}|0:0:0:0:0:0:0:1
-     * </p>
+     * Set the internal proxies either as a comma separated list of CIDR blocks or a single regular expression.
      *
-     * @param internalProxies The proxy regular expression
+     * @param internalProxies The new internal proxies
      */
     public void setInternalProxies(String internalProxies) {
         if (internalProxies == null || internalProxies.isEmpty()) {
-            this.internalProxies = null;
+            this.internalProxiesRegex = null;
+            this.internalProxiesCidr = null;
+        } else if (internalProxies.indexOf('/') > 0) {
+            this.internalProxiesRegex = null;
+            this.internalProxiesCidr = NetMaskSet.parse(internalProxies);
         } else {
-            this.internalProxies = Pattern.compile(internalProxies);
+            this.internalProxiesRegex = Pattern.compile(internalProxies);
+            this.internalProxiesCidr = null;
         }
     }
 
@@ -921,20 +960,20 @@ public class RemoteIpValve extends ValveBase {
     }
 
     /**
-     * <p>
-     * Regular expression defining proxies that are trusted when they appear in the {@link #remoteIpHeader} header.
-     * </p>
-     * <p>
-     * Default value : empty list, no external proxy is trusted.
-     * </p>
+     * Set the trusted proxies either as a comma separated list of CIDR blocks or a single regular expression.
      *
-     * @param trustedProxies The regular expression
+     * @param trustedProxies The new trusted proxies
      */
     public void setTrustedProxies(String trustedProxies) {
         if (trustedProxies == null || trustedProxies.isEmpty()) {
-            this.trustedProxies = null;
+            this.trustedProxiesRegex = null;
+            this.trustedProxiesCidr = null;
+        } else if (trustedProxies.indexOf('/') > 0) {
+            this.trustedProxiesRegex = null;
+            this.trustedProxiesCidr = NetMaskSet.parse(trustedProxies);
         } else {
-            this.trustedProxies = Pattern.compile(trustedProxies);
+            this.trustedProxiesCidr = null;
+            this.trustedProxiesRegex = Pattern.compile(trustedProxies);
         }
     }
 }
