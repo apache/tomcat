@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.GenericFilter;
@@ -110,11 +109,11 @@ import org.apache.tomcat.util.res.StringManager;
  * </tr>
  * <tr>
  * <td>internalProxies</td>
- * <td>Either a comma separated list of CIDR blocks or a single regular expression that matches the IP addresses of
- * internal proxies. If they appear in the <code>remoteIpHeader</code> value, they will be trusted and will not appear
- * in the <code>proxiesHeader</code> value</td>
+ * <td>A comma separated list of CIDR blocks that matches the IP addresses of the internal proxies. If they appear in
+ * the <code>remoteIpHeader</code> value, they will be trusted and will not appear in the <code>proxiesHeader</code>
+ * value</td>
  * <td>RemoteIPInternalProxy</td>
- * <td>Comma separated list of CIDR blocks or a single regular expression {@link Pattern}</td>
+ * <td>Comma separated list of CIDR blocks</td>
  * <td>10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16,100.64.0.0/10,127.0.0.0/8,::1/128,fe80::/10,fc00::/7</td>
  * </tr>
  * <tr>
@@ -127,11 +126,11 @@ import org.apache.tomcat.util.res.StringManager;
  * </tr>
  * <tr>
  * <td>trustedProxies</td>
- * <td>Either a comma separated list of CIDR blocks or a single regular expression that matches the IP addresses of
- * internal proxies. If they appear in the <code>remoteIpHeader</code> value, they will be trusted and will appear in
- * the <code>proxiesHeader</code> value</td>
+ * <td>A comma separated list of CIDR blocks that matches the IP addresses of the internal proxies. If they appear in
+ * the <code>remoteIpHeader</code> value, they will be trusted and will appear in the <code>proxiesHeader</code> value
+ * </td>
  * <td>RemoteIPTrustedProxy</td>
- * <td>Comma separated list of CIDR blocks or a single regular expression {@link Pattern}</td>
+ * <td>Comma separated list of CIDR blocks</td>
  * <td>&nbsp;</td>
  * </tr>
  * <tr>
@@ -670,31 +669,14 @@ public class RemoteIpFilter extends GenericFilter {
 
     protected static final String ENABLE_LOOKUPS_PARAMETER = "enableLookups";
 
-    /**
-     * @see #setHttpServerPort(int)
-     */
     private int httpServerPort = 80;
 
-    /**
-     * @see #setHttpsServerPort(int)
-     */
     private int httpsServerPort = 443;
 
-    /**
-     * Regular expression pattern for internal proxies.
-     */
-    private Pattern internalProxiesRegex = null;
-
-    /**
-     * CIDR notation for internal proxies.
-     */
-    private NetMaskSet internalProxiesCidr =
+    private NetMaskSet internalProxies =
             NetMaskSet.parse("10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16,100.64.0.0/10,127.0.0.0/8," +
                     "::1/128,fe80::/10,fc00::/7");
 
-    /**
-     * @see #setProtocolHeader(String)
-     */
     private String protocolHeader = "X-Forwarded-Proto";
 
     private String protocolHeaderHttpsValue = "https";
@@ -707,33 +689,16 @@ public class RemoteIpFilter extends GenericFilter {
 
     private boolean changeLocalPort = false;
 
-    /**
-     * @see #setProxiesHeader(String)
-     */
     private String proxiesHeader = "X-Forwarded-By";
 
-    /**
-     * @see #setRemoteIpHeader(String)
-     */
     private String remoteIpHeader = "X-Forwarded-For";
 
-    /**
-     * @see #setRequestAttributesEnabled(boolean)
-     */
     private boolean requestAttributesEnabled = true;
 
-    /**
-     * Regular expression notation for trusted proxies.
-     */
-    private Pattern trustedProxiesRegex = null;
-
-    /**
-     * CIDR notation for trusted proxies.
-     */
-    private NetMaskSet trustedProxiesCidr = null;
-
+    private NetMaskSet trustedProxies = null;
 
     private boolean enableLookups;
+
 
     public void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -889,10 +854,7 @@ public class RemoteIpFilter extends GenericFilter {
      * @return {@code true} if the IP address is from an internal proxy, otherwise {@code false}
      */
     private boolean isInternalProxy(String remoteIp) {
-        if (internalProxiesRegex != null && internalProxiesRegex.matcher(remoteIp).matches()) {
-            return true;
-        }
-        return checkIsCidr(internalProxiesCidr, remoteIp);
+        return checkIsCidr(internalProxies, remoteIp);
     }
 
     /**
@@ -903,11 +865,7 @@ public class RemoteIpFilter extends GenericFilter {
      * @return {@code true} if the IP address is from a trusted proxy, otherwise {@code false}
      */
     private boolean isTrustedProxy(String remoteIp) {
-        if (trustedProxiesRegex != null && trustedProxiesRegex.matcher(remoteIp).matches()) {
-            return true;
-        }
-
-        return checkIsCidr(trustedProxiesCidr, remoteIp);
+        return checkIsCidr(trustedProxies, remoteIp);
     }
 
     private boolean checkIsCidr(NetMaskSet netMaskSet, String remoteIp) {
@@ -991,10 +949,8 @@ public class RemoteIpFilter extends GenericFilter {
      * @return The currently configured internal proxies.
      */
     public String getInternalProxies() {
-        if (internalProxiesCidr != null) {
-            return internalProxiesCidr.toString();
-        } else if (internalProxiesRegex != null) {
-            return internalProxiesRegex.toString();
+        if (internalProxies != null) {
+            return internalProxies.toString();
         } else {
             return null;
         }
@@ -1035,10 +991,8 @@ public class RemoteIpFilter extends GenericFilter {
      * @return The currently configured trusted proxies.
      */
     public String getTrustedProxies() {
-        if (trustedProxiesCidr != null) {
-            return trustedProxiesCidr.toString();
-        } else if (trustedProxiesRegex != null) {
-            return trustedProxiesRegex.toString();
+        if (trustedProxies != null) {
+            return trustedProxies.toString();
         } else {
             return null;
         }
@@ -1175,20 +1129,15 @@ public class RemoteIpFilter extends GenericFilter {
     }
 
     /**
-     * Set the internal proxies either as a comma separated list of CIDR blocks or a single regular expression.
+     * Set the internal proxies as a comma separated list of CIDR blocks.
      *
      * @param internalProxies The new internal proxies
      */
     public void setInternalProxies(String internalProxies) {
         if (internalProxies == null || internalProxies.isEmpty()) {
-            this.internalProxiesRegex = null;
-            this.internalProxiesCidr = null;
-        } else if (internalProxies.indexOf('/') > 0) {
-            this.internalProxiesRegex = null;
-            this.internalProxiesCidr = NetMaskSet.parse(internalProxies);
+            this.internalProxies = null;
         } else {
-            this.internalProxiesRegex = Pattern.compile(internalProxies);
-            this.internalProxiesCidr = null;
+            this.internalProxies = NetMaskSet.parse(internalProxies);
         }
     }
 
@@ -1310,20 +1259,15 @@ public class RemoteIpFilter extends GenericFilter {
     }
 
     /**
-     * Set the trusted proxies either as a comma separated list of CIDR blocks or a single regular expression.
+     * Set the trusted proxies as a comma separated list of CIDR blocks.
      *
      * @param trustedProxies The new trusted proxies
      */
     public void setTrustedProxies(String trustedProxies) {
         if (trustedProxies == null || trustedProxies.isEmpty()) {
-            this.trustedProxiesRegex = null;
-            this.trustedProxiesCidr = null;
-        } else if (trustedProxies.indexOf('/') > 0) {
-            this.trustedProxiesRegex = null;
-            this.trustedProxiesCidr = NetMaskSet.parse(trustedProxies);
+            this.trustedProxies = null;
         } else {
-            this.trustedProxiesCidr = null;
-            this.trustedProxiesRegex = Pattern.compile(trustedProxies);
+            this.trustedProxies = NetMaskSet.parse(trustedProxies);
         }
     }
 

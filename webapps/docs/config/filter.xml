@@ -1553,7 +1553,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        </init-param>
        <init-param>
          <param-name>trustedProxies</param-name>
-         <param-value>proxy1|proxy2</param-value>
+         <param-value>200.0.0.1,200.0.0.2</param-value>
        </init-param>
      </filter>
 
@@ -1576,18 +1576,18 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-for'<code>]</code> </td>
-        <td> 140.211.11.130, proxy1, proxy2 </td>
+        <td> 140.211.11.130, 200.0.0.1, 200.0.0.2 </td>
         <td> null </td>
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-by'<code>]</code> </td>
         <td> null </td>
-        <td> proxy1, proxy2 </td>
+        <td> 200.0.0.1, 200.0.0.2 </td>
       </tr>
     </table>
 
     <p>
-    Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that
+    Note : <code>200.0.0.1</code> and <code>200.0.0.2</code> are both trusted proxies that
     come in <code>x-forwarded-for</code> header, they both are migrated in
     <code>x-forwarded-by</code> header. <code>x-forwarded-for</code> is <code>null</code>
     because all the proxies are trusted or internal.
@@ -1613,7 +1613,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        </init-param>
        <init-param>
          <param-name>trustedProxies</param-name>
-         <param-value>proxy1|proxy2</param-value>
+         <param-value>200.0.0.1,200.0.0.2</param-value>
        </init-param>
      </filter>
 
@@ -1636,18 +1636,18 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-for'<code>]</code> </td>
-        <td> 140.211.11.130, proxy1, proxy2, 192.168.0.10 </td>
+        <td> 140.211.11.130, 200.0.0.1, 200.0.0.2, 192.168.0.10 </td>
         <td> null </td>
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-by'<code>]</code> </td>
         <td> null </td>
-        <td> proxy1, proxy2 </td>
+        <td> 200.0.0.1, 200.0.0.2 </td>
       </tr>
     </table>
 
     <p>
-    Note : <code>proxy1</code> and <code>proxy2</code> are both trusted proxies that
+    Note : <code>200.0.0.1</code> and <code>200.0.0.2</code> are both trusted proxies that
     come in <code>x-forwarded-for</code> header, they both are migrated in
     <code>x-forwarded-by</code> header. As <code>192.168.0.10</code> is an internal
     proxy, it does not appear in <code>x-forwarded-by</code>.
@@ -1676,7 +1676,7 @@ FINE: Request "/docs/config/manager.html" with response status "200"
        </init-param>
        <init-param>
          <param-name>trustedProxies</param-name>
-         <param-value>proxy1|proxy2</param-value>
+         <param-value>200.0.0.1,200.0.0.2</param-value>
        </init-param>
      </filter>
 
@@ -1695,27 +1695,27 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       <tr>
         <td> request.remoteAddr </td>
         <td> 192.168.0.10 </td>
-        <td> untrusted-proxy </td>
+        <td> 200.99.99.99 </td>
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-for'<code>]</code> </td>
-        <td> 140.211.11.130, untrusted-proxy, proxy1 </td>
+        <td> 140.211.11.130, 200.99.99.99, 200.0.0.1 </td>
         <td> 140.211.11.130 </td>
       </tr>
       <tr>
         <td> request.header<code>[</code>'x-forwarded-by'<code>]</code> </td>
         <td> null </td>
-        <td> proxy1 </td>
+        <td> 200.0.0.1 </td>
       </tr>
     </table>
 
     <p>
-    Note : <code>x-forwarded-by</code> holds the trusted proxy <code>proxy1</code>.
+    Note : <code>x-forwarded-by</code> holds the trusted proxy <code>200.0.0.1</code>.
     <code>x-forwarded-by</code> holds <code>140.211.11.130</code> because
-    <code>untrusted-proxy</code> is not trusted and thus, we cannot trust that
-    <code>untrusted-proxy</code> is the actual remote ip.
-    <code>request.remoteAddr</code> is <code>untrusted-proxy</code> that is an IP
-    verified by <code>proxy1</code>.
+    <code>200.99.99.99</code> is not trusted and thus, we cannot trust that
+    <code>200.99.99.99</code> is the actual remote ip.
+    <code>request.remoteAddr</code> is <code>200.99.99.99</code> that is an IP
+    verified by <code>200.0.0.1</code>.
     </p>
   </subsection>
 
@@ -1739,12 +1739,11 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </attribute>
 
       <attribute name="internalProxies" required="false">
-        <p>Either a comma separated list of CIDR blocks or a single regular
-        expression that a proxy&apos;s IP address must match to be considered an
-        internal proxy. Internal proxies that appear in the
-        <strong>remoteIpHeader</strong> will be trusted and will not appear in
-        the <strong>proxiesHeader</strong> value. If not specified the default
-        value of <code>10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16,
+        <p>A comma separated list of CIDR blocks that a proxy&apos;s IP address
+        must match to be considered an internal proxy. Internal proxies that
+        appear in the <strong>remoteIpHeader</strong> will be trusted and will
+        not appear in the <strong>proxiesHeader</strong> value. If not specified
+        the default value of <code>10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16,
         169.254.0.0/16, 100.64.0.0/10, 127.0.0.0/8, ::1/128, fe80::/10, fc00::/7
         </code> will be used.</p>
       </attribute>
@@ -1766,12 +1765,11 @@ FINE: Request "/docs/config/manager.html" with response status "200"
       </attribute>
 
       <attribute name="trustedProxies" required="false">
-        <p>Either a comma separated list of CIDR blocks or a single regular
-        expression that a proxy&apos;s IP address must match to be considered a
-        trusted proxy. Trusted proxies that appear in the
-        <strong>remoteIpHeader</strong> will be trusted and will appear in the
-        <strong>proxiesHeader</strong> value. If not specified, no proxies will
-        be trusted.</p>
+        <p>A comma separated list of CIDR blocks that a proxy&apos;s IP address
+        must match to be considered a trusted proxy. Trusted proxies that appear
+        in the <strong>remoteIpHeader</strong> will be trusted and will appear
+        in the <strong>proxiesHeader</strong> value. If not specified, no
+        proxies will be trusted.</p>
       </attribute>
 
       <attribute name="protocolHeader" required="false">
