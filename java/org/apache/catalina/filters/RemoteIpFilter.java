@@ -948,28 +948,11 @@ public class RemoteIpFilter extends GenericFilter {
     }
 
     /**
-     * Obtain the currently configured regular expression Pattern for internal proxies.
-     *
-     * @return The currently configured regular expression Pattern for internal proxies
-     *
-     * @deprecated The implementation of this method will be replaced with the implementation of
-     *                 {@link #getInternalProxiesAsString()} in Tomcat 12 onwards with the return type changing to
-     *                 {@code String}
-     */
-    @Deprecated
-    public Pattern getInternalProxies() {
-        return internalProxies;
-    }
-
-    /**
      * Obtain the currently configured internal proxies.
      *
      * @return The currently configured internal proxies.
-     *
-     * @deprecated This method will be renamed to {@code getInternalProxies()} as of Tomcat 12
      */
-    @Deprecated
-    public String getInternalProxiesAsString() {
+    public String getInternalProxies() {
         if (internalProxies == null) {
             return null;
         }
@@ -1006,28 +989,11 @@ public class RemoteIpFilter extends GenericFilter {
     }
 
     /**
-     * Obtain the currently configured regular expression Pattern for trusted proxies.
-     *
-     * @return The currently configured regular expression Pattern for trusted proxies
-     *
-     * @deprecated The implementation of this method will be replaced with the implementation of
-     *                 {@link #getTrustedProxiesAsString()} in Tomcat 12 onwards with the return type changing to
-     *                 {@code String}
-     */
-    @Deprecated
-    public Pattern getTrustedProxies() {
-        return trustedProxies;
-    }
-
-    /**
      * Obtain the currently configured trusted proxies.
      *
      * @return The currently configured trusted proxies.
-     *
-     * @deprecated This method will be renamed to {@code getInternalProxies()} as of Tomcat 12
      */
-    @Deprecated
-    public String getTrustedProxiesAsString() {
+    public String getTrustedProxies() {
         if (trustedProxies == null) {
             return null;
         }
