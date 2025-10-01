@@ -844,7 +844,8 @@ public class TestRemoteIpFilter extends TomcatBaseTest {
     @Test
     public void testInternalProxies() throws Exception {
         RemoteIpFilter remoteIpFilter = new RemoteIpFilter();
-        Pattern internalProxiesPattern = remoteIpFilter.getInternalProxies();
+        @SuppressWarnings("deprecation")
+        Pattern internalProxiesPattern = Pattern.compile(remoteIpFilter.getInternalProxiesAsString());
 
         doTestPattern(internalProxiesPattern, "8.8.8.8", false);
         doTestPattern(internalProxiesPattern, "100.62.0.0", false);
