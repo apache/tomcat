@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 
 /**
@@ -33,6 +34,8 @@ import org.apache.tomcat.util.buf.StringUtils;
  * NetMasks, making it easy to create Allow and Deny lists of CIDR networks and hosts.
  */
 public class NetMaskSet {
+
+    private static final StringManager sm = StringManager.getManager(NetMaskSet.class);
 
     private final Set<NetMask> netmasks = new HashSet<>();
 
@@ -159,4 +162,19 @@ public class NetMaskSet {
         return result;
     }
 
+
+    public static NetMaskSet parse(String input) {
+        NetMaskSet result = new NetMaskSet();
+
+        List<String> errors = result.addAll(input);
+        if (!errors.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (String error : errors) {
+                sb.append(error).append("; ");
+            }
+            throw new IllegalArgumentException(sm.getString("netmaskSet.invalidNetMask", sb.toString()));
+        }
+
+        return result;
+    }
 }
