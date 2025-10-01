@@ -109,7 +109,7 @@
     <changelog>
       <scode>
         This release contains all of the changes up to and including those in
-        Apache Tomcat 11.0.11 plus the additional changes listed below. (markt)
+        Apache Tomcat 11.0.12 plus the additional changes listed below. (markt)
       </scode>
       <update>
         The minimum Java version has been updated to Java 21. (markt)
@@ -172,34 +172,6 @@
         performance. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Change the digest used to calculate strong ETags (if enabled) for the
-        default Servlet from SHA-1 to SHA-256 to align with the recommendation
-        in RFC 9110 that hash functions used to generate strong ETags should be
-        collision resistant. (markt)
-      </update>
-      <fix>
-        HTTP methods are case-sensitive so always use case sensitive comparisons
-        when comparing HTTP methods. (markt)
-      </fix>
-      <fix>
-        <bug>69814</bug>: Ensure that <code>HttpSession.isNew()</code> returns
-        <code>false</code> once the client has joined the session. (markt)
-      </fix>
-      <fix>
-        Further performance improvements for ParameterMap. (jengebr/markt)
-      </fix>
-      <scode>
-        Refactor access log time stamps to be based on the <code>Instant</code>
-        request processing starts. (markt)
-      </scode>
-      <fix>
-        Fix a case-sensitivity issue in the trailer header allow list. (markt)
-      </fix>
-      <fix>
-        Be proactive in cleaning up temporary files after a failed multi-part
-        upload rather than waiting for GC to do it. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
@@ -229,14 +201,6 @@
         (remm)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <add>
-        Optimize the conversion of HTTP method from byte form to String form.
-        (markt)
-      </add>
-      <fix>
-        Store HTTP request headers using the original case for the header name
-        rather than forcing it to lower case. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
@@ -276,10 +240,6 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Prevent the channel configuration (sender, receiver, membership service)
-        from being changed unless the channel is fully stopped. (markt)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
@@ -310,13 +270,6 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <fix>
-        Documentation. Clarify the purpose of the <code>maxPostSize</code>
-        attribute of the <code>Connector</code> element. (markt)
-      </fix>
-      <fix>
-        Avoid NPE in manager webapp displaying certificate information. (remm)
-      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">
@@ -325,27 +278,6 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
-      <update>
-        Update Byte Buddy to 1.17.7. (markt)
-      </update>
-      <update>
-        Update Checkstyle to 11.1.0. (markt)
-      </update>
-      <update>
-        Update SpotBugs to 4.9.6. (markt)
-      </update>
-      <update>
-        Update Jsign to 7.2. (markt)
-      </update>
-      <add>
-        Improvements to Russian translations provided by usmazat. (markt)
-      </add>
-      <add>
-        Improvements to French translations. (remm)
-      </add>
-      <add>
-        Improvements to Japanese translations provided by tak7iji. (markt)
-      </add>
     </changelog>
   </subsection>
 </section>
