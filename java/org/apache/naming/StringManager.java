@@ -37,7 +37,6 @@ import java.util.ResourceBundle;
  * Please see the documentation for java.util.ResourceBundle for more information.
  *
  * @author James Todd [gonzo@eng.sun.com]
- * @author Mel Martinez [mmartinez@g1440.com]
  *
  * @see java.util.ResourceBundle
  */
