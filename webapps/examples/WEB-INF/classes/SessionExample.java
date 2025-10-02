@@ -33,10 +33,7 @@ import util.HTMLFilter;
 
 /**
  * Example servlet showing request headers
- *
- * @author James Duncan Davidson &lt;duncan@eng.sun.com>
  */
-
 public class SessionExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
