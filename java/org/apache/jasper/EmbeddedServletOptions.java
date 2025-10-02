@@ -37,7 +37,6 @@ import org.apache.juli.logging.LogFactory;
  * A class to hold all init parameters specific to the JSP engine.
  *
  * @author Anil K. Vijendran
- * @author Hans Bergsten
  */
 public final class EmbeddedServletOptions implements Options {
 
