@@ -25,7 +25,6 @@ import javax.servlet.jsp.el.FunctionMapper;
  * Maps EL functions to their Java method counterparts. Keeps the actual Method objects protected so that JSP pages
  * can't indirectly do reflection.
  *
- * @author Mark Roth
  * @author Kin-man Chung
  */
 @SuppressWarnings("deprecation") // Have to support old JSP EL API

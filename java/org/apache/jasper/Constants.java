@@ -25,7 +25,6 @@ import java.util.List;
  *
  * @author Anil K. Vijendran
  * @author Shawn Bayern
- * @author Mark Roth
  */
 public class Constants {
 

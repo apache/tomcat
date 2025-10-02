@@ -46,9 +46,7 @@ import org.xml.sax.Attributes;
  *
  * @author Kin-man Chung
  * @author Shawn Bayern
- * @author Mark Roth
  */
-
 public abstract class Node implements TagConstants {
 
     private static final VariableInfo[] ZERO_VARIABLE_INFO = {};

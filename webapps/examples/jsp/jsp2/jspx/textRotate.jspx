@@ -17,9 +17,8 @@
 -->
 <!--
   - This example is based off the textRotate.svg example that comes
-  - with Apache Batik.  The original example was written by Bill Haneman.
-  - This version by Mark Roth.
-  -->
+  - with Apache Batik.
+-->
 <svg xmlns="http://www.w3.org/2000/svg"
      width="450" height="500" viewBox="0 0 450 500"
      xmlns:c="http://java.sun.com/jsp/jstl/core"

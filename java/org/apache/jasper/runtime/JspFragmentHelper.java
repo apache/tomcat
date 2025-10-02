@@ -27,8 +27,6 @@ import javax.servlet.jsp.tagext.JspTag;
  * JspFragments in a single page.
  * <p>
  * The class also provides various utility methods for JspFragment implementations.
- *
- * @author Mark Roth
  */
 public abstract class JspFragmentHelper extends JspFragment {
 
