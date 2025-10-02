@@ -23,10 +23,6 @@ import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.Validation;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstDotSuffix extends SimpleNode {
     public AstDotSuffix(int id) {
         super(id);

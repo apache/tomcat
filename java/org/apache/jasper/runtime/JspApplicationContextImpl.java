@@ -33,9 +33,7 @@ import org.apache.jasper.el.ELContextImpl;
 import org.apache.jasper.el.JasperELResolver;
 
 /**
- * Implementation of JspApplicationContext
- *
- * @author Jacob Hookom
+ * Implementation of JspApplicationContext.
  */
 public class JspApplicationContextImpl implements JspApplicationContext {
 

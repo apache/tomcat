@@ -16,9 +16,6 @@
  */
 package jakarta.el;
 
-/**
- * @author Jacob Hookom [jacob/hookom.net]
- */
 public abstract class ELResolver {
 
     /**

@@ -60,7 +60,6 @@ import org.apache.jasper.compiler.Localizer;
  *
  * @author Kin-man Chung
  * @author Jan Luehe
- * @author Jacob Hookom
  */
 public class JspContextWrapper extends PageContext {
 

@@ -21,10 +21,6 @@ import jakarta.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstDeferredExpression extends SimpleNode {
     public AstDeferredExpression(int id) {
         super(id);

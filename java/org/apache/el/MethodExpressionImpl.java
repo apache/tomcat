@@ -63,8 +63,6 @@ import org.apache.el.util.ReflectionUtil;
  * @see jakarta.el.Expression
  * @see jakarta.el.ExpressionFactory
  * @see jakarta.el.MethodExpression
- *
- * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class MethodExpressionImpl extends MethodExpression implements Externalizable {
 
