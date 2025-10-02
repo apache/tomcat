@@ -26,8 +26,6 @@ package org.apache.catalina.session;
  * </ul>
  * If used with a load-balancer, the load-balancer must be configured to use sticky sessions for this manager to operate
  * correctly.
- *
- * @author Kief Morris (kief@kief.com)
  */
 public final class PersistentManager extends PersistentManagerBase {
 
