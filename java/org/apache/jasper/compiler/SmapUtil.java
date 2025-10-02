@@ -43,7 +43,6 @@ import org.apache.juli.logging.LogFactory;
  * @author Jayson Falkner
  * @author Shawn Bayern
  * @author Robert Field (inner SDEInstaller class)
- * @author Mark Roth
  * @author Kin-man Chung
  */
 public class SmapUtil {
