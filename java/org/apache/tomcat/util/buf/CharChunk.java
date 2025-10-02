@@ -21,8 +21,6 @@ import java.io.IOException;
 /**
  * Utilities to manipulate char chunks. While String is the easiest way to manipulate chars ( search, substrings, etc),
  * it is known to not be the most efficient solution - Strings are designed as immutable and secure objects.
- *
- * @author dac@sun.com
  */
 public final class CharChunk extends AbstractChunk implements CharSequence {
 

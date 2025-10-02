@@ -48,8 +48,6 @@ import java.nio.charset.StandardCharsets;
  * <p>
  * For HTTP, it is not very clear how the encoding of RequestURI and mime values can be determined, but it is a great
  * advantage to be able to parse the request without converting to string.
- *
- * @author dac@sun.com
  */
 public final class ByteChunk extends AbstractChunk {
 
