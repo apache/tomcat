@@ -47,7 +47,6 @@ import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
  * structure. Some of the instance variables are set at different points. Most of the path-related stuff is here -
  * mangling names, versions, dirs, loading resources and dealing with uris.
  *
- * @author Anil K. Vijendran
  * @author Kin-man Chung
  */
 public class JspCompilationContext {

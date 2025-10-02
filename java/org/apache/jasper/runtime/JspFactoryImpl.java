@@ -31,8 +31,6 @@ import org.apache.jasper.Constants;
 
 /**
  * Implementation of JspFactory.
- *
- * @author Anil K. Vijendran
  */
 public class JspFactoryImpl extends JspFactory {
 
