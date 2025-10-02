@@ -38,7 +38,6 @@ import org.xml.sax.InputSource;
  * @author Mandar Raje.
  * @author Rajiv Mordani.
  * @author Danno Ferrin
- * @author Pierre Delisle
  * @author Shawn Bayern
  */
 public class JspUtil {

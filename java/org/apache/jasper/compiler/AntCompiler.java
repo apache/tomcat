@@ -40,7 +40,6 @@ import org.apache.tools.ant.types.PatternSet;
  *
  * @author Anil K. Vijendran
  * @author Mandar Raje
- * @author Pierre Delisle
  * @author Kin-man Chung
  */
 public class AntCompiler extends Compiler {

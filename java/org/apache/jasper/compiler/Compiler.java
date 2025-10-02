@@ -44,7 +44,6 @@ import org.apache.tomcat.util.scan.JarFactory;
  *
  * @author Anil K. Vijendran
  * @author Mandar Raje
- * @author Pierre Delisle
  * @author Kin-man Chung
  */
 public abstract class Compiler {

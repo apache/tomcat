@@ -58,7 +58,6 @@ import org.apache.tomcat.util.descriptor.tld.ValidatorXml;
  *
  * @author Anil K. Vijendran
  * @author Mandar Raje
- * @author Pierre Delisle
  * @author Kin-man Chung
  */
 class TagLibraryInfoImpl extends TagLibraryInfo implements TagConstants {
