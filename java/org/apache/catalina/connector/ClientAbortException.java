@@ -20,8 +20,6 @@ import org.apache.coyote.BadRequestException;
 
 /**
  * Extend IOException to identify it as being caused by an abort of a request by a remote client.
- *
- * @author Glenn L. Nielsen
  */
 public final class ClientAbortException extends BadRequestException {
 

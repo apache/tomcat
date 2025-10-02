@@ -40,7 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Expand out a WAR in a Host's appBase.
- * @author Glenn L. Nielsen
  */
 public class ExpandWar {
 

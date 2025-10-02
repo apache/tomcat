@@ -25,7 +25,6 @@
     <properties>
         <author email="leslie.hughes@rubus.com">Les Hughes</author>
         <author email="david-tomcat@haraburda.com">David Haraburda</author>
-        <author>Glenn Nielsen</author>
         <author email="yoavs@apache.org">Yoav Shapira</author>
         <title>JNDI Datasource How-To</title>
     </properties>
