@@ -51,7 +51,6 @@ import org.apache.juli.logging.LogFactory;
  *  <li>jmxEnabled - true of false, whether to register the pool with JMX.</li>
  *  <li>fairQueue - true of false, whether the pool should sacrifice a little bit of performance for true fairness.</li>
  * </ol>
- * @author Dirk Verbeeck
  */
 public class DataSourceFactory implements ObjectFactory {
     private static final Log log = LogFactory.getLog(DataSourceFactory.class);
