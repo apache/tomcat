@@ -35,8 +35,6 @@ import org.apache.catalina.Session;
  * <code>AuthenticatorBase</code> subclasses that need it in order to perform reauthentications when SingleSignOn is in
  * use.
  *
- * @author B Stansberry, based on work by Craig R. McClanahan
- *
  * @see SingleSignOn
  * @see AuthenticatorBase#reauthenticateFromSSO
  */
