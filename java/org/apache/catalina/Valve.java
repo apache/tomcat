@@ -30,7 +30,6 @@ import org.apache.catalina.connector.Response;
  * <p>
  * <b>HISTORICAL NOTE</b>: The "Valve" name was assigned to this concept because a valve is what you use in a real world
  * pipeline to control and/or modify flows through it.
- * @author Gunnar Rjnning
  */
 public interface Valve {
 
