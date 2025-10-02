@@ -22,7 +22,6 @@ import org.apache.catalina.connector.Request;
 
 /**
  * General purpose request parsing and encoding utility methods.
- * @author Tim Tye
  */
 public final class RequestUtil {
 
