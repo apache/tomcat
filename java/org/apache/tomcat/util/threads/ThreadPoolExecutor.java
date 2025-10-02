@@ -214,8 +214,6 @@ import org.apache.tomcat.util.res.StringManager;
  * }}</pre>
  *
  * @since 1.5
- *
- * @author Doug Lea
  */
 public class ThreadPoolExecutor extends AbstractExecutorService {
 
