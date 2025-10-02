@@ -33,8 +33,6 @@ import java.util.Locale;
  * <p>
  * The object can represent a byte[], a char[], or a (sub) String. All operations can be made in case-sensitive mode or
  * not.
- *
- * @author dac@eng.sun.com
  */
 public final class MessageBytes implements Cloneable, Serializable {
 
