@@ -1198,6 +1198,8 @@
         value of <code>10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16,
         169.254.0.0/16, 100.64.0.0/10, 127.0.0.0/8, ::1/128, fe80::/10, fc00::/7
         </code> will be used.</p>
+        <p><strong>Note:</strong> Support for configuration via regular
+        expressions is deprecated and will be removed in Tomcat 12.</p>
       </attribute>
 
       <attribute name="proxiesHeader" required="false">
@@ -1223,6 +1225,8 @@
         <strong>remoteIpHeader</strong> will be trusted and will appear in the
         <strong>proxiesHeader</strong> value. If not specified, no proxies will
         be trusted.</p>
+        <p><strong>Note:</strong> Support for configuration via regular
+        expressions is deprecated and will be removed in Tomcat 12.</p>
       </attribute>
 
       <attribute name="protocolHeader" required="false">

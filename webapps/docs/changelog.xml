@@ -110,7 +110,8 @@
       <add>
         Add CIDR support for the configuration of internal and trusted proxies
         for the <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>.
-        (markt)
+        Configuration via regular expression has been deprecated and will be
+        removed in Tomcat 12. (markt)
       </add>
     </changelog>
   </subsection>
