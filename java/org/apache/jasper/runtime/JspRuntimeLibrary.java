@@ -48,7 +48,6 @@ import org.apache.tomcat.InstanceManager;
  * Bunch of util methods that are used by code generated for useBean, getProperty and setProperty.
  *
  * @author Mandar Raje
- * @author Shawn Bayern
  */
 public class JspRuntimeLibrary {
 

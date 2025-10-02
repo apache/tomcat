@@ -20,8 +20,6 @@ import java.util.List;
 
 /**
  * Some constants and other global data that are used by the compiler and the runtime.
- *
- * @author Shawn Bayern
  */
 public class Constants {
 
