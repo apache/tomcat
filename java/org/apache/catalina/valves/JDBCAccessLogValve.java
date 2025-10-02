@@ -96,8 +96,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <code>remoteHost, user, timeStamp, query, status, bytes</code>
  * </p>
  *
- * @author Andre de Jesus
- *
  * @deprecated Non scalable design, and not documented. Will be removed in Tomcat 12.
  */
 @Deprecated
