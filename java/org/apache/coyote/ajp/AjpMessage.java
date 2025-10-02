@@ -31,7 +31,6 @@ import org.apache.tomcat.util.res.StringManager;
  * both incoming and outgoing packets.
  *
  * @author Henri Gomez
- * @author Dan Milstein
  */
 public class AjpMessage {
 
