@@ -36,7 +36,6 @@ import org.xml.sax.InputSource;
  *
  * @author Mandar Raje.
  * @author Rajiv Mordani.
- * @author Danno Ferrin
  */
 public class JspUtil {
 
