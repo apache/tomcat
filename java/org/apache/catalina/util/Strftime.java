@@ -35,7 +35,6 @@ import java.util.TimeZone;
  * DateFormat.</li>
  * </ul>
  *
- * @author Bip Thelin
  * @author Dan Sandberg
  */
 public class Strftime {

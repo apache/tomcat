@@ -22,7 +22,6 @@ import java.io.PrintWriter;
 /**
  * The interface that all SSI commands ( SSIEcho, SSIInclude, ...) must implement.
  *
- * @author Bip Thelin
  * @author Dan Sandberg
  * @author David Becker
  */
