@@ -51,7 +51,6 @@ import aQute.bnd.annotation.spi.ServiceConsumer;
  * <strong>IMPLEMENTATION NOTE</strong> - This implementation is heavily based on the SAXParserFactory and
  * DocumentBuilderFactory implementations (corresponding to the JAXP pluggability APIs) found in Apache Xerces.
  * </p>
- * @author Costin Manolache
  * @author Richard A. Sitze
  */
 @ServiceConsumer(value = Log.class)

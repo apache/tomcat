@@ -92,7 +92,6 @@ import org.apache.tomcat.util.res.StringManager;
  * </ul>
  * <li>Attribute caching is not supported</li>
  * </ul>
- * @author Costin Manolache
  */
 public class BaseModelMBean implements DynamicMBean, MBeanRegistration, ModelMBeanNotificationBroadcaster {
 

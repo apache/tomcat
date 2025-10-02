@@ -24,7 +24,6 @@ import java.io.IOException;
  *
  * @author dac@sun.com
  * @author James Todd [gonzo@sun.com]
- * @author Costin Manolache
  */
 public final class CharChunk extends AbstractChunk implements CharSequence {
 

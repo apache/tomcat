@@ -36,7 +36,6 @@ import org.apache.tomcat.util.res.StringManager;
  * The legacy (up to early Tomcat 8 releases) cookie parser based on RFC6265, RFC2109 and RFC2616. This class is not
  * thread-safe.
  *
- * @author Costin Manolache
  * @author kevin seguin
  */
 public final class LegacyCookieProcessor extends CookieProcessorBase {
