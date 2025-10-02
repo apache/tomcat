@@ -32,10 +32,8 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Henri Gomez
  * @author Dan Milstein
- * @author Keith Wannamaker
  */
 public class AjpMessage {
-
 
     private static final Log log = LogFactory.getLog(AjpMessage.class);
 
@@ -45,15 +43,9 @@ public class AjpMessage {
     protected static final StringManager sm = StringManager.getManager(AjpMessage.class);
 
 
-    // ------------------------------------------------------------ Constructor
-
-
     public AjpMessage(int packetSize) {
         buf = new byte[packetSize];
     }
-
-
-    // ----------------------------------------------------- Instance Variables
 
 
     /**
@@ -74,9 +66,6 @@ public class AjpMessage {
      * Oh, well.
      */
     protected int len;
-
-
-    // --------------------------------------------------------- Public Methods
 
 
     /**
