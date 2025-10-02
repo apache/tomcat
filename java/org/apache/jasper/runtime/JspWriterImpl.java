@@ -29,9 +29,7 @@ import org.apache.jasper.compiler.Localizer;
 /**
  * Write text to a character-output stream, buffering characters to provide efficient writing of single characters,
  * arrays, and strings. Provide support for discarding the output that has been buffered. This needs revisiting when the
- * buffering problems in the JSP spec are fixed -akv
- *
- * @author Anil K. Vijendran
+ * buffering problems in the JSP spec are fixed -akv.
  */
 public class JspWriterImpl extends JspWriter {
 
