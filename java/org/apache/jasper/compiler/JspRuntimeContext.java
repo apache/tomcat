@@ -43,8 +43,6 @@ import org.apache.juli.logging.LogFactory;
  * Class for tracking JSP compile time file dependencies when the &gt;%@include file="..."%&lt; directive is used. A
  * background thread periodically checks the files a JSP page is dependent upon. If a dependent file changes the JSP
  * page which included it is recompiled. Only used if a web application context is a directory.
- *
- * @author Glenn L. Nielsen
  */
 public final class JspRuntimeContext {
 
