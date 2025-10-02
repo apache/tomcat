@@ -33,7 +33,6 @@ import org.apache.tomcat.Jar;
  * bunch of parsing utility methods for understanding html style content.
  *
  * @author Anselm Baird-Smith
- * @author Rajiv Mordani
  */
 class JspReader {
 
