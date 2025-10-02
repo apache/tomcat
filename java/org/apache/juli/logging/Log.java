@@ -17,14 +17,11 @@
 package org.apache.juli.logging;
 
 /**
- * <p>
  * A simple logging interface abstracting logging APIs. In order to be instantiated successfully by {@link LogFactory},
  * classes that implement this interface must have a constructor that takes a single String parameter representing the
  * "name" of this Log.
- * </p>
  * <p>
  * The six logging levels used by <code>Log</code> are (in order):
- * </p>
  * <ol>
  * <li>trace (the least serious)</li>
  * <li>debug</li>
@@ -36,11 +33,9 @@ package org.apache.juli.logging;
  * <p>
  * The mapping of these log levels to the concepts used by the underlying logging system is implementation dependent.
  * The implementation should ensure, though, that this ordering behaves as expected.
- * </p>
  * <p>
  * Performance is often a logging concern. By examining the appropriate property, a component can avoid expensive
  * operations (producing information to be logged).
- * </p>
  * <p>
  * For example, <code>
  *    if (log.isDebugEnabled()) {
@@ -48,13 +43,9 @@ package org.apache.juli.logging;
  *        log.debug(theResult);
  *    }
  * </code>
- * </p>
  * <p>
  * Configuration of the underlying logging system will generally be done external to the Logging APIs, through whatever
  * mechanism is supported by that system.
- * </p>
- *
- * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
  */
 public interface Log {
 
