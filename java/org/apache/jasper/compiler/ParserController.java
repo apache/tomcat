@@ -38,7 +38,6 @@ import org.xml.sax.Attributes;
  * appropriate parser for the JSP page and its included segments.
  *
  * @author Pierre Delisle
- * @author Jan Luehe
  */
 public class ParserController implements TagConstants {
 

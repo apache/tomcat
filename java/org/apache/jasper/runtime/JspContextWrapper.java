@@ -59,7 +59,6 @@ import org.apache.jasper.compiler.Localizer;
  * by the invoking page via setJspContext().
  *
  * @author Kin-man Chung
- * @author Jan Luehe
  */
 public class JspContextWrapper extends PageContext {
 

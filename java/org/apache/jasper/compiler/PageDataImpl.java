@@ -36,8 +36,6 @@ import org.xml.sax.helpers.AttributesImpl;
  * the XML view. This pass ignores any nodes other than JspRoot and TaglibDirective. During the second pass, the
  * SecondPassVisitor produces the XML view, using the combined jsp:root attributes determined in the first pass and any
  * remaining pages nodes (this pass ignores any JspRoot and TaglibDirective nodes).
- *
- * @author Jan Luehe
  */
 class PageDataImpl extends PageData implements TagConstants {
 
