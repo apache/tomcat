@@ -35,8 +35,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Abstract implementation of the {@link Store} interface to support most of the functionality required by a
  * {@link Store}.
- *
- * @author Bip Thelin
  */
 public abstract class StoreBase extends LifecycleBase implements Store {
 

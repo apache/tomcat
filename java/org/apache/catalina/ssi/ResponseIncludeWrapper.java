@@ -28,9 +28,8 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 /**
- * An HttpServletResponseWrapper, used from <code>SSIServletExternalResolver</code>
+ * An HttpServletResponseWrapper, used from <code>SSIServletExternalResolver</code>.
  *
- * @author Bip Thelin
  * @author David Becker
  */
 public class ResponseIncludeWrapper extends HttpServletResponseWrapper {

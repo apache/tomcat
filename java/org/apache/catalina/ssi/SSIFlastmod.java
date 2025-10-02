@@ -25,9 +25,8 @@ import org.apache.catalina.util.Strftime;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implements the Server-side #flastmod command
+ * Implements the Server-side #flastmod command.
  *
- * @author Bip Thelin
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker

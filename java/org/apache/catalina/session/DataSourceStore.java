@@ -45,8 +45,6 @@ import org.apache.juli.logging.Log;
 /**
  * Implementation of the {@link org.apache.catalina.Store Store} interface that stores serialized session objects in a
  * database. Sessions that are saved are still subject to being expired based on inactivity.
- *
- * @author Bip Thelin
  */
 public class DataSourceStore extends StoreBase {
 

@@ -23,9 +23,8 @@ import java.io.PrintWriter;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implements the Server-side #include command
+ * Implements the Server-side #include command.
  *
- * @author Bip Thelin
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker

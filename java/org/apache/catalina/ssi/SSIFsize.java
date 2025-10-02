@@ -24,9 +24,8 @@ import java.text.DecimalFormat;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implements the Server-side #fsize command
+ * Implements the Server-side #fsize command.
  *
- * @author Bip Thelin
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker
