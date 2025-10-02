@@ -4336,6 +4336,10 @@
         <mime-type>video/webm</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>webmanifest</extension>
+        <mime-type>application/manifest+json</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>webp</extension>
         <mime-type>image/webp</mime-type>
     </mime-mapping>
