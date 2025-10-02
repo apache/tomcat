@@ -30,7 +30,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author Paul Speed
  * @author Dan Sandberg
- * @author David Becker
  */
 public class SSIExec implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIExec.class);

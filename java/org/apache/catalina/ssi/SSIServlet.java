@@ -38,7 +38,6 @@ import jakarta.servlet.http.HttpServletResponse;
  * Servlet to process SSI requests within a webpage. Mapped to a path from within web.xml.
  *
  * @author Dan Sandberg
- * @author David Becker
  */
 public class SSIServlet extends HttpServlet {
     @Serial

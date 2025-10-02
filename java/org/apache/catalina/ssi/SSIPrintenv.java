@@ -24,7 +24,6 @@ import java.util.Collection;
  * Implements the Server-side #printenv command
  *
  * @author Dan Sandberg
- * @author David Becker
  */
 public class SSIPrintenv implements SSICommand {
     @Override
