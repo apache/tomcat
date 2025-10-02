@@ -26,8 +26,6 @@ import java.security.PermissionCollection;
 /**
  * Class loader for loading servlet class files (corresponding to JSP files) and tag handler class files (corresponding
  * to tag files).
- *
- * @author Anil K. Vijendran
  */
 public class JasperLoader extends URLClassLoader {
 

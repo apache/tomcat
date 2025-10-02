@@ -42,7 +42,6 @@ import org.apache.tomcat.util.scan.JarFactory;
 /**
  * Main JSP compiler class. This class uses Ant for compiling.
  *
- * @author Anil K. Vijendran
  * @author Mandar Raje
  * @author Kin-man Chung
  */
