@@ -30,7 +30,6 @@ import org.apache.jasper.compiler.TldCache;
  *
  * @author Anil K. Vijendran
  * @author Hans Bergsten
- * @author Pierre Delisle
  */
 public interface Options {
 

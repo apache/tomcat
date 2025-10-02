@@ -48,7 +48,6 @@ import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
  * mangling names, versions, dirs, loading resources and dealing with uris.
  *
  * @author Anil K. Vijendran
- * @author Pierre Delisle
  * @author Kin-man Chung
  */
 public class JspCompilationContext {

@@ -38,7 +38,6 @@ import org.apache.juli.logging.LogFactory;
  *
  * @author Anil K. Vijendran
  * @author Hans Bergsten
- * @author Pierre Delisle
  */
 public final class EmbeddedServletOptions implements Options {
 
