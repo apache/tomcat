@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="leslie.hughes@rubus.com">Les Hughes</author>
         <title>JNDI Datasource How-To</title>
     </properties>
 
