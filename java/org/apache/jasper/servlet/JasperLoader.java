@@ -28,7 +28,6 @@ import java.security.PermissionCollection;
  * to tag files).
  *
  * @author Anil K. Vijendran
- * @author Harish Prabandham
  */
 public class JasperLoader extends URLClassLoader {
 

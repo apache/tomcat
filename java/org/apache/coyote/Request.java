@@ -54,7 +54,6 @@ import org.apache.tomcat.util.res.StringManager;
  * </ul>
  *
  * @author Jason Hunter [jch@eng.sun.com]
- * @author Harish Prabandham
  * @author Alex Cruikshank [alex@epitonic.com]
  * @author Hans Bergsten [hans@gefionsoftware.com]
  */
