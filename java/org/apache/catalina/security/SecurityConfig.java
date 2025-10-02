@@ -24,8 +24,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Util class to protect Catalina against package access and insertion. The code are been moved from Catalina.java
- *
- * @author the Catalina.java authors
  */
 public final class SecurityConfig {
 
