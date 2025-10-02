@@ -57,8 +57,6 @@ import org.apache.naming.StringManager;
  *           maxLimit="5"
  *           /&gt;
  * </pre>
- *
- * @author Aner Perez [aner at ncstech.com]
  */
 public class BeanFactory implements ObjectFactory {
 
