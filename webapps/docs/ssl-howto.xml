@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="ccain@apache.org">Christopher Cain</author>
         <title>SSL/TLS Configuration How-To</title>
     </properties>
 
