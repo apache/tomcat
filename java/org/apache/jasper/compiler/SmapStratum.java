@@ -21,8 +21,6 @@ import java.util.List;
 
 /**
  * Represents the line and file mappings associated with a JSR-045 "stratum".
- *
- * @author Jayson Falkner
  */
 public class SmapStratum {
 
