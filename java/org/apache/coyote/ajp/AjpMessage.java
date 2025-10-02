@@ -34,7 +34,6 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Dan Milstein
  * @author Keith Wannamaker
  * @author Kevin Seguin
- * @author Costin Manolache
  */
 public class AjpMessage {
 

@@ -131,8 +131,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @see <a href=
  *          "https://gitbox.apache.org/repos/asf?p=tomcat.git;a=blob;f=test/org/apache/catalina/startup/TestTomcat.java">TestTomcat</a>
- *
- * @author Costin Manolache
  */
 public class Tomcat {
 

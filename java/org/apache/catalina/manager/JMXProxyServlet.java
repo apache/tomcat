@@ -44,8 +44,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * This servlet will dump JMX attributes in a simple format and implement proxy services for modeler.
- *
- * @author Costin Manolache
  */
 public class JMXProxyServlet extends HttpServlet {
 
