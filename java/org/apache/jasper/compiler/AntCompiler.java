@@ -39,7 +39,6 @@ import org.apache.tools.ant.types.PatternSet;
  * Main JSP compiler class. This class uses Ant for compiling.
  *
  * @author Mandar Raje
- * @author Kin-man Chung
  */
 public class AntCompiler extends Compiler {
 

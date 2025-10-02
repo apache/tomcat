@@ -22,8 +22,6 @@ import org.apache.jasper.JasperException;
  * Interface for handling JSP parse and javac compilation errors. An implementation of this interface may be registered
  * with the ErrorDispatcher by setting the XXX initialization parameter in the JSP page compiler and execution servlet
  * in Catalina's web.xml file to the implementation's fully qualified class name.
- *
- * @author Kin-man Chung
  */
 public interface ErrorHandler {
 

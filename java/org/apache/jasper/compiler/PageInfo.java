@@ -35,10 +35,7 @@ import org.apache.jasper.JspCompilationContext;
 
 /**
  * A repository for various info about the translation unit under compilation.
- *
- * @author Kin-man Chung
  */
-
 public class PageInfo {
 
     private final List<String> imports;
