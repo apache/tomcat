@@ -38,9 +38,6 @@ import org.apache.tools.ant.types.FileSet;
  * special characters with their HTML escaped equivalents.
  * <p>
  * This task is currently used by the ant script to build our examples
- * </p>
- *
- * @author Mark Roth
  */
 public class Txt2Html extends Task {
 
