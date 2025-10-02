@@ -55,13 +55,8 @@ package org.apache.juli.logging;
  * </p>
  *
  * @author <a href="mailto:sanders@apache.org">Scott Sanders</a>
- * @author Rod Waldhoff
  */
 public interface Log {
-
-
-    // ----------------------------------------------------- Logging Properties
-
 
     /**
      * <p>
