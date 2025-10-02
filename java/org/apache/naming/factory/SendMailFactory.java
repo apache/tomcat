@@ -56,7 +56,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *           /&gt;
  * </pre>
  *
- * @author Glenn Nielsen Rich Catlett
+ * @author Rich Catlett
  */
 
 public class SendMailFactory implements ObjectFactory {

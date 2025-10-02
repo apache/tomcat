@@ -52,7 +52,6 @@ import org.apache.tomcat.util.security.Escape;
  * @author Anil K. Vijendran
  * @author Harish Prabandham
  * @author Kin-man Chung
- * @author Glenn Nielsen
  */
 public class JspServlet extends HttpServlet implements PeriodicEventListener {
 

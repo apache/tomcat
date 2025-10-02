@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="glenn@apache.org">Glenn L. Nielsen</author>
         <title>Jasper 2 JSP Engine How To</title>
     </properties>
 
