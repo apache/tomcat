@@ -31,8 +31,6 @@ import org.apache.tomcat.Jar;
 /**
  * JspReader is an input buffer for the JSP parser. It should allow unlimited lookahead and pushback. It also has a
  * bunch of parsing utility methods for understanding html style content.
- *
- * @author Anselm Baird-Smith
  */
 class JspReader {
 
