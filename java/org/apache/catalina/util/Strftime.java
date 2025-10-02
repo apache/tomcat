@@ -34,8 +34,6 @@ import java.util.TimeZone;
  * <li>The interface looks like a subset of DateFormat. Maybe someday someone will make this class extend
  * DateFormat.</li>
  * </ul>
- *
- * @author Dan Sandberg
  */
 public class Strftime {
     protected static final Properties translate;

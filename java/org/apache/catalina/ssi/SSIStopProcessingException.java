@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.ssi;
 
-
 import java.io.Serial;
 
 /**
@@ -24,7 +23,6 @@ import java.io.Serial;
  * behavior in #set with invalid attributes.
  *
  * @author Paul Speed
- * @author Dan Sandberg
  */
 public class SSIStopProcessingException extends Exception {
 

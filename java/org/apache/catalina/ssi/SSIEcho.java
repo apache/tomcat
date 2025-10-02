@@ -25,7 +25,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Return the result associated with the supplied Server Variable.
  *
  * @author Paul Speed
- * @author Dan Sandberg
  */
 public class SSIEcho implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIEcho.class);
