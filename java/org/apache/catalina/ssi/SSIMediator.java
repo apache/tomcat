@@ -36,7 +36,6 @@ import org.apache.tomcat.util.security.Escape;
  *
  * @author Paul Speed
  * @author Dan Sandberg
- * @author David Becker
  */
 public class SSIMediator {
     private static final StringManager sm = StringManager.getManager(SSIMediator.class);

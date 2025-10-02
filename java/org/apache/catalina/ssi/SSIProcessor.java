@@ -32,7 +32,6 @@ import org.apache.catalina.util.IOTools;
  * SSIExternalResolver as necessary.
  *
  * @author Dan Sandberg
- * @author David Becker
  */
 public class SSIProcessor {
     /** The start pattern */
