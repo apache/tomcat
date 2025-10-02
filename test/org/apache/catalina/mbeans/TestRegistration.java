@@ -113,8 +113,6 @@ public class TestRegistration extends TomcatBaseTest {
 
     /*
      * Test verifying that Tomcat correctly de-registers the MBeans it has registered.
-     *
-     * @author Marc Guillemot
      */
     @Test
     public void testMBeanDeregistration() throws Exception {
