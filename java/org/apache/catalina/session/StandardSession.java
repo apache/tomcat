@@ -68,7 +68,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <b>IMPLEMENTATION NOTE</b>: If you add fields to this class, you must make sure that you carry them over in the
  * read/writeObject methods so that this class is properly serialized.
  * @author Sean Legassick
- * @author <a href="mailto:jon@latchkey.com">Jon S. Stevens</a>
  */
 public class StandardSession implements HttpSession, Session, Serializable {
 
