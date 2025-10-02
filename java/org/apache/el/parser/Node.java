@@ -27,10 +27,6 @@ import org.apache.el.lang.EvaluationContext;
 /* All AST nodes must implement this interface.  It provides basic
    machinery for constructing the parent and child relationships
    between nodes. */
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 @SuppressWarnings("all") // Ignore warnings in generated code
 public interface Node {
 

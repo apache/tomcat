@@ -21,9 +21,6 @@ import javax.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstLessThanEqual extends BooleanNode {
 
     public AstLessThanEqual(int id) {

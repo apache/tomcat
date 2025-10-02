@@ -28,9 +28,7 @@ import javax.el.PropertyNotWritableException;
 import javax.el.ValueExpression;
 
 /**
- * Wrapper for providing context to ValueExpressions
- *
- * @author Jacob Hookom
+ * Wrapper for providing context to ValueExpressions.
  */
 public final class JspValueExpression extends ValueExpression implements Externalizable {
 

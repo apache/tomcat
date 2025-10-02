@@ -30,9 +30,6 @@ import javax.el.VariableMapper;
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstFunction extends SimpleNode {
 
     private String localName = "";

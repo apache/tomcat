@@ -32,11 +32,8 @@ import javax.el.MethodNotFoundException;
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
-
 /**
- * Utilities for Managing Serialization and Reflection
- *
- * @author Jacob Hookom [jacob@hookom.net]
+ * Utilities for Managing Serialization and Reflection.
  */
 public class ReflectionUtil {
 

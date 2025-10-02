@@ -62,8 +62,6 @@ import org.apache.el.util.ReflectionUtil;
  * @see javax.el.Expression
  * @see javax.el.ExpressionFactory
  * @see javax.el.MethodExpression
- *
- * @author Jacob Hookom [jacob@hookom.net]
  */
 public final class MethodExpressionImpl extends MethodExpression implements Externalizable {
 

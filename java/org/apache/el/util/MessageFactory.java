@@ -22,9 +22,6 @@ import java.text.NumberFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class MessageFactory {
 
     private static final ResourceBundle DEFAULT_BUNDLE = ResourceBundle.getBundle("org.apache.el.Messages");

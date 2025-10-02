@@ -23,9 +23,6 @@ import javax.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstInteger extends SimpleNode {
 
     public AstInteger(int id) {

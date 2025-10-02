@@ -21,9 +21,6 @@ import javax.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstFalse extends BooleanNode {
 
     public AstFalse(int id) {
