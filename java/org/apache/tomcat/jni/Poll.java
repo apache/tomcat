@@ -17,9 +17,7 @@
 package org.apache.tomcat.jni;
 
 /**
- * Poll
- *
- * @author Mladen Turk
+ * Poll.
  *
  * @deprecated The scope of the APR/Native Library will be reduced in Tomcat 9.1.x / Tomcat Native 2.x and has been
  *                 reduced in Tomcat 10.1.x / Tomcat Native 2.x onwards to only include those components required to

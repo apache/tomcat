@@ -65,8 +65,6 @@ import org.apache.tomcat.util.net.jsse.JSSESupport;
 
 /**
  * NIO endpoint.
- *
- * @author Mladen Turk
  */
 public class NioEndpoint extends AbstractJsseEndpoint<NioChannel,SocketChannel> {
 

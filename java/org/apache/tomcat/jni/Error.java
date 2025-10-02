@@ -17,9 +17,7 @@
 package org.apache.tomcat.jni;
 
 /**
- * Error
- *
- * @author Mladen Turk
+ * Error.
  *
  * @deprecated Unused. Will be removed in Tomcat 9.1 an has been removed in Tomcat 10.1.
  */

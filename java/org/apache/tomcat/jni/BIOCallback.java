@@ -17,9 +17,7 @@
 package org.apache.tomcat.jni;
 
 /**
- * Open SSL BIO Callback Interface
- *
- * @author Mladen Turk
+ * Open SSL BIO Callback Interface.
  *
  * @deprecated Unused. Will be removed in Tomcat 9.1 an has been removed in Tomcat 10.1.
  */
