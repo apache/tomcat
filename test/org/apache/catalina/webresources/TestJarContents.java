@@ -25,9 +25,6 @@ import org.junit.Test;
 
 import org.apache.catalina.WebResourceSet;
 
-/**
- * @author Kamnani, Jatin
- */
 public class TestJarContents {
 
     private static File empty;
