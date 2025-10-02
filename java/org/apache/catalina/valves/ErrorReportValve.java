@@ -42,16 +42,11 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * <p>
  * Implementation of a Valve that outputs HTML error pages.
- * </p>
  * <p>
  * This Valve should be attached at the Host level, although it will work if attached to a Context.
- * </p>
  * <p>
  * HTML code from the Cocoon 2 project.
- * </p>
- * @author <a href="mailto:nicolaken@supereva.it">Nicola Ken Barozzi</a> Aisa
  */
 public class ErrorReportValve extends ValveBase {
 
