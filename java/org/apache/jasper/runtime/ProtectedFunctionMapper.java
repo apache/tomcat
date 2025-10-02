@@ -22,8 +22,6 @@ import java.util.HashMap;
 /**
  * Maps EL functions to their Java method counterparts. Keeps the actual Method objects protected so that JSP pages
  * can't indirectly do reflection.
- *
- * @author Kin-man Chung
  */
 public final class ProtectedFunctionMapper extends jakarta.el.FunctionMapper {
 

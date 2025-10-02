@@ -33,8 +33,6 @@ import org.xml.sax.SAXException;
 
 /**
  * Manages tag plugin optimizations.
- *
- * @author Kin-man Chung
  */
 public class TagPluginManager {
 
