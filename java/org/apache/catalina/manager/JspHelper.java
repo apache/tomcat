@@ -30,8 +30,6 @@ import org.apache.tomcat.util.security.Escape;
 /**
  * Helper JavaBean for JSPs, because JSTL 1.1/EL 2.0 is too dumb to do what I need (call methods with parameters), or I
  * am too dumb to use it correctly. :)
- *
- * @author C&eacute;drik LIME
  */
 public class JspHelper {
 

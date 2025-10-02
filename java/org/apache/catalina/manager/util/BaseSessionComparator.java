@@ -25,8 +25,6 @@ import org.apache.catalina.Session;
  *
  * @param <T> The type of the session content to be compared
  *
- * @author C&eacute;drik LIME
- *
  * @deprecated Unused. Will be removed in Tomcat 10.1.x
  */
 @Deprecated
