@@ -17,11 +17,8 @@
 package org.apache.catalina;
 
 /**
- * <p>
  * Decoupling interface which specifies that an implementing class is associated with at most one
  * <strong>Container</strong> instance.
- * </p>
- * @author Peter Donald
  */
 public interface Contained {
 
