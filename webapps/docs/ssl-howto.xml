@@ -24,7 +24,6 @@
 
     <properties>
         <author email="ccain@apache.org">Christopher Cain</author>
-        <author email="yoavs@apache.org">Yoav Shapira</author>
         <title>SSL/TLS Configuration How-To</title>
     </properties>
 

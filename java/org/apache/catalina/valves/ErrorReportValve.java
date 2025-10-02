@@ -53,7 +53,6 @@ import org.apache.tomcat.util.security.Escape;
  * </p>
  * @author <a href="mailto:nicolaken@supereva.it">Nicola Ken Barozzi</a> Aisa
  * @author <a href="mailto:stefano@apache.org">Stefano Mazzocchi</a>
- * @author Yoav Shapira
  */
 public class ErrorReportValve extends ValveBase {
 
