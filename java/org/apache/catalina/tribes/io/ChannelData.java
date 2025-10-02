@@ -30,8 +30,6 @@ import org.apache.catalina.tribes.util.UUIDGenerator;
  * The <code>ChannelData</code> object is used to transfer a message through the channel interceptor stack and
  * eventually out on a transport to be sent to another node. While the message is being processed by the different
  * interceptors, the message data can be manipulated as each interceptor seems appropriate.
- *
- * @author Peter Rossbach
  */
 public class ChannelData implements ChannelMessage {
     @Serial

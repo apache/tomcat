@@ -58,8 +58,6 @@ import org.apache.tomcat.util.res.StringManager;
  * You can enable this mod_jk turnover mode via JMX before you drop a node to all backup nodes! Set enable true on all
  * JvmRouteBinderValve backups, disable worker at mod_jk and then drop node and restart it! Then enable mod_jk worker
  * and disable JvmRouteBinderValves again. This use case means that only requested sessions are migrated.
- *
- * @author Peter Rossbach
  */
 public class JvmRouteBinderValve extends ValveBase implements ClusterValve {
 

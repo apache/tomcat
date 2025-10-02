@@ -24,7 +24,6 @@
 
     <properties>
         <author email="fhanik@apache.org">Filip Hanik</author>
-        <author email="pero@apache.org">Peter Rossbach</author>
         <title>Clustering/Session Replication How-To</title>
     </properties>
 

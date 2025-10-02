@@ -22,7 +22,6 @@ import java.io.Serial;
 /**
  * Representation of an EJB resource reference for a web application, as represented in a <code>&lt;ejb-ref&gt;</code>
  * element in the deployment descriptor.
- * @author Peter Rossbach (pero@apache.org)
  */
 public class ContextEjb extends ResourceBase {
 

@@ -26,8 +26,6 @@ import org.apache.tools.ant.BuildException;
 /**
  * Ant task that implements the JMX Get command (<code>/jmxproxy/?get</code>) supported by the Tomcat manager
  * application.
- *
- * @author Peter Rossbach
  */
 public class JMXGetTask extends AbstractCatalinaTask {
 

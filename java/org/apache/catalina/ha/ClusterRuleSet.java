@@ -20,11 +20,7 @@ import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.RuleSet;
 
 /**
- * <p>
  * <strong>RuleSet</strong> for processing the contents of a Cluster definition element.
- * </p>
- *
- * @author Peter Rossbach
  */
 public class ClusterRuleSet implements RuleSet {
 

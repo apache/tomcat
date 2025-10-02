@@ -66,10 +66,7 @@ import org.apache.tomcat.util.scan.StandardJarScanner;
 
 /**
  * Simple <code>ServletContext</code> implementation without HTTP-specific methods.
- *
- * @author Peter Rossbach (pr@webapp.de)
  */
-
 public class JspCServletContext implements ServletContext {
 
 

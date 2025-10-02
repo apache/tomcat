@@ -20,8 +20,6 @@ import org.apache.catalina.tribes.io.XByteBuffer;
 
 /**
  * Manifest constants for the <code>org.apache.catalina.tribes.transport</code> package.
- *
- * @author Peter Rossbach
  */
 public class Constants {
 

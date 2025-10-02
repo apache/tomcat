@@ -26,8 +26,6 @@ import org.apache.catalina.tribes.io.ReplicationStream;
 /**
  * The common interface used by all cluster manager. This is so that we can have a more pluggable way of swapping
  * session managers for different algorithms.
- *
- * @author Peter Rossbach
  */
 public interface ClusterManager extends Manager {
 

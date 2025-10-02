@@ -22,7 +22,6 @@ import java.io.Serial;
 /**
  * Representation of a local EJB resource reference for a web application, as represented in a
  * <code>&lt;ejb-local-ref&gt;</code> element in the deployment descriptor.
- * @author Peter Rossbach (pero@apache.org)
  */
 public class ContextLocalEjb extends ResourceBase {
 

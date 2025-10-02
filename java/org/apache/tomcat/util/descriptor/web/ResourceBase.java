@@ -26,9 +26,7 @@ import java.util.Map;
 
 
 /**
- * Representation of a Context element
- *
- * @author Peter Rossbach (pero@apache.org)
+ * Representation of a Context element.
  */
 public class ResourceBase implements Serializable, Injectable {
 

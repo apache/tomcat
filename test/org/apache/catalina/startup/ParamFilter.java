@@ -29,8 +29,7 @@ import jakarta.servlet.annotation.WebFilter;
 import jakarta.servlet.annotation.WebInitParam;
 
 /**
- * Test Mock to check Filter Annotations
- * @author Peter Rossbach
+ * Test Mock to check Filter Annotations.
  */
 @WebFilter(value = "/param", filterName = "paramFilter",
         dispatcherTypes = { DispatcherType.ERROR, DispatcherType.ASYNC },

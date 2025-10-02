@@ -134,7 +134,6 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * </p>
  * @author Jason Brittain
  * @author Takayuki Kaneko
- * @author Peter Rossbach
  */
 public abstract class AbstractAccessLogValve extends ValveBase implements AccessLog {
 
