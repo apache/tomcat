@@ -133,8 +133,6 @@ import org.ietf.jgss.GSSName;
  * descriptor allows applications to refer to roles programmatically by names other than those used in the directory
  * server itself.</li>
  * </ul>
- *
- * @author John Holman
  */
 public class JNDIRealm extends RealmBase {
 
