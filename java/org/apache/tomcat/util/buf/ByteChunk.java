@@ -51,7 +51,6 @@ import java.nio.charset.StandardCharsets;
  * advantage to be able to parse the request without converting to string.
  *
  * @author dac@sun.com
- * @author James Todd [gonzo@sun.com]
  */
 public final class ByteChunk extends AbstractChunk {
 
