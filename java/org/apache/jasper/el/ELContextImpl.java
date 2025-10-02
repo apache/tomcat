@@ -38,9 +38,7 @@ import jakarta.el.VariableMapper;
 import org.apache.jasper.Constants;
 
 /**
- * Implementation of ELContext
- *
- * @author Jacob Hookom
+ * Implementation of ELContext.
  */
 public class ELContextImpl extends ELContext {
 

@@ -18,9 +18,6 @@ package jakarta.el;
 
 import java.util.Iterator;
 
-/**
- * @author Jacob Hookom [jacob/hookom.net]
- */
 public abstract class ELResolver {
 
     public static final String TYPE = "type";

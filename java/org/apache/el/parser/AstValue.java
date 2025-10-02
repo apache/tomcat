@@ -35,9 +35,6 @@ import org.apache.el.stream.Optional;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.ReflectionUtil;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstValue extends SimpleNode {
 
     private static final Object[] EMPTY_ARRAY = new Object[0];
