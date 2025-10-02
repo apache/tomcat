@@ -29,20 +29,10 @@ import org.apache.naming.EjbRef;
 
 /**
  * Object factory for EJBs.
- *
- * @author Jacek Laskowski
  */
 public class OpenEjbFactory implements ObjectFactory {
 
-
-    // -------------------------------------------------------------- Constants
-
-
     protected static final String DEFAULT_OPENEJB_FACTORY = "org.openejb.client.LocalInitialContextFactory";
-
-
-    // -------------------------------------------------- ObjectFactory Methods
-
 
     /**
      * Create a new EJB instance using OpenEJB.
@@ -79,12 +69,8 @@ public class OpenEjbFactory implements ObjectFactory {
                 String ejbLink = linkRefAddr.getContent().toString();
                 beanObj = (new InitialContext(env)).lookup(ejbLink);
             }
-
         }
 
         return beanObj;
-
     }
-
-
 }
