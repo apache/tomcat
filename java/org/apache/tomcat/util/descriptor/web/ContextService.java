@@ -25,8 +25,6 @@ import java.util.Map;
 /**
  * Representation of a web service reference for a web application, as represented in a <code>&lt;service-ref&gt;</code>
  * element in the deployment descriptor.
- *
- * @author Fabien Carrion
  */
 public class ContextService extends ResourceBase {
 

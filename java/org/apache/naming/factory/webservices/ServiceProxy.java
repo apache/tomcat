@@ -31,8 +31,6 @@ import org.apache.naming.StringManager;
 
 /**
  * Object proxy for Web Services.
- *
- * @author Fabien Carrion
  */
 public class ServiceProxy implements InvocationHandler {
 
