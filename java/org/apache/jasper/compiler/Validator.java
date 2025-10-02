@@ -50,7 +50,6 @@ import org.xml.sax.Attributes;
  * Performs validation on the page elements. Attributes are checked for mandatory presence, entry value validity, and
  * consistency. As a side effect, some page global value (such as those from page directives) are stored, for later use.
  *
- * @author Kin-man Chung
  * @author Shawn Bayern
  */
 class Validator {

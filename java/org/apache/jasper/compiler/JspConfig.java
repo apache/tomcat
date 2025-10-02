@@ -30,10 +30,7 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Handles the jsp-config element in WEB_INF/web.xml. This is used for specifying the JSP configuration information on a
  * JSP page
- *
- * @author Kin-man Chung
  */
-
 public class JspConfig {
 
     // Logger
