@@ -26,8 +26,6 @@ import org.apache.tools.ant.BuildException;
 /**
  * Ant task that implements the JMX Query command (<code>/jmxproxy/?qry</code>) supported by the Tomcat manager
  * application.
- *
- * @author Vivek Chopra
  */
 public class JMXQueryTask extends AbstractCatalinaTask {
 
