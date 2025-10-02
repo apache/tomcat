@@ -29,7 +29,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Implements the Server-side #exec command
  *
  * @author Bip Thelin
- * @author Amy Roh
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker
