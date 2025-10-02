@@ -34,8 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Implementation of <code>javax.servlet.Filter</code> used to compress
  * the ServletResponse if it is bigger than a threshold.
- *
- * @author Amy Roh
  */
 public class CompressionFilter extends GenericFilter {
 

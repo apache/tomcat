@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="amyroh@apache.org">Amy Roh</author>
         <title>MBeans Descriptors How To</title>
     </properties>
 

@@ -39,10 +39,8 @@ import org.apache.tomcat.util.modeler.ManagedBean;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
-
 /**
  * Public utility methods in support of the server side MBeans implementation.
- * @author Amy Roh
  */
 public class MBeanUtils {
 

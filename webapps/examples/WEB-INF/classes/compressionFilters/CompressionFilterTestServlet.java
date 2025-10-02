@@ -26,8 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * Very Simple test servlet to test compression filter
- * @author Amy Roh
+ * Very Simple test servlet to test compression filter.
  */
 public class CompressionFilterTestServlet extends HttpServlet {
 
