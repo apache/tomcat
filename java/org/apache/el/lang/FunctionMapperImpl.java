@@ -30,10 +30,6 @@ import jakarta.el.FunctionMapper;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.ReflectionUtil;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public class FunctionMapperImpl extends FunctionMapper implements Externalizable {
 
     @Serial

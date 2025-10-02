@@ -22,10 +22,6 @@ import jakarta.el.ELException;
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstNotEqual extends BooleanNode {
     public AstNotEqual(int id) {
         super(id);

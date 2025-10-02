@@ -21,10 +21,6 @@ import jakarta.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstNull extends SimpleNode {
     public AstNull(int id) {
         super(id);

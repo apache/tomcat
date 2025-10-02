@@ -42,9 +42,6 @@ import org.apache.el.util.ConcurrentCache;
 import org.apache.el.util.ExceptionUtils;
 import org.apache.el.util.MessageFactory;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class ExpressionBuilder implements NodeVisitor {
 
     private static final SynchronizedStack<ELParser> parserCache = new SynchronizedStack<>();

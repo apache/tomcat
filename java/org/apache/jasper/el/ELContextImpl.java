@@ -36,9 +36,7 @@ import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
 
 /**
- * Implementation of ELContext
- *
- * @author Jacob Hookom
+ * Implementation of ELContext.
  */
 public class ELContextImpl extends ELContext {
 
