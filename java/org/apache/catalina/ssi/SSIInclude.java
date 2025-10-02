@@ -26,7 +26,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Implements the Server-side #include command.
  *
  * @author Paul Speed
- * @author Dan Sandberg
  */
 public final class SSIInclude implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIInclude.class);

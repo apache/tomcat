@@ -22,9 +22,7 @@ import java.util.Collection;
 import java.util.Date;
 
 /**
- * Interface used by SSIMediator to talk to the 'outside world' ( usually a servlet )
- *
- * @author Dan Sandberg
+ * Interface used by SSIMediator to talk to the 'outside world' ( usually a servlet ).
  */
 public interface SSIExternalResolver {
     /**

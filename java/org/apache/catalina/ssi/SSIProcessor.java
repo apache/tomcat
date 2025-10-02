@@ -30,8 +30,6 @@ import org.apache.catalina.util.IOTools;
 /**
  * The entry point to SSI processing. This class does the actual parsing, delegating to the SSIMediator, SSICommand, and
  * SSIExternalResolver as necessary.
- *
- * @author Dan Sandberg
  */
 public class SSIProcessor {
     /** The start pattern */
