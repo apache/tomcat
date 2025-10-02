@@ -22,9 +22,7 @@ import java.io.Serial;
 import org.apache.catalina.ha.ClusterMessageBase;
 
 /**
- * Session cluster message
- *
- * @author Peter Rossbach
+ * Session cluster message.
  */
 public class SessionMessageImpl extends ClusterMessageBase implements SessionMessage {
 

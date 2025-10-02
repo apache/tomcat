@@ -27,8 +27,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Receive replicated SessionMessage form other cluster node.
- *
- * @author Peter Rossbach
  */
 public class ClusterSessionListener extends ClusterListener {
 

@@ -19,8 +19,6 @@ package org.apache.catalina.ha.tcp;
 import org.apache.catalina.tribes.Member;
 
 /**
- * @author Peter Rossbach
- *
  * @param message     The message that was sent
  * @param destination The destination of the message
  * @param exception   The exception, if any, when attempting to send the message

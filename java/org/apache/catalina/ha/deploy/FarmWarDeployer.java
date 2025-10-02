@@ -52,8 +52,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <li>tempDir - a temporaryDirectory to store binary data when downloading a war from the cluster</li>
  * </ul>
  * Currently we only support deployment of WAR files since they are easier to send across the wire.
- *
- * @author Peter Rossbach
  */
 public class FarmWarDeployer extends ClusterListener implements ClusterDeployer, FileChangeListener {
     /*--Static Variables----------------------------------------*/
