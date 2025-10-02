@@ -23,8 +23,6 @@ import javax.naming.StringRefAddr;
 
 /**
  * Represents a reference web service.
- *
- * @author Fabien Carrion
  */
 public class ServiceRef extends AbstractRef {
 

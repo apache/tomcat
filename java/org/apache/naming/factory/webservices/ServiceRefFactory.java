@@ -53,8 +53,6 @@ import org.apache.naming.ServiceRef;
 
 /**
  * Object factory for Web Services.
- *
- * @author Fabien Carrion
  */
 public class ServiceRefFactory implements ObjectFactory {
 

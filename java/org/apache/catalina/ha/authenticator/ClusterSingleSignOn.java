@@ -46,8 +46,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <li>The web applications themselves must use one of the standard Authenticators found in the
  * <code>org.apache.catalina.authenticator</code> package.</li>
  * </ul>
- *
- * @author Fabien Carrion
  */
 public class ClusterSingleSignOn extends SingleSignOn implements ClusterValve, MapOwner {
 

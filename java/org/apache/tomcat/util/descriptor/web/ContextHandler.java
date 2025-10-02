@@ -26,8 +26,6 @@ import java.util.Map;
 /**
  * Representation of a handler reference for a web service, as represented in a <code>&lt;handler&gt;</code> element in
  * the deployment descriptor.
- *
- * @author Fabien Carrion
  */
 public class ContextHandler extends ResourceBase {
 
