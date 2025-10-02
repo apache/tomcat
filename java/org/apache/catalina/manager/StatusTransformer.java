@@ -40,8 +40,6 @@ import org.apache.tomcat.util.security.Escape;
 /**
  * This is a refactoring of the servlet to externalize the output into a simple class. Although we could use XSLT, that
  * is unnecessarily complex.
- *
- * @author Peter Lin
  */
 public class StatusTransformer {
 
