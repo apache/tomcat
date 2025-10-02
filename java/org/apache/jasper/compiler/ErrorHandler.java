@@ -23,7 +23,6 @@ import org.apache.jasper.JasperException;
  * with the ErrorDispatcher by setting the XXX initialization parameter in the JSP page compiler and execution servlet
  * in Catalina's web.xml file to the implementation's fully qualified class name.
  *
- * @author Jan Luehe
  * @author Kin-man Chung
  */
 public interface ErrorHandler {

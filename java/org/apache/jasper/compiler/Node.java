@@ -44,7 +44,6 @@ import org.xml.sax.Attributes;
  * traversing nodes.
  *
  * @author Kin-man Chung
- * @author Jan Luehe
  * @author Shawn Bayern
  * @author Mark Roth
  */

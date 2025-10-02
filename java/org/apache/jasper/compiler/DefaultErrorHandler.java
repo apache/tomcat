@@ -20,8 +20,6 @@ import org.apache.jasper.JasperException;
 
 /**
  * Default implementation of ErrorHandler interface.
- *
- * @author Jan Luehe
  */
 class DefaultErrorHandler implements ErrorHandler {
 

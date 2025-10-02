@@ -62,7 +62,6 @@ import org.apache.jasper.compiler.Localizer;
  * by the invoking page via setJspContext().
  *
  * @author Kin-man Chung
- * @author Jan Luehe
  */
 @SuppressWarnings("deprecation") // Have to support old JSP EL API
 public class JspContextWrapper extends PageContext implements VariableResolver {

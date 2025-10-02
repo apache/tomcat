@@ -24,8 +24,6 @@ import org.apache.jasper.runtime.ExceptionUtils;
 
 /**
  * Class responsible for converting error codes to corresponding localized error messages.
- *
- * @author Jan Luehe
  */
 public class Localizer {
 
