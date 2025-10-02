@@ -3042,8 +3042,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 /**
  * Wraps the HttpServletResponse class to abstract the specific protocol used. To support other protocols we would only
  * need to modify this class and the WebDavRetCode classes.
- *
- * @author Marc Eaddy
  */
 class WebdavStatus {
 
