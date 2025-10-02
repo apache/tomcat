@@ -29,8 +29,6 @@ import org.apache.tomcat.util.res.StringManager;
  * A single packet for communication between the web server and the container. Designed to be reused many times with no
  * creation of garbage. Understands the format of data types for these packets. Can be used (somewhat confusingly) for
  * both incoming and outgoing packets.
- *
- * @author Henri Gomez
  */
 public class AjpMessage {
 
