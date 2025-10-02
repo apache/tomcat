@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="funkman@apache.org">Tim Funk</author>
         <title>Default Servlet Reference</title>
     </properties>
 
