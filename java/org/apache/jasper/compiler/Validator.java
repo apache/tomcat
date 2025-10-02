@@ -53,7 +53,6 @@ import org.xml.sax.Attributes;
  *
  * @author Kin-man Chung
  * @author Shawn Bayern
- * @author Mark Roth
  */
 class Validator {
 

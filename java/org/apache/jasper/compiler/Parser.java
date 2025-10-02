@@ -39,9 +39,7 @@ import org.xml.sax.helpers.AttributesImpl;
  *
  * @author Kin-man Chung
  * @author Shawn Bayern
- * @author Mark Roth
  */
-
 class Parser implements TagConstants {
 
     private final ParserController parserController;

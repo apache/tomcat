@@ -22,9 +22,7 @@ import org.apache.jasper.JasperException;
  * Collect info about the page and nodes, and make them available through the PageInfo object.
  *
  * @author Kin-man Chung
- * @author Mark Roth
  */
-
 class Collector {
 
     /**

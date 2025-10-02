@@ -39,9 +39,7 @@ import org.apache.tomcat.Jar;
  * @author Danno Ferrin
  * @author Kin-man Chung
  * @author Shawn Bayern
- * @author Mark Roth
  */
-
 class JspReader {
 
     /**
