@@ -97,7 +97,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  * </p>
  *
  * @author Andre de Jesus
- * @author Peter Rossbach
  *
  * @deprecated Non scalable design, and not documented. Will be removed in Tomcat 12.
  */

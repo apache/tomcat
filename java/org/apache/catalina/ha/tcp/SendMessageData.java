@@ -18,9 +18,6 @@ package org.apache.catalina.ha.tcp;
 
 import org.apache.catalina.tribes.Member;
 
-/**
- * @author Peter Rossbach
- */
 public class SendMessageData {
 
     private Object message;

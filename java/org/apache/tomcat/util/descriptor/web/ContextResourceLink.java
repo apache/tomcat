@@ -20,7 +20,6 @@ package org.apache.tomcat.util.descriptor.web;
 /**
  * Representation of a resource link for a web application, as represented in a <code>&lt;ResourceLink&gt;</code>
  * element in the server configuration file.
- * @author Peter Rossbach (Peter Rossbach (pero@apache.org))
  */
 public class ContextResourceLink extends ResourceBase {
 

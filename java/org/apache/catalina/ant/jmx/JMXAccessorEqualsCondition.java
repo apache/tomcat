@@ -54,8 +54,6 @@ import org.apache.tools.ant.BuildException;
  *   &lt;/target&gt;
  * </pre>
  *
- * @author Peter Rossbach
- *
  * @since 5.5.10
  */
 public class JMXAccessorEqualsCondition extends JMXAccessorConditionBase {

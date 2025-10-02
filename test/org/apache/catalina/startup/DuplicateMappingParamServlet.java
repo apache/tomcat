@@ -28,8 +28,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Test Mock with wrong Annotation!
- *
- * @author Peter Rossbach
  */
 @WebServlet(value = "/annotation/overwrite", urlPatterns ="/param2", name = "param", initParams = {
         @WebInitParam(name = "foo", value = "Hello"),
