@@ -23,8 +23,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implements the Server-side #set command.
- *
- * @author Paul Speed
  */
 public class SSISet implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSISet.class);

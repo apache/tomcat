@@ -29,8 +29,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Represents a parsed expression.
- *
- * @author Paul Speed
  */
 public class ExpressionParseTree {
     private static final StringManager sm = StringManager.getManager(ExpressionParseTree.class);

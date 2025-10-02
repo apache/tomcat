@@ -22,8 +22,6 @@ import java.text.ParseException;
 
 /**
  * SSI command that handles all conditional directives.
- *
- * @author Paul Speed
  */
 public class SSIConditional implements SSICommand {
     @Override
