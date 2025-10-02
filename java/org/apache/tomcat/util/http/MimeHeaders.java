@@ -62,7 +62,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Apache seems to be using a similar method for storing and manipulating headers.
  *
  * @author dac@eng.sun.com
- * @author kevin seguin
  */
 public class MimeHeaders {
 
