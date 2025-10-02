@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ResourceBundle;
@@ -28,10 +27,7 @@ import util.HTMLFilter;
 
 /**
  * Example servlet showing request information.
- *
- * @author James Duncan Davidson &lt;duncan@eng.sun.com>
  */
-
 public class RequestInfoExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;

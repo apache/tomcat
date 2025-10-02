@@ -26,10 +26,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * The simplest possible servlet.
- *
- * @author James Duncan Davidson
  */
-
 public class HelloWorldExample extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
