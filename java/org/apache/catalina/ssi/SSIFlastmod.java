@@ -28,7 +28,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Implements the Server-side #flastmod command.
  *
  * @author Paul Speed
- * @author Dan Sandberg
  */
 public final class SSIFlastmod implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIFlastmod.class);

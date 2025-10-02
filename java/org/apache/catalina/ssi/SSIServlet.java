@@ -35,8 +35,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * Servlet to process SSI requests within a webpage. Mapped to a path from within web.xml.
- *
- * @author Dan Sandberg
  */
 public class SSIServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;

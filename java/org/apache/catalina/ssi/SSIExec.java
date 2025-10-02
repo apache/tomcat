@@ -29,7 +29,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Implements the Server-side #exec command.
  *
  * @author Paul Speed
- * @author Dan Sandberg
  */
 public class SSIExec implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIExec.class);

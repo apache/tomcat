@@ -35,7 +35,6 @@ import org.apache.tomcat.util.security.Escape;
  * Allows the different SSICommand implementations to share data/talk to each other.
  *
  * @author Paul Speed
- * @author Dan Sandberg
  */
 public class SSIMediator {
     private static final StringManager sm = StringManager.getManager(SSIMediator.class);

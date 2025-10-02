@@ -16,13 +16,10 @@
  */
 package org.apache.catalina.ssi;
 
-
 import java.io.PrintWriter;
 
 /**
  * The interface that all SSI commands ( SSIEcho, SSIInclude, ...) must implement.
- *
- * @author Dan Sandberg
  */
 public interface SSICommand {
     /**
