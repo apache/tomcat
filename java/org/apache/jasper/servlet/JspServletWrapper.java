@@ -55,7 +55,6 @@ import org.apache.tomcat.Jar;
  * class loader, if that fails, it uses the parent class loader. In either case, it must be a URLClassLoader.
  *
  * @author Anil K. Vijendran
- * @author Harish Prabandham
  * @author Kin-man Chung
  * @author Tim Fennell
  */

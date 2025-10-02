@@ -34,7 +34,6 @@ import org.apache.tomcat.Jar;
  *
  * @author Anil K. Vijendran
  * @author Anselm Baird-Smith
- * @author Harish Prabandham
  * @author Rajiv Mordani
  * @author Mandar Raje
  * @author Danno Ferrin
