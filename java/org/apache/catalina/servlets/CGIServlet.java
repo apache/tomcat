@@ -198,8 +198,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <li>Confirm use of ServletInputStream.available() in CGIRunner.run() is not needed
  * <li>[add more to this TODO list]
  * </ul>
- *
- * @author Martin T Dengler [root@martindengler.com]
  */
 public final class CGIServlet extends HttpServlet {
 
@@ -1396,10 +1394,6 @@ public final class CGIServlet extends HttpServlet {
                 throw new IOException(sm.getString("cgiServlet.invalidCommand", command));
             }
 
-            /*
-             * original content/structure of this section taken from
-             * http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4216884 with major modifications by Martin Dengler
-             */
             Runtime rt;
             BufferedReader cgiHeaderReader = null;
             InputStream cgiOutput = null;
