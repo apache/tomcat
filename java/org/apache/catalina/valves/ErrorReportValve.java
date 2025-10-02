@@ -52,7 +52,6 @@ import org.apache.tomcat.util.security.Escape;
  * HTML code from the Cocoon 2 project.
  * </p>
  * @author <a href="mailto:nicolaken@supereva.it">Nicola Ken Barozzi</a> Aisa
- * @author <a href="mailto:stefano@apache.org">Stefano Mazzocchi</a>
  */
 public class ErrorReportValve extends ValveBase {
 
