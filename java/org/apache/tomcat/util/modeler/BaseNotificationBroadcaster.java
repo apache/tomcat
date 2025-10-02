@@ -30,7 +30,6 @@ import javax.management.NotificationListener;
 /**
  * Implementation of <code>NotificationBroadcaster</code> for attribute change notifications. This class is used by
  * <code>BaseModelMBean</code> to handle notifications of attribute change events to interested listeners.
- * @author Costin Manolache
  */
 
 public class BaseNotificationBroadcaster implements NotificationBroadcaster {

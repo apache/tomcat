@@ -24,8 +24,6 @@ import java.util.BitSet;
  * Efficient implementation of a UTF-8 encoder. This class is not thread safe - you need one encoder per thread. The
  * encoder will save and recycle the internal objects, avoiding garbage. You can add extra characters that you want
  * preserved, for example while encoding a URL you can add "/".
- *
- * @author Costin Manolache
  */
 public final class UEncoder {
 

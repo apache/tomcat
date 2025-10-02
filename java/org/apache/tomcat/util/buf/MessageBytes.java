@@ -36,7 +36,6 @@ import java.util.Locale;
  *
  * @author dac@eng.sun.com
  * @author James Todd [gonzo@eng.sun.com]
- * @author Costin Manolache
  */
 public final class MessageBytes implements Cloneable, Serializable {
 

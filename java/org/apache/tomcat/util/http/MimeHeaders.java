@@ -63,7 +63,6 @@ import org.apache.tomcat.util.res.StringManager;
  *
  * @author dac@eng.sun.com
  * @author James Todd [gonzo@eng.sun.com]
- * @author Costin Manolache
  * @author kevin seguin
  */
 public class MimeHeaders {

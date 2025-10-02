@@ -39,8 +39,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * The buffer used by Tomcat response. This is a derivative of the Tomcat 3.3 OutputBuffer, with the removal of some of
  * the state handling (which in Coyote is mostly the Processor's responsibility).
- *
- * @author Costin Manolache
  */
 public class OutputBuffer extends Writer {
 
