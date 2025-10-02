@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-      <author email="mturk@apache.org">Mladen Turk</author>
       <title>Windows Service How-To</title>
     </properties>
 
