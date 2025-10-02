@@ -48,10 +48,6 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-
-/**
- * @author Amy Roh
- */
 public class MBeanFactory {
 
     private static final Log log = LogFactory.getLog(MBeanFactory.class);

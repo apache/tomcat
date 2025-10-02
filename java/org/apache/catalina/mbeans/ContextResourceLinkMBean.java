@@ -27,12 +27,8 @@ import org.apache.tomcat.util.descriptor.web.NamingResources;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>
  * A <strong>ModelMBean</strong> implementation for the
  * <code>org.apache.tomcat.util.descriptor.web.ContextResourceLink</code> component.
- * </p>
- *
- * @author Amy Roh
  */
 public class ContextResourceLinkMBean extends BaseCatalinaMBean<ContextResourceLink> {
 

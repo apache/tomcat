@@ -199,7 +199,6 @@ import org.apache.tomcat.util.res.StringManager;
  * </ul>
  *
  * @author Martin T Dengler [root@martindengler.com]
- * @author Amy Roh
  */
 public final class CGIServlet extends HttpServlet {
 

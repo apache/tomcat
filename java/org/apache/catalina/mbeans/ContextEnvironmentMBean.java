@@ -25,12 +25,8 @@ import org.apache.tomcat.util.descriptor.web.ContextEnvironment;
 import org.apache.tomcat.util.descriptor.web.NamingResources;
 
 /**
- * <p>
  * A <strong>ModelMBean</strong> implementation for the
  * <code>org.apache.tomcat.util.descriptor.web.ContextEnvironment</code> component.
- * </p>
- *
- * @author Amy Roh
  */
 public class ContextEnvironmentMBean extends BaseCatalinaMBean<ContextEnvironment> {
 
