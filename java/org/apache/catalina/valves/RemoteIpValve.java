@@ -352,65 +352,32 @@ public class RemoteIpValve extends ValveBase {
 
     private boolean changeLocalName = false;
 
-    /**
-     * @see #setHttpServerPort(int)
-     */
     private int httpServerPort = 80;
 
-    /**
-     * @see #setHttpsServerPort(int)
-     */
     private int httpsServerPort = 443;
 
     private String portHeader = null;
 
     private boolean changeLocalPort = false;
 
-    /**
-     * Regular expression pattern for internal proxies.
-     */
     private Pattern internalProxiesRegex = null;
 
-    /**
-     * CIDR notation for internal proxies.
-     */
     private NetMaskSet internalProxiesCidr =
             NetMaskSet.parse("10.0.0.0/8,172.16.0.0/12,192.168.0.0/16,169.254.0.0/16,100.64.0.0/10,127.0.0.0/8," +
                     "::1/128,fe80::/10,fc00::/7");
 
-    /**
-     * @see #setProtocolHeader(String)
-     */
     private String protocolHeader = "X-Forwarded-Proto";
 
-    /**
-     * @see #setProtocolHeaderHttpsValue(String)
-     */
     private String protocolHeaderHttpsValue = "https";
 
-    /**
-     * @see #setProxiesHeader(String)
-     */
     private String proxiesHeader = "X-Forwarded-By";
 
-    /**
-     * @see #setRemoteIpHeader(String)
-     */
     private String remoteIpHeader = "X-Forwarded-For";
 
-    /**
-     * @see #setRequestAttributesEnabled(boolean)
-     */
     private boolean requestAttributesEnabled = true;
 
-    /**
-     * Regular expression notation for trusted proxies.
-     */
     private Pattern trustedProxiesRegex = null;
 
-    /**
-     * CIDR notation for trusted proxies.
-     */
     private NetMaskSet trustedProxiesCidr = null;
 
 
