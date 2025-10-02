@@ -22,8 +22,6 @@ import javax.naming.StringRefAddr;
 
 /**
  * Represents a reference handler for a web service.
- *
- * @author Fabien Carrion
  */
 public class HandlerRef extends AbstractRef {
 
