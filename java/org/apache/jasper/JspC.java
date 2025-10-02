@@ -88,7 +88,6 @@ import org.xml.sax.SAXException;
  * </pre>
  *
  * @author Danno Ferrin
- * @author Pierre Delisle
  */
 public class JspC extends Task implements Options {
 
