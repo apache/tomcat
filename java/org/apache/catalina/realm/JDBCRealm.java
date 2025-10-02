@@ -39,8 +39,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  * ugly connection logic use the <code>DataSourceRealm</code>.
  * </p>
  *
- * @author Carson McDonald
- *
  * @deprecated Will be removed in Tomcat 10 onwards. Use the DataSourceRealm instead.
  */
 @Deprecated
