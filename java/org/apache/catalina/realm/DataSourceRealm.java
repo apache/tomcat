@@ -36,7 +36,6 @@ import org.apache.naming.ContextBindings;
  * to set up the database and for configuration options.
  *
  * @author Carson McDonald
- * @author Ignacio Ortega
  */
 public class DataSourceRealm extends RealmBase {
 

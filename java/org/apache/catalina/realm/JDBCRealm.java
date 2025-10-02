@@ -40,7 +40,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  * </p>
  *
  * @author Carson McDonald
- * @author Ignacio Ortega
  *
  * @deprecated Will be removed in Tomcat 10 onwards. Use the DataSourceRealm instead.
  */
