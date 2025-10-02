@@ -46,7 +46,6 @@ import org.apache.tomcat.util.res.StringManager;
  * An implementation of SSIExternalResolver that is used with servlets.
  *
  * @author Dan Sandberg
- * @author David Becker
  */
 public class SSIServletExternalResolver implements SSIExternalResolver {
     private static final StringManager sm = StringManager.getManager(SSIServletExternalResolver.class);

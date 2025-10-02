@@ -39,8 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Filter to process SSI requests within a webpage. Mapped to a content types from within web.xml.
  *
- * @author David Becker
- *
  * @see org.apache.catalina.ssi.SSIServlet
  */
 public class SSIFilter extends GenericFilter {

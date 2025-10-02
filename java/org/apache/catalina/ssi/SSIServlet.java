@@ -37,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
  * Servlet to process SSI requests within a webpage. Mapped to a path from within web.xml.
  *
  * @author Dan Sandberg
- * @author David Becker
  */
 public class SSIServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
