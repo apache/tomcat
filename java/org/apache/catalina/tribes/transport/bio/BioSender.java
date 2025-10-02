@@ -35,8 +35,6 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Send cluster messages with only one socket. Ack and keep Alive Handling is supported
  *
- * @author Peter Rossbach
- *
  * @since 5.5.16
  *
  * @deprecated This will be removed in Tomcat 10

@@ -77,8 +77,6 @@ import org.apache.tools.ant.Project;
  * execute when property exist and with <em>unless</em> when property not exists. <br>
  * <b>NOTE </b>: These tasks require Ant 1.6 or later interface.
  *
- * @author Peter Rossbach
- *
  * @since 5.5.10
  */
 public class JMXAccessorTask extends BaseRedirectorHelperTask {

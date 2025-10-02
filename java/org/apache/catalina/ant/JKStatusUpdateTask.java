@@ -24,8 +24,6 @@ import org.apache.tools.ant.BuildException;
 /**
  * Ant task that implements the <code>/status</code> command, supported by the mod_jk status (1.2.9) application.
  *
- * @author Peter Rossbach
- *
  * @since 5.5.9
  */
 public class JKStatusUpdateTask extends AbstractCatalinaTask {

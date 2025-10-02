@@ -49,7 +49,6 @@ import org.apache.tomcat.util.security.Escape;
  * @author Bip Thelin
  * @author Malcolm Edgar
  * @author Glenn L. Nielsen
- * @author Peter Rossbach
  *
  * @see org.apache.catalina.manager.ManagerServlet
  */

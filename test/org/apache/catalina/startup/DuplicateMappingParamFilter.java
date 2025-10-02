@@ -27,9 +27,6 @@ import javax.servlet.annotation.WebFilter;
 
 /**
  * Test Mock with wrong Annotation!
- *
- * @author Peter Rossbach
- *
  */
 @WebFilter(value = "/param", filterName="paramDFilter",
         urlPatterns = { "/param1" , "/param2" })

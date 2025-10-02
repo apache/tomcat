@@ -81,8 +81,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  * <li><code>x-H(scheme)</code>: getScheme</li>
  * <li><code>x-H(secure)</code>: isSecure</li>
  * </ul>
- *
- * @author Peter Rossbach
  */
 public class ExtendedAccessLogValve extends AccessLogValve {
 

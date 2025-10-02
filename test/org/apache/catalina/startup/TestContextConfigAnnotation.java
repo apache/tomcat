@@ -46,8 +46,6 @@ import org.apache.tomcat.util.descriptor.web.WebXml;
 /**
  * Check Servlet 3.0 Spec 8.2.3.3: Override annotation parameter from web.xml or
  * fragment.
- *
- * @author Peter Rossbach
  */
 public class TestContextConfigAnnotation {
 
