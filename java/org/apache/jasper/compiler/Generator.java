@@ -59,9 +59,7 @@ import org.apache.juli.logging.LogFactory;
 import org.xml.sax.Attributes;
 
 /**
- * Generate Java source from Nodes
- *
- * @author Tomcat 4.1.x and Tomcat 5: Denis Benoit
+ * Generate Java source from Nodes.
  */
 class Generator {
 
