@@ -36,8 +36,6 @@ import org.apache.tools.ant.types.RedirectorElement;
  * If you are collecting output in a file the file will be overwritten with the output of the last run, unless you set
  * append="true", in which case each run will append it's output to the file.
  *
- * @author Gabriele Garuglieri
- *
  * @since 5.5
  */
 public abstract class BaseRedirectorHelperTask extends Task {
