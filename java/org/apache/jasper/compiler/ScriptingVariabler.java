@@ -28,8 +28,6 @@ import org.apache.jasper.JasperException;
 
 /**
  * Class responsible for determining the scripting variables that every custom action needs to declare.
- *
- * @author Jan Luehe
  */
 class ScriptingVariabler {
 

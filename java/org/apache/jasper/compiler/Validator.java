@@ -51,7 +51,6 @@ import org.xml.sax.Attributes;
  * consistency. As a side effect, some page global value (such as those from page directives) are stored, for later use.
  *
  * @author Kin-man Chung
- * @author Jan Luehe
  * @author Shawn Bayern
  * @author Mark Roth
  */

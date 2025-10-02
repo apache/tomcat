@@ -37,7 +37,6 @@ import org.xml.sax.SAXException;
  * In the case of a Java compilation error, the compiler error message is parsed into an array of JavacErrorDetail
  * instances, which is passed on to the configured error handler.
  *
- * @author Jan Luehe
  * @author Kin-man Chung
  */
 public class ErrorDispatcher {

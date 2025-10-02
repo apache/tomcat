@@ -50,7 +50,6 @@ import org.xml.sax.helpers.AttributesImpl;
 /**
  * Class implementing a parser for a JSP document, that is, a JSP page in XML syntax.
  *
- * @author Jan Luehe
  * @author Kin-man Chung
  */
 

@@ -58,7 +58,6 @@ import org.apache.jasper.runtime.JspContextWrapper.ELContextWrapper;
  * @author Hans Bergsten
  * @author Pierre Delisle
  * @author Mark Roth
- * @author Jan Luehe
  */
 public class PageContextImpl extends PageContext {
 

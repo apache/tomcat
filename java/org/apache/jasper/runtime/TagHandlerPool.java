@@ -27,8 +27,6 @@ import org.apache.tomcat.InstanceManager;
 
 /**
  * Pool of tag handlers that can be reused.
- *
- * @author Jan Luehe
  */
 public class TagHandlerPool {
 

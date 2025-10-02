@@ -34,7 +34,6 @@ import org.apache.jasper.compiler.Localizer;
  * arrays, and strings. Provide support for discarding the output that has been buffered.
  *
  * @author Rajiv Mordani
- * @author Jan Luehe
  */
 public class BodyContentImpl extends BodyContent {
 
