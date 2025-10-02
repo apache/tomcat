@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="yoavs@apache.org">Yoav Shapira</author>
         <title>Class Loader How-To</title>
     </properties>
 

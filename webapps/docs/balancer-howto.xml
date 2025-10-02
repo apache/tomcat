@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="yoavs@apache.org">Yoav Shapira</author>
         <author>Andy Oliver</author>
         <title>Load Balancer How-To</title>
     </properties>

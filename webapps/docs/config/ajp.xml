@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="yoavs@apache.org">Yoav Shapira</author>
     <author email="arjaquith@mindspring.com">Andrew R. Jaquith</author>
     <title>The AJP Connector</title>
   </properties>
