@@ -20,8 +20,6 @@ import java.io.PrintWriter;
 
 /**
  * This is what is used to generate servlets.
- *
- * @author Kin-man Chung
  */
 public class ServletWriter implements AutoCloseable {
 

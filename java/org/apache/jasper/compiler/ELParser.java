@@ -25,10 +25,7 @@ import org.apache.jasper.compiler.ELNode.Text;
 /**
  * This class implements a parser for EL expressions. It takes strings of the form xxx${..}yyy${..}zzz etc, and turn it
  * into a ELNode.Nodes. Currently, it only handles text outside ${..} and functions in ${ ..}.
- *
- * @author Kin-man Chung
  */
-
 public class ELParser {
 
     private Token curToken; // current token
