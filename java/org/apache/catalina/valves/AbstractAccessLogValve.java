@@ -133,7 +133,6 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * control characters.
  * </p>
  * @author Jason Brittain
- * @author Takayuki Kaneko
  */
 public abstract class AbstractAccessLogValve extends ValveBase implements AccessLog {
 
