@@ -32,12 +32,8 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>
  * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.deploy.NamingResourcesImpl</code>
  * component.
- * </p>
- *
- * @author Amy Roh
  */
 public class NamingResourcesMBean extends BaseModelMBean {
 

@@ -27,12 +27,8 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>
  * A <strong>ModelMBean</strong> implementation for the <code>org.apache.coyote.tomcat5.CoyoteConnector</code>
  * component.
- * </p>
- *
- * @author Amy Roh
  */
 public class ConnectorMBean extends ClassNameMBean<Connector> {
 
