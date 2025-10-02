@@ -44,8 +44,6 @@ import org.xml.sax.SAXException;
 /**
  * Class responsible for generating an implicit tag library containing tag handlers corresponding to the tag files in
  * "/WEB-INF/tags/" or a subdirectory of it.
- *
- * @author Jan Luehe
  */
 class ImplicitTagLibraryInfo extends TagLibraryInfo {
 
