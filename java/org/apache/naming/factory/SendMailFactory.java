@@ -54,10 +54,7 @@ import org.apache.tomcat.util.ExceptionUtils;
  *           mail.smtp.dsn.ret="FULL"
  *           /&gt;
  * </pre>
- *
- * @author Rich Catlett
  */
-
 public class SendMailFactory implements ObjectFactory {
     // The class name for the javamail MimeMessageDataSource
     protected static final String DataSourceClassName = "jakarta.mail.internet.MimePartDataSource";
