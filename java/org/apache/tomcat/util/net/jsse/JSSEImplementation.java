@@ -26,13 +26,6 @@ import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SSLUtil;
 
-/* JSSEImplementation:
-
-   Concrete implementation class for JSSE
-
-   @author EKR
- */
-
 public class JSSEImplementation extends SSLImplementation {
 
     public JSSEImplementation() {
