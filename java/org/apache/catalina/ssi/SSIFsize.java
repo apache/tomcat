@@ -25,8 +25,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implements the Server-side #fsize command.
- *
- * @author Paul Speed
  */
 public final class SSIFsize implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIFsize.class);
