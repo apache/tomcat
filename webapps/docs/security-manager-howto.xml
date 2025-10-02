@@ -24,7 +24,6 @@
     &project;
 
     <properties>
-        <author email="jeanfrancois.arcand@sun.com">Jean-Francois Arcand</author>
         <title>Security Manager How-To</title>
     </properties>
 
