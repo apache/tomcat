@@ -28,10 +28,7 @@ import jakarta.servlet.jsp.JspWriter;
 /**
  * ServletResponseWrapper used by the JSP 'include' action. This wrapper response object is passed to
  * RequestDispatcher.include(), so that the output of the included resource is appended to that of the including page.
- *
- * @author Pierre Delisle
  */
-
 public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
 
     /**

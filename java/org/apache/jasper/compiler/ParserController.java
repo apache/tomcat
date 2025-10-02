@@ -36,8 +36,6 @@ import org.xml.sax.Attributes;
  * The same ParserController instance is used for a JSP page and any JSP segments included by it (via an include
  * directive), where each segment may be provided in standard or XML syntax. This class selects and invokes the
  * appropriate parser for the JSP page and its included segments.
- *
- * @author Pierre Delisle
  */
 public class ParserController implements TagConstants {
 
