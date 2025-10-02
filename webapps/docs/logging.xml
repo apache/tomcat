@@ -26,7 +26,6 @@
   <properties>
     <title>Logging in Tomcat</title>
     <author>Allistair Crossley</author>
-    <author email="yoavs@apache.org">Yoav Shapira</author>
   </properties>
 
 <body>
