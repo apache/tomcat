@@ -47,8 +47,6 @@ import org.apache.tomcat.util.security.Escape;
  * However if you use a software that parses the output of <code>HostManagerServlet</code> you won't be able to upgrade
  * to this Servlet since the output are not in the same format as from <code>HostManagerServlet</code>
  *
- * @author Malcolm Edgar
- *
  * @see org.apache.catalina.manager.ManagerServlet
  */
 public class HTMLHostManagerServlet extends HostManagerServlet {
