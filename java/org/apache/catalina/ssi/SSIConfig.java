@@ -16,7 +16,6 @@
  */
 package org.apache.catalina.ssi;
 
-
 import java.io.PrintWriter;
 
 import org.apache.tomcat.util.res.StringManager;
@@ -25,7 +24,6 @@ import org.apache.tomcat.util.res.StringManager;
  * Implements the Server-side #exec command.
  *
  * @author Paul Speed
- * @author Dan Sandberg
  */
 public final class SSIConfig implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIConfig.class);
