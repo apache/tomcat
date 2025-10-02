@@ -86,7 +86,6 @@
         <xsl:value-of select="@email"/>
       </xsl:variable>
     -->
-    <meta name="author" content="{$name}"/>
   </xsl:for-each>
 </head>
 
