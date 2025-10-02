@@ -21,8 +21,6 @@ package org.apache.catalina;
  * support different ways to communicate within the Cluster. A Cluster implementation is responsible for setting up a
  * way to communicate within the Cluster and also supply "ClientApplications" with <code>ClusterSender</code> used when
  * sending information in the Cluster and <code>ClusterInfo</code> used for receiving information in the Cluster.
- *
- * @author Bip Thelin
  */
 public interface Cluster extends Contained {
 

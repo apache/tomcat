@@ -49,8 +49,6 @@ import org.apache.tomcat.util.ExceptionUtils;
  * Implementation of the {@link org.apache.catalina.Store Store} interface that stores serialized session objects in a
  * database. Sessions that are saved are still subject to being expired based on inactivity.
  *
- * @author Bip Thelin
- *
  * @deprecated Removed in Tomcat 10 and replaced by DataSourceStore with removal of legacy JDBC code
  */
 @Deprecated

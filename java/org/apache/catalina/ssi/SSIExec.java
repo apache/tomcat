@@ -25,9 +25,8 @@ import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implements the Server-side #exec command
+ * Implements the Server-side #exec command.
  *
- * @author Bip Thelin
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker

@@ -24,7 +24,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Return the result associated with the supplied Server Variable.
  *
- * @author Bip Thelin
  * @author Paul Speed
  * @author Dan Sandberg
  * @author David Becker
