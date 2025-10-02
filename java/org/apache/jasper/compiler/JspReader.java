@@ -35,7 +35,6 @@ import org.apache.tomcat.Jar;
  * @author Anselm Baird-Smith
  * @author Rajiv Mordani
  * @author Mandar Raje
- * @author Danno Ferrin
  */
 class JspReader {
 
