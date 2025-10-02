@@ -40,9 +40,6 @@ import org.apache.tomcat.util.res.StringManager;
  * extensions available to an application and then validates those extensions. See
  * http://docs.oracle.com/javase/1.4.2/docs/guide/extensions/spec.html for a detailed explanation of the extension
  * mechanism in Java.
- *
- * @author Greg Murray
- * @author Justyna Horwat
  */
 public final class ExtensionValidator {
 

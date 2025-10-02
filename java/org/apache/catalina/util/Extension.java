@@ -30,9 +30,6 @@ import java.util.StringTokenizer;
  * <p>
  * For more information about optional packages, see the document <em>Optional Package Versioning</em> in the
  * documentation bundle for your Java2 Standard Edition package, in file <code>guide/extensions/versioning.html</code>.
- *
- * @author Justyna Horwat
- * @author Greg Murray
  */
 public final class Extension {
 

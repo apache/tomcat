@@ -21,10 +21,7 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 /**
- * Representation of a Manifest file and its available extensions and required extensions
- *
- * @author Greg Murray
- * @author Justyna Horwat
+ * Representation of a Manifest file and its available extensions and required extensions.
  */
 public class ManifestResource {
 
