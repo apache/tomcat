@@ -20,8 +20,6 @@ import java.sql.Connection;
 
 /**
  * Interface to be implemented by custom validator classes.
- *
- * @author mpassell
  */
 public interface Validator {
     /**
