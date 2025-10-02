@@ -24,15 +24,13 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 
 /**
- * <p>
  * A <b>Valve</b> is a request processing component associated with a particular Container. A series of Valves are
  * generally associated with each other into a Pipeline. The detailed contract for a Valve is included in the
  * description of the <code>invoke()</code> method below.
- * </p>
+ * <p>
  * <b>HISTORICAL NOTE</b>: The "Valve" name was assigned to this concept because a valve is what you use in a real world
  * pipeline to control and/or modify flows through it.
  * @author Gunnar Rjnning
- * @author Peter Donald
  */
 public interface Valve {
 
