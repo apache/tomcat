@@ -41,8 +41,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Response object.
- *
- * @author Jason Hunter [jch@eng.sun.com]
  */
 public final class Response {
 

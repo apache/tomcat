@@ -53,7 +53,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <li>"org.apache.tomcat.request" - allows access to the low-level request object in trusted applications
  * </ul>
  *
- * @author Jason Hunter [jch@eng.sun.com]
  * @author Alex Cruikshank [alex@epitonic.com]
  */
 public final class Request {
