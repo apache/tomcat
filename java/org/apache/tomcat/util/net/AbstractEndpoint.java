@@ -63,8 +63,6 @@ import org.apache.tomcat.util.threads.VirtualThreadExecutor;
 /**
  * @param <S> The type used by the socket wrapper associated with this endpoint. Might be the same as U.
  * @param <U> The type of the underlying socket used by this endpoint. Might be the same as S.
- *
- * @author Mladen Turk
  */
 public abstract class AbstractEndpoint<S, U> {
 
