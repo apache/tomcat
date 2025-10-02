@@ -30,8 +30,6 @@ import util.HTMLFilter;
 
 /**
  * Example servlet showing request headers
- *
- * @author James Duncan Davidson &lt;duncan@eng.sun.com>
  */
 public class CookieExample extends HttpServlet {
 
