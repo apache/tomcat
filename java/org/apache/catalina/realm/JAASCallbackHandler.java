@@ -29,20 +29,15 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>
  * Implementation of the JAAS <code>CallbackHandler</code> interface, used to negotiate delivery of the username and
  * credentials that were specified to our constructor. No interaction with the user is required (or possible).
- * </p>
  * <p>
  * This <code>CallbackHandler</code> will pre-digest the supplied password, if required by the
  * <code>&lt;Realm&gt;</code> element in <code>server.xml</code>.
- * </p>
  * <p>
  * At present, <code>JAASCallbackHandler</code> knows how to handle callbacks of type
  * <code>javax.security.auth.callback.NameCallback</code> and
  * <code>javax.security.auth.callback.PasswordCallback</code>.
- * </p>
- * @author Andrew R. Jaquith
  */
 public class JAASCallbackHandler implements CallbackHandler {
 
