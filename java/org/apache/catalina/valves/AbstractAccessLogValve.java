@@ -55,15 +55,12 @@ import org.apache.tomcat.util.net.IPv6Utils;
 
 
 /**
- * <p>
  * Abstract implementation of the <b>Valve</b> interface that generates a web server access log with the detailed line
  * contents matching a configurable pattern. The syntax of the available patterns is similar to that supported by the
  * <a href="https://httpd.apache.org/">Apache HTTP Server</a> <code>mod_log_config</code> module.
- * </p>
  * <p>
  * Patterns for the logged message may include constant text or any of the following replacement strings, for which the
  * corresponding information from the specified Response is substituted:
- * </p>
  * <ul>
  * <li><b><code>%a</code></b> - Remote IP address
  * <li><b><code>%A</code></b> - Local IP address
@@ -96,7 +93,6 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * </ul>
  * <p>
  * In addition, the caller can specify one of the following aliases for commonly utilized patterns:
- * </p>
  * <ul>
  * <li><b>common</b> - <code>%h %l %u %t "%r" %s %b</code>
  * <li><b>combined</b> - <code>%h %l %u %t "%r" %s %b "%{Referer}i" "%{User-Agent}i"</code>
@@ -105,7 +101,6 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * There is also support to write information from the cookie, incoming header, the Session or something else in the
  * ServletRequest.<br>
  * It is modeled after the <a href="https://httpd.apache.org/">Apache HTTP Server</a> log configuration syntax:
- * </p>
  * <ul>
  * <li><code>%{xxx}i</code> for incoming headers
  * <li><code>%{xxx}o</code> for outgoing response headers
@@ -121,12 +116,9 @@ import org.apache.tomcat.util.net.IPv6Utils;
  * non-null value, the logging will be skipped. If the value returned from ServletRequest.getAttribute(conditionIf)
  * yields the null value, the logging will be skipped. The <code>condition</code> attribute is synonym for
  * <code>conditionUnless</code> and is provided for backwards compatibility.
- * </p>
  * <p>
  * For extended attributes coming from a getAttribute() call, it is you responsibility to ensure there are no newline or
  * control characters.
- * </p>
- * @author Jason Brittain
  */
 public abstract class AbstractAccessLogValve extends ValveBase implements AccessLog {
 
