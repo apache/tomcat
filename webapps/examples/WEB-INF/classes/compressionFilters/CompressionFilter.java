@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
  * the ServletResponse if it is bigger than a threshold.
  *
  * @author Amy Roh
- * @author Dmitri Valdin
  */
 public class CompressionFilter extends GenericFilter {
 

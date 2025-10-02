@@ -29,7 +29,6 @@ import javax.servlet.WriteListener;
  * the CompressionServletResponseWrapper implementation.
  *
  * @author Amy Roh
- * @author Dmitri Valdin
  */
 public class CompressionResponseStream extends ServletOutputStream {
 

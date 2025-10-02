@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServletResponseWrapper;
  * the CompressionServletResponseStream implementation..
  *
  * @author Amy Roh
- * @author Dmitri Valdin
  */
 public class CompressionServletResponseWrapper
         extends HttpServletResponseWrapper {
