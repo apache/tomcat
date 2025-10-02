@@ -23,8 +23,6 @@ import org.apache.jasper.JspCompilationContext;
 
 /**
  * Mark represents a point in the JSP input.
- *
- * @author Anil K. Vijendran
  */
 public final class Mark {
 

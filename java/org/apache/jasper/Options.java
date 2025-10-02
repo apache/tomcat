@@ -27,8 +27,6 @@ import org.apache.jasper.compiler.TldCache;
 
 /**
  * A class to hold all init parameters specific to the JSP engine.
- *
- * @author Anil K. Vijendran
  */
 public interface Options {
 

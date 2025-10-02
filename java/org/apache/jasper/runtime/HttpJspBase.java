@@ -31,8 +31,6 @@ import org.apache.jasper.compiler.Localizer;
 
 /**
  * This is the super class of all JSP-generated servlets.
- *
- * @author Anil K. Vijendran
  */
 public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
 
