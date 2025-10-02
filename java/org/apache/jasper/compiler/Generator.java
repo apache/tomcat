@@ -60,7 +60,7 @@ import org.xml.sax.Attributes;
  * Generate Java source from Nodes
  *
  * @author Danno Ferrin, Mandar Raje, Rajiv Mordani
- * @author Tomcat 4.1.x and Tomcat 5: Shawn Bayern, Denis Benoit
+ * @author Tomcat 4.1.x and Tomcat 5: Denis Benoit
  */
 class Generator {
 
