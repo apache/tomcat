@@ -34,8 +34,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * SSLUtil implementation for JSSE.
- *
- * @author Harish Prabandham
  */
 public class JSSEUtil extends SSLUtilBase {
 
