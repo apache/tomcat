@@ -32,8 +32,6 @@ import org.apache.tomcat.util.ExceptionUtils;
 
 /**
  * Utility methods on HttpSessions.
- *
- * @author C&eacute;drik LIME
  */
 public class SessionUtils {
 
