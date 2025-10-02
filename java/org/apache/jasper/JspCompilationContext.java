@@ -50,7 +50,6 @@ import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
  * @author Anil K. Vijendran
  * @author Harish Prabandham
  * @author Pierre Delisle
- * @author Costin Manolache
  * @author Kin-man Chung
  */
 public class JspCompilationContext {

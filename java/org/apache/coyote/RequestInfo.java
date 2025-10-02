@@ -25,9 +25,7 @@ import javax.management.ObjectName;
  * Structure holding the Request and Response objects. It also holds statistical information about request processing
  * and provide management information about the requests being processed. Each thread uses a Request/Response pair that
  * is recycled on each request. This object provides a place to collect global low-level statistics - without having to
- * deal with synchronization ( since each thread will have its own RequestProcessorMX ).
- *
- * @author Costin Manolache
+ * deal with synchronization (since each thread will have its own RequestProcessorMX).
  */
 public class RequestInfo {
     private RequestGroupInfo global = null;

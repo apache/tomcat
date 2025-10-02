@@ -28,8 +28,6 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * All URL decoding happens here. This way we can reuse, review, optimize without adding complexity to the buffers. The
  * conversion will modify the original buffer.
- *
- * @author Costin Manolache
  */
 public final class UDecoder {
 

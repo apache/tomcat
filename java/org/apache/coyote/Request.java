@@ -58,7 +58,6 @@ import org.apache.tomcat.util.res.StringManager;
  * @author Harish Prabandham
  * @author Alex Cruikshank [alex@epitonic.com]
  * @author Hans Bergsten [hans@gefionsoftware.com]
- * @author Costin Manolache
  */
 public final class Request {
 
