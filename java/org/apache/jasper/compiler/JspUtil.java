@@ -33,8 +33,6 @@ import org.xml.sax.InputSource;
 
 /**
  * This class has all the utility method(s). Ideally should move all the bean containers here.
- *
- * @author Rajiv Mordani.
  */
 public class JspUtil {
 
