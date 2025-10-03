@@ -19,6 +19,11 @@ package org.apache.tomcat.util.net.openssl.ciphers;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * All the signature schemes for TLS 1.3.
+ * @see <a href="https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-signaturescheme" >The signature schemes
+ *          registry</a>
+ */
 public enum SignatureScheme {
 
     // RSASSA-PKCS1-v1_5 algorithms
