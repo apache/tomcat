@@ -68,7 +68,7 @@ import org.apache.tomcat.util.openssl.openssl_h_Compatibility;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implements a {@link SSLEngine} using <a href="https://www.openssl.org/docs/crypto/BIO_s_bio.html#EXAMPLE">OpenSSL BIO
+ * Implements a {@link SSLEngine} using <a href="https://docs.openssl.org/master/man3/BIO_s_bio/#examples">OpenSSL BIO
  * abstractions</a>.
  */
 public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolInfo {
