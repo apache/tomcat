@@ -28,6 +28,7 @@ import jakarta.servlet.http.Cookie;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
@@ -569,12 +570,39 @@ public class SingleSignOn extends ValveBase {
 
     @Override
     protected void startInternal() throws LifecycleException {
-        Container c = getContainer();
-        while (c != null && !(c instanceof Engine)) {
-            c = c.getParent();
+        Container container = getContainer();
+        while (container != null && !(container instanceof Engine)) {
+            container = container.getParent();
         }
-        if (c != null) {
-            engine = (Engine) c;
+        if (container != null) {
+            engine = (Engine) container;
+        }
+        // Starting with the associated container, verify it has a realm associated,
+        // and that no child container returns a different realm
+        container = getContainer();
+        Realm containerRealm = container.getRealm();
+        if (containerRealm == null) {
+            containerLog.warn(sm.getString("singleSignOn.noRealm", container.getName()));
+        } else {
+            if (container instanceof Engine) {
+                for (Container host : engine.findChildren()) {
+                    if (host.getRealm() != containerRealm) {
+                        containerLog.warn(sm.getString("singleSignOn.duplicateRealm", host.getName()));
+                    } else {
+                        for (Container context : host.findChildren()) {
+                            if (context.getRealm() != containerRealm) {
+                                containerLog.warn(sm.getString("singleSignOn.duplicateRealm", context.getName()));
+                            }
+                        }
+                    }
+                }
+            } else if (container instanceof Host) {
+                for (Container context : container.findChildren()) {
+                    if (context.getRealm() != containerRealm) {
+                        containerLog.warn(sm.getString("singleSignOn.duplicateRealm", context.getName()));
+                    }
+                }
+            }
         }
         super.startInternal();
     }

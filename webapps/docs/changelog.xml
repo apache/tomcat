@@ -182,6 +182,10 @@
         for the <code>RemoteIpFilter</code> and <code>RemoteIpValve</code>.
         (markt)
       </add>
+      <fix>
+        Log warnings when the SSO configuration does not comply with the
+        documentation. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
