@@ -113,6 +113,10 @@
         Configuration via regular expression has been deprecated and will be
         removed in Tomcat 12. (markt)
       </add>
+      <fix>
+        Log warnings when the SSO configuration does not comply with the
+        documentation. (remm)
+      </fix>
     </changelog>
   </subsection>
 </section>
