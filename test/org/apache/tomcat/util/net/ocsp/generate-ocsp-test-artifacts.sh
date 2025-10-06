@@ -108,7 +108,7 @@ openssl ocsp -issuer certs/ca.cert.pem -cert certs/server.cert.pem -no_nonce -re
 printf "Done.\r\n"
 
 printf "Answering request with good status (ocsp-good.der)...\r\n"
-openssl ocsp -index index -CA certs/ca.cert.pem -rsigner certs/ocsp.cert.pem -rkey private/ocsp.key.pem -no_nonce -ndays 1 -reqin request.der -respout ../ocsp-good.der
+openssl ocsp -index index -CA certs/ca.cert.pem -rsigner certs/ocsp.cert.pem -rkey private/ocsp.key.pem -no_nonce -ndays 365 -reqin request.der -respout ../ocsp-good.der
 printf "Done.\r\n"
 
 printf "Revoking the server certificate in the CA database...\r\n"
@@ -116,7 +116,7 @@ openssl ca -config openssl.cnf -revoke certs/server.cert.pem -crl_reason keyComp
 printf "Done.\r\n"
 
 printf "Answering request with REVOKED status (ocsp-revoked.der)...\r\n"
-openssl ocsp -index index -CA certs/ca.cert.pem -rsigner certs/ocsp.cert.pem -rkey private/ocsp.key.pem -no_nonce -ndays 1 -reqin request.der -respout ../ocsp-revoked.der
+openssl ocsp -index index -CA certs/ca.cert.pem -rsigner certs/ocsp.cert.pem -rkey private/ocsp.key.pem -no_nonce -ndays 365 -reqin request.der -respout ../ocsp-revoked.der
 printf "Done.\r\n"
 
 cp certs/ca.cert.pem ../ca-cert.pem
@@ -124,6 +124,7 @@ cp private/server.key.pem ../server-key.pem
 cp certs/server.cert.pem ../server-cert.pem
 
 printf "Creating PKCS12 client's truststore (trustStore.p12) with the CA...\r\n"
+rm -f ../trustStore.p12
 echo "$PASS" > ../trust-password
 keytool -importcert -alias ocsp-ca -file certs/ca.cert.pem -keystore ../trustStore.p12 -storetype PKCS12 -storepass "$PASS" -noprompt
 printf "Done.\r\n"
