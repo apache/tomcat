@@ -1173,7 +1173,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         errnum = X509_STORE_CTX_get_error(x509ctx);
                     } else if (ocspResponse == V_OCSP_CERTSTATUS_UNKNOWN()) {
                         errnum = X509_STORE_CTX_get_error(x509ctx);
-                        if (errnum <= 0) {
+                        if (errnum < 0) {
                             ok = 0;
                         }
                     }
