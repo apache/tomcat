@@ -1138,6 +1138,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 ok = 1;
                 openssl_h_Compatibility.SSL_set_verify_result(state.ssl, X509_V_OK());
             }
+            if (ok == 0 && errnum == X509_V_ERR_UNABLE_TO_GET_CRL()) {
+                ok = 1;
+            }
             /*
              * Expired certificates vs. "expired" CRLs: by default, OpenSSL turns X509_V_ERR_CRL_HAS_EXPIRED into a
              * "certificate_expired(45)" SSL alert, but that's not really the message we should convey to the peer (at
