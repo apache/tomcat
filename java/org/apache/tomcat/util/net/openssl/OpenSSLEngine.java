@@ -1371,7 +1371,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
         }
 
         private Principal principal(Certificate[] certs) {
-            return ((java.security.cert.X509Certificate) certs[0]).getIssuerX500Principal();
+            return ((java.security.cert.X509Certificate) certs[0]).getSubjectX500Principal();
         }
 
         @Override
