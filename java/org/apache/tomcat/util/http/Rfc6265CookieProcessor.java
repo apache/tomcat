@@ -185,7 +185,7 @@ public class Rfc6265CookieProcessor extends CookieProcessorBase {
                 header.append("; Partitioned");
             }
         } else {
-            if (EMPTY_STRING.equals(cookiePartitioned) || Boolean.parseBoolean(cookiePartitioned)) {
+            if (EMPTY_STRING.equals(cookiePartitioned)) {
                 header.append("; Partitioned");
             }
         }

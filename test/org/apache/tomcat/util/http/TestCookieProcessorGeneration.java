@@ -250,7 +250,7 @@ public class TestCookieProcessorGeneration {
         rfc6265.setPartitioned(false);
         cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR, "true");
 
-        Assert.assertEquals("foo=bar; Secure; HttpOnly; Partitioned", rfc6265.generateHeader(cookie, null));
+        Assert.assertEquals("foo=bar; Secure; HttpOnly", rfc6265.generateHeader(cookie, null));
 
         cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR, "false");
 
