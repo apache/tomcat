@@ -21,6 +21,8 @@ import javax.servlet.http.Cookie;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.tomcat.util.descriptor.web.Constants;
+
 public class TestCookieProcessorGeneration {
 
     @Test
@@ -343,6 +345,19 @@ public class TestCookieProcessorGeneration {
         rfc6265.setPartitioned(true);
 
         Assert.assertEquals("foo=bar; Secure; HttpOnly; Partitioned", rfc6265.generateHeader(cookie, null));
+
+        rfc6265.setPartitioned(false);
+        cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR, "true");
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly; Partitioned", rfc6265.generateHeader(cookie, null));
+
+        cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR, "false");
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly", rfc6265.generateHeader(cookie, null));
+
+        cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR, "");
+
+        Assert.assertEquals("foo=bar; Secure; HttpOnly", rfc6265.generateHeader(cookie, null));
     }
 
 
