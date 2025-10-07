@@ -531,6 +531,10 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 case REQUIRED -> SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
             };
 
+            if (value == OPTIONAL_NO_CA) {
+                noOcspCheck = true;
+            }
+
             // Set int verify_callback(int preverify_ok, X509_STORE_CTX *x509_ctx) callback
             SSL_CTX_set_verify(state.sslCtx, value,
                     SSL_CTX_set_verify$callback.allocate(new OpenSSLEngine.VerifyCallback(), contextArena));
