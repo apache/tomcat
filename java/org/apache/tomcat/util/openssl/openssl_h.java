@@ -226,6 +226,16 @@ public class openssl_h {
         return X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN;
     }
 
+    private static final int X509_V_ERR_UNABLE_TO_GET_CRL = (int) 3L;
+
+    /**
+     * {@snippet lang = c : * #define X509_V_ERR_UNABLE_TO_GET_CRL 3
+     * }
+     */
+    public static int X509_V_ERR_UNABLE_TO_GET_CRL() {
+        return X509_V_ERR_UNABLE_TO_GET_CRL;
+    }
+
     private static final int X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY = (int) 20L;
 
     /**
