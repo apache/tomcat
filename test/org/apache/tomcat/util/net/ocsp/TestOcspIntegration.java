@@ -362,7 +362,6 @@ public class TestOcspIntegration extends TomcatBaseTest {
             serverSocket.close();
         }
 
-        @SuppressWarnings("unused")
         @Override
         public void run() {
             try {
