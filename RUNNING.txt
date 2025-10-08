@@ -311,8 +311,8 @@ The file will look like the following:
   <?xml version="1.0" encoding="UTF-8"?>
   <Context docBase="${catalina.home}/webapps/manager"
     antiResourceLocking="false" privileged="true" >
-    <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         allow="127\.0\.0\.1" />
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         allow="127.0.0.0/8,::1/128" />
     <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
   </Context>
 

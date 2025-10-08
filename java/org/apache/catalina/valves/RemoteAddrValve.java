@@ -30,7 +30,10 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Concrete implementation of <code>RequestFilterValve</code> that filters based on the string representation of the
  * remote client's IP address optionally combined with the server connector port number.
+ *
+ * @deprecated This Valve will be removed in Tomcat 12 onwards. Use {@link RemoteCIDRValve} instead.
  */
+@Deprecated
 public final class RemoteAddrValve extends RequestFilterValve {
 
     private static final Log log = LogFactory.getLog(RemoteAddrValve.class);

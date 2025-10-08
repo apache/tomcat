@@ -169,7 +169,7 @@
        <li>Do not remove the use of the <a
            href="config/realm.html#LockOut_Realm_-_org.apache.catalina.realm.LockOutRealm">LockOutRealm</a>
            which prevents brute force attacks against user passwords.</li>
-       <li>Configure the <a href="config/valve.html#Remote_Address_Valve">RemoteAddrValve</a>
+       <li>Configure the <a href="config/valve.html#Remote_CIDR_Valve">RemoteCIDRValve</a>
            in the <a href="config/context.html">context.xml</a> file for the
            management application which limits access to localhost by default.
            If remote access is required, limit it to specific IP addresses using
@@ -449,7 +449,7 @@
       context as required.</p>
 
       <p>Any administrative application should be protected by a
-      RemoteAddrValve (this Valve is also available as a Filter).
+      RemoteCIDRValve (this Valve is also available as a Filter).
       The <strong>allow</strong> attribute should be used to limit access to a
       set of known trusted hosts.</p>
 

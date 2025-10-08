@@ -29,7 +29,10 @@ import org.apache.juli.logging.LogFactory;
 /**
  * Concrete implementation of <code>RequestFilter</code> that filters based on the string representation of the remote
  * client's IP address.
+ *
+ * @deprecated This Filter will be removed in Tomcat 12 onwards. Use {@link RemoteCIDRFilter} instead.
  */
+@Deprecated
 public final class RemoteAddrFilter extends RequestFilter {
 
     // Log must be non-static as loggers are created per class-loader and this

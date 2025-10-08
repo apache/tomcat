@@ -100,6 +100,7 @@ public class TestRequestFilterValve {
         }
     }
 
+    @SuppressWarnings("deprecation")
     private void oneTest(String allow, String deny, boolean denyStatus, boolean addConnectorPort,
             boolean usePeerAddress, boolean auth, String property, String type, boolean allowed) {
         // PREPARE

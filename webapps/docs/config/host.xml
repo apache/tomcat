@@ -256,7 +256,7 @@
         a descriptor is located at <code>/META-INF/context.xml</code> and no
         descriptor is present in <strong>xmlBase</strong> then the context will
         fail to start in case the descriptor contains necessary configuration
-        for secure deployment (such as a RemoteAddrValve) which should not be
+        for secure deployment (such as a RemoteCIDRValve) which should not be
         ignored. The default is <code>true</code> unless a security manager is
         enabled when the default is <code>false</code>. When running under a
         security manager this may be enabled on a per web application basis by
@@ -537,8 +537,8 @@
   ...
   <Valve className="org.apache.catalina.valves.RemoteHostValve"
          allow=".*\.mycompany\.com|www\.yourcompany\.com"/>
-  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         deny="192\.168\.1\.\d+"/>
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         deny="192.168.1.0/24"/>
   ...
 </Host>]]></source>
 
