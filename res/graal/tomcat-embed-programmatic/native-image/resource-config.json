@@ -25,7 +25,6 @@
     {"name":"org.apache.naming.factory.LocalStrings"},
     {"name":"org.apache.tomcat.util.LocalStrings"},
     {"name":"org.apache.tomcat.util.buf.LocalStrings"},
-    {"name":"org.apache.tomcat.util.codec.binary.LocalStrings"},
     {"name":"org.apache.tomcat.util.compat.LocalStrings"},
     {"name":"org.apache.tomcat.util.http.LocalStrings"},
     {"name":"org.apache.tomcat.util.http.parser.LocalStrings"},

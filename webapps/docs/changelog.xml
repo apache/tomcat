@@ -305,6 +305,11 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69847</bug>: Remove remaining references to the
+        <code>org.apache.tomcat.util.codec.binary</code> package which has been
+        deleted. (markt)
+      </fix>
     </changelog>
   </subsection>
 </section>
