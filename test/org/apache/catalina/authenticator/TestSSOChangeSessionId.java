@@ -32,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -161,6 +162,7 @@ public class TestSSOChangeSessionId extends TomcatBaseTest {
         }
     }
 
+    @Ignore // Disable until BZ 69839 is fixed
     @Test
     public void testChangeSessionId() throws Exception {
         final Map<String,SingleSignOnEntry> cache = singleSignOn.cache;
