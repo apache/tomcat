@@ -292,6 +292,13 @@
         port information. (markt)
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        <bug>69845</bug>: When using <code>permessage-deflate</code> with Java
+        25 onwards, handle the underlying <code>Inflater</code> and/or
+        <code>Deflater</code> throwing <code>IllegalStateException</code>
+        when closed rather than <code>NullPointerException</code> as they do in
+        Java 24 and earlier. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Web applications">
