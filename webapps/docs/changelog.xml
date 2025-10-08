@@ -293,6 +293,10 @@
       </add>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
+        <bug>69844</bug>: Close the connection with a protocol error if the
+        server sends masked frames. (markt)
+      </fix>
+      <fix>
         <bug>69845</bug>: When using <code>permessage-deflate</code> with Java
         25 onwards, handle the underlying <code>Inflater</code> and/or
         <code>Deflater</code> throwing <code>IllegalStateException</code>
