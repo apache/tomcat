@@ -20,7 +20,6 @@ Bundle-SymbolicName: org.apache.tomcat-util
 Export-Package: \
     org.apache.tomcat.util,\
     org.apache.tomcat.util.buf,\
-    org.apache.tomcat.util.codec.binary,\
     org.apache.tomcat.util.collections,\
     org.apache.tomcat.util.compat,\
     org.apache.tomcat.util.concurrent,\
