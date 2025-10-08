@@ -667,6 +667,11 @@
     <a href="#Remote_CIDR_Valve">Remote CIDR Valve</a>,
     <a href="#Remote_IP_Valve">Remote IP Valve</a>,
     <a href="http.html">HTTP Connector</a> configuration.</p>
+
+    <p><strong>Note:</strong> This Valve is deprecated and will be removed in
+    Tomcat 12. Use <a href="#Remote_CIDR_Valve">Remote CIDR Valve</a>
+    instead.</p>
+
   </subsection>
 
   <subsection name="Attributes">

@@ -186,6 +186,11 @@
         Log warnings when the SSO configuration does not comply with the
         documentation. (remm)
       </fix>
+      <update>
+        Deprecate the <code>RemoteAddrFilter</code> and
+        <code>RemoteAddValve</code> in favour of the
+        <code>RemoteCIDRFilter</code> and <code>RemoteCIDRValve</code>. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">

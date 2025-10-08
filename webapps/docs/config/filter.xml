@@ -1131,6 +1131,11 @@ FINE: Request "/docs/config/manager.html" with response status "200"
     <code>::1</code>. Consult your access logs for the actual value.</p>
 
     <p>See also: <a href="#Remote_Host_Filter">Remote Host Filter</a>.</p>
+
+    <p><strong>Note:</strong> This Filter is deprecated and will be removed in
+    Tomcat 12. Use the <a href="#Remote_CIDR_Filter">Remote CIDR Filter</a>
+    instead.</p>
+
   </subsection>
 
   <subsection name="Filter Class Name">
