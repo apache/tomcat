@@ -200,9 +200,12 @@ public abstract class WsFrameBase {
             continuationExpected = !fin;
         }
         b = inputBuffer.get();
-        // Client data must be masked
         if ((b & 0x80) == 0 && isMasked()) {
+            // Client data must be masked
             throw new WsIOException(new CloseReason(CloseCodes.PROTOCOL_ERROR, sm.getString("wsFrame.notMasked")));
+        } else if ((b & 0x80) != 0 && !isMasked()) {
+            // Server data must not masked
+            throw new WsIOException(new CloseReason(CloseCodes.PROTOCOL_ERROR, sm.getString("wsFrame.masked")));
         }
         payloadLength = b & 0x7F;
         state = State.PARTIAL_HEADER;

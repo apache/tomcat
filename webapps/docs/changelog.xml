@@ -2347,6 +2347,10 @@
   <subsection name="WebSocket">
     <changelog>
       <fix>
+        <bug>69844</bug>: Close the connection with a protocol error if the
+        server sends masked frames. (markt)
+      </fix>
+      <fix>
         <bug>68884</bug>: Reduce the write timeout when writing WebSocket close
         messages for abnormal closes. The timeout defaults to 50 milliseconds
         and may be controlled using the
