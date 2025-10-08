@@ -118,6 +118,17 @@
       </update>
     </changelog>
   </subsection>
+  <subsection name="WebSocket">
+    <changelog>
+      <fix>
+        <bug>69845</bug>: When using <code>permessage-deflate</code> with Java
+        25 onwards, handle the underlying <code>Inflater</code> and/or
+        <code>Deflater</code> throwing <code>IllegalStateException</code>
+        when closed rather than <code>NullPointerException</code> as they do in
+        Java 24 and earlier. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.110 (remm)" rtext="2025-10-06">
   <subsection name="Catalina">

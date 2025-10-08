@@ -201,7 +201,8 @@ public class PerMessageDeflate implements Transformation {
                 written = inflater.inflate(dest.array(), dest.arrayOffset() + dest.position(), dest.remaining());
             } catch (DataFormatException e) {
                 throw new IOException(sm.getString("perMessageDeflate.deflateFailed"), e);
-            } catch (NullPointerException e) {
+            } catch (IllegalStateException | NullPointerException e) {
+                // As of Java 25, the JRE throws an ISE rather than an NPE
                 throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
             }
             dest.position(dest.position() + written);
@@ -361,7 +362,8 @@ public class PerMessageDeflate implements Transformation {
                                 compressedPayload.arrayOffset() + compressedPayload.position(),
                                 compressedPayload.remaining(), flush);
                         compressedPayload.position(compressedPayload.position() + written);
-                    } catch (NullPointerException e) {
+                    } catch (IllegalStateException | NullPointerException e) {
+                        // As of Java 25, the JRE throws an ISE rather than an NPE
                         throw new IOException(sm.getString("perMessageDeflate.alreadyClosed"), e);
                     }
 
