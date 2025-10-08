@@ -38,13 +38,6 @@ public class TestRequestFilterValve {
     private static final int FORBIDDEN = 403;
     private static final int CUSTOM = 499;
 
-    private static final String ADDR_ALLOW_PAT = "127\\.\\d*\\.\\d*\\.\\d*";
-    private static final String ADDR_DENY_PAT = "\\d*\\.\\d*\\.\\d*\\.1";
-    private static final String ADDR_ONLY_ALLOW = "127.0.0.2";
-    private static final String ADDR_ONLY_DENY = "192.168.0.1";
-    private static final String ADDR_ALLOW_AND_DENY = "127.0.0.1";
-    private static final String ADDR_NO_ALLOW_NO_DENY = "192.168.0.2";
-
     private static final String HOST_ALLOW_PAT = "www\\.example\\.[a-zA-Z0-9-]*";
     private static final String HOST_DENY_PAT = ".*\\.org";
     private static final String HOST_ONLY_ALLOW = "www.example.com";
@@ -105,7 +98,6 @@ public class TestRequestFilterValve {
         }
     }
 
-    @SuppressWarnings("deprecation")
     private void oneTest(String allow, String deny, boolean denyStatus, boolean addConnectorPort,
             boolean usePeerAddress, boolean auth, String property, String type, boolean allowed) {
         // PREPARE
@@ -123,19 +115,7 @@ public class TestRequestFilterValve {
         Assert.assertNotNull("Invalid test with null type", type);
 
         if (property != null) {
-            if (type.equals("Addr")) {
-                valve = new RemoteAddrValve();
-                if (usePeerAddress) {
-                    request.setRemoteAddr(ADDR_OTHER);
-                    request.getCoyoteRequest().peerAddr().setString(property);
-                    valve.setUsePeerAddress(true);
-                    msg.append(" peer='" + property + "'");
-                } else {
-                    request.setRemoteAddr(property);
-                    request.getCoyoteRequest().peerAddr().setString(ADDR_OTHER);
-                    msg.append(" ip='" + property + "'");
-                }
-            } else if (type.equals("Host")) {
+            if (type.equals("Host")) {
                 valve = new RemoteHostValve();
                 request.setRemoteHost(property);
                 msg.append(" host='" + property + "'");
@@ -172,14 +152,12 @@ public class TestRequestFilterValve {
             }
         }
         if (addConnectorPort) {
-            if (valve instanceof RemoteAddrValve) {
-                valve.setAddConnectorPort(true);
-            } else if (valve instanceof RemoteHostValve) {
+            if (valve instanceof RemoteHostValve) {
                 valve.setAddConnectorPort(true);
             } else if (valve instanceof RemoteCIDRValve) {
                 valve.setAddConnectorPort(true);
             } else {
-                Assert.fail("Can only set 'addConnectorPort' for RemoteAddrValve, RemoteHostValve and RemoteCIDRValve");
+                Assert.fail("Can only set 'addConnectorPort' for RemoteHostValve and RemoteCIDRValve");
             }
             msg.append(" addConnectorPort='true'");
         }
@@ -363,14 +341,6 @@ public class TestRequestFilterValve {
         twoTests(apat, dpat, true, true, auth, OnlyAllow, type, false);
         twoTests(apat, dpat, true, true, auth, OnlyDeny, type, false);
         twoTests(apat, dpat, true, true, auth, AllowAndDeny, type, false);
-    }
-
-    @Test
-    public void testRemoteAddrValveIPv4() {
-        standardTests(ADDR_ALLOW_PAT, ADDR_DENY_PAT, ADDR_ONLY_ALLOW, ADDR_ONLY_DENY, ADDR_ALLOW_AND_DENY,
-                ADDR_NO_ALLOW_NO_DENY, false, "Addr");
-        standardTests(ADDR_ALLOW_PAT, ADDR_DENY_PAT, ADDR_ONLY_ALLOW, ADDR_ONLY_DENY, ADDR_ALLOW_AND_DENY,
-                ADDR_NO_ALLOW_NO_DENY, true, "Addr");
     }
 
     @Test
