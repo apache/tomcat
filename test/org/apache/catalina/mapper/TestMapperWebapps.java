@@ -31,7 +31,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.catalina.valves.RemoteAddrValve;
+import org.apache.catalina.valves.RemoteHostValve;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
@@ -226,7 +226,7 @@ public class TestMapperWebapps extends TomcatBaseTest {
         org.apache.catalina.Context examples = tomcat.addWebapp(null, "/examples", examplesDir.getAbsolutePath());
         examples.setMapperContextRootRedirectEnabled(false);
         // Then block access to the examples to test redirection
-        RemoteAddrValve rav = new RemoteAddrValve();
+        RemoteHostValve rav = new RemoteHostValve();
         rav.setDeny(".*");
         rav.setDenyStatus(404);
         examples.getPipeline().addValve(rav);
