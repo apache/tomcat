@@ -97,7 +97,7 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         }
 
         // Additional Windows specific checks to handle known problems with
-        // File.getCanonicalPath()
+        // File.getCanonicalPath() and other issues
         if (JrePlatform.IS_WINDOWS && isInvalidWindowsFilename(name)) {
             return null;
         }
@@ -172,29 +172,37 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
         }
     }
 
+
     private boolean isInvalidWindowsFilename(String name) {
         final int len = name.length();
         if (len == 0) {
             return false;
         }
-        // This consistently ~10 times faster than the equivalent regular
-        // expression irrespective of input length.
+        // This is consistently ~10 times faster than the equivalent regular expression irrespective of input length.
         for (int i = 0; i < len; i++) {
             char c = name.charAt(i);
-            if (c == '\"' || c == '<' || c == '>' || c == ':') {
-                // These characters are disallowed in Windows file names and
-                // there are known problems for file names with these characters
-                // when using File#getCanonicalPath().
-                // Note: There are additional characters that are disallowed in
-                // Windows file names but these are not known to cause
-                // problems when using File#getCanonicalPath().
+            /*
+             * '\"', ':', '<' and '>' are disallowed in Windows file names and there are known problems with these
+             * characters when using File#getCanonicalPath().
+             *
+             * Control characters (0x00-0x31) are not permitted and tend to be display strangely in log messages and
+             * similar.
+             *
+             * '*', '/', '?', '\\' and '|' are also not allowed and, while they are not currently known to cause other
+             * difficulties, they are checked here rather than wasting cycles trying to find an invalid file later.
+             *
+             * Note: Characters listed in ASCII order.
+             */
+            if (c < 32 || c == '\"' || c == '*' || c == '/' || c == ':' || c == '<' || c == '>' || c == '?' || c == '\\'
+                    || c == '|') {
                 return true;
             }
         }
-        // Windows does not allow file names to end in ' ' unless specific low
-        // level APIs are used to create the files that bypass various checks.
-        // File names that end in ' ' are known to cause problems when using
-        // File#getCanonicalPath().
+        /*
+         * Windows does not allow file names to end in ' ' unless specific low-level APIs are used to create the files
+         * that bypass various checks. File names that end in ' ' are known to cause problems when using
+         * File#getCanonicalPath().
+         */
         return name.charAt(len - 1) == ' ';
     }
 
