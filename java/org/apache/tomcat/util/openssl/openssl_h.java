@@ -226,6 +226,16 @@ public class openssl_h {
         return X509_V_ERR_SELF_SIGNED_CERT_IN_CHAIN;
     }
 
+    private static final int X509_V_ERR_CERT_REVOKED = (int) 23L;
+
+    /**
+     * {@snippet lang = c : * #define X509_V_ERR_CERT_REVOKED 23
+     * }
+     */
+    public static int X509_V_ERR_CERT_REVOKED() {
+        return X509_V_ERR_CERT_REVOKED;
+    }
+
     private static final int X509_V_ERR_UNABLE_TO_GET_CRL = (int) 3L;
 
     /**
