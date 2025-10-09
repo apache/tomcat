@@ -202,6 +202,12 @@
       <fix>
         Reject requests that map to invalid Windows file names earlier. (markt)
       </fix>
+      <fix>
+        <bug>69839</bug>: Ensure that changes to session IDs (typically after
+        authentication) are promulgated to the SSO Valve to ensure that SSO
+        entries are fully clean-up on session expiration. Patch provided by Kim
+        Johan Andersson. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
