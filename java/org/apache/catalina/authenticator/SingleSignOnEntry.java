@@ -100,6 +100,18 @@ public class SingleSignOnEntry implements Serializable {
     }
 
     /**
+     * Removes the given <code>Session</code> from the list of those associated with this SSO, using the previous
+     * sessionId
+     *
+     * @param session      the <code>Session</code> to remove.
+     * @param oldSessionId the previous sessionId of the <code>Session</code> to remove.
+     */
+    public void removeSession(Session session, String oldSessionId) {
+        SingleSignOnSessionKey key = new SingleSignOnSessionKey(session, oldSessionId);
+        sessionKeys.remove(key);
+    }
+
+    /**
      * Returns the HTTP Session identifiers associated with this SSO.
      *
      * @return the identifiers for the HTTP sessions that are currently associated with this SSO entry
