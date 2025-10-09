@@ -23,9 +23,9 @@ import java.io.File;
 import java.io.FilePermission;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.nio.charset.StandardCharsets;
 
 import javax.management.ObjectName;
 import javax.servlet.ServletContext;
@@ -40,7 +40,6 @@ import org.apache.catalina.util.ToStringUtil;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
-import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
@@ -571,10 +570,14 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
             URL[] repositories = ((URLClassLoader) loader).getURLs();
             for (URL url : repositories) {
                 String repository = url.toString();
-                if (repository.startsWith("file://")) {
-                    repository = UDecoder.URLDecode(repository.substring(7), StandardCharsets.UTF_8);
-                } else if (repository.startsWith("file:")) {
-                    repository = UDecoder.URLDecode(repository.substring(5), StandardCharsets.UTF_8);
+                if (repository.startsWith("file:")) {
+                    // Let the JRE handle all the edge cases for URL to path conversion.
+                    try {
+                        File f = new File(url.toURI());
+                        repository = f.getAbsolutePath();
+                    } catch (URISyntaxException e) {
+                        // Can't convert from URL to URI. Treat as non-file URL and skip.
+                    }
                 } else {
                     continue;
                 }
@@ -587,8 +590,7 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
                 classpath.append(repository);
             }
         } else if (loader == ClassLoader.getSystemClassLoader()) {
-            // Java 9 onwards. The internal class loaders no longer extend
-            // URLCLassLoader
+            // From Java 9 the internal class loaders no longer extend URLCLassLoader
             String cp = System.getProperty("java.class.path");
             if (cp != null && !cp.isEmpty()) {
                 if (classpath.length() > 0) {
