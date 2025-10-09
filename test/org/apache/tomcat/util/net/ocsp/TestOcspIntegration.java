@@ -119,21 +119,13 @@ public class TestOcspIntegration extends TomcatBaseTest {
     }
     @Test
     public void testOcspGood_Mutual() throws Exception {
-        final int ocspResponderPortForClient = 8889;
-        Assume.assumeTrue("Port " + ocspResponderPortForClient + " is not available.", isPortAvailable(ocspResponderPortForClient));
-        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(OCSP_CLIENT_CERT_GOOD_RESPONSE)).toPath()), ocspResponderPortForClient)){
-            fakeOcspResponder.start();
-            Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, true, ffm));
-        }
+        testOCSPWithClientResponder(OCSP_CLIENT_CERT_GOOD_RESPONSE,
+                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, true, ffm)));
     }
     @Test
     public void testOcspGood_ServerVerifiesClientCertificateOnly() throws Exception {
-        final int ocspResponderPortForClient = 8889;
-        Assume.assumeTrue("Port " + ocspResponderPortForClient + " is not available.", isPortAvailable(ocspResponderPortForClient));
-        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(OCSP_CLIENT_CERT_GOOD_RESPONSE)).toPath()), ocspResponderPortForClient)){
-            fakeOcspResponder.start();
-            Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, false, ffm));
-        }
+        testOCSPWithClientResponder(OCSP_CLIENT_CERT_GOOD_RESPONSE,
+                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, false, ffm)));
     }
     @Test(expected = CertificateRevokedException.class)
     public void testOcspRevoked_ClientVerifiesServerCertificateOnly() throws Exception {
@@ -154,21 +146,13 @@ public class TestOcspIntegration extends TomcatBaseTest {
     }
     @Test(expected = SSLHandshakeException.class)
     public void testOcspRevoked_ServerVerifiesClientCertificateOnly() throws Exception {
-        final int ocspResponderPortForClient = 8889;
-        Assume.assumeTrue("Port " + ocspResponderPortForClient + " is not available.", isPortAvailable(ocspResponderPortForClient));
-        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(OCSP_CLIENT_CERT_REVOKED_RESPONSE)).toPath()), ocspResponderPortForClient)){
-            fakeOcspResponder.start();
-            testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, false, ffm);
-        }
+        testOCSPWithClientResponder(OCSP_CLIENT_CERT_REVOKED_RESPONSE,
+                () -> testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, false, ffm));
     }
     @Test
     public void testOcsp_NoVerification() throws Exception {
-        final int ocspResponderPortForClient = 8889;
-        Assume.assumeTrue("Port " + ocspResponderPortForClient + " is not available.", isPortAvailable(ocspResponderPortForClient));
-        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(OCSP_CLIENT_CERT_REVOKED_RESPONSE)).toPath()), ocspResponderPortForClient)){
-            fakeOcspResponder.start();
-            Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, false, ffm));
-        }
+        testOCSPWithClientResponder(OCSP_CLIENT_CERT_REVOKED_RESPONSE,
+                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, false, ffm)));
     }
     @Test
     public void testOcspResponderUrlDiscoveryViaCertificateAIA() throws Exception {
@@ -176,6 +160,18 @@ public class TestOcspIntegration extends TomcatBaseTest {
         Assume.assumeTrue("Port " + ocspPort + " is not available.", isPortAvailable(ocspPort));
         Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true, ffm,
                 true, ocspPort));
+    }
+    @FunctionalInterface
+    private interface TestOCSPAction {
+        void execute() throws Exception;
+    }
+    private void testOCSPWithClientResponder(String clientResponsePath, TestOCSPAction testOCSPAction) throws Exception {
+        final int ocspResponderPortForClient = 8889;
+        Assume.assumeTrue("Port " + ocspResponderPortForClient + " is not available.", isPortAvailable(ocspResponderPortForClient));
+        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(clientResponsePath)).toPath()), ocspResponderPortForClient)){
+            fakeOcspResponder.start();
+            testOCSPAction.execute();
+        }
     }
     private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled, boolean clientSideOcspVerificationEnabled, boolean ffm) throws Exception {
         return testOCSP(pathToOcspResponse, serverSideVerificationEnabled, clientSideOcspVerificationEnabled, ffm,
