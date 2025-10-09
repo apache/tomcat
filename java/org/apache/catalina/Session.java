@@ -56,6 +56,10 @@ public interface Session {
      */
     String SESSION_PASSIVATED_EVENT = "passivateSession";
 
+    /**
+     * The SessionEvent event type when a session changes its sessionId.
+     */
+    String SESSION_CHANGED_ID_EVENT = "changeSessionId";
 
     // ------------------------------------------------------------- Properties
 

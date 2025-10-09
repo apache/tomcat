@@ -613,4 +613,27 @@ public class SingleSignOn extends ValveBase {
         super.stopInternal();
         engine = null;
     }
+
+    protected void sessionChangedId(String ssoId, Session session, String oldSessionId) {
+        if (containerLog.isDebugEnabled()) {
+            containerLog.debug(sm.getString("singleSignOn.debug.sessionChangedId", session, oldSessionId, ssoId));
+        }
+
+        SingleSignOnEntry entry = cache.get(ssoId);
+        if (entry == null) {
+            return;
+        }
+
+        /*
+         * Associate the new sessionId with this SingleSignOnEntry. A SessionListener will be registered for the new
+         * sessionID. If not, then we would not notice any subsequent Session.SESSION_DESTROYED_EVENT for the session.
+         */
+        entry.addSession(this, ssoId, session);
+
+        /*
+         * Remove the obsolete sessionId from the SingleSignOnEntry. The sessionId part of the SingleSignOnSessionKey is
+         * final.
+         */
+        entry.removeSession(session, oldSessionId);
+    }
 }

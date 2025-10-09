@@ -32,7 +32,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
@@ -162,7 +161,6 @@ public class TestSSOChangeSessionId extends TomcatBaseTest {
         }
     }
 
-    @Ignore // Disable until BZ 69839 is fixed
     @Test
     public void testChangeSessionId() throws Exception {
         final Map<String,SingleSignOnEntry> cache = singleSignOn.cache;
@@ -184,8 +182,7 @@ public class TestSSOChangeSessionId extends TomcatBaseTest {
         Assert.assertEquals(1, sessions.size());
 
         final SingleSignOnSessionKey singleSignOnSessionKey1 = sessions.iterator().next();
-        Assert.assertNotEquals("A random SessionId is expected", NOTSORANDOMID,
-                singleSignOnSessionKey1.getSessionId());
+        Assert.assertNotEquals("A random SessionId is expected", NOTSORANDOMID, singleSignOnSessionKey1.getSessionId());
 
         // Perform the request that changes the session id:
         doTest(CONTEXT_PATH + URI_PROTECTED, USE_COOKIES, HttpServletResponse.SC_OK);
