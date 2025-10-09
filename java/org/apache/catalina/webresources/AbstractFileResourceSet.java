@@ -188,13 +188,15 @@ public abstract class AbstractFileResourceSet extends AbstractResourceSet {
              * Control characters (0x00-0x31) are not permitted and tend to be display strangely in log messages and
              * similar.
              *
-             * '*', '/', '?', '\\' and '|' are also not allowed and, while they are not currently known to cause other
+             * '*', '?' and '|' are also not allowed and, while they are not currently known to cause other
              * difficulties, they are checked here rather than wasting cycles trying to find an invalid file later.
              *
-             * Note: Characters listed in ASCII order.
+             * The file separators ('/' and '\\') are not allowed in file names but are not excluded here as paths are
+             * passed to this method.
+             *
+             * Note: Characters are listed in ASCII order.
              */
-            if (c < 32 || c == '\"' || c == '*' || c == '/' || c == ':' || c == '<' || c == '>' || c == '?' || c == '\\'
-                    || c == '|') {
+            if (c < 32 || c == '\"' || c == '*' || c == ':' || c == '<' || c == '>' || c == '?' || c == '|') {
                 return true;
             }
         }
