@@ -353,6 +353,9 @@ public class StandardSession implements HttpSession, Session, Serializable {
     @Override
     public void tellChangedSessionId(String newId, String oldId, boolean notifySessionListeners,
             boolean notifyContainerListeners) {
+        // Notify interested session event listeners
+        fireSessionEvent(SESSION_CHANGED_ID_EVENT, oldId);
+
         Context context = manager.getContext();
         // notify ContainerListeners
         if (notifyContainerListeners) {
