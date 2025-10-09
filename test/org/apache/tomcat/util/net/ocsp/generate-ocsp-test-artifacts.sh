@@ -56,7 +56,7 @@ default_md        = sha256
 policy            = policy_loose
 copy_extensions   = copy
 private_key       = $dir/private/ca.key.pem
-certificate       = $dir/certs/ca.cert.pem
+certificate       = $dir/certs/ca-cert.pem
 
 [ policy_loose ]
 commonName        = supplied
@@ -77,6 +77,13 @@ subjectAltName   = @san
 IP.1 = 127.0.0.1
 DNS.1 = localhost
 
+[ v3_client ]
+basicConstraints = critical,CA:FALSE
+keyUsage         = critical,digitalSignature,keyEncipherment
+extendedKeyUsage = clientAuth
+# Make the AIA field >127 bytes to test CVE-2017-15698
+authorityInfoAccess = OCSP;URI:http://127.0.0.1:8889/ocsp/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+
 [ v3_ocsp ]
 basicConstraints = critical,CA:FALSE
 keyUsage         = critical,digitalSignature
@@ -88,7 +95,7 @@ cd "$WORK_DIR" || (printf "Something went wrong.\r\n" && exit)
 
 printf "Generating CA key and certificate...\r\n"
 openssl genrsa -out private/ca.key.pem 2048
-openssl req -x509 -new -nodes -key private/ca.key.pem -days 3650 -subj "/CN=Test CA" -config openssl.cnf -extensions v3_ca -out certs/ca.cert.pem
+openssl req -x509 -new -nodes -key private/ca.key.pem -days 3650 -subj "/CN=Test CA" -config openssl.cnf -extensions v3_ca -out certs/ca-cert.pem
 printf "Done.\r\n"
 
 printf "Generating server key and certificate...\r\n"
@@ -104,11 +111,11 @@ openssl ca -batch -config openssl.cnf -extensions v3_ocsp -in ocsp.csr.pem -out 
 printf "Done.\r\n"
 
 printf "Building OCSP request for the server certificate...\r\n"
-openssl ocsp -issuer certs/ca.cert.pem -cert certs/server.cert.pem -no_nonce -reqout request.der
+openssl ocsp -issuer certs/ca-cert.pem -cert certs/server.cert.pem -no_nonce -reqout request.der
 printf "Done.\r\n"
 
 printf "Answering request with good status (ocsp-good.der)...\r\n"
-openssl ocsp -index index -CA certs/ca.cert.pem -rsigner certs/ocsp.cert.pem -rkey private/ocsp.key.pem -no_nonce -ndays 365 -reqin request.der -respout ../ocsp-good.der
+openssl ocsp -index index -CA certs/ca-cert.pem -rsigner certs/ocsp.cert.pem -rkey private/ocsp.key.pem -no_nonce -ndays 365 -reqin request.der -respout ../ocsp-good.der
 printf "Done.\r\n"
 
 printf "Revoking the server certificate in the CA database...\r\n"
@@ -116,17 +123,44 @@ openssl ca -config openssl.cnf -revoke certs/server.cert.pem -crl_reason keyComp
 printf "Done.\r\n"
 
 printf "Answering request with REVOKED status (ocsp-revoked.der)...\r\n"
-openssl ocsp -index index -CA certs/ca.cert.pem -rsigner certs/ocsp.cert.pem -rkey private/ocsp.key.pem -no_nonce -ndays 365 -reqin request.der -respout ../ocsp-revoked.der
+openssl ocsp -index index -CA certs/ca-cert.pem -rsigner certs/ocsp.cert.pem -rkey private/ocsp.key.pem -no_nonce -ndays 365 -reqin request.der -respout ../ocsp-revoked.der
 printf "Done.\r\n"
 
-cp certs/ca.cert.pem ../ca-cert.pem
+cp certs/ca-cert.pem ..
 cp private/server.key.pem ../server-key.pem
 cp certs/server.cert.pem ../server-cert.pem
 
 printf "Creating PKCS12 client's truststore (trustStore.p12) with the CA...\r\n"
 rm -f ../trustStore.p12
 echo "$PASS" > ../trust-password
-keytool -importcert -alias ocsp-ca -file certs/ca.cert.pem -keystore ../trustStore.p12 -storetype PKCS12 -storepass "$PASS" -noprompt
+keytool -importcert -alias ocsp-ca -file certs/ca-cert.pem -keystore ../trustStore.p12 -storetype PKCS12 -storepass "$PASS" -noprompt
+printf "Done.\r\n"
+
+printf "Generating client key and certificate...\r\n"
+openssl genrsa -out private/client.key.pem 2048
+openssl req -new -key private/client.key.pem -out client.csr.pem -subj "/CN=test-client"
+openssl ca -batch -config openssl.cnf -extensions v3_client -in client.csr.pem -out certs/client.cert.pem -days 365
+printf "Done.\r\n"
+
+printf "Building OCSP request for the CLIENT certificate...\r\n"
+openssl ocsp -issuer certs/ca-cert.pem -cert certs/client.cert.pem -no_nonce -reqout client-request.der
+printf "Done.\r\n"
+
+printf "Answering request with good status for client (ocsp-client-good.der)...\r\n"
+openssl ocsp -index index -CA certs/ca-cert.pem -rsigner certs/ocsp.cert.pem -rkey private/ocsp.key.pem -no_nonce -ndays 365 -reqin client-request.der -respout ../ocsp-client-good.der
+printf "Done.\r\n"
+
+printf "Revoking the client certificate in the CA database...\r\n"
+openssl ca -config openssl.cnf -revoke certs/client.cert.pem -crl_reason keyCompromise
+printf "Done.\r\n"
+
+printf "Answering request with REVOKED status for client (ocsp-client-revoked.der)...\r\n"
+openssl ocsp -index index -CA certs/ca-cert.pem -rsigner certs/ocsp.cert.pem -rkey private/ocsp.key.pem -no_nonce -ndays 365 -reqin client-request.der -respout ../ocsp-client-revoked.der
+printf "Done.\r\n"
+
+printf "Creating PKCS12 client keystore for mutual TLS...\r\n"
+echo "$PASS" > ../client-password
+openssl pkcs12 -export -name ocsp-client -out ../client-keystore.p12 -inkey private/client.key.pem -in certs/client.cert.pem -certfile certs/ca-cert.pem -passout pass:"$PASS"
 printf "Done.\r\n"
 
 printf "\r\nOptional verification:\r\n"
