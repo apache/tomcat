@@ -62,21 +62,19 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Assume;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLHostConfig;
 import org.apache.tomcat.util.net.SSLHostConfigCertificate;
 import org.apache.tomcat.util.net.TesterSupport;
-import org.apache.tomcat.util.net.openssl.OpenSSLImplementation;
 
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpServer;
@@ -96,41 +94,46 @@ public class TestOcspIntegration extends TomcatBaseTest {
     private static final String CLIENT_KEYSTORE_PASS = "client-password";
     private static final String OCSP_CLIENT_CERT_GOOD_RESPONSE = "ocsp-client-good.der";
     private static final String OCSP_CLIENT_CERT_REVOKED_RESPONSE = "ocsp-client-revoked.der";
-    @Parameterized.Parameters(name = "useFFM: {0}")
+
+    @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
-        parameterSets.add(new Object[] { Boolean.FALSE });
-        parameterSets.add(new Object[] { Boolean.TRUE });
+        parameterSets.add(new Object[] {
+                "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        parameterSets.add(new Object[] {
+                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+
         return parameterSets;
     }
 
-    @Parameterized.Parameter
-    public boolean ffm;
-    @Before
-    public void runtimeCheck() {
-        if (ffm) {
-            Assume.assumeTrue("FFM is not available.", JreCompat.isJre22Available());
-        }
-    }
+    @Parameter(0)
+    public String connectorName;
+
+    @Parameter(1)
+    public boolean useOpenSSL;
+
+    @Parameter(2)
+    public String sslImplementationName;
+
 
     @Test
     public void testOcspGood_ClientVerifiesServerCertificateOnly() throws Exception {
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true, ffm));
+        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true));
     }
     @Test
     public void testOcspGood_Mutual() throws Exception {
         testOCSPWithClientResponder(OCSP_CLIENT_CERT_GOOD_RESPONSE,
-                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, true, ffm)));
+                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, true)));
     }
     @Test
     public void testOcspGood_ServerVerifiesClientCertificateOnly() throws Exception {
         testOCSPWithClientResponder(OCSP_CLIENT_CERT_GOOD_RESPONSE,
-                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, false, ffm)));
+                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, false)));
     }
     @Test(expected = CertificateRevokedException.class)
     public void testOcspRevoked_ClientVerifiesServerCertificateOnly() throws Exception {
         try {
-            testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, true, ffm);
+            testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, true);
         }catch (SSLHandshakeException sslHandshakeException) {
             handleExceptionWhenRevoked(sslHandshakeException);
         }
@@ -139,7 +142,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
     public void testOcspRevoked_Mutual() throws Exception {
         try {
             // The exception is thrown before server side verification, while client does OCSP verification.
-            testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, true, ffm);
+            testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, true);
         }catch (SSLHandshakeException sslHandshakeException) {
             handleExceptionWhenRevoked(sslHandshakeException);
         }
@@ -147,18 +150,18 @@ public class TestOcspIntegration extends TomcatBaseTest {
     @Test(expected = SSLHandshakeException.class)
     public void testOcspRevoked_ServerVerifiesClientCertificateOnly() throws Exception {
         testOCSPWithClientResponder(OCSP_CLIENT_CERT_REVOKED_RESPONSE,
-                () -> testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, false, ffm));
+                () -> testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, false));
     }
     @Test
     public void testOcsp_NoVerification() throws Exception {
         testOCSPWithClientResponder(OCSP_CLIENT_CERT_REVOKED_RESPONSE,
-                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, false, ffm)));
+                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, false)));
     }
     @Test
     public void testOcspResponderUrlDiscoveryViaCertificateAIA() throws Exception {
         final int ocspPort = 8888;
         Assume.assumeTrue("Port " + ocspPort + " is not available.", isPortAvailable(ocspPort));
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true, ffm,
+        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true,
                 true, ocspPort));
     }
     @FunctionalInterface
@@ -173,20 +176,19 @@ public class TestOcspIntegration extends TomcatBaseTest {
             testOCSPAction.execute();
         }
     }
-    private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled, boolean clientSideOcspVerificationEnabled, boolean ffm) throws Exception {
-        return testOCSP(pathToOcspResponse, serverSideVerificationEnabled, clientSideOcspVerificationEnabled, ffm,
+    private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled, boolean clientSideOcspVerificationEnabled) throws Exception {
+        return testOCSP(pathToOcspResponse, serverSideVerificationEnabled, clientSideOcspVerificationEnabled,
             false, 0);
     }
-    private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled, boolean clientSideOcspVerificationEnabled, boolean ffm,
+    private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled, boolean clientSideOcspVerificationEnabled,
                          boolean clientDiscoversResponderFromAIA, int ocspResponderPort) throws Exception {
         File certificateFile = new File(getPath(SERVER_CERTIFICATE_PATH));
         File certificateKeyFile = new File(getPath(SERVER_CERTIFICATE_KEY_PATH));
         File certificateChainFile = new File(getPath(CA_CERTIFICATE_PATH));
         Tomcat tomcat = getTomcatInstance();
         initSsl(tomcat, serverSideVerificationEnabled, certificateFile, certificateKeyFile, certificateChainFile);
-        TesterSupport.configureSSLImplementation(tomcat,
-                ffm ? "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation" : OpenSSLImplementation.class.getName(),
-                true);
+
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         Context context = tomcat.addContext("", null);
         Tomcat.addServlet(context, "simple", new TesterSupport.SimpleServlet());
