@@ -208,6 +208,10 @@
         entries are fully clean-up on session expiration. Patch provided by Kim
         Johan Andersson. (markt)
       </fix>
+      <fix>
+        Fix a race condition in the creation of the storage location for the
+        <code>FileStore</code>. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
