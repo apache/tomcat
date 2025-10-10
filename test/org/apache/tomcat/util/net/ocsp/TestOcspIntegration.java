@@ -98,8 +98,11 @@ public class TestOcspIntegration extends TomcatBaseTest {
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
+        /*
+         * Disabled until a Tomcat Native release (2.0.10 onwards) is available with the OCSP fix
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
+        */
         parameterSets.add(new Object[] {
                 "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
