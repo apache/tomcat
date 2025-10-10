@@ -84,7 +84,7 @@ public class SSLHostConfigCertificate implements Serializable {
     private StoreType storeType = null;
 
     public SSLHostConfigCertificate() {
-        this(null, Type.UNDEFINED);
+        this(null, DEFAULT_TYPE);
     }
 
     public SSLHostConfigCertificate(SSLHostConfig sslHostConfig, Type type) {
