@@ -21,12 +21,16 @@
 #
 # Output:
 #   ca-cert.pem
+#   client-keystore.p12
+#   client-password
+#   ocsp-client-good.der
+#   ocsp-client-revoked.der
+#   ocsp-good.der
+#   ocsp-revoked.der
 #   server-cert.pem
 #   server-key.pem
 #   trustStore.p12
 #   trust-password
-#   ocsp-good.der
-#   ocsp-revoked.der
 #
 # Usage: generate-ocsp-test-artifacts.sh
 #
