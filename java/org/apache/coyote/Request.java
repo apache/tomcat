@@ -86,7 +86,7 @@ public final class Request {
 
     private final MessageBytes schemeMB = MessageBytes.newInstance();
 
-    private final MessageBytes methodMB = MessageBytes.newInstance();
+    private String method;
     private final MessageBytes uriMB = MessageBytes.newInstance();
     private final MessageBytes decodedUriMB = MessageBytes.newInstance();
     private final MessageBytes queryMB = MessageBytes.newInstance();
@@ -306,34 +306,16 @@ public final class Request {
         return schemeMB;
     }
 
-    /**
-     * Get a MessageBytes instance that holds the current request's HTTP method.
-     *
-     * @return a MessageBytes instance that holds the current request's HTTP method.
-     *
-     * @deprecated Use {@link #getMethod()}, {@link Request#setMethod(String)} and {@link #setMethod(byte[], int, int)}
-     */
-    @Deprecated
-    public MessageBytes method() {
-        return methodMB;
-    }
-
     public void setMethod(String method) {
-        methodMB.setString(method);
+        this.method = method;
     }
 
     public void setMethod(byte[] buf, int start, int len) {
-        String method = Method.bytesToString(buf, start, len);
-        if (method == null) {
-            methodMB.setBytes(buf, start, len);
-            method = methodMB.toStringType();
-        } else {
-            methodMB.setString(method);
-        }
+        this.method = Method.bytesToString(buf, start, len);
     }
 
     public String getMethod() {
-        return methodMB.toStringType();
+        return method;
     }
 
     public MessageBytes requestURI() {
@@ -790,7 +772,7 @@ public final class Request {
         uriMB.recycle();
         decodedUriMB.recycle();
         queryMB.recycle();
-        methodMB.recycle();
+        method = null;
         protoMB.recycle();
 
         schemeMB.recycle();
