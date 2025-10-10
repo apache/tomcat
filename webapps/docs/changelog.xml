@@ -144,6 +144,9 @@
         requests received via the AJP connector were processed as OPTIONS
         requests and PROPFIND requests were processed as TRACE. (markt)
       </fix>
+      <fix>
+        Various OCSP processing issues in the OpenSSL FFM code. (dsoumis)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
