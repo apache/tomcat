@@ -242,9 +242,9 @@
         generating session cookie. Patch submitted by Marc Pynaert. (remm)
       </fix>
       <fix>
-        <bug>69848</bug>: Fix copy/paste error that meant DELETE requests
-        received via the AJP connector were processed as OPTIONS requests.
-        (markt)
+        <bug>69848</bug>: Fix copy/paste errors that meant DELETE requests
+        received via the AJP connector were processed as OPTIONS requests and
+        PROPFIND requests were processed as TRACE. (markt)
       </fix>
     </changelog>
   </subsection>
