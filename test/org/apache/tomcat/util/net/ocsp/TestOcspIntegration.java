@@ -82,6 +82,7 @@ import com.sun.net.httpserver.HttpServer;
 
 @RunWith(Parameterized.class)
 public class TestOcspIntegration extends TomcatBaseTest {
+
     private static final String CA_CERTIFICATE_PATH = "ca-cert.pem";
     private static final String SERVER_CERTIFICATE_PATH = "server-cert.pem";
     private static final String SERVER_CERTIFICATE_KEY_PATH = "server-key.pem";
@@ -98,6 +99,11 @@ public class TestOcspIntegration extends TomcatBaseTest {
     @Parameterized.Parameters(name = "{0}")
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
+        /*
+         * Future JSSE testing
+         parameterSets.add(new Object[] {
+                "JSSE", Boolean.FALSE, "org.apache.tomcat.util.net.jsse.JSSEImplementation"});
+         */
         /*
          * Disabled until a Tomcat Native release (2.0.10 onwards) is available with the OCSP fix
         parameterSets.add(new Object[] {
@@ -123,68 +129,83 @@ public class TestOcspIntegration extends TomcatBaseTest {
     public void testOcspGood_ClientVerifiesServerCertificateOnly() throws Exception {
         Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true));
     }
+
     @Test
     public void testOcspGood_Mutual() throws Exception {
-        testOCSPWithClientResponder(OCSP_CLIENT_CERT_GOOD_RESPONSE,
-                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, true)));
+        testOCSPWithClientResponder(OCSP_CLIENT_CERT_GOOD_RESPONSE, () -> Assert.assertEquals(HttpServletResponse.SC_OK,
+                testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, true)));
     }
+
     @Test
     public void testOcspGood_ServerVerifiesClientCertificateOnly() throws Exception {
-        testOCSPWithClientResponder(OCSP_CLIENT_CERT_GOOD_RESPONSE,
-                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, false)));
+        testOCSPWithClientResponder(OCSP_CLIENT_CERT_GOOD_RESPONSE, () -> Assert.assertEquals(HttpServletResponse.SC_OK,
+                testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, false)));
     }
+
     @Test(expected = CertificateRevokedException.class)
     public void testOcspRevoked_ClientVerifiesServerCertificateOnly() throws Exception {
         try {
             testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, true);
-        }catch (SSLHandshakeException sslHandshakeException) {
+        } catch (SSLHandshakeException sslHandshakeException) {
             handleExceptionWhenRevoked(sslHandshakeException);
         }
     }
+
     @Test(expected = CertificateRevokedException.class)
     public void testOcspRevoked_Mutual() throws Exception {
         try {
             // The exception is thrown before server side verification, while client does OCSP verification.
             testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, true, true);
-        }catch (SSLHandshakeException sslHandshakeException) {
+        } catch (SSLHandshakeException sslHandshakeException) {
             handleExceptionWhenRevoked(sslHandshakeException);
         }
     }
+
     @Test(expected = SSLHandshakeException.class)
     public void testOcspRevoked_ServerVerifiesClientCertificateOnly() throws Exception {
         testOCSPWithClientResponder(OCSP_CLIENT_CERT_REVOKED_RESPONSE,
                 () -> testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, false));
     }
+
     @Test
     public void testOcsp_NoVerification() throws Exception {
-        testOCSPWithClientResponder(OCSP_CLIENT_CERT_REVOKED_RESPONSE,
-                () -> Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, false)));
+        testOCSPWithClientResponder(OCSP_CLIENT_CERT_REVOKED_RESPONSE, () -> Assert
+                .assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_REVOKED_RESPONSE, false, false)));
     }
+
     @Test
     public void testOcspResponderUrlDiscoveryViaCertificateAIA() throws Exception {
         final int ocspPort = 8888;
         Assume.assumeTrue("Port " + ocspPort + " is not available.", isPortAvailable(ocspPort));
-        Assert.assertEquals(HttpServletResponse.SC_OK, testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true,
-                true, ocspPort));
+        Assert.assertEquals(HttpServletResponse.SC_OK,
+                testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true, true, ocspPort));
     }
+
     @FunctionalInterface
     private interface TestOCSPAction {
         void execute() throws Exception;
     }
-    private void testOCSPWithClientResponder(String clientResponsePath, TestOCSPAction testOCSPAction) throws Exception {
+
+    private void testOCSPWithClientResponder(String clientResponsePath, TestOCSPAction testOCSPAction)
+            throws Exception {
         final int ocspResponderPortForClient = 8889;
-        Assume.assumeTrue("Port " + ocspResponderPortForClient + " is not available.", isPortAvailable(ocspResponderPortForClient));
-        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(Files.readAllBytes(new File(getPath(clientResponsePath)).toPath()), ocspResponderPortForClient)){
+        Assume.assumeTrue("Port " + ocspResponderPortForClient + " is not available.",
+                isPortAvailable(ocspResponderPortForClient));
+        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(
+                Files.readAllBytes(new File(getPath(clientResponsePath)).toPath()), ocspResponderPortForClient)) {
             fakeOcspResponder.start();
             testOCSPAction.execute();
         }
     }
-    private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled, boolean clientSideOcspVerificationEnabled) throws Exception {
-        return testOCSP(pathToOcspResponse, serverSideVerificationEnabled, clientSideOcspVerificationEnabled,
-            false, 0);
+
+    private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled,
+            boolean clientSideOcspVerificationEnabled) throws Exception {
+        return testOCSP(pathToOcspResponse, serverSideVerificationEnabled, clientSideOcspVerificationEnabled, false, 0);
     }
-    private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled, boolean clientSideOcspVerificationEnabled,
-                         boolean clientDiscoversResponderFromAIA, int ocspResponderPort) throws Exception {
+
+    private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled,
+            boolean clientSideOcspVerificationEnabled, boolean clientDiscoversResponderFromAIA, int ocspResponderPort)
+            throws Exception {
         File certificateFile = new File(getPath(SERVER_CERTIFICATE_PATH));
         File certificateKeyFile = new File(getPath(SERVER_CERTIFICATE_KEY_PATH));
         File certificateChainFile = new File(getPath(CA_CERTIFICATE_PATH));
@@ -199,10 +220,12 @@ public class TestOcspIntegration extends TomcatBaseTest {
 
         KeyStore trustStore = KeyStore.getInstance(KEYSTORE_TYPE);
         String trustStorePass = Files.readString(new File(getPath(TRUSTSTORE_PASS)).toPath()).trim();
-        trustStore.load(new FileInputStream(new File(getPath(TRUSTSTORE_PATH)).getAbsolutePath()), trustStorePass.toCharArray());
+        trustStore.load(new FileInputStream(new File(getPath(TRUSTSTORE_PATH)).getAbsolutePath()),
+                trustStorePass.toCharArray());
         KeyStore clientKeystore = KeyStore.getInstance(KEYSTORE_TYPE);
         String clientKeystorePass = Files.readString(new File(getPath(CLIENT_KEYSTORE_PASS)).toPath()).trim();
-        clientKeystore.load(new FileInputStream(new File(getPath(CLIENT_KEYSTORE_PATH)).getAbsolutePath()), clientKeystorePass.toCharArray());
+        clientKeystore.load(new FileInputStream(new File(getPath(CLIENT_KEYSTORE_PATH)).getAbsolutePath()),
+                clientKeystorePass.toCharArray());
         byte[] ocspResponse = Files.readAllBytes(new File(getPath(pathToOcspResponse)).toPath());
         try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(ocspResponse, ocspResponderPort)) {
             fakeOcspResponder.start();
@@ -212,7 +235,9 @@ public class TestOcspIntegration extends TomcatBaseTest {
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             SSLSocketFactory sslSocketFactory;
             if (clientSideOcspVerificationEnabled) {
-                sslSocketFactory = buildClientSslSocketFactoryWithOcsp(clientDiscoversResponderFromAIA ? null : fakeOcspResponder.url(), trustStore, clientKeystore, clientKeystorePass);
+                sslSocketFactory = buildClientSslSocketFactoryWithOcsp(
+                        clientDiscoversResponderFromAIA ? null : fakeOcspResponder.url(), trustStore, clientKeystore,
+                        clientKeystorePass);
             } else {
                 sslSocketFactory = buildClientSslSocketFactoryNoOcsp(trustStore, clientKeystore, clientKeystorePass);
             }
@@ -224,7 +249,8 @@ public class TestOcspIntegration extends TomcatBaseTest {
         }
     }
 
-    private static void initSsl(Tomcat tomcat, boolean serverSideVerificationEnabled, File certificateFile, File certificateKeyFile, File certificateChainFile) {
+    private static void initSsl(Tomcat tomcat, boolean serverSideVerificationEnabled, File certificateFile,
+            File certificateKeyFile, File certificateChainFile) {
         Connector connector = tomcat.getConnector();
         connector.setSecure(true);
         connector.setProperty("SSLEnabled", "true");
@@ -244,7 +270,8 @@ public class TestOcspIntegration extends TomcatBaseTest {
         connector.addSslHostConfig(sslHostConfig);
     }
 
-    private static SSLSocketFactory buildClientSslSocketFactoryWithOcsp(String ocspUrl, KeyStore trustStore, KeyStore clientKeystore, String clientKeystorePass) throws Exception {
+    private static SSLSocketFactory buildClientSslSocketFactoryWithOcsp(String ocspUrl, KeyStore trustStore,
+            KeyStore clientKeystore, String clientKeystorePass) throws Exception {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(clientKeystore, clientKeystorePass.toCharArray());
         Set<TrustAnchor> trustAnchors = getTrustAnchorsFromKeystore(trustStore);
@@ -261,14 +288,18 @@ public class TestOcspIntegration extends TomcatBaseTest {
         trustManagerFactory.init(new CertPathTrustManagerParameters(pkix));
         return initSSLContext(kmf, trustManagerFactory).getSocketFactory();
     }
-    private static SSLSocketFactory buildClientSslSocketFactoryNoOcsp(KeyStore trustStore, KeyStore clientKeystore, String clientKeystorePass) throws Exception {
+
+    private static SSLSocketFactory buildClientSslSocketFactoryNoOcsp(KeyStore trustStore, KeyStore clientKeystore,
+            String clientKeystorePass) throws Exception {
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         kmf.init(clientKeystore, clientKeystorePass.toCharArray());
         TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
         trustManagerFactory.init(trustStore);
         return initSSLContext(kmf, trustManagerFactory).getSocketFactory();
     }
-    private static SSLContext initSSLContext(KeyManagerFactory keyManagerFactory, TrustManagerFactory trustManagerFactory) throws Exception {
+
+    private static SSLContext initSSLContext(KeyManagerFactory keyManagerFactory,
+            TrustManagerFactory trustManagerFactory) throws Exception {
         SSLContext sslContext;
         if (TesterSupport.isTlsv13Available()) {
             sslContext = SSLContext.getInstance(Constants.SSL_PROTO_TLSv1_3);
@@ -278,6 +309,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
         sslContext.init(keyManagerFactory.getKeyManagers(), trustManagerFactory.getTrustManagers(), null);
         return sslContext;
     }
+
     private static Set<TrustAnchor> getTrustAnchorsFromKeystore(KeyStore keyStore) throws KeyStoreException {
         Set<TrustAnchor> trustAnchors = new HashSet<>();
         Enumeration<String> aliases = keyStore.aliases();
@@ -290,6 +322,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
         }
         return trustAnchors;
     }
+
     private static void handleExceptionWhenRevoked(Exception exception) throws Exception {
         if (exception.getCause().getCause() instanceof CertPathValidatorException cpe) {
             Assert.assertEquals("REVOKED", cpe.getReason().toString());
