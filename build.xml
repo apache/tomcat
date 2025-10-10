@@ -3278,6 +3278,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       <include name=".travis/*.sh" />
       <include name="res/graal/*.sh" />
       <include name="res/openssl/*.sh" />
+      <include name="test/org/apache/tomcat/util/net/ocsp/*.sh" />
     </fixcrlf>
 
     <zip zipfile="${tomcat.release}/v${version}/src/${final-src.name}.zip"
@@ -3300,6 +3301,7 @@ Configured for ${release.asfusername} to release Tomcat ${version.major}.${versi
       <include name=".travis/*.sh" />
       <include name="res/graal/*.sh" />
       <include name="res/openssl/*.sh" />
+      <include name="test/org/apache/tomcat/util/net/ocsp/*.sh" />
     </fixcrlf>
 
     <!-- Reproducible builds: consistent timestamps for distributed files -->
