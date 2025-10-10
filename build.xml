@@ -330,6 +330,7 @@
     <include name="**/*.jj"/>
     <include name="**/*.jjt"/>
     <include name="**/*.json"/>
+    <include name="**/*.json5"/>
     <include name="**/*.jsp"/>
     <include name="**/*.jspf"/>
     <include name="**/*.jspx"/>
