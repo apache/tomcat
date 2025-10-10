@@ -143,6 +143,11 @@
         <bug>69836</bug>: Incorrect processing of partitioned setting when
         generating session cookie. Patch submitted by Marc Pynaert. (remm)
       </fix>
+      <fix>
+        <bug>69848</bug>: Fix copy/paste error in 11.0.12 that meant DELETE
+        requests received via the AJP connector were processed as OPTIONS
+        requests. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
