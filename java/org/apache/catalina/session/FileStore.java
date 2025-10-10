@@ -278,12 +278,12 @@ public final class FileStore extends StoreBase {
      * Return a File object representing the pathname to our session persistence directory, if any. The directory will
      * be created if it does not already exist.
      */
-    private File directory() throws IOException {
+    private synchronized File directory() throws IOException {
+        // Synchronised to avoid concurrent attempts to create the directory.
         if (this.directory == null) {
             return null;
         }
         if (this.directoryFile != null) {
-            // NOTE: Race condition is harmless, so do not synchronize
             return this.directoryFile;
         }
         File file = new File(this.directory);
