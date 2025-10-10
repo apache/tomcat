@@ -313,6 +313,7 @@
     <include name="**/javax.websocket.ContainerProvider"/>
     <include name="**/javax.websocket.server.ServerEndpointConfig$Configurator"/>
     <include name="**/.gitignore"/>
+    <include name="**/*-password"/>
     <include name="**/*.bnd"/>
     <include name="**/*.classpath"/>
     <include name="**/*.conf"/>
