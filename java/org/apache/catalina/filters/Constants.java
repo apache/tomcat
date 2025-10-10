@@ -16,8 +16,6 @@
  */
 package org.apache.catalina.filters;
 
-import org.apache.tomcat.util.http.Method;
-
 /**
  * Manifest constants for this Java package.
  */
@@ -42,9 +40,6 @@ public final class Constants {
      * The servlet context attribute key under which the CSRF request parameter name can be found.
      */
     public static final String CSRF_NONCE_REQUEST_PARAM_NAME_KEY = "org.apache.catalina.filters.CSRF_NONCE_PARAM_NAME";
-
-    @Deprecated
-    public static final String METHOD_GET = Method.GET;
 
     public static final String CSRF_REST_NONCE_HEADER_NAME = "X-CSRF-Token";
 

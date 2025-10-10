@@ -51,19 +51,6 @@ public class ResolverImpl extends Resolver {
     private final Log containerLog;
 
 
-    /**
-     * Create a resolver for the given request.
-     *
-     * @param request The request
-     *
-     * @deprecated Will be removed in Tomcat 12 onwards. Use {@link #ResolverImpl(Request, Log)}
-     */
-    @Deprecated
-    public ResolverImpl(Request request) {
-        this(request, request.getContext().getLogger());
-    }
-
-
     public ResolverImpl(Request request, Log containerLog) {
         this.request = request;
         this.containerLog = containerLog;
