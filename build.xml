@@ -4426,6 +4426,86 @@ Signature mismatch for @{src-or-bin}/@{basefile}:
     </sequential>
   </macrodef>
 
+  <macrodef name="compare-signatures">
+    <attribute name="basefile" />
+    <attribute name="num" />
+    <attribute name="src-or-bin" />
+    <sequential>
+      <exec executable="${gpg.exec}"
+            failonerror="false"
+            resultproperty="gpgverify-@{num}"
+            discardOutput="true"
+            logError="true">
+        <!-- Only use the keyring from our own repository -->
+        <arg value="--no-default-keyring" />
+        <arg value="--primary-keyring" />
+        <arg value="${tomcat.release.verify}/apache-keys" />
+        <!-- Always trust keys in this keyring, even without explicit trust -->
+        <arg value="--trust-model" />
+        <arg value="always" />
+        <arg value="--verify"/>
+        <arg value="${tomcat.release.verify}/@{basefile}.asc" />
+        <arg value="output/release/v${version}/@{src-or-bin}/@{basefile}" />
+      </exec>
+
+      <condition property="validsignature-@{num}">
+        <equals arg1="${gpgverify-@{num}}" arg2="0"/>
+      </condition>
+
+      <echo if:set="validsignature-@{num}">
+Valid signature for @{src-or-bin}/@{basefile}
+</echo>
+      <echo unless:set="validsignature-@{num}">
+
+
+
+**********************************************
+**********************************************
+Invalid signature for @{src-or-bin}/@{basefile}
+**********************************************
+**********************************************
+
+
+
+</echo>
+    </sequential>
+  </macrodef>
+
+  <macrodef name="get-release-signature">
+    <attribute name="basefile" />
+    <attribute name="src-or-bin" />
+
+    <sequential>
+      <local name="success" />
+
+      <!-- Release hashes can be either 'released' or staged-for-release -->
+      <!-- First, try to find a released version hash. -->
+      <antcall target="trydownload">
+        <param name="sourcefile" value="https://dist.apache.org/repos/dist/release/tomcat/tomcat-${version.major}/v${version}/@{src-or-bin}/@{basefile}.asc" />
+        <param name="destfile" value="${tomcat.release.verify}/@{basefile}.asc" />
+      </antcall>
+      <!-- If necessary, try to find a dev version hash. -->
+      <antcall target="trydownload">
+        <param name="sourcefile" value="https://dist.apache.org/repos/dist/dev/tomcat/tomcat-${version.major}/v${version}/@{src-or-bin}/@{basefile}.asc" />
+        <param name="destfile" value="${tomcat.release.verify}/@{basefile}.asc" />
+      </antcall>
+
+      <condition property="success">
+        <or>
+          <available file="${tomcat.release.verify}/@{basefile}.asc" />
+          <and>
+            <contains string="${version}" substring="11.0." /><!-- Super hack -->
+            <contains string="@{basefile}" substring="x86" />
+          </and>
+        </or>
+      </condition>
+
+      <fail unless="success">
+Unable to locate release signature for @{basefile}
+</fail>
+    </sequential>
+  </macrodef>
+
   <target name="verify-release" depends="-check-release-toolchain-versions, -require-release-toolchain-versions" description="Verifies a release build against published hashes.">
 
     <available property="released" file="build.properties.release" />
@@ -4440,6 +4520,16 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
 </fail>
     <delete dir="${tomcat.release.verify}" />
     <mkdir dir="${tomcat.release.verify}" />
+<!--    <chmod dir="${tomcat.release.verify}" perm="700"/>--><!-- To make gpg happy -->
+
+    <exec executable="gpg" failonerror="false"><!-- Not sure why this returns 2 on 'success?' -->
+      <arg value="--no-default-keyring" />
+      <arg value="--primary-keyring" />
+      <arg value="${tomcat.release.verify}/apache-keys"/>
+      <arg value="--import"/>
+      <arg value="KEYS"/>
+    </exec>
+
     <get-release-hash src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
@@ -4451,6 +4541,17 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
     <get-release-hash src-or-bin="src" basefile="${final-src.name}.tar.gz" />
     <get-release-hash src-or-bin="src" basefile="${final-src.name}.zip" />
 
+    <get-release-signature src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}-deployer.zip" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}.exe" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}.tar.gz" />
+    <get-release-signature src-or-bin="bin" basefile="${final.name}.zip" />
+    <get-release-signature src-or-bin="src" basefile="${final-src.name}.tar.gz" />
+    <get-release-signature src-or-bin="src" basefile="${final-src.name}.zip" />
+
     <compare-hashes num="1"  src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
     <compare-hashes num="2"  src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <compare-hashes num="3"  src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
@@ -4461,6 +4562,23 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
     <compare-hashes num="8"  src-or-bin="bin" basefile="${final.name}.zip" />
     <compare-hashes num="9"  src-or-bin="src" basefile="${final-src.name}.tar.gz" />
     <compare-hashes num="10" src-or-bin="src" basefile="${final-src.name}.zip" />
+
+    <echo>
+Don't worry if there are a bunch of "WARNING: untrusted key" warnings below.
+It's just because the KEYS -&gt; apache-keys import doesn't contain any ownertrust
+information.
+</echo>
+
+    <compare-signatures num="1"  src-or-bin="bin" basefile="${final.name}-deployer.tar.gz" />
+    <compare-signatures num="2"  src-or-bin="bin" basefile="${final.name}-deployer.zip" />
+    <compare-signatures num="3"  src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
+    <compare-signatures num="4"  src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
+    <compare-signatures num="5"  src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
+    <compare-signatures num="6"  src-or-bin="bin" basefile="${final.name}.exe" />
+    <compare-signatures num="7"  src-or-bin="bin" basefile="${final.name}.tar.gz" />
+    <compare-signatures num="8"  src-or-bin="bin" basefile="${final.name}.zip" />
+    <compare-signatures num="9"  src-or-bin="src" basefile="${final-src.name}.tar.gz" />
+    <compare-signatures num="10" src-or-bin="src" basefile="${final-src.name}.zip" />
 
 <!--
 <echo>
@@ -4494,6 +4612,17 @@ reproducible-10=${reproducible-10}
         <isset property="reproducible-8" />
         <isset property="reproducible-9" />
         <isset property="reproducible-10" />
+
+        <isset property="validsignature-1" />
+        <isset property="validsignature-2" />
+        <isset property="validsignature-3" />
+        <isset property="validsignature-4" />
+        <isset property="validsignature-5" />
+        <isset property="validsignature-6" />
+        <isset property="validsignature-7" />
+        <isset property="validsignature-8" />
+        <isset property="validsignature-9" />
+        <isset property="validsignature-10" />
       </and>
     </condition>
 
