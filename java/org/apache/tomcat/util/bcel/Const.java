@@ -269,6 +269,22 @@ public final class Const {
     public static final short MAJOR_24 = 68;
 
     /**
+     * Minor version number of class files for Java 25: {@value}.
+     *
+     * @see #MAJOR_25
+     * @since 6.11.0
+     */
+    public static final short MINOR_25 = 0;
+
+    /**
+     * Major version number of class files for Java 25: {@value}.
+     *
+     * @see #MINOR_25
+     * @since 6.11.0
+     */
+    public static final short MAJOR_25 = 69;
+
+    /**
      * Get the CONSTANT_NAMES entry at the given index.
      *
      * @param index index into {@code CONSTANT_NAMES}.
