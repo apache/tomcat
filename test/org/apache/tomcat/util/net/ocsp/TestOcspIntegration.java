@@ -182,6 +182,17 @@ public class TestOcspIntegration extends TomcatBaseTest {
                 testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, false, true, true, ocspPort));
     }
 
+    public static void testLongUrlForOcspViaAIAWithTomcatNative(Tomcat tomcat) throws Exception {
+        final int ocspResponderPortForClient = 8889;
+        Assume.assumeTrue("Port " + ocspResponderPortForClient + " is not available.", isPortAvailable(ocspResponderPortForClient));
+        try (FakeOcspResponder fakeOcspResponder = new FakeOcspResponder(true, "/ocsp/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                Files.readAllBytes(new File(getPath(OCSP_CLIENT_CERT_REVOKED_RESPONSE)).toPath()), ocspResponderPortForClient)) {
+            fakeOcspResponder.start();
+            testOCSP(tomcat, OCSP_SERVER_CERT_GOOD_RESPONSE, true, false, false, 0,
+                    "org.apache.tomcat.util.net.openssl.OpenSSLImplementation", true);
+        }
+    }
+
     @FunctionalInterface
     private interface TestOCSPAction {
         void execute() throws Exception;
@@ -205,7 +216,16 @@ public class TestOcspIntegration extends TomcatBaseTest {
     }
 
     private int testOCSP(String pathToOcspResponse, boolean serverSideVerificationEnabled,
-            boolean clientSideOcspVerificationEnabled, boolean clientDiscoversResponderFromAIA, int ocspResponderPort)
+                                boolean clientSideOcspVerificationEnabled, boolean clientDiscoversResponderFromAIA, int ocspResponderPort)
+        throws Exception {
+        return testOCSP(getTomcatInstance(), pathToOcspResponse, serverSideVerificationEnabled,
+            clientSideOcspVerificationEnabled, clientDiscoversResponderFromAIA, ocspResponderPort,
+            sslImplementationName, useOpenSSL);
+    }
+
+    private static int testOCSP(Tomcat tomcat, String pathToOcspResponse, boolean serverSideVerificationEnabled,
+            boolean clientSideOcspVerificationEnabled, boolean clientDiscoversResponderFromAIA, int ocspResponderPort,
+                                String sslImplementationName, boolean useOpenSSL)
             throws Exception {
 
         Assume.assumeFalse("BoringSSL does not allow supporting OCSP",
@@ -214,7 +234,6 @@ public class TestOcspIntegration extends TomcatBaseTest {
         File certificateFile = new File(getPath(SERVER_CERTIFICATE_PATH));
         File certificateKeyFile = new File(getPath(SERVER_CERTIFICATE_KEY_PATH));
         File certificateChainFile = new File(getPath(CA_CERTIFICATE_PATH));
-        Tomcat tomcat = getTomcatInstance();
         initSsl(tomcat, serverSideVerificationEnabled, certificateFile, certificateKeyFile, certificateChainFile);
 
         TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
@@ -236,7 +255,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
             fakeOcspResponder.start();
             tomcat.start();
 
-            URL url = new URI("https://127.0.0.1:" + getPort() + "/").toURL();
+            URL url = new URI("https://127.0.0.1:" + tomcat.getConnector().getLocalPort() + "/").toURL();
             HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
             SSLSocketFactory sslSocketFactory;
             if (clientSideOcspVerificationEnabled) {
@@ -345,6 +364,14 @@ public class TestOcspIntegration extends TomcatBaseTest {
         private final byte[] ocspResponse;
         private HttpServer server;
         private int port;
+        private boolean strictPath = false;
+        private String path = "/ocsp";
+
+        FakeOcspResponder(boolean strictPath, String path, byte[] ocspResponse, int port) {
+            this(ocspResponse, port);
+            this.strictPath = strictPath;
+            this.path = path;
+        }
 
         FakeOcspResponder(byte[] ocspResponse, int port) {
             this.ocspResponse = ocspResponse;
@@ -353,7 +380,15 @@ public class TestOcspIntegration extends TomcatBaseTest {
 
         void start() throws IOException {
             server = HttpServer.create(new InetSocketAddress("127.0.0.1", port), 0);
-            server.createContext("/ocsp", httpExchange -> {
+            server.createContext(this.path, httpExchange -> {
+                if (strictPath) {
+                    String path = httpExchange.getRequestURI().getPath();
+                    if (!this.path.equals(path)) {
+                        httpExchange.sendResponseHeaders(404, -1);
+                        httpExchange.close();
+                        return;
+                    }
+                }
                 byte[] body = ocspResponse;
                 Headers headers = httpExchange.getResponseHeaders();
                 headers.add("Content-Type", "application/ocsp-response");
@@ -367,7 +402,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
         }
 
         String url() {
-            return "http://127.0.0.1:" + port + "/ocsp";
+            return "http://127.0.0.1:" + port + path;
         }
         @Override public void close() {
             if (server != null) {
@@ -376,11 +411,11 @@ public class TestOcspIntegration extends TomcatBaseTest {
         }
     }
 
-    private String getPath(String file) throws IOException {
+    private static String getPath(String file) throws IOException {
         if (file == null) {
             return null;
         }
-        String packageName = this.getClass().getPackageName();
+        String packageName = TestOcspIntegration.class.getPackageName();
         String path = packageName.replace(".", File.separator);
         File f = new File("test" + File.separator + path + File.separator + file);
 
@@ -388,7 +423,7 @@ public class TestOcspIntegration extends TomcatBaseTest {
     }
 
     @SuppressWarnings("unused")
-    private boolean isPortAvailable(int port) {
+    private static boolean isPortAvailable(int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             return true;
         } catch (IOException e) {
