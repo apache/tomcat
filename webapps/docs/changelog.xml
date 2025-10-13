@@ -105,6 +105,13 @@
   issues do not "pop up" wrt. others).
 -->
 <section name="Tomcat 11.0.14 (markt)" rtext="in development">
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update the internal fork of Apache Commons BCEL to 6.11.0. (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.13 (markt)" rtext="2025-10-13">
   <subsection name="Catalina">
