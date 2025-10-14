@@ -61,7 +61,7 @@ public final class FileStore extends StoreBase {
      * The pathname of the directory in which Sessions are stored. This may be an absolute pathname, or a relative path
      * that is resolved against the temporary work directory for this application.
      */
-    private String directory = ".";
+    private volatile String directory = ".";
 
 
     /**
@@ -98,7 +98,7 @@ public final class FileStore extends StoreBase {
      *
      * @param path The new directory path
      */
-    public void setDirectory(String path) {
+    public synchronized void setDirectory(String path) {
         String oldDirectory = this.directory;
         this.directory = path;
         this.directoryFile = null;
