@@ -3604,52 +3604,52 @@ public class openssl_h {
         }
     }
 
-    private static class X509_STORE_CTX_get0_current_issuer {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
+    private static class X509_STORE_CTX_get1_issuer {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
-        public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get0_current_issuer");
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get1_issuer");
 
         public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
     }
 
     /**
      * Function descriptor for:
-     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get1_issuer(X509 **issuer, X509_STORE_CTX *ctx, X509 *x)
      * }
      */
-    public static FunctionDescriptor X509_STORE_CTX_get0_current_issuer$descriptor() {
-        return X509_STORE_CTX_get0_current_issuer.DESC;
+    public static FunctionDescriptor X509_STORE_CTX_get1_issuer$descriptor() {
+        return X509_STORE_CTX_get1_issuer.DESC;
     }
 
     /**
      * Downcall method handle for:
-     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get1_issuer(X509 **issuer, X509_STORE_CTX *ctx, X509 *x)
      * }
      */
-    public static MethodHandle X509_STORE_CTX_get0_current_issuer$handle() {
-        return X509_STORE_CTX_get0_current_issuer.HANDLE;
+    public static MethodHandle X509_STORE_CTX_get1_issuer$handle() {
+        return X509_STORE_CTX_get1_issuer.HANDLE;
     }
 
     /**
      * Address for:
-     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get1_issuer(X509 **issuer, X509_STORE_CTX *ctx, X509 *x)
      * }
      */
-    public static MemorySegment X509_STORE_CTX_get0_current_issuer$address() {
-        return X509_STORE_CTX_get0_current_issuer.ADDR;
+    public static MemorySegment X509_STORE_CTX_get1_issuer$address() {
+        return X509_STORE_CTX_get1_issuer.ADDR;
     }
 
     /**
-     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * {@snippet lang = c : * int X509_STORE_CTX_get1_issuer(X509 **issuer, X509_STORE_CTX *ctx, X509 *x)
      * }
      */
-    public static MemorySegment X509_STORE_CTX_get0_current_issuer(MemorySegment ctx) {
-        var mh$ = X509_STORE_CTX_get0_current_issuer.HANDLE;
+    public static int X509_STORE_CTX_get1_issuer(MemorySegment issuer, MemorySegment ctx, MemorySegment x) {
+        var mh$ = X509_STORE_CTX_get1_issuer.HANDLE;
         try {
             if (TRACE_DOWNCALLS) {
-                traceDowncall("X509_STORE_CTX_get0_current_issuer", ctx);
+                traceDowncall("X509_STORE_CTX_get1_issuer", issuer, ctx, x);
             }
-            return (MemorySegment) mh$.invokeExact(ctx);
+            return (int) mh$.invokeExact(issuer, ctx, x);
         } catch (Throwable ex$) {
             throw new AssertionError("should not reach here", ex$);
         }
