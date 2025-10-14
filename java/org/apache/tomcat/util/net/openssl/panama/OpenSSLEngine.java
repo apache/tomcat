@@ -59,7 +59,6 @@ import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
-import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
 import org.apache.tomcat.util.openssl.SSL_set_info_callback$cb;
@@ -1203,12 +1202,18 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
             } else {
                 try (var localArena = Arena.ofConfined()) {
                     // If we can't get the issuer, we cannot perform OCSP verification
-                    MemorySegment x509IssuerPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
-                    int res = X509_STORE_CTX_get1_issuer(x509IssuerPointer, x509ctx, x509);
-                    if (res > 0) {
-                        MemorySegment issuer = MemorySegment.NULL;
-                        try {
-                            issuer = x509IssuerPointer.get(ValueLayout.ADDRESS, 0);
+                    MemorySegment issuer = MemorySegment.NULL;
+                    try {
+                        if (openssl_h_Compatibility.OPENSSL && !openssl_h_Compatibility.OPENSSL3) {
+                            issuer = openssl_h_Compatibility.X509_STORE_CTX_get0_current_issuer(x509ctx);
+                        } else {
+                            MemorySegment x509IssuerPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
+                            int res = X509_STORE_CTX_get1_issuer(x509IssuerPointer, x509ctx, x509);
+                            if (res > 0) {
+                                issuer = x509IssuerPointer.get(ValueLayout.ADDRESS, 0);
+                            }
+                        }
+                        if (!MemorySegment.NULL.equals(issuer)) {
                             // sslutils.c ssl_ocsp_request(x509, issuer, x509ctx);
                             int nid = X509_get_ext_by_NID(x509, NID_info_access(), -1);
                             if (nid >= 0) {
@@ -1246,9 +1251,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                                     }
                                 }
                             }
-                        } finally {
-                            X509_free(issuer);
                         }
+                    } finally {
+                        X509_free(issuer);
                     }
                 }
             }
@@ -1287,7 +1292,7 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static int processOCSPRequest(URL url, MemorySegment issuer, MemorySegment x509,
             MemorySegment /* X509_STORE_CTX */ x509ctx, Arena localArena) {
-        if (OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName())) {
+        if (openssl_h_Compatibility.BORINGSSL) {
             return V_OCSP_CERTSTATUS_UNKNOWN();
         }
         MemorySegment ocspRequest = MemorySegment.NULL;

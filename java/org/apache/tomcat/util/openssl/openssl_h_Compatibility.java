@@ -135,6 +135,58 @@ public class openssl_h_Compatibility {
         }
     }
 
+    private static class X509_STORE_CTX_get0_current_issuer {
+        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_POINTER, openssl_h.C_POINTER);
+
+        public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get0_current_issuer");
+
+        public static final MethodHandle HANDLE = Linker.nativeLinker().downcallHandle(ADDR, DESC);
+    }
+
+    /**
+     * OpenSSL 1.1 X509_STORE_CTX_get0_current_issuer
+     * Function descriptor for:
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * }
+     */
+    public static FunctionDescriptor X509_STORE_CTX_get0_current_issuer$descriptor() {
+        return X509_STORE_CTX_get0_current_issuer.DESC;
+    }
+
+    /**
+     * Downcall method handle for:
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * }
+     */
+    public static MethodHandle X509_STORE_CTX_get0_current_issuer$handle() {
+        return X509_STORE_CTX_get0_current_issuer.HANDLE;
+    }
+
+    /**
+     * Address for:
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * }
+     */
+    public static MemorySegment X509_STORE_CTX_get0_current_issuer$address() {
+        return X509_STORE_CTX_get0_current_issuer.ADDR;
+    }
+
+    /**
+     * {@snippet lang = c : * X509 *X509_STORE_CTX_get0_current_issuer(const X509_STORE_CTX *ctx)
+     * }
+     */
+    public static MemorySegment X509_STORE_CTX_get0_current_issuer(MemorySegment ctx) {
+        var mh$ = X509_STORE_CTX_get0_current_issuer.HANDLE;
+        try {
+            if (openssl_h.TRACE_DOWNCALLS) {
+                openssl_h.traceDowncall("X509_STORE_CTX_get0_current_issuer", ctx);
+            }
+            return (MemorySegment) mh$.invokeExact(ctx);
+        } catch (Throwable ex$) {
+            throw new AssertionError("should not reach here", ex$);
+        }
+    }
+
     // LibreSSL SSL_CTRL_OPTIONS
     public static final int SSL_CTRL_OPTIONS = 32;
 
