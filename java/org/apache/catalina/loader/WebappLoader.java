@@ -570,6 +570,9 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
             URL[] repositories = ((URLClassLoader) loader).getURLs();
             for (URL url : repositories) {
                 String repository = url.toString();
+                if (repository == null) {
+                    continue;
+                }
                 if (repository.startsWith("file:")) {
                     // Let the JRE handle all the edge cases for URL to path conversion.
                     try {
@@ -579,9 +582,6 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
                         // Can't convert from URL to URI. Treat as non-file URL and skip.
                     }
                 } else {
-                    continue;
-                }
-                if (repository == null) {
                     continue;
                 }
                 if (classpath.length() > 0) {
