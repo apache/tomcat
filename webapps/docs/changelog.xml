@@ -181,6 +181,11 @@
         <code>RemoteAddrValve</code>. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        When generating the class path in the Loader, re-order the check on
+        individual class path components to avoid a potential
+        <code>NullPointerException</code>. Identified by Coverity Scan. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
