@@ -163,6 +163,8 @@ public class TestOcspIntegration extends TomcatBaseTest {
 
     @Test(expected = SSLHandshakeException.class)
     public void testOcspRevoked_ServerVerifiesClientCertificateOnly() throws Exception {
+        Assume.assumeFalse("BoringSSL does not support OCSP in a compatible way",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
         testOCSPWithClientResponder(OCSP_CLIENT_CERT_REVOKED_RESPONSE,
                 () -> testOCSP(OCSP_SERVER_CERT_GOOD_RESPONSE, true, false));
     }
@@ -231,9 +233,6 @@ public class TestOcspIntegration extends TomcatBaseTest {
             boolean clientSideOcspVerificationEnabled, boolean clientDiscoversResponderFromAIA, int ocspResponderPort,
                                 String sslImplementationName, boolean useOpenSSL)
             throws Exception {
-
-        Assume.assumeFalse("BoringSSL does not allow supporting OCSP",
-                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
 
         File certificateFile = new File(getPath(SERVER_CERTIFICATE_PATH));
         File certificateKeyFile = new File(getPath(SERVER_CERTIFICATE_KEY_PATH));
