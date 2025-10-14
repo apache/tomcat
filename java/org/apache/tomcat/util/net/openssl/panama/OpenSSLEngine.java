@@ -59,6 +59,7 @@ import org.apache.tomcat.util.buf.Asn1Parser;
 import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.net.Constants;
 import org.apache.tomcat.util.net.SSLUtil;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 import org.apache.tomcat.util.net.openssl.ciphers.OpenSSLCipherConfigurationParser;
 import org.apache.tomcat.util.openssl.SSL_CTX_set_verify$callback;
 import org.apache.tomcat.util.openssl.SSL_set_info_callback$cb;
@@ -1200,46 +1201,53 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                 // don't do OCSP checking for valid self-issued certs
                 X509_STORE_CTX_set_error(x509ctx, X509_V_OK());
             } else {
-                // If we can't get the issuer, we cannot perform OCSP verification
-                MemorySegment issuer = X509_STORE_CTX_get0_current_issuer(x509ctx);
-                if (!MemorySegment.NULL.equals(issuer)) {
-                    // sslutils.c ssl_ocsp_request(x509, issuer, x509ctx);
-                    int nid = X509_get_ext_by_NID(x509, NID_info_access(), -1);
-                    if (nid >= 0) {
-                        try (var localArenal = Arena.ofConfined()) {
-                            MemorySegment ext = X509_get_ext(x509, nid);
-                            MemorySegment os = X509_EXTENSION_get_data(ext);
-                            int length = ASN1_STRING_length(os);
-                            MemorySegment data = ASN1_STRING_get0_data(os);
-                            // ocsp_urls = decode_OCSP_url(os);
-                            byte[] asn1String =
-                                    data.reinterpret(length, localArenal, null).toArray(ValueLayout.JAVA_BYTE);
-                            Asn1Parser parser = new Asn1Parser(asn1String);
-                            // Parse the byte sequence
-                            ArrayList<String> urls = new ArrayList<>();
-                            try {
-                                parseOCSPURLs(parser, urls);
-                            } catch (Exception e) {
-                                log.error(sm.getString("engine.ocspParseError"), e);
-                            }
-                            if (!urls.isEmpty()) {
-                                // Use OpenSSL to build OCSP request
-                                for (String urlString : urls) {
-                                    try {
-                                        URL url = (new URI(urlString)).toURL();
-                                        ocspResponse = processOCSPRequest(url, issuer, x509, x509ctx, localArenal);
-                                        if (log.isDebugEnabled()) {
-                                            log.debug(sm.getString("engine.ocspResponse", urlString,
-                                                    Integer.toString(ocspResponse)));
+                try (var localArena = Arena.ofConfined()) {
+                    // If we can't get the issuer, we cannot perform OCSP verification
+                    MemorySegment x509IssuerPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
+                    int res = X509_STORE_CTX_get1_issuer(x509IssuerPointer, x509ctx, x509);
+                    if (res > 0) {
+                        MemorySegment issuer = MemorySegment.NULL;
+                        try {
+                            issuer = x509IssuerPointer.get(ValueLayout.ADDRESS, 0);
+                            // sslutils.c ssl_ocsp_request(x509, issuer, x509ctx);
+                            int nid = X509_get_ext_by_NID(x509, NID_info_access(), -1);
+                            if (nid >= 0) {
+                                MemorySegment ext = X509_get_ext(x509, nid);
+                                MemorySegment os = X509_EXTENSION_get_data(ext);
+                                int length = ASN1_STRING_length(os);
+                                MemorySegment data = ASN1_STRING_get0_data(os);
+                                // ocsp_urls = decode_OCSP_url(os);
+                                byte[] asn1String =
+                                        data.reinterpret(length, localArena, null).toArray(ValueLayout.JAVA_BYTE);
+                                Asn1Parser parser = new Asn1Parser(asn1String);
+                                // Parse the byte sequence
+                                ArrayList<String> urls = new ArrayList<>();
+                                try {
+                                    parseOCSPURLs(parser, urls);
+                                } catch (Exception e) {
+                                    log.error(sm.getString("engine.ocspParseError"), e);
+                                }
+                                if (!urls.isEmpty()) {
+                                    // Use OpenSSL to build OCSP request
+                                    for (String urlString : urls) {
+                                        try {
+                                            URL url = (new URI(urlString)).toURL();
+                                            ocspResponse = processOCSPRequest(url, issuer, x509, x509ctx, localArena);
+                                            if (log.isDebugEnabled()) {
+                                                log.debug(sm.getString("engine.ocspResponse", urlString,
+                                                        Integer.toString(ocspResponse)));
+                                            }
+                                        } catch (MalformedURLException | URISyntaxException e) {
+                                            log.warn(sm.getString("engine.invalidOCSPURL", urlString));
                                         }
-                                    } catch (MalformedURLException | URISyntaxException e) {
-                                        log.warn(sm.getString("engine.invalidOCSPURL", urlString));
-                                    }
-                                    if (ocspResponse != V_OCSP_CERTSTATUS_UNKNOWN()) {
-                                        break;
+                                        if (ocspResponse != V_OCSP_CERTSTATUS_UNKNOWN()) {
+                                            break;
+                                        }
                                     }
                                 }
                             }
+                        } finally {
+                            X509_free(issuer);
                         }
                     }
                 }
@@ -1279,6 +1287,9 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
 
     private static int processOCSPRequest(URL url, MemorySegment issuer, MemorySegment x509,
             MemorySegment /* X509_STORE_CTX */ x509ctx, Arena localArena) {
+        if (OpenSSLStatus.Name.BORINGSSL.equals(OpenSSLStatus.getName())) {
+            return V_OCSP_CERTSTATUS_UNKNOWN();
+        }
         MemorySegment ocspRequest = MemorySegment.NULL;
         MemorySegment ocspResponse = MemorySegment.NULL;
         MemorySegment id;
