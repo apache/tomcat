@@ -907,11 +907,8 @@ class Parser implements TagConstants {
     }
 
     /*
-     * <<<<<<< HEAD Parses OptionalBody, but also reused to parse bodies for plugin and param since the syntax is
-     * identical (the only thing that differs substantially is how to process the body, and thus we accept the body type
-     * as a parameter). ======= Parses OptionalBody, but also reused to parse bodies for param since the syntax is
-     * identical (the only thing that differs substantially is how to process the body, and thus we accept the body type
-     * as a parameter). >>>>>>> 76d2ad0a5d (Code clean-up. Formatting. No functional change.)
+     * Parses OptionalBody, but also reused to parse bodies for plugin and param since the syntax is identical (the only
+     * thing that differs substantially is how to process the body, and thus we accept the body type as a parameter).
      *
      * OptionalBody ::= EmptyBody | ActionBody
      *
@@ -987,8 +984,8 @@ class Parser implements TagConstants {
     }
 
     /*
-     * <<<<<<< HEAD Params ::= `>' S? ( ( `<jsp:body>' ( ( S? Param+ S? `</jsp:body>' ) | <TRANSLATION_ERROR> ) ) |
-     * Param+ ) '</jsp:params>'
+     * Params ::= `>' S? ( ( `<jsp:body>' ( ( S? Param+ S? `</jsp:body>' ) | <TRANSLATION_ERROR> ) ) | Param+ )
+     * '</jsp:params>'
      */
     private void parseJspParams(Node parent) throws JasperException {
         Node jspParamsNode = new Node.ParamsAction(start, parent);
