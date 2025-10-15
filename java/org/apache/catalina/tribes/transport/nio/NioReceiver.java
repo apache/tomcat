@@ -128,13 +128,13 @@ public class NioReceiver extends ReceiverBase implements Runnable, NioReceiverMB
         // set up the datagram channel
         if (this.getUdpPort() > 0) {
             datagramChannel = DatagramChannel.open();
-            configureDatagraChannel();
+            configureDatagramChannel();
             // bind to the address to avoid security checks
             bindUdp(datagramChannel.socket(), getUdpPort(), getAutoBind());
         }
     }
 
-    private void configureDatagraChannel() throws IOException {
+    private void configureDatagramChannel() throws IOException {
         datagramChannel.configureBlocking(false);
         datagramChannel.socket().setSendBufferSize(getUdpTxBufSize());
         datagramChannel.socket().setReceiveBufferSize(getUdpRxBufSize());
