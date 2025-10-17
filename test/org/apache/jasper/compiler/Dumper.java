@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import org.apache.jasper.JasperException;
@@ -26,13 +25,13 @@ class Dumper {
         private int indent = 0;
 
         private String getAttributes(Attributes attrs) {
-            if (attrs == null)
+            if (attrs == null) {
                 return "";
+            }
 
             StringBuilder buf = new StringBuilder();
-            for (int i=0; i < attrs.getLength(); i++) {
-                buf.append(" " + attrs.getQName(i) + "=\""
-                           + attrs.getValue(i) + "\"");
+            for (int i = 0; i < attrs.getLength(); i++) {
+                buf.append(" " + attrs.getQName(i) + "=\"" + attrs.getValue(i) + "\"");
             }
             return buf.toString();
         }
@@ -51,17 +50,16 @@ class Dumper {
             }
         }
 
-        private void printAttributes(String prefix, Attributes attrs,
-                                     String suffix) {
+        private void printAttributes(String prefix, Attributes attrs, String suffix) {
             printString(prefix, getAttributes(attrs), suffix);
         }
 
         private void dumpBody(Node n) throws JasperException {
             Node.Nodes page = n.getBody();
             if (page != null) {
-//                indent++;
+                // indent++;
                 page.visit(this);
-//                indent--;
+                // indent--;
             }
         }
 
@@ -135,20 +133,6 @@ class Dumper {
         }
 
         @Override
-        public void visit(Node.PlugIn n) throws JasperException {
-            printAttributes("<jsp:plugin", n.getAttributes(), ">");
-            dumpBody(n);
-            printString("</jsp:plugin>");
-        }
-
-        @Override
-        public void visit(Node.ParamsAction n) throws JasperException {
-            printAttributes("<jsp:params", n.getAttributes(), ">");
-            dumpBody(n);
-            printString("</jsp:params>");
-        }
-
-        @Override
         public void visit(Node.ParamAction n) throws JasperException {
             printAttributes("<jsp:param", n.getAttributes(), ">");
             dumpBody(n);
@@ -171,7 +155,7 @@ class Dumper {
 
         @Override
         public void visit(Node.ELExpression n) throws JasperException {
-            printString( "${" + n.getText() + "}" );
+            printString("${" + n.getText() + "}");
         }
 
         @Override
@@ -184,7 +168,7 @@ class Dumper {
         @Override
         public void visit(Node.UninterpretedTag n) throws JasperException {
             String tag = n.getQName();
-            printAttributes("<"+tag, n.getAttributes(), ">");
+            printAttributes("<" + tag, n.getAttributes(), ">");
             dumpBody(n);
             printString("</" + tag + ">");
         }
@@ -195,7 +179,7 @@ class Dumper {
         }
 
         private void printIndent() {
-            for (int i=0; i < indent; i++) {
+            for (int i = 0; i < indent; i++) {
                 System.out.print("  ");
             }
         }

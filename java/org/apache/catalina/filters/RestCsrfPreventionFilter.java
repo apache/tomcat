@@ -24,19 +24,18 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
- * Provides basic CSRF protection for REST APIs. The filter assumes that the
- * clients have adapted the transfer of the nonce through the 'X-CSRF-Token'
- * header.
+ * Provides basic CSRF protection for REST APIs. The filter assumes that the clients have adapted the transfer of the
+ * nonce through the 'X-CSRF-Token' header.
  *
  * <pre>
  * Positive scenario:
@@ -78,16 +77,16 @@ import javax.servlet.http.HttpSession;
  */
 public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     private enum MethodType {
-        NON_MODIFYING_METHOD, MODIFYING_METHOD
+        NON_MODIFYING_METHOD,
+        MODIFYING_METHOD
     }
 
     private static final Pattern NON_MODIFYING_METHODS_PATTERN = Pattern.compile("GET|HEAD|OPTIONS");
-    private static final Predicate<String> nonModifyingMethods = m -> Objects.nonNull(m) &&
-            NON_MODIFYING_METHODS_PATTERN.matcher(m).matches();
+    private static final Predicate<String> nonModifyingMethods =
+            m -> Objects.nonNull(m) && NON_MODIFYING_METHODS_PATTERN.matcher(m).matches();
 
-    private Set<String> pathsAcceptingParams = new HashSet<>();
-
-    private String pathsDelimiter = ",";
+    private final Set<String> pathsAcceptingParams = new HashSet<>();
+    private static final String pathsDelimiter = ",";
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -95,8 +94,7 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
         super.init(filterConfig);
 
         // Put the expected request header name into the application scope
-        filterConfig.getServletContext().setAttribute(
-                Constants.CSRF_REST_NONCE_HEADER_NAME_KEY,
+        filterConfig.getServletContext().setAttribute(Constants.CSRF_REST_NONCE_HEADER_NAME_KEY,
                 Constants.CSRF_REST_NONCE_HEADER_NAME);
     }
 
@@ -104,21 +102,17 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
 
-        if (request instanceof HttpServletRequest &&
-                response instanceof HttpServletResponse) {
+        if (request instanceof HttpServletRequest && response instanceof HttpServletResponse) {
             MethodType mType = MethodType.MODIFYING_METHOD;
             if (nonModifyingMethods.test(((HttpServletRequest) request).getMethod())) {
                 mType = MethodType.NON_MODIFYING_METHOD;
             }
 
             RestCsrfPreventionStrategy strategy;
-            switch (mType) {
-            case NON_MODIFYING_METHOD:
+            if (mType == MethodType.NON_MODIFYING_METHOD) {
                 strategy = new FetchRequest();
-                break;
-            default:
+            } else {
                 strategy = new StateChangingRequest();
-                break;
             }
 
             if (!strategy.apply((HttpServletRequest) request, (HttpServletResponse) response)) {
@@ -128,17 +122,14 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
         chain.doFilter(request, response);
     }
 
-    private static interface RestCsrfPreventionStrategy {
-        static final NonceSupplier<HttpServletRequest, String> nonceFromRequestHeader = (r, k) -> r
-                .getHeader(k);
-        static final NonceSupplier<HttpServletRequest, String[]> nonceFromRequestParams = (r, k) -> r
-                .getParameterValues(k);
-        static final NonceSupplier<HttpSession, String> nonceFromSession = (s, k) -> Objects
-                .isNull(s) ? null : (String) s.getAttribute(k);
+    private interface RestCsrfPreventionStrategy {
+        NonceSupplier<HttpServletRequest,String> nonceFromRequestHeader = HttpServletRequest::getHeader;
+        NonceSupplier<HttpServletRequest,String[]> nonceFromRequestParams = ServletRequest::getParameterValues;
+        NonceSupplier<HttpSession,String> nonceFromSession =
+                (s, k) -> Objects.isNull(s) ? null : (String) s.getAttribute(k);
 
-        static final NonceConsumer<HttpServletResponse> nonceToResponse = (r, k, v) -> r.setHeader(
-                k, v);
-        static final NonceConsumer<HttpSession> nonceToSession = (s, k, v) -> s.setAttribute(k, v);
+        NonceConsumer<HttpServletResponse> nonceToResponse = HttpServletResponse::setHeader;
+        NonceConsumer<HttpSession> nonceToSession = HttpSession::setAttribute;
 
         boolean apply(HttpServletRequest request, HttpServletResponse response) throws IOException;
     }
@@ -146,44 +137,52 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     private class StateChangingRequest implements RestCsrfPreventionStrategy {
 
         @Override
-        public boolean apply(HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
-            if (isValidStateChangingRequest(
-                    extractNonceFromRequest(request),
-                    nonceFromSession.getNonce(request.getSession(false), Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME))) {
+        public boolean apply(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+            String nonceRequest = extractNonceFromRequest(request);
+            HttpSession session = request.getSession(false);
+            String nonceSession = nonceFromSession.getNonce(session, Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME);
+
+            if (isValidStateChangingRequest(nonceRequest, nonceSession)) {
                 return true;
             }
 
             nonceToResponse.setNonce(response, Constants.CSRF_REST_NONCE_HEADER_NAME,
                     Constants.CSRF_REST_NONCE_HEADER_REQUIRED_VALUE);
-            response.sendError(getDenyStatus(),
-                    sm.getString("restCsrfPreventionFilter.invalidNonce"));
+            response.sendError(getDenyStatus(), sm.getString("restCsrfPreventionFilter.invalidNonce"));
+
+            if (getLogger().isDebugEnabled()) {
+                getLogger().debug(sm.getString("restCsrfPreventionFilter.invalidNonce.debug", request.getMethod(),
+                        request.getRequestURI(), Boolean.valueOf(request.getRequestedSessionId() != null), session,
+                        Boolean.valueOf(nonceRequest != null), Boolean.valueOf(nonceSession != null)));
+            }
             return false;
         }
 
         private boolean isValidStateChangingRequest(String reqNonce, String sessionNonce) {
-            return Objects.nonNull(reqNonce) && Objects.nonNull(sessionNonce)
-                    && Objects.equals(reqNonce, sessionNonce);
+            return Objects.nonNull(reqNonce) && Objects.nonNull(sessionNonce) && Objects.equals(reqNonce, sessionNonce);
         }
 
         private String extractNonceFromRequest(HttpServletRequest request) {
-            String nonceFromRequest = nonceFromRequestHeader.getNonce(request,
-                    Constants.CSRF_REST_NONCE_HEADER_NAME);
-            if ((Objects.isNull(nonceFromRequest) || Objects.equals("", nonceFromRequest))
-                    && !getPathsAcceptingParams().isEmpty()
-                    && getPathsAcceptingParams().contains(getRequestedPath(request))) {
+            String nonceFromRequest = nonceFromRequestHeader.getNonce(request, Constants.CSRF_REST_NONCE_HEADER_NAME);
+            if ((Objects.isNull(nonceFromRequest) || Objects.equals("", nonceFromRequest)) &&
+                    !getPathsAcceptingParams().isEmpty() &&
+                    getPathsAcceptingParams().contains(getRequestedPath(request))) {
                 nonceFromRequest = extractNonceFromRequestParams(request);
             }
             return nonceFromRequest;
         }
 
         private String extractNonceFromRequestParams(HttpServletRequest request) {
-            String[] params = nonceFromRequestParams.getNonce(request,
-                    Constants.CSRF_REST_NONCE_HEADER_NAME);
+            String[] params = nonceFromRequestParams.getNonce(request, Constants.CSRF_REST_NONCE_HEADER_NAME);
             if (Objects.nonNull(params) && params.length > 0) {
                 String nonce = params[0];
                 for (String param : params) {
                     if (!Objects.equals(param, nonce)) {
+                        if (getLogger().isDebugEnabled()) {
+                            getLogger().debug(sm.getString("restCsrfPreventionFilter.multipleNonce.debug",
+                                    request.getMethod(), request.getRequestURI()));
+                        }
                         return null;
                     }
                 }
@@ -194,22 +193,23 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     private class FetchRequest implements RestCsrfPreventionStrategy {
-        private final Predicate<String> fetchRequest = s -> Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE
-                .equalsIgnoreCase(s);
+        private final Predicate<String> fetchRequest = Constants.CSRF_REST_NONCE_HEADER_FETCH_VALUE::equalsIgnoreCase;
 
         @Override
         public boolean apply(HttpServletRequest request, HttpServletResponse response) {
-            if (fetchRequest.test(
-                    nonceFromRequestHeader.getNonce(request, Constants.CSRF_REST_NONCE_HEADER_NAME))) {
+            if (fetchRequest.test(nonceFromRequestHeader.getNonce(request, Constants.CSRF_REST_NONCE_HEADER_NAME))) {
                 String nonceFromSessionStr = nonceFromSession.getNonce(request.getSession(false),
                         Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME);
                 if (nonceFromSessionStr == null) {
-                    nonceFromSessionStr = generateNonce();
+                    nonceFromSessionStr = generateNonce(request);
                     nonceToSession.setNonce(Objects.requireNonNull(request.getSession(true)),
                             Constants.CSRF_REST_NONCE_SESSION_ATTR_NAME, nonceFromSessionStr);
                 }
-                nonceToResponse.setNonce(response, Constants.CSRF_REST_NONCE_HEADER_NAME,
-                        nonceFromSessionStr);
+                nonceToResponse.setNonce(response, Constants.CSRF_REST_NONCE_HEADER_NAME, nonceFromSessionStr);
+                if (getLogger().isDebugEnabled()) {
+                    getLogger().debug(sm.getString("restCsrfPreventionFilter.fetch.debug", request.getMethod(),
+                            request.getRequestURI()));
+                }
             }
             return true;
         }
@@ -217,31 +217,27 @@ public class RestCsrfPreventionFilter extends CsrfPreventionFilterBase {
     }
 
     @FunctionalInterface
-    private static interface NonceSupplier<T, R> {
+    private interface NonceSupplier<T, R> {
         R getNonce(T supplier, String key);
     }
 
     @FunctionalInterface
-    private static interface NonceConsumer<T> {
+    private interface NonceConsumer<T> {
         void setNonce(T consumer, String key, String value);
     }
 
     /**
-     * A comma separated list of URLs that can accept nonces via request
-     * parameter 'X-CSRF-Token'. For use cases when a nonce information cannot
-     * be provided via header, one can provide it via request parameters. If
-     * there is a X-CSRF-Token header, it will be taken with preference over any
-     * parameter with the same name in the request. Request parameters cannot be
-     * used to fetch new nonce, only header.
+     * A comma separated list of URLs that can accept nonces via request parameter 'X-CSRF-Token'. For use cases when a
+     * nonce information cannot be provided via header, one can provide it via request parameters. If there is a
+     * X-CSRF-Token header, it will be taken with preference over any parameter with the same name in the request.
+     * Request parameters cannot be used to fetch new nonce, only header.
      *
-     * @param pathsList
-     *            Comma separated list of URLs to be configured as paths
-     *            accepting request parameters with nonce information.
+     * @param pathsList Comma separated list of URLs to be configured as paths accepting request parameters with nonce
+     *                      information.
      */
     public void setPathsAcceptingParams(String pathsList) {
         if (Objects.nonNull(pathsList)) {
-            Arrays.asList(pathsList.split(pathsDelimiter)).forEach(
-                    e -> pathsAcceptingParams.add(e.trim()));
+            Arrays.asList(pathsList.split(pathsDelimiter)).forEach(e -> pathsAcceptingParams.add(e.trim()));
         }
     }
 

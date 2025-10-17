@@ -19,25 +19,54 @@ package org.apache.tomcat.dbcp.pool2.impl;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 
 /**
- * CallStack strategy that uses the stack trace from a {@link Throwable}. This strategy, while slower than the
- * SecurityManager implementation, provides call stack method names and other metadata in addition to the call stack
- * of classes.
+ * CallStack strategy that uses the stack trace from a {@link Throwable}. This
+ * strategy provides call stack method names and other metadata in addition to
+ * the call stack of classes.
  *
  * @see Throwable#fillInStackTrace()
  * @since 2.4.3
  */
 public class ThrowableCallStack implements CallStack {
 
+    /**
+     * A snapshot of a throwable.
+     */
+    private static final class Snapshot extends Throwable {
+
+        private static final long serialVersionUID = 1L;
+        private final Instant timestamp;
+
+        /**
+         * Constructs a new instance with its message set to the now instant.
+         */
+        Snapshot() {
+            this(Instant.now());
+        }
+
+        /**
+         * Constructs a new instance and use the timestamp as the message with using {@link DateTimeFormatter#ISO_INSTANT} for more precision.
+         *
+         * @param timestamp normally the now instant.
+         */
+        private Snapshot(final Instant timestamp) {
+            super(timestamp.toString());
+            this.timestamp = timestamp;
+        }
+    }
+
     private final String messageFormat;
+
+    // We keep the SimpleDateFormat for backward compatibility instead of a DateTimeFormatter.
     //@GuardedBy("dateFormat")
     private final DateFormat dateFormat;
 
     private volatile Snapshot snapshot;
 
     /**
-     * Create a new instance.
+     * Creates a new instance.
      *
      * @param messageFormat message format
      * @param useTimestamp whether to format the dates in the output message or not
@@ -45,6 +74,16 @@ public class ThrowableCallStack implements CallStack {
     public ThrowableCallStack(final String messageFormat, final boolean useTimestamp) {
         this.messageFormat = messageFormat;
         this.dateFormat = useTimestamp ? new SimpleDateFormat(messageFormat) : null;
+    }
+
+    @Override
+    public void clear() {
+        snapshot = null;
+    }
+
+    @Override
+    public void fillInStackTrace() {
+        snapshot = new Snapshot();
     }
 
     @Override
@@ -58,29 +97,12 @@ public class ThrowableCallStack implements CallStack {
             message = messageFormat;
         } else {
             synchronized (dateFormat) {
-                message = dateFormat.format(Long.valueOf(snapshotRef.timestamp));
+                // The throwable message is in {@link DateTimeFormatter#ISO_INSTANT} format for more precision.
+                message = dateFormat.format(Long.valueOf(snapshotRef.timestamp.toEpochMilli()));
             }
         }
         writer.println(message);
         snapshotRef.printStackTrace(writer);
         return true;
-    }
-
-    @Override
-    public void fillInStackTrace() {
-        snapshot = new Snapshot();
-    }
-
-    @Override
-    public void clear() {
-        snapshot = null;
-    }
-
-    /**
-     * A snapshot of a throwable.
-     */
-    private static class Snapshot extends Throwable {
-        private static final long serialVersionUID = 1L;
-        private final long timestamp = System.currentTimeMillis();
     }
 }

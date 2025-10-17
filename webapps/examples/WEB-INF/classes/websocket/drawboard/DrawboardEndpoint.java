@@ -19,11 +19,11 @@ package websocket.drawboard;
 import java.io.EOFException;
 import java.io.IOException;
 
-import javax.websocket.CloseReason;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.Session;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -165,72 +165,63 @@ public final class DrawboardEndpoint extends Endpoint {
 
 
     private final MessageHandler.Whole<String> stringHandler =
-            new MessageHandler.Whole<String>() {
+            new MessageHandler.Whole<>() {
 
-        @Override
-        public void onMessage(final String message) {
-            // Invoke handling of the message in the room.
-            room.invokeAndWait(new Runnable() {
                 @Override
-                public void run() {
-                    try {
-
-                        // Currently, the only types of messages the client will send
-                        // are draw messages prefixed by a Message ID
-                        // (starting with char '1'), and pong messages (starting
-                        // with char '0').
-                        // Draw messages should look like this:
-                        // ID|type,colR,colB,colG,colA,thickness,x1,y1,x2,y2,lastInChain
-
-                        boolean dontSwallowException = false;
-                        try {
-                            char messageType = message.charAt(0);
-                            String messageContent = message.substring(1);
-                            switch (messageType) {
-                            case '0':
-                                // Pong message.
-                                // Do nothing.
-                                break;
-
-                            case '1':
-                                // Draw message
-                                int indexOfChar = messageContent.indexOf('|');
-                                long msgId = Long.parseLong(
-                                        messageContent.substring(0, indexOfChar));
-
-                                DrawMessage msg = DrawMessage.parseFromString(
-                                        messageContent.substring(indexOfChar + 1));
-
-                                // Don't ignore RuntimeExceptions thrown by
-                                // this method
-                                // TODO: Find a better solution than this variable
-                                dontSwallowException = true;
-                                if (player != null) {
-                                    player.handleDrawMessage(msg, msgId);
+                public void onMessage(final String message) {
+                // Invoke handling of the message in the room.
+                        room.invokeAndWait(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    // Currently, the only types of messages the client will send
+                                    // are draw messages prefixed by a Message ID
+                                    // (starting with char '1'), and pong messages (starting
+                                    // with char '0').
+                                    // Draw messages should look like this:
+                                    // ID|type,colR,colB,colG,colA,thickness,x1,y1,x2,y2,lastInChain
+                                    boolean dontSwallowException = false;
+                                    try {
+                                        char messageType = message.charAt(0);
+                                        String messageContent = message.substring(1);
+                                        switch (messageType) {
+                                            case '0':
+                                                // Pong message.
+                                                // Do nothing.
+                                                break;
+                                            case '1':
+                                                // Draw message
+                                                int indexOfChar = messageContent.indexOf('|');
+                                                long msgId = Long.parseLong(
+                                                        messageContent.substring(0, indexOfChar));
+                                                DrawMessage msg = DrawMessage.parseFromString(
+                                                        messageContent.substring(indexOfChar + 1));
+                                                // Don't ignore RuntimeExceptions thrown by
+                                                // this method
+                                                // TODO: Find a better solution than this variable
+                                                dontSwallowException = true;
+                                                if (player != null) {
+                                                    player.handleDrawMessage(msg, msgId);
+                                                }
+                                                dontSwallowException = false;
+                                                break;
+                                        }
+                                    } catch (ParseException e) {
+                                        // Client sent invalid data
+                                        // Ignore, TODO: maybe close connection
+                                    } catch (RuntimeException e) {
+                                        // Client sent invalid data.
+                                        // Ignore, TODO: maybe close connection
+                                        if (dontSwallowException) {
+                                            throw e;
+                                        }
+                                    }
+                                } catch (RuntimeException ex) {
+                                    log.error("Unexpected exception: " + ex.toString(), ex);
                                 }
-                                dontSwallowException = false;
-
-                                break;
                             }
-                        } catch (ParseException e) {
-                            // Client sent invalid data
-                            // Ignore, TODO: maybe close connection
-                        } catch (RuntimeException e) {
-                            // Client sent invalid data.
-                            // Ignore, TODO: maybe close connection
-                            if (dontSwallowException) {
-                                throw e;
-                            }
-                        }
+                        });
 
-                    } catch (RuntimeException ex) {
-                        log.error("Unexpected exception: " + ex.toString(), ex);
-                    }
                 }
-            });
-
-        }
-    };
-
-
+            };
 }

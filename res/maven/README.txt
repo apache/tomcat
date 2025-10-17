@@ -16,12 +16,11 @@
 ================================================================================
 
 General preparations before any publishing:
-1 - Generate a standard Tomcat release (ant release)
-2 - Copy mvn.properties.default to mvn.properties and adjust it as necessary.
-    You will need to set asf.ldap.username and you'll probably need to set
-    gpg.exec
-    The other properties should be OK. Note: you will be prompted for your
-    GPG pass-phrase and LDAP password when the script runs.
+1 - Generate a standard Tomcat release.
+    This will generate a mvn.properties.release file as part of the tag. It
+    should include the property settings required to complete the release.
+2 - Should any of the properties need to be overridden, create a
+    mvn.properties and override as necessary.
 
 To publish a snapshot do the following:
 1 - ant -f mvn-pub.xml deploy-snapshot

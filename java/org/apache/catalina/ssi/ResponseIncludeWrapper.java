@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.ssi;
 
 import java.io.IOException;
@@ -22,18 +21,14 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Locale;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.tomcat.util.http.FastHttpDateFormat;
 
 /**
- * An HttpServletResponseWrapper, used from
- * <code>SSIServletExternalResolver</code>
- *
- * @author Bip Thelin
- * @author David Becker
+ * An HttpServletResponseWrapper, used from <code>SSIServletExternalResolver</code>.
  */
 public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
     /**
@@ -51,23 +46,21 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
     protected PrintWriter printWriter;
 
     /**
-     * Initialize our wrapper with the current HttpServletResponse and
-     * ServletOutputStream.
+     * Initialize our wrapper with the current HttpServletResponse and ServletOutputStream.
      *
-     * @param response The response to use
+     * @param response                   The response to use
      * @param captureServletOutputStream The ServletOutputStream to use
      */
-    public ResponseIncludeWrapper(HttpServletResponse response,
-            ServletOutputStream captureServletOutputStream) {
+    public ResponseIncludeWrapper(HttpServletResponse response, ServletOutputStream captureServletOutputStream) {
         super(response);
         this.captureServletOutputStream = captureServletOutputStream;
     }
 
 
     /**
-     * Flush the servletOutputStream or printWriter ( only one will be non-null )
-     * This must be called after a requestDispatcher.include, since we can't
-     * assume that the included servlet flushed its stream.
+     * Flush the servletOutputStream or printWriter ( only one will be non-null ) This must be called after a
+     * requestDispatcher.include, since we can't assume that the included servlet flushed its stream.
+     *
      * @throws IOException an IO error occurred
      */
     public void flushOutputStreamOrWriter() throws IOException {
@@ -81,21 +74,19 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
 
     /**
-     * Return a printwriter, throws and exception if an OutputStream already
-     * been returned.
+     * Return a printwriter, throws an exception if an OutputStream already been returned.
      *
      * @return a PrintWriter object
-     * @exception java.io.IOException
-     *                if the outputstream already been called
+     *
+     * @exception java.io.IOException if the outputstream already been called
      */
     @Override
-    public PrintWriter getWriter() throws java.io.IOException {
+    public PrintWriter getWriter() throws IOException {
         if (servletOutputStream == null) {
             if (printWriter == null) {
                 setCharacterEncoding(getCharacterEncoding());
-                printWriter = new PrintWriter(
-                        new OutputStreamWriter(captureServletOutputStream,
-                                               getCharacterEncoding()));
+                printWriter =
+                        new PrintWriter(new OutputStreamWriter(captureServletOutputStream, getCharacterEncoding()));
             }
             return printWriter;
         }
@@ -104,15 +95,14 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
 
     /**
-     * Return an OutputStream, throws and exception if a printwriter already
-     * been returned.
+     * Return an OutputStream, throws an exception if a printwriter already been returned.
      *
      * @return an OutputStream object
-     * @exception java.io.IOException
-     *                if the printwriter already been called
+     *
+     * @exception java.io.IOException if the printwriter already been called
      */
     @Override
-    public ServletOutputStream getOutputStream() throws java.io.IOException {
+    public ServletOutputStream getOutputStream() throws IOException {
         if (printWriter == null) {
             if (servletOutputStream == null) {
                 servletOutputStream = captureServletOutputStream;
@@ -124,12 +114,11 @@ public class ResponseIncludeWrapper extends HttpServletResponseWrapper {
 
 
     /**
-     * Returns the value of the <code>last-modified</code> header field. The
-     * result is the number of milliseconds since January 1, 1970 GMT.
+     * Returns the value of the <code>last-modified</code> header field. The result is the number of milliseconds since
+     * January 1, 1970 GMT.
      *
-     * @return the date the resource referenced by this
-     *   <code>ResponseIncludeWrapper</code> was last modified, or -1 if not
-     *   known.
+     * @return the date the resource referenced by this <code>ResponseIncludeWrapper</code> was last modified, or -1 if
+     *             not known.
      */
     public long getLastModified() {
         return lastModified;

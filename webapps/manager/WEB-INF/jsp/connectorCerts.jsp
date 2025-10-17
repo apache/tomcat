@@ -15,10 +15,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@page session="false" contentType="text/html; charset=ISO-8859-1" %>
+<%@page session="false" contentType="text/html; charset=UTF-8" %>
 <%@page import="java.util.Map" %>
 <%@page import="java.util.Map.Entry" %>
 <%@page import="java.util.List" %>
+<%@page import="org.apache.catalina.manager.Constants" %>
 <!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -27,14 +28,15 @@
 <% Map<String,List<String>> certList = (Map<String,List<String>>) request.getAttribute("certList");
 %>
 <head>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
     <meta http-equiv="pragma" content="no-cache"/><!-- HTTP 1.0 -->
     <meta http-equiv="cache-control" content="no-cache,must-revalidate"/><!-- HTTP 1.1 -->
     <meta http-equiv="expires" content="0"/><!-- 0 is an invalid value and should be treated as 'now' -->
     <meta http-equiv="content-language" content="en"/>
-    <meta name="copyright" content="copyright 2005-2020 the Apache Software Foundation"/>
+    <meta name="copyright" content="<%= Constants.COPYRIGHT_NOTICE %>"/>
     <meta name="robots" content="noindex,nofollow,noarchive"/>
     <title>Configured certificate chains per Connector</title>
+    <link href="<%=request.getContextPath()%>/images/favicon.ico" rel="icon" type="image/x-icon" />
 </head>
 <body>
 <h1>Configured certificate chains per Connector</h1>
@@ -68,7 +70,7 @@
     </tbody>
 </table>
 
-<form method="get" action="<%=request.getContextPath()%>/html">
+<form method="GET" action="<%=request.getContextPath()%>/html">
   <p style="text-align: center;">
     <input type="submit" value="Return to main page" />
   </p>

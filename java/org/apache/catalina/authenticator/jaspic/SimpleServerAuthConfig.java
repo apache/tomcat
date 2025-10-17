@@ -1,4 +1,4 @@
-/**
+/*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -23,23 +23,23 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.message.AuthException;
-import javax.security.auth.message.MessageInfo;
-import javax.security.auth.message.config.ServerAuthConfig;
-import javax.security.auth.message.config.ServerAuthContext;
-import javax.security.auth.message.module.ServerAuthModule;
+
+import jakarta.security.auth.message.AuthException;
+import jakarta.security.auth.message.MessageInfo;
+import jakarta.security.auth.message.config.ServerAuthConfig;
+import jakarta.security.auth.message.config.ServerAuthContext;
+import jakarta.security.auth.message.module.ServerAuthModule;
 
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Basic implementation primarily intended for use when using third-party
- * {@link ServerAuthModule} implementations that only provide the module. This
- * implementation supports configuring the {@link ServerAuthContext} with
- * multiple modules.
+ * Basic implementation primarily intended for use when using third-party {@link ServerAuthModule} implementations that
+ * only provide the module. This implementation supports configuring the {@link ServerAuthContext} with multiple
+ * modules.
  */
 public class SimpleServerAuthConfig implements ServerAuthConfig {
 
-    private static StringManager sm = StringManager.getManager(SimpleServerAuthConfig.class);
+    private static final StringManager sm = StringManager.getManager(SimpleServerAuthConfig.class);
 
     private static final String SERVER_AUTH_MODULE_KEY_PREFIX =
             "org.apache.catalina.authenticator.jaspic.ServerAuthModule.";
@@ -47,12 +47,12 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     private final String layer;
     private final String appContext;
     private final CallbackHandler handler;
-    private final Map<String,String> properties;
+    private final Map<String,Object> properties;
 
     private volatile ServerAuthContext serverAuthContext;
 
     public SimpleServerAuthConfig(String layer, String appContext, CallbackHandler handler,
-            Map<String,String> properties) {
+            Map<String,Object> properties) {
         this.layer = layer;
         this.appContext = appContext;
         this.handler = handler;
@@ -90,15 +90,14 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
     }
 
 
-    @SuppressWarnings({"rawtypes", "unchecked"}) // JASPIC API uses raw types
     @Override
-    public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject,
-            Map properties) throws AuthException {
+    public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject, Map<String,Object> properties)
+            throws AuthException {
         ServerAuthContext serverAuthContext = this.serverAuthContext;
         if (serverAuthContext == null) {
             synchronized (this) {
                 if (this.serverAuthContext == null) {
-                    Map<String,String> mergedProperties = new HashMap<>();
+                    Map<String,Object> mergedProperties = new HashMap<>();
                     if (this.properties != null) {
                         mergedProperties.putAll(this.properties);
                     }
@@ -109,19 +108,15 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                     List<ServerAuthModule> modules = new ArrayList<>();
                     int moduleIndex = 1;
                     String key = SERVER_AUTH_MODULE_KEY_PREFIX + moduleIndex;
-                    String moduleClassName = mergedProperties.get(key);
-                    while (moduleClassName != null) {
+                    Object moduleClassName = mergedProperties.get(key);
+                    while (moduleClassName instanceof String) {
                         try {
-                            Class<?> clazz = Class.forName(moduleClassName);
-                            ServerAuthModule module =
-                                    (ServerAuthModule) clazz.getConstructor().newInstance();
+                            Class<?> clazz = Class.forName((String) moduleClassName);
+                            ServerAuthModule module = (ServerAuthModule) clazz.getConstructor().newInstance();
                             module.initialize(null, null, handler, mergedProperties);
                             modules.add(module);
-                        } catch (ReflectiveOperationException | IllegalArgumentException |
-                                SecurityException e) {
-                            AuthException ae = new AuthException();
-                            ae.initCause(e);
-                            throw ae;
+                        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+                            throw new AuthException(e);
                         }
 
                         // Look for the next module
@@ -130,7 +125,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                         moduleClassName = mergedProperties.get(key);
                     }
 
-                    if (modules.size() == 0) {
+                    if (modules.isEmpty()) {
                         throw new AuthException(sm.getString("simpleServerAuthConfig.noModules"));
                     }
 

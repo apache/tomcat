@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="remm@apache.org">Remy Maucherat</author>
     <title>Tomcat Setup</title>
   </properties>
 
@@ -62,15 +61,12 @@
         <li><strong>Java location</strong>: The installer will provide a default
             JRE to use to run the service. The installer uses the registry to
             determine the base path of a Java <min-java-version/> or later JRE,
-            including the JRE installed as part of the full JDK. When running on
-            a 64-bit operating system, the installer will first look for a
-            64-bit JRE and only look for a 32-bit JRE if a 64-bit JRE is not
-            found. If a JRE cannot be found when running on a 64-bit operating
-            system, the installer will look for a 64-bit JDK. Finally, if a JRE
-            or JDK has not been found, the installer will try to use the
-            <code>JAVA_HOME</code> environment variable. It is not mandatory to
-            use the default JRE detected by the installer. Any installed Java
-            <min-java-version/> or later JRE (32-bit or 64-bit) may be
+            including the JRE installed as part of the full JDK. The installer
+            will first look for a JRE and only look for a JDK if a JRE is not
+            found. Finally, if a JRE or JDK has not been found, the installer
+            will try to use the <code>JAVA_HOME</code> environment variable. It
+            is not mandatory to use the default JRE detected by the installer.
+            Any installed Java <min-java-version/> or later JRE may be
             used.</li>
         <li><strong>Tray icon</strong>: When Tomcat is run as a service, there
             will not be any tray icon present when Tomcat is running. Note that
@@ -85,7 +81,6 @@
             <li>JavaHome</li>
             <li>TomcatPortShutdown</li>
             <li>TomcatPortHttp</li>
-            <li>TomcatPortAjp</li>
             <li>TomcatMenuEntriesEnable</li>
             <li>TomcatShortcutAllUsers</li>
             <li>TomcatServiceDefaultName</li>
@@ -152,20 +147,16 @@ cd $CATALINA_HOME
     -classpath $CATALINA_HOME/bin/bootstrap.jar:$CATALINA_HOME/bin/tomcat-juli.jar \
     -outfile $CATALINA_BASE/logs/catalina.out \
     -errfile $CATALINA_BASE/logs/catalina.err \
+    --add-opens=java.base/java.lang=ALL-UNNAMED \
+    --add-opens=java.base/java.io=ALL-UNNAMED \
+    --add-opens=java.base/java.util=ALL-UNNAMED \
+    --add-opens=java.base/java.util.concurrent=ALL-UNNAMED \
+    --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
     -Dcatalina.home=$CATALINA_HOME \
     -Dcatalina.base=$CATALINA_BASE \
     -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager \
     -Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties \
     org.apache.catalina.startup.Bootstrap</source>
-
-    <p>When running on Java 9 you will need to additionally specify the
-    following when starting jsvc to avoid warnings on shutdown.</p>
-<source>...
---add-opens=java.base/java.lang=ALL-UNNAMED \
---add-opens=java.base/java.io=ALL-UNNAMED \
---add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
-...
-</source>
 
     <p>You may also need to specify <code>-jvm server</code> if the JVM defaults
        to using a server VM rather than a client VM. This has been observed on

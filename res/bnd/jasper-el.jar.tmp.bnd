@@ -12,10 +12,28 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd
+
 Bundle-Name: tomcat-jasper-el
 Bundle-SymbolicName: org.apache.tomcat-jasper-el
-Bundle-Version: @VERSION@
 Export-Package: \
     org.apache.el,\
     org.apache.el.lang,\
     org.apache.el.parser
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
+
+-includepackage: \
+    org.apache.el.stream,\
+    org.apache.el.util
+
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/jasper-el.jar/
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=jasper-el

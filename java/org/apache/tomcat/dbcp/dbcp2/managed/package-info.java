@@ -19,7 +19,7 @@
  * <p>
  * This package provides support for pooling of ManagedConnections. A managed
  * connection is responsible for managing a database connection in a
- * transactional environment (typically called <i>Container Managed</i>).
+ * transactional environment (typically called <em>Container Managed</em>).
  * A managed connection operates like any other connection when no global
  * transaction (a.k.a. XA transaction or JTA Transaction) is in progress.
  * When a global transaction is active a single physical connection to the
@@ -29,7 +29,7 @@
  * transaction is committed or rolled back the enlisted connections are
  * committed or rolled back.
  * </p>
-
+ *
  * <p>
  * This package supports full XADataSources and non-XA data sources using
  * local transaction semantics. non-XA data sources commit and rollback as

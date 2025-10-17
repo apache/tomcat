@@ -23,9 +23,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.security.auth.message.config.AuthConfigFactory;
-import javax.security.auth.message.config.AuthConfigProvider;
-import javax.security.auth.message.config.RegistrationListener;
+import jakarta.security.auth.message.config.AuthConfigFactory;
+import jakarta.security.auth.message.config.AuthConfigProvider;
+import jakarta.security.auth.message.config.RegistrationListener;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -41,19 +41,19 @@ public class TestAuthConfigFactoryImpl {
 
     @Test
     public void testRegistrationNullLayer() {
-        doTestResistration(null,  "AC_1",  ":AC_1");
+        doTestRegistration(null, "AC_1", ":AC_1");
     }
 
 
     @Test
     public void testRegistrationNullAppContext() {
-        doTestResistration("L_1",  null,  "L_1:");
+        doTestRegistration("L_1", null, "L_1:");
     }
 
 
     @Test
     public void testRegistrationNullLayerAndNullAppContext() {
-        doTestResistration(null,  null,  ":");
+        doTestRegistration(null, null, ":");
     }
 
 
@@ -151,7 +151,7 @@ public class TestAuthConfigFactoryImpl {
     }
 
 
-    private void doTestResistration(String layer, String appContext, String expectedRegId) {
+    private void doTestRegistration(String layer, String appContext, String expectedRegId) {
         AuthConfigFactory factory = new AuthConfigFactoryImpl();
         AuthConfigProvider acp1 = new SimpleAuthConfigProvider(null, null);
         SimpleRegistrationListener listener = new SimpleRegistrationListener(layer, appContext);
@@ -209,8 +209,8 @@ public class TestAuthConfigFactoryImpl {
     }
 
 
-    private void doTestRegistrationInsert(String newLayer, String newAppContext,
-            String expectedListenerLayer, String expectedListenerAppContext) {
+    private void doTestRegistrationInsert(String newLayer, String newAppContext, String expectedListenerLayer,
+            String expectedListenerAppContext) {
         // Set up
         AuthConfigFactory factory = new AuthConfigFactoryImpl();
         AuthConfigProvider acp1 = new SimpleAuthConfigProvider(null, null);
@@ -245,7 +245,7 @@ public class TestAuthConfigFactoryImpl {
         for (SimpleRegistrationListener listener : listeners) {
             if (listener.wasCalled()) {
                 Assert.assertEquals(listener.layer, expectedListenerLayer);
-                Assert.assertEquals(listener.appContext,  expectedListenerAppContext);
+                Assert.assertEquals(listener.appContext, expectedListenerAppContext);
                 Assert.assertTrue(listener.wasCorrectlyCalled());
             } else {
                 Assert.assertFalse((listener.layer.equals(expectedListenerLayer) &&
@@ -330,7 +330,7 @@ public class TestAuthConfigFactoryImpl {
 
     @After
     public void cleanUp() {
-        if (oldCatalinaBase != null ) {
+        if (oldCatalinaBase != null) {
             System.setProperty(Globals.CATALINA_BASE_PROP, oldCatalinaBase);
         } else {
             System.clearProperty(Globals.CATALINA_BASE_PROP);
@@ -346,19 +346,18 @@ public class TestAuthConfigFactoryImpl {
 
     @Test
     public void testRemovePersistentRegistration() {
-            AuthConfigFactory factory = new AuthConfigFactoryImpl();
-            factory.registerConfigProvider(
-                    SimpleAuthConfigProvider.class.getName(), null, "L_1", "AC_1", null);
-            String registrationId2 = factory.registerConfigProvider(
-                    SimpleAuthConfigProvider.class.getName(), null, "L_2", "AC_2", null);
+        AuthConfigFactory factory = new AuthConfigFactoryImpl();
+        factory.registerConfigProvider(SimpleAuthConfigProvider.class.getName(), null, "L_1", "AC_1", null);
+        String registrationId2 =
+                factory.registerConfigProvider(SimpleAuthConfigProvider.class.getName(), null, "L_2", "AC_2", null);
 
-            factory.removeRegistration(registrationId2);
-            factory.refresh();
+        factory.removeRegistration(registrationId2);
+        factory.refresh();
 
-            String[] registrationIds = factory.getRegistrationIDs(null);
-            for (String registrationId : registrationIds) {
-                Assert.assertNotEquals(registrationId2, registrationId);
-            }
+        String[] registrationIds = factory.getRegistrationIDs(null);
+        for (String registrationId : registrationIds) {
+            Assert.assertNotEquals(registrationId2, registrationId);
+        }
     }
 
 
@@ -381,18 +380,18 @@ public class TestAuthConfigFactoryImpl {
 
 
     private void doTestNullClassName(boolean shouldOverrideExistingProvider, String layer, String appContext) {
-            AuthConfigFactory factory = new AuthConfigFactoryImpl();
-            if (shouldOverrideExistingProvider) {
-                factory.registerConfigProvider(SimpleAuthConfigProvider.class.getName(), null, layer, appContext, null);
-            }
-            String registrationId = factory.registerConfigProvider(null, null, layer, appContext, null);
-            factory.refresh();
+        AuthConfigFactory factory = new AuthConfigFactoryImpl();
+        if (shouldOverrideExistingProvider) {
+            factory.registerConfigProvider(SimpleAuthConfigProvider.class.getName(), null, layer, appContext, null);
+        }
+        String registrationId = factory.registerConfigProvider(null, null, layer, appContext, null);
+        factory.refresh();
 
-            String[] registrationIds = factory.getRegistrationIDs(null);
-            Set<String> ids = new HashSet<>(Arrays.asList(registrationIds));
-            Assert.assertTrue(ids.contains(registrationId));
-            AuthConfigProvider provider = factory.getConfigProvider(layer, appContext, null);
-            Assert.assertNull(provider);
+        String[] registrationIds = factory.getRegistrationIDs(null);
+        Set<String> ids = new HashSet<>(Arrays.asList(registrationIds));
+        Assert.assertTrue(ids.contains(registrationId));
+        AuthConfigProvider provider = factory.getConfigProvider(layer, appContext, null);
+        Assert.assertNull(provider);
     }
 
 
@@ -405,7 +404,7 @@ public class TestAuthConfigFactoryImpl {
         private String layerNotified;
         private String appContextNotified;
 
-        public SimpleRegistrationListener(String layer, String appContext) {
+        SimpleRegistrationListener(String layer, String appContext) {
             this.layer = layer;
             this.appContext = appContext;
         }
@@ -424,8 +423,7 @@ public class TestAuthConfigFactoryImpl {
 
 
         public boolean wasCorrectlyCalled() {
-            return called && areTheSame(layer, layerNotified) &&
-                    areTheSame(appContext, appContextNotified);
+            return called && areTheSame(layer, layerNotified) && areTheSame(appContext, appContextNotified);
         }
 
 

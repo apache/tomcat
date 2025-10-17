@@ -2,10 +2,10 @@ Manifest-version: 1.0
 X-Compile-Source-JDK: @source.jdk@
 X-Compile-Target-JDK: @target.jdk@
 
-Name: javax/annotation/
-Implementation-Title: javax.annotation
+Name: jakarta/annotation/
+Specification-Title: Jakarta Annotations
+Specification-Version: @annotation.spec.version@
+Specification-Vendor: Eclipse Foundation
+Implementation-Title: jakarta.annotation
+Implementation-Version: @annotation.spec.version@@annotation.revision@
 Implementation-Vendor: Apache Software Foundation
-Implementation-Version: 1.3.@annotation.revision@
-Specification-Title: Common Annotations
-Specification-Vendor: Oracle Corporation
-Specification-Version: 1.3

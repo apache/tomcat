@@ -14,24 +14,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import org.apache.jasper.JasperException;
 
 /**
- * Collect info about the page and nodes, and make them available through
- * the PageInfo object.
- *
- * @author Kin-man Chung
- * @author Mark Roth
+ * Collect info about the page and nodes, and make them available through the PageInfo object.
  */
-
 class Collector {
 
     /**
-     * A visitor for collecting information on the page and the body of
-     * the custom tags.
+     * A visitor for collecting information on the page and the body of the custom tags.
      */
     private static class CollectVisitor extends Node.Visitor {
 
@@ -81,33 +74,20 @@ class Collector {
                 scriptingElementSeen = true;
             }
             usebeanSeen = true;
-                visitBody(n);
-        }
-
-        @Override
-        public void visit(Node.PlugIn n) throws JasperException {
-            if (n.getHeight() != null && n.getHeight().isExpression()) {
-                scriptingElementSeen = true;
-            }
-            if (n.getWidth() != null && n.getWidth().isExpression()) {
-                scriptingElementSeen = true;
-            }
             visitBody(n);
         }
 
         @Override
         public void visit(Node.CustomTag n) throws JasperException {
             // Check to see what kinds of element we see as child elements
-            checkSeen( n.getChildInfo(), n );
+            checkSeen(n.getChildInfo(), n);
         }
 
         /**
-         * Check all child nodes for various elements and update the given
-         * ChildInfo object accordingly.  Visits body in the process.
+         * Check all child nodes for various elements and update the given ChildInfo object accordingly. Visits body in
+         * the process.
          */
-        private void checkSeen( Node.ChildInfo ci, Node n )
-            throws JasperException
-        {
+        private void checkSeen(Node.ChildInfo ci, Node n) throws JasperException {
             // save values collected so far
             boolean scriptingElementSeenSave = scriptingElementSeen;
             scriptingElementSeen = false;
@@ -123,8 +103,7 @@ class Collector {
             hasScriptingVars = false;
 
             // Scan attribute list for expressions
-            if( n instanceof Node.CustomTag ) {
-                Node.CustomTag ct = (Node.CustomTag)n;
+            if (n instanceof Node.CustomTag ct) {
                 Node.JspAttribute[] attrs = ct.getJspAttributes();
                 for (int i = 0; attrs != null && i < attrs.length; i++) {
                     if (attrs[i].isExpression()) {
@@ -136,14 +115,12 @@ class Collector {
 
             visitBody(n);
 
-            if( (n instanceof Node.CustomTag) && !hasScriptingVars) {
-                Node.CustomTag ct = (Node.CustomTag)n;
-                hasScriptingVars = ct.getVariableInfos().length > 0 ||
-                    ct.getTagVariableInfos().length > 0;
+            if ((n instanceof Node.CustomTag ct) && !hasScriptingVars) {
+                hasScriptingVars = ct.getVariableInfos().length > 0 || ct.getTagVariableInfos().length > 0;
             }
 
             // Record if the tag element and its body contains any scriptlet.
-            ci.setScriptless(! scriptingElementSeen);
+            ci.setScriptless(!scriptingElementSeen);
             ci.setHasUseBean(usebeanSeen);
             ci.setHasIncludeAction(includeActionSeen);
             ci.setHasParamAction(paramActionSeen);
@@ -161,12 +138,13 @@ class Collector {
 
         @Override
         public void visit(Node.JspElement n) throws JasperException {
-            if (n.getNameAttribute().isExpression())
+            if (n.getNameAttribute().isExpression()) {
                 scriptingElementSeen = true;
+            }
 
             Node.JspAttribute[] attrs = n.getJspAttributes();
-            for (int i = 0; i < attrs.length; i++) {
-                if (attrs[i].isExpression()) {
+            for (Node.JspAttribute attr : attrs) {
+                if (attr.isExpression()) {
                     scriptingElementSeen = true;
                     break;
                 }
@@ -176,12 +154,12 @@ class Collector {
 
         @Override
         public void visit(Node.JspBody n) throws JasperException {
-            checkSeen( n.getChildInfo(), n );
+            checkSeen(n.getChildInfo(), n);
         }
 
         @Override
         public void visit(Node.NamedAttribute n) throws JasperException {
-            checkSeen( n.getChildInfo(), n );
+            checkSeen(n.getChildInfo(), n);
         }
 
         @Override
@@ -200,15 +178,14 @@ class Collector {
         }
 
         private void updatePageInfo(PageInfo pageInfo) {
-            pageInfo.setScriptless(! scriptingElementSeen);
+            pageInfo.setScriptless(!scriptingElementSeen);
         }
     }
 
 
-    public static void collect(Compiler compiler, Node.Nodes page)
-        throws JasperException {
+    public static void collect(Compiler compiler, Node.Nodes page) throws JasperException {
 
-    CollectVisitor collectVisitor = new CollectVisitor();
+        CollectVisitor collectVisitor = new CollectVisitor();
         page.visit(collectVisitor);
         collectVisitor.updatePageInfo(compiler.getPageInfo());
 

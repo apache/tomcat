@@ -19,12 +19,12 @@ package org.apache.coyote.http2;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -62,7 +62,7 @@ public class TestAsyncFlush extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
         ctxt.addServletMappingDecoded("/simple", "simple");
         Wrapper w = Tomcat.addServlet(ctxt, "async", new AsyncFlushServlet(blockCount));
@@ -75,7 +75,7 @@ public class TestAsyncFlush extends Http2TestBase {
         sendClientPreface();
         validateHttp2InitialResponse();
 
-        // Reset connection window size after intial response
+        // Reset connection window size after initial response
         sendWindowUpdate(0, SimpleServlet.CONTENT_LENGTH);
 
         // Send request
@@ -85,16 +85,16 @@ public class TestAsyncFlush extends Http2TestBase {
         writeFrame(frameHeader, headersPayload);
 
         // Headers
-        parser.readFrame(true);
+        parser.readFrame();
         // Body
 
-        while (output.getBytesRead() < targetSize ) {
+        while (output.getBytesRead() < targetSize) {
             if (output.getBytesRead() == totalWindow) {
                 sendWindowUpdate(3, ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE);
                 sendWindowUpdate(0, ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE);
                 totalWindow += ConnectionSettingsBase.DEFAULT_INITIAL_WINDOW_SIZE;
             }
-            parser.readFrame(true);
+            parser.readFrame();
         }
 
         // Check that the right number of bytes were received
@@ -113,8 +113,7 @@ public class TestAsyncFlush extends Http2TestBase {
         }
 
         @Override
-        protected void doGet(HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
             final AsyncContext asyncContext = request.startAsync();
 

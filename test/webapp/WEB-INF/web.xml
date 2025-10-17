@@ -15,11 +15,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
-                      http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
-  version="4.0"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd"
+  version="6.2"
   metadata-complete="true">
 
   <display-name>Tomcat Test Application</display-name>
@@ -27,6 +27,11 @@
      Used as part of the Tomcat unit tests when a full web application is
      required.
   </description>
+
+  <servlet-mapping>
+    <servlet-name>JSP-nonstandard</servlet-name>
+    <url-pattern>/jsp/generator/nonstandard/*</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>jsp</servlet-name>
@@ -38,6 +43,29 @@
       <init-param>
         <param-name>xpoweredBy</param-name>
         <param-value>false</param-value>
+      </init-param>
+      <!-- Required by /jsp/tagFileInJar.jsp / TestJspCompilationContext  -->
+      <init-param>
+        <param-name>modificationTestInterval</param-name>
+        <param-value>0</param-value>
+      </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>JSP-nonstandard</servlet-name>
+      <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
+      <init-param>
+        <param-name>fork</param-name>
+        <param-value>false</param-value>
+      </init-param>
+      <init-param>
+        <param-name>xpoweredBy</param-name>
+        <param-value>false</param-value>
+      </init-param>
+      <init-param>
+        <param-name>useNonstandardTagOptimizations</param-name>
+        <param-value>c:set,c:remove</param-value>
       </init-param>
       <!-- Required by /jsp/tagFileInJar.jsp / TestJspCompilationContext  -->
       <init-param>
@@ -66,6 +94,19 @@
     <dispatcher>FORWARD</dispatcher>
     <dispatcher>INCLUDE</dispatcher>
   </filter-mapping>
+  <servlet>
+    <servlet-name>bug49297NoSpace</servlet-name>
+    <jsp-file>/bug49nnn/bug49297NoSpace.jsp</jsp-file>
+      <init-param>
+        <param-name>strictWhitespace</param-name>
+        <param-value>false</param-value>
+      </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>bug49297NoSpace</servlet-name>
+    <url-pattern>/bug49nnn/bug49297NoSpace.jsp</url-pattern>
+  </servlet-mapping>
   <servlet>
     <servlet-name>Bug49922Forward</servlet-name>
     <servlet-class>
@@ -139,6 +180,14 @@
       <page-encoding>ISO-8859-1</page-encoding>
       <is-xml>true</is-xml>
     </jsp-property-group>
+    <jsp-property-group>
+      <url-pattern>/jsp/errorOnELNotFound/web-xml-true.jsp</url-pattern>
+      <error-on-el-not-found>true</error-on-el-not-found>
+    </jsp-property-group>
+    <jsp-property-group>
+      <url-pattern>/jsp/errorOnELNotFound/web-xml-false.jsp</url-pattern>
+      <error-on-el-not-found>false</error-on-el-not-found>
+    </jsp-property-group>
   </jsp-config>
 
   <servlet>
@@ -153,10 +202,145 @@
   <servlet>
     <servlet-name>Bug53574</servlet-name>
     <jsp-file>/WEB-INF/jsp/bug53574.jsp</jsp-file>
+    <load-on-startup>-2</load-on-startup>
   </servlet>
   <servlet-mapping>
     <servlet-name>Bug53574</servlet-name>
     <url-pattern>/bug53574</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-x-powered-by</servlet-name>
+    <jsp-file>/jsp/generator/x-powered-by.jsp</jsp-file>
+    <init-param>
+      <param-name>xpoweredBy</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-x-powered-by</servlet-name>
+    <url-pattern>/jsp/generator/x-powered-by.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-usebean-04</servlet-name>
+    <jsp-file>/jsp/generator/usebean-04.jsp</jsp-file>
+    <init-param>
+      <param-name>errorOnUseBeanInvalidClassAttribute</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-usebean-04</servlet-name>
+    <url-pattern>/jsp/generator/usebean-04.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-usebean-07</servlet-name>
+    <jsp-file>/jsp/generator/usebean-07.jsp</jsp-file>
+    <init-param>
+      <param-name>errorOnUseBeanInvalidClassAttribute</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-usebean-07</servlet-name>
+    <url-pattern>/jsp/generator/usebean-07.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-templatetext-01</servlet-name>
+    <jsp-file>/jsp/generator/templatetext-01.jsp</jsp-file>
+    <init-param>
+      <param-name>trimSpaces</param-name>
+      <param-value>extended</param-value>
+    </init-param>
+    <init-param>
+      <param-name>genStringAsCharArray</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-templatetext-01</servlet-name>
+    <url-pattern>/jsp/generator/templatetext-01.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-templatetext-02</servlet-name>
+    <jsp-file>/jsp/generator/templatetext-02.jsp</jsp-file>
+    <init-param>
+      <param-name>mappedfile</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-templatetext-02</servlet-name>
+    <url-pattern>/jsp/generator/templatetext-02.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>JSP-jsp-id</servlet-name>
+    <jsp-file>/jsp/generator/jsp-id.jsp</jsp-file>
+    <init-param>
+      <param-name>enablePooling</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <param-name>useInstanceManagerForTags</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>JSP-jsp-id</servlet-name>
+    <url-pattern>/jsp/generator/jsp-id.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>bug48701-no-strict</servlet-name>
+    <jsp-file>/bug48nnn/bug48701-VI.jsp</jsp-file>
+    <init-param>
+      <param-name>strictGetProperty</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>bug48701-no-strict</servlet-name>
+    <url-pattern>/bug48nnn/bug48701-VI.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>bug58445b</servlet-name>
+    <jsp-file>/bug5nnnn/bug58444b.jsp</jsp-file>
+    <init-param>
+      <param-name>poolTagsWithExtends</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>bug58445b</servlet-name>
+    <url-pattern>/bug5nnnn/bug58444b.jsp</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>deferred-method-02</servlet-name>
+    <jsp-file>/jsp/generator/deferred-method-02.jsp</jsp-file>
+    <init-param>
+      <param-name>enablePooling</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <load-on-startup>-2</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>deferred-method-02</servlet-name>
+    <url-pattern>/jsp/generator/deferred-method-02.jsp</url-pattern>
   </servlet-mapping>
 
   <login-config>
@@ -171,4 +355,12 @@
     <mapped-name>Bug53465MappedName</mapped-name>
   </env-entry>
 
+  <session-config>
+    <cookie-config>
+      <attribute>
+        <attribute-name>aaa</attribute-name>
+        <attribute-value>bbb</attribute-value>
+      </attribute>
+    </cookie-config>
+  </session-config>
 </web-app>

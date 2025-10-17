@@ -21,7 +21,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
@@ -33,14 +32,7 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * Allows the different SSICommand implementations to share data/talk to each
- * other
- *
- * @author Bip Thelin
- * @author Amy Roh
- * @author Paul Speed
- * @author Dan Sandberg
- * @author David Becker
+ * Allows the different SSICommand implementations to share data/talk to each other.
  */
 public class SSIMediator {
     private static final StringManager sm = StringManager.getManager(SSIMediator.class);
@@ -61,11 +53,10 @@ public class SSIMediator {
     protected final long lastModifiedDate;
     protected Strftime strftime;
     protected final SSIConditionalState conditionalState = new SSIConditionalState();
-    protected  int lastMatchCount = 0;
+    protected int lastMatchCount = 0;
 
 
-    public SSIMediator(SSIExternalResolver ssiExternalResolver,
-            long lastModifiedDate) {
+    public SSIMediator(SSIExternalResolver ssiExternalResolver, long lastModifiedDate) {
         this.ssiExternalResolver = ssiExternalResolver;
         this.lastModifiedDate = lastModifiedDate;
         setConfigTimeFmt(DEFAULT_CONFIG_TIME_FMT, true);
@@ -85,9 +76,10 @@ public class SSIMediator {
     public void setConfigTimeFmt(String configTimeFmt, boolean fromConstructor) {
         this.configTimeFmt = configTimeFmt;
         this.strftime = new Strftime(configTimeFmt, Locale.US);
-        //Variables like DATE_LOCAL, DATE_GMT, and LAST_MODIFIED need to be
-        // updated when
-        //the timefmt changes. This is what Apache SSI does.
+        /*
+         * Variables like DATE_LOCAL, DATE_GMT, and LAST_MODIFIED need to be updated when the timefmt changes. This is
+         * what Apache SSI does.
+         */
         setDateVariables(fromConstructor);
     }
 
@@ -119,21 +111,13 @@ public class SSIMediator {
 
     public Collection<String> getVariableNames() {
         Set<String> variableNames = new HashSet<>();
-        //These built-in variables are supplied by the mediator ( if not
-        // over-written by
-        // the user ) and always exist
+        // These built-in variables are supplied by the mediator (if not over-written by the user) and always exist
         variableNames.add("DATE_GMT");
         variableNames.add("DATE_LOCAL");
         variableNames.add("LAST_MODIFIED");
         ssiExternalResolver.addVariableNames(variableNames);
-        //Remove any variables that are reserved by this class
-        Iterator<String> iter = variableNames.iterator();
-        while (iter.hasNext()) {
-            String name = iter.next();
-            if (isNameReserved(name)) {
-                iter.remove();
-            }
-        }
+        // Remove any variables that are reserved by this class
+        variableNames.removeIf(this::isNameReserved);
         return variableNames;
     }
 
@@ -143,8 +127,7 @@ public class SSIMediator {
     }
 
 
-    public long getFileLastModified(String path, boolean virtual)
-            throws IOException {
+    public long getFileLastModified(String path, boolean virtual) throws IOException {
         return ssiExternalResolver.getFileLastModified(path, virtual);
     }
 
@@ -175,14 +158,11 @@ public class SSIMediator {
         String lowerCaseVariableName = variableName.toLowerCase(Locale.ENGLISH);
         String variableValue = null;
         if (!isNameReserved(lowerCaseVariableName)) {
-            //Try getting it externally first, if it fails, try getting the
-            // 'built-in'
-            // value
+            // Try getting it externally first, if it fails, try getting the 'built-in' value
             variableValue = ssiExternalResolver.getVariableValue(variableName);
             if (variableValue == null) {
                 variableName = variableName.toUpperCase(Locale.ENGLISH);
-                variableValue = ssiExternalResolver
-                        .getVariableValue(className + "." + variableName);
+                variableValue = ssiExternalResolver.getVariableValue(className + "." + variableName);
             }
             if (variableValue != null) {
                 variableValue = encode(variableValue, encoding);
@@ -193,15 +173,17 @@ public class SSIMediator {
 
 
     /**
-     * Applies variable substitution to the specified String and returns the
-     * new resolved string.
+     * Applies variable substitution to the specified String and returns the new resolved string.
+     *
      * @param val The value which should be checked
+     *
      * @return the value after variable substitution
      */
     public String substituteVariables(String val) {
-        // If it has no references or HTML entities then no work
-        // need to be done
-        if (val.indexOf('$') < 0 && val.indexOf('&') < 0) return val;
+        // If it has no references or HTML entities then no work need to be done
+        if (val.indexOf('$') < 0 && val.indexOf('&') < 0) {
+            return val;
+        }
 
         // HTML decoding
         val = val.replace("&lt;", "<");
@@ -214,8 +196,7 @@ public class SSIMediator {
         while (charStart > -1) {
             int charEnd = sb.indexOf(";", charStart);
             if (charEnd > -1) {
-                char c = (char) Integer.parseInt(
-                        sb.substring(charStart + 2, charEnd));
+                char c = (char) Integer.parseInt(sb.substring(charStart + 2, charEnd));
                 sb.delete(charStart, charEnd + 1);
                 sb.insert(charStart, c);
                 charStart = sb.indexOf("&#");
@@ -232,7 +213,9 @@ public class SSIMediator {
                     break;
                 }
             }
-            if (i == sb.length()) break;
+            if (i == sb.length()) {
+                break;
+            }
             // Check to see if the $ is escaped
             if (i > 1 && sb.charAt(i - 2) == '\\') {
                 sb.deleteCharAt(i - 2);
@@ -241,8 +224,8 @@ public class SSIMediator {
             }
             int nameStart = i;
             int start = i - 1;
-            int end = -1;
-            int nameEnd = -1;
+            int end;
+            int nameEnd;
             char endChar = ' ';
             // Check for {} wrapped var
             if (sb.charAt(i) == '{') {
@@ -251,19 +234,24 @@ public class SSIMediator {
             }
             // Find the end of the var reference
             for (; i < sb.length(); i++) {
-                if (sb.charAt(i) == endChar) break;
+                if (sb.charAt(i) == endChar) {
+                    break;
+                }
             }
             end = i;
             nameEnd = end;
-            if (endChar == '}') end++;
+            if (endChar == '}') {
+                end++;
+            }
             // We should now have enough to extract the var name
             String varName = sb.substring(nameStart, nameEnd);
             String value = getVariableValue(varName);
-            if (value == null) value = "";
+            if (value == null) {
+                value = "";
+            }
             // Replace the var name with its value
             sb.replace(start, end, value);
-            // Start searching for the next $ after the value
-            // that was just substituted.
+            // Start searching for the next $ after the value that was just substituted.
             i = start + value.length();
         }
         return sb.toString();
@@ -273,9 +261,7 @@ public class SSIMediator {
     protected String formatDate(Date date, TimeZone timeZone) {
         String retVal;
         if (timeZone != null) {
-            //we temporarily change strftime. Since SSIMediator is inherently
-            // single-threaded, this
-            //isn't a problem
+            // we temporarily change strftime. Since SSIMediator is inherently single-threaded, this isn't a problem
             TimeZone oldTimeZone = strftime.getTimeZone();
             strftime.setTimeZone(timeZone);
             retVal = strftime.format(date);
@@ -288,7 +274,7 @@ public class SSIMediator {
 
 
     protected String encode(String value, String encoding) {
-        String retVal = null;
+        String retVal;
         if (encoding.equalsIgnoreCase(ENCODING_URL)) {
             retVal = URLEncoder.DEFAULT.encode(value, StandardCharsets.UTF_8);
         } else if (encoding.equalsIgnoreCase(ENCODING_NONE)) {
@@ -296,7 +282,7 @@ public class SSIMediator {
         } else if (encoding.equalsIgnoreCase(ENCODING_ENTITY)) {
             retVal = Escape.htmlElementContent(value);
         } else {
-            //This shouldn't be possible
+            // This shouldn't be possible
             throw new IllegalArgumentException(sm.getString("ssiMediator.unknownEncoding", encoding));
         }
         return retVal;
@@ -314,32 +300,25 @@ public class SSIMediator {
 
 
     protected void setDateVariables(boolean fromConstructor) {
-        boolean alreadySet = ssiExternalResolver.getVariableValue(className
-                + ".alreadyset") != null;
-        //skip this if we are being called from the constructor, and this has
-        // already
-        // been set
+        boolean alreadySet = ssiExternalResolver.getVariableValue(className + ".alreadyset") != null;
+        // skip this if we are being called from the constructor, and this has already been set
         if (!(fromConstructor && alreadySet)) {
-            ssiExternalResolver.setVariableValue(className + ".alreadyset",
-                    "true");
+            ssiExternalResolver.setVariableValue(className + ".alreadyset", "true");
             Date date = new Date();
             TimeZone timeZone = TimeZone.getTimeZone("GMT");
             String retVal = formatDate(date, timeZone);
-            //If we are setting on of the date variables, we want to remove
-            // them from the
-            // user
-            //defined list of variables, because this is what Apache does
+            /*
+             * If we are setting on of the date variables, we want to remove them from the user defined list of
+             * variables, because this is what Apache does.
+             */
             setVariableValue("DATE_GMT", null);
-            ssiExternalResolver.setVariableValue(className + ".DATE_GMT",
-                    retVal);
+            ssiExternalResolver.setVariableValue(className + ".DATE_GMT", retVal);
             retVal = formatDate(date, null);
             setVariableValue("DATE_LOCAL", null);
-            ssiExternalResolver.setVariableValue(className + ".DATE_LOCAL",
-                    retVal);
+            ssiExternalResolver.setVariableValue(className + ".DATE_LOCAL", retVal);
             retVal = formatDate(new Date(lastModifiedDate), null);
             setVariableValue("LAST_MODIFIED", null);
-            ssiExternalResolver.setVariableValue(className + ".LAST_MODIFIED",
-                    retVal);
+            ssiExternalResolver.setVariableValue(className + ".LAST_MODIFIED", retVal);
         }
     }
 

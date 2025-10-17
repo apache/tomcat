@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package compressionFilters;
 
 import java.io.IOException;
@@ -21,15 +21,12 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.zip.GZIPOutputStream;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 
 /**
  * Implementation of <b>ServletOutputStream</b> that works with
  * the CompressionServletResponseWrapper implementation.
- *
- * @author Amy Roh
- * @author Dmitri Valdin
  */
 public class CompressionResponseStream extends ServletOutputStream {
 
@@ -122,6 +119,9 @@ public class CompressionResponseStream extends ServletOutputStream {
 
     /**
      * Set the compressionThreshold number and create buffer for this size
+     *
+     * @param compressionThreshold Responses above this size in bytes will be
+     *                             compressed
      */
     protected void setCompressionThreshold(int compressionThreshold) {
         this.compressionThreshold = compressionThreshold;
@@ -133,6 +133,8 @@ public class CompressionResponseStream extends ServletOutputStream {
 
     /**
      * The compression buffer size to avoid chunking
+     *
+     * @param compressionBuffer The compression buffer size in bytes
      */
     protected void setCompressionBuffer(int compressionBuffer) {
         this.compressionBuffer = compressionBuffer;
@@ -164,8 +166,9 @@ public class CompressionResponseStream extends ServletOutputStream {
         if (debug > 1) {
             System.out.println("close() @ CompressionResponseStream");
         }
-        if (closed)
+        if (closed) {
             throw new IOException("This output stream has already been closed");
+        }
 
         if (gzipstream != null) {
             flushToGZip();
@@ -237,8 +240,9 @@ public class CompressionResponseStream extends ServletOutputStream {
         if (debug > 1) {
             System.out.println("write "+b+" in CompressionResponseStream ");
         }
-        if (closed)
+        if (closed) {
             throw new IOException("Cannot write to a closed output stream");
+        }
 
         if (bufferCount >= buffer.length) {
             flushToGZip();
@@ -308,11 +312,13 @@ public class CompressionResponseStream extends ServletOutputStream {
             System.out.println(")");
         }
 
-        if (closed)
+        if (closed) {
             throw new IOException("Cannot write to a closed output stream");
+        }
 
-        if (len == 0)
+        if (len == 0) {
             return;
+        }
 
         // Can we write into buffer ?
         if (len <= (buffer.length - bufferCount)) {
@@ -381,16 +387,19 @@ public class CompressionResponseStream extends ServletOutputStream {
             }
 
             if (response.isCommitted()) {
-                if (debug > 1)
+                if (debug > 1) {
                     System.out.print("Response already committed. Using original output stream");
+                }
                 gzipstream = output;
             } else if (alreadyCompressed) {
-                if (debug > 1)
+                if (debug > 1) {
                     System.out.print("Response already compressed. Using original output stream");
+                }
                 gzipstream = output;
             } else if (!compressibleMimeType) {
-                if (debug > 1)
+                if (debug > 1) {
                     System.out.print("Response mime type is not compressible. Using original output stream");
+                }
                 gzipstream = output;
             } else {
                 response.addHeader("Content-Encoding", "gzip");
@@ -423,10 +432,11 @@ public class CompressionResponseStream extends ServletOutputStream {
      * @param value string
      */
     private boolean startsWithStringArray(String sArray[], String value) {
-        if (value == null)
-           return false;
-        for (int i = 0; i < sArray.length; i++) {
-            if (value.startsWith(sArray[i])) {
+        if (value == null) {
+            return false;
+        }
+        for (String s : sArray) {
+            if (value.startsWith(s)) {
                 return true;
             }
         }

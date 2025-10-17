@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.util;
 
 
@@ -26,10 +24,7 @@ import org.apache.tomcat.util.ExceptionUtils;
 
 
 /**
- * Simple utility module to make it easy to plug in the server identifier
- * when integrating Tomcat.
- *
- * @author Craig R. McClanahan
+ * Simple utility module to make it easy to plug in the server identifier when integrating Tomcat.
  */
 public class ServerInfo {
 
@@ -48,6 +43,11 @@ public class ServerInfo {
     private static final String serverBuilt;
 
     /**
+     * The server built String, in ISO-8604 date format.
+     */
+    private static final String serverBuiltIso;
+
+    /**
      * The server's version number String.
      */
     private static final String serverNumber;
@@ -56,27 +56,35 @@ public class ServerInfo {
 
         String info = null;
         String built = null;
+        String builtIso = null;
         String number = null;
 
         Properties props = new Properties();
-        try (InputStream is = ServerInfo.class.getResourceAsStream
-                ("/org/apache/catalina/util/ServerInfo.properties")) {
+        try (InputStream is = ServerInfo.class.getResourceAsStream("/org/apache/catalina/util/ServerInfo.properties")) {
             props.load(is);
             info = props.getProperty("server.info");
             built = props.getProperty("server.built");
+            builtIso = props.getProperty("server.built.iso");
             number = props.getProperty("server.number");
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
         }
-        if (info == null || info.equals("Apache Tomcat/@VERSION@"))
-            info = "Apache Tomcat/9.0.x-dev";
-        if (built == null || built.equals("@VERSION_BUILT@"))
+        if (info == null || info.equals("Apache Tomcat/@VERSION@")) {
+            info = "Apache Tomcat/12.0.x-dev";
+        }
+        if (built == null || built.equals("@VERSION_BUILT@")) {
             built = "unknown";
-        if (number == null || number.equals("@VERSION_NUMBER@"))
-            number = "9.0.x";
+        }
+        if (builtIso == null || builtIso.equals("@VERSION_BUILT_ISO@")) {
+            builtIso = "unknown";
+        }
+        if (number == null || number.equals("@VERSION_NUMBER@")) {
+            number = "12.0.x";
+        }
 
         serverInfo = info;
         serverBuilt = built;
+        serverBuiltIso = builtIso;
         serverNumber = number;
     }
 
@@ -99,26 +107,28 @@ public class ServerInfo {
     }
 
     /**
+     * @return the server built date for this version of Tomcat in ISO-8601 date format.
+     */
+    public static String getServerBuiltISO() {
+        return serverBuiltIso;
+    }
+
+    /**
      * @return the server's version number.
      */
     public static String getServerNumber() {
         return serverNumber;
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         System.out.println("Server version: " + getServerInfo());
         System.out.println("Server built:   " + getServerBuilt());
         System.out.println("Server number:  " + getServerNumber());
-        System.out.println("OS Name:        " +
-                           System.getProperty("os.name"));
-        System.out.println("OS Version:     " +
-                           System.getProperty("os.version"));
-        System.out.println("Architecture:   " +
-                           System.getProperty("os.arch"));
-        System.out.println("JVM Version:    " +
-                           System.getProperty("java.runtime.version"));
-        System.out.println("JVM Vendor:     " +
-                           System.getProperty("java.vm.vendor"));
+        System.out.println("OS Name:        " + System.getProperty("os.name"));
+        System.out.println("OS Version:     " + System.getProperty("os.version"));
+        System.out.println("Architecture:   " + System.getProperty("os.arch"));
+        System.out.println("JVM Version:    " + System.getProperty("java.runtime.version"));
+        System.out.println("JVM Vendor:     " + System.getProperty("java.vm.vendor"));
     }
 
 }

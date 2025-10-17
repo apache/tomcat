@@ -16,7 +16,7 @@
   limitations under the License.
 -->
 <project version="4">
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="false" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_@BUILD_JAVA_VERSION@" default="false" project-jdk-name="@BUILD_JAVA_VERSION@" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/.idea/output" />
   </component>
 </project>

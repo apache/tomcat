@@ -17,8 +17,8 @@
 package org.apache.catalina;
 
 /**
- * The list of valid states for components that implement {@link Lifecycle}.
- * See {@link Lifecycle} for the state transition diagram.
+ * The list of valid states for components that implement {@link Lifecycle}. See {@link Lifecycle} for the state
+ * transition diagram.
  */
 public enum LifecycleState {
     NEW(false, null),
@@ -37,23 +37,21 @@ public enum LifecycleState {
     private final boolean available;
     private final String lifecycleEvent;
 
-    private LifecycleState(boolean available, String lifecycleEvent) {
+    LifecycleState(boolean available, String lifecycleEvent) {
         this.available = available;
         this.lifecycleEvent = lifecycleEvent;
     }
 
     /**
-     * May the public methods other than property getters/setters and lifecycle
-     * methods be called for a component in this state? It returns
-     * <code>true</code> for any component in any of the following states:
+     * May the public methods other than property getters/setters and lifecycle methods be called for a component in
+     * this state? It returns <code>true</code> for any component in any of the following states:
      * <ul>
      * <li>{@link #STARTING}</li>
      * <li>{@link #STARTED}</li>
      * <li>{@link #STOPPING_PREP}</li>
      * </ul>
      *
-     * @return <code>true</code> if the component is available for use,
-     *         otherwise <code>false</code>
+     * @return <code>true</code> if the component is available for use, otherwise <code>false</code>
      */
     public boolean isAvailable() {
         return available;

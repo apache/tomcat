@@ -18,10 +18,7 @@ package org.apache.catalina.valves;
 
 
 /**
- * Manifest constants for the <code>org.apache.catalina.valves</code>
- * package.
- *
- * @author Craig R. McClanahan
+ * Manifest constants for the <code>org.apache.catalina.valves</code> package.
  */
 
 public final class Constants {

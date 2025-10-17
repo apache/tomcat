@@ -17,8 +17,7 @@
 
 # -----------------------------------------------------------------------------
 #  Set JAVA_HOME or JRE_HOME if not already set, ensure any provided settings
-#  are valid and consistent with the selected start-up options and set up the
-#  endorsed directory.
+#  are valid and consistent with the selected start-up options.
 # -----------------------------------------------------------------------------
 
 # Make sure prerequisite environment variables are set
@@ -54,15 +53,13 @@ if [ -z "$JAVA_HOME" ] && [ "$1" = "debug" ]; then
   echo "JAVA_HOME should point to a JDK in order to run in debug mode."
   exit 1
 fi
-if [ -z "$JRE_HOME" ]; then
-  JRE_HOME="$JAVA_HOME"
-fi
 
 # If we're running under jdb, we need a full jdk.
 if [ "$1" = "debug" ] ; then
   if [ "$os400" = "true" ]; then
     if [ ! -x "$JAVA_HOME"/bin/java ] || [ ! -x "$JAVA_HOME"/bin/javac ]; then
       echo "The JAVA_HOME environment variable is not defined correctly"
+      echo "JAVA_HOME=$JAVA_HOME"
       echo "This environment variable is needed to run this program"
       echo "NB: JAVA_HOME should point to a JDK not a JRE"
       exit 1
@@ -70,6 +67,7 @@ if [ "$1" = "debug" ] ; then
   else
     if [ ! -x "$JAVA_HOME"/bin/java ] || [ ! -x "$JAVA_HOME"/bin/jdb ] || [ ! -x "$JAVA_HOME"/bin/javac ]; then
       echo "The JAVA_HOME environment variable is not defined correctly"
+      echo "JAVA_HOME=$JAVA_HOME"
       echo "This environment variable is needed to run this program"
       echo "NB: JAVA_HOME should point to a JDK not a JRE"
       exit 1
@@ -77,13 +75,22 @@ if [ "$1" = "debug" ] ; then
   fi
 fi
 
-# Don't override the endorsed dir if the user has set it previously
-if [ -z "$JAVA_ENDORSED_DIRS" ]; then
-  # Java 9 no longer supports the java.endorsed.dirs
-  # system property. Only try to use it if
-  # CATALINA_HOME/endorsed exists.
-  if [ -d "$CATALINA_HOME"/endorsed ]; then
-    JAVA_ENDORSED_DIRS="$CATALINA_HOME"/endorsed
+if [ -z "$JRE_HOME" ]; then
+  # JAVA_HOME_MUST be set
+  if [ ! -x "$JAVA_HOME"/bin/java ]; then
+    echo "The JAVA_HOME environment variable is not defined correctly"
+    echo "JAVA_HOME=$JAVA_HOME"
+    echo "This environment variable is needed to run this program"
+    echo "NB: JAVA_HOME should point to a JDK not a JRE"
+    exit 1
+  fi
+  JRE_HOME="$JAVA_HOME"
+else
+  if [ ! -x "$JRE_HOME"/bin/java ]; then
+    echo "The JRE_HOME environment variable is not defined correctly"
+    echo "JRE_HOME=$JRE_HOME"
+    echo "This environment variable is needed to run this program"
+    exit 1
   fi
 fi
 

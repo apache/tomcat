@@ -17,11 +17,9 @@
 package org.apache.tomcat.util.collections;
 
 /**
- * This is intended as a (mostly) GC-free alternative to
- * {@link java.util.concurrent.ConcurrentLinkedQueue} when the requirement is to
- * create a pool of re-usable objects with no requirement to shrink the pool.
- * The aim is to provide the bare minimum of required functionality as quickly
- * as possible with minimum garbage.
+ * This is intended as a (mostly) GC-free alternative to {@link java.util.Stack} when the requirement is to create a
+ * pool of re-usable objects with no requirement to shrink the pool. The aim is to provide the bare minimum of required
+ * functionality as quickly as possible with minimum garbage.
  *
  * @param <T> The type of object managed by this stack
  */
@@ -31,7 +29,7 @@ public class SynchronizedStack<T> {
     private static final int DEFAULT_LIMIT = -1;
 
     private int size;
-    private final int limit;
+    private int limit;
 
     /*
      * Points to the next available object in the stack
@@ -52,7 +50,7 @@ public class SynchronizedStack<T> {
             this.size = size;
         }
         this.limit = limit;
-        stack = new Object[size];
+        stack = new Object[this.size];
     }
 
 
@@ -87,6 +85,10 @@ public class SynchronizedStack<T> {
             }
         }
         index = -1;
+    }
+
+    public synchronized void setLimit(int limit) {
+        this.limit = limit;
     }
 
     private void expand() {

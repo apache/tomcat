@@ -23,40 +23,40 @@ public interface ConnectionPoolMBean extends PoolConfiguration  {
     //       POOL STATS
     //=================================================================
 
-    public int getSize();
+    int getSize();
 
-    public int getIdle();
+    int getIdle();
 
-    public int getActive();
+    int getActive();
 
-    public int getNumIdle();
+    int getNumIdle();
 
-    public int getNumActive();
+    int getNumActive();
 
-    public int getWaitCount();
+    int getWaitCount();
 
-    public long getBorrowedCount();
+    long getBorrowedCount();
 
-    public long getReturnedCount();
+    long getReturnedCount();
 
-    public long getCreatedCount();
+    long getCreatedCount();
 
-    public long getReleasedCount();
+    long getReleasedCount();
 
-    public long getReconnectedCount();
+    long getReconnectedCount();
 
-    public long getRemoveAbandonedCount();
+    long getRemoveAbandonedCount();
 
-    public long getReleasedIdleCount();
+    long getReleasedIdleCount();
 
     //=================================================================
     //       POOL OPERATIONS
     //=================================================================
-    public void checkIdle();
+    void checkIdle();
 
-    public void checkAbandoned();
+    void checkAbandoned();
 
-    public void testIdle();
+    void testIdle();
 
     /**
      * Purges all connections in the pool.
@@ -65,19 +65,19 @@ public interface ConnectionPoolMBean extends PoolConfiguration  {
      * purges connections that are idle and in the pool
      * To only purge used/active connections see {@link #purgeOnReturn()}
      */
-    public void purge();
+    void purge();
 
     /**
      * Purges connections when they are returned from the pool.
      * This call does not purge idle connections until they are used.
      * To purge idle connections see {@link #purge()}
      */
-    public void purgeOnReturn();
+    void purgeOnReturn();
 
     /**
      * reset the statistics of this pool.
      */
-    public void resetStats();
+    void resetStats();
 
     //=================================================================
     //       POOL NOTIFICATIONS

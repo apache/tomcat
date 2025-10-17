@@ -24,7 +24,7 @@ class StreamRunnable implements Runnable {
     private final SocketEvent event;
 
 
-    public StreamRunnable(StreamProcessor processor, SocketEvent event) {
+    StreamRunnable(StreamProcessor processor, SocketEvent event) {
         this.processor = processor;
         this.event = event;
     }

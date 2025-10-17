@@ -24,21 +24,21 @@
            version="1.0">
   <xs:element name="tomcat-users">
     <xs:complexType>
-      <xs:sequence>
-        <xs:element name="role" minOccurs="0" maxOccurs="unbounded">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="role">
           <xs:complexType>
             <xs:attribute name="rolename" use="required" type="users:entityname" />
             <xs:attribute name="description" type="xs:string" />
           </xs:complexType>
         </xs:element>
-        <xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="group">
           <xs:complexType>
             <xs:attribute name="groupname" use="required" type="users:entityname" />
             <xs:attribute name="description" type="xs:string" />
             <xs:attribute name="roles" type="xs:string" />
           </xs:complexType>
         </xs:element>
-        <xs:element name="user" minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="user">
           <xs:complexType>
             <xs:attribute name="username" use="required" type="users:entityname" />
             <xs:attribute name="fullname" type="xs:string" />
@@ -47,7 +47,7 @@
             <xs:attribute name="groups" type="xs:string" />
           </xs:complexType>
         </xs:element>
-      </xs:sequence>
+      </xs:choice>
       <xs:attribute name="version" type="xs:string" />
     </xs:complexType>
   </xs:element>

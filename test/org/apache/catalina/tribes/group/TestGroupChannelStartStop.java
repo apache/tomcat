@@ -24,9 +24,6 @@ import org.junit.Test;
 import org.apache.catalina.tribes.Channel;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 
-/**
- * @version 1.0
- */
 public class TestGroupChannelStartStop {
     private GroupChannel channel = null;
     private int udpPort = 45543;
@@ -34,6 +31,7 @@ public class TestGroupChannelStartStop {
     @Before
     public void setUp() throws Exception {
         channel = new GroupChannel();
+        ((ReceiverBase) channel.getChannelReceiver()).setHost("localhost");
     }
 
     @After

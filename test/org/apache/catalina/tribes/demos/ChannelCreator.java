@@ -17,7 +17,6 @@
 package org.apache.catalina.tribes.demos;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.catalina.tribes.Channel;
@@ -34,50 +33,29 @@ import org.apache.catalina.tribes.group.interceptors.TcpFailureDetector;
 import org.apache.catalina.tribes.group.interceptors.ThroughputInterceptor;
 import org.apache.catalina.tribes.membership.McastService;
 import org.apache.catalina.tribes.membership.MemberImpl;
+import org.apache.catalina.tribes.transport.Constants;
 import org.apache.catalina.tribes.transport.MultiPointSender;
 import org.apache.catalina.tribes.transport.ReceiverBase;
 import org.apache.catalina.tribes.transport.ReplicationTransmitter;
 
-/**
- * <p>Title: </p>
- *
- * <p>Description: </p>
- *
- *
- * <p>Company: </p>
- *
- * @version 1.0
- */
 public class ChannelCreator {
-
 
     public static StringBuilder usage() {
         StringBuilder buf = new StringBuilder();
-        buf.append("\n\t\t[-bind tcpbindaddress]")
-           .append("\n\t\t[-tcpselto tcpselectortimeout]")
-           .append("\n\t\t[-tcpthreads tcpthreadcount]")
-           .append("\n\t\t[-port tcplistenport]")
-           .append("\n\t\t[-autobind tcpbindtryrange]")
-           .append("\n\t\t[-ackto acktimeout]")
-           .append("\n\t\t[-receiver org.apache.catalina.tribes.transport.nio.NioReceiver|org.apache.catalina.tribes.transport.bio.BioReceiver|]")
-           .append("\n\t\t[-transport org.apache.catalina.tribes.transport.nio.PooledParallelSender|org.apache.catalina.tribes.transport.bio.PooledMultiSender]")
-           .append("\n\t\t[-transport.xxx transport specific property]")
-           .append("\n\t\t[-maddr multicastaddr]")
-           .append("\n\t\t[-mport multicastport]")
-           .append("\n\t\t[-mbind multicastbindaddr]")
-           .append("\n\t\t[-mfreq multicastfrequency]")
-           .append("\n\t\t[-mdrop multicastdroptime]")
-           .append("\n\t\t[-gzip]")
-           .append("\n\t\t[-static hostname:port (-static localhost:9999 -static 127.0.0.1:8888 can be repeated)]")
-           .append("\n\t\t[-order]")
-           .append("\n\t\t[-ordersize maxorderqueuesize]")
-           .append("\n\t\t[-frag]")
-           .append("\n\t\t[-fragsize maxmsgsize]")
-           .append("\n\t\t[-throughput]")
-           .append("\n\t\t[-failuredetect]")
-           .append("\n\t\t[-async]")
-           .append("\n\t\t[-asyncsize maxqueuesizeinkilobytes]");
-       return buf;
+        buf.append("\n\t\t[-bind tcpbindaddress]").append("\n\t\t[-tcpselto tcpselectortimeout]")
+                .append("\n\t\t[-tcpthreads tcpthreadcount]").append("\n\t\t[-port tcplistenport]")
+                .append("\n\t\t[-autobind tcpbindtryrange]").append("\n\t\t[-ackto acktimeout]")
+                .append("\n\t\t[-receiver org.apache.catalina.tribes.transport.nio.NioReceiver|org.apache.catalina.tribes.transport.bio.BioReceiver|]")
+                .append("\n\t\t[-transport org.apache.catalina.tribes.transport.nio.PooledParallelSender|org.apache.catalina.tribes.transport.bio.PooledMultiSender]")
+                .append("\n\t\t[-transport.xxx transport specific property]").append("\n\t\t[-maddr multicastaddr]")
+                .append("\n\t\t[-mport multicastport]").append("\n\t\t[-mbind multicastbindaddr]")
+                .append("\n\t\t[-mfreq multicastfrequency]").append("\n\t\t[-mdrop multicastdroptime]")
+                .append("\n\t\t[-gzip]")
+                .append("\n\t\t[-static hostname:port (-static localhost:9999 -static 127.0.0.1:8888 can be repeated)]")
+                .append("\n\t\t[-order]").append("\n\t\t[-ordersize maxorderqueuesize]").append("\n\t\t[-frag]")
+                .append("\n\t\t[-fragsize maxmsgsize]").append("\n\t\t[-throughput]").append("\n\t\t[-failuredetect]")
+                .append("\n\t\t[-async]").append("\n\t\t[-asyncsize maxqueuesizeinkilobytes]");
+        return buf;
 
     }
 
@@ -103,7 +81,7 @@ public class ChannelCreator {
         String transport = "org.apache.catalina.tribes.transport.nio.PooledParallelSender";
         String receiver = "org.apache.catalina.tribes.transport.nio.NioReceiver";
         boolean async = false;
-        int asyncsize = 1024*1024*50; //50MB
+        int asyncsize = 1024 * 1024 * 50; // 50 MiB
         boolean throughput = false;
         boolean failuredetect = false;
 
@@ -126,12 +104,12 @@ public class ChannelCreator {
                 failuredetect = true;
             } else if ("-asyncsize".equals(args[i])) {
                 asyncsize = Integer.parseInt(args[++i]);
-                System.out.println("Setting MessageDispatchInterceptor.maxQueueSize="+asyncsize);
+                System.out.println("Setting MessageDispatchInterceptor.maxQueueSize=" + asyncsize);
             } else if ("-static".equals(args[i])) {
                 String d = args[++i];
-                String h = d.substring(0,d.indexOf(':'));
-                String p = d.substring(h.length()+1);
-                Member m = new MemberImpl(h,Integer.parseInt(p),2000);
+                String h = d.substring(0, d.indexOf(':'));
+                String p = d.substring(h.length() + 1);
+                Member m = new MemberImpl(h, Integer.parseInt(p), 2000);
                 staticMembers.add(m);
             } else if ("-throughput".equals(args[i])) {
                 throughput = true;
@@ -139,20 +117,20 @@ public class ChannelCreator {
                 order = true;
             } else if ("-ordersize".equals(args[i])) {
                 ordersize = Integer.parseInt(args[++i]);
-                System.out.println("Setting OrderInterceptor.maxQueue="+ordersize);
+                System.out.println("Setting OrderInterceptor.maxQueue=" + ordersize);
             } else if ("-frag".equals(args[i])) {
                 frag = true;
             } else if ("-fragsize".equals(args[i])) {
                 fragsize = Integer.parseInt(args[++i]);
-                System.out.println("Setting FragmentationInterceptor.maxSize="+fragsize);
+                System.out.println("Setting FragmentationInterceptor.maxSize=" + fragsize);
             } else if ("-ackto".equals(args[i])) {
                 acktimeout = Integer.parseInt(args[++i]);
             } else if ("-transport".equals(args[i])) {
                 transport = args[++i];
-            } else if (args[i]!=null && args[i].startsWith("transport.")) {
+            } else if (args[i] != null && args[i].startsWith("transport.")) {
                 String key = args[i];
                 String val = args[++i];
-                transportProperties.setProperty(key,val);
+                transportProperties.setProperty(key, val);
             } else if ("-receiver".equals(args[i])) {
                 receiver = args[++i];
             } else if ("-maddr".equals(args[i])) {
@@ -168,40 +146,41 @@ public class ChannelCreator {
             }
         }
 
-        System.out.println("Creating receiver class="+receiver);
-        Class<?> cl = Class.forName(receiver, true,
-                ChannelCreator.class.getClassLoader());
-        ReceiverBase rx = (ReceiverBase)cl.getConstructor().newInstance();
+        System.out.println("Creating receiver class=" + receiver);
+        Class<?> cl = Class.forName(receiver, true, ChannelCreator.class.getClassLoader());
+        ReceiverBase rx = (ReceiverBase) cl.getConstructor().newInstance();
         rx.setAddress(bind);
         rx.setPort(port);
         rx.setSelectorTimeout(tcpseltimeout);
         rx.setMaxThreads(tcpthreadcount);
         rx.setMinThreads(tcpthreadcount);
         rx.getBind();
-        rx.setRxBufSize(43800);
-        rx.setTxBufSize(25188);
+        rx.setRxBufSize(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE);
+        rx.setTxBufSize(Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE);
         rx.setAutoBind(autoBind);
 
 
         ReplicationTransmitter ps = new ReplicationTransmitter();
-        System.out.println("Creating transport class="+transport);
-        MultiPointSender sender = (MultiPointSender)Class.forName(
-                transport,true,ChannelCreator.class.getClassLoader()).getConstructor().newInstance();
+        System.out.println("Creating transport class=" + transport);
+        MultiPointSender sender = (MultiPointSender) Class
+                .forName(transport, true, ChannelCreator.class.getClassLoader()).getConstructor().newInstance();
         sender.setTimeout(acktimeout);
         sender.setMaxRetryAttempts(2);
-        sender.setRxBufSize(43800);
-        sender.setTxBufSize(25188);
+        sender.setRxBufSize(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE);
+        sender.setTxBufSize(Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE);
 
-        Iterator<Object> i = transportProperties.keySet().iterator();
-        while ( i.hasNext() ) {
-            String key = (String)i.next();
-            IntrospectionUtils.setProperty(sender,key,transportProperties.getProperty(key));
+        for (Object o : transportProperties.keySet()) {
+            String key = (String) o;
+            IntrospectionUtils.setProperty(sender, key, transportProperties.getProperty(key));
         }
+        IntrospectionUtils.clear();
         ps.setTransport(sender);
 
         McastService service = new McastService();
         service.setAddress(mcastaddr);
-        if (mbind != null) service.setMcastBindAddress(mbind);
+        if (mbind != null) {
+            service.setMcastBindAddress(mbind);
+        }
         service.setFrequency(mcastfreq);
         service.setMcastDropTime(mcastdrop);
         service.setPort(mcastport);
@@ -211,9 +190,13 @@ public class ChannelCreator {
         channel.setChannelSender(ps);
         channel.setMembershipService(service);
 
-        if ( throughput ) channel.addInterceptor(new ThroughputInterceptor());
-        if (gzip) channel.addInterceptor(new GzipInterceptor());
-        if ( frag ) {
+        if (throughput) {
+            channel.addInterceptor(new ThroughputInterceptor());
+        }
+        if (gzip) {
+            channel.addInterceptor(new GzipInterceptor());
+        }
+        if (frag) {
             FragmentationInterceptor fi = new FragmentationInterceptor();
             fi.setMaxSize(fragsize);
             channel.addInterceptor(fi);
@@ -224,27 +207,27 @@ public class ChannelCreator {
             channel.addInterceptor(oi);
         }
 
-        if ( async ) {
+        if (async) {
             MessageDispatchInterceptor mi = new MessageDispatchInterceptor();
             mi.setMaxQueueSize(asyncsize);
             channel.addInterceptor(mi);
             System.out.println("Added MessageDispatchInterceptor");
         }
 
-        if ( failuredetect ) {
+        if (failuredetect) {
             TcpFailureDetector tcpfi = new TcpFailureDetector();
             channel.addInterceptor(tcpfi);
         }
-        if ( staticMembers.size() > 0 ) {
+        if (staticMembers.size() > 0) {
             StaticMembershipInterceptor smi = new StaticMembershipInterceptor();
-            for (int x=0; x<staticMembers.size(); x++ ) {
-                smi.addStaticMember(staticMembers.get(x));
+            for (Member staticMember : staticMembers) {
+                smi.addStaticMember(staticMember);
             }
             channel.addInterceptor(smi);
         }
 
 
-        byte[] domain = new byte[] {1,2,3,4,5,6,7,8,9,0};
+        byte[] domain = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 0 };
         channel.getMembershipService().setDomain(domain);
         DomainFilterInterceptor filter = new DomainFilterInterceptor();
         filter.setDomain(domain);

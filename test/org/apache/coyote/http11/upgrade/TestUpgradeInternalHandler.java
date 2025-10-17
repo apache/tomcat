@@ -31,15 +31,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.SocketFactory;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpUpgradeHandler;
-import javax.servlet.http.WebConnection;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.WebConnection;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
@@ -59,10 +59,6 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
 
     @Test
     public void testUpgradeInternal() throws Exception {
-        Assume.assumeTrue(
-                "Only supported on NIO X",
-                getTomcatInstance().getConnector().getProtocolHandlerClassName().contains("Nio"));
-
         UpgradeConnection uc = doUpgrade(EchoAsync.class);
         PrintWriter pw = new PrintWriter(uc.getWriter());
         BufferedReader reader = uc.getReader();
@@ -87,10 +83,10 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
             Class<? extends HttpUpgradeHandler> upgradeHandlerClass) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
-        tomcat.getConnector().setProperty("useAsyncIO", "true");
+        Assert.assertTrue(tomcat.getConnector().setProperty("useAsyncIO", "true"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         UpgradeServlet servlet = new UpgradeServlet(upgradeHandlerClass);
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -133,7 +129,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
 
         private final Class<? extends HttpUpgradeHandler> upgradeHandlerClass;
 
-        public UpgradeServlet(Class<? extends HttpUpgradeHandler> upgradeHandlerClass) {
+        UpgradeServlet(Class<? extends HttpUpgradeHandler> upgradeHandlerClass) {
             this.upgradeHandlerClass = upgradeHandlerClass;
         }
 
@@ -150,7 +146,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         private final Writer writer;
         private final BufferedReader reader;
 
-        public UpgradeConnection(Socket socket) {
+        UpgradeConnection(Socket socket) {
             this.socket = socket;
             InputStream is;
             OutputStream os;
@@ -227,6 +223,17 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
                 }
             }, buffer);
             System.out.println("CompletionState: " + state);
+            // Test zero length write used by websockets
+            wrapper.write(BlockingMode.BLOCK, 10, TimeUnit.SECONDS, null, SocketWrapperBase.COMPLETE_WRITE_WITH_COMPLETION, new CompletionHandler<Long, Void>() {
+                @Override
+                public void completed(Long result, Void attachment) {
+                    System.out.println("Write: " + result.longValue());
+                }
+                @Override
+                public void failed(Throwable exc, Void attachment) {
+                    exc.printStackTrace();
+                }
+            }, buffer);
         }
 
         @Override
@@ -243,17 +250,17 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         public SocketState upgradeDispatch(SocketEvent status) {
             System.out.println("Processing: " + status);
             switch (status) {
-            case OPEN_READ:
-                // Note: there's always an initial read event at the moment (reading should be skipped since it ends up in the internal buffer)
-                break;
-            case OPEN_WRITE:
-                break;
-            case STOP:
-            case DISCONNECT:
-            case ERROR:
-            case TIMEOUT:
-            case CONNECT_FAIL:
-                return SocketState.CLOSED;
+                case OPEN_READ:
+                    // Note: there's always an initial read event at the moment (reading should be skipped since it ends up in the internal buffer)
+                    break;
+                case OPEN_WRITE:
+                    break;
+                case STOP:
+                case DISCONNECT:
+                case ERROR:
+                case TIMEOUT:
+                case CONNECT_FAIL:
+                    return SocketState.CLOSED;
             }
             return SocketState.UPGRADED;
         }

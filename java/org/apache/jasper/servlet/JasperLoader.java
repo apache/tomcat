@@ -14,41 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.security.CodeSource;
-import java.security.PermissionCollection;
-
-import org.apache.jasper.Constants;
 
 /**
- * Class loader for loading servlet class files (corresponding to JSP files)
- * and tag handler class files (corresponding to tag files).
- *
- * @author Anil K. Vijendran
- * @author Harish Prabandham
+ * Class loader for loading servlet class files (corresponding to JSP files) and tag handler class files (corresponding
+ * to tag files).
  */
 public class JasperLoader extends URLClassLoader {
 
-    private final PermissionCollection permissionCollection;
-    private final SecurityManager securityManager;
+    private final String packageName;
 
-    public JasperLoader(URL[] urls, ClassLoader parent,
-                        PermissionCollection permissionCollection) {
+    public JasperLoader(URL[] urls, ClassLoader parent, String packageName) {
         super(urls, parent);
-        this.permissionCollection = permissionCollection;
-        this.securityManager = System.getSecurityManager();
+        this.packageName = packageName;
     }
 
     /**
-     * Load the class with the specified name.  This method searches for
-     * classes in the same manner as <code>loadClass(String, boolean)</code>
-     * with <code>false</code> as the second argument.
+     * Load the class with the specified name. This method searches for classes in the same manner as
+     * <code>loadClass(String, boolean)</code> with <code>false</code> as the second argument.
      *
      * @param name Name of the class to be loaded
      *
@@ -60,68 +48,45 @@ public class JasperLoader extends URLClassLoader {
     }
 
     /**
-     * Load the class with the specified name, searching using the following
-     * algorithm until it finds and returns the class.  If the class cannot
-     * be found, returns <code>ClassNotFoundException</code>.
+     * Load the class with the specified name, searching using the following algorithm until it finds and returns the
+     * class. If the class cannot be found, returns <code>ClassNotFoundException</code>.
      * <ul>
-     * <li>Call <code>findLoadedClass(String)</code> to check if the
-     *     class has already been loaded.  If it has, the same
-     *     <code>Class</code> object is returned.</li>
-     * <li>If the <code>delegate</code> property is set to <code>true</code>,
-     *     call the <code>loadClass()</code> method of the parent class
-     *     loader, if any.</li>
-     * <li>Call <code>findClass()</code> to find this class in our locally
-     *     defined repositories.</li>
-     * <li>Call the <code>loadClass()</code> method of our parent
-     *     class loader, if any.</li>
+     * <li>Call <code>findLoadedClass(String)</code> to check if the class has already been loaded. If it has, the same
+     * <code>Class</code> object is returned.</li>
+     * <li>If the <code>delegate</code> property is set to <code>true</code>, call the <code>loadClass()</code> method
+     * of the parent class loader, if any.</li>
+     * <li>Call <code>findClass()</code> to find this class in our locally defined repositories.</li>
+     * <li>Call the <code>loadClass()</code> method of our parent class loader, if any.</li>
      * </ul>
-     * If the class was found using the above steps, and the
-     * <code>resolve</code> flag is <code>true</code>, this method will then
-     * call <code>resolveClass(Class)</code> on the resulting Class object.
+     * If the class was found using the above steps, and the <code>resolve</code> flag is <code>true</code>, this method
+     * will then call <code>resolveClass(Class)</code> on the resulting Class object.
      *
-     * @param name Name of the class to be loaded
+     * @param name    Name of the class to be loaded
      * @param resolve If <code>true</code> then resolve the class
      *
      * @exception ClassNotFoundException if the class was not found
      */
     @Override
-    public synchronized Class<?> loadClass(final String name, boolean resolve)
-        throws ClassNotFoundException {
+    public synchronized Class<?> loadClass(final String name, boolean resolve) throws ClassNotFoundException {
 
-        Class<?> clazz = null;
+        Class<?> clazz;
 
         // (0) Check our previously loaded class cache
         clazz = findLoadedClass(name);
         if (clazz != null) {
-            if (resolve)
+            if (resolve) {
                 resolveClass(clazz);
+            }
             return clazz;
         }
 
-        // (.5) Permission to access this class when using a SecurityManager
-        if (securityManager != null) {
-            int dot = name.lastIndexOf('.');
-            if (dot >= 0) {
-                try {
-                    // Do not call the security manager since by default, we grant that package.
-                    if (!"org.apache.jasper.runtime".equalsIgnoreCase(name.substring(0,dot))){
-                        securityManager.checkPackageAccess(name.substring(0,dot));
-                    }
-                } catch (SecurityException se) {
-                    String error = "Security Violation, attempt to use " +
-                        "Restricted Class: " + name;
-                    se.printStackTrace();
-                    throw new ClassNotFoundException(error);
-                }
-            }
-        }
-
-        if( !name.startsWith(Constants.JSP_PACKAGE_NAME + '.') ) {
+        if (!name.startsWith(packageName + '.')) {
             // Class is not in org.apache.jsp, therefore, have our
             // parent load it
             clazz = getParent().loadClass(name);
-            if( resolve )
+            if (resolve) {
                 resolveClass(clazz);
+            }
             return clazz;
         }
 
@@ -132,7 +97,7 @@ public class JasperLoader extends URLClassLoader {
     /**
      * Delegate to parent
      *
-     * @see java.lang.ClassLoader#getResourceAsStream(java.lang.String)
+     * @see java.lang.ClassLoader#getResourceAsStream(String)
      */
     @Override
     public InputStream getResourceAsStream(String name) {
@@ -142,27 +107,11 @@ public class JasperLoader extends URLClassLoader {
             if (url != null) {
                 try {
                     is = url.openStream();
-                } catch (IOException e) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
         }
         return is;
-    }
-
-
-    /**
-     * Get the Permissions for a CodeSource.
-     *
-     * Since this ClassLoader is only used for a JSP page in
-     * a web application context, we just return our preset
-     * PermissionCollection for the web app context.
-     *
-     * @param codeSource Code source where the code was loaded from
-     * @return PermissionCollection for CodeSource
-     */
-    @Override
-    public final PermissionCollection getPermissions(CodeSource codeSource) {
-        return permissionCollection;
     }
 }

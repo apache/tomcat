@@ -19,12 +19,11 @@ package org.apache.tomcat.dbcp.dbcp2.datasources;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,25 +34,71 @@ import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
 import org.apache.tomcat.dbcp.dbcp2.ListException;
+import org.apache.tomcat.dbcp.dbcp2.Utils;
 
 /**
- * A JNDI ObjectFactory which creates <code>SharedPoolDataSource</code>s or <code>PerUserPoolDataSource</code>s
+ * A JNDI ObjectFactory which creates {@code SharedPoolDataSource}s or {@code PerUserPoolDataSource}s
  *
  * @since 2.0
  */
 abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
 
-    private static final Map<String, InstanceKeyDataSource> instanceMap = new ConcurrentHashMap<>();
+    private static final Map<String, InstanceKeyDataSource> INSTANCE_MAP = new ConcurrentHashMap<>();
+
+    /**
+     * Closes all pools associated with this class.
+     *
+     * @throws ListException
+     *             a {@link ListException} containing all exceptions thrown by {@link InstanceKeyDataSource#close()}
+     * @see InstanceKeyDataSource#close()
+     * @since 2.4.0 throws a {@link ListException} instead of, in 2.3.0 and before, the first exception thrown by
+     *        {@link InstanceKeyDataSource#close()}.
+     */
+    public static void closeAll() throws ListException {
+        // Get iterator to loop over all instances of this data source.
+        final List<Throwable> exceptionList = new ArrayList<>(INSTANCE_MAP.size());
+        INSTANCE_MAP.entrySet().forEach(entry -> {
+            // Bullet-proof to avoid anything else but problems from InstanceKeyDataSource#close().
+            if (entry != null) {
+                final InstanceKeyDataSource value = entry.getValue();
+                Utils.close(value, exceptionList::add);
+            }
+        });
+        INSTANCE_MAP.clear();
+        if (!exceptionList.isEmpty()) {
+            throw new ListException("Could not close all InstanceKeyDataSource instances.", exceptionList);
+        }
+    }
+
+    /**
+     * Deserializes the provided byte array to create an object.
+     *
+     * @param data
+     *            Data to deserialize to create the configuration parameter.
+     *
+     * @return The Object created by deserializing the data.
+     * @throws ClassNotFoundException
+     *            If a class cannot be found during the deserialization of a configuration parameter.
+     * @throws IOException
+     *            If an I/O error occurs during the deserialization of a configuration parameter.
+     */
+    protected static final Object deserialize(final byte[] data) throws IOException, ClassNotFoundException {
+        ObjectInputStream in = null;
+        try {
+            in = new ObjectInputStream(new ByteArrayInputStream(data));
+            return in.readObject();
+        } finally {
+            Utils.closeQuietly(in);
+        }
+    }
 
     static synchronized String registerNewInstance(final InstanceKeyDataSource ds) {
         int max = 0;
-        final Iterator<String> iterator = instanceMap.keySet().iterator();
-        while (iterator.hasNext()) {
-            final String s = iterator.next();
+        for (final String s : INSTANCE_MAP.keySet()) {
             if (s != null) {
                 try {
                     max = Math.max(max, Integer.parseInt(s));
-                } catch (final NumberFormatException e) {
+                } catch (final NumberFormatException ignored) {
                     // no sweat, ignore those keys
                 }
             }
@@ -61,50 +106,33 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
         final String instanceKey = String.valueOf(max + 1);
         // Put a placeholder here for now, so other instances will not
         // take our key. We will replace with a pool when ready.
-        instanceMap.put(instanceKey, ds);
+        INSTANCE_MAP.put(instanceKey, ds);
         return instanceKey;
     }
 
     static void removeInstance(final String key) {
         if (key != null) {
-            instanceMap.remove(key);
+            INSTANCE_MAP.remove(key);
         }
     }
 
-    /**
-     * Closes all pools associated with this class.
-     *
-     * @throws Exception
-     *             a {@link ListException} containing all exceptions thrown by {@link InstanceKeyDataSource#close()}
-     * @see InstanceKeyDataSource#close()
-     * @see ListException
-     * @since 2.4.0 throws a {@link ListException} instead of, in 2.3.0 and before, the first exception thrown by
-     *        {@link InstanceKeyDataSource#close()}.
-     */
-    public static void closeAll() throws Exception {
-        // Get iterator to loop over all instances of this data source.
-        final List<Throwable> exceptionList = new ArrayList<>(instanceMap.size());
-        final Iterator<Entry<String, InstanceKeyDataSource>> instanceIterator = instanceMap.entrySet().iterator();
-        while (instanceIterator.hasNext()) {
-            // Bullet-proof to avoid anything else but problems from InstanceKeyDataSource#close().
-            final Entry<String, InstanceKeyDataSource> next = instanceIterator.next();
-            if (next != null) {
-                @SuppressWarnings("resource")
-                final InstanceKeyDataSource value = next.getValue();
-                if (value != null) {
-                    try {
-                        value.close();
-                    } catch (final Exception e) {
-                        exceptionList.add(e);
-                    }
-                }
-            }
-        }
-        instanceMap.clear();
-        if (!exceptionList.isEmpty()) {
-            throw new ListException("Could not close all InstanceKeyDataSource instances.", exceptionList);
-        }
+    private Boolean booleanValueOf(RefAddr refAddr) {
+        return Boolean.valueOf(toString(refAddr));
     }
+
+    /**
+     * Creates an instance of the subclass and sets any properties contained in the Reference.
+     *
+     * @param ref
+     *            The properties to be set on the created DataSource
+     *
+     * @return A configured DataSource of the appropriate type.
+     * @throws ClassNotFoundException
+     *            If a class cannot be found during the deserialization of a configuration parameter.
+     * @throws IOException
+     *            If an I/O error occurs during the deserialization of a configuration parameter.
+     */
+    protected abstract InstanceKeyDataSource getNewInstance(Reference ref) throws IOException, ClassNotFoundException;
 
     /**
      * Implements ObjectFactory to create an instance of SharedPoolDataSource or PerUserPoolDataSource
@@ -119,9 +147,9 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
             final Reference ref = (Reference) refObj;
             if (isCorrectClass(ref.getClassName())) {
                 final RefAddr refAddr = ref.get("instanceKey");
-                if (refAddr != null && refAddr.getContent() != null) {
+                if (hasContent(refAddr)) {
                     // object was bound to JNDI via Referenceable API.
-                    obj = instanceMap.get(refAddr.getContent());
+                    obj = INSTANCE_MAP.get(refAddr.getContent());
                 } else {
                     // Tomcat JNDI creates a Reference out of server.xml
                     // <ResourceParam> configuration and passes it to an
@@ -129,14 +157,14 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
                     String key = null;
                     if (name != null) {
                         key = name.toString();
-                        obj = instanceMap.get(key);
+                        obj = INSTANCE_MAP.get(key);
                     }
                     if (obj == null) {
                         final InstanceKeyDataSource ds = getNewInstance(ref);
                         setCommonProperties(ref, ds);
                         obj = ds;
                         if (key != null) {
-                            instanceMap.put(key, ds);
+                            INSTANCE_MAP.put(key, ds);
                         }
                     }
                 }
@@ -145,148 +173,13 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
         return obj;
     }
 
-    private void setCommonProperties(final Reference ref, final InstanceKeyDataSource ikds)
-            throws IOException, ClassNotFoundException {
-
-        RefAddr refAddr = ref.get("dataSourceName");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDataSourceName(refAddr.getContent().toString());
-        }
-
-        refAddr = ref.get("description");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDescription(refAddr.getContent().toString());
-        }
-
-        refAddr = ref.get("jndiEnvironment");
-        if (refAddr != null && refAddr.getContent() != null) {
-            final byte[] serialized = (byte[]) refAddr.getContent();
-            ikds.setJndiEnvironment((Properties) deserialize(serialized));
-        }
-
-        refAddr = ref.get("loginTimeout");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setLoginTimeout(Integer.parseInt(refAddr.getContent().toString()));
-        }
-
-        // Pool properties
-        refAddr = ref.get("blockWhenExhausted");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultBlockWhenExhausted(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
-        }
-
-        refAddr = ref.get("evictionPolicyClassName");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultEvictionPolicyClassName(refAddr.getContent().toString());
-        }
-
-        // Pool properties
-        refAddr = ref.get("lifo");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultLifo(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
-        }
-
-        refAddr = ref.get("maxIdlePerKey");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultMaxIdle(Integer.parseInt(refAddr.getContent().toString()));
-        }
-
-        refAddr = ref.get("maxTotalPerKey");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultMaxTotal(Integer.parseInt(refAddr.getContent().toString()));
-        }
-
-        refAddr = ref.get("maxWaitMillis");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultMaxWaitMillis(Long.parseLong(refAddr.getContent().toString()));
-        }
-
-        refAddr = ref.get("minEvictableIdleTimeMillis");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultMinEvictableIdleTimeMillis(Long.parseLong(refAddr.getContent().toString()));
-        }
-
-        refAddr = ref.get("minIdlePerKey");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultMinIdle(Integer.parseInt(refAddr.getContent().toString()));
-        }
-
-        refAddr = ref.get("numTestsPerEvictionRun");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultNumTestsPerEvictionRun(Integer.parseInt(refAddr.getContent().toString()));
-        }
-
-        refAddr = ref.get("softMinEvictableIdleTimeMillis");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultSoftMinEvictableIdleTimeMillis(Long.parseLong(refAddr.getContent().toString()));
-        }
-
-        refAddr = ref.get("testOnCreate");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultTestOnCreate(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
-        }
-
-        refAddr = ref.get("testOnBorrow");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultTestOnBorrow(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
-        }
-
-        refAddr = ref.get("testOnReturn");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultTestOnReturn(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
-        }
-
-        refAddr = ref.get("testWhileIdle");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultTestWhileIdle(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
-        }
-
-        refAddr = ref.get("timeBetweenEvictionRunsMillis");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultTimeBetweenEvictionRunsMillis(Long.parseLong(refAddr.getContent().toString()));
-        }
-
-        // Connection factory properties
-
-        refAddr = ref.get("validationQuery");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setValidationQuery(refAddr.getContent().toString());
-        }
-
-        refAddr = ref.get("validationQueryTimeout");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setValidationQueryTimeout(Integer.parseInt(refAddr.getContent().toString()));
-        }
-
-        refAddr = ref.get("rollbackAfterValidation");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setRollbackAfterValidation(Boolean.valueOf(refAddr.getContent().toString()).booleanValue());
-        }
-
-        refAddr = ref.get("maxConnLifetimeMillis");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setMaxConnLifetimeMillis(Long.parseLong(refAddr.getContent().toString()));
-        }
-
-        // Connection properties
-
-        refAddr = ref.get("defaultAutoCommit");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultAutoCommit(Boolean.valueOf(refAddr.getContent().toString()));
-        }
-
-        refAddr = ref.get("defaultTransactionIsolation");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultTransactionIsolation(Integer.parseInt(refAddr.getContent().toString()));
-        }
-
-        refAddr = ref.get("defaultReadOnly");
-        if (refAddr != null && refAddr.getContent() != null) {
-            ikds.setDefaultReadOnly(Boolean.valueOf(refAddr.getContent().toString()));
-        }
+    private boolean hasContent(final RefAddr refAddr) {
+        return refAddr != null && refAddr.getContent() != null;
     }
 
     /**
+     * Tests if className is the value returned from getClass().getName().toString().
+     *
      * @param className
      *            The class name to test.
      *
@@ -294,47 +187,168 @@ abstract class InstanceKeyDataSourceFactory implements ObjectFactory {
      */
     protected abstract boolean isCorrectClass(String className);
 
-    /**
-     * Creates an instance of the subclass and sets any properties contained in the Reference.
-     *
-     * @param ref
-     *            The properties to be set on the created DataSource
-     *
-     * @return A configured DataSource of the appropriate type.
-     *
-     * @throws ClassNotFoundException
-     *            If a class cannot be found during the deserialization of a configuration parameter.
-     * @throws IOException
-     *            If an I/O error occurs during the deserialization of a configuration parameter.
-     */
-    protected abstract InstanceKeyDataSource getNewInstance(Reference ref) throws IOException, ClassNotFoundException;
+    boolean parseBoolean(final RefAddr refAddr) {
+        return Boolean.parseBoolean(toString(refAddr));
+    }
 
-    /**
-     * Deserializes the provided byte array to create an object.
-     *
-     * @param data
-     *            Data to deserialize to create the configuration parameter.
-     *
-     * @return The Object created by deserializing the data.
-     *
-     * @throws ClassNotFoundException
-     *            If a class cannot be found during the deserialization of a configuration parameter.
-     * @throws IOException
-     *            If an I/O error occurs during the deserialization of a configuration parameter.
-     */
-    protected static final Object deserialize(final byte[] data) throws IOException, ClassNotFoundException {
-        ObjectInputStream in = null;
-        try {
-            in = new ObjectInputStream(new ByteArrayInputStream(data));
-            return in.readObject();
-        } finally {
-            if (in != null) {
-                try {
-                    in.close();
-                } catch (final IOException ex) {
-                    // ignore
-                }
-            }
+    int parseInt(final RefAddr refAddr) {
+        return Integer.parseInt(toString(refAddr));
+    }
+
+    long parseLong(final RefAddr refAddr) {
+        return Long.parseLong(toString(refAddr));
+    }
+
+    private void setCommonProperties(final Reference ref, final InstanceKeyDataSource ikds)
+            throws IOException, ClassNotFoundException {
+
+        RefAddr refAddr = ref.get("dataSourceName");
+        if (hasContent(refAddr)) {
+            ikds.setDataSourceName(toString(refAddr));
         }
+
+        refAddr = ref.get("description");
+        if (hasContent(refAddr)) {
+            ikds.setDescription(toString(refAddr));
+        }
+
+        refAddr = ref.get("jndiEnvironment");
+        if (hasContent(refAddr)) {
+            final byte[] serialized = (byte[]) refAddr.getContent();
+            ikds.setJndiEnvironment((Properties) deserialize(serialized));
+        }
+
+        refAddr = ref.get("loginTimeout");
+        if (hasContent(refAddr)) {
+            ikds.setLoginTimeout(toDurationFromSeconds(refAddr));
+        }
+
+        // Pool properties
+        refAddr = ref.get("blockWhenExhausted");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultBlockWhenExhausted(parseBoolean(refAddr));
+        }
+
+        refAddr = ref.get("evictionPolicyClassName");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultEvictionPolicyClassName(toString(refAddr));
+        }
+
+        // Pool properties
+        refAddr = ref.get("lifo");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultLifo(parseBoolean(refAddr));
+        }
+
+        refAddr = ref.get("maxIdlePerKey");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultMaxIdle(parseInt(refAddr));
+        }
+
+        refAddr = ref.get("maxTotalPerKey");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultMaxTotal(parseInt(refAddr));
+        }
+
+        refAddr = ref.get("maxWaitMillis");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultMaxWait(toDurationFromMillis(refAddr));
+        }
+
+        refAddr = ref.get("minEvictableIdleTimeMillis");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultMinEvictableIdle(toDurationFromMillis(refAddr));
+        }
+
+        refAddr = ref.get("minIdlePerKey");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultMinIdle(parseInt(refAddr));
+        }
+
+        refAddr = ref.get("numTestsPerEvictionRun");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultNumTestsPerEvictionRun(parseInt(refAddr));
+        }
+
+        refAddr = ref.get("softMinEvictableIdleTimeMillis");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultSoftMinEvictableIdle(toDurationFromMillis(refAddr));
+        }
+
+        refAddr = ref.get("testOnCreate");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultTestOnCreate(parseBoolean(refAddr));
+        }
+
+        refAddr = ref.get("testOnBorrow");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultTestOnBorrow(parseBoolean(refAddr));
+        }
+
+        refAddr = ref.get("testOnReturn");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultTestOnReturn(parseBoolean(refAddr));
+        }
+
+        refAddr = ref.get("testWhileIdle");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultTestWhileIdle(parseBoolean(refAddr));
+        }
+
+        refAddr = ref.get("timeBetweenEvictionRunsMillis");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultDurationBetweenEvictionRuns(toDurationFromMillis(refAddr));
+        }
+
+        // Connection factory properties
+
+        refAddr = ref.get("validationQuery");
+        if (hasContent(refAddr)) {
+            ikds.setValidationQuery(toString(refAddr));
+        }
+
+        refAddr = ref.get("validationQueryTimeout");
+        if (hasContent(refAddr)) {
+            ikds.setValidationQueryTimeout(toDurationFromSeconds(refAddr));
+        }
+
+        refAddr = ref.get("rollbackAfterValidation");
+        if (hasContent(refAddr)) {
+            ikds.setRollbackAfterValidation(parseBoolean(refAddr));
+        }
+
+        refAddr = ref.get("maxConnLifetimeMillis");
+        if (hasContent(refAddr)) {
+            ikds.setMaxConnLifetime(toDurationFromMillis(refAddr));
+        }
+
+        // Connection properties
+
+        refAddr = ref.get("defaultAutoCommit");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultAutoCommit(booleanValueOf(refAddr));
+        }
+
+        refAddr = ref.get("defaultTransactionIsolation");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultTransactionIsolation(parseInt(refAddr));
+        }
+
+        refAddr = ref.get("defaultReadOnly");
+        if (hasContent(refAddr)) {
+            ikds.setDefaultReadOnly(booleanValueOf(refAddr));
+        }
+    }
+
+    private Duration toDurationFromMillis(RefAddr refAddr) {
+        return Duration.ofMillis(parseLong(refAddr));
+    }
+
+    private Duration toDurationFromSeconds(RefAddr refAddr) {
+        return Duration.ofSeconds(parseInt(refAddr));
+    }
+
+    String toString(final RefAddr refAddr) {
+        return refAddr.getContent().toString();
     }
 }

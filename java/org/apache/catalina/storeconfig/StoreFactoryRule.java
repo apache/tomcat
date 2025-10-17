@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.storeconfig;
 
 import org.apache.tomcat.util.digester.Rule;
@@ -22,9 +21,8 @@ import org.xml.sax.Attributes;
 
 /**
  * <p>
- * Rule that creates a new <code>IStoreFactory</code> instance, and associates
- * it with the top object on the stack (which must implement
- * <code>IStoreFactory</code>).
+ * Rule that creates a new <code>IStoreFactory</code> instance, and associates it with the top object on the stack
+ * (which must implement <code>IStoreFactory</code>).
  * </p>
  */
 
@@ -35,18 +33,14 @@ public class StoreFactoryRule extends Rule {
     /**
      * Construct a new instance of this Rule.
      *
-     * @param storeFactoryClass
-     *            Default name of the StoreFactory implementation class to be
-     *            created
-     * @param attributeName
-     *            Name of the attribute that optionally includes an override
-     *            name of the IStoreFactory class
-     * @param storeAppenderClass The store appender class
-     * @param appenderAttributeName The attribute name for the store
-     *  appender class
+     * @param storeFactoryClass     Default name of the StoreFactory implementation class to be created
+     * @param attributeName         Name of the attribute that optionally includes an override name of the IStoreFactory
+     *                                  class
+     * @param storeAppenderClass    The store appender class
+     * @param appenderAttributeName The attribute name for the store appender class
      */
-    public StoreFactoryRule(String storeFactoryClass, String attributeName,
-            String storeAppenderClass, String appenderAttributeName) {
+    public StoreFactoryRule(String storeFactoryClass, String attributeName, String storeAppenderClass,
+            String appenderAttributeName) {
 
         this.storeFactoryClass = storeFactoryClass;
         this.attributeName = attributeName;
@@ -58,38 +52,27 @@ public class StoreFactoryRule extends Rule {
     // ----------------------------------------------------- Instance Variables
 
     /**
-     * The attribute name of an attribute that can override the implementation
-     * class name.
+     * The attribute name of an attribute that can override the implementation class name.
      */
-    private String attributeName;
+    private final String attributeName;
 
-    private String appenderAttributeName;
+    private final String appenderAttributeName;
 
     /**
      * The name of the <code>IStoreFactory</code> implementation class.
      */
-    private String storeFactoryClass;
+    private final String storeFactoryClass;
 
-    private String storeAppenderClass;
+    private final String storeAppenderClass;
 
     // --------------------------------------------------------- Public Methods
 
-    /**
-     * Handle the beginning of an XML element.
-     *
-     * @param namespace XML namespace
-     * @param name The element name
-     * @param attributes The attributes of this element
-     * @exception Exception if a processing error occurs
-     */
     @Override
-    public void begin(String namespace, String name, Attributes attributes)
-            throws Exception {
+    public void begin(String namespace, String name, Attributes attributes) throws Exception {
 
-        IStoreFactory factory = (IStoreFactory) newInstance(attributeName,
-                storeFactoryClass, attributes);
-        StoreAppender storeAppender = (StoreAppender) newInstance(
-                appenderAttributeName, storeAppenderClass, attributes);
+        IStoreFactory factory = (IStoreFactory) newInstance(attributeName, storeFactoryClass, attributes);
+        StoreAppender storeAppender =
+                (StoreAppender) newInstance(appenderAttributeName, storeAppenderClass, attributes);
         factory.setStoreAppender(storeAppender);
 
         // Add this StoreFactory to our associated component
@@ -103,19 +86,22 @@ public class StoreFactoryRule extends Rule {
     /**
      * Create new instance from attribute className!
      *
-     * @param attr class Name attribute
+     * @param attr        class Name attribute
      * @param defaultName Default Class
-     * @param attributes current digester attribute elements
+     * @param attributes  current digester attribute elements
+     *
      * @return new configured object instance
+     *
      * @throws ReflectiveOperationException Error creating an instance
      */
-    protected Object newInstance(String attr, String defaultName,
-            Attributes attributes) throws ReflectiveOperationException {
+    protected Object newInstance(String attr, String defaultName, Attributes attributes)
+            throws ReflectiveOperationException {
         String className = defaultName;
         if (attr != null) {
             String value = attributes.getValue(attr);
-            if (value != null)
+            if (value != null) {
                 className = value;
+            }
         }
         Class<?> clazz = Class.forName(className);
         return clazz.getConstructor().newInstance();

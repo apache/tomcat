@@ -15,11 +15,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
-                      http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
-  version="4.0">
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd"
+  version="6.2">
 
   <!-- ======================== Introduction ============================== -->
   <!-- This document defines default values for *all* web applications      -->
@@ -30,6 +30,11 @@
   <!--                                                                      -->
   <!-- WARNING:  Do not configure application-specific resources here!      -->
   <!-- They should go in the "/WEB-INF/web.xml" file in your application.   -->
+
+
+  <!-- Set the default request and response character encodings to UTF-8.   -->
+  <request-character-encoding>UTF-8</request-character-encoding>
+  <response-character-encoding>UTF-8</response-character-encoding>
 
 
   <!-- ================== Built In Servlet Definitions ==================== -->
@@ -73,12 +78,9 @@
   <!--                       contents. [null]                               -->
   <!--                                                                      -->
   <!--   sendfileSize        If the connector used supports sendfile, this  -->
-  <!--                       represents the minimal file size in KB for     -->
+  <!--                       represents the minimal file size in KiB for    -->
   <!--                       which sendfile will be used. Use a negative    -->
   <!--                       value to always disable sendfile.  [48]        -->
-  <!--                                                                      -->
-  <!--   useAcceptRanges     Should the Accept-Ranges header be included    -->
-  <!--                       in responses where appropriate? [true]         -->
   <!--                                                                      -->
   <!--  For directory listing customization. Checks localXsltFile, then     -->
   <!--  globalXsltFile, then defaults to original behavior.                 -->
@@ -106,9 +108,16 @@
   <!--                       listings is enabled? [true]                    -->
   <!--                                                                      -->
   <!--   allowPartialPut     Should the server treat an HTTP PUT request    -->
-  <!--                       with a Range header as a partial PUT? Note     -->
-  <!--                       that RFC 7233 clarified that Range headers are -->
-  <!--                       only valid for GET requests. [true]            -->
+  <!--                       with a Content-Range header as a partial PUT?  -->
+  <!--                       Note that while RFC 7231 clarified that such a -->
+  <!--                       PUT with a Content-Range header field is a bad -->
+  <!--                       request, RFC 9110 (which obsoletes RFC 7231)   -->
+  <!--                       now allows partial PUT. [true]                 -->
+  <!--                                                                      -->
+  <!--   directoryRedirectStatusCode                                        -->
+  <!--                       Status code to use for directory redirects.    -->
+  <!--                       Possible values: 301, 302, 307, 308            -->
+  <!--                       [302]                                          -->
 
     <servlet>
         <servlet-name>default</servlet-name>
@@ -148,9 +157,9 @@
   <!--                       pages.  See the jasper documentation for more  -->
   <!--                       information.                                   -->
   <!--                                                                      -->
-  <!--   compilerSourceVM    Compiler source VM. [1.8]                      -->
+  <!--   compilerSourceVM    Compiler source VM. [21]                       -->
   <!--                                                                      -->
-  <!--   compilerTargetVM    Compiler target VM. [1.8]                      -->
+  <!--   compilerTargetVM    Compiler target VM. [21]                       -->
   <!--                                                                      -->
   <!--   development         Is Jasper used in development mode? If true,   -->
   <!--                       the frequency at which JSPs are checked for    -->
@@ -173,8 +182,6 @@
   <!--   engineOptionsClass  Allows specifying the Options class used to    -->
   <!--                       configure Jasper. If not present, the default  -->
   <!--                       EmbeddedServletOptions will be used.           -->
-  <!--                       This option is ignored when running under a    -->
-  <!--                       SecurityManager.                               -->
   <!--                                                                      -->
   <!--   errorOnUseBeanInvalidClassAttribute                                -->
   <!--                       Should Jasper issue an error when the value of -->
@@ -189,10 +196,6 @@
   <!--                       Should text strings be generated as char       -->
   <!--                       arrays, to improve performance in some cases?  -->
   <!--                       [false]                                        -->
-  <!--                                                                      -->
-  <!--   ieClassId           The class-id value to be sent to Internet      -->
-  <!--                       Explorer when using <jsp:plugin> tags.         -->
-  <!--                       [clsid:8AD9C840-044E-11D1-B3E9-00805F499D93]   -->
   <!--                                                                      -->
   <!--   javaEncoding        Java file encoding to use for generating java  -->
   <!--                       source files. [UTF8]                           -->
@@ -236,8 +239,6 @@
   <!--   scratchdir          What scratch directory should we use when      -->
   <!--                       compiling JSP pages?  [default work directory  -->
   <!--                       for the current web application]               -->
-  <!--                       This option is ignored when running under a    -->
-  <!--                       SecurityManager.                               -->
   <!--                                                                      -->
   <!--   suppressSmap        Should the generation of SMAP info for JSR45   -->
   <!--                       debugging be suppressed?  [false]              -->
@@ -360,7 +361,7 @@
   <!--                        the arguments to the OS. See the CGI How-To   -->
   <!--                        for more details. The default varies by       -->
   <!--                        platform.                                     -->
-  <!--                        Windows: [[a-zA-Z0-9\Q-_.\\/:\E]+]            -->
+  <!--                        Windows: [[\w\Q-.\\/:\E]+]                    -->
   <!--                        Others:  [.*]                                 -->
   <!--                        Note that internally the CGI Servlet treats   -->
   <!--                        [.*] as a special case to improve performance -->
@@ -371,7 +372,7 @@
   <!--                        command line arguments must match else the    -->
   <!--                        request will be rejected. The default matches -->
   <!--                        the allowed values defined by RFC3875.        -->
-  <!--                        [[a-zA-Z0-9\Q%;/?:@&,$-_.!~*'()\E]+]          -->
+  <!--                        [[\w\Q%;/?:@&,$-.!~*'()\E]+]                  -->
   <!--                                                                      -->
   <!--   enableCmdLineArguments                                             -->
   <!--                        Are command line parameters generated from    -->
@@ -518,19 +519,6 @@
     </filter>
 -->
 
-  <!-- A filter that triggers request parameters parsing and rejects the    -->
-  <!-- request if some parameters were skipped because of parsing errors or -->
-  <!-- request size limitations.                                            -->
-<!--
-    <filter>
-        <filter-name>failedRequestFilter</filter-name>
-        <filter-class>
-          org.apache.catalina.filters.FailedRequestFilter
-        </filter-class>
-        <async-supported>true</async-supported>
-    </filter>
--->
-
 
   <!-- NOTE: An SSI Servlet is also available as an alternative SSI         -->
   <!-- implementation. Use either the Servlet or the Filter but NOT both.   -->
@@ -543,7 +531,7 @@
   <!-- this to work you will need to uncomment the .shtml mime type         -->
   <!-- definition towards the bottom of this file.                          -->
   <!-- The contentType init param allows you to apply SSI processing to JSP -->
-  <!-- pages, javascript, or any other content you wish.  This filter       -->
+  <!-- pages, JavaScript, or any other content you wish.  This filter       -->
   <!-- supports the following initialization parameters (default values are -->
   <!-- in square brackets):                                                 -->
   <!--                                                                      -->
@@ -605,14 +593,6 @@
 <!--
     <filter-mapping>
         <filter-name>setCharacterEncodingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
--->
-
-  <!-- The mapping for the Failed Request Filter -->
-<!--
-    <filter-mapping>
-        <filter-name>failedRequestFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 -->
@@ -838,6 +818,10 @@
     <mime-mapping>
         <extension>avi</extension>
         <mime-type>video/x-msvideo</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>avif</extension>
+        <mime-type>image/avif</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>avx</extension>
@@ -1768,6 +1752,10 @@
         <mime-type>application/vnd.geogebra.file</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>ggs</extension>
+        <mime-type>application/vnd.geogebra.slides</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>ggt</extension>
         <mime-type>application/vnd.geogebra.tool</mime-type>
     </mime-mapping>
@@ -2121,7 +2109,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>js</extension>
-        <mime-type>application/javascript</mime-type>
+        <mime-type>text/javascript</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>jsf</extension>
@@ -2138,6 +2126,10 @@
     <mime-mapping>
         <extension>jspf</extension>
         <mime-type>text/plain</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>jxl</extension>
+        <mime-type>image/jxl</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>kar</extension>
@@ -2308,6 +2300,14 @@
         <mime-type>audio/mpeg</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>m2t</extension>
+        <mime-type>video/mp2t</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>m2ts</extension>
+        <mime-type>video/mp2t</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>m2v</extension>
         <mime-type>video/mpeg</mime-type>
     </mime-mapping>
@@ -2470,6 +2470,10 @@
     <mime-mapping>
         <extension>mjp2</extension>
         <mime-type>video/mj2</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>mjs</extension>
+        <mime-type>text/javascript</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mk3d</extension>
@@ -2673,7 +2677,7 @@
     </mime-mapping>
     <mime-mapping>
         <extension>mts</extension>
-        <mime-type>model/vnd.mts</mime-type>
+        <mime-type>video/mp2t</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>mus</extension>
@@ -2908,6 +2912,10 @@
     <mime-mapping>
         <extension>oprc</extension>
         <mime-type>application/vnd.palm</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>opus</extension>
+        <mime-type>audio/ogg</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>org</extension>
@@ -3957,6 +3965,10 @@
         <mime-type>application/x-msterminal</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>ts</extension>
+        <mime-type>video/mp2t</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>tsd</extension>
         <mime-type>application/timestamped-data</mime-type>
     </mime-mapping>
@@ -4251,6 +4263,10 @@
     <mime-mapping>
         <extension>wad</extension>
         <mime-type>application/x-doom</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>wasm</extension>
+        <mime-type>application/wasm</mime-type>
     </mime-mapping>
     <mime-mapping>
         <extension>wav</extension>
@@ -4658,10 +4674,6 @@
         <mime-type>application/x-compress</mime-type>
     </mime-mapping>
     <mime-mapping>
-        <extension>Z</extension>
-        <mime-type>application/x-compress</mime-type>
-    </mime-mapping>
-    <mime-mapping>
         <extension>z1</extension>
         <mime-type>application/x-zmachine</mime-type>
     </mime-mapping>
@@ -4726,7 +4738,7 @@
   <!-- If you define welcome files in your own application's web.xml        -->
   <!-- deployment descriptor, that list *replaces* the list configured      -->
   <!-- here, so be sure to include any of the default values that you wish  -->
-  <!-- to use within your application.                                       -->
+  <!-- to use within your application.                                      -->
 
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>

@@ -23,10 +23,11 @@ import java.util.Locale;
 
 import javax.net.SocketFactory;
 
+import org.apache.tomcat.util.http.Method;
+
 /**
- * AJP client that is not (yet) a full AJP client implementation as it just
- * provides the functionality required for the unit tests. The client uses
- * blocking IO throughout.
+ * AJP client that is not (yet) a full AJP client implementation as it just provides the functionality required for the
+ * unit tests. The client uses blocking IO throughout.
  */
 public class SimpleAjpClient {
 
@@ -39,8 +40,7 @@ public class SimpleAjpClient {
         ajpCping.appendByte(Constants.JK_AJP13_CPING_REQUEST);
         ajpCping.end();
         AJP_CPING = new byte[ajpCping.getLen()];
-        System.arraycopy(ajpCping.getBuffer(), 0, AJP_CPING, 0,
-                ajpCping.getLen());
+        System.arraycopy(ajpCping.getBuffer(), 0, AJP_CPING, 0, ajpCping.getLen());
     }
 
     private final int packetSize;
@@ -76,46 +76,46 @@ public class SimpleAjpClient {
     public void setMethod(String method) {
         method = method.toUpperCase(Locale.ENGLISH);
         switch (method) {
-            case "OPTIONS":
+            case Method.OPTIONS:
                 this.method = 1;
                 break;
-            case "GET":
+            case Method.GET:
                 this.method = 2;
                 break;
-            case "HEAD":
+            case Method.HEAD:
                 this.method = 3;
                 break;
-            case "POST":
+            case Method.POST:
                 this.method = 4;
                 break;
-            case "PUT":
+            case Method.PUT:
                 this.method = 5;
                 break;
-            case "DELETE":
+            case Method.DELETE:
                 this.method = 6;
                 break;
-            case "TRACE":
+            case Method.TRACE:
                 this.method = 7;
                 break;
-            case "PROPFIND":
+            case Method.PROPFIND:
                 this.method = 8;
                 break;
-            case "PROPPATCH":
+            case Method.PROPPATCH:
                 this.method = 9;
                 break;
-            case "MKCOL":
+            case Method.MKCOL:
                 this.method = 10;
                 break;
-            case "COPY":
+            case Method.COPY:
                 this.method = 11;
                 break;
-            case "MOVE":
+            case Method.MOVE:
                 this.method = 12;
                 break;
-            case "LOCK":
+            case Method.LOCK:
                 this.method = 13;
                 break;
-            case "UNLOCK":
+            case Method.UNLOCK:
                 this.method = 14;
                 break;
             case "ACL":
@@ -165,33 +165,33 @@ public class SimpleAjpClient {
     public String getMethod() {
         switch (method) {
             case 1:
-                return "OPTIONS";
+                return Method.OPTIONS;
             case 2:
-                return "GET";
+                return Method.GET;
             case 3:
-                return "HEAD";
+                return Method.HEAD;
             case 4:
-                return "POST";
+                return Method.POST;
             case 5:
-                return "PUT";
+                return Method.PUT;
             case 6:
-                return "DELETE";
+                return Method.DELETE;
             case 7:
-                return "TRACE";
+                return Method.TRACE;
             case 8:
-                return "PROPFIND";
+                return Method.PROPFIND;
             case 9:
-                return "PROPPATCH";
+                return Method.PROPPATCH;
             case 10:
-                return "MKCOL";
+                return Method.MKCOL;
             case 11:
-                return "COPY";
+                return Method.COPY;
             case 12:
-                return "MOVE";
+                return Method.MOVE;
             case 13:
-                return "LOCK";
+                return Method.LOCK;
             case 14:
-                return "UNLOCK";
+                return Method.UNLOCK;
             case 15:
                 return "ACL";
             case 16:
@@ -349,20 +349,16 @@ public class SimpleAjpClient {
     /*
      * Sends an TesterAjpMessage to the server and returns the response message.
      */
-    public TesterAjpMessage sendMessage(TesterAjpMessage headers)
-            throws IOException {
+    public TesterAjpMessage sendMessage(TesterAjpMessage headers) throws IOException {
         return sendMessage(headers, null);
     }
 
-    public TesterAjpMessage sendMessage(TesterAjpMessage headers,
-            TesterAjpMessage body) throws IOException {
+    public TesterAjpMessage sendMessage(TesterAjpMessage headers, TesterAjpMessage body) throws IOException {
         // Send the headers
-        socket.getOutputStream().write(
-                headers.getBuffer(), 0, headers.getLen());
+        socket.getOutputStream().write(headers.getBuffer(), 0, headers.getLen());
         if (body != null) {
             // Send the body of present
-            socket.getOutputStream().write(
-                    body.getBuffer(), 0, body.getLen());
+            socket.getOutputStream().write(body.getBuffer(), 0, body.getLen());
         }
         // Read the response
         return readMessage();
@@ -398,18 +394,15 @@ public class SimpleAjpClient {
             return message;
         } else {
             if (messageLength > buf.length) {
-                throw new IllegalArgumentException("Message too long [" +
-                        Integer.valueOf(messageLength) +
-                        "] for buffer length [" +
-                        Integer.valueOf(buf.length) + "]");
+                throw new IllegalArgumentException("Message too long [" + Integer.valueOf(messageLength) +
+                        "] for buffer length [" + Integer.valueOf(buf.length) + "]");
             }
             read(is, buf, Constants.H_SIZE, messageLength);
             return message;
         }
     }
 
-    protected boolean read(InputStream is, byte[] buf, int pos, int n)
-        throws IOException {
+    protected boolean read(InputStream is, byte[] buf, int pos, int n) throws IOException {
 
         int read = 0;
         int res = 0;

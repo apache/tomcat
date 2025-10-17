@@ -19,10 +19,10 @@ package org.apache.jasper.servlet;
 import java.io.File;
 import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,6 +32,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.descriptor.web.ErrorPage;
+import org.apache.tomcat.util.http.Method;
 
 public class TestJspServlet  extends TomcatBaseTest {
 
@@ -53,13 +54,14 @@ public class TestJspServlet  extends TomcatBaseTest {
         // PUT requests are normally blocked for JSPs
         ErrorPage ep = new ErrorPage();
         ep.setErrorCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        ep.setLocation("/WEB-INF/jsp/error.jsp");
+        ep.setLocation("/jsp/error.jsp");
         context.addErrorPage(ep);
 
         tomcat.start();
 
+        // When using JaCoCo, the CI system seems to need a longer timeout
         int rc = methodUrl("http://localhost:" + getPort() + "/test/bug56568",
-                new ByteChunk(), 5000, null, null, "PUT");
+                new ByteChunk(), 30000, null, null, Method.PUT);
 
         // Make sure we get the original 500 response and not a 405 response
         // which would indicate that error.jsp is complaining about being called
@@ -73,7 +75,7 @@ public class TestJspServlet  extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         int rc = methodUrl("http://localhost:" + getPort() + "/test/jsp/error.jsp",
-                new ByteChunk(), 500000, null, null, "PUT");
+                new ByteChunk(), 500000, null, null, Method.PUT);
 
         // Make sure we get a 200 response and not a 405 response
         // which would indicate that error.jsp is complaining about being called
@@ -87,7 +89,7 @@ public class TestJspServlet  extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         int rc = methodUrl("http://localhost:" + getPort() + "/test/jsp/test.jsp",
-                new ByteChunk(), 500000, null, null, "PUT");
+                new ByteChunk(), 500000, null, null, Method.PUT);
 
         // Make sure we get a 405 response which indicates that test.jsp is
         // complaining about being called with the PUT method.

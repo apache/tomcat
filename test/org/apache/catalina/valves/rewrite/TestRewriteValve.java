@@ -16,21 +16,36 @@
  */
 package org.apache.catalina.valves.rewrite;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.HttpURLConnection;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Request;
+import org.apache.catalina.connector.Response;
 import org.apache.catalina.servlets.DefaultServlet;
 import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.Method;
 
 /*
  * Implementation note:
@@ -50,12 +65,17 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testBackslashPercentSign() throws Exception {
-        doTestRewrite("RewriteRule ^(.*) /a/\\%5A", "/", "/a/%255A");
+        doTestRewrite("RewriteRule ^(.*) /a/\\%5A", "/", "/a/%5A");
     }
 
     @Test
     public void testNoopRewrite() throws Exception {
         doTestRewrite("RewriteRule ^(.*) $1", "/a/%255A", "/a/%255A");
+    }
+
+    @Test
+    public void testNoopValveSkipRewrite() throws Exception {
+        doTestRewrite("RewriteRule ^(.*) $1 [VS]", "/a/%255A", "/a/%255A", null, null, true);
     }
 
     @Test
@@ -107,6 +127,124 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
     @Test
+    public void testRewriteMap07() throws Exception {
+        doTestRewrite("RewriteMap mapa org.apache.catalina.valves.rewrite.TesterRewriteMapA foo bar\n" +
+                "RewriteRule /b/.* /c/${mapa:${mapa:a}}", "/b/a.html", "/c/aaaa");
+    }
+
+    @Test
+    public void testRewriteMap08() throws Exception {
+        doTestRewrite("RewriteMap lc int:tolower\n" + "RewriteRule ^(.*) ${lc:$1}", "/C/AaA", "/c/aaa");
+    }
+
+    @Test
+    public void testRewriteMap09() throws Exception {
+        doTestRewrite("RewriteMap lc int:toupper\n" + "RewriteRule ^(.*) ${lc:$1}", "/w/aAa", "/W/AAA");
+    }
+
+    @Test
+    public void testRewriteMap10() throws Exception {
+        doTestRewrite("RewriteMap lc int:escape\n" + "RewriteRule ^(.*) ${lc:$1}", "/c/a%20aa", "/c/a%20aa");
+    }
+
+    @Test
+    public void testRewriteMap11() throws Exception {
+        doTestRewrite("RewriteMap lc int:unescape\n" + "RewriteRule ^(.*) ${lc:$1}", "/c/a%2520aa", "/c/a%20aa");
+    }
+
+
+    private static String getTestConfDirectory() {
+        File f = new File("test/conf");
+        return f.getAbsolutePath() + File.separator;
+    }
+
+
+    @Test
+    public void testRewriteMap12() throws Exception {
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/a.html", "/c/aa");
+    }
+
+    @Test
+    public void testRewriteMap13() throws Exception {
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:$1|dd}", "/b/x.html", "/c/dd");
+    }
+
+    // BZ 62667
+    @Test
+    public void testRewriteMap14() throws Exception {
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:$1|d$1d}", "/b/x.html", "/c/dxd");
+    }
+
+    @Test
+    public void testRewriteMap15() throws Exception {
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:a$1|dd}", "/b/a.html", "/c/aaaa");
+    }
+
+    @Test
+    public void testRewriteMap16() throws Exception {
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
+                "RewriteRule /b/.* /c/${mapb:a}", "/b/a.html", "/c/aa");
+    }
+
+    @Test
+    public void testRewriteMap17() throws Exception {
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
+                "RewriteRule /b/.* /c/${mapb:${mapb:a}}", "/b/a.html", "/c/aaaa");
+    }
+
+    @Test
+    public void testRewriteMap18() throws Exception {
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt\n" +
+                "RewriteRule /b/.* /c/${mapb:${mapb:a}}", "/b/a.html", "/c/aaaa");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRewriteMap19() throws Exception {
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt first\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/aa.html", "/c/aaaa");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRewriteMap20() throws Exception {
+        doTestRewrite("RewriteMap mapb txt:" + getTestConfDirectory() + "TesterRewriteMapB.txt first second\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/aa.html", "/c/aaaa");
+    }
+
+    @Test
+    public void testRewriteMap21() throws Exception {
+        doTestRewrite("RewriteMap mapb rnd:" + getTestConfDirectory() + "TesterRewriteMapC.txt\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/a.html", "/c/aa");
+    }
+
+    // This test should succeed 50% of the runs as it depends on a random choice
+    public void testRewriteMap22() throws Exception {
+        doTestRewrite("RewriteMap mapb rnd:" + getTestConfDirectory() + "TesterRewriteMapC.txt\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/b.html", "/c/bb");
+    }
+
+    @Test
+    public void testRewriteMap23() throws Exception {
+        doTestRewrite("RewriteMap mapb rnd:" + getTestConfDirectory() + "TesterRewriteMapC.txt\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/aa.html", "/c/aaaa");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRewriteMap24() throws Exception {
+        doTestRewrite("RewriteMap mapb rnd:" + getTestConfDirectory() + "TesterRewriteMapC.txt first\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/aa.html", "/c/aaaa");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testRewriteMap25() throws Exception {
+        doTestRewrite("RewriteMap mapb rnd:" + getTestConfDirectory() + "TesterRewriteMapC.txt first second\n" +
+                "RewriteRule /b/(.*).html$ /c/${mapb:$1}", "/b/aa.html", "/c/aaaa");
+    }
+
+    @Test
     public void testRewriteServerVar() throws Exception {
         doTestRewrite("RewriteRule /b/(.*).html$ /c%{SERVLET_PATH}", "/b/x.html", "/c/b/x.html");
     }
@@ -114,15 +252,15 @@ public class TestRewriteValve extends TomcatBaseTest {
     @Test
     public void testRewriteEnvVarAndServerVar() throws Exception {
         System.setProperty("some_variable", "something");
-        doTestRewrite("RewriteRule /b/(.*).html$ /c/%{ENV:some_variable}%{SERVLET_PATH}",
-                "/b/x.html", "/c/something/b/x.html");
+        doTestRewrite("RewriteRule /b/(.*).html$ /c/%{ENV:some_variable}%{SERVLET_PATH}", "/b/x.html",
+                "/c/something/b/x.html");
     }
 
     @Test
     public void testRewriteServerVarAndEnvVar() throws Exception {
         System.setProperty("some_variable", "something");
-        doTestRewrite("RewriteRule /b/(.*).html$ /c%{SERVLET_PATH}/%{ENV:some_variable}",
-                "/b/x.html", "/c/b/x.html/something");
+        doTestRewrite("RewriteRule /b/(.*).html$ /c%{SERVLET_PATH}/%{ENV:some_variable}", "/b/x.html",
+                "/c/b/x.html/something");
     }
 
     @Test
@@ -130,7 +268,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         try {
             doTestRewrite("RewriteRule /b/(.*).html$ /c%_{SERVLET_PATH}", "/b/x.html", "/c");
             Assert.fail("IAE expected.");
-        } catch (java.lang.IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             // expected as %_{ is invalid
         }
     }
@@ -140,15 +278,15 @@ public class TestRewriteValve extends TomcatBaseTest {
         try {
             doTestRewrite("RewriteRule /b/(.*).html$ /c$_{SERVLET_PATH}", "/b/x.html", "/c");
             Assert.fail("IAE expected.");
-        } catch (java.lang.IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             // expected as $_{ is invalid
         }
     }
 
     // https://bz.apache.org/bugzilla/show_bug.cgi?id=60013
     public void testRewriteWithEncoding02() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*)$ /c/?param=$1 [L]",
-                "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95", "/c/", "param=\u5728\u7EBF\u6D4B\u8BD5");
+        doTestRewrite("RewriteRule ^/b/(.*)$ /c/?param=$1 [L]", "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95", "/c/",
+                "param=\u5728\u7EBF\u6D4B\u8BD5");
     }
 
     @Test
@@ -159,54 +297,144 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testNonAsciiPathRedirect() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [R]",
-                "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [R]", "/b/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
                 "/c/%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
     }
 
     @Test
-    public void testQueryString() throws Exception {
+    public void testQueryStringTargetOnly() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?je=2", "/b/id=1", "/c/id=1", "je=2");
+    }
+
+    @Test
+    public void testQueryStringTargetOnlyQSA() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?je=2 [QSA]", "/b/id=1", "/c/id=1", "je=2");
+    }
+
+    @Test
+    public void testQueryStringTargetOnlyQSD() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?je=2 [QSD]", "/b/id=1", "/c/id=1", "je=2");
+    }
+
+    @Test
+    public void testQueryStringTargetOnlyQSAQSD() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?je=2 [QSA,QSD]", "/b/id=1", "/c/id=1", "je=2");
+    }
+
+    @Test
+    public void testQueryStringTargetOnlyQS() throws Exception {
         doTestRewrite("RewriteRule ^/b/(.*) /c?$1", "/b/id=1", "/c", "id=1");
     }
 
     @Test
+    public void testQueryStringTargetOnlyQSAQS() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c?$1 [QSA]", "/b/id=1", "/c", "id=1");
+    }
+
+    @Test
+    public void testQueryStringTargetOnlyQSDQS() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c?$1 [QSD]", "/b/id=1", "/c", "id=1");
+    }
+
+    @Test
+    public void testQueryStringTargetOnlyQSAQSDQS() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c?$1 [QSA,QSD]", "/b/id=1", "/c", "id=1");
+    }
+
+    @Test
+    public void testQueryStringSourceOnly() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1", "/b/d?id=1", "/c/d", "id=1");
+    }
+
+    @Test
+    public void testQueryStringSourceOnlyQSA() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [QSA]", "/b/d?id=1", "/c/d", "id=1");
+    }
+
+    @Test
+    public void testQueryStringSourceOnlyQSD() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [QSD]", "/b/d?id=1", "/c/d", null);
+    }
+
+    @Test
+    public void testQueryStringSourceOnlyQSAQSD() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [QSA,QSD]", "/b/d?id=1", "/c/d", null);
+    }
+
+    @Test
+    public void testQueryStringSourceAndTarget() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?id=1", "/b/d?je=2", "/c/d", "id=1");
+    }
+
+    @Test
+    public void testQueryStringSourceAndTargetQSA() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?id=1 [QSA]", "/b/d?je=2", "/c/d", "id=1&je=2");
+    }
+
+    @Test
+    public void testQueryStringSourceAndTargetQSD() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?id=1 [QSD]", "/b/d?je=2", "/c/d", "id=1");
+    }
+
+    @Test
+    public void testQueryStringSourceAndTargetQSAQSD() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?id=1 [QSA,QSD]", "/b/d?je=2", "/c/d", "id=1");
+    }
+
+    @Test
+    public void testQueryStringEncoded01() throws Exception {
+        doTestRewrite("RewriteCond %{QUERY_STRING} a=(.*)\nRewriteRule ^/b.*$ /%1 [QSD]", "/b?a=c", "/c", null);
+    }
+
+    @Test
+    public void testQueryStringEncoded02() throws Exception {
+        doTestRewrite("RewriteCond %{QUERY_STRING} a=(.*)\nRewriteRule ^/b.*$ /z/%1 [QSD]", "/b?a=%2e%2e%2fc%2faAbB", "/z/%2e%2e%2fc%2faAbB", null);
+    }
+
+    @Test
     public void testQueryStringRemove() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?", "/b/d?=1", "/c/d", null);
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?", "/b/d?id=1", "/c/d", null);
     }
 
     @Test
     public void testQueryStringRemove02() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [QSD]", "/b/d?id=1", "/c/d", null);
+    }
+
+    @Test
+    public void testQueryStringRemoveInvalid() throws Exception {
+        doTestRewrite("RewriteRule ^/b/(.*) /c/$1?", "/b/d?=1", "/c/d", null);
+    }
+
+    @Test
+    public void testQueryStringRemoveInvalid02() throws Exception {
         doTestRewrite("RewriteRule ^/b/(.*) /c/$1 [QSD]", "/b/d?=1", "/c/d", null);
     }
 
     @Test
     public void testNonAsciiQueryString() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*) /c?$1",
-                "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
-                "/c", "id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
+        doTestRewrite("RewriteRule ^/b/(.*) /c?$1", "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95", "/c",
+                "id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
     }
 
 
     @Test
     public void testNonAsciiQueryStringAndPath() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/$1?$2",
-                "/b/%E5%9C%A8%E7%BA%BF/id=%E6%B5%8B%E8%AF%95",
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/$1?$2", "/b/%E5%9C%A8%E7%BA%BF/id=%E6%B5%8B%E8%AF%95",
                 "/c/%E5%9C%A8%E7%BA%BF", "id=%E6%B5%8B%E8%AF%95");
     }
 
 
     @Test
     public void testNonAsciiQueryStringAndRedirect() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*) /c?$1 [R]",
-                "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95",
-                "/c", "id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
+        doTestRewrite("RewriteRule ^/b/(.*) /c?$1 [R]", "/b/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95", "/c",
+                "id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
     }
 
 
     @Test
     public void testNonAsciiQueryStringAndPathAndRedirect() throws Exception {
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/$1?$2 [R]",
-                "/b/%E5%9C%A8%E7%BA%BF/id=%E6%B5%8B%E8%AF%95",
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/$1?$2 [R]", "/b/%E5%9C%A8%E7%BA%BF/id=%E6%B5%8B%E8%AF%95",
                 "/c/%E5%9C%A8%E7%BA%BF", "id=%E6%B5%8B%E8%AF%95");
     }
 
@@ -215,7 +443,7 @@ public class TestRewriteValve extends TomcatBaseTest {
     public void testNonAsciiQueryStringWithB() throws Exception {
         doTestRewrite("RewriteRule ^/b/(.*)/id=(.*) /c?filename=$1&id=$2 [B]",
                 "/b/file01/id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95", "/c",
-                "filename=file01&id=%25E5%259C%25A8%25E7%25BA%25BF%25E6%25B5%258B%25E8%25AF%2595");
+                "filename=file01&id=%E5%9C%A8%E7%BA%BF%E6%B5%8B%E8%AF%95");
     }
 
 
@@ -223,41 +451,40 @@ public class TestRewriteValve extends TomcatBaseTest {
     public void testNonAsciiQueryStringAndPathAndRedirectWithB() throws Exception {
         // Note the double encoding of the result (httpd produces the same result)
         doTestRewrite("RewriteRule ^/b/(.*)/(.*)/id=(.*) /c/$1?filename=$2&id=$3 [B,R]",
-                "/b/%E5%9C%A8%E7%BA%BF/file01/id=%E6%B5%8B%E8%AF%95",
-                "/c/%25E5%259C%25A8%25E7%25BA%25BF",
-                "filename=file01&id=%25E6%25B5%258B%25E8%25AF%2595");
+                "/b/%E5%9C%A8%E7%BA%BF/file01/id=%E6%B5%8B%E8%AF%95", "/c/%E5%9C%A8%E7%BA%BF",
+                "filename=file01&id=%E6%B5%8B%E8%AF%95");
     }
 
 
     @Test
     public void testUtf8WithBothQsFlagsNone() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%C2%A1", "id=%C2%A1");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2", "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%C2%A1",
+                "id=%C2%A1");
     }
 
 
     @Test
     public void testUtf8WithBothQsFlagsB() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [B]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%25C2%25A1", "id=%25C2%25A1");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [B]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE",
+                "/c/%C2%A1%C2%A1", "id=%C2%A1");
     }
 
 
     @Test
     public void testUtf8WithBothQsFlagsR() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%C2%A1", "id=%C2%A1");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE",
+                "/c/%C2%A1%C2%A1", "id=%C2%A1");
     }
 
 
     @Test
     public void testUtf8WithBothQsFlagsRB() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%25C2%25A1", "id=%25C2%25A1");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE",
+                "/c/%C2%A1%C2%A1", "id=%C2%A1");
     }
 
 
@@ -266,8 +493,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,NE]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,NE]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
     }
 
 
@@ -276,35 +502,31 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,NE]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,NE]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
     }
 
 
     @Test
     public void testUtf8WithBothQsFlagsBQSA() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [B,QSA]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%25C2%25A1",
-                "id=%25C2%25A1&di=%C2%AE");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [B,QSA]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE",
+                "/c/%C2%A1%C2%A1", "id=%C2%A1&di=%C2%AE");
     }
 
 
     @Test
     public void testUtf8WithBothQsFlagsRQSA() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,QSA]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%C2%A1",
-                "id=%C2%A1&di=%C2%AE");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,QSA]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE",
+                "/c/%C2%A1%C2%A1", "id=%C2%A1&di=%C2%AE");
     }
 
 
     @Test
     public void testUtf8WithBothQsFlagsRBQSA() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,QSA]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%25C2%25A1",
-                "id=%25C2%25A1&di=%C2%AE");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,QSA]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE",
+                "/c/%C2%A1%C2%A1", "id=%C2%A1&di=%C2%AE");
     }
 
 
@@ -313,8 +535,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,NE,QSA]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,NE,QSA]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
     }
 
 
@@ -323,40 +544,37 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,NE,QSA]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,NE,QSA]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE", null);
     }
 
 
     @Test
     public void testUtf8WithOriginalQsFlagsNone() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1",
-                "/b/%C2%A1?id=%C2%A1", "/c/%C2%A1%C2%A1", "id=%C2%A1");
+        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1", "/b/%C2%A1?id=%C2%A1", "/c/%C2%A1%C2%A1", "id=%C2%A1");
     }
 
 
     @Test
     public void testUtf8WithOriginalQsFlagsB() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [B]",
-                "/b/%C2%A1?id=%C2%A1", "/c/%C2%A1%25C2%25A1", "id=%C2%A1");
+        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [B]", "/b/%C2%A1?id=%C2%A1", "/c/%C2%A1%C2%A1",
+                "id=%C2%A1");
     }
 
 
     @Test
     public void testUtf8WithOriginalQsFlagsR() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R]",
-                "/b/%C2%A1?id=%C2%A1", "/c/%C2%A1%C2%A1", "id=%C2%A1");
+        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R]", "/b/%C2%A1?id=%C2%A1", "/c/%C2%A1%C2%A1", "id=%C2%A1");
     }
 
 
     @Test
     public void testUtf8WithOriginalQsFlagsRB() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,B]",
-                "/b/%C2%A1?id=%C2%A1", "/c/%C2%A1%25C2%25A1", "id=%C2%A1");
+        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,B]", "/b/%C2%A1?id=%C2%A1", "/c/%C2%A1%C2%A1",
+                "id=%C2%A1");
     }
 
 
@@ -365,8 +583,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
-        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,NE]",
-                "/b/%C2%A1?id=%C2%A1", null);
+        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,NE]", "/b/%C2%A1?id=%C2%A1", null);
     }
 
 
@@ -375,49 +592,47 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
-        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,B,NE]",
-                "/b/%C2%A1?id=%C2%A1", null);
+        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,B,NE]", "/b/%C2%A1?id=%C2%A1", null);
     }
 
 
     @Test
     public void testUtf8WithRewriteQsFlagsNone() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2",
-                "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%C2%A1", "id=%C2%A1");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2", "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%C2%A1",
+                "id=%C2%A1");
     }
 
 
     @Test
     public void testUtf8WithRewriteQsFlagsB() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [B]",
-                "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%25C2%25A1", "id=%25C2%25A1");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [B]", "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%C2%A1",
+                "id=%C2%A1");
     }
 
 
     @Test
     public void testUtf8WithRewriteQsFlagsR() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R]",
-                "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%C2%A1", "id=%C2%A1");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R]", "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%C2%A1",
+                "id=%C2%A1");
     }
 
 
     @Test
     public void testUtf8WithBothQsFlagsQSA() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [QSA]",
-                "/b/%C2%A1/id=%C2%A1?di=%C2%AE", "/c/%C2%A1%C2%A1",
-                "id=%C2%A1&di=%C2%AE");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [QSA]", "/b/%C2%A1/id=%C2%A1?di=%C2%AE",
+                "/c/%C2%A1%C2%A1", "id=%C2%A1&di=%C2%AE");
     }
 
 
     @Test
     public void testUtf8WithRewriteQsFlagsRB() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B]",
-                "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%25C2%25A1", "id=%25C2%25A1");
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B]", "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%C2%A1",
+                "id=%C2%A1");
     }
 
 
@@ -426,8 +641,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,NE]",
-                "/b/%C2%A1/id=%C2%A1", null);
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,NE]", "/b/%C2%A1/id=%C2%A1", null);
     }
 
 
@@ -436,16 +650,14 @@ public class TestRewriteValve extends TomcatBaseTest {
         // Note %C2%A1 == \u00A1
         // Failing to escape the redirect means UTF-8 bytes in the Location
         // header which will be treated as if they are ISO-8859-1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,NE]",
-                "/b/%C2%A1/id=%C2%A1", null);
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [R,B,NE]", "/b/%C2%A1/id=%C2%A1", null);
     }
 
 
     @Test
     public void testUtf8WithRewriteQsFlagsQSA() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [QSA]",
-                "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%C2%A1",
+        doTestRewrite("RewriteRule ^/b/(.*)/(.*) /c/\u00A1$1?$2 [QSA]", "/b/%C2%A1/id=%C2%A1", "/c/%C2%A1%C2%A1",
                 "id=%C2%A1");
     }
 
@@ -460,7 +672,7 @@ public class TestRewriteValve extends TomcatBaseTest {
     @Test
     public void testUtf8FlagsB() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [B]", "/b/%C2%A1", "/c/%C2%A1%25C2%25A1");
+        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [B]", "/b/%C2%A1", "/c/%C2%A1%C2%A1");
     }
 
 
@@ -474,7 +686,7 @@ public class TestRewriteValve extends TomcatBaseTest {
     @Test
     public void testUtf8FlagsRB() throws Exception {
         // Note %C2%A1 == \u00A1
-        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,B]", "/b/%C2%A1", "/c/%C2%A1%25C2%25A1");
+        doTestRewrite("RewriteRule ^/b/(.*) /c/\u00A1$1 [R,B]", "/b/%C2%A1", "/c/%C2%A1%C2%A1");
     }
 
 
@@ -499,9 +711,25 @@ public class TestRewriteValve extends TomcatBaseTest {
     @Test
     public void testFlagsNC() throws Exception {
         // https://bz.apache.org/bugzilla/show_bug.cgi?id=60116
-        doTestRewrite("RewriteCond %{QUERY_STRING} a=([a-z]*) [NC]\n"
-                + "RewriteRule .* - [E=X-Test:%1]",
-                    "/c?a=aAa", "/c", null, "aAa");
+        doTestRewrite("RewriteCond %{QUERY_STRING} a=([a-z]*) [NC]\n" + "RewriteRule .* - [E=X-Test:%1]", "/c?a=aAa",
+                "/c", "a=aAa", "aAa");
+    }
+
+    @Test
+    public void testRewriteEmptyHeader() throws Exception {
+
+        // Disable the following of redirects for this test only
+        boolean originalValue = HttpURLConnection.getFollowRedirects();
+        HttpURLConnection.setFollowRedirects(false);
+        try {
+            Map<String, List<String>> resHead = new HashMap<>();
+            Map<String, List<String>> reqHead = new HashMap<>();
+            reqHead.put("\"\"", Arrays.asList(new String[]{"Test"}));
+            doTestRewriteEx("RewriteCond %{HTTP:} .+\nRewriteRule .* - [F]", "",
+                    null, null, null, false, resHead, reqHead);
+        } finally {
+            HttpURLConnection.setFollowRedirects(originalValue);
+        }
     }
 
 
@@ -509,33 +737,29 @@ public class TestRewriteValve extends TomcatBaseTest {
     public void testHostRewrite() throws Exception {
         // Based on report from users list that ':' was encoded and breaking
         // the redirect
-        doTestRewrite("RewriteRule ^/b(.*) http://%{HTTP_HOST}:%{SERVER_PORT}/a$1 [R]",
-                "/b/%255A", "/a/%255A");
+        doTestRewrite("RewriteRule ^/b(.*) http://%{HTTP_HOST}:%{SERVER_PORT}/a$1 [R]", "/b/%255A", "/a/%255A");
     }
 
 
     @Test
     public void testDefaultRedirect() throws Exception {
-        doTestRedirect("RewriteRule ^/from/a$ /to/b [R]", "/redirect/from/a", "/redirect/to/b",
-                302);
+        doTestRedirect("RewriteRule ^/from/a$ /to/b [R]", "/redirect/from/a", "/redirect/to/b", 302);
     }
 
 
     @Test
     public void testTempRedirect() throws Exception {
-        doTestRedirect("RewriteRule ^/from/a$ /to/b [R=temp]", "/redirect/from/a", "/redirect/to/b",
-                302);
+        doTestRedirect("RewriteRule ^/from/a$ /to/b [R=temp]", "/redirect/from/a", "/redirect/to/b", 302);
     }
 
 
     @Test
     public void testPermanentRedirect() throws Exception {
-         // Disable the following of redirects for this test only
+        // Disable the following of redirects for this test only
         boolean originalValue = HttpURLConnection.getFollowRedirects();
         HttpURLConnection.setFollowRedirects(false);
         try {
-            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=permanent]", "/redirect/from/a", "/redirect/to/b",
-                301);
+            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=permanent]", "/redirect/from/a", "/redirect/to/b", 301);
         } finally {
             HttpURLConnection.setFollowRedirects(originalValue);
         }
@@ -544,12 +768,11 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void testSeeotherRedirect() throws Exception {
-         // Disable the following of redirects for this test only
+        // Disable the following of redirects for this test only
         boolean originalValue = HttpURLConnection.getFollowRedirects();
         HttpURLConnection.setFollowRedirects(false);
         try {
-            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=seeother]", "/redirect/from/a", "/redirect/to/b",
-                303);
+            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=seeother]", "/redirect/from/a", "/redirect/to/b", 303);
         } finally {
             HttpURLConnection.setFollowRedirects(originalValue);
         }
@@ -558,12 +781,11 @@ public class TestRewriteValve extends TomcatBaseTest {
 
     @Test
     public void test307Redirect() throws Exception {
-         // Disable the following of redirects for this test only
+        // Disable the following of redirects for this test only
         boolean originalValue = HttpURLConnection.getFollowRedirects();
         HttpURLConnection.setFollowRedirects(false);
         try {
-            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=307]", "/redirect/from/a", "/redirect/to/b",
-                307);
+            doTestRedirect("RewriteRule ^/from/a$ /to/b [R=307]", "/redirect/from/a", "/redirect/to/b", 307);
         } finally {
             HttpURLConnection.setFollowRedirects(originalValue);
         }
@@ -605,41 +827,74 @@ public class TestRewriteValve extends TomcatBaseTest {
         doTestRewrite("RewriteRule !^/c/.* /b/", "/c/d", "/c/d");
     }
 
+    @Test
+    public void testMultiLine001() throws Exception {
+        doTestRewrite("RewriteRule /dummy /anotherDummy [L]\nRewriteRule ^/a /c [L]", "/a", "/c");
+    }
+
+    @Test
+    public void testMultiLine002() throws Exception {
+        doTestRewrite("RewriteRule /dummy /a\nRewriteRule /a /c [L]", "/dummy", "/c");
+    }
 
     private void doTestRewrite(String config, String request, String expectedURI) throws Exception {
         doTestRewrite(config, request, expectedURI, null);
     }
 
 
-    private void doTestRewrite(String config, String request, String expectedURI,
-            String expectedQueryString) throws Exception {
+    private void doTestRewrite(String config, String request, String expectedURI, String expectedQueryString)
+            throws Exception {
         doTestRewrite(config, request, expectedURI, expectedQueryString, null);
     }
 
 
-    private void doTestRewrite(String config, String request, String expectedURI,
-            String expectedQueryString, String expectedAttributeValue) throws Exception {
+    private void doTestRewrite(String config, String request, String expectedURI, String expectedQueryString,
+            String expectedAttributeValue) throws Exception {
+        doTestRewrite(config, request, expectedURI, expectedQueryString, expectedAttributeValue, false);
+    }
+
+    private void doTestRewrite(String config, String request, String expectedURI, String expectedQueryString,
+            String expectedAttributeValue, boolean valveSkip) throws Exception {
+        doTestRewriteEx(config, request, expectedURI, expectedQueryString,
+                expectedAttributeValue, valveSkip, null, null);
+    }
+
+    private void doTestRewriteEx(String config, String request, String expectedURI, String expectedQueryString,
+            String expectedAttributeValue, boolean valveSkip, Map<String, List<String>> resHead, Map<String, List<String>> reqHead ) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         RewriteValve rewriteValve = new RewriteValve();
         ctx.getPipeline().addValve(rewriteValve);
+        if (valveSkip) {
+            ctx.getPipeline().addValve(new ValveBase() {
+                @Override
+                public void invoke(Request request, Response response) throws IOException, ServletException {
+                    throw new IllegalStateException();
+                }
+            });
+        }
 
         rewriteValve.setConfiguration(config);
 
         Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/a/Z", "snoop");
         ctx.addServletMappingDecoded("/a/%5A", "snoop");
         ctx.addServletMappingDecoded("/c/*", "snoop");
+        ctx.addServletMappingDecoded("/W/*", "snoop");
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
         tomcat.start();
 
         ByteChunk res = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() + request, res, null);
+        int rc = methodUrl("http://localhost:" + getPort() + request, res, DEFAULT_CLIENT_TIMEOUT_MS,
+                reqHead,
+                resHead,
+                Method.GET, true);
         res.setCharset(StandardCharsets.UTF_8);
 
         if (expectedURI == null) {
@@ -647,12 +902,16 @@ public class TestRewriteValve extends TomcatBaseTest {
             // were written into the request target
             Assert.assertEquals(400, rc);
         } else {
+            // If there is an expected URI, the request should be successful
+            Assert.assertEquals(200, rc);
             String body = res.toString();
             RequestDescriptor requestDesc = SnoopResult.parse(body);
             String requestURI = requestDesc.getRequestInfo("REQUEST-URI");
             Assert.assertEquals(expectedURI, requestURI);
 
-            if (expectedQueryString != null) {
+            if (expectedQueryString == null) {
+                Assert.assertTrue(requestDesc.getParams().isEmpty());
+            } else {
                 String queryString = requestDesc.getRequestInfo("REQUEST-QUERY-STRING");
                 Assert.assertEquals(expectedQueryString, queryString);
             }
@@ -664,8 +923,8 @@ public class TestRewriteValve extends TomcatBaseTest {
         }
     }
 
-    private void doTestRedirect(String config, String request, String expectedURI,
-        int expectedStatusCode) throws Exception {
+    private void doTestRedirect(String config, String request, String expectedURI, int expectedStatusCode)
+            throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -685,8 +944,8 @@ public class TestRewriteValve extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
         Map<String, List<String>> resHead = new HashMap<>();
-        int rc = methodUrl("http://localhost:" + getPort() + request, res,
-                DEFAULT_CLIENT_TIMEOUT_MS, null, resHead, "GET", false);
+        int rc = methodUrl("http://localhost:" + getPort() + request, res, DEFAULT_CLIENT_TIMEOUT_MS, null, resHead,
+                Method.GET, false);
         res.setCharset(StandardCharsets.UTF_8);
 
         if (expectedURI == null) {
@@ -700,5 +959,159 @@ public class TestRewriteValve extends TomcatBaseTest {
             Assert.assertEquals(expectedURI, redirectURI);
             Assert.assertEquals(expectedStatusCode, rc);
         }
+    }
+
+
+    @Test
+    public void testCookie() throws Exception {
+
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("redirect", null);
+
+        CookieTestValve cookieTestValve = new CookieTestValve();
+        tomcat.getHost().getPipeline().addValve(cookieTestValve);
+        RewriteValve rewriteValve = new RewriteValve();
+        tomcat.getHost().getPipeline().addValve(rewriteValve);
+
+        rewriteValve.setConfiguration("RewriteRule ^/source/(.*) /redirect/$1");
+
+        Tomcat.addServlet(ctx, "cookieTest", new CookieTestServlet());
+
+        ctx.addServletMappingDecoded("/", "cookieTest");
+
+        tomcat.start();
+
+        Map<String, List<String>> reqHead = new HashMap<>();
+        reqHead.put("cookie", Arrays.asList("test=data"));
+        ByteChunk res = new ByteChunk();
+        int rc = methodUrl("http://localhost:" + getPort() + "/source/cookieTest", res, DEFAULT_CLIENT_TIMEOUT_MS,
+                reqHead, null, Method.GET, false);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        res.setCharset(StandardCharsets.UTF_8);
+        Assert.assertEquals("PASS", res.toString());
+    }
+
+
+    public static class CookieTestValve extends ValveBase {
+
+        @Override
+        public void invoke(Request request, Response response) throws IOException, ServletException {
+            Cookie[] cookies = request.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("test".equals(cookie.getName())) {
+                        request.setAttribute("cookieTest", cookie.getValue());
+                        break;
+                    }
+                }
+            }
+            getNext().invoke(request, response);
+        }
+    }
+
+
+    public static class CookieTestServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            PrintWriter pw = resp.getWriter();
+            if (req.getAttribute("cookieTest") != null) {
+                pw.print("PASS");
+            } else {
+                pw.print("FAIL");
+            }
+        }
+    }
+
+
+    @Test
+    public void testEncodedUriSimple() throws Exception {
+        doTestRewriteWithEncoding("aaa");
+    }
+
+
+    @Test
+    public void testEncodedUriEncodedQuestionMark01() throws Exception {
+        doTestRewriteWithEncoding("a%3fa");
+    }
+
+
+    @Test
+    public void testEncodedUriEncodedQuestionMark02() throws Exception {
+        doTestRewriteWithEncoding("%3faa");
+    }
+
+
+    @Test
+    public void testEncodedUriEncodedQuestionMark03() throws Exception {
+        doTestRewriteWithEncoding("aa%3f");
+    }
+
+
+    @Test
+    public void testEncodedUriEncodedQuestionMarkAndQueryString() throws Exception {
+        doTestRewriteWithEncoding("a%3fa?b=c", "a%3fa", "b=c");
+    }
+
+
+    @Test
+    public void testEncodedUriEncodedSemicolon01() throws Exception {
+        doTestRewriteWithEncoding("a%3ba");
+    }
+
+
+    @Test
+    public void testEncodedUriEncodedSemicolon02() throws Exception {
+        doTestRewriteWithEncoding("%3baa");
+    }
+
+
+    @Test
+    public void testEncodedUriEncodedSemicolon03() throws Exception {
+        doTestRewriteWithEncoding("aa%3b");
+    }
+
+
+    private void doTestRewriteWithEncoding(String segment) throws Exception {
+        doTestRewriteWithEncoding(segment, segment, null);
+    }
+
+    private void doTestRewriteWithEncoding(String segment, String expectedSegment, String expectedQueryString)
+            throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = tomcat.addContext("", null);
+
+        RewriteValve rewriteValve = new RewriteValve();
+        tomcat.getHost().getPipeline().addValve(rewriteValve);
+
+        rewriteValve.setConfiguration("RewriteRule ^/source/(.*)$ /target/$1");
+
+        Tomcat.addServlet(ctx, "snoop", new SnoopServlet());
+        ctx.addServletMappingDecoded("/target/*", "snoop");
+
+        tomcat.start();
+
+        ByteChunk res = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/source/" + segment, res, false);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        res.setCharset(StandardCharsets.UTF_8);
+        String body = res.toString();
+        Assert.assertTrue(body, body.contains("REQUEST-URI: /target/" + expectedSegment));
+        Assert.assertTrue(body, body.contains("PATH-INFO: /" +
+                URLDecoder.decode(expectedSegment, StandardCharsets.UTF_8)));
+        Assert.assertTrue(body, body.contains("REQUEST-QUERY-STRING: " + expectedQueryString));
     }
 }

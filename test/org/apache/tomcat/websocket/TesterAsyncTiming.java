@@ -19,12 +19,12 @@ package org.apache.tomcat.websocket;
 import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 
-import javax.websocket.OnMessage;
-import javax.websocket.RemoteEndpoint.Async;
-import javax.websocket.SendHandler;
-import javax.websocket.SendResult;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.RemoteEndpoint.Async;
+import jakarta.websocket.SendHandler;
+import jakarta.websocket.SendResult;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.apache.tomcat.websocket.server.TesterEndpointConfig;
 
@@ -45,8 +45,8 @@ public class TesterAsyncTiming {
     @ServerEndpoint(Config.PATH)
     public static class Endpoint {
 
-        private static final ByteBuffer LARGE_DATA= ByteBuffer.allocate(16 * 1024);
-        private static final ByteBuffer SMALL_DATA= ByteBuffer.allocate(4 * 1024);
+        private static final ByteBuffer LARGE_DATA = ByteBuffer.allocate(16 * 1024);
+        private static final ByteBuffer SMALL_DATA = ByteBuffer.allocate(4 * 1024);
 
         @OnMessage
         public void onMessage(Session session, @SuppressWarnings("unused") String text) {

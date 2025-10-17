@@ -86,7 +86,7 @@ public class SocketNioValidateSend {
                         if ( ( (++count) % 10000) == 0) {
                             long time = System.currentTimeMillis();
                             double seconds = ( (double) (time - start)) / 1000;
-                            System.out.println("Throughput " + df.format(mb / seconds) + " MB/seconds, total "+mb+" MB, total "+total+" bytes.");
+                            System.out.println("Throughput " + df.format(mb / seconds) + " MiB/s, total "+mb+" MiB total "+total+" bytes.");
                         }
                     }
 

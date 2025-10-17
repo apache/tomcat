@@ -14,20 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.transport;
 
 import org.apache.catalina.tribes.io.ListenCallback;
 
-public abstract class AbstractRxTask implements Runnable
-{
+public abstract class AbstractRxTask implements Runnable {
 
     public static final int OPTION_DIRECT_BUFFER = ReceiverBase.OPTION_DIRECT_BUFFER;
 
     private ListenCallback callback;
     private RxTaskPool pool;
-    @Deprecated
-    private boolean doRun = true;
     private int options;
     protected boolean useBufferPool = true;
 
@@ -47,18 +43,6 @@ public abstract class AbstractRxTask implements Runnable
         this.callback = callback;
     }
 
-    /**
-     * Sets doRun field which is unused.
-     *
-     * @param doRun New value
-     *
-     * @deprecated Will be removed in Tomcat 10
-     */
-    @Deprecated
-    public void setDoRun(boolean doRun) {
-        this.doRun = doRun;
-    }
-
     public RxTaskPool getTaskPool() {
         return pool;
     }
@@ -71,20 +55,8 @@ public abstract class AbstractRxTask implements Runnable
         return callback;
     }
 
-    /**
-     * Gets doRun field which is unused.
-     *
-     * @return Current field value
-     *
-     * @deprecated Will be removed in Tomcat 10
-     */
-    @Deprecated
-    public boolean isDoRun() {
-        return doRun;
-    }
-
     public void close() {
-        doRun = false;
+        // NO-OP
     }
 
     public void setUseBufferPool(boolean usebufpool) {

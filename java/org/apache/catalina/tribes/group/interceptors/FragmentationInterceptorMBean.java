@@ -19,11 +19,11 @@ package org.apache.catalina.tribes.group.interceptors;
 public interface FragmentationInterceptorMBean {
 
     // Attributes
-    public int getMaxSize();
+    int getMaxSize();
 
-    public long getExpire();
+    long getExpire();
 
-    public void setMaxSize(int maxSize);
+    void setMaxSize(int maxSize);
 
-    public void setExpire(long expire);
+    void setExpire(long expire);
 }

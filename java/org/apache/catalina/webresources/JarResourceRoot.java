@@ -19,6 +19,8 @@ package org.apache.catalina.webresources;
 import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.util.jar.Manifest;
@@ -35,13 +37,11 @@ public class JarResourceRoot extends AbstractResource {
     private final String baseUrl;
     private final String name;
 
-    public JarResourceRoot(WebResourceRoot root, File base, String baseUrl,
-            String webAppPath) {
+    public JarResourceRoot(WebResourceRoot root, File base, String baseUrl, String webAppPath) {
         super(root, webAppPath);
         // Validate the webAppPath before going any further
         if (!webAppPath.endsWith("/")) {
-            throw new IllegalArgumentException(sm.getString(
-                    "jarResourceRoot.invalidWebAppPath", webAppPath));
+            throw new IllegalArgumentException(sm.getString("jarResourceRoot.invalidWebAppPath", webAppPath));
         }
         this.base = base;
         this.baseUrl = "jar:" + baseUrl;
@@ -124,8 +124,8 @@ public class JarResourceRoot extends AbstractResource {
     public URL getURL() {
         String url = baseUrl + "!/";
         try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
+            return new URI(url).toURL();
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("fileResource.getUrlFail", url), e);
             }
@@ -136,14 +136,15 @@ public class JarResourceRoot extends AbstractResource {
     @Override
     public URL getCodeBase() {
         try {
-            return new URL(baseUrl);
-        } catch (MalformedURLException e) {
+            return new URI(baseUrl).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("fileResource.getUrlFail", baseUrl), e);
             }
             return null;
         }
     }
+
     @Override
     protected Log getLog() {
         return log;

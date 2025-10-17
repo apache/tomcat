@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.jasper.tagplugins.jstl.core;
 
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
@@ -27,18 +25,18 @@ public class Remove implements TagPlugin {
     @Override
     public void doTag(TagPluginContext ctxt) {
 
-        //scope flag
+        // scope flag
         boolean hasScope = ctxt.isAttributeSpecified("scope");
 
-        //the value of the "var"
+        // the value of the "var"
         String strVar = ctxt.getConstantAttribute("var");
 
-        //remove attribute from certain scope.
-        //default scope is "page".
-        if(hasScope){
+        // remove attribute from certain scope.
+        // default scope is "page".
+        if (hasScope) {
             int iScope = Util.getScope(ctxt.getConstantAttribute("scope"));
             ctxt.generateJavaSource("pageContext.removeAttribute(\"" + strVar + "\"," + iScope + ");");
-        }else{
+        } else {
             ctxt.generateJavaSource("pageContext.removeAttribute(\"" + strVar + "\");");
         }
     }

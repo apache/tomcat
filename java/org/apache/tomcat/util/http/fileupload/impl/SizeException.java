@@ -46,7 +46,7 @@ public abstract class SizeException extends FileUploadException {
      * @param actual The actual number of bytes in the request.
      * @param permitted The requests size limit, in bytes.
      */
-    protected SizeException(String message, long actual, long permitted) {
+    protected SizeException(final String message, final long actual, final long permitted) {
         super(message);
         this.actual = actual;
         this.permitted = permitted;
@@ -56,7 +56,7 @@ public abstract class SizeException extends FileUploadException {
      * Retrieves the actual size of the request.
      *
      * @return The actual size of the request.
-     * @since 1.3
+     * @since FileUpload 1.3
      */
     public long getActualSize() {
         return actual;
@@ -66,7 +66,7 @@ public abstract class SizeException extends FileUploadException {
      * Retrieves the permitted size of the request.
      *
      * @return The permitted size of the request.
-     * @since 1.3
+     * @since FileUpload 1.3
      */
     public long getPermittedSize() {
         return permitted;

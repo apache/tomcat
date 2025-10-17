@@ -14,18 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.digester;
 
+
+import java.util.HashMap;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 import org.xml.sax.Attributes;
 
 
 /**
- * <p>Rule implementation that sets properties on the object at the top of the
- * stack, based on attributes with corresponding names.</p>
+ * <p>
+ * Rule implementation that sets properties on the object at the top of the stack, based on attributes with
+ * corresponding names.
+ * </p>
  */
 
 public class SetPropertiesRule extends Rule {
@@ -34,56 +36,80 @@ public class SetPropertiesRule extends Rule {
         void endSetPropertiesRule();
     }
 
+    protected final HashMap<String,String> excludes;
+
+    public SetPropertiesRule() {
+        excludes = null;
+    }
+
+    public SetPropertiesRule(String[] exclude) {
+        excludes = new HashMap<>();
+        for (String s : exclude) {
+            if (s != null) {
+                this.excludes.put(s, s);
+            }
+        }
+    }
+
     /**
      * Process the beginning of this element.
      *
-     * @param namespace the namespace URI of the matching element, or an
-     *   empty string if the parser is not namespace aware or the element has
-     *   no namespace
-     * @param theName the local name if the parser is namespace aware, or just
-     *   the element name otherwise
+     * @param namespace  the namespace URI of the matching element, or an empty string if the parser is not namespace
+     *                       aware or the element has no namespace
+     * @param theName    the local name if the parser is namespace aware, or just the element name otherwise
      * @param attributes The attribute list for this element
      */
     @Override
-    public void begin(String namespace, String theName, Attributes attributes)
-            throws Exception {
+    public void begin(String namespace, String theName, Attributes attributes) throws Exception {
 
         // Populate the corresponding properties of the top object
         Object top = digester.peek();
-        if (digester.log.isDebugEnabled()) {
-            if (top != null) {
-                digester.log.debug("[SetPropertiesRule]{" + digester.match +
-                                   "} Set " + top.getClass().getName() +
-                                   " properties");
-            } else {
-                digester.log.debug("[SetPropertiesRule]{" + digester.match +
-                                   "} Set NULL properties");
-            }
+        if (digester.log.isTraceEnabled()) {
+            digester.log.trace(
+                    "[SetPropertiesRule]{" + digester.match + "} Set " + top.getClass().getName() + " properties");
+        }
+        StringBuilder code = digester.getGeneratedCode();
+        String variableName = null;
+        if (code != null) {
+            variableName = digester.toVariableName(top);
         }
 
         for (int i = 0; i < attributes.getLength(); i++) {
             String name = attributes.getLocalName(i);
-            if ("".equals(name)) {
+            if (name.isEmpty()) {
                 name = attributes.getQName(i);
             }
             String value = attributes.getValue(i);
 
-            if (digester.log.isDebugEnabled()) {
-                digester.log.debug("[SetPropertiesRule]{" + digester.match +
-                        "} Setting property '" + name + "' to '" +
+            if (digester.log.isTraceEnabled()) {
+                digester.log.trace("[SetPropertiesRule]{" + digester.match + "} Setting property '" + name + "' to '" +
                         value + "'");
             }
-            if (!digester.isFakeAttribute(top, name)
-                    && !IntrospectionUtils.setProperty(top, name, value)
-                    && digester.getRulesValidation()) {
-                if (!"optional".equals(name)) {
-                    digester.log.warn(sm.getString("rule.noProperty", digester.match, name, value));
+            if (!digester.isFakeAttribute(top, name) && (excludes == null || !excludes.containsKey(name))) {
+                StringBuilder actualMethod = null;
+                if (code != null) {
+                    actualMethod = new StringBuilder();
+                }
+                if (!IntrospectionUtils.setProperty(top, name, value, true, actualMethod)) {
+                    if (digester.getRulesValidation() && !"optional".equals(name)) {
+                        digester.log.warn(sm.getString("rule.noProperty", digester.match, name, value));
+                    }
+                } else {
+                    if (code != null) {
+                        code.append(variableName).append('.').append(actualMethod).append(';');
+                        code.append(System.lineSeparator());
+                    }
                 }
             }
         }
 
         if (top instanceof Listener) {
             ((Listener) top).endSetPropertiesRule();
+            if (code != null) {
+                code.append("((org.apache.tomcat.util.digester.SetPropertiesRule.Listener) ");
+                code.append(variableName).append(").endSetPropertiesRule();");
+                code.append(System.lineSeparator());
+            }
         }
 
     }
@@ -94,8 +120,6 @@ public class SetPropertiesRule extends Rule {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("SetPropertiesRule[");
-        sb.append("]");
-        return sb.toString();
+        return "SetPropertiesRule[]";
     }
 }

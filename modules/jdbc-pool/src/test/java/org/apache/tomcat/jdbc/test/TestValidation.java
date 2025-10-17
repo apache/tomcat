@@ -55,7 +55,7 @@ public class TestValidation extends DefaultTestCase {
         datasource.setMinIdle(1);
         datasource.setMaxIdle(1);
         datasource.setMaxActive(2);
-        // Validation interval is disabled by default to ensure validation occurs everytime
+        // Validation interval is disabled by default to ensure validation occurs every time
         datasource.setValidationInterval(-1);
         // No validation query by default
         datasource.setValidationQuery(null);
@@ -216,8 +216,7 @@ public class TestValidation extends DefaultTestCase {
         Assert.assertFalse("No transaction must be running after connection is obtained", mockCxn2.isRunningTransaction());
         if (validationOutcome == ValidationOutcome.SUCCESS) {
             Assert.assertEquals("Connection with successful validation is reused", mockCxn1, mockCxn2);
-        }
-        else {
+        } else {
             Assert.assertNotEquals("Connection with failed validation must not be returned again", mockCxn1, mockCxn2);
         }
     }
@@ -428,8 +427,7 @@ public class TestValidation extends DefaultTestCase {
 
         if (validationOutcome == ValidationOutcome.SUCCESS) {
             Assert.assertEquals("Pool must contain 1 idle connection at this time", datasource.getIdle(), 1);
-        }
-        else {
+        } else {
             Assert.assertEquals("Pool must not contain any idle connection at this time", datasource.getIdle(), 0);
         }
     }
@@ -516,7 +514,7 @@ public class TestValidation extends DefaultTestCase {
 
     /* ------- Helper mock classes ----- */
 
-    public static enum ValidationOutcome {
+    public enum ValidationOutcome {
         SUCCESS,  // Validation returns true
         FAILURE,  // Validation returns false
         EXCEPTION // Validation throws an unexpected exception
@@ -643,10 +641,10 @@ public class TestValidation extends DefaultTestCase {
         public boolean isValid(int timeout) throws SQLException {
             statementExecuted();
             switch (validationOutcome) {
-            case SUCCESS: { return true; }
-            case FAILURE: { return false; }
-            case EXCEPTION: { throw new SQLException("Unexpected error generated in test"); }
-            default: { return true; }
+                case SUCCESS: { return true; }
+                case FAILURE: { return false; }
+                case EXCEPTION: { throw new SQLException("Unexpected error generated in test"); }
+                default: { return true; }
             }
         }
     }
@@ -664,8 +662,7 @@ public class TestValidation extends DefaultTestCase {
         public boolean execute(String sql) throws SQLException {
             if (connection.getValidationOutcome()==ValidationOutcome.SUCCESS) {
                 return false;
-            }
-            else {
+            } else {
                 throw new SQLException("Simulated validation query failure");
             }
         }

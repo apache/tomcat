@@ -23,17 +23,17 @@ import java.util.Map;
  * This class incorporates test response data
  */
 class ResponseDescriptor {
-    private Map<String, List<String>> headers;
+    private Map<String,List<String>> headers;
     private String body;
     private int responseCode;
 
 
-    public Map<String, List<String>> getHeaders() {
+    public Map<String,List<String>> getHeaders() {
         return headers;
     }
 
 
-    public void setHeaders(Map<String, List<String>> headers) {
+    public void setHeaders(Map<String,List<String>> headers) {
         this.headers = headers;
     }
 

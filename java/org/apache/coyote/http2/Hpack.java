@@ -18,6 +18,7 @@ package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
 
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
 final class Hpack {
@@ -26,11 +27,19 @@ final class Hpack {
 
     private static final byte LOWER_DIFF = 'a' - 'A';
     static final int DEFAULT_TABLE_SIZE = 4096;
-    private static final int MAX_INTEGER_OCTETS = 8; //not sure what a good value for this is, but the spec says we need to provide an upper bound
+    /*
+     * The HPack specification says there SHOULD be an upper bound on this.
+     *
+     * Tomcat has opted to limit values to INTEGER.MAX_VALUE. Give that there is the prefix byte and then each octet
+     * provides up to 7-bits, a total a 5 octets plus the prefix may be required.
+     *
+     * Note: The maximum value represented by 5 octets is greater than INTEGER.MAX_VALUE.
+     *
+     */
+    private static final int MAX_INTEGER_OCTETS = 5;
 
     /**
-     * table that contains powers of two,
-     * used as both bitmask and to quickly calculate 2^n
+     * table that contains powers of two, used as both bitmask and to quickly calculate 2^n
      */
     private static final int[] PREFIX_TABLE;
 
@@ -50,10 +59,10 @@ final class Hpack {
         }
 
         HeaderField[] fields = new HeaderField[62];
-        //note that zero is not used
+        // note that zero is not used
         fields[1] = new HeaderField(":authority", null);
-        fields[2] = new HeaderField(":method", "GET");
-        fields[3] = new HeaderField(":method", "POST");
+        fields[2] = new HeaderField(":method", Method.GET);
+        fields[3] = new HeaderField(":method", Method.POST);
         fields[4] = new HeaderField(":path", "/");
         fields[5] = new HeaderField(":path", "/index.html");
         fields[6] = new HeaderField(":scheme", "http");
@@ -133,14 +142,14 @@ final class Hpack {
     }
 
     /**
-     * Decodes an integer in the HPACK prefix format. If the return value is -1
-     * it means that there was not enough data in the buffer to complete the decoding
-     * sequence.
+     * Decodes an integer in the HPACK prefix format. If the return value is -1 it means that there was not enough data
+     * in the buffer to complete the decoding sequence.
      * <p/>
      * If this method returns -1 then the source buffer will not have been modified.
      *
      * @param source The buffer that contains the integer
      * @param n      The encoding prefix length
+     *
      * @return The encoded integer, or -1 if there was not enough data
      */
     static int decodeInteger(ByteBuffer source, int n) throws HpackException {
@@ -151,37 +160,42 @@ final class Hpack {
         int sp = source.position();
         int mask = PREFIX_TABLE[n];
 
-        int i = mask & source.get();
+        // Use long internally as the value may exceed Integer.MAX_VALUE
+        long result = mask & source.get();
         int b;
-        if (i < PREFIX_TABLE[n]) {
-            return i;
+        if (result < PREFIX_TABLE[n]) {
+            // Casting is safe as result must be less than 255 at this point.
+            return (int) result;
         } else {
             int m = 0;
             do {
-                if(count++ > MAX_INTEGER_OCTETS) {
-                    throw new HpackException(sm.getString("hpack.integerEncodedOverTooManyOctets",
-                            Integer.valueOf(MAX_INTEGER_OCTETS)));
+                if (count++ > MAX_INTEGER_OCTETS) {
+                    throw new HpackException(
+                            sm.getString("hpack.integerEncodedOverTooManyOctets", Integer.valueOf(MAX_INTEGER_OCTETS)));
                 }
                 if (source.remaining() == 0) {
-                    //we have run out of data
-                    //reset
+                    // we have run out of data
+                    // reset
                     source.position(sp);
                     return -1;
                 }
                 b = source.get();
-                i = i + (b & 127) * (PREFIX_TABLE[m] + 1);
+                result = result + (b & 127) * (PREFIX_TABLE[m] + 1L);
+                if (result > Integer.MAX_VALUE) {
+                    throw new HpackException(sm.getString("hpack.integerEncodedTooBig"));
+                }
                 m += 7;
             } while ((b & 128) == 128);
         }
-        return i;
+        // Casting is safe as result must be less than Integer.MAX_VALUE at this point
+        return (int) result;
     }
 
     /**
      * Encodes an integer in the HPACK prefix format.
      * <p/>
-     * This method assumes that the buffer has already had the first 8-n bits filled.
-     * As such it will modify the last byte that is already present in the buffer, and
-     * potentially add more if required
+     * This method assumes that the buffer has already had the first 8-n bits filled. As such it will modify the last
+     * byte that is already present in the buffer, and potentially add more if required
      *
      * @param source The buffer that contains the integer
      * @param value  The integer to encode
@@ -211,6 +225,7 @@ final class Hpack {
         return c;
     }
 
-    private Hpack() {}
+    private Hpack() {
+    }
 
 }

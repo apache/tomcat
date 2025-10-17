@@ -1,0 +1,7 @@
+{
+  "bundles":[
+    {"name":"org.apache.tomcat.websocket.LocalStrings"},
+    {"name":"org.apache.tomcat.websocket.pojo.LocalStrings"},
+    {"name":"org.apache.tomcat.websocket.server.LocalStrings"}
+  ]
+}

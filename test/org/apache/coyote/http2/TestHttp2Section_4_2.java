@@ -20,11 +20,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * Unit tests for Section 4.2 of
- * <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>.
- * <br>
- * The order of tests in this class is aligned with the order of the
- * requirements in the RFC.
+ * Unit tests for Section 4.2 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
+ * The order of tests in this class is aligned with the order of the requirements in the RFC.
  */
 public class TestHttp2Section_4_2 extends Http2TestBase {
 
@@ -54,6 +51,7 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         }
 
         os.write(settings);
+        os.flush();
 
         handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
@@ -76,8 +74,9 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         // Empty payload
 
         os.write(ping);
+        os.flush();
 
-        handleGoAwayResponse(1,  Http2Error.FRAME_SIZE_ERROR);
+        handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
 
 
@@ -98,8 +97,9 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         // Empty payload
 
         os.write(ping);
+        os.flush();
 
-        handleGoAwayResponse(1,  Http2Error.FRAME_SIZE_ERROR);
+        handleGoAwayResponse(1, Http2Error.FRAME_SIZE_ERROR);
     }
 
 
@@ -121,11 +121,11 @@ public class TestHttp2Section_4_2 extends Http2TestBase {
         // Empty payload
 
         os.write(priority);
+        os.flush();
 
         // Read Stream reset frame
-        parser.readFrame(true);
+        parser.readFrame();
 
-        Assert.assertTrue(output.getTrace(),
-                output.getTrace().startsWith("3-RST-[6]"));
+        Assert.assertTrue(output.getTrace(), output.getTrace().startsWith("3-RST-[6]"));
     }
 }

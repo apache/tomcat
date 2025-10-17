@@ -43,7 +43,7 @@ public class IOFileUploadException extends FileUploadException {
      * @param pMsg The detail message.
      * @param pException The exceptions cause.
      */
-    public IOFileUploadException(String pMsg, IOException pException) {
+    public IOFileUploadException(final String pMsg, final IOException pException) {
         super(pMsg);
         cause = pException;
     }

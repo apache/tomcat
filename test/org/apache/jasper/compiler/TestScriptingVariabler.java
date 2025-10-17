@@ -14,15 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.io.IOException;
 
-import javax.servlet.jsp.tagext.TagData;
-import javax.servlet.jsp.tagext.TagExtraInfo;
-import javax.servlet.jsp.tagext.TagSupport;
-import javax.servlet.jsp.tagext.VariableInfo;
+import jakarta.servlet.jsp.tagext.TagData;
+import jakarta.servlet.jsp.tagext.TagExtraInfo;
+import jakarta.servlet.jsp.tagext.TagSupport;
+import jakarta.servlet.jsp.tagext.VariableInfo;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -60,10 +59,7 @@ public class TestScriptingVariabler extends TomcatBaseTest {
          */
         @Override
         public VariableInfo[] getVariableInfo(TagData data) {
-            return new VariableInfo[] {
-                new VariableInfo("Test", "java.lang.String", true,
-                    VariableInfo.AT_END)
-            };
+            return new VariableInfo[] { new VariableInfo("Test", "java.lang.String", true, VariableInfo.AT_END) };
         }
     }
 

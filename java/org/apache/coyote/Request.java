@@ -17,49 +17,39 @@
 package org.apache.coyote;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
+import java.io.StringReader;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
-import javax.servlet.ReadListener;
+import jakarta.servlet.ReadListener;
+import jakarta.servlet.ServletConnection;
 
-import org.apache.tomcat.util.buf.B2CConverter;
+import org.apache.tomcat.util.buf.CharsetHolder;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookies;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * This is a low-level, efficient representation of a server request. Most
- * fields are GC-free, expensive operations are delayed until the  user code
- * needs the information.
- *
- * Processing is delegated to modules, using a hook mechanism.
- *
- * This class is not intended for user code - it is used internally by tomcat
- * for processing the request in the most efficient way. Users ( servlets ) can
- * access the information using a facade, which provides the high-level view
- * of the request.
- *
- * Tomcat defines a number of attributes:
+ * This is a low-level, efficient representation of a server request. Most fields are GC-free, expensive operations are
+ * delayed until the user code needs the information. Processing is delegated to modules, using a hook mechanism. This
+ * class is not intended for user code - it is used internally by tomcat for processing the request in the most
+ * efficient way. Users ( servlets ) can access the information using a facade, which provides the high-level view of
+ * the request. Tomcat defines a number of attributes:
  * <ul>
- *   <li>"org.apache.tomcat.request" - allows access to the low-level
- *       request object in trusted applications
+ * <li>"org.apache.tomcat.request" - allows access to the low-level request object in trusted applications
  * </ul>
- *
- * @author James Duncan Davidson [duncan@eng.sun.com]
- * @author James Todd [gonzo@eng.sun.com]
- * @author Jason Hunter [jch@eng.sun.com]
- * @author Harish Prabandham
- * @author Alex Cruikshank [alex@epitonic.com]
- * @author Hans Bergsten [hans@gefionsoftware.com]
- * @author Costin Manolache
- * @author Remy Maucherat
  */
 public final class Request {
 
@@ -67,6 +57,16 @@ public final class Request {
 
     // Expected maximum typical number of cookies per request.
     private static final int INITIAL_COOKIE_SIZE = 4;
+
+    /*
+     * At 100,000 requests a second there are enough IDs here for ~3,000,000 years before it overflows (and then we have
+     * another 3,000,000 years before it gets back to zero).
+     *
+     * Local testing shows that 5, 10, 50, 500 or 1000 threads can obtain 60,000,000+ IDs a second from a single
+     * AtomicLong. That is about 17ns per request. It does not appear that the introduction of this counter will cause a
+     * bottleneck for request processing.
+     */
+    private static final AtomicLong requestIdGenerator = new AtomicLong(0);
 
     // ----------------------------------------------------------- Constructors
 
@@ -86,21 +86,23 @@ public final class Request {
 
     private final MessageBytes schemeMB = MessageBytes.newInstance();
 
-    private final MessageBytes methodMB = MessageBytes.newInstance();
+    private String method;
     private final MessageBytes uriMB = MessageBytes.newInstance();
     private final MessageBytes decodedUriMB = MessageBytes.newInstance();
     private final MessageBytes queryMB = MessageBytes.newInstance();
     private final MessageBytes protoMB = MessageBytes.newInstance();
 
+    private volatile String requestId = Long.toString(requestIdGenerator.getAndIncrement());
+
     // remote address/host
     private final MessageBytes remoteAddrMB = MessageBytes.newInstance();
+    private final MessageBytes peerAddrMB = MessageBytes.newInstance();
     private final MessageBytes localNameMB = MessageBytes.newInstance();
     private final MessageBytes remoteHostMB = MessageBytes.newInstance();
     private final MessageBytes localAddrMB = MessageBytes.newInstance();
 
     private final MimeHeaders headers = new MimeHeaders();
-    private final Map<String,String> trailerFields = new HashMap<>();
-
+    private final MimeHeaders trailerFields = new MimeHeaders();
 
     /**
      * Path parameters
@@ -110,7 +112,7 @@ public final class Request {
     /**
      * Notes.
      */
-    private final Object notes[] = new Object[Constants.MAX_NOTES];
+    private final Object[] notes = new Object[Constants.MAX_NOTES];
 
 
     /**
@@ -130,10 +132,7 @@ public final class Request {
      */
     private long contentLength = -1;
     private MessageBytes contentTypeMB = null;
-    private Charset charset = null;
-    // Retain the original, user specified character encoding so it can be
-    // returned even if it is invalid
-    private String characterEncoding = null;
+    private CharsetHolder charsetHolder = null;
 
     /**
      * Is there an expectation ?
@@ -151,16 +150,33 @@ public final class Request {
     private Response response;
     private volatile ActionHook hook;
 
-    private long bytesRead=0;
+    private long bytesRead = 0;
     // Time of the request - useful to avoid repeated calls to System.currentTime
-    private long startTime = -1;
+    private long startTimeNanos = -1;
+    private Instant startInstant = null;
+    private long threadId = 0;
     private int available = 0;
 
-    private final RequestInfo reqProcessorMX=new RequestInfo(this);
+    private final RequestInfo reqProcessorMX = new RequestInfo(this);
 
     private boolean sendfile = true;
 
+    /**
+     * Holds request body reading error exception.
+     */
+    private Exception errorException = null;
+
+    /*
+     * State for non-blocking output is maintained here as it is the one point easily reachable from the
+     * CoyoteInputStream and the CoyoteAdapter which both need access to state.
+     */
     volatile ReadListener listener;
+    // Ensures listener is only fired after a call is isReady()
+    private boolean fireListener = false;
+    // Tracks read registration to prevent duplicate registrations
+    private boolean registeredForRead = false;
+    // Lock used to manage concurrent access to above flags
+    private final Object nonBlockingStateLock = new Object();
 
     public ReadListener getReadListener() {
         return listener;
@@ -168,24 +184,85 @@ public final class Request {
 
     public void setReadListener(ReadListener listener) {
         if (listener == null) {
-            throw new NullPointerException(
-                    sm.getString("request.nullReadListener"));
+            throw new NullPointerException(sm.getString("request.nullReadListener"));
         }
         if (getReadListener() != null) {
-            throw new IllegalStateException(
-                    sm.getString("request.readListenerSet"));
+            throw new IllegalStateException(sm.getString("request.readListenerSet"));
         }
         // Note: This class is not used for HTTP upgrade so only need to test
-        //       for async
+        // for async
         AtomicBoolean result = new AtomicBoolean(false);
         action(ActionCode.ASYNC_IS_ASYNC, result);
         if (!result.get()) {
-            throw new IllegalStateException(
-                    sm.getString("request.notAsync"));
+            throw new IllegalStateException(sm.getString("request.notAsync"));
         }
 
         this.listener = listener;
+
+        // The container is responsible for the first call to
+        // listener.onDataAvailable(). If isReady() returns true, the container
+        // needs to call listener.onDataAvailable() from a new thread. If
+        // isReady() returns false, the socket will be registered for read and
+        // the container will call listener.onDataAvailable() once data arrives.
+        // Must call isFinished() first as a call to isReady() if the request
+        // has been finished will register the socket for read interest and that
+        // is not required.
+        if (!isFinished() && isReady()) {
+            synchronized (nonBlockingStateLock) {
+                // Ensure we don't get multiple read registrations
+                registeredForRead = true;
+                // Need to set the fireListener flag otherwise when the
+                // container tries to trigger onDataAvailable, nothing will
+                // happen
+                fireListener = true;
+            }
+            action(ActionCode.DISPATCH_READ, null);
+            if (!isRequestThread()) {
+                // Not on a container thread so need to execute the dispatch
+                action(ActionCode.DISPATCH_EXECUTE, null);
+            }
+        }
     }
+
+    public boolean isReady() {
+        // Assume read is not possible
+        boolean ready;
+        synchronized (nonBlockingStateLock) {
+            if (registeredForRead) {
+                fireListener = true;
+                return false;
+            }
+            ready = checkRegisterForRead();
+            fireListener = !ready;
+        }
+        return ready;
+    }
+
+    private boolean checkRegisterForRead() {
+        AtomicBoolean ready = new AtomicBoolean(false);
+        synchronized (nonBlockingStateLock) {
+            if (!registeredForRead) {
+                action(ActionCode.NB_READ_INTEREST, ready);
+                registeredForRead = !ready.get();
+            }
+        }
+        return ready.get();
+    }
+
+    public void onDataAvailable() throws IOException {
+        boolean fire = false;
+        synchronized (nonBlockingStateLock) {
+            registeredForRead = false;
+            if (fireListener) {
+                fireListener = false;
+                fire = true;
+            }
+        }
+        if (fire) {
+            listener.onDataAvailable();
+        }
+    }
+
 
     private final AtomicBoolean allDataReadEventSent = new AtomicBoolean(false);
 
@@ -209,6 +286,11 @@ public final class Request {
 
 
     public Map<String,String> getTrailerFields() {
+        return trailerFields.toMap();
+    }
+
+
+    public MimeHeaders getMimeTrailerFields() {
         return trailerFields;
     }
 
@@ -224,8 +306,16 @@ public final class Request {
         return schemeMB;
     }
 
-    public MessageBytes method() {
-        return methodMB;
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public void setMethod(byte[] buf, int start, int len) {
+        this.method = Method.bytesToString(buf, start, len);
+    }
+
+    public String getMethod() {
+        return method;
     }
 
     public MessageBytes requestURI() {
@@ -245,11 +335,9 @@ public final class Request {
     }
 
     /**
-     * Get the "virtual host", derived from the Host: header associated with
-     * this request.
+     * Get the "virtual host", derived from the Host: header associated with this request.
      *
-     * @return The buffer holding the server name, if any. Use isNull() to check
-     *         if there is no value set.
+     * @return The buffer holding the server name, if any. Use isNull() to check if there is no value set.
      */
     public MessageBytes serverName() {
         return serverNameMB;
@@ -259,12 +347,16 @@ public final class Request {
         return serverPort;
     }
 
-    public void setServerPort(int serverPort ) {
-        this.serverPort=serverPort;
+    public void setServerPort(int serverPort) {
+        this.serverPort = serverPort;
     }
 
     public MessageBytes remoteAddr() {
         return remoteAddrMB;
+    }
+
+    public MessageBytes peerAddr() {
+        return peerAddrMB;
     }
 
     public MessageBytes remoteHost() {
@@ -279,66 +371,39 @@ public final class Request {
         return localAddrMB;
     }
 
-    public int getRemotePort(){
+    public int getRemotePort() {
         return remotePort;
     }
 
-    public void setRemotePort(int port){
+    public void setRemotePort(int port) {
         this.remotePort = port;
     }
 
-    public int getLocalPort(){
+    public int getLocalPort() {
         return localPort;
     }
 
-    public void setLocalPort(int port){
+    public void setLocalPort(int port) {
         this.localPort = port;
     }
 
 
     // -------------------- encoding/type --------------------
 
-    /**
-     * Get the character encoding used for this request.
-     *
-     * @return The value set via {@link #setCharset(Charset)} or if no
-     *         call has been made to that method try to obtain if from the
-     *         content type.
-     */
-    public String getCharacterEncoding() {
-        if (characterEncoding == null) {
-            characterEncoding = getCharsetFromContentType(getContentType());
+    public CharsetHolder getCharsetHolder() {
+        if (charsetHolder == null) {
+            charsetHolder = CharsetHolder.getInstance(getCharsetFromContentType(getContentType()));
         }
-
-        return characterEncoding;
+        return charsetHolder;
     }
 
 
-    /**
-     * Get the character encoding used for this request.
-     *
-     * @return The value set via {@link #setCharset(Charset)} or if no
-     *         call has been made to that method try to obtain if from the
-     *         content type.
-     *
-     * @throws UnsupportedEncodingException If the user agent has specified an
-     *         invalid character encoding
-     */
-    public Charset getCharset() throws UnsupportedEncodingException {
-        if (charset == null) {
-            getCharacterEncoding();
-            if (characterEncoding != null) {
-                charset = B2CConverter.getCharset(characterEncoding);
-            }
-         }
-
-        return charset;
-    }
-
-
-    public void setCharset(Charset charset) {
-        this.charset = charset;
-        this.characterEncoding = charset.name();
+    public void setCharsetHolder(CharsetHolder charsetHolder) {
+        if (charsetHolder == null || charsetHolder.getName() == null) {
+            this.charsetHolder = null;
+        } else {
+            this.charsetHolder = charsetHolder;
+        }
     }
 
 
@@ -357,7 +422,7 @@ public final class Request {
     }
 
     public long getContentLengthLong() {
-        if( contentLength > -1 ) {
+        if (contentLength > -1) {
             return contentLength;
         }
 
@@ -369,10 +434,10 @@ public final class Request {
 
     public String getContentType() {
         contentType();
-        if ((contentTypeMB == null) || contentTypeMB.isNull()) {
+        if (contentTypeMB == null || contentTypeMB.isNull()) {
             return null;
         }
-        return contentTypeMB.toString();
+        return contentTypeMB.toStringType();
     }
 
 
@@ -390,7 +455,7 @@ public final class Request {
 
 
     public void setContentType(MessageBytes mb) {
-        contentTypeMB=mb;
+        contentTypeMB = mb;
     }
 
 
@@ -420,17 +485,13 @@ public final class Request {
         response.setRequest(this);
     }
 
-    protected void setHook(ActionHook hook) {
+    void setHook(ActionHook hook) {
         this.hook = hook;
     }
 
     public void action(ActionCode actionCode, Object param) {
         if (hook != null) {
-            if (param == null) {
-                hook.action(actionCode, this);
-            } else {
-                hook.action(actionCode, param);
-            }
+            hook.action(actionCode, Objects.requireNonNullElse(param, this));
         }
     }
 
@@ -461,15 +522,15 @@ public final class Request {
     // -------------------- Other attributes --------------------
     // We can use notes for most - need to discuss what is of general interest
 
-    public void setAttribute( String name, Object o ) {
-        attributes.put( name, o );
+    public void setAttribute(String name, Object o) {
+        attributes.put(name, o);
     }
 
     public HashMap<String,Object> getAttributes() {
         return attributes;
     }
 
-    public Object getAttribute(String name ) {
+    public Object getAttribute(String name) {
         return attributes.get(name);
     }
 
@@ -512,10 +573,7 @@ public final class Request {
     }
 
     public boolean getSupportsRelativeRedirects() {
-        if (protocol().equals("") || protocol().equals("HTTP/1.0")) {
-            return false;
-        }
-        return true;
+        return !protocol().equals("") && !protocol().equals("HTTP/1.0");
     }
 
 
@@ -532,14 +590,10 @@ public final class Request {
 
 
     /**
-     * Read data from the input buffer and put it into ApplicationBufferHandler.
-     *
-     * The buffer is owned by the protocol implementation - it will be reused on
-     * the next read. The Adapter must either process the data in place or copy
-     * it to a separate buffer if it needs to hold it. In most cases this is
-     * done during byte-&gt;char conversions or via InputStream. Unlike
-     * InputStream, this interface allows the app to process data in place,
-     * without copy.
+     * Read data from the input buffer and put it into ApplicationBufferHandler. The buffer is owned by the protocol
+     * implementation - it will be reused on the next read. The Adapter must either process the data in place or copy it
+     * to a separate buffer if it needs to hold it. In most cases this is done during byte-&gt;char conversions or via
+     * InputStream. Unlike InputStream, this interface allows the app to process data in place, without copy.
      *
      * @param handler The destination to which to copy the data
      *
@@ -548,15 +602,65 @@ public final class Request {
      * @throws IOException If an I/O error occurs during the copy
      */
     public int doRead(ApplicationBufferHandler handler) throws IOException {
+        if (getBytesRead() == 0 && !response.isCommitted()) {
+            action(ActionCode.ACK, ContinueResponseTiming.ON_REQUEST_BODY_READ);
+        }
+
         int n = inputBuffer.doRead(handler);
         if (n > 0) {
-            bytesRead+=n;
+            bytesRead += n;
         }
         return n;
     }
 
 
+    // -------------------- Error tracking --------------------
+
+    /**
+     * Set the error Exception that occurred during the writing of the response processing.
+     *
+     * @param ex The exception that occurred
+     */
+    public void setErrorException(Exception ex) {
+        errorException = ex;
+    }
+
+
+    /**
+     * Get the Exception that occurred during the writing of the response.
+     *
+     * @return The exception that occurred
+     */
+    public Exception getErrorException() {
+        return errorException;
+    }
+
+
+    public boolean isExceptionPresent() {
+        return errorException != null;
+    }
+
+
     // -------------------- debug --------------------
+
+    public String getRequestId() {
+        return requestId;
+    }
+
+
+    public String getProtocolRequestId() {
+        AtomicReference<String> ref = new AtomicReference<>();
+        hook.action(ActionCode.PROTOCOL_REQUEST_ID, ref);
+        return ref.get();
+    }
+
+
+    public ServletConnection getServletConnection() {
+        AtomicReference<ServletConnection> ref = new AtomicReference<>();
+        hook.action(ActionCode.SERVLET_CONNECTION, ref);
+        return ref.get();
+    }
+
 
     @Override
     public String toString() {
@@ -564,40 +668,61 @@ public final class Request {
     }
 
     public long getStartTime() {
-        return startTime;
+        return System.currentTimeMillis() - TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTimeNanos);
     }
 
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
+    public long getStartTimeNanos() {
+        return startTimeNanos;
+    }
+
+    public void markStartTime() {
+        startTimeNanos = System.nanoTime();
+        startInstant = Instant.now();
+    }
+
+    public Instant getStartInstant() {
+        return startInstant;
+    }
+
+    public long getThreadId() {
+        return threadId;
+    }
+
+    public void clearRequestThread() {
+        threadId = 0;
+    }
+
+    @SuppressWarnings("deprecation")
+    public void setRequestThread() {
+        Thread t = Thread.currentThread();
+        threadId = t.getId();
+        getRequestProcessor().setWorkerThreadName(t.getName());
+    }
+
+    @SuppressWarnings("deprecation")
+    public boolean isRequestThread() {
+        return Thread.currentThread().getId() == threadId;
     }
 
     // -------------------- Per-Request "notes" --------------------
 
 
     /**
-     * Used to store private data. Thread data could be used instead - but
-     * if you have the req, getting/setting a note is just an array access, may
-     * be faster than ThreadLocal for very frequent operations.
+     * Used to store private data. Thread data could be used instead - but if you have the req, getting/setting a note
+     * is just an array access, may be faster than ThreadLocal for very frequent operations. Example use: Catalina
+     * CoyoteAdapter: ADAPTER_NOTES = 1 - stores the HttpServletRequest object ( req/res) To avoid conflicts, note in
+     * the range 0 - 8 are reserved for the servlet container ( catalina connector, etc ), and values in 9 - 16 for
+     * connector use. 17-31 range is not allocated or used.
      *
-     *  Example use:
-     *   Catalina CoyoteAdapter:
-     *      ADAPTER_NOTES = 1 - stores the HttpServletRequest object ( req/res)
-     *
-     *   To avoid conflicts, note in the range 0 - 8 are reserved for the
-     *   servlet container ( catalina connector, etc ), and values in 9 - 16
-     *   for connector use.
-     *
-     *   17-31 range is not allocated or used.
-     *
-     * @param pos Index to use to store the note
+     * @param pos   Index to use to store the note
      * @param value The value to store at that index
      */
-    public final void setNote(int pos, Object value) {
+    public void setNote(int pos, Object value) {
         notes[pos] = value;
     }
 
 
-    public final Object getNote(int pos) {
+    public Object getNote(int pos) {
         return notes[pos];
     }
 
@@ -606,25 +731,39 @@ public final class Request {
 
 
     public void recycle() {
-        bytesRead=0;
+        bytesRead = 0;
 
         contentLength = -1;
         contentTypeMB = null;
-        charset = null;
-        characterEncoding = null;
+        charsetHolder = null;
         expectation = false;
         headers.recycle();
-        trailerFields.clear();
+        trailerFields.recycle();
+        /*
+         * Trailer fields are limited in size by bytes. The following call ensures that any request with a large number
+         * of small trailer fields doesn't result in a long lasting, large array of headers inside the MimeHeader
+         * instance.
+         */
+        trailerFields.setLimit(MimeHeaders.DEFAULT_HEADER_SIZE);
         serverNameMB.recycle();
-        serverPort=-1;
+        serverPort = -1;
         localAddrMB.recycle();
         localNameMB.recycle();
         localPort = -1;
+        peerAddrMB.recycle();
         remoteAddrMB.recycle();
         remoteHostMB.recycle();
         remotePort = -1;
         available = 0;
         sendfile = true;
+
+        // There may be multiple calls to recycle but only the first should
+        // trigger a change in the request ID until a new request has been
+        // started. Use startTimeNanos to detect when a request has started so a
+        // subsequent call to recycle() will trigger a change in the request ID.
+        if (startTimeNanos != -1) {
+            requestId = Long.toHexString(requestIdGenerator.getAndIncrement());
+        }
 
         serverCookies.recycle();
         parameters.recycle();
@@ -633,7 +772,7 @@ public final class Request {
         uriMB.recycle();
         decodedUriMB.recycle();
         queryMB.recycle();
-        methodMB.recycle();
+        method = null;
         protoMB.recycle();
 
         schemeMB.recycle();
@@ -643,13 +782,30 @@ public final class Request {
         authType.recycle();
         attributes.clear();
 
+        errorException = null;
+
         listener = null;
+        synchronized (nonBlockingStateLock) {
+            fireListener = false;
+            registeredForRead = false;
+        }
         allDataReadEventSent.set(false);
 
-        startTime = -1;
+        startTimeNanos = -1;
+        startInstant = null;
+        threadId = 0;
+
+        if (hook instanceof NonPipeliningProcessor) {
+            /*
+             * No requirement to maintain state between requests so clear the hook (a.k.a. Processor) and the input
+             * buffer to aid GC.
+             */
+            setHook(null);
+            setInputBuffer(null);
+        }
     }
 
-    // -------------------- Info  --------------------
+    // -------------------- Info --------------------
     public void updateCounters() {
         reqProcessorMX.updateCounters();
     }
@@ -663,13 +819,12 @@ public final class Request {
     }
 
     public boolean isProcessing() {
-        return reqProcessorMX.getStage()==org.apache.coyote.Constants.STAGE_SERVICE;
+        return reqProcessorMX.getStage() == Constants.STAGE_SERVICE;
     }
 
     /**
-     * Parse the character encoding from the specified content type header.
-     * If the content type is null, or there is no explicit character encoding,
-     * <code>null</code> is returned.
+     * Parse the character encoding from the specified content type header. If the content type is null, or there is no
+     * explicit character encoding, <code>null</code> is returned.
      *
      * @param contentType a content type header
      */
@@ -678,21 +833,17 @@ public final class Request {
         if (contentType == null) {
             return null;
         }
-        int start = contentType.indexOf("charset=");
-        if (start < 0) {
-            return null;
+
+        MediaType mediaType = null;
+        try {
+            mediaType = MediaType.parseMediaType(new StringReader(contentType));
+        } catch (IOException ioe) {
+            // Ignore - null test below handles this
         }
-        String encoding = contentType.substring(start + 8);
-        int end = encoding.indexOf(';');
-        if (end >= 0) {
-            encoding = encoding.substring(0, end);
-        }
-        encoding = encoding.trim();
-        if ((encoding.length() > 2) && (encoding.startsWith("\""))
-            && (encoding.endsWith("\""))) {
-            encoding = encoding.substring(1, encoding.length() - 1);
+        if (mediaType != null) {
+            return mediaType.getCharset();
         }
 
-        return encoding.trim();
+        return null;
     }
 }

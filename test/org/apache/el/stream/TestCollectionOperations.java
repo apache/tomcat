@@ -20,8 +20,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.el.ELException;
-import javax.el.ELProcessor;
+import jakarta.el.ELBaseTest;
+import jakarta.el.ELException;
+import jakarta.el.ELProcessor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -29,7 +30,7 @@ import org.junit.Test;
 import org.apache.el.TesterBeanA;
 import org.apache.el.lang.ELSupport;
 
-public class TestCollectionOperations {
+public class TestCollectionOperations extends ELBaseTest {
 
     private static final TesterBeanA bean01 = new TesterBeanA();
     private static final TesterBeanA bean02 = new TesterBeanA();
@@ -122,8 +123,6 @@ public class TestCollectionOperations {
         Object result = processor.getValue(
                 "beans.stream().filter(b->b.valLong > 1).map(b->[b.name, b.valLong]).toList()",
                 List.class);
-
-        Assert.assertTrue(result instanceof List);
 
         @SuppressWarnings("unchecked")
         List<List<Object>> list = (List<List<Object>>) result;

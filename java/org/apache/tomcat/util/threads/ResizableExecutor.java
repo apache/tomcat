@@ -25,20 +25,19 @@ public interface ResizableExecutor extends Executor {
      *
      * @return the number of threads
      */
-    public int getPoolSize();
+    int getPoolSize();
 
-    public int getMaxThreads();
+    int getMaxThreads();
 
     /**
-     * Returns the approximate number of threads that are actively executing
-     * tasks.
+     * Returns the approximate number of threads that are actively executing tasks.
      *
      * @return the number of threads
      */
-    public int getActiveCount();
+    int getActiveCount();
 
-    public boolean resizePool(int corePoolSize, int maximumPoolSize);
+    boolean resizePool(int corePoolSize, int maximumPoolSize);
 
-    public boolean resizeQueue(int capacity);
+    boolean resizeQueue(int capacity);
 
 }

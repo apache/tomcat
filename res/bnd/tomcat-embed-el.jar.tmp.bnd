@@ -12,12 +12,52 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.q
-Automatic-Module-Name: org.apache.tomcat.embed.jasper.el
+
+-include: build-defaults.bnd
+
 Bundle-Name: tomcat-embed-jasper-el
 Bundle-SymbolicName: org.apache.tomcat-embed-jasper-el
-Bundle-Version: @VERSION@
 Export-Package: \
-    javax.el,\
+    jakarta.el;version=${el.spec.version},\
     org.apache.el,\
     org.apache.el.lang,\
     org.apache.el.parser
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
+
+-includepackage: \
+    org.apache.el.stream,\
+    org.apache.el.util
+
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/jasper-el.jar/
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JakartaExpressionLanguage;\
+        version:Version=${el.spec.version};\
+        uses:='${packages;NAMED;jakarta.el.*}'
+
+Require-Capability: \
+    osgi.extender;\
+        filter:="(&(osgi.extender=osgi.serviceloader.processor)(version>=1.0.0)(!(version>=2.0.0)))",\
+    osgi.serviceloader;\
+        filter:="(osgi.serviceloader=jakarta.el.ExpressionFactory)";\
+        osgi.serviceloader="jakarta.el.ExpressionFactory",\
+    osgi.ee;\
+        filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+
+-namesection: jakarta/el*/;\
+    Specification-Title=Jakarta Expression Language;\
+    Specification-Version=${el.spec.version};\
+    Specification-Vendor=Eclipse Foundation;\
+    Implementation-Title=jakarta.annotation;\
+    Implementation-Version=${el.spec.version}${el.revision};\
+    Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    org.apache.tomcat.embed.el;\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    org.apache.tomcat.embed.el;\
+        substitute=tomcat-embed-el

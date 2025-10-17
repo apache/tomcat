@@ -85,11 +85,17 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     public void setProperties(Map<String, InterceptorProperty> properties) {
         super.setProperties(properties);
         InterceptorProperty p = properties.get("prepared");
-        if (p!=null) cachePrepared = p.getValueAsBoolean(cachePrepared);
+        if (p!=null) {
+            cachePrepared = p.getValueAsBoolean(cachePrepared);
+        }
         p = properties.get("callable");
-        if (p!=null) cacheCallable = p.getValueAsBoolean(cacheCallable);
+        if (p!=null) {
+            cacheCallable = p.getValueAsBoolean(cacheCallable);
+        }
         p = properties.get("max");
-        if (p!=null) maxCacheSize = p.getValueAsInt(maxCacheSize);
+        if (p!=null) {
+            maxCacheSize = p.getValueAsInt(maxCacheSize);
+        }
         if (cachePrepared && cacheCallable) {
             this.types = ALL_TYPES;
         } else if (cachePrepared) {
@@ -105,7 +111,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
     /*begin the cache size*/
     private static ConcurrentHashMap<ConnectionPool,AtomicInteger> cacheSizeMap =
-        new ConcurrentHashMap<>();
+            new ConcurrentHashMap<>();
 
     private AtomicInteger cacheSize;
 
@@ -152,7 +158,7 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     public void disconnected(ConnectionPool parent, PooledConnection con, boolean finalizing) {
         @SuppressWarnings("unchecked")
         ConcurrentHashMap<CacheKey,CachedStatement> statements =
-            (ConcurrentHashMap<CacheKey,CachedStatement>)con.getAttributes().get(STATEMENT_CACHE_ATTR);
+                (ConcurrentHashMap<CacheKey,CachedStatement>)con.getAttributes().get(STATEMENT_CACHE_ATTR);
 
         if (statements!=null) {
             for (Map.Entry<CacheKey, CachedStatement> p : statements.entrySet()) {
@@ -165,14 +171,16 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     }
 
     public void closeStatement(CachedStatement st) {
-        if (st==null) return;
+        if (st==null) {
+            return;
+        }
         st.forceClose();
     }
 
     @Override
     protected Object createDecorator(Object proxy, Method method, Object[] args,
                                      Object statement, Constructor<?> constructor, String sql)
-    throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        throws InstantiationException, IllegalAccessException, InvocationTargetException {
         boolean process = process(this.types, method, false);
         if (process) {
             Object result = null;
@@ -207,13 +215,21 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
     public CachedStatement isCached(Method method, Object[] args) {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
-        if (cache == null) return null;
-        return cache.get(createCacheKey(method, args));
+        if (cache == null) {
+            return null;
+        }
+        CacheKey key = createCacheKey(method, args);
+        if (key == null) {
+            throw new IllegalArgumentException("Null key");
+        }
+        return cache.get(key);
     }
 
     public boolean cacheStatement(CachedStatement proxy) {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
-        if (cache == null) return false;
+        if (cache == null) {
+            return false;
+        }
         if (proxy.getCacheKey()==null) {
             return false;
         } else if (cache.containsKey(proxy.getCacheKey())) {
@@ -232,7 +248,9 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
     public boolean removeStatement(CachedStatement proxy) {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
-        if (cache == null) return false;
+        if (cache == null) {
+            return false;
+        }
         if (cache.remove(proxy.getCacheKey()) != null) {
             cacheSize.decrementAndGet();
             return true;
@@ -245,7 +263,9 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     protected ConcurrentHashMap<CacheKey,CachedStatement> getCache() {
         PooledConnection pCon = this.pcon;
         if (pCon == null) {
-            if (log.isWarnEnabled()) log.warn("Connection has already been closed or abandoned");
+            if (log.isWarnEnabled()) {
+                log.warn("Connection has already been closed or abandoned");
+            }
             return null;
         }
         @SuppressWarnings("unchecked")
@@ -257,7 +277,9 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
     @Override
     public int getCacheSizePerConnection() {
         ConcurrentHashMap<CacheKey,CachedStatement> cache = getCache();
-        if (cache == null) return 0;
+        if (cache == null) {
+            return 0;
+        }
         return cache.size();
     }
 
@@ -354,20 +376,26 @@ public class StatementCache extends StatementDecoratorInterceptor implements Sta
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             CacheKey other = (CacheKey) obj;
-            if (!Arrays.deepEquals(args, other.args))
+            if (!Arrays.deepEquals(args, other.args)) {
                 return false;
+            }
             if (stmtType == null) {
-                if (other.stmtType != null)
+                if (other.stmtType != null) {
                     return false;
-            } else if (!stmtType.equals(other.stmtType))
+                }
+            } else if (!stmtType.equals(other.stmtType)) {
                 return false;
+            }
             return true;
         }
     }

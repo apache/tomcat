@@ -24,10 +24,10 @@ import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,7 +48,6 @@ public class TestInputBuffer extends TomcatBaseTest {
         Tomcat.addServlet(root, "Echo", new Utf8Echo());
         root.addServletMappingDecoded("/test", "Echo");
 
-        tomcat.getConnector().setProperty("soTimeout", "300000");
         tomcat.start();
 
         for (Utf8TestCase testCase : TestUtf8.TEST_CASES) {
@@ -68,7 +67,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         Tomcat.addServlet(root, "Bug60400Servlet", new Bug60400Servlet());
         root.addServletMappingDecoded("/", "Bug60400Servlet");
 
-        tomcat.getConnector().setProperty("appReadBufSize", "9000");
+        Assert.assertTrue(tomcat.getConnector().setProperty("socket.appReadBufSize", "9000"));
         tomcat.start();
 
         ByteChunk bc = new ByteChunk();
@@ -80,8 +79,7 @@ public class TestInputBuffer extends TomcatBaseTest {
     }
 
 
-    private void doUtf8BodyTest(String description, int[] input,
-            String expected) throws Exception {
+    private void doUtf8BodyTest(String description, int[] input, String expected) throws Exception {
 
         byte[] bytes = new byte[input.length];
         for (int i = 0; i < input.length; i++) {
@@ -89,8 +87,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         }
 
         ByteChunk bc = new ByteChunk();
-        int rc = postUrl(bytes, "http://localhost:" + getPort() + "/test", bc,
-                null);
+        int rc = postUrl(bytes, "http://localhost:" + getPort() + "/test", bc, null);
 
         if (expected == null) {
             Assert.assertEquals(description, HttpServletResponse.SC_OK, rc);
@@ -109,15 +106,13 @@ public class TestInputBuffer extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             // Should use POST
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         }
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             req.setCharacterEncoding("UTF-8");
             Reader r = req.getReader();
 
@@ -146,8 +141,7 @@ public class TestInputBuffer extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             StringBuilder builder = new StringBuilder();
             try (BufferedReader reader = req.getReader()) {
                 String line;

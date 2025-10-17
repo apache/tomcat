@@ -20,6 +20,8 @@ import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -29,6 +31,9 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,7 +42,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.naming.NameParserImpl;
 import org.apache.tomcat.unittest.TesterContext;
-import org.apache.tomcat.util.security.MD5Encoder;
+import org.apache.tomcat.util.buf.HexUtils;
 import org.easymock.EasyMock;
 
 public class TestJNDIRealm {
@@ -49,7 +54,8 @@ public class TestJNDIRealm {
     private static final String REALM = "test-realm";
 
     private static final String NONCE = "test-nonce";
-    private static final String HA2 = "test-md5a2";
+    // Not digested but doesn't matter for the purposes of the test
+    private static final String DIGEST_A2 = "method:request-uri";
     public static final String USER_PASSWORD_ATTR = "test-pwd";
 
     private static MessageDigest md5Helper;
@@ -66,9 +72,9 @@ public class TestJNDIRealm {
 
         // WHEN
         String expectedResponse =
-                MD5Encoder.encode(md5Helper.digest((ha1() + ":" + NONCE + ":" + HA2).getBytes()));
+                HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + DIGEST_A2).getBytes()));
         Principal principal =
-                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
+                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2, ALGORITHM);
 
         // THEN
         Assert.assertNull(principal);
@@ -82,44 +88,65 @@ public class TestJNDIRealm {
 
         // WHEN
         String expectedResponse =
-                MD5Encoder.encode(md5Helper.digest((ha1() + ":" + NONCE + ":" + HA2).getBytes()));
+                HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + DIGEST_A2).getBytes()));
         Principal principal =
-                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
+                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2, ALGORITHM);
 
         // THEN
-        Assert.assertTrue(principal instanceof GenericPrincipal);
-        Assert.assertEquals(PASSWORD, ((GenericPrincipal)principal).getPassword());
+        assertThat(principal, instanceOf(GenericPrincipal.class));
+        Assert.assertEquals(USER, principal.getName());
     }
 
     @Test
     public void testAuthenticateWithUserPasswordAndCredentialHandler() throws Exception {
         // GIVEN
-        JNDIRealm realm = buildRealm(ha1());
+        JNDIRealm realm = buildRealm(digestA1());
         realm.setCredentialHandler(buildCredentialHandler());
         realm.setUserPassword(USER_PASSWORD_ATTR);
 
         // WHEN
         String expectedResponse =
-                MD5Encoder.encode(md5Helper.digest((ha1() + ":" + NONCE + ":" + HA2).getBytes()));
+                HexUtils.toHexString(md5Helper.digest((digestA1() + ":" + NONCE + ":" + DIGEST_A2).getBytes()));
         Principal principal =
-                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, HA2);
+                realm.authenticate(USER, expectedResponse, NONCE, null, null, null, REALM, DIGEST_A2, ALGORITHM);
 
         // THEN
-        Assert.assertTrue(principal instanceof GenericPrincipal);
-        Assert.assertEquals(ha1(), ((GenericPrincipal)principal).getPassword());
+        assertThat(principal, instanceOf(GenericPrincipal.class));
+        Assert.assertEquals(USER, principal.getName());
+    }
+
+    @Test
+    public void testErrorRealm() throws Exception {
+        Context context = new TesterContext();
+        JNDIRealm realm = new JNDIRealm();
+        realm.setContainer(context);
+        realm.setUserSearch("");
+        // Connect to something that will fail
+        realm.setConnectionURL("ldap://127.0.0.1:12345");
+        realm.start();
+
+        final CountDownLatch latch = new CountDownLatch(3);
+        (new Thread(() -> { realm.authenticate("foo", "bar"); latch.countDown(); })).start();
+        (new Thread(() -> { realm.authenticate("foo", "bar"); latch.countDown(); })).start();
+        (new Thread(() -> { realm.authenticate("foo", "bar"); latch.countDown(); })).start();
+
+        Assert.assertTrue(latch.await(30, TimeUnit.SECONDS));
     }
 
 
-    private JNDIRealm buildRealm(String password) throws javax.naming.NamingException,
+    private JNDIRealm buildRealm(String password) throws NamingException,
             NoSuchFieldException, IllegalAccessException, LifecycleException {
         Context context = new TesterContext();
         JNDIRealm realm = new JNDIRealm();
         realm.setContainer(context);
         realm.setUserSearch("");
 
-        Field field = JNDIRealm.class.getDeclaredField("context");
+        // Usually everything is created in create() but that's not the case here
+        Field field = JNDIRealm.class.getDeclaredField("singleConnection");
         field.setAccessible(true);
-        field.set(realm, mockDirContext(mockSearchResults(password)));
+        Field field2 = JNDIRealm.JNDIConnection.class.getDeclaredField("context");
+        field2.setAccessible(true);
+        field2.set(field.get(realm), mockDirContext(mockSearchResults(password)));
 
         realm.start();
 
@@ -135,7 +162,6 @@ public class TestJNDIRealm {
 
     private NamingEnumeration<SearchResult> mockSearchResults(String password)
             throws NamingException {
-        @SuppressWarnings("unchecked")
         NamingEnumeration<SearchResult> searchResults =
                 EasyMock.createNiceMock(NamingEnumeration.class);
         EasyMock.expect(Boolean.valueOf(searchResults.hasMore()))
@@ -167,8 +193,8 @@ public class TestJNDIRealm {
         return dirContext;
     }
 
-    private String ha1() {
+    private String digestA1() {
         String a1 = USER + ":" + REALM + ":" + PASSWORD;
-        return MD5Encoder.encode(md5Helper.digest(a1.getBytes()));
+        return HexUtils.toHexString(md5Helper.digest(a1.getBytes()));
     }
 }

@@ -16,36 +16,59 @@
  */
 package org.apache.tomcat.websocket;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import javax.websocket.Extension;
-
-import org.apache.tomcat.util.res.StringManager;
+import jakarta.websocket.Extension;
 
 public class TransformationFactory {
 
-    private static final StringManager sm = StringManager.getManager(TransformationFactory.class);
-
     private static final TransformationFactory factory = new TransformationFactory();
+
+    private Map<String,TransformationBuilder> builders = new HashMap<>();
+
 
     private TransformationFactory() {
         // Hide default constructor
+
+        // Configure the built-in transformations
+        builders.put(PerMessageDeflate.NAME, PerMessageDeflate.BUILDER);
     }
+
 
     public static TransformationFactory getInstance() {
         return factory;
     }
 
-    public Transformation create(String name, List<List<Extension.Parameter>> preferences,
-            boolean isServer) {
-        if (PerMessageDeflate.NAME.equals(name)) {
-            return PerMessageDeflate.negotiate(preferences, isServer);
+
+    public Transformation create(String name, List<List<Extension.Parameter>> preferences, boolean isServer) {
+        TransformationBuilder builder = builders.get(name);
+        if (builder != null) {
+            return builder.build(preferences, isServer);
         }
-        if (Constants.ALLOW_UNSUPPORTED_EXTENSIONS) {
-            return null;
-        } else {
-            throw new IllegalArgumentException(
-                    sm.getString("transformerFactory.unsupportedExtension", name));
+        return null;
+    }
+
+
+    public void registerExtension(String name, TransformationBuilder builder) {
+        builders.put(name, builder);
+    }
+
+
+    public Set<String> getInstalledExtensionNames() {
+        return new HashSet<>(builders.keySet());
+    }
+
+
+    public Set<Extension> getInstalledExtensions() {
+        Set<Extension> result = new HashSet<>();
+        for (String extensionName : builders.keySet()) {
+            result.add(new WsExtension(extensionName));
         }
+        return Collections.unmodifiableSet(result);
     }
 }

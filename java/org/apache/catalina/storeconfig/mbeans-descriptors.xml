@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean         name="StoreConfig"
@@ -23,16 +26,17 @@
                domain="Catalina"
                 group="StoreConfig"
                  type="org.apache.catalina.storeconfig.StoreConfig">
+
     <operation name="storeConfig"
                description="Store Server"
                impact="ACTION" returnType="void" />
+
     <operation name="storeServer"
                description="Store Server from ObjectName"
                impact="ACTION" returnType="void" >
          <parameter name="objectname"
                  description="Objectname from Server"
-                 type="java.lang.String"
-                 default="Catalina:type=Server"/>
+                 type="java.lang.String"/>
          <parameter name="backup"
                  description="store Context with backup"
                  type="boolean"/>
@@ -57,6 +61,7 @@
                  description="store all or store only internal server.xml context (configFile == null)"
                  type="boolean"/>
     </operation>
+
     <operation name="store"
                description="Store Server"
                impact="ACTION" returnType="void" >
@@ -65,26 +70,13 @@
                  type="org.apache.catalina.Server"
                  />
     </operation>
+
     <operation name="store"
                description="Store Context"
                impact="ACTION" returnType="void" >
           <parameter name="context"
                  description="Context"
-                 type="org.apache.catalina.context"/>
-    </operation>
-    <operation name="store"
-               description="Store Host"
-               impact="ACTION" returnType="void" >
-          <parameter name="host"
-                 description="Host"
-                 type="org.apache.catalina.Host"/>
-    </operation>
-    <operation name="store"
-               description="Store Service"
-               impact="ACTION" returnType="void" >
-          <parameter name="service"
-                 description="service"
-                 type="org.apache.catalina.Service"/>
+                 type="org.apache.catalina.Context"/>
     </operation>
 
   </mbean>

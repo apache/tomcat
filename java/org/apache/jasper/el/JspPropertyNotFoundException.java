@@ -16,11 +16,13 @@
  */
 package org.apache.jasper.el;
 
-import javax.el.PropertyNotFoundException;
+import java.io.Serial;
 
-public final class JspPropertyNotFoundException extends
-        PropertyNotFoundException {
+import jakarta.el.PropertyNotFoundException;
 
+public final class JspPropertyNotFoundException extends PropertyNotFoundException {
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public JspPropertyNotFoundException(String mark, PropertyNotFoundException e) {

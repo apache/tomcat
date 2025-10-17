@@ -39,7 +39,7 @@ maven.asf.release.repo.url=https://repository.apache.org/service/local/staging/d
 maven.asf.release.repo.repositoryId=apache.releases.https
 
 # Release version info
-maven.asf.release.deploy.version=9.0.31
+maven.asf.release.deploy.version=12.0.0-M1
 
 #Where do we load the libraries from
 tomcat.lib.path=../../output/build/lib
@@ -59,7 +59,7 @@ tomcat.pom.path=../../res/maven
 base.path=${user.home}/tomcat-build-libs
 
 # ----- Maven Ant Tasks -----
-maven-ant-tasks.version=2.1.3
-maven-ant-tasks.home=${base.path}/maven-ant-tasks-${maven-ant-tasks.version}
-maven-ant-tasks.loc=https://archive.apache.org/dist/maven/ant-tasks/${maven-ant-tasks.version}/binaries/maven-ant-tasks-${maven-ant-tasks.version}.jar
-maven-ant-tasks.jar=${maven-ant-tasks.home}/maven-ant-tasks-${maven-ant-tasks.version}.jar
+maven-resolver-ant-tasks.version=1.3.0
+maven-resolver-ant-tasks.home=${base.path}/maven-resolver-ant-tasks-${maven-resolver-ant-tasks.version}
+maven-resolver-ant-tasks.loc=https://repo1.maven.org/maven2/org/apache/maven/resolver/maven-resolver-ant-tasks/${maven-resolver-ant-tasks.version}/maven-resolver-ant-tasks-${maven-resolver-ant-tasks.version}-uber.jar
+maven-resolver-ant-tasks.jar=${maven-resolver-ant-tasks.home}/maven-resolver-ant-tasks-${maven-resolver-ant-tasks.version}-uber.jar

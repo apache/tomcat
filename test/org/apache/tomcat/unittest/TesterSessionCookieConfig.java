@@ -16,7 +16,9 @@
  */
 package org.apache.tomcat.unittest;
 
-import javax.servlet.SessionCookieConfig;
+import java.util.Map;
+
+import jakarta.servlet.SessionCookieConfig;
 
 public class TesterSessionCookieConfig implements SessionCookieConfig {
 
@@ -88,6 +90,21 @@ public class TesterSessionCookieConfig implements SessionCookieConfig {
 
     @Override
     public int getMaxAge() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void setAttribute(String name, String value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getAttribute(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
         throw new UnsupportedOperationException();
     }
 }

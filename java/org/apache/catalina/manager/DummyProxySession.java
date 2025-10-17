@@ -19,7 +19,7 @@ package org.apache.catalina.manager;
 import java.security.Principal;
 import java.util.Iterator;
 
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
 
 import org.apache.catalina.Manager;
 import org.apache.catalina.Session;
@@ -96,6 +96,11 @@ public class DummyProxySession implements Session {
     @Override
     public long getIdleTimeInternal() {
         return 0;
+    }
+
+    @Override
+    public boolean isNew() {
+        return false;
     }
 
     @Override
@@ -210,8 +215,8 @@ public class DummyProxySession implements Session {
     }
 
     @Override
-    public void tellChangedSessionId(String newId, String oldId,
-            boolean notifySessionListeners, boolean notifyContainerListeners) {
+    public void tellChangedSessionId(String newId, String oldId, boolean notifySessionListeners,
+            boolean notifyContainerListeners) {
         // NOOP
     }
 

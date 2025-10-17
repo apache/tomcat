@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-import javax.servlet.SessionTrackingMode;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.SessionTrackingMode;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Request;
@@ -44,7 +44,7 @@ public class TesterRequest extends Request {
 
 
     public TesterRequest(boolean withSession) {
-        super(null);
+        super(null, null);
         context = new TesterContext();
         servletContext = new TesterServletContext();
         context.setServletContext(servletContext);
@@ -111,12 +111,7 @@ public class TesterRequest extends Request {
 
     private final Map<String,List<String>> headers = new HashMap<>();
     public void addHeader(String name, String value) {
-        List<String> values = headers.get(name);
-        if (values == null) {
-            values = new ArrayList<>();
-            headers.put(name, values);
-        }
-        values.add(value);
+        headers.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
     }
     @Override
     public String getHeader(String name) {

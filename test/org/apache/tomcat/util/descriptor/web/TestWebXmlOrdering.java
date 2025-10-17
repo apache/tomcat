@@ -16,6 +16,8 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -203,8 +205,7 @@ public class TestWebXmlOrdering {
                         for (int m = 0; m < 2; m++) {
                             setUp();
                             runner.init();
-                            ArrayList<WebXml> source = new ArrayList<>();
-                            source.addAll(fragments.values());
+                            ArrayList<WebXml> source = new ArrayList<>(fragments.values());
                             Map<String,WebXml> input =
                                     new LinkedHashMap<>();
 
@@ -255,8 +256,7 @@ public class TestWebXmlOrdering {
     }
 
     private void populatePositions(Set<WebXml> ordered) {
-        List<WebXml> indexed = new ArrayList<>();
-        indexed.addAll(ordered);
+        List<WebXml> indexed = new ArrayList<>(ordered);
 
         posA = indexed.indexOf(a);
         posB = indexed.indexOf(b);
@@ -348,6 +348,18 @@ public class TestWebXmlOrdering {
         c.addAfterOrdering("b");
 
         WebXml.orderWebFragments(app, fragments, null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testOrderWebFragmentsRelativeDuplicate() throws MalformedURLException {
+        WebXml withDuplicate = new WebXml();
+        withDuplicate.setURL(URI.create("https://example.com/original.jar").toURL());
+        withDuplicate.addDuplicate("https://example.com/duplicate.jar");
+
+        Map<String,WebXml> fragmentsWithDuplicate = new LinkedHashMap<>();
+        fragmentsWithDuplicate.put("has-duplicate", withDuplicate);
+
+        WebXml.orderWebFragments(app, fragmentsWithDuplicate, null);
     }
 
     private interface RelativeOrderingTestRunner {

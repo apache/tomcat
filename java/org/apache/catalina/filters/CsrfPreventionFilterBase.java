@@ -19,10 +19,10 @@ package org.apache.catalina.filters;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterConfig;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -52,22 +52,19 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
     }
 
     /**
-     * Set response status code that is used to reject denied request. If none
-     * set, the default value of 403 will be used.
+     * Set response status code that is used to reject denied request. If none set, the default value of 403 will be
+     * used.
      *
-     * @param denyStatus
-     *            HTTP status code
+     * @param denyStatus HTTP status code
      */
     public void setDenyStatus(int denyStatus) {
         this.denyStatus = denyStatus;
     }
 
     /**
-     * Specify the class to use to generate the nonces. Must be in instance of
-     * {@link Random}.
+     * Specify the class to use to generate the nonces. Must be in instance of {@link Random}.
      *
-     * @param randomClass
-     *            The name of the class to use
+     * @param randomClass The name of the class to use
      */
     public void setRandomClass(String randomClass) {
         this.randomClass = randomClass;
@@ -82,9 +79,7 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
             Class<?> clazz = Class.forName(randomClass);
             randomSource = (Random) clazz.getConstructor().newInstance();
         } catch (ReflectiveOperationException e) {
-            ServletException se = new ServletException(sm.getString(
-                    "csrfPrevention.invalidRandomClass", randomClass), e);
-            throw se;
+            throw new ServletException(sm.getString("csrfPrevention.invalidRandomClass", randomClass), e);
         }
     }
 
@@ -93,24 +88,26 @@ public abstract class CsrfPreventionFilterBase extends FilterBase {
         return true;
     }
 
+
     /**
-     * Generate a once time token (nonce) for authenticating subsequent
-     * requests. The nonce generation is a simplified version of
-     * ManagerBase.generateSessionId().
+     * Generate a once time token (nonce) for authenticating subsequent requests. The nonce generation is a simplified
+     * version of ManagerBase.generateSessionId().
+     *
+     * @param request The request. Unused in this method but present for the benefit of subclasses.
      *
      * @return the generated nonce
      */
-    protected String generateNonce() {
-        byte random[] = new byte[16];
+    protected String generateNonce(HttpServletRequest request) {
+        byte[] random = new byte[16];
 
         // Render the result as a String of hexadecimal digits
         StringBuilder buffer = new StringBuilder();
 
         randomSource.nextBytes(random);
 
-        for (int j = 0; j < random.length; j++) {
-            byte b1 = (byte) ((random[j] & 0xf0) >> 4);
-            byte b2 = (byte) (random[j] & 0x0f);
+        for (byte b : random) {
+            byte b1 = (byte) ((b & 0xf0) >> 4);
+            byte b2 = (byte) (b & 0x0f);
             if (b1 < 10) {
                 buffer.append((char) ('0' + b1));
             } else {

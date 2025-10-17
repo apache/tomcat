@@ -16,8 +16,8 @@
  */
 package org.apache.tomcat.util.http;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class TestResponseUtil {
         TesterResponse response = new TesterResponse();
         response.getCoyoteResponse();
         response.addHeader("vary", "host");
-        Set<String> expected = new HashSet<>();
+        List<String> expected = new ArrayList<>();
         expected.add("*");
         doTestAddVaryFieldName(response, "*", expected);
     }
@@ -42,7 +42,7 @@ public class TestResponseUtil {
         TesterResponse response = new TesterResponse();
         response.getCoyoteResponse();
         response.addHeader("vary", "*");
-        Set<String> expected = new HashSet<>();
+        List<String> expected = new ArrayList<>();
         expected.add("*");
         doTestAddVaryFieldName(response, "*", expected);
     }
@@ -52,7 +52,7 @@ public class TestResponseUtil {
     public void testAddAllWithNone() {
         TesterResponse response = new TesterResponse();
         response.getCoyoteResponse();
-        Set<String> expected = new HashSet<>();
+        List<String> expected = new ArrayList<>();
         expected.add("*");
         doTestAddVaryFieldName(response, "*", expected);
     }
@@ -63,9 +63,9 @@ public class TestResponseUtil {
         TesterResponse response = new TesterResponse();
         response.getCoyoteResponse();
         response.addHeader("vary", "foo, bar");
-        Set<String> expected = new HashSet<>();
-        expected.add("bar");
+        List<String> expected = new ArrayList<>();
         expected.add("foo");
+        expected.add("bar");
         expected.add("too");
         doTestAddVaryFieldName(response, "too", expected);
     }
@@ -76,7 +76,7 @@ public class TestResponseUtil {
         TesterResponse response = new TesterResponse();
         response.getCoyoteResponse();
         response.addHeader("vary", "foo, *");
-        Set<String> expected = new HashSet<>();
+        List<String> expected = new ArrayList<>();
         expected.add("*");
         doTestAddVaryFieldName(response, "too", expected);
     }
@@ -87,9 +87,9 @@ public class TestResponseUtil {
         TesterResponse response = new TesterResponse();
         response.getCoyoteResponse();
         response.addHeader("vary", "foo, bar");
-        Set<String> expected = new HashSet<>();
-        expected.add("bar");
+        List<String> expected = new ArrayList<>();
         expected.add("foo");
+        expected.add("bar");
         doTestAddVaryFieldName(response, "foo", expected);
     }
 
@@ -100,9 +100,9 @@ public class TestResponseUtil {
         response.getCoyoteResponse();
         response.addHeader("vary", "foo");
         response.addHeader("vary", "bar");
-        Set<String> expected = new HashSet<>();
-        expected.add("bar");
+        List<String> expected = new ArrayList<>();
         expected.add("foo");
+        expected.add("bar");
         expected.add("too");
         doTestAddVaryFieldName(response, "too", expected);
     }
@@ -114,7 +114,7 @@ public class TestResponseUtil {
         response.getCoyoteResponse();
         response.addHeader("vary", "foo");
         response.addHeader("vary", "*");
-        Set<String> expected = new HashSet<>();
+        List<String> expected = new ArrayList<>();
         expected.add("*");
         doTestAddVaryFieldName(response, "too", expected);
     }
@@ -126,9 +126,9 @@ public class TestResponseUtil {
         response.getCoyoteResponse();
         response.addHeader("vary", "foo");
         response.addHeader("vary", "bar");
-        Set<String> expected = new HashSet<>();
-        expected.add("bar");
+        List<String> expected = new ArrayList<>();
         expected.add("foo");
+        expected.add("bar");
         doTestAddVaryFieldName(response, "foo", expected);
     }
 
@@ -138,7 +138,7 @@ public class TestResponseUtil {
         TesterResponse response = new TesterResponse();
         response.getCoyoteResponse();
         response.addHeader("vary", "{{{, bar");
-        Set<String> expected = new HashSet<>();
+        List<String> expected = new ArrayList<>();
         expected.add("bar");
         expected.add("too");
         doTestAddVaryFieldName(response, "too", expected);
@@ -150,7 +150,7 @@ public class TestResponseUtil {
         TesterResponse response = new TesterResponse();
         response.getCoyoteResponse();
         response.addHeader("vary", "{{{, *");
-        Set<String> expected = new HashSet<>();
+        List<String> expected = new ArrayList<>();
         expected.add("*");
         doTestAddVaryFieldName(response, "too", expected);
     }
@@ -161,18 +161,18 @@ public class TestResponseUtil {
         TesterResponse response = new TesterResponse();
         response.getCoyoteResponse();
         response.addHeader("vary", "{{{, bar");
-        Set<String> expected = new HashSet<>();
+        List<String> expected = new ArrayList<>();
         expected.add("bar");
         doTestAddVaryFieldName(response, "bar", expected);
     }
 
 
     private void doTestAddVaryFieldName(TesterResponse response, String fieldName,
-            Set<String> expected) {
+            List<String> expected) {
         ResponseUtil.addVaryFieldName(response, fieldName);
         // There will now only be one Vary header
         String resultHeader = response.getHeader("vary");
-        Set<String> result = new HashSet<>();
+        List<String> result = new ArrayList<>();
         // Deliberately do not use Vary.parseVary as it will skip invalid values.
         for (String value : resultHeader.split(",")) {
             result.add(value.trim());
@@ -184,7 +184,7 @@ public class TestResponseUtil {
     @Test
     public void testMimeHeadersAddAllWithNone() {
         MimeHeaders mh = new MimeHeaders();
-        Set<String> expected = new HashSet<>();
+        List<String> expected = new ArrayList<>();
         expected.add("*");
         doTestAddVaryFieldName(mh, "*", expected);
     }
@@ -195,23 +195,59 @@ public class TestResponseUtil {
         MimeHeaders mh = new MimeHeaders();
         mh.addValue("vary").setString("foo");
         mh.addValue("vary").setString("bar");
-        Set<String> expected = new HashSet<>();
-        expected.add("bar");
+        List<String> expected = new ArrayList<>();
         expected.add("foo");
+        expected.add("bar");
         expected.add("too");
         doTestAddVaryFieldName(mh, "too", expected);
     }
 
     private void doTestAddVaryFieldName(MimeHeaders mh, String fieldName,
-            Set<String> expected) {
+            List<String> expected) {
         ResponseUtil.addVaryFieldName(mh, fieldName);
         // There will now only be one Vary header
         String resultHeader = mh.getHeader("vary");
-        Set<String> result = new HashSet<>();
+        List<String> result = new ArrayList<>();
         // Deliberately do not use Vary.parseVary as it will skip invalid values.
         for (String value : resultHeader.split(",")) {
             result.add(value.trim());
         }
         Assert.assertEquals(expected, result);
+    }
+
+
+    /*
+     * https://bz.apache.org/bugzilla/show_bug.cgi?id=65505
+     */
+    @Test
+    public void testAddVaryHeaderOrder() {
+        MimeHeaders responseHeaders = new MimeHeaders();
+        responseHeaders.addValue("Vary").setString("Origin");
+        responseHeaders.addValue("Vary").setString("Access-Control-Request-Method");
+        responseHeaders.addValue("Vary").setString("Access-Control-Request-Headers");
+        responseHeaders.addValue("Access-Control-Allow-Origin").setString("https://xxxx");
+        responseHeaders.addValue("Access-Control-Allow-Credentials").setString("true");
+        responseHeaders.addValue("Set-Cookie").setString("rememberMe=deleteMe; Path=/; Max-Age=0; Expires=Tue, 17-Aug-2021 11:19:04 GMT; SameSite=lax");
+        responseHeaders.addValue("Set-Cookie").setString("rememberMe=rememberMeData; Path=/; Max-Age=1296000; Expires=Thu, 02-Sep-2021 11:19:04 GMT; HttpOnly; SameSite=lax");
+
+        String cookiesBefore = getHeaderValues(responseHeaders, "Set-Cookie");
+
+        ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
+
+        String cookiesAfter = getHeaderValues(responseHeaders, "Set-Cookie");
+
+        Assert.assertEquals(cookiesBefore, cookiesAfter);
+    }
+
+
+    private String getHeaderValues(MimeHeaders headers, String headerName) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < headers.size(); i++) {
+            if (headers.getName(i).equals(headerName)) {
+                sb.append(headers.getValue(i));
+                sb.append('\n');
+            }
+        }
+        return sb.toString();
     }
 }

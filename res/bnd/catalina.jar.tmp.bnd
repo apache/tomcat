@@ -12,9 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd
+
 Bundle-Name: tomcat-catalina
 Bundle-SymbolicName: org.apache.tomcat-catalina
-Bundle-Version: @VERSION@
 Export-Package: \
     org.apache.catalina.authenticator,\
     org.apache.catalina.authenticator.jaspic,\
@@ -31,7 +33,6 @@ Export-Package: \
     org.apache.catalina.security,\
     org.apache.catalina.servlets,\
     org.apache.catalina.session,\
-    org.apache.catalina.ssi,\
     org.apache.catalina.startup,\
     org.apache.catalina.users,\
     org.apache.catalina.util,\
@@ -44,3 +45,23 @@ Export-Package: \
     org.apache.catalina.webresources.war,\
     org.apache.catalina.manager.util,\
     org.apache.catalina
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version};\
+        modules='\
+            jakarta.ejb,\
+            jakarta.mail,\
+            jakarta.persistence,\
+            jakarta.xml.ws,\
+            java.xml.ws'
+-jpms-module-info-options: \
+    ${module.name};substitute=catalina,\
+    jakarta.ejb;static=true,\
+    jakarta.mail;static=true,\
+    jakarta.persistence;static=true,\
+    jakarta.xml.ws;static=true,\
+    java.xml.ws;static=true

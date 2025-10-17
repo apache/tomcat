@@ -37,7 +37,7 @@ final class OpenSSLX509Certificate extends X509Certificate {
     private final byte[] bytes;
     private X509Certificate wrapped;
 
-    public OpenSSLX509Certificate(byte[] bytes) {
+    OpenSSLX509Certificate(byte[] bytes) {
         this.bytes = bytes;
     }
 
@@ -62,11 +62,13 @@ final class OpenSSLX509Certificate extends X509Certificate {
     }
 
     @Override
+    @Deprecated
     public Principal getIssuerDN() {
         return unwrap().getIssuerDN();
     }
 
     @Override
+    @Deprecated
     public Principal getSubjectDN() {
         return unwrap().getSubjectDN();
     }
@@ -132,16 +134,14 @@ final class OpenSSLX509Certificate extends X509Certificate {
     }
 
     @Override
-    public void verify(PublicKey key)
-            throws CertificateException, NoSuchAlgorithmException,
-            InvalidKeyException, NoSuchProviderException, SignatureException {
+    public void verify(PublicKey key) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
+            NoSuchProviderException, SignatureException {
         unwrap().verify(key);
     }
 
     @Override
-    public void verify(PublicKey key, String sigProvider)
-            throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
-            NoSuchProviderException, SignatureException {
+    public void verify(PublicKey key, String sigProvider) throws CertificateException, NoSuchAlgorithmException,
+            InvalidKeyException, NoSuchProviderException, SignatureException {
         unwrap().verify(key, sigProvider);
     }
 
@@ -179,8 +179,8 @@ final class OpenSSLX509Certificate extends X509Certificate {
         X509Certificate wrapped = this.wrapped;
         if (wrapped == null) {
             try {
-                wrapped = this.wrapped = (X509Certificate) OpenSSLContext.X509_CERT_FACTORY.generateCertificate(
-                        new ByteArrayInputStream(bytes));
+                wrapped = this.wrapped = (X509Certificate) OpenSSLContext.X509_CERT_FACTORY
+                        .generateCertificate(new ByteArrayInputStream(bytes));
             } catch (CertificateException e) {
                 throw new IllegalStateException(e);
             }

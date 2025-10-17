@@ -23,8 +23,6 @@
     &project;
 
     <properties>
-        <author email="craigmcc@apache.org">Craig R. McClanahan</author>
-        <author email="yoavs@apache.org">Yoav Shapira</author>
         <title>Class Loader How-To</title>
     </properties>
 
@@ -130,37 +128,57 @@ loaders as it is initialized:</p>
     </ul>
     <p>By default, this includes the following:</p>
     <ul>
-    <li><em>annotations-api.jar</em> &#8212; JavaEE annotations classes.</li>
+    <li><em>annotations-api.jar</em> &#8212; Jakarta Annotations 3.1 classes.
+        </li>
     <li><em>catalina.jar</em> &#8212; Implementation of the Catalina servlet
         container portion of Tomcat.</li>
-    <li><em>catalina-ant.jar</em> &#8212; Tomcat Catalina Ant tasks.</li>
-    <li><em>catalina-ha.jar</em> &#8212; High availability package.</li>
-    <li><em>catalina-ssi.jar</em> &#8212; Server-side Includes module.</li>
-    <li><em>catalina-storeconfig.jar</em> &#8212; Generation of XML
-        configuration files from current state</li>
-    <li><em>catalina-tribes.jar</em> &#8212; Group communication package.</li>
-    <li><em>ecj-*.jar</em> &#8212; Eclipse JDT Java compiler.</li>
-    <li><em>el-api.jar</em> &#8212; EL 3.0 API.</li>
-    <li><em>jasper.jar</em> &#8212; Tomcat Jasper JSP Compiler and Runtime.</li>
-    <li><em>jasper-el.jar</em> &#8212; Tomcat Jasper EL implementation.</li>
-    <li><em>jsp-api.jar</em> &#8212; JSP 2.3 API.</li>
-    <li><em>servlet-api.jar</em> &#8212; Servlet 4.0 API.</li>
-    <li><em>tomcat-api.jar</em> &#8212; Several interfaces defined by Tomcat.</li>
-    <li><em>tomcat-coyote.jar</em> &#8212; Tomcat connectors and utility classes.</li>
-    <li><em>tomcat-dbcp.jar</em> &#8212; Database connection pool
+    <li><em>catalina-ant.jar</em> &#8212; Optional. Tomcat Catalina Ant tasks
+        for working with the Manager web application.</li>
+    <li><em>catalina-ha.jar</em> &#8212; Optional. High availability package
+        that provides session clustering functionality built on Tribes.</li>
+    <li><em>catalina-ssi.jar</em> &#8212; Optional. Server-side Includes module.
+        </li>
+    <li><em>catalina-storeconfig.jar</em> &#8212; Optional. Generation of XML
+        configuration files from current state.</li>
+    <li><em>catalina-tribes.jar</em> &#8212; Optional. Group communication
+        package used by the high availability package.</li>
+    <li><em>ecj-*.jar</em> &#8212; Optional. Eclipse JDT Java compiler used to
+        compile JSPs to Servlets.</li>
+    <li><em>el-api.jar</em> &#8212; Optional. EL 6.1 API.</li>
+    <li><em>jakartaee-migration-*-shaded.jar</em> &#8212; Optional. Provides
+        conversion of web applications from Java EE 8 to Jakarta EE 9.</li>
+    <li><em>jasper.jar</em> &#8212; Optional. Tomcat Jasper JSP Compiler and
+        Runtime.</li>
+    <li><em>jasper-el.jar</em> &#8212; Optional. Tomcat EL implementation.</li>
+    <li><em>jaspic-api.jar</em> &#8212; Jakarta Authentication 3.2 API.</li>
+    <li><em>jsp-api.jar</em> &#8212; Optional. Jakarta Pages 4.1 API.</li>
+    <li><em>servlet-api.jar</em> &#8212; Jakarta Servlet 6.2 API.</li>
+    <li><em>tomcat-api.jar</em> &#8212; Several interfaces defined by Tomcat.
+        </li>
+    <li><em>tomcat-coyote.jar</em> &#8212; Tomcat connectors and utility
+        classes.</li>
+    <li><em>tomcat-dbcp.jar</em> &#8212; Optional. Database connection pool
         implementation based on package-renamed copy of Apache Commons Pool 2
         and Apache Commons DBCP 2.</li>
-    <li><em>tomcat-i18n-**.jar</em> &#8212; Optional JARs containing resource bundles
-        for other languages. As default bundles are also included in each
-        individual JAR, they can be safely removed if no internationalization
-        of messages is needed.</li>
-    <li><em>tomcat-jdbc.jar</em> &#8212; An alternative database connection pool
-        implementation, known as Tomcat JDBC pool. See
+    <li><em>tomcat-i18n-**.jar</em> &#8212; Optional JARs containing resource
+        bundles for other languages. As default bundles are also included in
+        each individual JAR, they can be safely removed if no
+        internationalization of messages is needed.</li>
+    <li><em>tomcat-jdbc.jar</em> &#8212; Optional. An alternative database
+        connection pool implementation, known as Tomcat JDBC pool. See
         <a href="jdbc-pool.html">documentation</a> for more details.</li>
-    <li><em>tomcat-util.jar</em> &#8212; Common classes used by various components of
-        Apache Tomcat.</li>
-    <li><em>tomcat-websocket.jar</em> &#8212; WebSocket 1.1 implementation</li>
-    <li><em>websocket-api.jar</em> &#8212; WebSocket 1.1 API</li>
+    <li><em>tomcat-jni.jar</em> &#8212; Provides the integration with the Tomcat
+        Native library.</li>
+    <li><em>tomcat-util.jar</em> &#8212; Common classes used by various
+        components of Apache Tomcat.</li>
+    <li><em>tomcat-util-scan.jar</em> &#8212; Provides the class scanning
+        functionality used by Tomcat.</li>
+    <li><em>tomcat-websocket.jar</em> &#8212; Optional. Jakarta WebSocket 2.3
+        implementation</li>
+    <li><em>websocket-api.jar</em> &#8212; Optional. Jakarta WebSocket 2.3 API
+        </li>
+    <li><em>websocket-client-api.jar</em> &#8212; Optional. Jakarta WebSocket
+        2.3 Client API</li>
     </ul></li>
 <li><p><strong>WebappX</strong> &#8212; A class loader is created for each web
     application that is deployed in a single Tomcat instance.  All unpacked
@@ -178,11 +196,10 @@ class from the web application's <em>WebappX</em> class loader is processed,
 this class loader will look in the local repositories <strong>first</strong>,
 instead of delegating before looking.  There are exceptions. Classes which are
 part of the JRE base classes cannot be overridden. There are some exceptions
-such as the XML parser components which can be overridden using the appropriate
-JVM feature which is the endorsed standards override feature for Java &lt;= 8
-and the upgradeable modules feature for Java 9+.
-Lastly, the web application class loader will always delegate first for JavaEE
-API classes for the specifications implemented by Tomcat
+such as the XML parser components which can be overridden using the upgradeable
+modules feature.
+Lastly, the web application class loader will always delegate first for Jakarta
+EE API classes for the specifications implemented by Tomcat
 (Servlet, JSP, EL, WebSocket). All other class loaders in Tomcat follow the
 usual delegation pattern.</p>
 
@@ -213,34 +230,16 @@ then the order becomes:</p>
 
 <section name="XML Parsers and Java">
 
-<p>Starting with Java 1.4 a copy of JAXP APIs and an XML parser are packed
-inside the JRE.  This has impacts on applications that wish to use their own
-XML parser.</p>
-
-<p>In old versions of Tomcat, you could simply replace the XML parser
+<p>In older versions of Tomcat, you could simply replace the XML parser
 in the Tomcat libraries directory to change the parser
 used by all web applications.  However, this technique will not be effective
 when you are running modern versions of Java, because the usual class loader
 delegation process will always choose the implementation inside the JDK in
 preference to this one.</p>
 
-<p>Java &lt;= 8 supports a mechanism called the "Endorsed Standards Override
-Mechanism" to allow replacement of APIs created outside of the JCP
-(i.e. DOM and SAX from W3C).  It can also be used to update the XML parser
-implementation.  For more information, see:
-<a href="http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html">
-http://docs.oracle.com/javase/1.5.0/docs/guide/standards/index.html</a>. For
-Java 9+, use the upgradeable modules feature.</p>
-
-<p>Tomcat utilizes the endorsed mechanism by including the system property setting
-<code>-Djava.endorsed.dirs=$JAVA_ENDORSED_DIRS</code> in the
-command line that starts the container. The default value of this option is
-<em>$CATALINA_HOME/endorsed</em>. This <em>endorsed</em> directory is not
-created by default. Note that the endorsed feature is no longer supported
-with Java 9 and the above system property will only be set if either the
-directory <em>$CATALINA_HOME/endorsed</em> exists, or the variable
-<code>JAVA_ENDORSED_DIRS</code> has been set.
-</p>
+<p>Java supports a mechanism called upgradeable modules to allow replacement
+of APIs created outside of the JCP (i.e. DOM and SAX from W3C).  It can also be
+used to update the XML parser implementation.</p>
 
 <p>Note that overriding any JRE component carries risk. If the overriding
 component does not provide a 100% compatible API (e.g. the API provided by
@@ -250,20 +249,11 @@ is a risk that Tomcat and/or the deployed application will experience errors.</p
 </section>
 
 
-<section name="Running under a security manager">
-
-<p>When running under a security manager the locations from which classes
-are permitted to be loaded will also depend on the contents of your policy
-file. See <a href="security-manager-howto.html">Security Manager How-To</a>
-for further information.</p>
-
-</section>
-
 <section name="Advanced configuration">
 
 <p>A more complex class loader hierarchy may also be configured. See the diagram
 below. By default, the <strong>Server</strong> and <strong>Shared</strong>
-class loaders are not defined and the simplifed hierarchy shown above is used.
+class loaders are not defined and the simplified hierarchy shown above is used.
 This more complex hierarchy may be use by defining values for the
 <code>server.loader</code> and/or <code>shared.loader</code> properties in
 <code>conf/catalina.properties</code>.</p>

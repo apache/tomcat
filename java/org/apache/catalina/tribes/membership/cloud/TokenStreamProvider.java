@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.membership.cloud;
 
 import java.io.IOException;
@@ -28,7 +27,8 @@ import javax.net.ssl.TrustManager;
 public class TokenStreamProvider extends AbstractStreamProvider {
 
     private String token;
-    private SSLSocketFactory factory;
+    private final SSLSocketFactory factory;
+
 
     TokenStreamProvider(String token, String caCertFile) throws Exception {
         this.token = token;
@@ -38,13 +38,20 @@ public class TokenStreamProvider extends AbstractStreamProvider {
         this.factory = context.getSocketFactory();
     }
 
+
     @Override
     protected SSLSocketFactory getSocketFactory() {
         return factory;
     }
 
+
+    protected void setToken(String token) {
+        this.token = token;
+    }
+
+
     @Override
-    public InputStream openStream(String url, Map<String, String> headers, int connectTimeout, int readTimeout)
+    public InputStream openStream(String url, Map<String,String> headers, int connectTimeout, int readTimeout)
             throws IOException {
         // Set token header
         if (token != null) {
@@ -52,10 +59,9 @@ public class TokenStreamProvider extends AbstractStreamProvider {
         }
         try {
             return super.openStream(url, headers, connectTimeout, readTimeout);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             // Add debug information
-            throw new IOException(sm.getString("tokenStream.failedConnection", url, token), e);
+            throw new IOException(sm.getString("tokenStream.failedConnection", url, token), ioe);
         }
     }
-
 }

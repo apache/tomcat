@@ -1,0 +1,97 @@
+@startuml
+
+' Licensed to the Apache Software Foundation (ASF) under one or more
+' contributor license agreements.  See the NOTICE file distributed with
+' this work for additional information regarding copyright ownership.
+' The ASF licenses this file to You under the Apache License, Version 2.0
+' (the "License"); you may not use this file except in compliance with
+' the License.  You may obtain a copy of the License at
+'
+'     http://www.apache.org/licenses/LICENSE-2.0
+'
+' Unless required by applicable law or agreed to in writing, software
+' distributed under the License is distributed on an "AS IS" BASIS,
+' WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+' See the License for the specific language governing permissions and
+' limitations under the License.
+
+hide footbox
+skinparam style strictuml
+
+activate Acceptor
+participant NioEndpoint
+participant ServerSocket
+participant SocketChannel
+activate Poller
+participant Selector
+participant Executor
+activate Worker
+
+group Acceptor Loop
+Acceptor -> NioEndpoint ++: serverSocketAccept()
+NioEndpoint -> ServerSocket ++: accept()
+note right of ServerSocket
+  This is where Tomcat
+  waits for incoming
+  connections
+end note
+ServerSocket -->> SocketChannel **:
+return
+return
+
+Acceptor -> NioEndpoint ++: setSocketOptions()
+NioEndpoint -> Poller ++: register()
+return
+return
+end
+
+group Poller Loop (simplified)
+Poller -> Poller ++: events()
+Poller -> SocketChannel ++: register(OP_READ)
+return
+return
+
+Poller -> Selector ++: select()
+return
+
+Poller -> Poller ++: processKey()
+Poller -> NioEndpoint ++: processSocket()
+NioEndpoint -> NioEndpoint ++: createSocketProcessor()
+NioEndpoint -->> SocketProcessor **:
+NioEndpoint -> Executor ++: execute()
+Executor -> Worker ++: run()
+return
+return
+return
+return
+return
+end
+
+Worker -> SocketProcessor ++: run()
+SocketProcessor -> SocketChannel ++: handshake()
+note right of SocketChannel
+  TLS handshake
+end note
+return
+SocketProcessor -> ConnectionHandler ++: process()
+ConnectionHandler -> Protocol ++: createProcessor()
+Protocol -->> Processor **:
+activate Processor
+Processor -->> CoyoteRequest **:
+Processor -->> CoyoteResponse **:
+return
+return
+ConnectionHandler -> Processor ++: process()
+Processor -> Processor ++: service()
+note right of Processor
+  More detail of this
+  processing in the
+  protocol specific
+  diagrams
+end note
+return
+return
+return
+return
+
+@enduml

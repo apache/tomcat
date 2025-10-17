@@ -14,24 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
 /**
- * Representation of a context initialization parameter that is configured
- * in the server configuration file, rather than the application deployment
- * descriptor.  This is convenient for establishing default values (which
- * may be configured to allow application overrides or not) without having
- * to modify the application deployment descriptor itself.
- *
- * @author Craig R. McClanahan
+ * Representation of a context initialization parameter that is configured in the server configuration file, rather than
+ * the application deployment descriptor. This is convenient for establishing default values (which may be configured to
+ * allow application overrides or not) without having to modify the application deployment descriptor itself.
  */
 public class ApplicationParameter implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
@@ -66,8 +62,7 @@ public class ApplicationParameter implements Serializable {
 
 
     /**
-     * Does this application parameter allow overrides by the application
-     * deployment descriptor?
+     * Does this application parameter allow overrides by the application deployment descriptor?
      */
     private boolean override = true;
 
@@ -113,7 +108,7 @@ public class ApplicationParameter implements Serializable {
         sb.append(value);
         sb.append(", override=");
         sb.append(override);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
 
     }

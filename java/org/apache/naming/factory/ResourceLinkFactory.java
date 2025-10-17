@@ -25,16 +25,15 @@ import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.RefAddr;
-import javax.naming.Reference;
 import javax.naming.spi.ObjectFactory;
 
 import org.apache.naming.ResourceLinkRef;
 import org.apache.naming.StringManager;
 
 /**
- * <p>Object factory for resource links.</p>
- *
- * @author Remy Maucherat
+ * <p>
+ * Object factory for resource links.
+ * </p>
  */
 public class ResourceLinkFactory implements ObjectFactory {
 
@@ -47,8 +46,7 @@ public class ResourceLinkFactory implements ObjectFactory {
      */
     private static Context globalContext = null;
 
-    private static Map<ClassLoader,Map<String,String>> globalResourceRegistrations =
-            new ConcurrentHashMap<>();
+    private static final Map<ClassLoader,Map<String,String>> globalResourceRegistrations = new ConcurrentHashMap<>();
 
     // --------------------------------------------------------- Public Methods
 
@@ -58,27 +56,16 @@ public class ResourceLinkFactory implements ObjectFactory {
      * @param newGlobalContext new global context value
      */
     public static void setGlobalContext(Context newGlobalContext) {
-        SecurityManager sm = System.getSecurityManager();
-        if (sm != null) {
-            sm.checkPermission(new RuntimePermission(
-                   ResourceLinkFactory.class.getName() + ".setGlobalContext"));
-        }
         globalContext = newGlobalContext;
     }
 
 
-    public static void registerGlobalResourceAccess(Context globalContext, String localName,
-            String globalName) {
+    public static void registerGlobalResourceAccess(Context globalContext, String localName, String globalName) {
         validateGlobalContext(globalContext);
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        Map<String,String> registrations = globalResourceRegistrations.get(cl);
-        if (registrations == null) {
-            // Web application initialization is single threaded so this is
-            // safe.
-            registrations = new HashMap<>();
-            globalResourceRegistrations.put(cl, registrations);
-        }
-        registrations.put(localName, globalName);
+        // Web application initialization is single threaded so this is
+        // safe.
+        globalResourceRegistrations.computeIfAbsent(cl, k -> new HashMap<>()).put(localName, globalName);
     }
 
 
@@ -100,8 +87,7 @@ public class ResourceLinkFactory implements ObjectFactory {
 
 
     private static void validateGlobalContext(Context globalContext) {
-        if (ResourceLinkFactory.globalContext != null &&
-                ResourceLinkFactory.globalContext != globalContext) {
+        if (ResourceLinkFactory.globalContext != null && ResourceLinkFactory.globalContext != globalContext) {
             throw new SecurityException(sm.getString("resourceLinkFactory.invalidGlobalContext"));
         }
     }
@@ -123,23 +109,28 @@ public class ResourceLinkFactory implements ObjectFactory {
     // -------------------------------------------------- ObjectFactory Methods
 
     /**
-     * Create a new DataSource instance.
+     * Create a new resource instance.
      *
-     * @param obj The reference object describing the DataSource
+     * @param name        the bound name
+     * @param nameCtx     unused
+     * @param environment unused
+     *
+     * @return the object instance
+     *
+     * @throws NamingException if an error occur creating the instance
      */
     @Override
-    public Object getObjectInstance(Object obj, Name name, Context nameCtx,
-            Hashtable<?,?> environment) throws NamingException {
+    public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)
+            throws NamingException {
 
-        if (!(obj instanceof ResourceLinkRef)) {
+        if (!(obj instanceof ResourceLinkRef ref)) {
             return null;
         }
 
         // Can we process this request?
-        Reference ref = (Reference) obj;
 
         // Read the global ref addr
-        String globalName = null;
+        String globalName;
         RefAddr refAddr = ref.get(ResourceLinkRef.GLOBALNAME);
         if (refAddr != null) {
             globalName = refAddr.getContent().toString();
@@ -148,24 +139,22 @@ public class ResourceLinkFactory implements ObjectFactory {
             if (!validateGlobalResourceAccess(globalName)) {
                 return null;
             }
-            Object result = null;
-            result = globalContext.lookup(globalName);
+            Object result = globalContext.lookup(globalName);
             // Check the expected type
             String expectedClassName = ref.getClassName();
             if (expectedClassName == null) {
-                throw new IllegalArgumentException(
-                        sm.getString("resourceLinkFactory.nullType", name, globalName));
+                throw new IllegalArgumentException(sm.getString("resourceLinkFactory.nullType", name, globalName));
             }
             try {
-                Class<?> expectedClazz = Class.forName(
-                        expectedClassName, true, Thread.currentThread().getContextClassLoader());
+                Class<?> expectedClazz =
+                        Class.forName(expectedClassName, true, Thread.currentThread().getContextClassLoader());
                 if (!expectedClazz.isAssignableFrom(result.getClass())) {
-                    throw new IllegalArgumentException(sm.getString("resourceLinkFactory.wrongType",
-                            name, globalName, expectedClassName, result.getClass().getName()));
+                    throw new IllegalArgumentException(sm.getString("resourceLinkFactory.wrongType", name, globalName,
+                            expectedClassName, result.getClass().getName()));
                 }
             } catch (ClassNotFoundException e) {
-                throw new IllegalArgumentException(sm.getString("resourceLinkFactory.unknownType",
-                        name, globalName, expectedClassName), e);
+                throw new IllegalArgumentException(
+                        sm.getString("resourceLinkFactory.unknownType", name, globalName, expectedClassName), e);
             }
             return result;
         }

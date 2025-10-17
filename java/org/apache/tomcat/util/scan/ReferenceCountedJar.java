@@ -24,8 +24,8 @@ import java.util.jar.Manifest;
 import org.apache.tomcat.Jar;
 
 /**
- * This class provides a wrapper around {@link Jar} that uses reference counting
- * to close and re-create the wrapped {@link Jar} instance as required.
+ * This class provides a wrapper around {@link Jar} that uses reference counting to close and re-create the wrapped
+ * {@link Jar} instance as required.
  */
 public class ReferenceCountedJar implements Jar {
 

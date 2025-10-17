@@ -23,7 +23,7 @@
     &project;
 
   <properties>
-    <title>GraalVM support</title>
+    <title>Ahead of Time compilation support</title>
   </properties>
 
 <body>
@@ -35,7 +35,7 @@
   <section name="Introduction">
 
   <p>
-    Tomcat supports using the GraalVM 19.3 Native Image tool to produce
+    Tomcat supports using the GraalVM/Mandrel Native Image tool to produce
     a native binary including the container. This documentation page
     describes the build process of such an image.
   </p>
@@ -46,25 +46,24 @@
 
   <p>
     The native image tool is much easier to use with single JARs, as a result
-    the process will use the Maven shade plugin JAR packaging (fat JAR). The
+    the process will use the Maven shade plugin JAR packaging. The
     idea is to produce a single JAR that contains all necessary classes from
     Tomcat, the webapps and all additional dependencies. Although Tomcat has
-    received compatibility fixes to support GraalVM native images, any library
+    received compatibility fixes to support native images, other libraries
     may not be compatible and may require replacement code (the GraalVM
     documentation has more details about this).
   </p>
 
   <p>
-    Download and install GraalVM. The first step is then to add the
-    native-image tool.
-    <source>export JAVA_HOME=/absolute...path...to/graalvm-ce-javaX-x.y.z
-cd $JAVA_HOME/bin
-./gu install native-image</source>
-    Download the Tomcat Maven packaging from
-    https://github.com/apache/tomcat/tree/master/res/tomcat-maven and place
-    all the files in a folder (named tomcat-maven in this documentation.
-    <source>export TOMCAT_MAVEN=/absolute...path...to/tomcat-maven</source>
-    The build process now requires both Ant and Maven.
+    Download and install GraalVM or Mandrel.
+  </p>
+
+  <p>
+    Download the Tomcat Stuffed module from
+    <code>https://github.com/apache/tomcat/tree/main/modules/stuffed</code>.
+    For convenience, an env property can be set:
+    <source>export TOMCAT_STUFFED=/absolute...path...to/stuffed</source>
+    The build process now requires both Apache Ant and Maven.
   </p>
 
   </section>
@@ -72,21 +71,52 @@ cd $JAVA_HOME/bin
   <section name="Packaging and Building">
 
   <p>
-    Inside the tomcat-maven folder, the directory structure is the same as for
-    regular Tomcat. The main configuration files are placed in the conf folder,
-    and if using the default server.xml the webapps are placed in the webapps
+    Inside the <code>$TOMCAT_STUFFED</code> folder, the directory structure
+    is the same as for regular Tomcat. The main configuration files
+    are placed in the <code>conf</code> folder, and if using the default
+    <code>server.xml</code> the webapps are placed in the <code>webapps</code>
     folder.
   </p>
 
   <p>
-    The first step is to build the fat Tomcat JAR with all dependencies.
-    Any JSP in the webapp must all be precompiled and packaged.
-    <source>cd $TOMCAT_MAVEN
+    All the webapp classes need to be made available to the Maven shade plugin
+    as well as the compiler during the JSP precompilation step.
+    Any JARs that are present in <code>/WEB-INF/lib</code>
+    need to be made available as Maven dependencies.
+    The <code>webapp-jspc.ant.xml</code> script will copy classes from the
+    <code>/WEB-INF/classes</code> folder of the webapp
+    to the <code>target/classes</code> path that Maven uses as the compilation
+    target, but if any of the JSP sources use them, then they need to be
+    packaged as JARs instead.
+  </p>
+
+  <p>
+    The first step is to build the shaded Tomcat JAR with all dependencies.
+    Any JSP in the webapp must all be precompiled and packaged (assuming
+    that the <code>webapps</code> contains a <code>$WEBAPPNAME</code> webapp):
+    <source>cd $TOMCAT_STUFFED
 mvn package
-ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
-    Dependencies for the webapp should now be added to the main pom.xml,
-    following with building the complete fat JAR.
+ant -Dwebapp.name=$WEBAPPNAME -f webapp-jspc.ant.xml</source>
+    Dependencies for the webapp should now be added to the main
+    <code>$TOMCAT_STUFFED/pom.xml</code>,
+    following by building the shaded JAR:
     <source>mvn package</source>
+  </p>
+
+  <p>
+    As it is best to avoid using reflection whenever possible with Ahead of
+    Time compilation, it can be a good idea to generate and compile Tomcat
+    Embedded code out of the main server.xml configuration as well as the
+    context.xml files used to configure the contexts.
+    <source>$JAVA_HOME/bin/java\
+        -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties\
+        -jar target/tomcat-stuffed-1.0.jar --catalina -generateCode src/main/java</source>
+    Then stop Tomcat and use the following command to include the generated
+    embedded code:
+    <source>mvn package</source>
+    The rest of the process described here will assume this step was done and
+    the <code>--catalina -useGeneratedCode</code> arguments are added to the
+    command lines. If this was not the case, they should be removed.
   </p>
 
   </section>
@@ -101,11 +131,12 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
   </p>
 
   <p>
-    Run the GraalVM substrate VM using the trace agent:
+    Run Tomcat using the GraalVM substrate VM and its trace agent:
     <source>$JAVA_HOME/bin/java\
-        -agentlib:native-image-agent=config-output-dir=$TOMCAT_MAVEN/target/\
+        -agentlib:native-image-agent=config-output-dir=$TOMCAT_STUFFED/target/\
+        -Dorg.graalvm.nativeimage.imagecode=agent\
         -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties\
-        -jar target/tomcat-maven-1.0.jar</source>
+        -jar target/tomcat-stuffed-1.0.jar --catalina -useGeneratedCode</source>
   </p>
 
   <p>
@@ -113,7 +144,7 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
     (ex: Servlet access, websockets, etc) need to be accessed using a script
     that will exercise the webapp. Servlets may be loaded on startup
     instead of needing an actual access. Listeners may also be used to load
-    additional classes on startup.
+    additional classes on startup. When that is done, Tomcat can be stopped.
   </p>
 
   <p>
@@ -124,6 +155,14 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
     information on this process.
   </p>
 
+  <p>
+    Even though all classes that are used have to be complied AOT into the
+    native image, webapps must still be left unchanged, and continue including
+    all needed classes and JARs in the <code>WEB-INF</code> folder. Although
+    these classes will not actually be run or loaded, access to them is
+    required.
+  </p>
+
   </section>
 
   <section name="Building the native image">
@@ -131,23 +170,23 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
   <p>
     If everything has been done properly, the native image can now be built
     using the native-image tool.
-    <source>$JAVA_HOME/bin/native-image --no-server\
-        --allow-incomplete-classpath --enable-https\
-        --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,javax.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl\
-        -H:+JNI -H:+ReportUnsupportedElementsAtRuntime\
-        -H:+ReportExceptionStackTraces -H:EnableURLProtocols=http,https,jar,jrt\
-        -H:ConfigurationFileDirectories=$TOMCAT_MAVEN/target/\
-        -H:ReflectionConfigurationFiles=$TOMCAT_MAVEN/tomcat-reflection.json\
-        -H:ResourceConfigurationFiles=$TOMCAT_MAVEN/tomcat-resource.json\
-        -H:JNIConfigurationFiles=$TOMCAT_MAVEN/tomcat-jni.json\
-        -jar $TOMCAT_MAVEN/target/tomcat-maven-1.0.jar</source>
+    <source>$JAVA_HOME/bin/native-image --report-unsupported-elements-at-runtime\
+        --enable-http --enable-https --enable-url-protocols=http,https,jar,jrt\
+        --initialize-at-build-time=org.eclipse.jdt,org.apache.el.parser.SimpleNode,jakarta.servlet.jsp.JspFactory,org.apache.jasper.servlet.JasperInitializer,org.apache.jasper.runtime.JspFactoryImpl\
+        -H:+UnlockExperimentalVMOptions\
+        -H:+JNI -H:+ReportExceptionStackTraces\
+        -H:ConfigurationFileDirectories=$TOMCAT_STUFFED/target/\
+        -H:ReflectionConfigurationFiles=$TOMCAT_STUFFED/tomcat-reflection.json\
+        -H:ResourceConfigurationFiles=$TOMCAT_STUFFED/tomcat-resource.json\
+        -H:JNIConfigurationFiles=$TOMCAT_STUFFED/tomcat-jni.json\
+        -jar $TOMCAT_STUFFED/target/tomcat-stuffed-1.0.jar</source>
     The additional <code>--static</code> parameter enables static linking of
     glibc, zlib and libstd++ in the generated binary.
   </p>
 
   <p>
     Running the native image is then:
-    <source>./tomcat-maven-1.0 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties</source>
+    <source>./tomcat-stuffed-1.0 -Dcatalina.base=. -Djava.util.logging.config.file=conf/logging.properties --catalina -useGeneratedCode</source>
   </p>
 
   </section>
@@ -176,9 +215,6 @@ ant -Dwebapp.name=somewebapp -f graal-webapp.ant.xml</source>
   <p>
     Missing items for better Tomcat functionality:
     <ul>
-      <li>Java serialization: Clustering and session persistence are not
-        functional</li>
-      <li>JMX: The usual monitoring and management is not usable</li>
       <li>java.util.logging LogManager: Configuration through a system property
         is not implemented, so standard java.util.logging must be used instead
         of JULI</li>

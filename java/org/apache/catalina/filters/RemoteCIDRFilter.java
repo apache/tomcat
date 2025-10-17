@@ -20,26 +20,24 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.util.NetMask;
+import org.apache.catalina.util.NetMaskSet;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 public final class RemoteCIDRFilter extends FilterBase {
 
     /**
-     * text/plain MIME type: this is the MIME type we return when a
-     * {@link ServletResponse} is not an {@link HttpServletResponse}
+     * text/plain MIME type: this is the MIME type we return when a {@link ServletResponse} is not an
+     * {@link HttpServletResponse}
      */
     private static final String PLAIN_TEXT_MIME_TYPE = "text/plain";
 
@@ -49,21 +47,20 @@ public final class RemoteCIDRFilter extends FilterBase {
     private final Log log = LogFactory.getLog(RemoteCIDRFilter.class); // must not be static
 
     /**
-     * The list of allowed {@link NetMask}s
+     * The allowed {@link NetMask}s.
      */
-    private final List<NetMask> allow = new ArrayList<>();
+    private final NetMaskSet allow = new NetMaskSet();
 
     /**
-     * The list of denied {@link NetMask}s
+     * The denied {@link NetMask}s.
      */
-    private final List<NetMask> deny = new ArrayList<>();
+    private final NetMaskSet deny = new NetMaskSet();
 
 
     /**
      * Return a string representation of the {@link NetMask} list in #allow.
      *
-     * @return the #allow list as a string, without the leading '[' and trailing
-     *         ']'
+     * @return the #allow list as a string, without the leading '[' and trailing ']'
      */
     public String getAllow() {
         return allow.toString().replace("[", "").replace("]", "");
@@ -71,14 +68,14 @@ public final class RemoteCIDRFilter extends FilterBase {
 
 
     /**
-     * Fill the #allow list with the list of netmasks provided as an argument,
-     * if any. Calls #fillFromInput.
+     * Fill the #allow list with the list of netmasks provided as an argument, if any. Calls #fillFromInput.
      *
      * @param input The list of netmasks, as a comma separated string
+     *
      * @throws IllegalArgumentException One or more netmasks are invalid
      */
     public void setAllow(final String input) {
-        final List<String> messages = fillFromInput(input, allow);
+        final List<String> messages = allow.addAll(input);
 
         if (messages.isEmpty()) {
             return;
@@ -95,8 +92,7 @@ public final class RemoteCIDRFilter extends FilterBase {
     /**
      * Return a string representation of the {@link NetMask} list in #deny.
      *
-     * @return the #deny list as string, without the leading '[' and trailing
-     *         ']'
+     * @return the #deny list as string, without the leading '[' and trailing ']'
      */
     public String getDeny() {
         return deny.toString().replace("[", "").replace("]", "");
@@ -104,17 +100,18 @@ public final class RemoteCIDRFilter extends FilterBase {
 
 
     /**
-     * Fill the #deny list with the list of netmasks provided as an argument, if
-     * any. Calls #fillFromInput.
+     * Fill the #deny list with the list of netmasks provided as an argument, if any. Calls #fillFromInput.
      *
      * @param input The list of netmasks, as a comma separated string
+     *
      * @throws IllegalArgumentException One or more netmasks are invalid
      */
     public void setDeny(final String input) {
-        final List<String> messages = fillFromInput(input, deny);
+        final List<String> messages = deny.addAll(input);
 
-        if (messages.isEmpty())
+        if (messages.isEmpty()) {
             return;
+        }
 
         for (final String message : messages) {
             log.error(message);
@@ -122,7 +119,6 @@ public final class RemoteCIDRFilter extends FilterBase {
 
         throw new IllegalArgumentException(sm.getString("remoteCidrFilter.invalid", "deny"));
     }
-
 
 
     @Override
@@ -161,6 +157,7 @@ public final class RemoteCIDRFilter extends FilterBase {
      * Test if a remote's IP address is allowed to proceed.
      *
      * @param property The remote's IP address, as a string
+     *
      * @return true if allowed
      */
     private boolean isAllowed(final String property) {
@@ -175,25 +172,17 @@ public final class RemoteCIDRFilter extends FilterBase {
             return false;
         }
 
-        for (final NetMask nm : deny) {
-            if (nm.matches(addr)) {
-                return false;
-            }
+        if (deny.contains(addr)) {
+            return false;
         }
 
-        for (final NetMask nm : allow) {
-            if (nm.matches(addr)) {
-                return true;
-            }
-        }
-
-        // Allow if deny is specified but allow isn't
-        if (!deny.isEmpty() && allow.isEmpty()) {
+        if (allow.contains(addr)) {
             return true;
         }
 
-        // Deny this request
-        return false;
+        // Allow if deny is specified but allow isn't
+        // Deny this request otherwise
+        return !deny.isEmpty() && allow.isEmpty();
     }
 
 
@@ -202,35 +191,5 @@ public final class RemoteCIDRFilter extends FilterBase {
         response.setContentType(PLAIN_TEXT_MIME_TYPE);
         writer.write(sm.getString("http.403"));
         writer.flush();
-    }
-
-
-    /**
-     * Fill a {@link NetMask} list from a string input containing a
-     * comma-separated list of (hopefully valid) {@link NetMask}s.
-     *
-     * @param input The input string
-     * @param target The list to fill
-     * @return a string list of processing errors (empty when no errors)
-     */
-    private List<String> fillFromInput(final String input, final List<NetMask> target) {
-        target.clear();
-        if (input == null || input.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        final List<String> messages = new LinkedList<>();
-        NetMask nm;
-
-        for (final String s : input.split("\\s*,\\s*")) {
-            try {
-                nm = new NetMask(s);
-                target.add(nm);
-            } catch (IllegalArgumentException e) {
-                messages.add(s + ": " + e.getMessage());
-            }
-        }
-
-        return Collections.unmodifiableList(messages);
     }
 }

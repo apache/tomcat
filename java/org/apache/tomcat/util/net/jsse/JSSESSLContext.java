@@ -14,13 +14,13 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net.jsse;
 
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,7 +37,7 @@ import org.apache.tomcat.util.net.SSLContext;
 
 class JSSESSLContext implements SSLContext {
 
-    private javax.net.ssl.SSLContext context;
+    private final javax.net.ssl.SSLContext context;
     private KeyManager[] kms;
     private TrustManager[] tms;
 
@@ -46,8 +46,7 @@ class JSSESSLContext implements SSLContext {
     }
 
     @Override
-    public void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr)
-            throws KeyManagementException {
+    public void init(KeyManager[] kms, TrustManager[] tms, SecureRandom sr) throws KeyManagementException {
         this.kms = kms;
         this.tms = tms;
         context.init(kms, tms, sr);
@@ -97,14 +96,10 @@ class JSSESSLContext implements SSLContext {
             for (TrustManager tm : tms) {
                 if (tm instanceof X509TrustManager) {
                     X509Certificate[] accepted = ((X509TrustManager) tm).getAcceptedIssuers();
-                    if (accepted != null) {
-                        for (X509Certificate c : accepted) {
-                            certs.add(c);
-                        }
-                    }
+                    certs.addAll(Arrays.asList(accepted));
                 }
             }
         }
-        return certs.toArray(new X509Certificate[certs.size()]);
+        return certs.toArray(new X509Certificate[0]);
     }
 }

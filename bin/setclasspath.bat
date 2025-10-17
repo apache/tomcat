@@ -16,8 +16,7 @@ rem limitations under the License.
 
 rem ---------------------------------------------------------------------------
 rem Set JAVA_HOME or JRE_HOME if not already set, ensure any provided settings
-rem are valid and consistent with the selected start-up options and set up the
-rem endorsed directory.
+rem are valid and consistent with the selected start-up options.
 rem ---------------------------------------------------------------------------
 
 rem Make sure prerequisite environment variables are set
@@ -43,13 +42,23 @@ goto okJava
 
 :noJavaHome
 echo The JAVA_HOME environment variable is not defined correctly.
+echo JAVA_HOME=%JAVA_HOME%
 echo It is needed to run this program in debug mode.
 echo NB: JAVA_HOME should point to a JDK not a JRE.
 goto exit
 
 :gotJavaHome
-rem No JRE given, use JAVA_HOME as JRE_HOME
+rem No JRE given, check if JAVA_HOME is usable as JRE_HOME
+if not exist "%JAVA_HOME%\bin\java.exe" goto noJavaHomeAsJre
+rem Use JAVA_HOME as JRE_HOME
 set "JRE_HOME=%JAVA_HOME%"
+goto okJava
+
+:noJavaHomeAsJre
+echo The JAVA_HOME environment variable is not defined correctly.
+echo JAVA_HOME=%JAVA_HOME%
+echo NB: JAVA_HOME should point to a JDK not a JRE.
+goto exit
 
 :gotJreHome
 rem Check if we have a usable JRE
@@ -59,30 +68,22 @@ goto okJava
 :noJreHome
 rem Needed at least a JRE
 echo The JRE_HOME environment variable is not defined correctly
+echo JRE_HOME=%JRE_HOME%
 echo This environment variable is needed to run this program
 goto exit
 
 :okJava
-rem Don't override the endorsed dir if the user has set it previously
-if not "%JAVA_ENDORSED_DIRS%" == "" goto gotEndorseddir
-rem Java 9 no longer supports the java.endorsed.dirs
-rem system property. Only try to use it if
-rem CATALINA_HOME/endorsed exists.
-if not exist "%CATALINA_HOME%\endorsed" goto gotEndorseddir
-set "JAVA_ENDORSED_DIRS=%CATALINA_HOME%\endorsed"
-:gotEndorseddir
-
 rem Don't override _RUNJAVA if the user has set it previously
 if not "%_RUNJAVA%" == "" goto gotRunJava
 rem Set standard command for invoking Java.
 rem Also note the quoting as JRE_HOME may contain spaces.
-set _RUNJAVA="%JRE_HOME%\bin\java.exe"
+set "_RUNJAVA=%JRE_HOME%\bin\java.exe"
 :gotRunJava
 
 rem Don't override _RUNJDB if the user has set it previously
 rem Also note the quoting as JAVA_HOME may contain spaces.
 if not "%_RUNJDB%" == "" goto gotRunJdb
-set _RUNJDB="%JAVA_HOME%\bin\jdb.exe"
+set "_RUNJDB=%JAVA_HOME%\bin\jdb.exe"
 :gotRunJdb
 
 goto end

@@ -122,8 +122,8 @@ policy had to be relaxed. This is not recommended for production environments.
   </subsection>
 
   <subsection name="Tomcat instance (Windows server)">
-  <p>These steps assume that Tomcat and a Java 8 JDK/JRE have already been
-  installed and configured and that Tomcat is running as the tc01@dev.local
+  <p>These steps assume that Tomcat and an appropriate Java JDK/JRE have already
+  been installed and configured and that Tomcat is running as the tc01@dev.local
   user. The steps to configure the Tomcat instance for Windows authentication
   are as follows:
   </p>
@@ -192,7 +192,7 @@ com.sun.security.jgss.krb5.accept {
   <li>Ubuntu Server 12.04.3 LTS 64-bit</li>
   <li>Tomcat 8.0.x (r1546570)</li>
   </ul>
-  <p>It should work with any Tomcat 8 release although it is recommended that
+  <p>It should work with any Tomcat release although it is recommended that
   the latest stable release is used.</p>
   <p>The configuration is the same as for Windows but with the following
   changes:</p>
@@ -272,16 +272,6 @@ com.sun.security.jgss.krb5.accept {
   </ul>
   </subsection>
 
-  <subsection name="SPNEGO project at SourceForge">
-  <p>Full details of this solution can be found through the
-  <a href="http://spnego.sourceforge.net/index.html/"  rel="nofollow">project
-  site</a>. The key features are:</p>
-  <ul>
-  <li>Uses Kerberos</li>
-  <li>Pure Java solution</li>
-  </ul>
-  </subsection>
-
   <subsection name="Jespa">
   <p>Full details of this solution can be found through the
   <a href="http://www.ioplex.com/" rel="nofollow">project web site.</a> The key
@@ -289,6 +279,17 @@ com.sun.security.jgss.krb5.accept {
   <ul>
   <li>Pure Java solution</li>
   <li>Advanced Active Directory integration</li>
+  </ul>
+  </subsection>
+
+  <subsection name="SPNEGO AD project at SourceForge">
+  <p>Full details of this solution can be found through the
+  <a href="http://tomcatspnegoad.sourceforge.net/"  rel="nofollow">project
+  site</a>. The key features are:</p>
+  <ul>
+  <li>Pure Java solution</li>
+  <li>SPNEGO/Kerberos Authenticator</li>
+  <li>Active Directory Realm</li>
   </ul>
   </subsection>
 </section>

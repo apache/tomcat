@@ -72,17 +72,21 @@ public class TestHpack {
 
     private static class HeadersListener implements HpackDecoder.HeaderEmitter {
         private final MimeHeaders headers;
-        public HeadersListener(MimeHeaders headers) {
+
+        HeadersListener(MimeHeaders headers) {
             this.headers = headers;
         }
+
         @Override
         public void emitHeader(String name, String value) {
             headers.setValue(name).setString(value);
         }
+
         @Override
         public void setHeaderException(StreamException streamException) {
             // NO-OP
         }
+
         @Override
         public void validateHeaders() throws StreamException {
             // NO-OP
@@ -100,7 +104,7 @@ public class TestHpack {
             // Skip the control characters except VTAB
             if (i == 9 || i > 31 && i < 127 || i > 127) {
                 try {
-                    doTestHeaderValueBug60451("foo" + Character.toString((char) i)  + "bar");
+                    doTestHeaderValueBug60451("foo" + Character.toString((char) i) + "bar");
                 } catch (Exception e) {
                     e.printStackTrace();
                     Assert.fail(e.getMessage() + "[" + i + "]");
@@ -109,7 +113,7 @@ public class TestHpack {
         }
     }
 
-    @Test(expected=HpackException.class)
+    @Test(expected = HpackException.class)
     public void testExcessiveStringLiteralPadding() throws Exception {
         MimeHeaders headers = new MimeHeaders();
         headers.setValue("X-test").setString("foobar");
@@ -142,5 +146,69 @@ public class TestHpack {
         decoder.setHeaderEmitter(new HeadersListener(headers2));
         decoder.decode(output);
         Assert.assertEquals(headerValue, headers2.getHeader(headerName));
+    }
+
+
+    @Test
+    public void testDecodeIntegerMaxValue() throws HpackException {
+        ByteBuffer bb = ByteBuffer.allocate(9);
+        bb.put((byte) 255);
+        bb.put((byte) 254);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 7);
+        bb.position(0);
+
+        Assert.assertEquals(Integer.MAX_VALUE,Hpack.decodeInteger(bb, 1));
+    }
+
+
+    @Test(expected = HpackException.class)
+    public void testDecodeIntegerMaxValuePlus1() throws HpackException {
+        ByteBuffer bb = ByteBuffer.allocate(9);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 7);
+        bb.position(0);
+
+        Hpack.decodeInteger(bb, 1);
+    }
+
+    @Test(expected = HpackException.class)
+    public void testDecodeIntegerOverflow() throws HpackException {
+        ByteBuffer bb = ByteBuffer.allocate(9);
+        bb.put((byte) 255);
+        bb.put((byte) 254);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 255);
+        bb.put((byte) 15);
+        bb.position(0);
+
+        Hpack.decodeInteger(bb, 1);
+    }
+
+    @Test(expected = HpackException.class)
+    public void testDecodeIntegerZeroValues() throws HpackException {
+        ByteBuffer bb = ByteBuffer.allocate(12);
+        bb.put((byte) 255);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.put((byte) 128);
+        bb.position(0);
+
+        Hpack.decodeInteger(bb, 1);
     }
 }

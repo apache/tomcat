@@ -22,15 +22,16 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.SimpleHttpClient;
@@ -52,6 +53,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         TEXT_8K = sb.toString();
         BYTES_8K = TEXT_8K.getBytes(StandardCharsets.UTF_8);
     }
+
     @Test
     public void testPathParmsRootNone() throws Exception {
         pathParamTest("/", "none");
@@ -133,7 +135,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "servlet", new PathParamServlet());
         ctx.addServletMappingDecoded("/", "servlet");
@@ -153,8 +155,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.setContentType("text/plain");
             PrintWriter pw = resp.getWriter();
             String sessionId = req.getRequestedSessionId();
@@ -180,8 +181,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         pathParamExtensionTest("/testapp/blah;x=y/blah.txt", "none");
     }
 
-    private void pathParamExtensionTest(String path, String expected)
-            throws Exception {
+    private void pathParamExtensionTest(String path, String expected) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
@@ -212,23 +212,22 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
     @Test
     public void testBug54602c() throws Exception {
         // Partial UTF-8
-        doTestUriDecoding("/foo%c4", "UTF-8", "/foo\uFFFD");
+        doTestUriDecoding("/foo%c4", "UTF-8", null);
     }
 
     @Test
     public void testBug54602d() throws Exception {
         // Invalid UTF-8
-        doTestUriDecoding("/foo%ff", "UTF-8", "/foo\uFFFD");
+        doTestUriDecoding("/foo%ff", "UTF-8", null);
     }
 
     @Test
     public void testBug54602e() throws Exception {
         // Invalid UTF-8
-        doTestUriDecoding("/foo%ed%a0%80", "UTF-8", "/foo\uFFFD\uFFFD\uFFFD");
+        doTestUriDecoding("/foo%ed%a0%80", "UTF-8", null);
     }
 
-    private void doTestUriDecoding(String path, String encoding,
-            String expectedPathInfo) throws Exception{
+    private void doTestUriDecoding(String path, String encoding, String expectedPathInfo) throws Exception {
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
@@ -236,7 +235,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         tomcat.getConnector().setURIEncoding(encoding);
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         PathInfoServlet servlet = new PathInfoServlet();
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -244,11 +243,16 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
 
         tomcat.start();
 
-        int rc = getUrl("http://localhost:" + getPort() + path,
-                new ByteChunk(), null);
-        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+        int rc = getUrl("http://localhost:" + getPort() + path, new ByteChunk(), null);
 
-        Assert.assertEquals(expectedPathInfo, servlet.getPathInfo());
+        if (expectedPathInfo == null) {
+            // Invalid URI
+            Assert.assertEquals(HttpServletResponse.SC_BAD_REQUEST, rc);
+        } else {
+            // Valid URI
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            Assert.assertEquals(expectedPathInfo, servlet.getPathInfo());
+        }
     }
 
     private static class PathInfoServlet extends HttpServlet {
@@ -262,8 +266,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             // Not thread safe. Concurrent requests to this servlet will
             // over-write all the results but the last processed.
@@ -278,7 +281,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         AsyncServlet servlet = new AsyncServlet();
         Wrapper w = Tomcat.addServlet(ctx, "async", servlet);
@@ -294,19 +297,27 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
             }
         };
 
-        String request = "GET /async HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: a" + SimpleHttpClient.CRLF + SimpleHttpClient.CRLF;
+        // @formatter:off
+        String request =
+                "GET /async HTTP/1.1" + CRLF +
+                "Host: a" + CRLF +
+                CRLF;
+        // @formatter:on
 
         client.setPort(getPort());
-        client.setRequest(new String[] {request});
+        client.setRequest(new String[] { request });
 
         client.connect();
         client.sendRequest();
 
         for (int i = 0; i < 10; i++) {
             String line = client.readLine();
-            if (line != null && line.length() > 20) {
-                log.info(line.subSequence(0, 20) + "...");
+            if (line != null) {
+                if (line.length() > 20) {
+                    log.info(line.subSequence(0, 20) + "...");
+                } else {
+                    log.info(line);
+                }
             }
         }
 
@@ -317,8 +328,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         long startTime = System.nanoTime();
         t.join(5000);
         long endTime = System.nanoTime();
-        log.info("Waited for servlet thread to stop for "
-                + (endTime - startTime) / 1000000 + " ms");
+        log.info("Waited for servlet thread to stop for " + (endTime - startTime) / 1000000 + " ms");
 
         Assert.assertTrue(servlet.isCompleted());
     }
@@ -328,12 +338,20 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         doTestNormalize("/foo/../bar", "/bar");
     }
 
+    @Test
+    public void testNormalize02() {
+        doTestNormalize("/foo/.", "/foo");
+    }
+
     private void doTestNormalize(String input, String expected) {
         MessageBytes mb = MessageBytes.newInstance();
         byte[] b = input.getBytes(StandardCharsets.UTF_8);
-        mb.setBytes(b, 0, b.length);
+        // Need to allow an extra byte in case '/' is appended during processing
+        byte[] b2 = new byte[b.length + 1];
+        System.arraycopy(b, 0, b2, 0, b.length);
+        mb.setBytes(b2, 0, b.length);
 
-        boolean result = CoyoteAdapter.normalize(mb);
+        boolean result = CoyoteAdapter.normalize(mb, false);
         mb.toString();
 
         if (expected == null) {
@@ -363,8 +381,7 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
@@ -384,13 +401,13 @@ public class TestCoyoteAdapter extends TomcatBaseTest {
                             // because the client has gone away). In some cases
                             // there may be a large (ish) buffer to fill before
                             // the write fails.
-                            for (int j = 0 ; j < 8; j++) {
+                            for (int j = 0; j < 8; j++) {
                                 os.write(BYTES_8K);
                             }
                             os.flush();
                             Thread.sleep(1000);
                         } catch (Exception e) {
-                            log.info("Exception caught " + e);
+                            log.info("Exception caught " + e, e);
                             try {
                                 // Note if request times out before this
                                 // exception is thrown and the complete call

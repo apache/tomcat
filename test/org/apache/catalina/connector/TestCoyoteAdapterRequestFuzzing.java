@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -57,6 +58,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
     public static Collection<Object[]> parameters() {
         List<Object[]> parameterSets = new ArrayList<>();
 
+        // @formatter:off
         parameterSets.add(new Object[] { "GET /00 HTTP/1.1",
                                          "Host: lÿ#" + CRLF,
                                          "400" } );
@@ -93,7 +95,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
                                          "Host: localhost" + CRLF +
                                          COOKIE_250,
                                          "400" } );
-
+        // @formatter:on
         return parameterSets;
     }
 
@@ -110,7 +112,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
     @Test
     public void doTest() throws Exception {
         Tomcat tomcat = getTomcatInstance();
-        tomcat.getConnector().setAttribute("restrictedUserAgents", "value-not-important");
+        Assert.assertTrue(tomcat.getConnector().setProperty("restrictedUserAgents", "value-not-important"));
 
         File appDir = new File("test/webapp");
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
@@ -120,10 +122,15 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
         tomcat.start();
 
         Client client = new Client(tomcat.getConnector().getLocalPort());
-        client.setRequest(new String[] {requestLine + CRLF, headers + CRLF});
+        client.setRequest(new String[] { requestLine + CRLF, headers + CRLF });
 
         client.connect();
-        client.processRequest();
+        try {
+            client.processRequest();
+        } catch (SocketException e) {
+            // Likely connection reset. Response line won't be available.
+            return;
+        }
 
         // Expected response
         String line = client.getResponseLine();
@@ -133,7 +140,7 @@ public class TestCoyoteAdapterRequestFuzzing extends TomcatBaseTest {
 
     private static final class Client extends SimpleHttpClient {
 
-        public Client(int port) {
+        Client(int port) {
             setPort(port);
             setRequestPause(0);
         }

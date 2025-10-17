@@ -23,9 +23,7 @@ import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.Attributes;
 
 /**
- * RulesSet for digesting implicit.tld files.
- *
- * Only version information used and short names are allowed.
+ * RulesSet for digesting implicit.tld files. Only version information used and short names are allowed.
  */
 public class ImplicitTldRuleSet implements RuleSet {
 
@@ -51,6 +49,13 @@ public class ImplicitTldRuleSet implements RuleSet {
             public void begin(String namespace, String name, Attributes attributes) {
                 TaglibXml taglibXml = (TaglibXml) digester.peek();
                 taglibXml.setJspVersion(attributes.getValue("version"));
+
+                StringBuilder code = digester.getGeneratedCode();
+                if (code != null) {
+                    code.append(digester.toVariableName(taglibXml)).append(".setJspVersion(\"");
+                    code.append(attributes.getValue("version")).append("\");");
+                    code.append(System.lineSeparator());
+                }
             }
         });
         digester.addCallMethod(PREFIX + "/shortname", "setShortName", 0);

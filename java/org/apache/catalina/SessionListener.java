@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
 import java.util.EventListener;
@@ -23,8 +21,6 @@ import java.util.EventListener;
 
 /**
  * Interface defining a listener for significant Session generated events.
- *
- * @author Craig R. McClanahan
  */
 public interface SessionListener extends EventListener {
 
@@ -34,7 +30,7 @@ public interface SessionListener extends EventListener {
      *
      * @param event SessionEvent that has occurred
      */
-    public void sessionEvent(SessionEvent event);
+    void sessionEvent(SessionEvent event);
 
 
 }

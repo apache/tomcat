@@ -14,19 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.dbcp.dbcp2.datasources;
 
 import java.io.Serializable;
+import java.util.Objects;
 
-import org.apache.tomcat.dbcp.dbcp2.Utils;
+import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
 
 /**
  * <p>
- * Holds a user name and password pair. Serves as a poolable object key for the KeyedObjectPool backing a
- * SharedPoolDataSource. Two instances with the same user name are considered equal. This ensures that there will be
- * only one keyed pool for each user in the pool. The password is used (along with the user name) by the
- * KeyedCPDSConnectionFactory when creating new connections.
+ * Holds a user name and password pair. Serves as a poolable object key for the {@link KeyedObjectPool} backing a
+ * {@link SharedPoolDataSource}. Two instances with the same user name are considered equal. This ensures that there
+ * will be only one keyed pool for each user in the pool. The password is used (along with the user name) by the
+ * {@code KeyedCPDSConnectionFactory} when creating new connections.
  * </p>
  *
  * <p>
@@ -36,28 +36,27 @@ import org.apache.tomcat.dbcp.dbcp2.Utils;
  *
  * @since 2.0
  */
-class UserPassKey implements Serializable {
+final class UserPassKey implements Serializable {
     private static final long serialVersionUID = 5142970911626584817L;
-    private final String userName;
-    private final char[] userPassword;
 
-    /**
-     * @since 2.4.0
-     */
-    UserPassKey(final String userName) {
-        this(userName, (char[]) null);
+    private final CharArray name;
+    private final CharArray password;
+
+    UserPassKey(final CharArray userName, final CharArray userPassword) {
+        this.name = userName;
+        this.password = userPassword;
     }
 
-    /**
-     * @since 2.4.0
-     */
+    UserPassKey(final String userName) {
+        this(new CharArray(userName), CharArray.NULL);
+    }
+
     UserPassKey(final String userName, final char[] password) {
-        this.userName = userName;
-        this.userPassword = password;
+        this(new CharArray(userName), new CharArray(password));
     }
 
     UserPassKey(final String userName, final String userPassword) {
-        this(userName, Utils.toCharArray(userPassword));
+        this(new CharArray(userName), new CharArray(userPassword));
     }
 
     /**
@@ -75,14 +74,7 @@ class UserPassKey implements Serializable {
             return false;
         }
         final UserPassKey other = (UserPassKey) obj;
-        if (userName == null) {
-            if (other.userName != null) {
-                return false;
-            }
-        } else if (!userName.equals(other.userName)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(name, other.name);
     }
 
     /**
@@ -90,8 +82,8 @@ class UserPassKey implements Serializable {
      *
      * @return value of password.
      */
-    public String getPassword() {
-        return Utils.toString(userPassword);
+    String getPassword() {
+        return password.asString();
     }
 
     /**
@@ -99,8 +91,8 @@ class UserPassKey implements Serializable {
      *
      * @return value of password.
      */
-    public char[] getPasswordCharArray() {
-        return userPassword;
+    char[] getPasswordCharArray() {
+        return password.get();
     }
 
     /**
@@ -108,8 +100,8 @@ class UserPassKey implements Serializable {
      *
      * @return value of user name.
      */
-    public String getUsername() {
-        return userName;
+    String getUserName() {
+        return name.asString();
     }
 
     /**
@@ -117,18 +109,7 @@ class UserPassKey implements Serializable {
      */
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((userName == null) ? 0 : userName.hashCode());
-        return result;
+        return Objects.hash(name);
     }
 
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer(super.toString());
-        sb.append("[");
-        sb.append(userName);
-        sb.append(']');
-        return sb.toString();
-    }
 }

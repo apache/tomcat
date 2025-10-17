@@ -21,39 +21,46 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>21</version>
+        <version>34</version>
     </parent>
 
     <groupId>org.apache.tomcat</groupId>
     <artifactId>tomcat-owb</artifactId>
-    <name>Apache Tomcat CDI 2 support</name>
-    <description>Apache Tomcat CDI 2 support using Apache OpenWebBeans</description>
+    <name>Apache Tomcat CDI 4 support</name>
+    <description>Apache Tomcat CDI 4 support using Apache OpenWebBeans</description>
     <!-- This is the Apache OpenWebBeans version -->
-    <version>2.0.13</version>
+    <version>4.0.3</version>
     <packaging>jar</packaging>
 
     <properties>
-        <geronimo-atinject.version>1.0</geronimo-atinject.version>
-        <geronimo-interceptor.version>1.0</geronimo-interceptor.version>
-        <geronimo-jcdi.version>1.0.1</geronimo-jcdi.version>
-        <tomcat.version>9.0.30</tomcat.version>
+        <jakarta-inject.version>2.0.1</jakarta-inject.version>
+        <jakarta-interceptor.version>2.1.0</jakarta-interceptor.version>
+        <jakarta-enterprise-cdi.version>4.0.1</jakarta-enterprise-cdi.version>
+        <jakarta-annotation-api.version>2.1.1</jakarta-annotation-api.version>
+        <tomcat.version>12.0.0-SNAPSHOT</tomcat.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-atinject_1.0_spec</artifactId>
-           <version>${geronimo-atinject.version}</version>
+            <groupId>jakarta.inject</groupId>
+            <artifactId>jakarta.inject-api</artifactId>
+            <version>${jakarta-inject.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-interceptor_1.2_spec</artifactId>
-            <version>${geronimo-interceptor.version}</version>
+            <groupId>jakarta.interceptor</groupId>
+            <artifactId>jakarta.interceptor-api</artifactId>
+            <version>${jakarta-interceptor.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jcdi_2.0_spec</artifactId>
-            <version>${geronimo-jcdi.version}</version>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <version>${jakarta-enterprise-cdi.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>${jakarta-annotation-api.version}</version>
+            <scope>provided</scope>
         </dependency>
         <!-- Apache OpenWebBeans -->
         <dependency>
@@ -71,6 +78,11 @@
             <artifactId>openwebbeans-web</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.openwebbeans</groupId>
+            <artifactId>openwebbeans-el22</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- Allows building integration code, temporarily located here -->
         <dependency>
             <groupId>org.apache.tomcat</groupId>
@@ -80,23 +92,18 @@
         </dependency>
     </dependencies>
 
-
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <release>21</release>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
-                <!--<version>3.2.2</version>-->
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -106,23 +113,35 @@
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <transformers>
-                                <transformer implementation="org.apache.openwebbeans.maven.shade.OpenWebBeansPropertiesTransformer" />
-                                <!-- With Shade 3.2.2 <transformer implementation="org.apache.maven.plugins.shade.resource.properties.OpenWebBeansPropertiesTransformer"/>-->
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>${mainClass}</mainClass>
-                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.properties.OpenWebBeansPropertiesTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer" />
                             </transformers>
+                            <artifactSet>
+                                <excludes>
+                                    <!-- Already present in Tomcat -->
+                                    <exclude>jakarta.el:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/DEPENDENCIES</exclude>
+                                        <exclude>META-INF/LICENSE.txt</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>META-INF/NOTICE.txt</exclude>
+                                        <exclude>META-INF/NOTICE</exclude>
+                                        <!-- Unneeded configuration files -->
+                                        <exclude>module-info.class</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
                         </configuration>
                     </execution>
                 </executions>
-                <!-- Remove after Shade 3.2.2 -->
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.openwebbeans</groupId>
-                        <artifactId>openwebbeans-maven</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

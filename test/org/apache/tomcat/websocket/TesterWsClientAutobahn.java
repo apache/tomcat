@@ -23,23 +23,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-import javax.websocket.ClientEndpoint;
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ContainerProvider;
-import javax.websocket.Endpoint;
-import javax.websocket.Extension;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import jakarta.websocket.ClientEndpoint;
+import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.Extension;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.websocket.pojo.PojoEndpointClient;
 
 /**
- * Runs the Autobahn test suite in client mode for testing the WebSocket client
- * implementation.
+ * Runs the Autobahn test suite in client mode for testing the WebSocket client implementation.
  */
 public class TesterWsClientAutobahn {
 
@@ -73,8 +72,7 @@ public class TesterWsClientAutobahn {
     }
 
 
-    private static int getTestCaseCount(WebSocketContainer wsc)
-            throws Exception {
+    private static int getTestCaseCount(WebSocketContainer wsc) throws Exception {
 
         URI uri = new URI("ws://" + HOST + ":" + PORT + "/getCaseCount");
         CaseCountClient caseCountClient = new CaseCountClient();
@@ -83,10 +81,8 @@ public class TesterWsClientAutobahn {
     }
 
 
-    private static void executeTestCase(WebSocketContainer wsc, int testCase)
-            throws Exception {
-        URI uri = new URI("ws://" + HOST + ":" + PORT + "/runCase?case=" +
-                testCase + "&agent=" + USER_AGENT);
+    private static void executeTestCase(WebSocketContainer wsc, int testCase) throws Exception {
+        URI uri = new URI("ws://" + HOST + ":" + PORT + "/runCase?case=" + testCase + "&agent=" + USER_AGENT);
         TestCaseClient testCaseClient = new TestCaseClient();
 
         Extension permessageDeflate = new WsExtension("permessage-deflate");
@@ -94,12 +90,11 @@ public class TesterWsClientAutobahn {
         // Client only supports some values so there will be some failures here
         // Note Autobahn returns a 400 response if you provide a value for
         // client_max_window_bits
-        permessageDeflate.getParameters().add(
-                new WsExtensionParameter("client_max_window_bits", null));
+        permessageDeflate.getParameters().add(new WsExtensionParameter("client_max_window_bits", null));
         List<Extension> extensions = new ArrayList<>(1);
         extensions.add(permessageDeflate);
 
-        Endpoint ep = new PojoEndpointClient(testCaseClient, null);
+        Endpoint ep = new PojoEndpointClient(testCaseClient, null, null);
         ClientEndpointConfig.Builder builder = ClientEndpointConfig.Builder.create();
         ClientEndpointConfig config = builder.extensions(extensions).build();
 
@@ -108,11 +103,9 @@ public class TesterWsClientAutobahn {
     }
 
 
-    private static void updateReports(WebSocketContainer wsc)
-            throws Exception {
+    private static void updateReports(WebSocketContainer wsc) throws Exception {
 
-        URI uri = new URI("ws://" + HOST + ":" + PORT +
-                "/updateReports?agent=" + USER_AGENT);
+        URI uri = new URI("ws://" + HOST + ":" + PORT + "/updateReports?agent=" + USER_AGENT);
         UpdateReportsClient updateReportsClient = new UpdateReportsClient();
         wsc.connectToServer(updateReportsClient, uri);
     }
@@ -160,26 +153,25 @@ public class TesterWsClientAutobahn {
                 if (session.isOpen()) {
                     session.getBasicRemote().sendText(msg, last);
                 }
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
         }
 
         @OnMessage
-        public void echoBinaryMessage(Session session, ByteBuffer bb,
-                boolean last) {
+        public void echoBinaryMessage(Session session, ByteBuffer bb, boolean last) {
             try {
                 if (session.isOpen()) {
                     session.getBasicRemote().sendBinary(bb, last);
                 }
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }

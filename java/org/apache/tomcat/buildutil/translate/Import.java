@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.tomcat.buildutil.translate;
 
 import java.io.File;
@@ -44,8 +44,8 @@ public class Import {
         String language = Utils.getLanguage(f.getName());
 
         // Skip the original
-        if (language.length() == 0) {
-            // Comment this line out if the originals needs to be exported.
+        if (language.isEmpty()) {
+            // Comment this line out if the originals need to be imported.
             return;
         }
 
@@ -59,17 +59,25 @@ public class Import {
 
         for (Object objKey : objKeys) {
             String key = (String) objKey;
+            String value = props.getProperty(key);
+            // Skip untranslated values
+            if (value.trim().isEmpty()) {
+                continue;
+            }
             CompositeKey cKey = new CompositeKey(key);
 
             if (!cKey.pkg.equals(currentPkg)) {
                 currentPkg = cKey.pkg;
+                currentGroup = "zzz";
                 if (w != null) {
                     w.close();
                 }
-                File outFile = new File(currentPkg.replace('.', File.separatorChar), Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
+                File outFile = new File(currentPkg.replace('.', File.separatorChar),
+                        Constants.L10N_PREFIX + language + Constants.L10N_SUFFIX);
                 FileOutputStream fos = new FileOutputStream(outFile);
                 w = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
-                insertLicense(w);
+                org.apache.tomcat.buildutil.Utils.insertLicense(w);
+                Utils.insertEditInstructions(w);
             }
 
             if (!currentGroup.equals(cKey.group)) {
@@ -77,7 +85,10 @@ public class Import {
                 w.write(System.lineSeparator());
             }
 
-            w.write(cKey.key + "=" + Utils.formatValue(props.getProperty(key)));
+            value = Utils.formatValueImport(value);
+            value = Utils.fixUnnecessaryEscaping(cKey.key, value);
+
+            w.write(cKey.key + "=" + value);
             w.write(System.lineSeparator());
         }
         if (w != null) {
@@ -86,45 +97,15 @@ public class Import {
     }
 
 
-    private static void insertLicense(Writer w) throws IOException {
-        w.write("# Licensed to the Apache Software Foundation (ASF) under one or more");
-        w.write(System.lineSeparator());
-        w.write("# contributor license agreements.  See the NOTICE file distributed with");
-        w.write(System.lineSeparator());
-        w.write("# this work for additional information regarding copyright ownership.");
-        w.write(System.lineSeparator());
-        w.write("# The ASF licenses this file to You under the Apache License, Version 2.0");
-        w.write(System.lineSeparator());
-        w.write("# (the \"License\"); you may not use this file except in compliance with");
-        w.write(System.lineSeparator());
-        w.write("# the License.  You may obtain a copy of the License at");
-        w.write(System.lineSeparator());
-        w.write("#");
-        w.write(System.lineSeparator());
-        w.write("#     http://www.apache.org/licenses/LICENSE-2.0");
-        w.write(System.lineSeparator());
-        w.write("#");
-        w.write(System.lineSeparator());
-        w.write("# Unless required by applicable law or agreed to in writing, software");
-        w.write(System.lineSeparator());
-        w.write("# distributed under the License is distributed on an \"AS IS\" BASIS,");
-        w.write(System.lineSeparator());
-        w.write("# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.");
-        w.write(System.lineSeparator());
-        w.write("# See the License for the specific language governing permissions and");
-        w.write(System.lineSeparator());
-        w.write("# limitations under the License.");
-        w.write(System.lineSeparator());
-    }
     private static class CompositeKey {
 
         public final String pkg;
         public final String key;
         public final String group;
 
-        public CompositeKey(String in) {
+        CompositeKey(String in) {
             int posPkg = in.indexOf(Constants.END_PACKAGE_MARKER);
-            pkg = in.substring(0, posPkg);
+            pkg = in.substring(0, posPkg).replace(Constants.JAVA_EE_SUBSTRING, Constants.JAKARTA_EE_SUBSTRING);
             key = in.substring(posPkg + Constants.END_PACKAGE_MARKER.length());
             int posGroup = key.indexOf('.');
             if (posGroup == -1) {

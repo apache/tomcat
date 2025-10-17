@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="ControlFlowStatementWithoutBraces" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="ForCanBeForeach" enabled="true" level="WEAK_WARNING" enabled_by_default="true"/>
+    <inspection_tool class="FieldMayBeFinal" enabled="true" level="WEAK_WARNING" enabled_by_default="true"/>
+    <inspection_tool class="RedundantModifier" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnnecessarySemicolon" enabled="true" level="WEAK_WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnnecessaryParentheses" enabled="true" level="WEAK_WARNING" enabled_by_default="true"/>
+    <inspection_tool class="StaticAccessedFromInstance" enabled="true" level="WEAK_WARNING" enabled_by_default="true"/>
+    <inspection_tool class="SerializableHasSerialVersionUIDField" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="override" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="NonSynchronizedMethodOverridesSynchronizedMethod" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="resource" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="IOResourceOpenedButNotSafelyClosed" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="SocketOpenedButNotSafelyClosed" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="ChannelOpenedButNotSafelyClosed" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnusedImport" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnusedDeclaration" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnusedAssignment" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="RedundantThrows" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="DuplicateThrows" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="RedundantCast" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="StatementWithEmptyBody" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="EmptyMethod" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnnecessaryBoxing" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="UnnecessaryUnboxing" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="BoxingBoxedValue" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="AutoUnboxing" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="FinalizeNotProtected" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="FinalizeDeclaration" enabled="true" level="WARNING" enabled_by_default="true"/>
+    <inspection_tool class="FinalizeCalledExplicitly" enabled="true" level="WARNING" enabled_by_default="true"/>
+  </profile>
+</component>

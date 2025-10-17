@@ -23,6 +23,7 @@ import java.net.Socket;
 import java.text.DecimalFormat;
 
 import org.apache.catalina.tribes.io.XByteBuffer;
+import org.apache.catalina.tribes.transport.Constants;
 
 public class SocketTribesReceive {
     static long start = 0;
@@ -37,7 +38,7 @@ public class SocketTribesReceive {
 
 
     public static void main(String[] args) throws Exception {
-        int size = 43800;
+        int size = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
         if (args.length > 0 ) {
             try {
                 size = Integer.parseInt(args[0]);
@@ -45,7 +46,7 @@ public class SocketTribesReceive {
                 /* Ignore */
             }
         }
-        XByteBuffer xbuf = new XByteBuffer(43800,true);
+        XByteBuffer xbuf = new XByteBuffer(Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE, true);
         try (ServerSocket srvSocket = new ServerSocket(9999)) {
             System.out.println("Listening on 9999");
             Socket socket = srvSocket.accept();
@@ -56,7 +57,7 @@ public class SocketTribesReceive {
                 public void run() {
                     while ( true ) {
                         try {
-                            Thread.sleep(1000);
+                            sleep(1000);
                             printStats(start, mb, count, df, total);
                         }catch ( Exception x ) { /* Ignore */ }
                     }
@@ -96,7 +97,7 @@ public class SocketTribesReceive {
         long time = System.currentTimeMillis();
         double seconds = ((double)(time-start))/1000;
         System.out.println("Throughput " + df.format(mb/seconds) +
-                " MB/seconds messages " + count + ", total " + mb +
-                " MB, total " + total + " bytes.");
+                " MiB/s messages " + count + ", total " + mb +
+                " MiB total " + total + " bytes.");
     }
 }

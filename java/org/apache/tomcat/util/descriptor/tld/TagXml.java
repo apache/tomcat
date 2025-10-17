@@ -19,15 +19,13 @@ package org.apache.tomcat.util.descriptor.tld;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.jsp.tagext.TagAttributeInfo;
-import javax.servlet.jsp.tagext.TagInfo;
-import javax.servlet.jsp.tagext.TagVariableInfo;
+import jakarta.servlet.jsp.tagext.TagAttributeInfo;
+import jakarta.servlet.jsp.tagext.TagInfo;
+import jakarta.servlet.jsp.tagext.TagVariableInfo;
 
 /**
- * Model of a tag define in a tag library descriptor.
- * This represents the information as parsed from the XML but differs from
- * TagInfo in that is does not provide a link back to the tag library that
- * defined it.
+ * Model of a tag define in a tag library descriptor. This represents the information as parsed from the XML but differs
+ * from TagInfo in that it does not provide a link back to the tag library that defined it.
  */
 public class TagXml {
     private String name;

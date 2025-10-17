@@ -14,40 +14,39 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote;
 
-import javax.servlet.http.HttpUpgradeHandler;
+import jakarta.servlet.http.HttpUpgradeHandler;
 
 import org.apache.tomcat.ContextBind;
 import org.apache.tomcat.InstanceManager;
 
 /**
  * Token used during the upgrade process.
+ *
+ * @param httpUpgradeHandler The handler for the HTTP upgrade
+ * @param contextBind        The object to use to bind/unbind the current thread to/from the web application class
+ *                               loader
+ * @param instanceManager    The instance manager to use to create new Servlets, Filters, Listeners etc
+ * @param protocol           The desired protocol to upgrade to
  */
-public final class UpgradeToken {
+public record UpgradeToken(HttpUpgradeHandler httpUpgradeHandler, ContextBind contextBind,
+        InstanceManager instanceManager, String protocol) {
 
-    private final ContextBind contextBind;
-    private final HttpUpgradeHandler httpUpgradeHandler;
-    private final InstanceManager instanceManager;
-
-    public UpgradeToken(HttpUpgradeHandler httpUpgradeHandler,
-            ContextBind contextBind, InstanceManager instanceManager) {
-        this.contextBind = contextBind;
-        this.httpUpgradeHandler = httpUpgradeHandler;
-        this.instanceManager = instanceManager;
-    }
-
-    public final ContextBind getContextBind() {
+    public ContextBind getContextBind() {
         return contextBind;
     }
 
-    public final HttpUpgradeHandler getHttpUpgradeHandler() {
+    public HttpUpgradeHandler getHttpUpgradeHandler() {
         return httpUpgradeHandler;
     }
 
-    public final InstanceManager getInstanceManager() {
+    public InstanceManager getInstanceManager() {
         return instanceManager;
+    }
+
+    public String getProtocol() {
+        return protocol;
     }
 
 }

@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <!-- This MBean contains Connector attributes and some common attributes of
@@ -43,6 +46,10 @@
     <attribute   name="ajpFlush"
           description="Send AJP flush package for each explicit flush"
                  type="boolean"/>
+
+    <attribute   name="allowedRequestAttributesPattern"
+          description="Regular expression that any custom request attributes must match else the request will be rejected"
+                 type="java.lang.String"/>
 
     <attribute   name="allowTrace"
           description="Allow disabling TRACE method"
@@ -100,7 +107,7 @@
                  type="int"/>
 
     <attribute   name="maxParameterCount"
-          description="The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 10000 by default. A value of less than 0 means no limit."
+          description="The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 1000 by default. A value of less than 0 means no limit."
                  type="int"/>
 
     <attribute   name="maxPostSize"
@@ -180,9 +187,13 @@
                  type="java.lang.String"/>
 
     <attribute   name="secret"
-          description="Authentication secret (I guess ... not in Javadocs)"
+          description="Authentication secret"
             readable = "false"
                  type="java.lang.String"/>
+
+    <attribute   name="secretRequired"
+          description="Must secret be set to a non-null, non-zero-length String?"
+                 type="boolean"/>
 
     <attribute   name="secure"
           description="Is this a secure (SSL) Connector?"

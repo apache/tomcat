@@ -37,14 +37,14 @@ public class AccessLogAdapter implements AccessLog {
 
     public void add(AccessLog log) {
         Objects.requireNonNull(log);
-        AccessLog newArray[] = Arrays.copyOf(logs, logs.length + 1);
+        AccessLog[] newArray = Arrays.copyOf(logs, logs.length + 1);
         newArray[newArray.length - 1] = log;
         logs = newArray;
     }
 
     @Override
     public void log(Request request, Response response, long time) {
-        for (AccessLog log: logs) {
+        for (AccessLog log : logs) {
             log.log(request, response, time);
         }
     }

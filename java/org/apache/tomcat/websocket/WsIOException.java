@@ -17,16 +17,17 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
+import java.io.Serial;
 
-import javax.websocket.CloseReason;
+import jakarta.websocket.CloseReason;
 
 /**
- * Allows the WebSocket implementation to throw an {@link IOException} that
- * includes a {@link CloseReason} specific to the error that can be passed back
- * to the client.
+ * Allows the WebSocket implementation to throw an {@link IOException} that includes a {@link CloseReason} specific to
+ * the error that can be passed back to the client.
  */
 public class WsIOException extends IOException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final CloseReason closeReason;

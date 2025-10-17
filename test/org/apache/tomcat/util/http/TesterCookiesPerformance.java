@@ -21,6 +21,10 @@ import org.junit.Test;
 
 import org.apache.tomcat.util.buf.MessageBytes;
 
+/*
+ * This is an absolute performance test. There is no benefit it running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
 public class TesterCookiesPerformance {
 
     @Test
@@ -47,23 +51,14 @@ public class TesterCookiesPerformance {
         headerValue.setBytes(cookieHeaderBytes, 0, cookieHeaderBytes.length);
         ServerCookies serverCookies = new ServerCookies(4);
 
-        LegacyCookieProcessor originalCookieProcessor = new LegacyCookieProcessor();
         Rfc6265CookieProcessor rfc6265CookieProcessor = new Rfc6265CookieProcessor();
 
         // warm up
         for (int i = 0; i < parsingLoops; i++) {
-            originalCookieProcessor.parseCookieHeader(mimeHeaders, serverCookies);
+            rfc6265CookieProcessor.parseCookieHeader(mimeHeaders, serverCookies);
             Assert.assertEquals(cookieCount, serverCookies.getCookieCount());
             serverCookies.recycle();
         }
-
-        long oldStart = System.nanoTime();
-        for (int i = 0; i < parsingLoops; i++) {
-            originalCookieProcessor.parseCookieHeader(mimeHeaders, serverCookies);
-            Assert.assertEquals(cookieCount, serverCookies.getCookieCount());
-            serverCookies.recycle();
-        }
-        long oldDuration = System.nanoTime() - oldStart;
 
         long newStart = System.nanoTime();
         for (int i = 0; i < parsingLoops; i++) {
@@ -73,7 +68,8 @@ public class TesterCookiesPerformance {
         }
         long newDuration = System.nanoTime() - newStart;
 
-        System.out.println("Original duration: " + oldDuration);
         System.out.println("RFC6265 duration:  " + newDuration);
+
+        // As of November 2021 markt's desktop runs this test in 970ms to 1000ms
     }
 }

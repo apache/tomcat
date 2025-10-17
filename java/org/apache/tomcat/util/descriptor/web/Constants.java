@@ -18,9 +18,23 @@ package org.apache.tomcat.util.descriptor.web;
 
 public class Constants {
 
-    public static final String PACKAGE_NAME =
-            Constants.class.getPackage().getName();
+    public static final String PACKAGE_NAME = Constants.class.getPackage().getName();
 
     public static final String WEB_XML_LOCATION = "/WEB-INF/web.xml";
 
+    // -------------------------------------------------- Cookie attribute names
+    public static final String COOKIE_COMMENT_ATTR = "Comment";
+    public static final String COOKIE_DOMAIN_ATTR = "Domain";
+    public static final String COOKIE_MAX_AGE_ATTR = "Max-Age";
+    public static final String COOKIE_PATH_ATTR = "Path";
+    public static final String COOKIE_SECURE_ATTR = "Secure";
+    public static final String COOKIE_HTTP_ONLY_ATTR = "HttpOnly";
+    public static final String COOKIE_SAME_SITE_ATTR = "SameSite";
+    /**
+     * The name of the attribute used to indicate a partitioned cookie as part of
+     * <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a>. This cookie attribute is not
+     * defined by an RFC and may change in a non-backwards compatible way once equivalent functionality is included in
+     * an RFC.
+     */
+    public static final String COOKIE_PARTITIONED_ATTR = "Partitioned";
 }

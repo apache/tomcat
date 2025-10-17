@@ -14,14 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.tomcat.dbcp.pool2.KeyedObjectPool;
 
@@ -50,15 +46,15 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
      */
     private final K key;
 
-    private volatile boolean batchAdded = false;
+    private volatile boolean batchAdded;
 
     /**
-     * Constructor.
+     * Constructs a new instance.
      *
      * @param stmt
      *            my underlying {@link PreparedStatement}
      * @param key
-     *            my key" as used by {@link KeyedObjectPool}
+     *            my key as used by {@link KeyedObjectPool}
      * @param pool
      *            the {@link KeyedObjectPool} from which I was obtained.
      * @param conn
@@ -72,7 +68,14 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
 
         // Remove from trace now because this statement will be
         // added by the activate method.
-        removeThisTrace(getConnectionInternal());
+        removeThisTrace(conn);
+    }
+
+    @Override
+    public void activate() throws SQLException {
+        setClosedInternal(false);
+        add(getConnectionInternal(), this);
+        super.activate();
     }
 
     /**
@@ -102,9 +105,7 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         if (!isClosed()) {
             try {
                 pool.returnObject(key, this);
-            } catch (final SQLException e) {
-                throw e;
-            } catch (final RuntimeException e) {
+            } catch (final SQLException | RuntimeException e) {
                 throw e;
             } catch (final Exception e) {
                 throw new SQLException("Cannot close preparedstatement (return to pool failed)", e);
@@ -112,13 +113,13 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         }
     }
 
-    @Override
-    public void activate() throws SQLException {
-        setClosedInternal(false);
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().addTrace(this);
-        }
-        super.activate();
+    /**
+     * Package-protected for tests.
+     *
+     * @return The key.
+     */
+    K getKey() {
+        return key;
     }
 
     @Override
@@ -128,32 +129,6 @@ public class PoolablePreparedStatement<K> extends DelegatingPreparedStatement {
         if (batchAdded) {
             clearBatch();
         }
-        setClosedInternal(true);
-        removeThisTrace(getConnectionInternal());
-
-        // The JDBC spec requires that a statement closes any open
-        // ResultSet's when it is closed.
-        // FIXME The PreparedStatement we're wrapping should handle this for us.
-        // See bug 17301 for what could happen when ResultSets are closed twice.
-        final List<AbandonedTrace> resultSetList = getTrace();
-        if (resultSetList != null) {
-            final List<Exception> thrownList = new ArrayList<>();
-            final ResultSet[] resultSets = resultSetList.toArray(new ResultSet[resultSetList.size()]);
-            for (final ResultSet resultSet : resultSets) {
-                if (resultSet != null) {
-                    try {
-                        resultSet.close();
-                    } catch (Exception e) {
-                        thrownList.add(e);
-                    }
-                }
-            }
-            clearTrace();
-            if (!thrownList.isEmpty()) {
-                throw new SQLExceptionList(thrownList);
-            }
-        }
-
-        super.passivate();
+        prepareToReturn();
     }
 }

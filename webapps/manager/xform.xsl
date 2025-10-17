@@ -24,21 +24,21 @@
               indent="no"/>
 
   <xsl:template match="status">
-    <html>
-    <head>
-        <TITLE>Tomcat Status</TITLE>
-        <STYLE type="text/css">
+    <html lang="en">
+      <head>
+        <title>Tomcat Status</title>
+        <style>
             body, table, tr, td, a, div, span {
-                vertical-align : top;
+              vertical-align: top;
             }
-        </STYLE>
-    </head>
-    <body>
-      <div style='font-size:20px;'>Tomcat Status</div>
+        </style>
+      </head>
+      <body>
+        <div style='font-size:20px;'>Tomcat Status</div>
 
-      <xsl:apply-templates select="jvm"/>
-      <xsl:apply-templates select="connector"/>
-     </body>
+        <xsl:apply-templates select="jvm"/>
+        <xsl:apply-templates select="connector"/>
+      </body>
     </html>
   </xsl:template>
 
@@ -50,24 +50,27 @@
   </xsl:template>
 
   <xsl:template match="memory">
-    <table><tr>
-             <td><b>JVM:</b></td>
-             <td><b>free:</b> <xsl:value-of select="@free"/></td>
-             <td><b>total:</b> <xsl:value-of select="@total"/></td>
-             <td><b>max:</b> <xsl:value-of select="@max"/></td>
-           </tr>
-    </table><hr />
+    <table>
+        <tr>
+          <td><b>JVM:</b></td>
+          <td><b>free:</b> <xsl:value-of select="@free"/></td>
+          <td><b>total:</b> <xsl:value-of select="@total"/></td>
+          <td><b>max:</b> <xsl:value-of select="@max"/></td>
+        </tr>
+    </table>
+    <hr />
   </xsl:template>
 
   <xsl:template match="memorypool">
-    <table><tr>
-             <td><b>Name:</b> <xsl:value-of select="@name"/></td>
-             <td><b>Type:</b> <xsl:value-of select="@type"/></td>
-             <td><b>Initial:</b> <xsl:value-of select="@usageInit"/></td>
-             <td><b>Committed:</b> <xsl:value-of select="@usageCommitted"/></td>
-             <td><b>Maximum:</b> <xsl:value-of select="@usageMax"/></td>
-             <td><b>Used:</b> <xsl:value-of select="@usageUsed"/></td>
-           </tr>
+    <table>
+        <tr>
+          <td><b>Name:</b> <xsl:value-of select="@name"/></td>
+          <td><b>Type:</b> <xsl:value-of select="@type"/></td>
+          <td><b>Initial:</b> <xsl:value-of select="@usageInit"/></td>
+          <td><b>Committed:</b> <xsl:value-of select="@usageCommitted"/></td>
+          <td><b>Maximum:</b> <xsl:value-of select="@usageMax"/></td>
+          <td><b>Used:</b> <xsl:value-of select="@usageUsed"/></td>
+        </tr>
     </table>
   </xsl:template>
 
@@ -80,46 +83,58 @@
   </xsl:template>
 
   <xsl:template match="threadInfo">
-    <table><tr>
-             <td><b>threadInfo</b></td>
-             <td><b>maxThreads:</b> <xsl:value-of select="@maxThreads"/></td>
-             <td><b>currentThreadCount:</b> <xsl:value-of select="@currentThreadCount"/></td>
-             <td><b>currentThreadsBusy:</b> <xsl:value-of select="@currentThreadsBusy"/></td>
-           </tr>
-    </table><hr />
+    <table>
+        <tr>
+          <td><b>threadInfo</b></td>
+          <td><b>maxThreads:</b> <xsl:value-of select="@maxThreads"/></td>
+          <td><b>currentThreadCount:</b> <xsl:value-of select="@currentThreadCount"/></td>
+          <td><b>currentThreadsBusy:</b> <xsl:value-of select="@currentThreadsBusy"/></td>
+        </tr>
+    </table>
+    <hr />
   </xsl:template>
 
   <xsl:template match="requestInfo">
-    <table><tr>
-             <td><b>requestInfo </b></td>
-             <td><b>maxTime:</b> <xsl:value-of select="@maxTime"/></td>
-             <td><b>processingTime:</b> <xsl:value-of select="@processingTime"/></td>
-             <td><b>requestCount:</b> <xsl:value-of select="@requestCount"/></td>
-             <td><b>errorCount:</b> <xsl:value-of select="@errorCount"/></td>
-             <td><b>bytesReceived:</b> <xsl:value-of select="@bytesReceived"/></td>
-             <td><b>bytesSent:</b> <xsl:value-of select="@bytesSent"/></td>
-           </tr>
-    </table><hr />
+    <table>
+        <tr>
+          <td><b>requestInfo </b></td>
+          <td><b>maxTime:</b> <xsl:value-of select="@maxTime"/></td>
+          <td><b>processingTime:</b> <xsl:value-of select="@processingTime"/></td>
+          <td><b>requestCount:</b> <xsl:value-of select="@requestCount"/></td>
+          <td><b>errorCount:</b> <xsl:value-of select="@errorCount"/></td>
+          <td><b>bytesReceived:</b> <xsl:value-of select="@bytesReceived"/></td>
+          <td><b>bytesSent:</b> <xsl:value-of select="@bytesSent"/></td>
+        </tr>
+    </table>
+    <hr />
   </xsl:template>
 
   <xsl:template match="workers">
-   <table>
-    <tr><th>Stage</th><th>Time</th><th>B Sent</th><th>B Recv</th><th>Client</th><th>VHost</th><th>Request</th></tr>
-      <xsl:apply-templates select="worker"/>
-
-   </table><hr />
+    <table>
+        <tr>
+          <th>Stage</th>
+          <th>Time</th>
+          <th>B Sent</th>
+          <th>B Recv</th>
+          <th>Client</th>
+          <th>VHost</th>
+          <th>Request</th>
+        </tr>
+        <xsl:apply-templates select="worker"/>
+    </table>
+    <hr />
   </xsl:template>
 
   <xsl:template match="worker">
-   <tr>
-    <td><xsl:value-of select="@stage"/></td>
-    <td><xsl:value-of select="@requestProcessingTime"/></td>
-    <td><xsl:value-of select="@requestBytesSent"/></td>
-    <td><xsl:value-of select="@requestBytesReceived"/></td>
-    <td><xsl:value-of select="@remoteAddr"/></td>
-    <td><xsl:value-of select="@virtualHost"/></td>
-    <td><xsl:value-of select="@method"/> <xsl:value-of select="@currentUri"/>?<xsl:value-of select="@currentQueryString"/> <xsl:value-of select="@protocol"/></td>
-   </tr>
+    <tr>
+      <td><xsl:value-of select="@stage"/></td>
+      <td><xsl:value-of select="@requestProcessingTime"/></td>
+      <td><xsl:value-of select="@requestBytesSent"/></td>
+      <td><xsl:value-of select="@requestBytesReceived"/></td>
+      <td><xsl:value-of select="@remoteAddr"/></td>
+      <td><xsl:value-of select="@virtualHost"/></td>
+      <td><xsl:value-of select="@method"/> <xsl:value-of select="@currentUri"/>?<xsl:value-of select="@currentQueryString"/> <xsl:value-of select="@protocol"/></td>
+    </tr>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.JasperException;
@@ -34,48 +34,43 @@ import org.apache.tomcat.util.descriptor.tld.TldResourcePath;
 import org.xml.sax.SAXException;
 
 /**
- * This class caches parsed instances of TLD files to remove the need for the
- * same TLD to be parsed for each JSP that references it. It does not protect
- * against multiple threads processing the same, new TLD but it does ensure that
- * each all threads will use the same TLD object after parsing.
+ * This class caches parsed instances of TLD files to remove the need for the same TLD to be parsed for each JSP that
+ * references it. It does not protect against multiple threads processing the same new TLD, but it does ensure that each
+ * all threads will use the same TLD object after parsing.
  */
 public class TldCache {
 
-    public static final String SERVLET_CONTEXT_ATTRIBUTE_NAME =
-            TldCache.class.getName();
+    public static final String SERVLET_CONTEXT_ATTRIBUTE_NAME = TldCache.class.getName();
 
     private final ServletContext servletContext;
     private final Map<String,TldResourcePath> uriTldResourcePathMap = new HashMap<>();
-    private final Map<TldResourcePath,TaglibXmlCacheEntry> tldResourcePathTaglibXmlMap =
-            new HashMap<>();
+    private final Map<TldResourcePath,TaglibXmlCacheEntry> tldResourcePathTaglibXmlMap = new HashMap<>();
     private final TldParser tldParser;
 
 
     public static TldCache getInstance(ServletContext servletContext) {
         if (servletContext == null) {
-            throw new IllegalArgumentException(Localizer.getMessage(
-                    "org.apache.jasper.compiler.TldCache.servletContextNull"));
+            throw new IllegalArgumentException(
+                    Localizer.getMessage("org.apache.jasper.compiler.TldCache.servletContextNull"));
         }
         return (TldCache) servletContext.getAttribute(SERVLET_CONTEXT_ATTRIBUTE_NAME);
     }
 
 
-    public TldCache(ServletContext servletContext,
-            Map<String, TldResourcePath> uriTldResourcePathMap,
-            Map<TldResourcePath, TaglibXml> tldResourcePathTaglibXmlMap) {
+    public TldCache(ServletContext servletContext, Map<String,TldResourcePath> uriTldResourcePathMap,
+            Map<TldResourcePath,TaglibXml> tldResourcePathTaglibXmlMap) {
         this.servletContext = servletContext;
         this.uriTldResourcePathMap.putAll(uriTldResourcePathMap);
-        for (Entry<TldResourcePath, TaglibXml> entry : tldResourcePathTaglibXmlMap.entrySet()) {
+        for (Entry<TldResourcePath,TaglibXml> entry : tldResourcePathTaglibXmlMap.entrySet()) {
             TldResourcePath tldResourcePath = entry.getKey();
-            long lastModified[] = getLastModified(tldResourcePath);
-            TaglibXmlCacheEntry cacheEntry = new TaglibXmlCacheEntry(
-                    entry.getValue(), lastModified[0], lastModified[1]);
+            long[] lastModified = getLastModified(tldResourcePath);
+            TaglibXmlCacheEntry cacheEntry =
+                    new TaglibXmlCacheEntry(entry.getValue(), lastModified[0], lastModified[1]);
             this.tldResourcePathTaglibXmlMap.put(tldResourcePath, cacheEntry);
         }
-        boolean validate = Boolean.parseBoolean(
-                servletContext.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
-        String blockExternalString = servletContext.getInitParameter(
-                Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
+        boolean validate =
+                Boolean.parseBoolean(servletContext.getInitParameter(Constants.XML_VALIDATION_TLD_INIT_PARAM));
+        String blockExternalString = servletContext.getInitParameter(Constants.XML_BLOCK_EXTERNAL_INIT_PARAM);
         boolean blockExternal;
         if (blockExternalString == null) {
             blockExternal = true;
@@ -96,7 +91,7 @@ public class TldCache {
         if (cacheEntry == null) {
             return null;
         }
-        long lastModified[] = getLastModified(tldResourcePath);
+        long[] lastModified = getLastModified(tldResourcePath);
         if (lastModified[0] != cacheEntry.getWebAppPathLastModified() ||
                 lastModified[1] != cacheEntry.getEntryLastModified()) {
             synchronized (cacheEntry) {
@@ -143,7 +138,7 @@ public class TldCache {
                     result[1] = jar.getLastModified(tldResourcePath.getEntryName());
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore (shouldn't happen)
         }
         return result;
@@ -154,8 +149,7 @@ public class TldCache {
         private volatile long webAppPathLastModified;
         private volatile long entryLastModified;
 
-        public TaglibXmlCacheEntry(TaglibXml taglibXml, long webAppPathLastModified,
-                long entryLastModified) {
+        TaglibXmlCacheEntry(TaglibXml taglibXml, long webAppPathLastModified, long entryLastModified) {
             this.taglibXml = taglibXml;
             this.webAppPathLastModified = webAppPathLastModified;
             this.entryLastModified = entryLastModified;

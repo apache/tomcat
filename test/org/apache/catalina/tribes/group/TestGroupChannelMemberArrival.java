@@ -28,6 +28,7 @@ import org.apache.catalina.tribes.ManagedChannel;
 import org.apache.catalina.tribes.Member;
 import org.apache.catalina.tribes.MembershipListener;
 import org.apache.catalina.tribes.TesterUtil;
+import org.apache.catalina.tribes.transport.ReceiverBase;
 
 public class TestGroupChannelMemberArrival {
     private static int count = 10;
@@ -38,6 +39,7 @@ public class TestGroupChannelMemberArrival {
     public void setUp() throws Exception {
         for (int i = 0; i < channels.length; i++) {
             channels[i] = new GroupChannel();
+            ((ReceiverBase) channels[i].getChannelReceiver()).setHost("localhost");
             channels[i].getMembershipService().setPayload( ("Channel-" + (i + 1)).getBytes("ASCII"));
             listeners[i] = new TestMbrListener( ("Listener-" + (i + 1)));
             channels[i].addMembershipListener(listeners[i]);
@@ -64,11 +66,11 @@ public class TestGroupChannelMemberArrival {
             };
             threads[i] = t;
         }
-        for (int i = 0; i < threads.length; i++) {
-            threads[i].start();
+        for (Thread thread : threads) {
+            thread.start();
         }
-        for (int i = 0; i < threads.length; i++) {
-            threads[i].join();
+        for (Thread thread : threads) {
+            thread.join();
         }
         Thread.sleep(5000);
         System.out.println(System.currentTimeMillis()
@@ -84,7 +86,7 @@ public class TestGroupChannelMemberArrival {
                     arrivalLengthErrors.append(listener.members.size());
                     arrivalLengthErrors.append("] but should have been [");
                     arrivalLengthErrors.append(channels.length - 1);
-                    arrivalLengthErrors.append("]");
+                    arrivalLengthErrors.append(']');
                     arrivalLengthErrors.append('\n');
                 }
             }
@@ -99,9 +101,9 @@ public class TestGroupChannelMemberArrival {
     @After
     public void tearDown() throws Exception {
 
-        for (int i = 0; i < channels.length; i++) {
+        for (ManagedChannel channel : channels) {
             try {
-                channels[i].stop(Channel.DEFAULT);
+                channel.stop(Channel.DEFAULT);
             } catch (Exception ignore) {
                 // Ignore
             }
@@ -109,7 +111,7 @@ public class TestGroupChannelMemberArrival {
     }
 
     public static class TestMbrListener
-        implements MembershipListener {
+            implements MembershipListener {
         public String name = null;
         public TestMbrListener(String name) {
             this.name = name;

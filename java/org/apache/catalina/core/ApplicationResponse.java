@@ -18,23 +18,19 @@ package org.apache.catalina.core;
 
 import java.util.Locale;
 
-import javax.servlet.ServletResponse;
-import javax.servlet.ServletResponseWrapper;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.ServletResponseWrapper;
 
 
 /**
- * Wrapper around a <code>javax.servlet.ServletResponse</code>
- * that transforms an application response object (which might be the original
- * one passed to a servlet, or might be based on the 2.3
- * <code>javax.servlet.ServletResponseWrapper</code> class)
- * back into an internal <code>org.apache.catalina.Response</code>.
+ * Wrapper around a <code>jakarta.servlet.ServletResponse</code> that transforms an application response object (which
+ * might be the original one passed to a servlet, or might be based on the 2.3
+ * <code>jakarta.servlet.ServletResponseWrapper</code> class) back into an internal
+ * <code>org.apache.catalina.Response</code>.
  * <p>
- * <strong>WARNING</strong>:  Due to Java's lack of support for multiple
- * inheritance, all of the logic in <code>ApplicationResponse</code> is
- * duplicated in <code>ApplicationHttpResponse</code>.  Make sure that you
- * keep these two classes in synchronization when making changes!
- *
- * @author Craig R. McClanahan
+ * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
+ * <code>ApplicationResponse</code> is duplicated in <code>ApplicationHttpResponse</code>. Make sure that you keep these
+ * two classes in synchronization when making changes!
  */
 class ApplicationResponse extends ServletResponseWrapper {
 
@@ -44,10 +40,10 @@ class ApplicationResponse extends ServletResponseWrapper {
      * Construct a new wrapped response around the specified servlet response.
      *
      * @param response The servlet response being wrapped
-     * @param included <code>true</code> if this response is being processed
-     *  by a <code>RequestDispatcher.include()</code> call
+     * @param included <code>true</code> if this response is being processed by a
+     *                     <code>RequestDispatcher.include()</code> call
      */
-    public ApplicationResponse(ServletResponse response, boolean included) {
+    ApplicationResponse(ServletResponse response, boolean included) {
 
         super(response);
         setIncluded(included);
@@ -59,8 +55,7 @@ class ApplicationResponse extends ServletResponseWrapper {
 
 
     /**
-     * Is this wrapped response the subject of an <code>include()</code>
-     * call?
+     * Is this wrapped response the subject of an <code>include()</code> call?
      */
     protected boolean included = false;
 
@@ -69,47 +64,47 @@ class ApplicationResponse extends ServletResponseWrapper {
 
 
     /**
-     * Disallow <code>reset()</code> calls on a included response.
+     * Disallow <code>reset()</code> calls on an included response.
      *
-     * @exception IllegalStateException if the response has already
-     *  been committed
+     * @exception IllegalStateException if the response has already been committed
      */
     @Override
     public void reset() {
 
         // If already committed, the wrapped response will throw ISE
-        if (!included || getResponse().isCommitted())
+        if (!included || getResponse().isCommitted()) {
             getResponse().reset();
+        }
 
     }
 
 
     /**
-     * Disallow <code>setContentLength(int)</code> calls on an included
-     * response.
+     * Disallow <code>setContentLength(int)</code> calls on an included response.
      *
      * @param len The new content length
      */
     @Override
     public void setContentLength(int len) {
 
-        if (!included)
+        if (!included) {
             getResponse().setContentLength(len);
+        }
 
     }
 
 
     /**
-     * Disallow <code>setContentLengthLong(long)</code> calls on an included
-     * response.
+     * Disallow <code>setContentLengthLong(long)</code> calls on an included response.
      *
      * @param len The new content length
      */
     @Override
     public void setContentLengthLong(long len) {
 
-        if (!included)
+        if (!included) {
             getResponse().setContentLengthLong(len);
+        }
 
     }
 
@@ -122,8 +117,9 @@ class ApplicationResponse extends ServletResponseWrapper {
     @Override
     public void setContentType(String type) {
 
-        if (!included)
+        if (!included) {
             getResponse().setContentType(type);
+        }
 
     }
 
@@ -135,8 +131,9 @@ class ApplicationResponse extends ServletResponseWrapper {
      */
     @Override
     public void setLocale(Locale loc) {
-        if (!included)
+        if (!included) {
             getResponse().setLocale(loc);
+        }
     }
 
 
@@ -147,8 +144,9 @@ class ApplicationResponse extends ServletResponseWrapper {
      */
     @Override
     public void setBufferSize(int size) {
-        if (!included)
+        if (!included) {
             getResponse().setBufferSize(size);
+        }
     }
 
 

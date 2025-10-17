@@ -20,10 +20,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.jsp.tagext.FunctionInfo;
-import javax.servlet.jsp.tagext.TagAttributeInfo;
-import javax.servlet.jsp.tagext.TagVariableInfo;
-import javax.servlet.jsp.tagext.VariableInfo;
+import jakarta.servlet.jsp.tagext.FunctionInfo;
+import jakarta.servlet.jsp.tagext.TagAttributeInfo;
+import jakarta.servlet.jsp.tagext.TagVariableInfo;
+import jakarta.servlet.jsp.tagext.VariableInfo;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -80,16 +80,16 @@ public class TestTldParser {
         Assert.assertEquals("fragment", attributeInfo.getName());
         Assert.assertTrue(attributeInfo.isFragment());
         Assert.assertTrue(attributeInfo.canBeRequestTime());
-        Assert.assertEquals("javax.servlet.jsp.tagext.JspFragment", attributeInfo.getTypeName());
+        Assert.assertEquals("jakarta.servlet.jsp.tagext.JspFragment", attributeInfo.getTypeName());
 
         attributeInfo = tag.getAttributes().get(2);
         Assert.assertEquals("deferredValue", attributeInfo.getName());
-        Assert.assertEquals("javax.el.ValueExpression", attributeInfo.getTypeName());
+        Assert.assertEquals("jakarta.el.ValueExpression", attributeInfo.getTypeName());
         Assert.assertEquals("java.util.Date", attributeInfo.getExpectedTypeName());
 
         attributeInfo = tag.getAttributes().get(3);
         Assert.assertEquals("deferredMethod", attributeInfo.getName());
-        Assert.assertEquals("javax.el.MethodExpression", attributeInfo.getTypeName());
+        Assert.assertEquals("jakarta.el.MethodExpression", attributeInfo.getTypeName());
         Assert.assertEquals("java.util.Date getDate()", attributeInfo.getMethodSignature());
 
         Assert.assertEquals(1, xml.getTagFiles().size());

@@ -19,20 +19,14 @@ package org.apache.catalina.ssi;
 
 import java.io.PrintWriter;
 import java.text.ParseException;
+
 /**
  * SSI command that handles all conditional directives.
- *
- * @author Paul Speed
- * @author David Becker
  */
 public class SSIConditional implements SSICommand {
-    /**
-     * @see SSICommand
-     */
     @Override
-    public long process(SSIMediator ssiMediator, String commandName,
-            String[] paramNames, String[] paramValues, PrintWriter writer)
-            throws SSIStopProcessingException {
+    public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
+            PrintWriter writer) throws SSIStopProcessingException {
         // Assume anything using conditionals was modified by it
         long lastModified = System.currentTimeMillis();
         // Retrieve the current state information
@@ -57,7 +51,9 @@ public class SSIConditional implements SSICommand {
         } else if ("elif".equalsIgnoreCase(commandName)) {
             // No need to even execute if we are nested in
             // a false branch
-            if (state.nestingCount > 0) return lastModified;
+            if (state.nestingCount > 0) {
+                return lastModified;
+            }
             // If a branch was already taken in this if block
             // then disable output and return
             if (state.branchTaken) {
@@ -77,7 +73,9 @@ public class SSIConditional implements SSICommand {
         } else if ("else".equalsIgnoreCase(commandName)) {
             // No need to even execute if we are nested in
             // a false branch
-            if (state.nestingCount > 0) return lastModified;
+            if (state.nestingCount > 0) {
+                return lastModified;
+            }
             // If we've already taken another branch then
             // disable output otherwise enable it.
             state.processConditionalCommandsOnly = state.branchTaken;
@@ -99,41 +97,36 @@ public class SSIConditional implements SSICommand {
             state.branchTaken = true;
         } else {
             throw new SSIStopProcessingException();
-            //throw new SsiCommandException( "Not a conditional command:" +
-            // cmdName );
         }
         return lastModified;
     }
 
 
     /**
-     * Retrieves the expression from the specified arguments and peforms the
-     * necessary evaluation steps.
+     * Retrieves the expression from the specified arguments and performs the necessary evaluation steps.
      */
-    private boolean evaluateArguments(String[] names, String[] values,
-            SSIMediator ssiMediator) throws SSIStopProcessingException {
+    private boolean evaluateArguments(String[] names, String[] values, SSIMediator ssiMediator)
+            throws SSIStopProcessingException {
         String expr = getExpression(names, values);
         if (expr == null) {
             throw new SSIStopProcessingException();
-            //throw new SsiCommandException( "No expression specified." );
         }
         try {
-            ExpressionParseTree tree = new ExpressionParseTree(expr,
-                    ssiMediator);
+            ExpressionParseTree tree = new ExpressionParseTree(expr, ssiMediator);
             return tree.evaluateTree();
         } catch (ParseException e) {
-            //throw new SsiCommandException( "Error parsing expression." );
             throw new SSIStopProcessingException();
         }
     }
 
 
     /**
-     * Returns the "expr" if the arg name is appropriate, otherwise returns
-     * null.
+     * Returns the "expr" if the arg name is appropriate, otherwise returns null.
      */
     private String getExpression(String[] paramNames, String[] paramValues) {
-        if ("expr".equalsIgnoreCase(paramNames[0])) return paramValues[0];
+        if ("expr".equalsIgnoreCase(paramNames[0])) {
+            return paramValues[0];
+        }
         return null;
     }
 }

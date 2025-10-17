@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -40,11 +40,10 @@ public class TagPluginParser {
     private final Log log = LogFactory.getLog(TagPluginParser.class); // must not be static
     private static final String PREFIX = "tag-plugins/tag-plugin";
     private final Digester digester;
-    private final Map<String, String> plugins = new HashMap<>();
+    private final Map<String,String> plugins = new HashMap<>();
 
     public TagPluginParser(ServletContext context, boolean blockExternal) {
-        digester = DigesterFactory.newDigester(
-                false, false, new TagPluginRuleSet(), blockExternal);
+        digester = DigesterFactory.newDigester(false, false, new TagPluginRuleSet(), blockExternal);
         digester.setClassLoader(context.getClassLoader());
     }
 
@@ -62,7 +61,7 @@ public class TagPluginParser {
                 handler.logFindings(log, source.getSystemId());
                 if (!handler.getErrors().isEmpty()) {
                     // throw the first to indicate there was an error during processing
-                    throw handler.getErrors().iterator().next();
+                    throw handler.getErrors().getFirst();
                 }
             }
         } finally {
@@ -74,7 +73,7 @@ public class TagPluginParser {
         plugins.put(tagClass, pluginClass);
     }
 
-    public Map<String, String> getPlugins() {
+    public Map<String,String> getPlugins() {
         return plugins;
     }
 

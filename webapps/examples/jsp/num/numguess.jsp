@@ -15,8 +15,6 @@
   limitations under the License.
 
   Number Guess Game
-  Written by Jason Hunter, CTO, K&A Software
-  http://www.servlets.com
 --%>
 
 <%@ page import = "num.NumberGuessBean" %>

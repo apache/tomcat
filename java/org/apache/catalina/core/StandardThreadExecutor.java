@@ -14,11 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.core;
 
-import java.util.concurrent.RejectedExecutionException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.catalina.Executor;
 import org.apache.catalina.LifecycleException;
@@ -30,11 +35,9 @@ import org.apache.tomcat.util.threads.TaskQueue;
 import org.apache.tomcat.util.threads.TaskThreadFactory;
 import org.apache.tomcat.util.threads.ThreadPoolExecutor;
 
-public class StandardThreadExecutor extends LifecycleMBeanBase
-        implements Executor, ResizableExecutor {
+public class StandardThreadExecutor extends LifecycleMBeanBase implements Executor, ResizableExecutor {
 
-    protected static final StringManager sm =
-            StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(StandardThreadExecutor.class);
 
     // ---------------------------------------------- Properties
     /**
@@ -78,55 +81,41 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
     protected String name;
 
     /**
-     * prestart threads?
-     */
-    protected boolean prestartminSpareThreads = false;
-
-    /**
      * The maximum number of elements that can queue up before we reject them
      */
     protected int maxQueueSize = Integer.MAX_VALUE;
 
     /**
-     * After a context is stopped, threads in the pool are renewed. To avoid
-     * renewing all threads at the same time, this delay is observed between 2
-     * threads being renewed.
+     * After a context is stopped, threads in the pool are renewed. To avoid renewing all threads at the same time, this
+     * delay is observed between 2 threads being renewed.
      */
-    protected long threadRenewalDelay =
-        org.apache.tomcat.util.threads.Constants.DEFAULT_THREAD_RENEWAL_DELAY;
+    protected long threadRenewalDelay = org.apache.tomcat.util.threads.Constants.DEFAULT_THREAD_RENEWAL_DELAY;
 
     private TaskQueue taskqueue = null;
+
     // ---------------------------------------------- Constructors
     public StandardThreadExecutor() {
-        //empty constructor for the digester
+        // empty constructor for the digester
     }
 
 
     // ---------------------------------------------- Public Methods
 
-    @Override
-    protected void initInternal() throws LifecycleException {
-        super.initInternal();
-    }
-
-
     /**
-     * Start the component and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
+     * Start the component and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that prevents this component from being used
+     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
+     *                                   used
      */
     @Override
     protected void startInternal() throws LifecycleException {
 
         taskqueue = new TaskQueue(maxQueueSize);
-        TaskThreadFactory tf = new TaskThreadFactory(namePrefix,daemon,getThreadPriority());
-        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,taskqueue, tf);
+        TaskThreadFactory tf = new TaskThreadFactory(namePrefix, daemon, getThreadPriority());
+        executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), maxIdleTime, TimeUnit.MILLISECONDS,
+                taskqueue, tf);
         executor.setThreadRenewalDelay(threadRenewalDelay);
-        if (prestartminSpareThreads) {
-            executor.prestartAllCoreThreads();
-        }
         taskqueue.setParent(executor);
 
         setState(LifecycleState.STARTING);
@@ -134,11 +123,10 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
 
     /**
-     * Stop the component and implement the requirements
-     * of {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
+     * Stop the component and implement the requirements of
+     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
      *
-     * @exception LifecycleException if this component detects a fatal error
-     *  that needs to be reported
+     * @exception LifecycleException if this component detects a fatal error that needs to be reported
      */
     @Override
     protected void stopInternal() throws LifecycleException {
@@ -153,32 +141,11 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
 
     @Override
-    protected void destroyInternal() throws LifecycleException {
-        super.destroyInternal();
-    }
-
-
-    @Override
-    public void execute(Runnable command, long timeout, TimeUnit unit) {
-        if (executor != null) {
-            executor.execute(command,timeout,unit);
-        } else {
-            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
-        }
-    }
-
-
-    @Override
     public void execute(Runnable command) {
         if (executor != null) {
-            try {
-                executor.execute(command);
-            } catch (RejectedExecutionException rx) {
-                //there could have been contention around the queue
-                if (!((TaskQueue) executor.getQueue()).force(command)) {
-                    throw new RejectedExecutionException(sm.getString("standardThreadExecutor.queueFull"));
-                }
-            }
+            // Note any RejectedExecutionException due to the use of TaskQueue
+            // will be handled by the o.a.t.u.threads.ThreadPoolExecutor
+            executor.execute(command);
         } else {
             throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
         }
@@ -221,10 +188,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         return name;
     }
 
-    public boolean isPrestartminSpareThreads() {
-
-        return prestartminSpareThreads;
-    }
     public void setThreadPriority(int threadPriority) {
         this.threadPriority = threadPriority;
     }
@@ -256,10 +219,6 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
         if (executor != null) {
             executor.setCorePoolSize(minSpareThreads);
         }
-    }
-
-    public void setPrestartminSpareThreads(boolean prestartminSpareThreads) {
-        this.prestartminSpareThreads = prestartminSpareThreads;
     }
 
     public void setName(String name) {
@@ -315,8 +274,9 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
     @Override
     public boolean resizePool(int corePoolSize, int maximumPoolSize) {
-        if (executor == null)
+        if (executor == null) {
             return false;
+        }
 
         executor.setCorePoolSize(corePoolSize);
         executor.setMaximumPoolSize(maximumPoolSize);
@@ -338,8 +298,117 @@ public class StandardThreadExecutor extends LifecycleMBeanBase
 
     @Override
     protected String getObjectNameKeyProperties() {
-        StringBuilder name = new StringBuilder("type=Executor,name=");
-        name.append(getName());
-        return name.toString();
+        return "type=Executor,name=" + getName();
+    }
+
+
+    @Override
+    public void shutdown() {
+        // Controlled by Lifecycle instead
+    }
+
+
+    @Override
+    public List<Runnable> shutdownNow() {
+        // Controlled by Lifecycle instead
+        return Collections.emptyList();
+    }
+
+
+    @Override
+    public boolean isShutdown() {
+        if (executor != null) {
+            return executor.isShutdown();
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public boolean isTerminated() {
+        if (executor != null) {
+            return executor.isTerminated();
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+        return false;
+    }
+
+
+    @Override
+    public <T> Future<T> submit(Callable<T> task) {
+        if (executor != null) {
+            return executor.submit(task);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public <T> Future<T> submit(Runnable task, T result) {
+        if (executor != null) {
+            return executor.submit(task, result);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public Future<?> submit(Runnable task) {
+        if (executor != null) {
+            return executor.submit(task);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
+        if (executor != null) {
+            return executor.invokeAll(tasks);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+            throws InterruptedException {
+        if (executor != null) {
+            return executor.invokeAll(tasks, timeout, unit);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
+        if (executor != null) {
+            return executor.invokeAny(tasks);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
+    }
+
+
+    @Override
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+            throws InterruptedException, ExecutionException, TimeoutException {
+        if (executor != null) {
+            return executor.invokeAny(tasks, timeout, unit);
+        } else {
+            throw new IllegalStateException(sm.getString("standardThreadExecutor.notStarted"));
+        }
     }
 }

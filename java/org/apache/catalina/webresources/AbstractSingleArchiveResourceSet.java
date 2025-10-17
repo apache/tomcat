@@ -18,21 +18,19 @@ package org.apache.catalina.webresources;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.zip.ZipFile;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.tomcat.util.buf.UriUtil;
-import org.apache.tomcat.util.compat.JreCompat;
 
 /**
- * Base class for a {@link org.apache.catalina.WebResourceSet} based on a
- * single, rather than nested, archive.
+ * Base class for a {@link org.apache.catalina.WebResourceSet} based on a single, rather than nested, archive.
  */
 public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveResourceSet {
 
@@ -45,8 +43,8 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
     }
 
 
-    public AbstractSingleArchiveResourceSet(WebResourceRoot root, String webAppMount, String base,
-            String internalPath) throws IllegalArgumentException {
+    public AbstractSingleArchiveResourceSet(WebResourceRoot root, String webAppMount, String base, String internalPath)
+            throws IllegalArgumentException {
         setRoot(root);
         setWebAppMount(webAppMount);
         setBase(base);
@@ -115,8 +113,7 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
                     JarFile jarFile = null;
                     try {
                         jarFile = openJarFile();
-                        multiRelease = Boolean.valueOf(
-                                JreCompat.getInstance().jarFileIsMultiRelease(jarFile));
+                        multiRelease = Boolean.valueOf(jarFile.isMultiRelease());
                     } catch (IOException ioe) {
                         // Should never happen
                         throw new IllegalStateException(ioe);
@@ -133,11 +130,11 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
     }
 
 
-    //-------------------------------------------------------- Lifecycle methods
+    // -------------------------------------------------------- Lifecycle methods
     @Override
     protected void initInternal() throws LifecycleException {
 
-        try (JarFile jarFile = JreCompat.getInstance().jarFileNewInstance(getBase())) {
+        try (JarFile jarFile = new JarFile(new File(getBase()), true, ZipFile.OPEN_READ, Runtime.version())) {
             setManifest(jarFile.getManifest());
         } catch (IOException ioe) {
             throw new IllegalArgumentException(ioe);
@@ -145,8 +142,8 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
 
         try {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(e);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(ioe);
         }
     }
 }

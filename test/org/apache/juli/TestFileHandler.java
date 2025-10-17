@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.juli;
 
 import java.io.File;
@@ -36,8 +35,8 @@ public class TestFileHandler {
     private static final String PREFIX_2 = "test.";
     private static final String PREFIX_3 = "";
     private static final String PREFIX_4 = "localhost1";
-    private static final String SUFIX_1 = ".log";
-    private static final String SUFIX_2 = ".txt";
+    private static final String SUFFIX_1 = ".log";
+    private static final String SUFFIX_2 = ".txt";
 
     private File logsDir;
 
@@ -50,13 +49,13 @@ public class TestFileHandler {
         Path logsBasePath = FileSystems.getDefault().getPath(logsBase.getAbsolutePath());
         logsDir = Files.createTempDirectory(logsBasePath, "test").toFile();
 
-        generateLogFiles(logsDir, PREFIX_1, SUFIX_2, 3);
-        generateLogFiles(logsDir, PREFIX_2, SUFIX_1, 3);
-        generateLogFiles(logsDir, PREFIX_3, SUFIX_1, 3);
-        generateLogFiles(logsDir, PREFIX_4, SUFIX_1, 3);
+        generateLogFiles(logsDir, PREFIX_1, SUFFIX_2, 3);
+        generateLogFiles(logsDir, PREFIX_2, SUFFIX_1, 3);
+        generateLogFiles(logsDir, PREFIX_3, SUFFIX_1, 3);
+        generateLogFiles(logsDir, PREFIX_4, SUFFIX_1, 3);
 
-        String date = LocalDateTime.now().minusDays(3).toString().replaceAll(":", "-");
-        File file = new File(logsDir, PREFIX_1 + date + SUFIX_1);
+        String date = LocalDateTime.now().minusDays(3).toString().replace(":", "-");
+        File file = new File(logsDir, PREFIX_1 + date + SUFFIX_1);
         if (!file.createNewFile()) {
             Assert.fail("Unable to create " + file.getAbsolutePath());
         }
@@ -75,9 +74,10 @@ public class TestFileHandler {
 
     @Test
     public void testCleanOnInitOneHandler() throws Exception {
-        generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
+        generateLogFiles(logsDir, PREFIX_1, SUFFIX_1, 3);
 
-        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, Integer.valueOf(2));
+        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFFIX_1, Integer.valueOf(2));
+        fh1.open();
 
         Thread.sleep(1000);
 
@@ -88,12 +88,16 @@ public class TestFileHandler {
 
     @Test
     public void testCleanOnInitMultipleHandlers() throws Exception {
-        generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
+        generateLogFiles(logsDir, PREFIX_1, SUFFIX_1, 3);
 
-        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, Integer.valueOf(2));
-        FileHandler fh2 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_2, Integer.valueOf(2));
-        FileHandler fh3 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_2, SUFIX_1, Integer.valueOf(2));
-        FileHandler fh4 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_3, SUFIX_1, Integer.valueOf(2));
+        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFFIX_1, Integer.valueOf(2));
+        FileHandler fh2 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFFIX_2, Integer.valueOf(2));
+        FileHandler fh3 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_2, SUFFIX_1, Integer.valueOf(2));
+        FileHandler fh4 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_3, SUFFIX_1, Integer.valueOf(2));
+        fh1.open();
+        fh2.open();
+        fh3.open();
+        fh4.open();
 
         Thread.sleep(1000);
 
@@ -107,9 +111,10 @@ public class TestFileHandler {
 
     @Test
     public void testCleanDisabled() throws Exception {
-        generateLogFiles(logsDir, PREFIX_1, SUFIX_1, 3);
+        generateLogFiles(logsDir, PREFIX_1, SUFFIX_1, 3);
 
-        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFIX_1, null);
+        FileHandler fh1 = new FileHandler(logsDir.getAbsolutePath(), PREFIX_1, SUFFIX_1, null);
+        fh1.open();
 
         Thread.sleep(1000);
 
@@ -118,11 +123,11 @@ public class TestFileHandler {
         fh1.close();
     }
 
-    private void generateLogFiles(File dir, String prefix, String sufix, int amount)
+    private void generateLogFiles(File dir, String prefix, String suffix, int amount)
             throws IOException {
         for (int i = 0; i < amount; i++) {
             String date = LocalDate.now().minusDays(i + 1).toString().substring(0, 10);
-            File file = new File(dir, prefix + date + sufix);
+            File file = new File(dir, prefix + date + suffix);
             if (!file.createNewFile()) {
                 Assert.fail("Unable to create " + file.getAbsolutePath());
             }

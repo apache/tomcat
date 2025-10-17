@@ -18,9 +18,6 @@ package org.apache.coyote.http2;
 
 public class Constants {
 
-    // Prioritisation
-    public static final int DEFAULT_WEIGHT = 16;
-
     // Parsing
     static final int DEFAULT_HEADER_READ_BUFFER_SIZE = 1024;
 

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.util.ArrayList;
@@ -22,25 +21,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.jsp.tagext.TagVariableInfo;
-import javax.servlet.jsp.tagext.VariableInfo;
+import jakarta.servlet.jsp.tagext.TagVariableInfo;
+import jakarta.servlet.jsp.tagext.VariableInfo;
 
 import org.apache.jasper.JasperException;
 
 /**
- * Class responsible for determining the scripting variables that every
- * custom action needs to declare.
- *
- * @author Jan Luehe
+ * Class responsible for determining the scripting variables that every custom action needs to declare.
  */
 class ScriptingVariabler {
 
     private static final Integer MAX_SCOPE = Integer.valueOf(Integer.MAX_VALUE);
 
     /*
-     * Assigns an identifier (of type integer) to every custom tag, in order
-     * to help identify, for every custom tag, the scripting variables that it
-     * needs to declare.
+     * Assigns an identifier (of type integer) to every custom tag, in order to help identify, for every custom tag, the
+     * scripting variables that it needs to declare.
      */
     private static class CustomTagCounter extends Node.Visitor {
 
@@ -59,15 +54,14 @@ class ScriptingVariabler {
     }
 
     /*
-     * For every custom tag, determines the scripting variables it needs to
-     * declare.
+     * For every custom tag, determines the scripting variables it needs to declare.
      */
     private static class ScriptingVariableVisitor extends Node.Visitor {
 
         private final ErrorDispatcher err;
-        private final Map<String, Integer> scriptVars;
+        private final Map<String,Integer> scriptVars;
 
-        public ScriptingVariableVisitor(ErrorDispatcher err) {
+        ScriptingVariableVisitor(ErrorDispatcher err) {
             this.err = err;
             scriptVars = new HashMap<>();
         }
@@ -80,8 +74,7 @@ class ScriptingVariabler {
             setScriptingVars(n, VariableInfo.AT_END);
         }
 
-        private void setScriptingVars(Node.CustomTag n, int scope)
-                throws JasperException {
+        private void setScriptingVars(Node.CustomTag n, int scope) throws JasperException {
 
             TagVariableInfo[] tagVarInfos = n.getTagVariableInfos();
             VariableInfo[] varInfos = n.getVariableInfos();
@@ -91,56 +84,50 @@ class ScriptingVariabler {
 
             List<Object> vec = new ArrayList<>();
 
-            Integer ownRange = null;
+            Integer ownRange;
             Node.CustomTag parent = n.getCustomTagParent();
-            if (scope == VariableInfo.AT_BEGIN
-                    || scope == VariableInfo.AT_END) {
-                if (parent == null)
+            if (scope == VariableInfo.AT_BEGIN || scope == VariableInfo.AT_END) {
+                if (parent == null) {
                     ownRange = MAX_SCOPE;
-                else
+                } else {
                     ownRange = parent.getNumCount();
+                }
             } else {
                 // NESTED
                 ownRange = n.getNumCount();
             }
 
             if (varInfos.length > 0) {
-                for (int i=0; i<varInfos.length; i++) {
-                    if (varInfos[i].getScope() != scope
-                            || !varInfos[i].getDeclare()) {
+                for (VariableInfo varInfo : varInfos) {
+                    if (varInfo.getScope() != scope || !varInfo.getDeclare()) {
                         continue;
                     }
-                    String varName = varInfos[i].getVarName();
+                    String varName = varInfo.getVarName();
 
                     Integer currentRange = scriptVars.get(varName);
-                    if (currentRange == null ||
-                            ownRange.compareTo(currentRange) > 0) {
+                    if (currentRange == null || ownRange.compareTo(currentRange) > 0) {
                         scriptVars.put(varName, ownRange);
-                        vec.add(varInfos[i]);
+                        vec.add(varInfo);
                     }
                 }
             } else {
-                for (int i=0; i<tagVarInfos.length; i++) {
-                    if (tagVarInfos[i].getScope() != scope
-                            || !tagVarInfos[i].getDeclare()) {
+                for (TagVariableInfo tagVarInfo : tagVarInfos) {
+                    if (tagVarInfo.getScope() != scope || !tagVarInfo.getDeclare()) {
                         continue;
                     }
-                    String varName = tagVarInfos[i].getNameGiven();
+                    String varName = tagVarInfo.getNameGiven();
                     if (varName == null) {
-                        varName = n.getTagData().getAttributeString(
-                                        tagVarInfos[i].getNameFromAttribute());
+                        varName = n.getTagData().getAttributeString(tagVarInfo.getNameFromAttribute());
                         if (varName == null) {
-                            err.jspError(n,
-                                    "jsp.error.scripting.variable.missing_name",
-                                    tagVarInfos[i].getNameFromAttribute());
+                            err.jspError(n, "jsp.error.scripting.variable.missing_name",
+                                    tagVarInfo.getNameFromAttribute());
                         }
                     }
 
                     Integer currentRange = scriptVars.get(varName);
-                    if (currentRange == null ||
-                            ownRange.compareTo(currentRange) > 0) {
+                    if (currentRange == null || ownRange.compareTo(currentRange) > 0) {
                         scriptVars.put(varName, ownRange);
-                        vec.add(tagVarInfos[i]);
+                        vec.add(tagVarInfo);
                     }
                 }
             }
@@ -149,8 +136,7 @@ class ScriptingVariabler {
         }
     }
 
-    public static void set(Node.Nodes page, ErrorDispatcher err)
-            throws JasperException {
+    public static void set(Node.Nodes page, ErrorDispatcher err) throws JasperException {
         page.visit(new CustomTagCounter());
         page.visit(new ScriptingVariableVisitor(err));
     }

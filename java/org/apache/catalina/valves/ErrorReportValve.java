@@ -25,9 +25,9 @@ import java.io.Writer;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -42,18 +42,11 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * <p>Implementation of a Valve that outputs HTML error pages.</p>
- *
- * <p>This Valve should be attached at the Host level, although it will work
- * if attached to a Context.</p>
- *
- * <p>HTML code from the Cocoon 2 project.</p>
- *
- * @author Remy Maucherat
- * @author Craig R. McClanahan
- * @author <a href="mailto:nicolaken@supereva.it">Nicola Ken Barozzi</a> Aisa
- * @author <a href="mailto:stefano@apache.org">Stefano Mazzocchi</a>
- * @author Yoav Shapira
+ * Implementation of a Valve that outputs HTML error pages.
+ * <p>
+ * This Valve should be attached at the Host level, although it will work if attached to a Context.
+ * <p>
+ * HTML code from the Cocoon 2 project.
  */
 public class ErrorReportValve extends ValveBase {
 
@@ -64,7 +57,7 @@ public class ErrorReportValve extends ValveBase {
     private final ErrorPageSupport errorPageSupport = new ErrorPageSupport();
 
 
-    //------------------------------------------------------ Constructor
+    // ------------------------------------------------------ Constructor
 
     public ErrorReportValve() {
         super(true);
@@ -74,16 +67,10 @@ public class ErrorReportValve extends ValveBase {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Invoke the next Valve in the sequence. When the invoke returns, check
-     * the response state. If the status code is greater than or equal to 400
-     * or an uncaught exception was thrown then the error handling will be
-     * triggered.
-     *
-     * @param request The servlet request to be processed
-     * @param response The servlet response to be created
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet error occurs
+     * {@inheritDoc}
+     * <p>
+     * Invoke the next Valve in the sequence. When the invoke returns, check the response state. If the status code is
+     * greater than or equal to 400 or an uncaught exception was thrown then the error handling will be triggered.
      */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
@@ -93,18 +80,26 @@ public class ErrorReportValve extends ValveBase {
 
         if (response.isCommitted()) {
             if (response.setErrorReported()) {
-                // Error wasn't previously reported but we can't write an error
-                // page because the response has already been committed. Attempt
-                // to flush any data that is still to be written to the client.
-                try {
-                    response.flushBuffer();
-                } catch (Throwable t) {
-                    ExceptionUtils.handleThrowable(t);
+                // Error wasn't previously reported, but we can't write an error
+                // page because the response has already been committed.
+
+                // See if IO is allowed
+                AtomicBoolean ioAllowed = new AtomicBoolean(true);
+                response.getCoyoteResponse().action(ActionCode.IS_IO_ALLOWED, ioAllowed);
+
+                if (ioAllowed.get()) {
+                    // I/O is currently still allowed. Flush any data that is
+                    // still to be written to the client.
+                    try {
+                        response.flushBuffer();
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                    }
+                    // Now close immediately to signal to the client that
+                    // something went wrong
+                    response.getCoyoteResponse().action(ActionCode.CLOSE_NOW,
+                            request.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
                 }
-                // Close immediately to signal to the client that something went
-                // wrong
-                response.getCoyoteResponse().action(ActionCode.CLOSE_NOW,
-                        request.getAttribute(RequestDispatcher.ERROR_EXCEPTION));
             }
             return;
         }
@@ -144,12 +139,35 @@ public class ErrorReportValve extends ValveBase {
 
 
     /**
+     * Return the error page associated with the specified status and exception.
+     *
+     * @param statusCode the status code
+     * @param throwable  the exception
+     *
+     * @return the associated error page
+     */
+    protected ErrorPage findErrorPage(int statusCode, Throwable throwable) {
+        ErrorPage errorPage = null;
+        if (throwable != null) {
+            errorPage = errorPageSupport.find(throwable);
+        }
+        if (errorPage == null) {
+            errorPage = errorPageSupport.find(statusCode);
+        }
+        if (errorPage == null) {
+            // Default error page
+            errorPage = errorPageSupport.find(0);
+        }
+        return errorPage;
+    }
+
+
+    /**
      * Prints out an error report.
      *
-     * @param request The request being processed
-     * @param response The response being generated
-     * @param throwable The exception that occurred (which possibly wraps
-     *  a root cause exception
+     * @param request   The request being processed
+     * @param response  The response being generated
+     * @param throwable The exception that occurred (which possibly wraps a root cause exception
      */
     protected void report(Request request, Response response, Throwable throwable) {
 
@@ -158,7 +176,7 @@ public class ErrorReportValve extends ValveBase {
         // Do nothing on a 1xx, 2xx and 3xx status
         // Do nothing if anything has been written already
         // Do nothing if the response hasn't been explicitly marked as in error
-        //    and that error has not been reported.
+        // and that error has not been reported.
         if (statusCode < 400 || response.getContentWritten() > 0 || !response.setErrorReported()) {
             return;
         }
@@ -171,18 +189,7 @@ public class ErrorReportValve extends ValveBase {
             return;
         }
 
-        ErrorPage errorPage = null;
-        if (throwable != null) {
-            errorPage = errorPageSupport.find(throwable);
-        }
-        if (errorPage == null) {
-            errorPage = errorPageSupport.find(statusCode);
-        }
-        if (errorPage == null) {
-            // Default error page
-            errorPage = errorPageSupport.find(0);
-        }
-
+        ErrorPage errorPage = findErrorPage(statusCode, throwable);
 
         if (errorPage != null) {
             if (sendErrorPage(errorPage.getLocation(), response)) {
@@ -196,8 +203,10 @@ public class ErrorReportValve extends ValveBase {
         if (message == null) {
             if (throwable != null) {
                 String exceptionMessage = throwable.getMessage();
-                if (exceptionMessage != null && exceptionMessage.length() > 0) {
-                    message = Escape.htmlElementContent((new Scanner(exceptionMessage)).nextLine());
+                if (exceptionMessage != null && !exceptionMessage.isEmpty()) {
+                    try (Scanner scanner = new Scanner(exceptionMessage)) {
+                        message = Escape.htmlElementContent(scanner.nextLine());
+                    }
                 }
             }
             if (message == null) {
@@ -209,8 +218,7 @@ public class ErrorReportValve extends ValveBase {
         // no error message provided
         String reason = null;
         String description = null;
-        StringManager smClient = StringManager.getManager(
-                Constants.Package, request.getLocales());
+        StringManager smClient = StringManager.getManager(Constants.Package, request.getLocales());
         response.setLocale(smClient.getLocale());
         try {
             reason = smClient.getString("http." + statusCode + ".reason");
@@ -233,16 +241,15 @@ public class ErrorReportValve extends ValveBase {
         sb.append(smClient.getLocale().getLanguage()).append("\">");
         sb.append("<head>");
         sb.append("<title>");
-        sb.append(smClient.getString("errorReportValve.statusHeader",
-                String.valueOf(statusCode), reason));
+        sb.append(smClient.getString("errorReportValve.statusHeader", String.valueOf(statusCode), reason));
         sb.append("</title>");
         sb.append("<style type=\"text/css\">");
         sb.append(TomcatCSS.TOMCAT_CSS);
         sb.append("</style>");
         sb.append("</head><body>");
         sb.append("<h1>");
-        sb.append(smClient.getString("errorReportValve.statusHeader",
-                String.valueOf(statusCode), reason)).append("</h1>");
+        sb.append(smClient.getString("errorReportValve.statusHeader", String.valueOf(statusCode), reason))
+                .append("</h1>");
         if (isShowReport()) {
             sb.append("<hr class=\"line\" />");
             sb.append("<p><b>");
@@ -308,7 +315,7 @@ public class ErrorReportValve extends ValveBase {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (container.getLogger().isDebugEnabled()) {
-                    container.getLogger().debug("status.setContentType", t);
+                    container.getLogger().debug(sm.getString("errorReportValve.contentTypeFail"), t);
                 }
             }
             Writer writer = response.getReporter();
@@ -318,9 +325,7 @@ public class ErrorReportValve extends ValveBase {
                 writer.write(sb.toString());
                 response.finishResponse();
             }
-        } catch (IOException e) {
-            // Ignore
-        } catch (IllegalStateException e) {
+        } catch (IOException | IllegalStateException e) {
             // Ignore
         }
 
@@ -328,9 +333,10 @@ public class ErrorReportValve extends ValveBase {
 
 
     /**
-     * Print out a partial servlet stack trace (truncating at the last
-     * occurrence of javax.servlet.).
+     * Print out a partial servlet stack trace (truncating at the last occurrence of jakarta.servlet.).
+     *
      * @param t The stack trace to process
+     *
      * @return the stack trace relative to the application layer
      */
     protected String getPartialServletStackTrace(Throwable t) {
@@ -339,16 +345,14 @@ public class ErrorReportValve extends ValveBase {
         StackTraceElement[] elements = t.getStackTrace();
         int pos = elements.length;
         for (int i = elements.length - 1; i >= 0; i--) {
-            if ((elements[i].getClassName().startsWith
-                 ("org.apache.catalina.core.ApplicationFilterChain"))
-                && (elements[i].getMethodName().equals("internalDoFilter"))) {
+            if ((elements[i].getClassName().startsWith("org.apache.catalina.core.ApplicationFilterChain")) &&
+                    (elements[i].getMethodName().equals("doFilter"))) {
                 pos = i;
                 break;
             }
         }
         for (int i = 0; i < pos; i++) {
-            if (!(elements[i].getClassName().startsWith
-                  ("org.apache.catalina.core."))) {
+            if (!(elements[i].getClassName().startsWith("org.apache.catalina.core."))) {
                 trace.append('\t').append(elements[i].toString()).append(System.lineSeparator());
             }
         }
@@ -362,8 +366,7 @@ public class ErrorReportValve extends ValveBase {
             file = new File(getContainer().getCatalinaBase(), location);
         }
         if (!file.isFile() || !file.canRead()) {
-            getContainer().getLogger().warn(
-                    sm.getString("errorReportValve.errorPageNotFound", location));
+            getContainer().getLogger().warn(sm.getString("errorReportValve.errorPageNotFound", location));
             return false;
         }
 
@@ -372,12 +375,10 @@ public class ErrorReportValve extends ValveBase {
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
 
-        try (OutputStream os = response.getOutputStream();
-                InputStream is = new FileInputStream(file);){
+        try (OutputStream os = response.getOutputStream(); InputStream is = new FileInputStream(file)) {
             IOTools.flow(is, os);
-        } catch (IOException e) {
-            getContainer().getLogger().warn(
-                    sm.getString("errorReportValve.errorPageIOException", location), e);
+        } catch (IOException ioe) {
+            getContainer().getLogger().warn(sm.getString("errorReportValve.errorPageIOException", location), ioe);
             return false;
         }
 

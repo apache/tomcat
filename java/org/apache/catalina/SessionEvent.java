@@ -14,21 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
 
+import java.io.Serial;
 import java.util.EventObject;
 
 
 /**
  * General event for notifying listeners of significant changes on a Session.
- *
- * @author Craig R. McClanahan
  */
 public final class SessionEvent extends EventObject {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 
@@ -54,8 +52,8 @@ public final class SessionEvent extends EventObject {
      * Construct a new SessionEvent with the specified parameters.
      *
      * @param session Session on which this event occurred
-     * @param type Event type
-     * @param data Event data
+     * @param type    Event type
+     * @param data    Event data
      */
     public SessionEvent(Session session, String type, Object data) {
 

@@ -20,8 +20,6 @@ import java.sql.Connection;
 
 /**
  * Interface to be implemented by custom validator classes.
- *
- * @author mpassell
  */
 public interface Validator {
     /**
@@ -33,5 +31,5 @@ public interface Validator {
      *   {@link PooledConnection#VALIDATE_RETURN}
      * @return true if the connection is valid
      */
-    public boolean validate(Connection connection, int validateAction);
+    boolean validate(Connection connection, int validateAction);
 }

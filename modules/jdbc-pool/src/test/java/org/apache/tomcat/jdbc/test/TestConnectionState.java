@@ -17,12 +17,18 @@
 package org.apache.tomcat.jdbc.test;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
+
+import javax.sql.PooledConnection;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.tomcat.jdbc.pool.DataSourceProxy;
 import org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;
+import org.apache.tomcat.jdbc.test.driver.Driver;
 
 public class TestConnectionState extends DefaultTestCase {
 
@@ -78,5 +84,71 @@ public class TestConnectionState extends DefaultTestCase {
         c1.close();
         c1 = d1.getConnection();
         Assert.assertEquals("Catalog should be information_schema",c1.getCatalog(),"information_schema");
+    }
+
+    @Test
+    public void testWithException() throws SQLException {
+        DriverManager.registerDriver(new MockErrorDriver());
+        // use our mock driver
+        datasource.setDriverClassName(MockErrorDriver.class.getName());
+        datasource.setUrl(MockErrorDriver.url);
+        datasource.setDefaultAutoCommit(Boolean.TRUE);
+        datasource.setMinIdle(1);
+        datasource.setMaxIdle(1);
+        datasource.setMaxActive(1);
+        datasource.setJdbcInterceptors(ConnectionState.class.getName());
+        Connection connection = datasource.getConnection();
+        PooledConnection pc = (PooledConnection) connection;
+        MockErrorConnection c1 = (MockErrorConnection) pc.getConnection();
+        Assert.assertTrue("Auto commit should be true", c1.getAutoCommit());
+        connection.close();
+        c1.setThrowError(true);
+        Connection c2 = datasource.getConnection();
+        try {
+            c2.setAutoCommit(false);
+        } catch (SQLException e) {
+            // ignore
+        }
+        Assert.assertFalse("Auto commit should be false", c2.getAutoCommit());
+        c2.close();
+        DriverManager.deregisterDriver(new MockErrorDriver());
+    }
+    public static class MockErrorDriver extends Driver {
+        @Override
+        public Connection connect(String url, Properties info) throws SQLException {
+            return new MockErrorConnection(info);
+        }
+    }
+
+    public static class MockErrorConnection extends org.apache.tomcat.jdbc.test.driver.Connection {
+        private boolean throwError = false;
+        private boolean autoCommit = false;
+        public void setThrowError(boolean throwError) {
+            this.throwError = throwError;
+        }
+
+        public MockErrorConnection(Properties info) {
+            super(info);
+        }
+
+        @Override
+        public boolean getAutoCommit() throws SQLException {
+            return autoCommit;
+        }
+
+        @Override
+        public void close() throws SQLException {
+            super.close();
+            throwError = true;
+        }
+
+        @Override
+        public void setAutoCommit(boolean autoCommit) throws SQLException {
+            this.autoCommit = autoCommit;
+            if (throwError) {
+                throw new SQLException("Mock error");
+            }
+        }
+
     }
 }

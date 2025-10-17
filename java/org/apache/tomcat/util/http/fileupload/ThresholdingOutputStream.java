@@ -35,7 +35,7 @@ import java.io.OutputStream;
  * cause the threshold to be exceeded.
  */
 public abstract class ThresholdingOutputStream
-    extends OutputStream
+        extends OutputStream
 {
 
     // ----------------------------------------------------------- Data members

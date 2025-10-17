@@ -21,15 +21,16 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -123,8 +124,8 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         }
     }
 
-    private void doNonBlockingTest(int asyncWriteTarget, int syncWriteTarget,
-            boolean useContainerThreadToSetListener) throws Exception {
+    private void doNonBlockingTest(int asyncWriteTarget, int syncWriteTarget, boolean useContainerThreadToSetListener)
+            throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
 
@@ -133,8 +134,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
                 new NonBlockingWriteServlet(asyncWriteTarget, useContainerThreadToSetListener));
         w.setAsyncSupported(true);
         root.addServletMappingDecoded("/nbWrite", "nbWrite");
-        Tomcat.addServlet(root, "write",
-                new BlockingWriteServlet(asyncWriteTarget, syncWriteTarget));
+        Tomcat.addServlet(root, "write", new BlockingWriteServlet(asyncWriteTarget, syncWriteTarget));
         w.setAsyncSupported(true);
         root.addServletMappingDecoded("/write", "write");
 
@@ -142,8 +142,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         // Extend timeout to 5 mins for debugging
-        int rc = getUrl("http://localhost:" + getPort() + "/nbWrite", bc,
-                300000, null, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/nbWrite", bc, 300000, null, null);
 
         int totalCount = asyncWriteTarget + syncWriteTarget;
         StringBuilder sb = new StringBuilder(totalCount * 16);
@@ -166,15 +165,13 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         private final AtomicInteger asyncWriteCount = new AtomicInteger(0);
         private final boolean useContainerThreadToSetListener;
 
-        public NonBlockingWriteServlet(int asyncWriteTarget,
-                boolean useContainerThreadToSetListener) {
+        NonBlockingWriteServlet(int asyncWriteTarget, boolean useContainerThreadToSetListener) {
             this.asyncWriteTarget = asyncWriteTarget;
             this.useContainerThreadToSetListener = useContainerThreadToSetListener;
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
@@ -192,14 +189,11 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
             }
         }
 
-        private void doAsyncWrite(AsyncContext asyncCtxt,
-                ServletOutputStream sos) throws IOException {
+        private void doAsyncWrite(AsyncContext asyncCtxt, ServletOutputStream sos) throws IOException {
             while (sos.isReady()) {
                 int next = asyncWriteCount.getAndIncrement();
                 if (next < asyncWriteTarget) {
-                    sos.write(
-                            ("OK - " + next + System.lineSeparator()).getBytes(
-                                    StandardCharsets.UTF_8));
+                    sos.write(("OK - " + next + System.lineSeparator()).getBytes(StandardCharsets.UTF_8));
                     sos.flush();
                 } else {
                     asyncCtxt.dispatch("/write");
@@ -213,7 +207,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
             private final AsyncContext asyncCtxt;
             private final ServletOutputStream sos;
 
-            public AsyncTask(AsyncContext asyncCtxt, ServletOutputStream sos) {
+            AsyncTask(AsyncContext asyncCtxt, ServletOutputStream sos) {
                 this.asyncCtxt = asyncCtxt;
                 this.sos = sos;
             }
@@ -229,8 +223,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
             private final AsyncContext asyncCtxt;
             private final ServletOutputStream sos;
 
-            public MyWriteListener(AsyncContext asyncCtxt,
-                    ServletOutputStream sos) {
+            MyWriteListener(AsyncContext asyncCtxt, ServletOutputStream sos) {
                 this.asyncCtxt = asyncCtxt;
                 this.sos = sos;
             }
@@ -255,22 +248,20 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         private final int start;
         private final int len;
 
-        public BlockingWriteServlet(int start, int len) {
+        BlockingWriteServlet(int start, int len) {
             this.start = start;
             this.len = len;
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
             ServletOutputStream sos = resp.getOutputStream();
 
             for (int i = start; i < start + len; i++) {
-                sos.write(("OK - " + i + System.lineSeparator()).getBytes(
-                        StandardCharsets.UTF_8));
+                sos.write(("OK - " + i + System.lineSeparator()).getBytes(StandardCharsets.UTF_8));
             }
         }
     }
@@ -280,8 +271,7 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             CoyoteOutputStream os = (CoyoteOutputStream) resp.getOutputStream();
             File file = new File("test/org/apache/catalina/connector/test_content.txt");
             try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
@@ -289,5 +279,54 @@ public class TestCoyoteOutputStream extends TomcatBaseTest {
             }
         }
 
+    }
+
+
+    @Test
+    public void testWriteAfterBodyComplete() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        Context root = tomcat.addContext("", TEMP_DIR);
+        Tomcat.addServlet(root, "servlet", new WriteAfterBodyCompleteServlet());
+        root.addServletMappingDecoded("/", "servlet");
+
+        tomcat.start();
+
+        ByteChunk bc = new ByteChunk();
+        int rc = getUrl("http://localhost:" + getPort() + "/", bc, null, null);
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        // Wait upto 5s
+        int count = 0;
+        boolean exceptionSeen = WriteAfterBodyCompleteServlet.exceptionSeen.get();
+        while (count < 50 && !exceptionSeen) {
+            Thread.sleep(100);
+            exceptionSeen = WriteAfterBodyCompleteServlet.exceptionSeen.get();
+            count++;
+        }
+        Assert.assertTrue(exceptionSeen);
+    }
+
+
+    private static final class WriteAfterBodyCompleteServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+        private static final AtomicBoolean exceptionSeen = new AtomicBoolean(false);
+
+        @Override
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setCharacterEncoding(StandardCharsets.UTF_8);
+            resp.setContentType("text/plain");
+            resp.setContentLengthLong(10);
+            ServletOutputStream sos = resp.getOutputStream();
+            sos.write("0123456789".getBytes(StandardCharsets.UTF_8));
+
+            // sos should now be closed. A further write should trigger an error.
+            try {
+                sos.write("anything".getBytes(StandardCharsets.UTF_8));
+            } catch (IOException ioe) {
+                exceptionSeen.set(true);
+            }
+        }
     }
 }

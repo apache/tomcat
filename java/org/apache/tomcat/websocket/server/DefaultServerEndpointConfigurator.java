@@ -21,17 +21,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.websocket.Extension;
-import javax.websocket.HandshakeResponse;
-import javax.websocket.server.HandshakeRequest;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.Extension;
+import jakarta.websocket.HandshakeResponse;
+import jakarta.websocket.server.HandshakeRequest;
+import jakarta.websocket.server.ServerEndpointConfig;
 
-public class DefaultServerEndpointConfigurator
-        extends ServerEndpointConfig.Configurator {
+@aQute.bnd.annotation.spi.ServiceProvider(value = ServerEndpointConfig.Configurator.class)
+public class DefaultServerEndpointConfigurator extends ServerEndpointConfig.Configurator {
 
     @Override
-    public <T> T getEndpointInstance(Class<T> clazz)
-            throws InstantiationException {
+    public <T> T getEndpointInstance(Class<T> clazz) throws InstantiationException {
         try {
             return clazz.getConstructor().newInstance();
         } catch (InstantiationException e) {
@@ -45,8 +44,7 @@ public class DefaultServerEndpointConfigurator
 
 
     @Override
-    public String getNegotiatedSubprotocol(List<String> supported,
-            List<String> requested) {
+    public String getNegotiatedSubprotocol(List<String> supported, List<String> requested) {
 
         for (String request : requested) {
             if (supported.contains(request)) {
@@ -58,8 +56,7 @@ public class DefaultServerEndpointConfigurator
 
 
     @Override
-    public List<Extension> getNegotiatedExtensions(List<Extension> installed,
-            List<Extension> requested) {
+    public List<Extension> getNegotiatedExtensions(List<Extension> installed, List<Extension> requested) {
         Set<String> installedNames = new HashSet<>();
         for (Extension e : installed) {
             installedNames.add(e.getName());
@@ -80,8 +77,7 @@ public class DefaultServerEndpointConfigurator
     }
 
     @Override
-    public void modifyHandshake(ServerEndpointConfig sec,
-            HandshakeRequest request, HandshakeResponse response) {
+    public void modifyHandshake(ServerEndpointConfig sec, HandshakeRequest request, HandshakeResponse response) {
         // NO-OP
     }
 

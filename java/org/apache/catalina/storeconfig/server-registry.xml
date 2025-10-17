@@ -24,6 +24,7 @@
         children="true"
         tagClass="org.apache.catalina.core.StandardServer"
         storeFactoryClass="org.apache.catalina.storeconfig.StandardServerSF">
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Service"
@@ -32,6 +33,7 @@
         children="true"
         tagClass="org.apache.catalina.core.StandardService"
         storeFactoryClass="org.apache.catalina.storeconfig.StandardServiceSF">
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Engine"
@@ -79,7 +81,7 @@
         <TransientAttribute>effectiveMajorVersion</TransientAttribute>
         <TransientAttribute>effectiveMinorVersion</TransientAttribute>
         <TransientAttribute>webappVersion</TransientAttribute>
-        <TransientAttribute>ignoreAnnotations</TransientAttribute>
+        <TransientAttribute>metadataComplete</TransientAttribute>
      </Description>
      <Description
         id="org.apache.catalina.deploy.NamingResourcesImpl.[GlobalNamingResources]"
@@ -90,6 +92,7 @@
         children="true"
         tagClass="org.apache.catalina.deploy.NamingResourcesImpl"
         storeFactoryClass="org.apache.catalina.storeconfig.GlobalNamingResourcesSF">
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Connector"
@@ -99,52 +102,7 @@
         children="true"
         storeFactoryClass="org.apache.catalina.storeconfig.ConnectorSF"
         storeAppenderClass="org.apache.catalina.storeconfig.ConnectorStoreAppender">
-        <TransientAttribute>URIEncoding</TransientAttribute>
-        <TransientAttribute>maxProcessor</TransientAttribute>
-        <TransientAttribute>minProcessor</TransientAttribute>
-        <!-- All attribute duplicated from the SSLHostConfig, removed in Tomcat 10 -->
-        <TransientAttribute>SSLProtocol</TransientAttribute>
-        <TransientAttribute>sslEnabledProtocols</TransientAttribute>
-        <TransientAttribute>SSLCipherSuite</TransientAttribute>
-        <TransientAttribute>ciphers</TransientAttribute>
-        <TransientAttribute>SSLCertificateChainFile</TransientAttribute>
-        <TransientAttribute>SSLCertificateFile</TransientAttribute>
-        <TransientAttribute>keyAlias</TransientAttribute>
-        <TransientAttribute>SSLCertificateKeyFile</TransientAttribute>
-        <TransientAttribute>keyPass</TransientAttribute>
-        <TransientAttribute>SSLPassword</TransientAttribute>
-        <TransientAttribute>keystoreFile</TransientAttribute>
-        <TransientAttribute>keystorePass</TransientAttribute>
-        <TransientAttribute>keystoreProvider</TransientAttribute>
-        <TransientAttribute>keystoreType</TransientAttribute>
-        <TransientAttribute>SSLCACertificateFile</TransientAttribute>
-        <TransientAttribute>SSLCACertificatePath</TransientAttribute>
-        <TransientAttribute>crlFile</TransientAttribute>
-        <TransientAttribute>SSLCARevocationFile</TransientAttribute>
-        <TransientAttribute>SSLCARevocationPath</TransientAttribute>
-        <TransientAttribute>SSLDisableCompression</TransientAttribute>
-        <TransientAttribute>SSLDisableSessionTickets</TransientAttribute>
-        <TransientAttribute>SSLDisableCompression</TransientAttribute>
-        <TransientAttribute>SSLHonorCipherOrder</TransientAttribute>
-        <TransientAttribute>useServerCipherSuitesOrder</TransientAttribute>
-        <TransientAttribute>algorithm</TransientAttribute>
-        <TransientAttribute>sslContext</TransientAttribute>
-        <TransientAttribute>sessionCacheSize</TransientAttribute>
-        <TransientAttribute>sessionTimeout</TransientAttribute>
-        <TransientAttribute>sslProtocol</TransientAttribute>
-        <TransientAttribute>trustManagerClassName</TransientAttribute>
-        <TransientAttribute>truststoreAlgorithm</TransientAttribute>
-        <TransientAttribute>truststoreFile</TransientAttribute>
-        <TransientAttribute>truststorePass</TransientAttribute>
-        <TransientAttribute>truststoreProvider</TransientAttribute>
-        <TransientAttribute>truststoreType</TransientAttribute>
-        <!-- All attribute duplicated from the AbstractHttp11Protocol, removed in Tomcat 10 -->
-        <TransientAttribute>clientAuth</TransientAttribute>
-        <TransientAttribute>SSLVerifyClient</TransientAttribute>
-        <TransientAttribute>trustMaxCertLength</TransientAttribute>
-        <TransientAttribute>SSLVerifyDepth</TransientAttribute>
-        <TransientAttribute>useServerCipherSuitesOrder</TransientAttribute>
-        <TransientAttribute>SSLHonorCipherOrder</TransientAttribute>
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="UpgradeProtocol"
@@ -163,16 +121,6 @@
         storeFactoryClass="org.apache.catalina.storeconfig.SSLHostConfigSF">
         <TransientAttribute>openSslContext</TransientAttribute>
         <TransientAttribute>openSslConfContext</TransientAttribute>
-        <!-- All attribute duplicated from the Certificate, may be removed in Tomcat 10 -->
-        <TransientAttribute>certificateChainFile</TransientAttribute>
-        <TransientAttribute>certificateFile</TransientAttribute>
-        <TransientAttribute>certificateKeyAlias</TransientAttribute>
-        <TransientAttribute>certificateKeyFile</TransientAttribute>
-        <TransientAttribute>certificateKeyPassword</TransientAttribute>
-        <TransientAttribute>certificateKeystoreFile</TransientAttribute>
-        <TransientAttribute>certificateKeystorePassword</TransientAttribute>
-        <TransientAttribute>certificateKeystoreProvider</TransientAttribute>
-        <TransientAttribute>certificateKeystoreType</TransientAttribute>
      </Description>
      <Description
         tag="Certificate"
@@ -224,6 +172,7 @@
         children="true"
         tagClass="org.apache.catalina.session.PersistentManager"
         storeFactoryClass="org.apache.catalina.storeconfig.PersistentManagerSF">
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Store"
@@ -236,7 +185,7 @@
         tag="Store"
         standard="false"
         default="false"
-        tagClass="org.apache.catalina.session.JDBCStore"
+        tagClass="org.apache.catalina.session.DataSourceStore"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
      </Description>
      <Description
@@ -247,6 +196,7 @@
         tagClass="org.apache.catalina.ha.CatalinaCluster"
         storeFactoryClass="org.apache.catalina.storeconfig.CatalinaClusterSF">
         <TransientAttribute>clusterName</TransientAttribute>
+        <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Realm"
@@ -290,6 +240,7 @@
        <TransientChild>org.apache.catalina.mbeans.ServerLifecycleListener</TransientChild>
        <TransientChild>org.apache.catalina.core.NamingContextListener</TransientChild>
        <TransientChild>org.apache.catalina.startup.ContextConfig</TransientChild>
+       <TransientChild>org.apache.catalina.startup.ContextConfig$HostWebXmlCacheCleaner</TransientChild>
        <TransientChild>org.apache.catalina.startup.EngineConfig</TransientChild>
        <TransientChild>org.apache.catalina.startup.HostConfig</TransientChild>
        <TransientChild>org.apache.catalina.startup.ListenerCreateRule$OptionalListener</TransientChild>
@@ -322,6 +273,7 @@
          <TransientChild>org.apache.catalina.valves.CertificatesValve</TransientChild>
          <TransientChild>org.apache.catalina.valves.ErrorReportValve</TransientChild>
          <TransientChild>org.apache.catalina.valves.RequestListenerValve</TransientChild>
+         <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="Environment"
@@ -358,13 +310,6 @@
         children="true"
         tagClass="org.apache.catalina.WebResourceRoot"
         storeFactoryClass="org.apache.catalina.storeconfig.WebResourceRootSF">
-        <TransientAttribute>allowLinking</TransientAttribute>
-        <TransientAttribute>cachingAllowed</TransientAttribute>
-        <TransientAttribute>cacheTtl</TransientAttribute>
-        <TransientAttribute>cacheMaxSize</TransientAttribute>
-        <TransientAttribute>cacheObjectMaxSize</TransientAttribute>
-        <TransientAttribute>cached</TransientAttribute>
-        <TransientAttribute>caseSensitive</TransientAttribute>
         <TransientAttribute>domain</TransientAttribute>
      </Description>
     <Description
@@ -510,6 +455,7 @@
         default="false"
         tagClass="org.apache.catalina.core.StandardThreadExecutor"
         storeFactoryClass="org.apache.catalina.storeconfig.StoreFactoryBase">
+       <TransientAttribute>domain</TransientAttribute>
      </Description>
      <Description
         tag="JarScanner"

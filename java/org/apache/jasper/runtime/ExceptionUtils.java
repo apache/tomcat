@@ -25,14 +25,11 @@ import java.lang.reflect.InvocationTargetException;
 public class ExceptionUtils {
 
     /**
-     * Checks whether the supplied Throwable is one that needs to be
-     * rethrown and swallows all others.
+     * Checks whether the supplied Throwable is one that needs to be rethrown and swallows all others.
+     *
      * @param t the Throwable to check
      */
     public static void handleThrowable(Throwable t) {
-        if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        }
         if (t instanceof StackOverflowError) {
             // Swallow silently - it should be recoverable
             return;
@@ -44,11 +41,11 @@ public class ExceptionUtils {
     }
 
     /**
-     * Checks whether the supplied Throwable is an instance of
-     * <code>InvocationTargetException</code> and returns the throwable that is
-     * wrapped by it, if there is any.
+     * Checks whether the supplied Throwable is an instance of <code>InvocationTargetException</code> and returns the
+     * throwable that is wrapped by it, if there is any.
      *
      * @param t the Throwable to check
+     *
      * @return <code>t</code> or <code>t.getCause()</code>
      */
     public static Throwable unwrapInvocationTargetException(Throwable t) {

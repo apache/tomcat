@@ -38,8 +38,8 @@ public class NoOpCallStack implements CallStack {
     }
 
     @Override
-    public boolean printStackTrace(final PrintWriter writer) {
-        return false;
+    public void clear() {
+        // no-op
     }
 
     @Override
@@ -48,7 +48,7 @@ public class NoOpCallStack implements CallStack {
     }
 
     @Override
-    public void clear() {
-        // no-op
+    public boolean printStackTrace(final PrintWriter writer) {
+        return false;
     }
 }

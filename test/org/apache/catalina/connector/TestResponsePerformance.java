@@ -24,23 +24,26 @@ import org.junit.Test;
 import org.apache.catalina.startup.LoggingBaseTest;
 import org.apache.tomcat.unittest.TesterRequest;
 
+/*
+ * This is a relative performance test so it remains part of the standard test run. If the test fails then we need to
+ * looking at why and possibly disable/remove the homebrew approach for some OS/Java combinations.
+ */
 public class TestResponsePerformance extends LoggingBaseTest {
 
-    private static final int ITERATIONS = 100000;
+    private static final int ITERATIONS = 1000000;
 
     @Test
     public void testToAbsolutePerformance() throws Exception {
         Request req = new TesterRequest();
-        Response resp = new Response();
+        Response resp = new Response(null);
         resp.setRequest(req);
 
         // Warm up
         doHomebrew(resp);
         doUri();
 
-        // Note: Java 9 on my OSX laptop consistently shows doUri() is faster
-        //       than doHomebrew(). Worth a closer look for Tomcat 10 on the
-        //       assumption it will require java 9
+        // Note: With Java 11 the 'homebrew' approach is consistently 3-4 times faster on both MacOS (Intel) and Linux
+        // With Java 22 EA the 'homebrew' approach is consistently a little over 2x faster on MacOS (M1)
 
         // To allow for timing differences between runs, a "best of n" approach
         // is taken for this test
@@ -74,8 +77,7 @@ public class TestResponsePerformance extends LoggingBaseTest {
     private long doUri() {
         long start = System.currentTimeMillis();
         for (int i = 0; i < ITERATIONS; i++) {
-            URI base = URI.create(
-                    "http://localhost:8080/level1/level2/foo.html");
+            URI base = URI.create("http://localhost:8080/level1/level2/foo.html");
             base.resolve(URI.create("bar.html")).toASCIIString();
         }
         return System.currentTimeMillis() - start;

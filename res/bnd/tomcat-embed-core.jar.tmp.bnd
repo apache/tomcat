@@ -12,20 +12,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-Automatic-Module-Name: org.apache.tomcat.embed.core
+
+-include: build-defaults.bnd
+
 Bundle-Name: tomcat-embed-core
 Bundle-SymbolicName: org.apache.tomcat-embed-core
-Bundle-Version: @VERSION@
 Export-Package: \
-    javax.security.auth.message,\
-    javax.security.auth.message.callback,\
-    javax.security.auth.message.config,\
-    javax.security.auth.message.module,\
-    javax.servlet,\
-    javax.servlet.annotation,\
-    javax.servlet.descriptor,\
-    javax.servlet.http,\
-    javax.servlet.resources,\
+    !jakarta.servlet.jsp.*,\
+    jakarta.security.auth.message.*;version=${jaspic.spec.version},\
+    jakarta.servlet.*;version=${servlet.spec.version},\
     org.apache.catalina,\
     org.apache.catalina.authenticator,\
     org.apache.catalina.authenticator.jaspic,\
@@ -43,7 +38,6 @@ Export-Package: \
     org.apache.catalina.security,\
     org.apache.catalina.servlets,\
     org.apache.catalina.session,\
-    org.apache.catalina.ssi,\
     org.apache.catalina.startup,\
     org.apache.catalina.users,\
     org.apache.catalina.util,\
@@ -67,23 +61,24 @@ Export-Package: \
     org.apache.tomcat.util,\
     org.apache.tomcat.util.bcel.classfile,\
     org.apache.tomcat.util.buf,\
-    org.apache.tomcat.util.codec.binary,\
     org.apache.tomcat.util.collections,\
     org.apache.tomcat.util.compat,\
+    org.apache.tomcat.util.concurrent,\
     org.apache.tomcat.util.descriptor,\
     org.apache.tomcat.util.descriptor.tagplugin,\
-    org.apache.tomcat.util.descriptor.tld,\
     org.apache.tomcat.util.descriptor.web,\
     org.apache.tomcat.util.digester,\
     org.apache.tomcat.util.file,\
     org.apache.tomcat.util.http,\
     org.apache.tomcat.util.http.fileupload,\
     org.apache.tomcat.util.http.fileupload.disk,\
+    org.apache.tomcat.util.http.fileupload.impl,\
     org.apache.tomcat.util.http.fileupload.servlet,\
     org.apache.tomcat.util.http.fileupload.util,\
     org.apache.tomcat.util.http.parser,\
     org.apache.tomcat.util.log,\
     org.apache.tomcat.util.modeler,\
+    org.apache.tomcat.util.modeler.modules,\
     org.apache.tomcat.util.net,\
     org.apache.tomcat.util.net.openssl,\
     org.apache.tomcat.util.net.openssl.ciphers,\
@@ -91,3 +86,58 @@ Export-Package: \
     org.apache.tomcat.util.scan,\
     org.apache.tomcat.util.security,\
     org.apache.tomcat.util.threads
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
+
+-includepackage: \
+    org.apache.tomcat.util.bcel,\
+    org.apache.tomcat.util.http.fileupload.util.mime,\
+    org.apache.tomcat.util.json,\
+    org.apache.tomcat.util.net.jsse
+
+-includeresource.notice2: META-INF/NOTICE=${tomcat.output}/manifests/servlet-api.jar.notice
+-includeresource.license2: META-INF/LICENSE=${tomcat.output}/manifests/servlet-api.jar.license
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JakartaAuthentication;\
+        version:Version=${jaspic.spec.version};\
+        uses:='${packages;NAMED;jakarta.security.auth.message.*}',\
+    osgi.contract;\
+        osgi.contract=JakartaServlet;\
+        version:Version=${servlet.spec.version};\
+        uses:='${packages;NAMED;jakarta.servlet.*;NAMED;!jakarta.servlet.jsp.*}'
+
+-namesection: \
+    jakarta/security/auth/message*/;\
+        Specification-Title=Jakarta Authentication SPI for Containers;\
+        Specification-Version=${jaspic.spec.version};\
+        Specification-Vendor=Eclipse Foundation;\
+        Implementation-Title=jakarta.security.auth.message;\
+        Implementation-Version=${jaspic.spec.version}${jaspic.revision};\
+        Implementation-Vendor=Apache Software Foundation,\
+    jakarta/servlet*/;\
+        Specification-Title=Jakarta Servlet;\
+        Specification-Version=${servlet.spec.version};\
+        Specification-Vendor=Eclipse Foundation;\
+        Implementation-Title=jakarta.servlet;\
+        Implementation-Version=${servlet.spec.version}${servlet.revision};\
+        Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version};\
+        modules='\
+            jakarta.ejb,\
+            jakarta.mail,\
+            jakarta.persistence,\
+            jakarta.xml.ws,\
+            java.xml.ws'
+-jpms-module-info-options: \
+    ${module.name};substitute=tomcat-embed-core,\
+    jakarta.ejb;static=true,\
+    jakarta.mail;static=true,\
+    jakarta.persistence;static=true,\
+    jakarta.xml.ws;static=true,\
+    java.xml.ws;static=true

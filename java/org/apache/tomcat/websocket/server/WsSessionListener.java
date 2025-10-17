@@ -16,19 +16,10 @@
  */
 package org.apache.tomcat.websocket.server;
 
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
 
-public class WsSessionListener implements HttpSessionListener{
-
-    private final WsServerContainer wsServerContainer;
-
-
-    public WsSessionListener(WsServerContainer wsServerContainer) {
-        this.wsServerContainer = wsServerContainer;
-    }
-
-
+public record WsSessionListener(WsServerContainer wsServerContainer) implements HttpSessionListener {
     @Override
     public void sessionDestroyed(HttpSessionEvent se) {
         wsServerContainer.closeAuthenticatedSession(se.getSession().getId());

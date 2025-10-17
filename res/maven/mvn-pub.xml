@@ -15,31 +15,30 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Tomcat 9.0 Maven Deployment" default="" basedir="."
-         xmlns:artifact="urn:maven-artifact-ant"
+<project name="Tomcat 12.0 Maven Deployment" default="" basedir="."
+         xmlns:resolver="antlib:org.apache.maven.resolver.ant"
          xmlns:if="ant:if"
          xmlns:unless="ant:unless">
-  <!--
-    Built for using Maven Ant Tasks (version 2.1.0 is known to work)
-  -->
 
   <property file="${basedir}/mvn.properties"/>
+  <property file="${basedir}/mvn.properties.release"/>
   <property file="${basedir}/mvn.properties.default"/>
   <property name="local.repo" value="${user.home}/.m2/repository"/>
+  <property name="aether.checksums.algorithms" value="MD5,SHA-1,SHA-256,SHA-512"/>
 
   <target name="init-maven">
     <antcall target="downloadfile">
-      <param name="sourcefile" value="${maven-ant-tasks.loc}"/>
-      <param name="destfile" value="${maven-ant-tasks.jar}"/>
-      <param name="destdir" value="${maven-ant-tasks.home}"/>
+      <param name="sourcefile" value="${maven-resolver-ant-tasks.loc}"/>
+      <param name="destfile" value="${maven-resolver-ant-tasks.jar}"/>
+      <param name="destdir" value="${maven-resolver-ant-tasks.home}"/>
     </antcall>
 
-    <typedef resource="org/apache/maven/artifact/ant/antlib.xml"
-             uri="urn:maven-artifact-ant">
+    <taskdef resource="org/apache/maven/resolver/ant/antlib.xml"
+             uri="antlib:org.apache.maven.resolver.ant">
       <classpath>
-        <pathelement location="${maven-ant-tasks.jar}" />
+        <pathelement location="${maven-resolver-ant-tasks.jar}" />
       </classpath>
-    </typedef>
+    </taskdef>
   </target>
 
   <target name="maven-install" depends="init-maven">
@@ -53,9 +52,13 @@
       </filterset>
     </copy>
 
-    <artifact:install file="${file}">
+    <resolver:install>
+      <artifact file="${file}" />
+      <artifact file="${src}" classifier="sources"/>
       <pom file="${pom}.tmp"/>
-    </artifact:install>
+      <artifact file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+    </resolver:install>
 
     <delete file="${pom}.tmp"/>
   </target>
@@ -76,7 +79,7 @@
         <param name="pom" value="${tomcat.pom.path}/@{pom}"/>
         <param name="src" value="@{src}"/>
         <param name="src.skip" value="@{src.skip}"/>
-        <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}-dev"/>
+        <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}-SNAPSHOT"/>
       </antcall>
     </sequential>
   </macrodef>
@@ -109,18 +112,19 @@
       <param name="file.out" value="${pom}.asc" />
     </antcall>
 
-    <artifact:deploy file="${file}">
+    <resolver:deploy>
+      <artifact file="${file}" />
       <pom file="${pom}.tmp"/>
-      <remoteRepository id="${maven.repo.repositoryId}" url="${maven.repo.url}">
+      <remoterepo id="${maven.repo.repositoryId}" url="${maven.repo.url}">
         <authentication username="${asf.ldap.username}"
                         password="${asf.ldap.password}"
                         unless:set="maven.auth.useSettings" />
-      </remoteRepository>
-      <attach file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
-      <attach file="${src}" classifier="sources" type="jar"/>
-      <attach file="${src}.asc" classifier="sources" type="jar.asc" if:set="gpg.passphrase"/>
-      <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
-    </artifact:deploy>
+      </remoterepo>
+      <artifact file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${src}" classifier="sources" type="jar"/>
+      <artifact file="${src}.asc" classifier="sources" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+    </resolver:deploy>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
@@ -171,16 +175,17 @@
       <param name="file.out" value="${pom}.asc" />
     </antcall>
 
-    <artifact:deploy file="${file}">
+    <resolver:deploy>
+      <artifact file="${file}" />
       <pom file="${pom}.tmp"/>
-      <remoteRepository id="${maven.repo.repositoryId}" url="${maven.repo.url}">
+      <remoterepo id="${maven.repo.repositoryId}" url="${maven.repo.url}">
         <authentication username="${asf.ldap.username}"
                         password="${asf.ldap.password}"
                         unless:set="maven.auth.useSettings"/>
-      </remoteRepository>
-      <attach file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
-      <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
-    </artifact:deploy>
+      </remoterepo>
+      <artifact file="${file}.asc" type="jar.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+    </resolver:deploy>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
@@ -208,6 +213,7 @@
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
     <delete file="${file}.zip.asc"/>
+    <delete file="${file}-windows-x64.zip.asc"/>
     <delete file="${file}.tar.gz.asc"/>
 
     <!--replace the version in the pom-->
@@ -222,6 +228,10 @@
       <param name="file.in" value="${file}.zip" />
       <param name="file.out" value="${file}.zip.asc" />
     </antcall>
+      <antcall target="-sign" >
+        <param name="file.in" value="${file}-windows-x64.zip" />
+        <param name="file.out" value="${file}-windows-x64.zip.asc" />
+      </antcall>
     <antcall target="-sign" >
       <param name="file.in" value="${file}.tar.gz" />
       <param name="file.out" value="${file}.tar.gz.asc" />
@@ -231,23 +241,26 @@
       <param name="file.out" value="${pom}.asc" />
     </antcall>
 
-    <artifact:deploy file="${pom}">
+    <resolver:deploy>
       <pom file="${pom}.tmp"/>
-        <remoteRepository id="${maven.repo.repositoryId}" url="${maven.repo.url}">
+      <remoterepo id="${maven.repo.repositoryId}" url="${maven.repo.url}">
         <authentication username="${asf.ldap.username}"
                         password="${asf.ldap.password}"
                         unless:set="maven.auth.useSettings"/>
-      </remoteRepository>
-      <attach file="${file}.zip" type="zip"/>
-      <attach file="${file}.zip.asc" type="zip.asc" if:set="gpg.passphrase"/>
-      <attach file="${file}.tar.gz" type="tar.gz"/>
-      <attach file="${file}.tar.gz.asc" type="tar.gz.asc" if:set="gpg.passphrase"/>
-      <attach file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
-    </artifact:deploy>
+      </remoterepo>
+      <artifact file="${file}.zip" type="zip"/>
+      <artifact file="${file}.zip.asc" type="zip.asc" if:set="gpg.passphrase"/>
+      <artifact file="${file}-windows-x64.zip" type="zip" classifier="windows-x64"/>
+      <artifact file="${file}-windows-x64.zip.asc" type="zip.asc" classifier="windows-x64" if:set="gpg.passphrase"/>
+      <artifact file="${file}.tar.gz" type="tar.gz"/>
+      <artifact file="${file}.tar.gz.asc" type="tar.gz.asc" if:set="gpg.passphrase"/>
+      <artifact file="${pom}.asc" type="pom.asc" if:set="gpg.passphrase"/>
+    </resolver:deploy>
 
     <delete file="${pom}.tmp"/>
     <delete file="${pom}.asc"/>
     <delete file="${file}.zip.asc"/>
+    <delete file="${file}-windows-x64.zip.asc"/>
     <delete file="${file}.tar.gz.asc"/>
   </target>
 
@@ -327,6 +340,10 @@
                    jarFileName="websocket-api.jar"
                 srcJarFileName="websocket-api-src.jar"/>
 
+     <doMavenInstall artifactId="tomcat-websocket-client-api"
+                   jarFileName="websocket-client-api.jar"
+                srcJarFileName="websocket-client-api-src.jar"/>
+
      <doMavenInstall artifactId="tomcat-jaspic-api"
                    jarFileName="jaspic-api.jar"
                 srcJarFileName="jaspic-api-src.jar"/>
@@ -336,15 +353,21 @@
      <doMavenInstall artifactId="tomcat-util"/>
      <doMavenInstall artifactId="tomcat-util-scan"/>
      <doMavenInstall artifactId="tomcat-coyote"/>
+     <doMavenInstall artifactId="tomcat-coyote-ffm"/>
      <doMavenInstall artifactId="tomcat-dbcp"/>
      <doMavenInstall artifactId="tomcat-websocket"/>
 
-     <!-- Emedded jars -->
+     <!-- Embedded jars -->
      <doMavenInstall artifactId="tomcat-embed-core"
          groupId="org.apache.tomcat.embed"
          file="${tomcat.embed.path}/tomcat-embed-core.jar"
          pom="tomcat-embed-core.pom"
          src="${tomcat.embed.src.path}/tomcat-embed-core-src.jar"/>
+     <doMavenInstall artifactId="tomcat-embed-programmatic"
+         groupId="org.apache.tomcat.experimental"
+         file="${tomcat.embed.path}/tomcat-embed-programmatic.jar"
+         pom="tomcat-embed-programmatic.pom"
+         src="${tomcat.embed.src.path}/tomcat-embed-programmatic-src.jar"/>
      <doMavenInstall artifactId="tomcat-embed-jasper"
          groupId="org.apache.tomcat.embed"
          file="${tomcat.embed.path}/tomcat-embed-jasper.jar"
@@ -425,6 +448,10 @@
                   jarFileName="websocket-api.jar"
                srcJarFileName="websocket-api-src.jar"/>
 
+    <doMavenDeploy artifactId="tomcat-websocket-client-api"
+                  jarFileName="websocket-client-api.jar"
+               srcJarFileName="websocket-client-api-src.jar"/>
+
     <doMavenDeploy artifactId="tomcat-jaspic-api"
                   jarFileName="jaspic-api.jar"
                srcJarFileName="jaspic-api-src.jar"/>
@@ -434,6 +461,7 @@
     <doMavenDeploy artifactId="tomcat-util"/>
     <doMavenDeploy artifactId="tomcat-util-scan"/>
     <doMavenDeploy artifactId="tomcat-coyote"/>
+    <doMavenDeploy artifactId="tomcat-coyote-ffm"/>
     <doMavenDeploy artifactId="tomcat-dbcp"/>
     <doMavenDeploy artifactId="tomcat-websocket"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-cs"/>
@@ -446,13 +474,18 @@
     <doMavenDeployNoSrc artifactId="tomcat-i18n-ru"/>
     <doMavenDeployNoSrc artifactId="tomcat-i18n-zh-CN"/>
 
-    <!-- Emedded jars -->
+    <!-- Embedded jars -->
     <!-- Skip DBCP - optional and can use standard ones above -->
     <doMavenDeploy artifactId="tomcat-embed-core"
         groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-core.jar"
         pom="tomcat-embed-core.pom"
         src="${tomcat.embed.src.path}/tomcat-embed-core-src.jar"/>
+    <doMavenDeploy artifactId="tomcat-embed-programmatic"
+                   groupId="org.apache.tomcat.experimental"
+                   file="${tomcat.embed.path}/tomcat-embed-programmatic.jar"
+                   pom="tomcat-embed-programmatic.pom"
+                   src="${tomcat.embed.src.path}/tomcat-embed-programmatic-src.jar"/>
     <doMavenDeploy artifactId="tomcat-embed-jasper"
         groupId="org.apache.tomcat.embed"
         file="${tomcat.embed.path}/tomcat-embed-jasper.jar"
@@ -481,13 +514,14 @@
       <param name="maven.repo.repositoryId"
              value="${maven.snapshot.repo.repositoryId}"/>
       <param name="maven.repo.url" value="${maven.snapshot.repo.url}"/>
-      <param name="maven.deploy.version" value="9.0-SNAPSHOT"/>
+      <param name="maven.deploy.version" value="${maven.asf.release.deploy.version}-SNAPSHOT"/>
       <param name="maven.deploy.binary.version"
              value="${maven.asf.release.deploy.version}-dev"/>
     </antcall>
   </target>
 
-  <target name="deploy-release">
+  <target name="deploy-release" depends="init-gpg-1,init-gpg-2">
+    <fail unless="gpg.exec.available">GPG is required, but was not found at ${gpg.exec}</fail>
     <antcall target="generic-deploy">
       <param name="maven.repo.repositoryId"
              value="${maven.asf.release.repo.repositoryId}"/>
@@ -521,6 +555,8 @@
     <exec executable="${gpg.exec}" failonerror="true"
           inputstring="${gpg.passphrase}">
       <arg value="--batch"/>
+      <arg value="--pinentry-mode"/>
+      <arg value="loopback"/>
       <arg value="--passphrase-fd"/>
       <arg value="0"/>
       <arg value="-a"/>

@@ -2,10 +2,10 @@ Manifest-version: 1.0
 X-Compile-Source-JDK: @source.jdk@
 X-Compile-Target-JDK: @target.jdk@
 
-Name: javax/el/
-Specification-Title: Expression Language
-Specification-Version: 3.0
-Specification-Vendor: Sun Microsystems, Inc.
-Implementation-Title: javax.el
-Implementation-Version: 3.0.@el.revision@
+Name: jakarta/el/
+Specification-Title: Jakarta Expression Language
+Specification-Version: @el.spec.version@
+Specification-Vendor: Eclipse Foundation
+Implementation-Title: jakarta.annotation
+Implementation-Version: @el.spec.version@@el.revision@
 Implementation-Vendor: Apache Software Foundation

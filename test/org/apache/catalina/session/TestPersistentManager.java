@@ -18,9 +18,9 @@ package org.apache.catalina.session;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -108,7 +108,8 @@ public class TestPersistentManager {
         context.setParent(host);
 
         Connector connector = EasyMock.createNiceMock(Connector.class);
-        Request req = new Request(connector) {
+        EasyMock.replay(connector);
+        Request req = new Request(connector, null) {
             @Override
             public Context getContext() {
                 return context;
@@ -116,7 +117,6 @@ public class TestPersistentManager {
         };
         req.setRequestedSessionId("invalidSession");
         HttpServletRequest request = new RequestFacade(req);
-        EasyMock.replay(connector);
         requestCachingSessionListener.request = request;
 
         manager.setContext(context);

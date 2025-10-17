@@ -16,18 +16,16 @@
  */
 package org.apache.catalina.tribes;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.apache.catalina.tribes.util.Arrays;
 
 /**
- * <p>Title: Represents a globally unique Id</p>
- *
- * <p>Company: </p>
- *
- * @version 1.0
+ * Represents a globally unique Id.
  */
-public final class UniqueId implements Serializable{
+public final class UniqueId implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     final byte[] id;
@@ -42,25 +40,32 @@ public final class UniqueId implements Serializable{
 
     public UniqueId(byte[] id, int offset, int length) {
         this.id = new byte[length];
-        System.arraycopy(id,offset,this.id,0,length);
+        System.arraycopy(id, offset, this.id, 0, length);
     }
 
     @Override
     public int hashCode() {
-        if ( id == null ) return 0;
+        if (id == null) {
+            return 0;
+        }
         return Arrays.hashCode(id);
     }
 
     @Override
     public boolean equals(Object other) {
         boolean result = (other instanceof UniqueId);
-        if ( result ) {
-            UniqueId uid = (UniqueId)other;
-            if ( this.id == null && uid.id == null ) result = true;
-            else if ( this.id == null && uid.id != null ) result = false;
-            else if ( this.id != null && uid.id == null ) result = false;
-            else result = Arrays.equals(this.id,uid.id);
-        }//end if
+        if (result) {
+            UniqueId uid = (UniqueId) other;
+            if (this.id == null && uid.id == null) {
+                // Nothing to do
+            } else if (this.id == null) {
+                result = false;
+            } else if (uid.id == null) {
+                result = false;
+            } else {
+                result = Arrays.equals(this.id, uid.id);
+            }
+        }
         return result;
     }
 
@@ -70,9 +75,7 @@ public final class UniqueId implements Serializable{
 
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder("UniqueId");
-        buf.append(Arrays.toString(id));
-        return buf.toString();
+        return "UniqueId" + Arrays.toString(id);
     }
 
 }

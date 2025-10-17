@@ -19,7 +19,7 @@ package org.apache.el.lang;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import javax.el.ELProcessor;
+import jakarta.el.ELProcessor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,7 +27,7 @@ import org.junit.Test;
 public class TestELArithmetic {
     private static final String a = "1.1";
     private static final BigInteger b =
-        new BigInteger("1000000000000000000000");
+            new BigInteger("1000000000000000000000");
 
     @Test
     public void testAdd01() throws Exception {
@@ -38,7 +38,7 @@ public class TestELArithmetic {
     @Test
     public void testAdd02() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("null + null");
+        Long result = processor.eval("null + null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 
@@ -51,7 +51,7 @@ public class TestELArithmetic {
     @Test
     public void testSubtract02() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("null - null");
+        Long result = processor.eval("null - null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 
@@ -64,7 +64,7 @@ public class TestELArithmetic {
     @Test
     public void testMultiply02() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("null * null");
+        Long result = processor.eval("null * null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 
@@ -77,7 +77,7 @@ public class TestELArithmetic {
     @Test
     public void testDivide02() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("null / null");
+        Long result = processor.eval("null / null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 
@@ -90,14 +90,22 @@ public class TestELArithmetic {
     @Test
     public void testMod02() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("null % null");
+        Long result = processor.eval("null % null");
         Assert.assertEquals(Long.valueOf(0), result);
+    }
+
+    @Test
+    public void testMod03() {
+        ELProcessor processor = new ELProcessor();
+        // Large so BigInteger rather than Long is used internally
+        BigInteger result = processor.eval("1 % -9999999999999999999");
+        Assert.assertEquals(BigInteger.valueOf(1), result);
     }
 
     @Test
     public void testUnaryMinus01() {
         ELProcessor processor = new ELProcessor();
-        Object result = processor.eval("-null");
+        Long result = processor.eval("-null");
         Assert.assertEquals(Long.valueOf(0), result);
     }
 

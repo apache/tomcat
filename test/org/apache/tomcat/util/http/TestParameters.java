@@ -27,20 +27,20 @@ import org.junit.Test;
 public class TestParameters {
 
     private static final Parameter SIMPLE =
-        new Parameter("foo1", "bar1");
+            new Parameter("foo1", "bar1");
     private static final Parameter SIMPLE_MULTIPLE =
-        new Parameter("foo2", "bar1", "bar2", "hello world", "?%@");
+            new Parameter("foo2", "bar1", "bar2", "hello world", "?%@");
     private static final Parameter NO_VALUE =
-        new Parameter("foo3");
+            new Parameter("foo3");
     private static final Parameter EMPTY_VALUE =
-        new Parameter("foo4", "");
+            new Parameter("foo4", "");
     private static final Parameter EMPTY =
-        new Parameter("");
+            new Parameter("");
     private static final Parameter UTF8 =
             new Parameter("\ufb6b\ufb6a\ufb72", "\uffee\uffeb\uffe2");
 
     @Test
-    public void testProcessParametersByteArrayIntInt() {
+    public void testProcessParametersByteArrayIntIntValid() {
         doTestProcessParametersByteArrayIntInt(-1, SIMPLE);
         doTestProcessParametersByteArrayIntInt(-1, SIMPLE_MULTIPLE);
         doTestProcessParametersByteArrayIntInt(-1, NO_VALUE);
@@ -60,13 +60,25 @@ public class TestParameters {
         doTestProcessParametersByteArrayIntInt(-1,
                 UTF8, SIMPLE, SIMPLE_MULTIPLE, NO_VALUE, EMPTY_VALUE, EMPTY);
 
+        doTestProcessParametersByteArrayIntInt(4,
+                SIMPLE, NO_VALUE, EMPTY_VALUE, UTF8);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testProcessParametersByteArrayIntIntInvalid01() {
         doTestProcessParametersByteArrayIntInt(1,
                 SIMPLE, NO_VALUE, EMPTY_VALUE, UTF8);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testProcessParametersByteArrayIntIntInvalid02() {
         doTestProcessParametersByteArrayIntInt(2,
                 SIMPLE, NO_VALUE, EMPTY_VALUE, UTF8);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testProcessParametersByteArrayIntIntInvalid03() {
         doTestProcessParametersByteArrayIntInt(3,
-                SIMPLE, NO_VALUE, EMPTY_VALUE, UTF8);
-        doTestProcessParametersByteArrayIntInt(4,
                 SIMPLE, NO_VALUE, EMPTY_VALUE, UTF8);
     }
 
@@ -274,7 +286,7 @@ public class TestParameters {
         private final String name;
         private final String[] values;
 
-        public Parameter(String name, String... values) {
+        Parameter(String name, String... values) {
             this.name = name;
             this.values = values;
         }

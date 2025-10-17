@@ -14,46 +14,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.util.digester;
 
 
 import org.xml.sax.Attributes;
 
 /**
- * <p> Interface for use with {@link FactoryCreateRule}.
- * The rule calls {@link #createObject} to create an object
- * to be pushed onto the <code>Digester</code> stack
- * whenever it is matched.</p>
- *
- * <p> {@link AbstractObjectCreationFactory} is an abstract
- * implementation suitable for creating anonymous
+ * <p>
+ * Interface for use with {@link FactoryCreateRule}. The rule calls {@link #createObject} to create an object to be
+ * pushed onto the <code>Digester</code> stack whenever it is matched.
+ * </p>
+ * <p>
+ * {@link AbstractObjectCreationFactory} is an abstract implementation suitable for creating anonymous
  * <code>ObjectCreationFactory</code> implementations.
  */
 public interface ObjectCreationFactory {
 
     /**
-     * Factory method called by {@link FactoryCreateRule} to supply an
-     * object based on the element's attributes.
+     * Factory method called by {@link FactoryCreateRule} to supply an object based on the element's attributes.
      *
      * @param attributes the element's attributes
-     * @return the creted object
+     *
+     * @return the created object
+     *
      * @throws Exception any exception thrown will be propagated upwards
      */
-    public Object createObject(Attributes attributes) throws Exception;
+    Object createObject(Attributes attributes) throws Exception;
 
     /**
-     * @return the {@link Digester} that was set by the
-     * {@link FactoryCreateRule} upon initialization.
+     * @return the {@link Digester} that was set by the {@link FactoryCreateRule} upon initialization.
      */
-    public Digester getDigester();
+    Digester getDigester();
 
     /**
-     * Set the {@link Digester} to allow the implementation to do logging,
-     * classloading based on the digester's classloader, etc.
+     * Set the {@link Digester} to allow the implementation to do logging, classloading based on the digester's
+     * classloader, etc.
      *
      * @param digester parent Digester object
      */
-    public void setDigester(Digester digester);
+    void setDigester(Digester digester);
 
 }

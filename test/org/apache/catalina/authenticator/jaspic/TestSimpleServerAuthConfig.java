@@ -19,10 +19,10 @@ package org.apache.catalina.authenticator.jaspic;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.security.auth.message.AuthException;
-import javax.security.auth.message.MessageInfo;
-import javax.security.auth.message.config.ServerAuthConfig;
-import javax.security.auth.message.config.ServerAuthContext;
+import jakarta.security.auth.message.AuthException;
+import jakarta.security.auth.message.MessageInfo;
+import jakarta.security.auth.message.config.ServerAuthConfig;
+import jakarta.security.auth.message.config.ServerAuthContext;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -32,17 +32,15 @@ public class TestSimpleServerAuthConfig {
     private static final String SERVER_AUTH_MODULE_KEY_PREFIX =
             "org.apache.catalina.authenticator.jaspic.ServerAuthModule.";
 
-    private static final Map<String,String> CONFIG_PROPERTIES;
+    private static final Map<String,Object> CONFIG_PROPERTIES;
     static {
         CONFIG_PROPERTIES = new HashMap<>();
-        CONFIG_PROPERTIES.put(SERVER_AUTH_MODULE_KEY_PREFIX + "1",
-                TesterServerAuthModuleA.class.getName());
+        CONFIG_PROPERTIES.put(SERVER_AUTH_MODULE_KEY_PREFIX + "1", TesterServerAuthModuleA.class.getName());
     }
 
     @Test
     public void testConfigOnServerAuthConfig() throws Exception {
-        ServerAuthConfig serverAuthConfig =
-                new SimpleServerAuthConfig(null,  null, null, CONFIG_PROPERTIES);
+        ServerAuthConfig serverAuthConfig = new SimpleServerAuthConfig(null, null, null, CONFIG_PROPERTIES);
         ServerAuthContext serverAuthContext = serverAuthConfig.getAuthContext(null, null, null);
 
         validateServerAuthContext(serverAuthContext);
@@ -51,17 +49,16 @@ public class TestSimpleServerAuthConfig {
 
     @Test
     public void testConfigOnGetAuthContext() throws Exception {
-        ServerAuthConfig serverAuthConfig = new SimpleServerAuthConfig(null,  null, null, null);
-        ServerAuthContext serverAuthContext =
-                serverAuthConfig.getAuthContext(null, null, CONFIG_PROPERTIES);
+        ServerAuthConfig serverAuthConfig = new SimpleServerAuthConfig(null, null, null, null);
+        ServerAuthContext serverAuthContext = serverAuthConfig.getAuthContext(null, null, CONFIG_PROPERTIES);
 
         validateServerAuthContext(serverAuthContext);
     }
 
 
-    @Test(expected=AuthException.class)
+    @Test(expected = AuthException.class)
     public void testConfigNone() throws Exception {
-        ServerAuthConfig serverAuthConfig = new SimpleServerAuthConfig(null,  null, null, null);
+        ServerAuthConfig serverAuthConfig = new SimpleServerAuthConfig(null, null, null, null);
         serverAuthConfig.getAuthContext(null, null, null);
     }
 

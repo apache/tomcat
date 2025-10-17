@@ -19,18 +19,15 @@ package org.apache.tomcat.util.descriptor.web;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.servlet.descriptor.JspPropertyGroupDescriptor;
+import jakarta.servlet.descriptor.JspPropertyGroupDescriptor;
 
 
-
-public class JspPropertyGroupDescriptorImpl
-        implements JspPropertyGroupDescriptor{
+public class JspPropertyGroupDescriptorImpl implements JspPropertyGroupDescriptor {
 
     private final JspPropertyGroup jspPropertyGroup;
 
 
-    public JspPropertyGroupDescriptorImpl(
-            JspPropertyGroup jspPropertyGroup) {
+    public JspPropertyGroupDescriptorImpl(JspPropertyGroup jspPropertyGroup) {
         this.jspPropertyGroup = jspPropertyGroup;
     }
 
@@ -72,12 +69,23 @@ public class JspPropertyGroupDescriptorImpl
 
 
     @Override
+    public String getErrorOnELNotFound() {
+        String result = null;
+
+        if (jspPropertyGroup.getErrorOnELNotFound() != null) {
+            result = jspPropertyGroup.getErrorOnELNotFound().toString();
+        }
+
+        return result;
+    }
+
+
+    @Override
     public String getErrorOnUndeclaredNamespace() {
         String result = null;
 
         if (jspPropertyGroup.getErrorOnUndeclaredNamespace() != null) {
-            result =
-                jspPropertyGroup.getErrorOnUndeclaredNamespace().toString();
+            result = jspPropertyGroup.getErrorOnUndeclaredNamespace().toString();
         }
 
         return result;

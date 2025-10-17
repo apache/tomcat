@@ -21,9 +21,9 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.Deque;
 
-import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.Session;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.Session;
 
 public class Snake {
 
@@ -67,8 +67,7 @@ public class Snake {
         try {
             session.getBasicRemote().sendText(msg);
         } catch (IOException ioe) {
-            CloseReason cr =
-                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, ioe.getMessage());
+            CloseReason cr = new CloseReason(CloseCodes.CLOSED_ABNORMALLY, ioe.getMessage());
             try {
                 session.close(cr);
             } catch (IOException ioe2) {

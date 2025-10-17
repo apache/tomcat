@@ -22,14 +22,14 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.websocket.ClientEndpointConfig;
-import javax.websocket.ContainerProvider;
-import javax.websocket.EndpointConfig;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.websocket.ClientEndpointConfig;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,8 +42,8 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
 import org.apache.tomcat.websocket.WebSocketBaseTest;
 
 /**
- * Tests inspired by https://bz.apache.org/bugzilla/show_bug.cgi?id=58835 to
- * check that WebSocket connections are closed gracefully on Tomcat shutdown.
+ * Tests inspired by https://bz.apache.org/bugzilla/show_bug.cgi?id=58835 to check that WebSocket connections are closed
+ * gracefully on Tomcat shutdown.
  */
 public class TestShutdown extends WebSocketBaseTest {
 
@@ -51,7 +51,7 @@ public class TestShutdown extends WebSocketBaseTest {
     public void testShutdownBufferedMessages() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(EchoBufferedConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -60,9 +60,7 @@ public class TestShutdown extends WebSocketBaseTest {
 
         WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
         ClientEndpointConfig clientEndpointConfig = ClientEndpointConfig.Builder.create().build();
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class,
-                clientEndpointConfig,
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class, clientEndpointConfig,
                 new URI("ws://localhost:" + getPort() + "/test"));
         CountDownLatch latch = new CountDownLatch(1);
         BasicText handler = new BasicText(latch);
@@ -74,8 +72,7 @@ public class TestShutdown extends WebSocketBaseTest {
             Thread.sleep(200);
             count++;
         }
-        Assert.assertNotEquals("Message not received by server",
-                EchoBufferedEndpoint.messageCount.get(), 0);
+        Assert.assertNotEquals("Message not received by server", EchoBufferedEndpoint.messageCount.get(), 0);
 
         tomcat.stop();
 
@@ -97,8 +94,7 @@ public class TestShutdown extends WebSocketBaseTest {
         private static AtomicLong messageCount = new AtomicLong(0);
 
         @OnOpen
-        public void onOpen(Session session, @SuppressWarnings("unused") EndpointConfig  epc)
-                throws IOException {
+        public void onOpen(Session session, @SuppressWarnings("unused") EndpointConfig epc) throws IOException {
             session.getAsyncRemote().setBatchingAllowed(true);
         }
 

@@ -20,29 +20,28 @@ import java.util.Map;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.message.AuthException;
-import javax.security.auth.message.AuthStatus;
-import javax.security.auth.message.MessageInfo;
-import javax.security.auth.message.MessagePolicy;
-import javax.security.auth.message.module.ServerAuthModule;
+
+import jakarta.security.auth.message.AuthException;
+import jakarta.security.auth.message.AuthStatus;
+import jakarta.security.auth.message.MessageInfo;
+import jakarta.security.auth.message.MessagePolicy;
+import jakarta.security.auth.message.module.ServerAuthModule;
 
 public class TesterServerAuthModuleA implements ServerAuthModule {
 
     private StringBuilder trace = new StringBuilder("init()-");
 
     @Override
-    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject,
-            Subject serviceSubject) throws AuthException {
-        return null;
-    }
-
-    @Override
-    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject)
+    public AuthStatus validateRequest(MessageInfo messageInfo, Subject clientSubject, Subject serviceSubject)
             throws AuthException {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
+    public AuthStatus secureResponse(MessageInfo messageInfo, Subject serviceSubject) throws AuthException {
+        return null;
+    }
+
     @Override
     public void cleanSubject(MessageInfo messageInfo, Subject subject) throws AuthException {
         trace.append("cleanSubject()-");
@@ -50,15 +49,13 @@ public class TesterServerAuthModuleA implements ServerAuthModule {
     }
 
     @Override
-    public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, @SuppressWarnings("rawtypes") Map options)
-                    throws AuthException {
+    public void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy, CallbackHandler handler,
+            @SuppressWarnings("rawtypes") Map options) throws AuthException {
         // NO-OP
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
-    public Class[] getSupportedMessageTypes() {
+    public Class<?>[] getSupportedMessageTypes() {
         return null;
     }
 }

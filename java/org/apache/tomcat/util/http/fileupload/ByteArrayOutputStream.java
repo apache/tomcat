@@ -17,7 +17,6 @@
 package org.apache.tomcat.util.http.fileupload;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -165,34 +164,6 @@ public class ByteArrayOutputStream extends OutputStream {
         }
         currentBuffer[inBufferPos] = (byte) b;
         count++;
-    }
-
-    /**
-     * Writes the entire contents of the specified input stream to this
-     * byte stream. Bytes from the input stream are read directly into the
-     * internal buffers of this streams.
-     *
-     * @param in the input stream to read from
-     * @return total number of bytes read from the input stream
-     *         (and written to this stream)
-     * @throws IOException if an I/O error occurs while reading the input stream
-     * @since 1.4
-     */
-    public synchronized int write(final InputStream in) throws IOException {
-        int readCount = 0;
-        int inBufferPos = count - filledBufferSum;
-        int n = in.read(currentBuffer, inBufferPos, currentBuffer.length - inBufferPos);
-        while (n != -1) {
-            readCount += n;
-            inBufferPos += n;
-            count += n;
-            if (inBufferPos == currentBuffer.length) {
-                needNewBuffer(currentBuffer.length);
-                inBufferPos = 0;
-            }
-            n = in.read(currentBuffer, inBufferPos, currentBuffer.length - inBufferPos);
-        }
-        return readCount;
     }
 
     /**

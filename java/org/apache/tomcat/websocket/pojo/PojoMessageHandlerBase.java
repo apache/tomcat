@@ -17,24 +17,31 @@
 package org.apache.tomcat.websocket.pojo;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 
-import javax.websocket.EncodeException;
-import javax.websocket.MessageHandler;
-import javax.websocket.RemoteEndpoint;
-import javax.websocket.Session;
+import jakarta.websocket.EncodeException;
+import jakarta.websocket.MessageHandler;
+import jakarta.websocket.RemoteEndpoint;
+import jakarta.websocket.Session;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
+import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.WrappedMessageHandler;
+import org.apache.tomcat.websocket.WsSession;
 
 /**
  * Common implementation code for the POJO message handlers.
  *
- * @param <T>   The type of message to handle
+ * @param <T> The type of message to handle
  */
-public abstract class PojoMessageHandlerBase<T>
-        implements WrappedMessageHandler {
+public abstract class PojoMessageHandlerBase<T> implements WrappedMessageHandler {
+
+    private final Log log = LogFactory.getLog(PojoMessageHandlerBase.class); // must not be static
+    private static final StringManager sm = StringManager.getManager(PojoMessageHandlerBase.class);
 
     protected final Object pojo;
     protected final Method method;
@@ -45,9 +52,8 @@ public abstract class PojoMessageHandlerBase<T>
     protected final int indexSession;
     protected final long maxMessageSize;
 
-    public PojoMessageHandlerBase(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload, boolean convert,
-            int indexSession, long maxMessageSize) {
+    public PojoMessageHandlerBase(Object pojo, Method method, Session session, Object[] params, int indexPayload,
+            boolean convert, int indexSession, long maxMessageSize) {
         this.pojo = pojo;
         this.method = method;
         // TODO: The method should already be accessible here but the following
@@ -74,14 +80,11 @@ public abstract class PojoMessageHandlerBase<T>
 
         RemoteEndpoint.Basic remoteEndpoint = session.getBasicRemote();
         try {
-            if (result instanceof String) {
-                remoteEndpoint.sendText((String) result);
-            } else if (result instanceof ByteBuffer) {
-                remoteEndpoint.sendBinary((ByteBuffer) result);
-            } else if (result instanceof byte[]) {
-                remoteEndpoint.sendBinary(ByteBuffer.wrap((byte[]) result));
-            } else {
-                remoteEndpoint.sendObject(result);
+            switch (result) {
+                case String s -> remoteEndpoint.sendText(s);
+                case ByteBuffer byteBuffer -> remoteEndpoint.sendBinary(byteBuffer);
+                case byte[] bytes -> remoteEndpoint.sendBinary(ByteBuffer.wrap(bytes));
+                default -> remoteEndpoint.sendObject(result);
             }
         } catch (IOException | EncodeException ioe) {
             throw new IllegalStateException(ioe);
@@ -90,9 +93,8 @@ public abstract class PojoMessageHandlerBase<T>
 
 
     /**
-     * Expose the POJO if it is a message handler so the Session is able to
-     * match requests to remove handlers if the original handler has been
-     * wrapped.
+     * Expose the POJO if it is a message handler so the Session is able to match requests to remove handlers if the
+     * original handler has been wrapped.
      */
     @Override
     public final MessageHandler getWrappedHandler() {
@@ -110,13 +112,20 @@ public abstract class PojoMessageHandlerBase<T>
     }
 
 
-    protected final void handlePojoMethodException(Throwable t) {
-        t = ExceptionUtils.unwrapInvocationTargetException(t);
+    protected final void handlePojoMethodInvocationTargetException(InvocationTargetException e) {
+        /*
+         * This is a failure during the execution of onMessage. This does not normally need to trigger the failure of
+         * the WebSocket connection.
+         */
+        Throwable t = ExceptionUtils.unwrapInvocationTargetException(e);
+        // Check for JVM wide issues
         ExceptionUtils.handleThrowable(t);
-        if (t instanceof RuntimeException) {
-            throw (RuntimeException) t;
-        } else {
-            throw new RuntimeException(t.getMessage(), t);
+        // Log at debug level since this is an application issue and the application should be handling this.
+        if (log.isDebugEnabled()) {
+            log.debug(sm.getString("pojoMessageHandlerBase.onMessageFail", pojo.getClass().getName(), session.getId()),
+                    t);
         }
+        // Notify the application of the issue so it can handle it.
+        ((WsSession) session).getLocal().onError(session, t);
     }
 }

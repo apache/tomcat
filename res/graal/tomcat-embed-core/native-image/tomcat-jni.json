@@ -1,0 +1,12 @@
+[
+  { "name":"org.apache.tomcat.jni.Buffer", "allDeclaredConstructors" : true,"allPublicConstructors" : true,"allDeclaredMethods" : true,"allPublicMethods" : true,"allDeclaredClasses" : true,"allPublicClasses" : true,"allPublicFields" : true,"allDeclaredFields" : true},
+  { "name":"org.apache.tomcat.jni.FileInfo", "allDeclaredConstructors" : true,"allPublicConstructors" : true,"allDeclaredMethods" : true,"allPublicMethods" : true,"allDeclaredClasses" : true,"allPublicClasses" : true,"allPublicFields" : true,"allDeclaredFields" : true},
+  { "name":"org.apache.tomcat.jni.Library", "allDeclaredConstructors" : true,"allPublicConstructors" : true,"allDeclaredMethods" : true,"allPublicMethods" : true,"allDeclaredClasses" : true,"allPublicClasses" : true,"allPublicFields" : true,"allDeclaredFields" : true},
+  { "name":"org.apache.tomcat.jni.Pool", "allDeclaredConstructors" : true,"allPublicConstructors" : true,"allDeclaredMethods" : true,"allPublicMethods" : true,"allDeclaredClasses" : true,"allPublicClasses" : true,"allPublicFields" : true,"allDeclaredFields" : true},
+  { "name":"org.apache.tomcat.jni.Sockaddr", "allDeclaredConstructors" : true,"allPublicConstructors" : true,"allDeclaredMethods" : true,"allPublicMethods" : true,"allDeclaredClasses" : true,"allPublicClasses" : true,"allPublicFields" : true,"allDeclaredFields" : true},
+  { "name":"org.apache.tomcat.jni.SSL", "allDeclaredConstructors" : true,"allPublicConstructors" : true,"allDeclaredMethods" : true,"allPublicMethods" : true,"allDeclaredClasses" : true,"allPublicClasses" : true,"allPublicFields" : true,"allDeclaredFields" : true},
+  { "name":"org.apache.tomcat.jni.SSLConf", "allDeclaredConstructors" : true,"allPublicConstructors" : true,"allDeclaredMethods" : true,"allPublicMethods" : true,"allDeclaredClasses" : true,"allPublicClasses" : true,"allPublicFields" : true,"allDeclaredFields" : true},
+  { "name":"org.apache.tomcat.jni.SSLContext", "allDeclaredConstructors" : true,"allPublicConstructors" : true,"allDeclaredMethods" : true,"allPublicMethods" : true,"allDeclaredClasses" : true,"allPublicClasses" : true,"allPublicFields" : true,"allDeclaredFields" : true},
+  { "name":"java.lang.String", "allDeclaredConstructors" : true,"allPublicConstructors" : true,"allDeclaredMethods" : true,"allPublicMethods" : true,"allDeclaredClasses" : true,"allPublicClasses" : true,"allPublicFields" : true,"allDeclaredFields" : true}
+
+]

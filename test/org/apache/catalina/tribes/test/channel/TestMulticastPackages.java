@@ -96,7 +96,9 @@ public class TestMulticastPackages {
 
     public static void printMissingMsgs(int[] msgs, int maxIdx) {
         for (int i=0; i<maxIdx && i<msgs.length; i++) {
-            if (msgs[i]==0) System.out.print(i+", ");
+            if (msgs[i]==0) {
+                System.out.print(i+", ");
+            }
         }
         System.out.println();
     }
@@ -130,11 +132,17 @@ public class TestMulticastPackages {
                 }
             };
         }
-        for (int x=0; x<threads.length; x++ ) { threads[x].start();}
-        for (int x=0; x<threads.length; x++ ) { threads[x].join();}
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        for (Thread thread : threads) {
+            thread.join();
+        }
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
-        while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count.get()) Thread.sleep(500);
+        while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count.get()) {
+            Thread.sleep(500);
+        }
         System.err.println("Finished NO_ACK ["+listener1.count+"]");
         System.out.println("Sent "+counter.get()+ " messages. Received "+listener1.count+" Highest msg received:"+listener1.maxIdx);
         System.out.print("Missing messages:");
@@ -145,10 +153,14 @@ public class TestMulticastPackages {
     @Test
     public void testDataSendASYNC() throws Exception {
         System.err.println("Starting ASYNC");
-        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_ASYNCHRONOUS|Channel.SEND_OPTIONS_MULTICAST);
+        for (int i=0; i<msgCount; i++) {
+            channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_ASYNCHRONOUS|Channel.SEND_OPTIONS_MULTICAST);
+        }
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
-        while ( (System.currentTimeMillis()-start)<5000 && msgCount!=listener1.count.get()) Thread.sleep(500);
+        while ( (System.currentTimeMillis()-start)<5000 && msgCount!=listener1.count.get()) {
+            Thread.sleep(500);
+        }
         System.err.println("Finished ASYNC");
         Assert.assertEquals("Checking success messages.",msgCount,listener1.count.get());
     }
@@ -156,7 +168,9 @@ public class TestMulticastPackages {
     @Test
     public void testDataSendACK() throws Exception {
         System.err.println("Starting ACK");
-        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_MULTICAST);
+        for (int i=0; i<msgCount; i++) {
+            channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_MULTICAST);
+        }
         Thread.sleep(250);
         System.err.println("Finished ACK");
         Assert.assertEquals("Checking success messages.",msgCount,listener1.count.get());
@@ -165,7 +179,9 @@ public class TestMulticastPackages {
     @Test
     public void testDataSendSYNCACK() throws Exception {
         System.err.println("Starting SYNC_ACK");
-        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_MULTICAST);
+        for (int i=0; i<msgCount; i++) {
+            channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(1024),Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK|Channel.SEND_OPTIONS_MULTICAST);
+        }
         Thread.sleep(250);
         System.err.println("Finished SYNC_ACK");
         Assert.assertEquals("Checking success messages.",msgCount,listener1.count.get());
@@ -224,7 +240,9 @@ public class TestMulticastPackages {
             int i = r.nextInt();
             i = ( i % 127 );
             int length = Math.abs(r.nextInt() % size);
-            if (length<100) length += 100;
+            if (length<100) {
+                length += 100;
+            }
             Data d = new Data();
             d.length = length;
             d.key = (byte)i;
@@ -239,13 +257,17 @@ public class TestMulticastPackages {
         }
 
         public int getNumber() {
-            if (!hasNr) return -1;
+            if (!hasNr) {
+                return -1;
+            }
             return XByteBuffer.toInt(this.data, 0);
         }
 
         public static boolean verify(Data d) {
             boolean result = (d.length == d.data.length);
-            for ( int i=(d.hasNr?4:0); result && (i<d.data.length); i++ ) result = result && d.data[i] == d.key;
+            for ( int i=(d.hasNr?4:0); result && (i<d.data.length); i++ ) {
+                result = result && d.data[i] == d.key;
+            }
             return result;
         }
     }

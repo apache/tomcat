@@ -18,29 +18,29 @@ package org.apache.catalina.tribes.group.interceptors;
 
 public interface MessageDispatchInterceptorMBean {
 
-    public int getOptionFlag();
+    int getOptionFlag();
 
-    public boolean isAlwaysSend();
+    boolean isAlwaysSend();
 
-    public void setAlwaysSend(boolean alwaysSend);
+    void setAlwaysSend(boolean alwaysSend);
 
-    public long getMaxQueueSize();
+    long getMaxQueueSize();
 
-    public long getCurrentSize();
+    long getCurrentSize();
 
-    public long getKeepAliveTime();
+    long getKeepAliveTime();
 
-    public int getMaxSpareThreads();
+    int getMaxSpareThreads();
 
-    public int getMaxThreads();
+    int getMaxThreads();
 
     // pool stats
-    public int getPoolSize();
+    int getPoolSize();
 
-    public int getActiveCount();
+    int getActiveCount();
 
-    public long getTaskCount();
+    long getTaskCount();
 
-    public long getCompletedTaskCount();
+    long getCompletedTaskCount();
 
 }

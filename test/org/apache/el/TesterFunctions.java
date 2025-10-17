@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el;
 
 import java.lang.reflect.Method;
 
-import javax.el.FunctionMapper;
+import jakarta.el.FunctionMapper;
 
 public class TesterFunctions {
     public static String trim(String input) {
@@ -53,6 +52,7 @@ public class TesterFunctions {
     public static class Inner$Class {
 
         public static final String RETVAL = "Return from bug49555";
+
         public static String bug49555() {
             return RETVAL;
         }
@@ -68,9 +68,7 @@ public class TesterFunctions {
                 try {
                     m = TesterFunctions.class.getMethod("trim", String.class);
                     return m;
-                } catch (SecurityException e) {
-                    // Ignore
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     // Ignore
                 }
             } else if ("concat".equals(localName)) {
@@ -78,9 +76,7 @@ public class TesterFunctions {
                 try {
                     m = TesterFunctions.class.getMethod("concat", String[].class);
                     return m;
-                } catch (SecurityException e) {
-                    // Ignore
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     // Ignore
                 }
             } else if ("concat2".equals(localName)) {
@@ -88,9 +84,7 @@ public class TesterFunctions {
                 try {
                     m = TesterFunctions.class.getMethod("concat2", String.class, String[].class);
                     return m;
-                } catch (SecurityException e) {
-                    // Ignore
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     // Ignore
                 }
             } else if ("toArray".equals(localName)) {
@@ -98,9 +92,7 @@ public class TesterFunctions {
                 try {
                     m = TesterFunctions.class.getMethod("toArray", String.class, String.class);
                     return m;
-                } catch (SecurityException e) {
-                    // Ignore
-                } catch (NoSuchMethodException e) {
+                } catch (SecurityException | NoSuchMethodException e) {
                     // Ignore
                 }
             }

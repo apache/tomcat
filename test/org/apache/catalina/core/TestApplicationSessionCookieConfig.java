@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.core;
 
 import org.junit.Assert;
@@ -29,15 +28,14 @@ public class TestApplicationSessionCookieConfig {
 
     @Before
     public void setUp() throws Exception {
-        applicationSessionCookieConfig = new ApplicationSessionCookieConfig(
-                context);
+        applicationSessionCookieConfig = new ApplicationSessionCookieConfig(context);
     }
 
     @Test
     public void testSetCommentInitPhase() {
         context.setState(LifecycleState.STARTING_PREP);
         applicationSessionCookieConfig.setComment("test");
-        Assert.assertTrue(applicationSessionCookieConfig.getComment().equals("test"));
+        Assert.assertNull(applicationSessionCookieConfig.getComment());
     }
 
     @Test(expected = IllegalStateException.class)

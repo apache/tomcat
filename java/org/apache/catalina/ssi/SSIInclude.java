@@ -21,44 +21,34 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.apache.tomcat.util.res.StringManager;
+
 /**
- * Implements the Server-side #include command
- *
- * @author Bip Thelin
- * @author Paul Speed
- * @author Dan Sandberg
- * @author David Becker
+ * Implements the Server-side #include command.
  */
 public final class SSIInclude implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIInclude.class);
-    /**
-     * @see SSICommand
-     */
+
     @Override
-    public long process(SSIMediator ssiMediator, String commandName,
-            String[] paramNames, String[] paramValues, PrintWriter writer) {
+    public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
+            PrintWriter writer) {
         long lastModified = 0;
         String configErrMsg = ssiMediator.getConfigErrMsg();
         for (int i = 0; i < paramNames.length; i++) {
             String paramName = paramNames[i];
             String paramValue = paramValues[i];
-            String substitutedValue = ssiMediator
-                    .substituteVariables(paramValue);
+            String substitutedValue = ssiMediator.substituteVariables(paramValue);
             try {
-                if (paramName.equalsIgnoreCase("file")
-                        || paramName.equalsIgnoreCase("virtual")) {
+                if (paramName.equalsIgnoreCase("file") || paramName.equalsIgnoreCase("virtual")) {
                     boolean virtual = paramName.equalsIgnoreCase("virtual");
-                    lastModified = ssiMediator.getFileLastModified(
-                            substitutedValue, virtual);
-                    String text = ssiMediator.getFileText(substitutedValue,
-                            virtual);
+                    lastModified = ssiMediator.getFileLastModified(substitutedValue, virtual);
+                    String text = ssiMediator.getFileText(substitutedValue, virtual);
                     writer.write(text);
                 } else {
                     ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                     writer.write(configErrMsg);
                 }
-            } catch (IOException e) {
-                ssiMediator.log(sm.getString("ssiInclude.includeFailed", substitutedValue), e);
+            } catch (IOException ioe) {
+                ssiMediator.log(sm.getString("ssiInclude.includeFailed", substitutedValue), ioe);
                 writer.write(configErrMsg);
             }
         }

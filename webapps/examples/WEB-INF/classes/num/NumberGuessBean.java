@@ -14,11 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/*
- * Originally written by Jason Hunter, http://www.servlets.com.
- */
-
 package num;
 
 import java.io.Serializable;

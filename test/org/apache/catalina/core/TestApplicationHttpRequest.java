@@ -22,17 +22,20 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.connector.Request;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.unittest.TesterContext;
+import org.apache.tomcat.unittest.TesterServletContext;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.buf.ByteChunk;
 
@@ -170,19 +173,19 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
         String test = "\u0422\u0435\u0441\u0442";
         String query = test + "=%D0%A2%D0%B5%D1%81%D1%82";
 
-        Map<String, String[]> expected = new HashMap<>();
+        Map<String,String[]> expected = new HashMap<>();
         expected.put("a", new String[] { "b" });
         expected.put(test, new String[] { test });
         doQueryStringTest("a=b", query, expected);
     }
 
 
-    private void doQueryStringTest(String originalQueryString, String forwardQueryString,
-            Map<String,String[]> expected) throws Exception {
+    private void doQueryStringTest(String originalQueryString, String forwardQueryString, Map<String,String[]> expected)
+            throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         if (forwardQueryString == null) {
             Tomcat.addServlet(ctx, "forward", new ForwardServlet("/display"));
@@ -211,12 +214,37 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
     }
 
 
+    private static HttpServletRequest getNestedRequest(int depth) {
+        if (depth <= 0) {
+            org.apache.coyote.Request coyoteRequest = new org.apache.coyote.Request();
+            Request request = new Request(null, coyoteRequest);
+            request.setAttribute("key", "value");
+            TesterContext ctxt = new TesterContext();
+            ctxt.setServletContext(new TesterServletContext());
+            request.getMappingData().context = ctxt;
+            return request;
+        }
+        return new ApplicationHttpRequest(getNestedRequest(depth - 1), null, false);
+    }
+
+
+    @Test
+    public void testAttributeRetrieval() {
+        int[] depths = { 0, 1, 4, 7 };
+        for (int depth : depths) {
+            HttpServletRequest httpRequest = getNestedRequest(depth);
+            Assert.assertEquals("value", httpRequest.getAttribute("key"));
+            Assert.assertEquals(null, httpRequest.getAttribute("nonexistent entry"));
+        }
+    }
+
+
     @Test
     public void testParameterImmutability() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "forward", new ForwardServlet("/modify"));
         ctx.addServletMappingDecoded("/forward", "forward");
@@ -243,13 +271,12 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
 
         private final String target;
 
-        public ForwardServlet(String target) {
+        ForwardServlet(String target) {
             this.target = target;
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             req.setCharacterEncoding("UTF-8");
             req.getRequestDispatcher(target).forward(req, resp);
         }
@@ -262,13 +289,12 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
 
         private Map<String,String[]> expected;
 
-        public DisplayParameterServlet(Map<String,String[]> expected) {
+        DisplayParameterServlet(Map<String,String[]> expected) {
             this.expected = expected;
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             req.setCharacterEncoding("UTF-8");
             resp.setContentType("text/plain");
             resp.setCharacterEncoding("UTF-8");
@@ -278,8 +304,7 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
             boolean ok = true;
             for (Entry<String,String[]> entry : actual.entrySet()) {
                 String[] expectedValue = expected.get(entry.getKey());
-                if (expectedValue == null ||
-                        expectedValue.length != entry.getValue().length) {
+                if (expectedValue == null || expectedValue.length != entry.getValue().length) {
                     ok = false;
                     break;
                 }
@@ -329,10 +354,9 @@ public class TestApplicationHttpRequest extends TomcatBaseTest {
 
         // Suppress warnings generated because the code is trying to put the
         // wrong type of values into the Map
-        @SuppressWarnings({"rawtypes", "unchecked"})
+        @SuppressWarnings({ "rawtypes", "unchecked" })
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             Map map = req.getParameterMap();
 
             boolean insertWorks;

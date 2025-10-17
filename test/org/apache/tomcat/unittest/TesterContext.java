@@ -24,14 +24,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.ObjectName;
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration.Dynamic;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletSecurityElement;
-import javax.servlet.descriptor.JspConfigDescriptor;
+
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration.Dynamic;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletSecurityElement;
+import jakarta.servlet.descriptor.JspConfigDescriptor;
 
 import org.apache.catalina.AccessLog;
 import org.apache.catalina.Authenticator;
@@ -84,7 +86,7 @@ public class TesterContext implements Context {
 
     @Override
     public String[] findSecurityRoles() {
-        return securityRoles.toArray(new String[securityRoles.size()]);
+        return securityRoles.toArray(new String[0]);
     }
 
     @Override
@@ -100,8 +102,7 @@ public class TesterContext implements Context {
 
     @Override
     public SecurityConstraint[] findConstraints() {
-        return securityConstraints.toArray(
-                new SecurityConstraint[securityConstraints.size()]);
+        return securityConstraints.toArray(new SecurityConstraint[0]);
     }
 
     @Override
@@ -365,11 +366,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public String getCharset(Locale locale) {
-        return null;
-    }
-
-    @Override
     public URL getConfigFile() {
         return null;
     }
@@ -416,6 +412,16 @@ public class TesterContext implements Context {
 
     @Override
     public void setUseHttpOnly(boolean useHttpOnly) {
+        // NO-OP
+    }
+
+    @Override
+    public boolean getUsePartitioned() {
+        return false;
+    }
+
+    @Override
+    public void setUsePartitioned(boolean usePartitioned) {
         // NO-OP
     }
 
@@ -739,9 +745,24 @@ public class TesterContext implements Context {
         // NO-OP
     }
 
+    private final Map<String,String> localEncodingMap = new ConcurrentHashMap<>();
+
     @Override
     public void addLocaleEncodingMappingParameter(String locale, String encoding) {
-        // NO-OP
+        localEncodingMap.put(locale, encoding);
+    }
+    @Override
+    public String getCharset(Locale locale) {
+        // Match full language_country_variant first, then language_country,
+        // then language only
+        String charset = localEncodingMap.get(locale.toString());
+        if (charset == null) {
+            charset = localEncodingMap.get(locale.getLanguage() + "_" + locale.getCountry());
+            if (charset == null) {
+                charset = localEncodingMap.get(locale.getLanguage());
+            }
+        }
+        return charset;
     }
 
     @Override
@@ -811,11 +832,6 @@ public class TesterContext implements Context {
     }
 
     @Override
-    public ErrorPage findErrorPage(String exceptionType) {
-        return null;
-    }
-
-    @Override
     public ErrorPage findErrorPage(Throwable exceptionType) {
         return null;
     }
@@ -872,16 +888,6 @@ public class TesterContext implements Context {
 
     @Override
     public String[] findServletMappings() {
-        return null;
-    }
-
-    @Override
-    public String findStatusPage(int status) {
-        return null;
-    }
-
-    @Override
-    public int[] findStatusPages() {
         return null;
     }
 
@@ -1210,12 +1216,12 @@ public class TesterContext implements Context {
     public void setThreadBindingListener(ThreadBindingListener threadBindingListener) { /* NO-OP */ }
 
     @Override
-    public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+    public ClassLoader bind(ClassLoader originalClassLoader) {
         return null;
     }
 
     @Override
-    public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
+    public void unbind(ClassLoader originalClassLoader) {
         // NO-OP
     }
 
@@ -1289,4 +1295,35 @@ public class TesterContext implements Context {
     public void setCreateUploadTargets(boolean createUploadTargets) { /* NO-OP */}
     @Override
     public boolean getCreateUploadTargets() { return false; }
+
+    @Override
+    public boolean getAlwaysAccessSession() { return false; }
+    @Override
+    public void setAlwaysAccessSession(boolean alwaysAccessSession) {}
+
+    @Override
+    public boolean getContextGetResourceRequiresSlash() { return false; }
+    @Override
+    public void setContextGetResourceRequiresSlash(boolean contextGetResourceRequiresSlash) {}
+
+    @Override
+    public boolean getDispatcherWrapsSameObject() { return false; }
+    @Override
+    public void setDispatcherWrapsSameObject(boolean dispatcherWrapsSameObject) {}
+
+    @Override
+    public boolean getParallelAnnotationScanning() { return false; }
+    @Override
+    public void setParallelAnnotationScanning(boolean parallelAnnotationScanning) {}
+
+    @Override
+    public boolean getMetadataComplete() { return false; }
+    @Override
+    public void setMetadataComplete(boolean metadataComplete) { /* NO-OP */ }
+
+    @Override
+    public boolean getSuspendWrappedResponseAfterForward() { return true; }
+    @Override
+    public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {}
+
 }

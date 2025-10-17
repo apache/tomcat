@@ -21,19 +21,18 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.NetMask;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.buf.StringUtils;
 
-public final class RemoteCIDRValve extends ValveBase {
+public final class RemoteCIDRValve extends RequestFilterValve {
 
     /**
      * Our logger
@@ -52,28 +51,28 @@ public final class RemoteCIDRValve extends ValveBase {
 
 
     public RemoteCIDRValve() {
-        super(true);
     }
 
 
     /**
      * Return a string representation of the {@link NetMask} list in #allow.
      *
-     * @return the #allow list as a string, without the leading '[' and trailing
-     *         ']'
+     * @return the #allow list as a string, without the leading '[' and trailing ']'
      */
+    @Override
     public String getAllow() {
         return allow.toString().replace("[", "").replace("]", "");
     }
 
 
     /**
-     * Fill the #allow list with the list of netmasks provided as an argument,
-     * if any. Calls #fillFromInput.
+     * Fill the #allow list with the list of netmasks provided as an argument, if any. Calls #fillFromInput.
      *
      * @param input The list of netmasks, as a comma separated string
+     *
      * @throws IllegalArgumentException One or more netmasks are invalid
      */
+    @Override
     public void setAllow(final String input) {
         final List<String> messages = fillFromInput(input, allow);
 
@@ -81,6 +80,7 @@ public final class RemoteCIDRValve extends ValveBase {
             return;
         }
 
+        allowValid = false;
         for (final String message : messages) {
             log.error(message);
         }
@@ -92,22 +92,22 @@ public final class RemoteCIDRValve extends ValveBase {
     /**
      * Return a string representation of the {@link NetMask} list in #deny.
      *
-     * @return the #deny list as a string, without the leading '[' and trailing
-     *         ']'
+     * @return the #deny list as a string, without the leading '[' and trailing ']'
      */
+    @Override
     public String getDeny() {
         return deny.toString().replace("[", "").replace("]", "");
     }
 
 
     /**
-     * Fill the #deny list with the list of netmasks provided as an argument, if
-     * any. Calls #fillFromInput.
+     * Fill the #deny list with the list of netmasks provided as an argument, if any. Calls #fillFromInput.
      *
      * @param input The list of netmasks, as a comma separated string
+     *
      * @throws IllegalArgumentException One or more netmasks are invalid
      */
-
+    @Override
     public void setDeny(final String input) {
         final List<String> messages = fillFromInput(input, deny);
 
@@ -115,6 +115,7 @@ public final class RemoteCIDRValve extends ValveBase {
             return;
         }
 
+        denyValid = false;
         for (final String message : messages) {
             log.error(message);
         }
@@ -125,19 +126,51 @@ public final class RemoteCIDRValve extends ValveBase {
 
     @Override
     public void invoke(final Request request, final Response response) throws IOException, ServletException {
-
-        if (isAllowed(request.getRequest().getRemoteAddr())) {
-            getNext().invoke(request, response);
+        String property;
+        if (getUsePeerAddress()) {
+            property = request.getPeerAddr();
         } else {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN);
+            property = request.getRequest().getRemoteAddr();
         }
+        if (getAddConnectorPort()) {
+            property = property + ";" + request.getConnector().getPortWithOffset();
+        }
+        process(property, request, response);
     }
 
-    private boolean isAllowed(final String property) {
-        final InetAddress addr;
+    @Override
+    public boolean isAllowed(final String property) {
 
+        final int portIdx = property.indexOf(';');
+        final int port;
+        final String nonPortPart;
+
+        if (portIdx == -1) {
+            if (getAddConnectorPort()) {
+                log.error(sm.getString("remoteCidrValve.noPort"));
+                return false;
+            }
+            port = -1;
+            nonPortPart = property;
+        } else {
+            if (!getAddConnectorPort()) {
+                log.error(sm.getString("remoteCidrValve.unexpectedPort"));
+                return false;
+            }
+            nonPortPart = property.substring(0, portIdx);
+            try {
+                port = Integer.parseInt(property.substring(portIdx + 1));
+            } catch (NumberFormatException e) {
+                // This should be in the 'could never happen' category but handle it
+                // to be safe.
+                log.error(sm.getString("remoteCidrValve.noPort"), e);
+                return false;
+            }
+        }
+
+        final InetAddress addr;
         try {
-            addr = InetAddress.getByName(property);
+            addr = InetAddress.getByName(nonPortPart);
         } catch (UnknownHostException e) {
             // This should be in the 'could never happen' category but handle it
             // to be safe.
@@ -146,33 +179,48 @@ public final class RemoteCIDRValve extends ValveBase {
         }
 
         for (final NetMask nm : deny) {
-            if (nm.matches(addr)) {
-                return false;
+            if (getAddConnectorPort()) {
+                if (nm.matches(addr, port)) {
+                    return false;
+                }
+            } else {
+                if (nm.matches(addr)) {
+                    return false;
+                }
             }
         }
 
         for (final NetMask nm : allow) {
-            if (nm.matches(addr)) {
-                return true;
+            if (getAddConnectorPort()) {
+                if (nm.matches(addr, port)) {
+                    return true;
+                }
+            } else {
+                if (nm.matches(addr)) {
+                    return true;
+                }
             }
         }
 
         // Allow if deny is specified but allow isn't
-        if (!deny.isEmpty() && allow.isEmpty()) {
-            return true;
-        }
+        // Otherwise deny this request
+        return !deny.isEmpty() && allow.isEmpty();
+    }
 
-        // Deny this request
-        return false;
+
+    @Override
+    protected Log getLog() {
+        return log;
     }
 
 
     /**
-     * Fill a {@link NetMask} list from a string input containing a
-     * comma-separated list of (hopefully valid) {@link NetMask}s.
+     * Fill a {@link NetMask} list from a string input containing a comma-separated list of (hopefully valid)
+     * {@link NetMask}s.
      *
-     * @param input The input string
+     * @param input  The input string
      * @param target The list to fill
+     *
      * @return a string list of processing errors (empty when no errors)
      */
 
@@ -182,10 +230,10 @@ public final class RemoteCIDRValve extends ValveBase {
             return Collections.emptyList();
         }
 
-        final List<String> messages = new LinkedList<>();
+        final List<String> messages = new ArrayList<>();
         NetMask nm;
 
-        for (final String s : input.split("\\s*,\\s*")) {
+        for (final String s : StringUtils.splitCommaSeparated(input)) {
             try {
                 nm = new NetMask(s);
                 target.add(nm);

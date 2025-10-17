@@ -22,15 +22,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Locale;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.DispatcherType;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletMapping;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.MappingMatch;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.DispatcherType;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.MappingMatch;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,305 +51,206 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
             "targetMapping[{3}], targetUri[{4}], useEncodedDispatchPaths[{5}], " +
             "expectedRequestURI[{6}], expectedContextPath[{7}], expectedServletPath[{8}], " +
             "expectedPathInfo[{9}], expectedQueryString[{10}], expectedMappingMatch[{11}, " +
-            "expectedMappingPattern[{12}], expectedMappingMatchValue[{13}], " +
-            "expectedMappingServletName[{14}], " +
+            "expectedMappingPattern[{12}], expectedMappingMatchValue[{13}], " + "expectedMappingServletName[{14}], " +
             "expectedDispatcherRequestURI[{15}], expectedDispatcherContextPath[{16}], " +
             "expectedDispatcherServletPath[{17}], expectedDispatcherPathInfo[{18}], " +
             "expectedDispatcherQueryString[{19}], expectedDispatcherMappingMatch[{20}]," +
             "expectedDispatcherMappingPattern[{21}], expectedDispatcherMappingMatchValue[{22}]," +
-            "expectedDispatcherMappingServletName[{23}]," +
-            "expectedBody")
+            "expectedDispatcherMappingServletName[{23}]," + "expectedBody")
     public static Collection<Object[]> data() {
-        return Arrays.asList(new Object[][]{
-            // Simple dispatch for each type
-            { "/start", "/start", DispatcherType.INCLUDE, "/target", "/target", Boolean.TRUE,
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "OK"},
-            { "/start", "/start", DispatcherType.FORWARD, "/target", "/target", Boolean.TRUE,
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", "/start", DispatcherType.ASYNC, "/target", "/target", Boolean.TRUE,
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            // Simple dispatch with query strings
-            { "/start", "/start?abcde=fghij", DispatcherType.INCLUDE, "/target", "/target?zyxwv=utsrq", Boolean.TRUE,
-                    "/test/start", "/test", "/start", null, "abcde=fghij",
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/target", "/test", "/target", null, "zyxwv=utsrq",
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "OK"},
-            { "/start", "/start?abcde=fghij", DispatcherType.FORWARD, "/target", "/target?zyxwv=utsrq", Boolean.TRUE,
-                    "/test/target", "/test", "/target", null, "zyxwv=utsrq",
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start", "/test", "/start", null, "abcde=fghij",
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", "/start?abcde=fghij", DispatcherType.ASYNC, "/target", "/target?zyxwv=utsrq", Boolean.TRUE,
-                    "/test/target", "/test", "/target", null, "zyxwv=utsrq",
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start", "/test", "/start", null, "abcde=fghij",
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            // Simple dispatch with trailing path parameters at start
-            { "/start", "/start;abcde=fghij", DispatcherType.INCLUDE, "/target", "/target", Boolean.TRUE,
-                    "/test/start;abcde=fghij", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "OK"},
-            { "/start", "/start;abcde=fghij", DispatcherType.FORWARD, "/target", "/target", Boolean.TRUE,
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start;abcde=fghij", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", "/start;abcde=fghij", DispatcherType.ASYNC, "/target", "/target", Boolean.TRUE,
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start;abcde=fghij", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            // Simple dispatch with path parameters at start
-            { "/start", ";abcde=fghij/start", DispatcherType.INCLUDE, "/target", "/target", Boolean.TRUE,
-                    "/test;abcde=fghij/start", "/test;abcde=fghij", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "OK"},
-            { "/start", ";abcde=fghij/start", DispatcherType.FORWARD, "/target", "/target", Boolean.TRUE,
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test;abcde=fghij/start", "/test;abcde=fghij", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", ";abcde=fghij/start", DispatcherType.ASYNC, "/target", "/target", Boolean.TRUE,
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test;abcde=fghij/start", "/test;abcde=fghij", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            // Simple dispatch with path parameters on dispatch
-            { "/start", "/start", DispatcherType.INCLUDE, "/target", "/target;abcde=fghij", Boolean.TRUE,
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/target;abcde=fghij", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "OK"},
-            { "/start", "/start", DispatcherType.FORWARD, "/target", "/target;abcde=fghij", Boolean.TRUE,
-                    "/test/target;abcde=fghij", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", "/start", DispatcherType.ASYNC, "/target", "/target;abcde=fghij", Boolean.TRUE,
-                    "/test/target;abcde=fghij", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            // Simple dispatch with multiple path parameters on start and dispatch
-            { "/start", "/start;abcde=fghij", DispatcherType.INCLUDE, "/target", ";klmno=pqrst/target;uvwxy=z0123", Boolean.TRUE,
-                    "/test/start;abcde=fghij", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/;klmno=pqrst/target;uvwxy=z0123", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "OK"},
-            { "/start", "/start;abcde=fghij", DispatcherType.FORWARD, "/target", ";klmno=pqrst/target;uvwxy=z0123", Boolean.TRUE,
-                    "/test/;klmno=pqrst/target;uvwxy=z0123", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start;abcde=fghij", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", "/start;abcde=fghij", DispatcherType.ASYNC, "/target", ";klmno=pqrst/target;uvwxy=z0123", Boolean.TRUE,
-                    "/test/;klmno=pqrst/target;uvwxy=z0123", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start;abcde=fghij", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "ASYNC-IAE"},
-            // Simple dispatch with directory traversal
-            { "/start/*", "/start/foo", DispatcherType.INCLUDE, "/target", "../target", Boolean.TRUE,
-                    "/test/start/foo", "/test", "/start", "/foo", null,
-                    MappingMatch.PATH, "/start/*", "foo", "rd",
-                    "/test/start/../target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "OK"},
-            { "/start/*", "/start/foo", DispatcherType.FORWARD, "/target", "../target", Boolean.TRUE,
-                    "/test/start/../target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start/foo", "/test", "/start", "/foo", null,
-                    MappingMatch.PATH, "/start/*", "foo", "rd",
-                    "OK"},
-            { "/start/*", "/start/foo", DispatcherType.ASYNC, "/target", "../target", Boolean.TRUE,
-                    "/test/start/../target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start/foo", "/test", "/start", "/foo", null,
-                    MappingMatch.PATH, "/start/*", "foo", "rd",
-                    "ASYNC-IAE"},
-            // Simple dispatch with directory traversal and path parameters
-            // Note comments in Request.getRequestDispatcher(String) that
-            // explain why the path parameter abcde=fghij is not present on the
-            // dispatched requestURI
-            { "/start/*", "/start;abcde=fghij/foo", DispatcherType.INCLUDE, "/target", "../target;klmno=pqrst", Boolean.TRUE,
-                    "/test/start;abcde=fghij/foo", "/test", "/start", "/foo", null,
-                    MappingMatch.PATH, "/start/*", "foo", "rd",
-                    "/test/start/../target;klmno=pqrst", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "OK"},
-            { "/start/*", "/start;abcde=fghij/foo", DispatcherType.FORWARD, "/target", "../target;klmno=pqrst", Boolean.TRUE,
-                    "/test/start/../target;klmno=pqrst", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start;abcde=fghij/foo", "/test", "/start", "/foo", null,
-                    MappingMatch.PATH, "/start/*", "foo", "rd",
-                    "OK"},
-            { "/start/*", "/start;abcde=fghij/foo", DispatcherType.ASYNC, "/target", "../target;klmno=pqrst", Boolean.TRUE,
-                    "/test/start;abcde=fghij/../target;klmno=pqrst", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start;abcde=fghij/foo", "/test", "/start", "/foo", null,
-                    MappingMatch.PATH, "/start/*", "foo", "rd",
-                    "ASYNC-IAE"},
-            // Simple dispatch with invalid directory traversal
-            { "/start/*", "/start/foo", DispatcherType.INCLUDE, "/target", "../../target", Boolean.TRUE,
-                    "/test/start/foo", "/test", "/start", "/foo", null,
-                    MappingMatch.PATH, "/start/*", "foo", "rd",
-                    "/test/start/../target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "RD-NULL"},
-            { "/start/*", "/start/foo", DispatcherType.FORWARD, "/target", "../../target", Boolean.TRUE,
-                    "/test/start/../target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start/foo", "/test", "/start", "/foo", null,
-                    MappingMatch.PATH, "/start/*", "foo", "rd",
-                    "RD-NULL"},
-            { "/start/*", "/start/foo", DispatcherType.ASYNC, "/target", "../../target", Boolean.TRUE,
-                    "/test/start/../target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start/foo", "/test", "/start", "/foo", null,
-                    MappingMatch.PATH, "/start/*", "foo", "rd",
-                    "ASYNC-IAE"},
-            // Simple dispatch with invalid target
-            { "/start", "/start", DispatcherType.INCLUDE, "/target", "/does-not-exist", Boolean.TRUE,
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "RD-NULL"},
-            { "/start", "/start", DispatcherType.FORWARD, "/target", "/does-not-exist", Boolean.TRUE,
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "RD-NULL"},
-            { "/start", "/start", DispatcherType.ASYNC, "/target", "/does-not-exist", Boolean.TRUE,
-                    "/test/target", "/test", "/target", null, null,
-                    MappingMatch.EXACT, "/target", "target", "target",
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "ASYNC-RD-NULL"},
-            // Welcome files
-            { "/start", "/start", DispatcherType.INCLUDE, "*.html", "/", Boolean.TRUE,
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "OK"},
-            { "/start", "/start", DispatcherType.FORWARD, "*.html", "/", Boolean.TRUE,
-                    "/test/", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", "/start", DispatcherType.ASYNC, "*.html", "/", Boolean.TRUE,
-                    "/test/", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            // Welcome files with query strings
-            { "/start", "/start?abcde=fghij", DispatcherType.INCLUDE, "*.html", "/?zyxwv=utsrq", Boolean.TRUE,
-                    "/test/start", "/test", "/start", null, "abcde=fghij",
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/", "/test", "/index.html", null, "zyxwv=utsrq",
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "OK"},
-            { "/start", "/start?abcde=fghij", DispatcherType.FORWARD, "*.html", "/?zyxwv=utsrq", Boolean.TRUE,
-                    "/test/", "/test", "/index.html", null, "zyxwv=utsrq",
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "/test/start", "/test", "/start", null, "abcde=fghij",
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", "/start?abcde=fghij", DispatcherType.ASYNC, "*.html", "/?zyxwv=utsrq", Boolean.TRUE,
-                    "/test/", "/test", "/index.html", null, "zyxwv=utsrq",
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "/test/start", "/test", "/start", null, "abcde=fghij",
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            // Welcome files with trailing path parameters at start
-            { "/start", "/start;abcde=fghij", DispatcherType.INCLUDE, "*.html", "/", Boolean.TRUE,
-                    "/test/start;abcde=fghij", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "OK"},
-            { "/start", "/start;abcde=fghij", DispatcherType.FORWARD, "*.html", "/", Boolean.TRUE,
-                    "/test/", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "/test/start;abcde=fghij", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", "/start;abcde=fghij", DispatcherType.ASYNC, "*.html", "/", Boolean.TRUE,
-                    "/test/", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "/test/start;abcde=fghij", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            // Welcome files with path parameters at start
-            { "/start", ";abcde=fghij/start", DispatcherType.INCLUDE, "*.html", "/", Boolean.TRUE,
-                    "/test;abcde=fghij/start", "/test;abcde=fghij", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "OK"},
-            { "/start", ";abcde=fghij/start", DispatcherType.FORWARD, "*.html", "/", Boolean.TRUE,
-                    "/test/", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "/test;abcde=fghij/start", "/test;abcde=fghij", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", ";abcde=fghij/start", DispatcherType.ASYNC, "*.html", "/", Boolean.TRUE,
-                    "/test/", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "/test;abcde=fghij/start", "/test;abcde=fghij", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            // Welcome files with trailing path parameters on dispatch
-            { "/start", "/start", DispatcherType.INCLUDE, "*.html", "/;abcde=fghij", Boolean.TRUE,
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "/test/;abcde=fghij", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "OK"},
-            { "/start", "/start", DispatcherType.FORWARD, "*.html", "/;abcde=fghij", Boolean.TRUE,
-                    "/test/;abcde=fghij", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-            { "/start", "/start", DispatcherType.ASYNC, "*.html", "/;abcde=fghij", Boolean.TRUE,
-                    "/test/;abcde=fghij", "/test", "/index.html", null, null,
-                    MappingMatch.EXTENSION, "*.html", "index", "target",
-                    "/test/start", "/test", "/start", null, null,
-                    MappingMatch.EXACT, "/start", "start", "rd",
-                    "OK"},
-        });
+        return Arrays.asList(new Object[][] {
+                // Simple dispatch for each type
+                { "/start", "/start", DispatcherType.INCLUDE, "/target", "/target", Boolean.TRUE, "/test/start",
+                        "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start", "rd", "/test/target",
+                        "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target", "target", "OK" },
+                { "/start", "/start", DispatcherType.FORWARD, "/target", "/target", Boolean.TRUE, "/test/target",
+                        "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target", "target",
+                        "/test/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start", "rd",
+                        "OK" },
+                { "/start", "/start", DispatcherType.ASYNC, "/target", "/target", Boolean.TRUE, "/test/target", "/test",
+                        "/target", null, null, MappingMatch.EXACT, "/target", "target", "target", "/test/start",
+                        "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start", "rd", "OK" },
+                // Simple dispatch with query strings
+                { "/start", "/start?abcde=fghij", DispatcherType.INCLUDE, "/target", "/target?zyxwv=utsrq",
+                        Boolean.TRUE, "/test/start", "/test", "/start", null, "abcde=fghij", MappingMatch.EXACT,
+                        "/start", "start", "rd", "/test/target", "/test", "/target", null, "zyxwv=utsrq",
+                        MappingMatch.EXACT, "/target", "target", "target", "OK" },
+                { "/start", "/start?abcde=fghij", DispatcherType.FORWARD, "/target", "/target?zyxwv=utsrq",
+                        Boolean.TRUE, "/test/target", "/test", "/target", null, "zyxwv=utsrq", MappingMatch.EXACT,
+                        "/target", "target", "target", "/test/start", "/test", "/start", null, "abcde=fghij",
+                        MappingMatch.EXACT, "/start", "start", "rd", "OK" },
+                { "/start", "/start?abcde=fghij", DispatcherType.ASYNC, "/target", "/target?zyxwv=utsrq", Boolean.TRUE,
+                        "/test/target", "/test", "/target", null, "zyxwv=utsrq", MappingMatch.EXACT, "/target",
+                        "target", "target", "/test/start", "/test", "/start", null, "abcde=fghij", MappingMatch.EXACT,
+                        "/start", "start", "rd", "OK" },
+                // Simple dispatch with trailing path parameters at start
+                { "/start", "/start;abcde=fghij", DispatcherType.INCLUDE, "/target", "/target", Boolean.TRUE,
+                        "/test/start;abcde=fghij", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start",
+                        "rd", "/test/target", "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target",
+                        "target", "OK" },
+                { "/start", "/start;abcde=fghij", DispatcherType.FORWARD, "/target", "/target", Boolean.TRUE,
+                        "/test/target", "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target",
+                        "target", "/test/start;abcde=fghij", "/test", "/start", null, null, MappingMatch.EXACT,
+                        "/start", "start", "rd", "OK" },
+                { "/start", "/start;abcde=fghij", DispatcherType.ASYNC, "/target", "/target", Boolean.TRUE,
+                        "/test/target", "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target",
+                        "target", "/test/start;abcde=fghij", "/test", "/start", null, null, MappingMatch.EXACT,
+                        "/start", "start", "rd", "OK" },
+                // Simple dispatch with path parameters at start
+                { "/start", ";abcde=fghij/start", DispatcherType.INCLUDE, "/target", "/target", Boolean.TRUE,
+                        "/test;abcde=fghij/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start",
+                        "rd", "/test/target", "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target",
+                        "target", "OK" },
+                { "/start", ";abcde=fghij/start", DispatcherType.FORWARD, "/target", "/target", Boolean.TRUE,
+                        "/test/target", "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target",
+                        "target", "/test;abcde=fghij/start", "/test", "/start", null, null, MappingMatch.EXACT,
+                        "/start", "start", "rd", "OK" },
+                { "/start", ";abcde=fghij/start", DispatcherType.ASYNC, "/target", "/target", Boolean.TRUE,
+                        "/test/target", "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target",
+                        "target", "/test;abcde=fghij/start", "/test", "/start", null, null, MappingMatch.EXACT,
+                        "/start", "start", "rd", "OK" },
+                // Simple dispatch with path parameters on dispatch
+                { "/start", "/start", DispatcherType.INCLUDE, "/target", "/target;abcde=fghij", Boolean.TRUE,
+                        "/test/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start", "rd",
+                        "/test/target;abcde=fghij", "/test", "/target", null, null, MappingMatch.EXACT, "/target",
+                        "target", "target", "OK" },
+                { "/start", "/start", DispatcherType.FORWARD, "/target", "/target;abcde=fghij", Boolean.TRUE,
+                        "/test/target;abcde=fghij", "/test", "/target", null, null, MappingMatch.EXACT, "/target",
+                        "target", "target", "/test/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start",
+                        "start", "rd", "OK" },
+                { "/start", "/start", DispatcherType.ASYNC, "/target", "/target;abcde=fghij", Boolean.TRUE,
+                        "/test/target;abcde=fghij", "/test", "/target", null, null, MappingMatch.EXACT, "/target",
+                        "target", "target", "/test/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start",
+                        "start", "rd", "OK" },
+                // Simple dispatch with multiple path parameters on start and dispatch
+                { "/start", "/start;abcde=fghij", DispatcherType.INCLUDE, "/target", ";klmno=pqrst/target;uvwxy=z0123",
+                        Boolean.TRUE, "/test/start;abcde=fghij", "/test", "/start", null, null, MappingMatch.EXACT,
+                        "/start", "start", "rd", "/test/;klmno=pqrst/target;uvwxy=z0123", "/test", "/target", null,
+                        null, MappingMatch.EXACT, "/target", "target", "target", "OK" },
+                { "/start", "/start;abcde=fghij", DispatcherType.FORWARD, "/target", ";klmno=pqrst/target;uvwxy=z0123",
+                        Boolean.TRUE, "/test/;klmno=pqrst/target;uvwxy=z0123", "/test", "/target", null, null,
+                        MappingMatch.EXACT, "/target", "target", "target", "/test/start;abcde=fghij", "/test", "/start",
+                        null, null, MappingMatch.EXACT, "/start", "start", "rd", "OK" },
+                { "/start", "/start;abcde=fghij", DispatcherType.ASYNC, "/target", ";klmno=pqrst/target;uvwxy=z0123",
+                        Boolean.TRUE, "/test/;klmno=pqrst/target;uvwxy=z0123", "/test", "/target", null, null,
+                        MappingMatch.EXACT, "/target", "target", "target", "/test/start;abcde=fghij", "/test", "/start",
+                        null, null, MappingMatch.EXACT, "/start", "start", "rd", "ASYNC-IAE" },
+                // Simple dispatch with directory traversal
+                { "/start/*", "/start/foo", DispatcherType.INCLUDE, "/target", "../target", Boolean.TRUE,
+                        "/test/start/foo", "/test", "/start", "/foo", null, MappingMatch.PATH, "/start/*", "foo", "rd",
+                        "/test/start/../target", "/test", "/target", null, null, MappingMatch.EXACT, "/target",
+                        "target", "target", "OK" },
+                { "/start/*", "/start/foo", DispatcherType.FORWARD, "/target", "../target", Boolean.TRUE,
+                        "/test/start/../target", "/test", "/target", null, null, MappingMatch.EXACT, "/target",
+                        "target", "target", "/test/start/foo", "/test", "/start", "/foo", null, MappingMatch.PATH,
+                        "/start/*", "foo", "rd", "OK" },
+                { "/start/*", "/start/foo", DispatcherType.ASYNC, "/target", "../target", Boolean.TRUE,
+                        "/test/start/../target", "/test", "/target", null, null, MappingMatch.EXACT, "/target",
+                        "target", "target", "/test/start/foo", "/test", "/start", "/foo", null, MappingMatch.PATH,
+                        "/start/*", "foo", "rd", "ASYNC-IAE" },
+                // Simple dispatch with directory traversal and path parameters
+                // Note comments in Request.getRequestDispatcher(String) that
+                // explain why the path parameter abcde=fghij is not present on the
+                // dispatched requestURI
+                { "/start/*", "/start;abcde=fghij/foo", DispatcherType.INCLUDE, "/target", "../target;klmno=pqrst",
+                        Boolean.TRUE, "/test/start;abcde=fghij/foo", "/test", "/start", "/foo", null, MappingMatch.PATH,
+                        "/start/*", "foo", "rd", "/test/start/../target;klmno=pqrst", "/test", "/target", null, null,
+                        MappingMatch.EXACT, "/target", "target", "target", "OK" },
+                { "/start/*", "/start;abcde=fghij/foo", DispatcherType.FORWARD, "/target", "../target;klmno=pqrst",
+                        Boolean.TRUE, "/test/start/../target;klmno=pqrst", "/test", "/target", null, null,
+                        MappingMatch.EXACT, "/target", "target", "target", "/test/start;abcde=fghij/foo", "/test",
+                        "/start", "/foo", null, MappingMatch.PATH, "/start/*", "foo", "rd", "OK" },
+                { "/start/*", "/start;abcde=fghij/foo", DispatcherType.ASYNC, "/target", "../target;klmno=pqrst",
+                        Boolean.TRUE, "/test/start;abcde=fghij/../target;klmno=pqrst", "/test", "/target", null, null,
+                        MappingMatch.EXACT, "/target", "target", "target", "/test/start;abcde=fghij/foo", "/test",
+                        "/start", "/foo", null, MappingMatch.PATH, "/start/*", "foo", "rd", "ASYNC-IAE" },
+                // Simple dispatch with invalid directory traversal
+                { "/start/*", "/start/foo", DispatcherType.INCLUDE, "/target", "../../target", Boolean.TRUE,
+                        "/test/start/foo", "/test", "/start", "/foo", null, MappingMatch.PATH, "/start/*", "foo", "rd",
+                        "/test/start/../target", "/test", "/target", null, null, MappingMatch.EXACT, "/target",
+                        "target", "target", "RD-NULL" },
+                { "/start/*", "/start/foo", DispatcherType.FORWARD, "/target", "../../target", Boolean.TRUE,
+                        "/test/start/../target", "/test", "/target", null, null, MappingMatch.EXACT, "/target",
+                        "target", "target", "/test/start/foo", "/test", "/start", "/foo", null, MappingMatch.PATH,
+                        "/start/*", "foo", "rd", "RD-NULL" },
+                { "/start/*", "/start/foo", DispatcherType.ASYNC, "/target", "../../target", Boolean.TRUE,
+                        "/test/start/../target", "/test", "/target", null, null, MappingMatch.EXACT, "/target",
+                        "target", "target", "/test/start/foo", "/test", "/start", "/foo", null, MappingMatch.PATH,
+                        "/start/*", "foo", "rd", "ASYNC-IAE" },
+                // Simple dispatch with invalid target
+                { "/start", "/start", DispatcherType.INCLUDE, "/target", "/does-not-exist", Boolean.TRUE, "/test/start",
+                        "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start", "rd", "/test/target",
+                        "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target", "target", "RD-NULL" },
+                { "/start", "/start", DispatcherType.FORWARD, "/target", "/does-not-exist", Boolean.TRUE,
+                        "/test/target", "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target",
+                        "target", "/test/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start",
+                        "rd", "RD-NULL" },
+                { "/start", "/start", DispatcherType.ASYNC, "/target", "/does-not-exist", Boolean.TRUE, "/test/target",
+                        "/test", "/target", null, null, MappingMatch.EXACT, "/target", "target", "target",
+                        "/test/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start", "rd",
+                        "ASYNC-RD-NULL" },
+                // Welcome files
+                { "/start", "/start", DispatcherType.INCLUDE, "*.html", "/", Boolean.TRUE, "/test/start", "/test",
+                        "/start", null, null, MappingMatch.EXACT, "/start", "start", "rd", "/test/", "/test",
+                        "/index.html", null, null, MappingMatch.EXTENSION, "*.html", "index", "target", "OK" },
+                { "/start", "/start", DispatcherType.FORWARD, "*.html", "/", Boolean.TRUE, "/test/", "/test",
+                        "/index.html", null, null, MappingMatch.EXTENSION, "*.html", "index", "target", "/test/start",
+                        "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start", "rd", "OK" },
+                { "/start", "/start", DispatcherType.ASYNC, "*.html", "/", Boolean.TRUE, "/test/", "/test",
+                        "/index.html", null, null, MappingMatch.EXTENSION, "*.html", "index", "target", "/test/start",
+                        "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start", "rd", "OK" },
+                // Welcome files with query strings
+                { "/start", "/start?abcde=fghij", DispatcherType.INCLUDE, "*.html", "/?zyxwv=utsrq", Boolean.TRUE,
+                        "/test/start", "/test", "/start", null, "abcde=fghij", MappingMatch.EXACT, "/start", "start",
+                        "rd", "/test/", "/test", "/index.html", null, "zyxwv=utsrq", MappingMatch.EXTENSION, "*.html",
+                        "index", "target", "OK" },
+                { "/start", "/start?abcde=fghij", DispatcherType.FORWARD, "*.html", "/?zyxwv=utsrq", Boolean.TRUE,
+                        "/test/", "/test", "/index.html", null, "zyxwv=utsrq", MappingMatch.EXTENSION, "*.html",
+                        "index", "target", "/test/start", "/test", "/start", null, "abcde=fghij", MappingMatch.EXACT,
+                        "/start", "start", "rd", "OK" },
+                { "/start", "/start?abcde=fghij", DispatcherType.ASYNC, "*.html", "/?zyxwv=utsrq", Boolean.TRUE,
+                        "/test/", "/test", "/index.html", null, "zyxwv=utsrq", MappingMatch.EXTENSION, "*.html",
+                        "index", "target", "/test/start", "/test", "/start", null, "abcde=fghij", MappingMatch.EXACT,
+                        "/start", "start", "rd", "OK" },
+                // Welcome files with trailing path parameters at start
+                { "/start", "/start;abcde=fghij", DispatcherType.INCLUDE, "*.html", "/", Boolean.TRUE,
+                        "/test/start;abcde=fghij", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start",
+                        "rd", "/test/", "/test", "/index.html", null, null, MappingMatch.EXTENSION, "*.html", "index",
+                        "target", "OK" },
+                { "/start", "/start;abcde=fghij", DispatcherType.FORWARD, "*.html", "/", Boolean.TRUE, "/test/",
+                        "/test", "/index.html", null, null, MappingMatch.EXTENSION, "*.html", "index", "target",
+                        "/test/start;abcde=fghij", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start",
+                        "rd", "OK" },
+                { "/start", "/start;abcde=fghij", DispatcherType.ASYNC, "*.html", "/", Boolean.TRUE, "/test/", "/test",
+                        "/index.html", null, null, MappingMatch.EXTENSION, "*.html", "index", "target",
+                        "/test/start;abcde=fghij", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start",
+                        "rd", "OK" },
+                // Welcome files with path parameters at start
+                { "/start", ";abcde=fghij/start", DispatcherType.INCLUDE, "*.html", "/", Boolean.TRUE,
+                        "/test;abcde=fghij/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start",
+                        "rd", "/test/", "/test", "/index.html", null, null, MappingMatch.EXTENSION, "*.html", "index",
+                        "target", "OK" },
+                { "/start", ";abcde=fghij/start", DispatcherType.FORWARD, "*.html", "/", Boolean.TRUE, "/test/",
+                        "/test", "/index.html", null, null, MappingMatch.EXTENSION, "*.html", "index", "target",
+                        "/test;abcde=fghij/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start",
+                        "rd", "OK" },
+                { "/start", ";abcde=fghij/start", DispatcherType.ASYNC, "*.html", "/", Boolean.TRUE, "/test/", "/test",
+                        "/index.html", null, null, MappingMatch.EXTENSION, "*.html", "index", "target",
+                        "/test;abcde=fghij/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start",
+                        "rd", "OK" },
+                // Welcome files with trailing path parameters on dispatch
+                { "/start", "/start", DispatcherType.INCLUDE, "*.html", "/;abcde=fghij", Boolean.TRUE, "/test/start",
+                        "/test", "/start", null, null, MappingMatch.EXACT, "/start", "start", "rd",
+                        "/test/;abcde=fghij", "/test", "/index.html", null, null, MappingMatch.EXTENSION, "*.html",
+                        "index", "target", "OK" },
+                { "/start", "/start", DispatcherType.FORWARD, "*.html", "/;abcde=fghij", Boolean.TRUE,
+                        "/test/;abcde=fghij", "/test", "/index.html", null, null, MappingMatch.EXTENSION, "*.html",
+                        "index", "target", "/test/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start",
+                        "start", "rd", "OK" },
+                { "/start", "/start", DispatcherType.ASYNC, "*.html", "/;abcde=fghij", Boolean.TRUE,
+                        "/test/;abcde=fghij", "/test", "/index.html", null, null, MappingMatch.EXTENSION, "*.html",
+                        "index", "target", "/test/start", "/test", "/start", null, null, MappingMatch.EXACT, "/start",
+                        "start", "rd", "OK" }, });
     }
 
     // Inputs
@@ -382,17 +283,14 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
 
 
     public TestApplicationContextGetRequestDispatcherB(String startMapping, String startUri,
-            DispatcherType dispatcherType, String targetMapping, String targetUri,
-            boolean useEncodedDispatchPaths,
-            String expectedRequestURI, String expectedContextPath, String expectedServletPath,
-            String expectedPathInfo, String expectedQueryString, MappingMatch expectedMappingMatch,
-            String expectedMappingPattern, String expectedMappingMatchValue,
-            String expectedMappingServletName,
-            String expectedDispatcherRequestURI, String expectedDispatcherContextPath,
-            String expectedDispatcherServletPath, String expectedDispatcherPathInfo,
-            String expectedDispatcherQueryString, MappingMatch expectedDispatcherMappingMatch,
-            String expectedDispatcherMappingPattern, String expectedDispatcherMappingMatchValue,
-            String expectedDispatcherMappingServletName,
+            DispatcherType dispatcherType, String targetMapping, String targetUri, boolean useEncodedDispatchPaths,
+            String expectedRequestURI, String expectedContextPath, String expectedServletPath, String expectedPathInfo,
+            String expectedQueryString, MappingMatch expectedMappingMatch, String expectedMappingPattern,
+            String expectedMappingMatchValue, String expectedMappingServletName, String expectedDispatcherRequestURI,
+            String expectedDispatcherContextPath, String expectedDispatcherServletPath,
+            String expectedDispatcherPathInfo, String expectedDispatcherQueryString,
+            MappingMatch expectedDispatcherMappingMatch, String expectedDispatcherMappingPattern,
+            String expectedDispatcherMappingMatchValue, String expectedDispatcherMappingServletName,
             String expectedBody) {
         this.startMapping = startMapping;
         this.startUri = startUri;
@@ -419,7 +317,7 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
         this.expectedDispatcherMappingMatchValue = expectedDispatcherMappingMatchValue;
         this.expectedDispatcherMappingServletName = expectedDispatcherMappingServletName;
         this.expectedBody = expectedBody;
-     }
+    }
 
 
     @Test
@@ -460,8 +358,7 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             if (dispatcherType == DispatcherType.INCLUDE) {
                 RequestDispatcher rd = req.getRequestDispatcher(targetUri);
@@ -520,8 +417,7 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             Assert.assertEquals(expectedRequestURI, req.getRequestURI());
             Assert.assertEquals(expectedContextPath, req.getContextPath());
@@ -538,27 +434,22 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
                 if (type == dispatcherType) {
                     String name = dispatcherType.name().toLowerCase(Locale.ENGLISH);
                     Assert.assertEquals(expectedDispatcherRequestURI,
-                            req.getAttribute("javax.servlet." + name + ".request_uri"));
+                            req.getAttribute("jakarta.servlet." + name + ".request_uri"));
                     Assert.assertEquals(expectedDispatcherContextPath,
-                            req.getAttribute("javax.servlet." + name + ".context_path"));
+                            req.getAttribute("jakarta.servlet." + name + ".context_path"));
                     Assert.assertEquals(expectedDispatcherServletPath,
-                            req.getAttribute("javax.servlet." + name + ".servlet_path"));
+                            req.getAttribute("jakarta.servlet." + name + ".servlet_path"));
                     Assert.assertEquals(expectedDispatcherPathInfo,
-                            req.getAttribute("javax.servlet." + name + ".path_info"));
+                            req.getAttribute("jakarta.servlet." + name + ".path_info"));
                     Assert.assertEquals(expectedDispatcherQueryString,
-                            req.getAttribute("javax.servlet." + name + ".query_string"));
+                            req.getAttribute("jakarta.servlet." + name + ".query_string"));
                     HttpServletMapping dispatcherMapping =
-                            (HttpServletMapping) req.getAttribute(
-                                    "javax.servlet." + name + ".mapping");
+                            (HttpServletMapping) req.getAttribute("jakarta.servlet." + name + ".mapping");
                     Assert.assertNotNull(dispatcherMapping);
-                    Assert.assertEquals(expectedDispatcherMappingMatch,
-                            dispatcherMapping.getMappingMatch());
-                    Assert.assertEquals(expectedDispatcherMappingPattern,
-                            dispatcherMapping.getPattern());
-                    Assert.assertEquals(expectedDispatcherMappingMatchValue,
-                            dispatcherMapping.getMatchValue());
-                    Assert.assertEquals(expectedDispatcherMappingServletName,
-                            dispatcherMapping.getServletName());
+                    Assert.assertEquals(expectedDispatcherMappingMatch, dispatcherMapping.getMappingMatch());
+                    Assert.assertEquals(expectedDispatcherMappingPattern, dispatcherMapping.getPattern());
+                    Assert.assertEquals(expectedDispatcherMappingMatchValue, dispatcherMapping.getMatchValue());
+                    Assert.assertEquals(expectedDispatcherMappingServletName, dispatcherMapping.getServletName());
                 } else if (type == DispatcherType.ERROR || type == DispatcherType.REQUEST) {
                     // Skip - not tested
                 } else {
@@ -575,11 +466,11 @@ public class TestApplicationContextGetRequestDispatcherB extends TomcatBaseTest 
 
 
     private void assertAllNull(HttpServletRequest req, String type) {
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".request_uri"));
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".context_path"));
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".servlet_path"));
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".path_info"));
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".query_string"));
-        Assert.assertNull(req.getAttribute("javax.servlet." + type + ".mapping"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".request_uri"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".context_path"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".servlet_path"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".path_info"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".query_string"));
+        Assert.assertNull(req.getAttribute("jakarta.servlet." + type + ".mapping"));
     }
 }

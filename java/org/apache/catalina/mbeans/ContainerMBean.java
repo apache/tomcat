@@ -38,29 +38,28 @@ import org.apache.catalina.startup.HostConfig;
 public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
 
     /**
-     * Add a new child Container to those associated with this Container,
-     * if supported. Won't start the child yet. Has to be started with a call to
-     * Start method after necessary configurations are done.
+     * Add a new child Container to those associated with this Container, if supported. Won't start the child yet. Has
+     * to be started with a call to Start method after necessary configurations are done.
      *
      * @param type ClassName of the child to be added
      * @param name Name of the child to be added
      *
      * @exception MBeanException if the child cannot be added
      */
-    public void addChild(String type, String name) throws MBeanException{
+    public void addChild(String type, String name) throws MBeanException {
 
         Container contained = (Container) newInstance(type);
         contained.setName(name);
 
-        if(contained instanceof StandardHost){
+        if (contained instanceof StandardHost) {
             HostConfig config = new HostConfig();
             contained.addLifecycleListener(config);
-        } else if(contained instanceof StandardContext){
+        } else if (contained instanceof StandardContext) {
             ContextConfig config = new ContextConfig();
             contained.addLifecycleListener(config);
         }
 
-        boolean oldValue= true;
+        boolean oldValue = true;
 
         ContainerBase container = doGetManagedResource();
         try {
@@ -68,10 +67,10 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
             container.setStartChildren(false);
             container.addChild(contained);
             contained.init();
-        } catch (LifecycleException e){
+        } catch (LifecycleException e) {
             throw new MBeanException(e);
         } finally {
-            if(container != null) {
+            if (container != null) {
                 container.setStartChildren(oldValue);
             }
         }
@@ -79,13 +78,13 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
 
 
     /**
-     * Remove an existing child Container from association with this parent
-     * Container.
+     * Remove an existing child Container from association with this parent Container.
      *
      * @param name Name of the existing child Container to be removed
+     *
      * @throws MBeanException if the child cannot be removed
      */
-    public void removeChild(String name) throws MBeanException{
+    public void removeChild(String name) throws MBeanException {
         if (name != null) {
             Container container = doGetManagedResource();
             Container contained = container.findChild(name);
@@ -98,17 +97,19 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
      * Adds a valve to this Container instance.
      *
      * @param valveType ClassName of the valve to be added
+     *
      * @return the MBean name of the new valve
+     *
      * @throws MBeanException if adding the valve failed
      */
-    public String addValve(String valveType) throws MBeanException{
+    public String addValve(String valveType) throws MBeanException {
         Valve valve = (Valve) newInstance(valveType);
 
         Container container = doGetManagedResource();
         container.getPipeline().addValve(valve);
 
         if (valve instanceof JmxEnabled) {
-            return ((JmxEnabled)valve).getObjectName().toString();
+            return ((JmxEnabled) valve).getObjectName().toString();
         } else {
             return null;
         }
@@ -122,25 +123,23 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
      *
      * @exception MBeanException if a component cannot be removed
      */
-    public void removeValve(String valveName) throws MBeanException{
+    public void removeValve(String valveName) throws MBeanException {
         Container container = doGetManagedResource();
 
         ObjectName oname;
         try {
             oname = new ObjectName(valveName);
-        } catch (MalformedObjectNameException e) {
-            throw new MBeanException(e);
-        } catch (NullPointerException e) {
+        } catch (MalformedObjectNameException | NullPointerException e) {
             throw new MBeanException(e);
         }
 
         if (container != null) {
             Valve[] valves = container.getPipeline().getValves();
-            for (int i = 0; i < valves.length; i++) {
-                if (valves[i] instanceof JmxEnabled) {
-                    ObjectName voname = ((JmxEnabled) valves[i]).getObjectName();
+            for (Valve valve : valves) {
+                if (valve instanceof JmxEnabled) {
+                    ObjectName voname = ((JmxEnabled) valve).getObjectName();
                     if (voname.equals(oname)) {
-                        container.getPipeline().removeValve(valves[i]);
+                        container.getPipeline().removeValve(valve);
                     }
                 }
             }
@@ -152,9 +151,10 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
      * Add a LifecycleEvent listener to this component.
      *
      * @param type ClassName of the listener to add
+     *
      * @throws MBeanException if adding the listener failed
      */
-    public void addLifecycleListener(String type) throws MBeanException{
+    public void addLifecycleListener(String type) throws MBeanException {
         LifecycleListener listener = (LifecycleListener) newInstance(type);
         Container container = doGetManagedResource();
         container.addLifecycleListener(listener);
@@ -164,15 +164,16 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
     /**
      * Remove a LifecycleEvent listeners from this component.
      *
-     * @param type The ClassName of the listeners to be removed.
-     * Note that all the listeners having given ClassName will be removed.
+     * @param type The ClassName of the listeners to be removed. Note that all the listeners having given ClassName will
+     *                 be removed.
+     *
      * @throws MBeanException propagated from the managed resource access
      */
-    public void removeLifecycleListeners(String type) throws MBeanException{
+    public void removeLifecycleListeners(String type) throws MBeanException {
         Container container = doGetManagedResource();
 
         LifecycleListener[] listeners = container.findLifecycleListeners();
-        for (LifecycleListener listener : listeners){
+        for (LifecycleListener listener : listeners) {
             if (listener.getClass().getName().equals(type)) {
                 container.removeLifecycleListener(listener);
             }
@@ -181,9 +182,10 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
 
 
     /**
-     * List the class name of each of the lifecycle listeners added to this
-     * container.
+     * List the class name of each of the lifecycle listeners added to this container.
+     *
      * @return the lifecycle listeners class names
+     *
      * @throws MBeanException propagated from the managed resource access
      */
     public String[] findLifecycleListenerNames() throws MBeanException {
@@ -191,18 +193,19 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
         List<String> result = new ArrayList<>();
 
         LifecycleListener[] listeners = container.findLifecycleListeners();
-        for(LifecycleListener listener: listeners){
+        for (LifecycleListener listener : listeners) {
             result.add(listener.getClass().getName());
         }
 
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 
 
     /**
-     * List the class name of each of the container listeners added to this
-     * container.
+     * List the class name of each of the container listeners added to this container.
+     *
      * @return the container listeners class names
+     *
      * @throws MBeanException propagated from the managed resource access
      */
     public String[] findContainerListenerNames() throws MBeanException {
@@ -210,10 +213,10 @@ public class ContainerMBean extends BaseCatalinaMBean<ContainerBase> {
         List<String> result = new ArrayList<>();
 
         ContainerListener[] listeners = container.findContainerListeners();
-        for(ContainerListener listener: listeners){
+        for (ContainerListener listener : listeners) {
             result.add(listener.getClass().getName());
         }
 
-        return result.toArray(new String[result.size()]);
+        return result.toArray(new String[0]);
     }
 }

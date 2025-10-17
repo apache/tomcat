@@ -14,16 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.membership.cloud;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
-import java.security.AccessController;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivilegedAction;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,7 +49,7 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     protected Instant startTime;
     protected MessageDigest md5;
 
-    protected Map<String, String> headers = new HashMap<>();
+    protected Map<String,String> headers = new HashMap<>();
 
     protected String localIp;
     protected int port;
@@ -69,27 +66,31 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
 
     /**
      * Get value of environment variable.
+     *
      * @param keys the environment variables
+     *
      * @return the env variables values, or null if not found
      */
     protected static String getEnv(String... keys) {
         String val = null;
         for (String key : keys) {
-            val = AccessController.doPrivileged((PrivilegedAction<String>) () -> System.getenv(key));
-            if (val != null)
+            val = System.getenv(key);
+            if (val != null) {
                 break;
+            }
         }
         return val;
     }
 
     /**
-     * Get the Kubernetes namespace, or "tomcat" if the Kubernetes environment variable
-     * cannot be found (with a warning log about the missing namespace).
+     * Get the Kubernetes namespace, or "tomcat" if the Kubernetes environment variable cannot be found (with a warning
+     * log about the missing namespace).
+     *
      * @return the namespace
      */
     protected String getNamespace() {
-        String namespace = getEnv("KUBERNETES_NAMESPACE", CUSTOM_ENV_PREFIX + "NAMESPACE");
-        if (namespace == null || namespace.length() == 0) {
+        String namespace = getEnv(CUSTOM_ENV_PREFIX + "NAMESPACE", "KUBERNETES_NAMESPACE");
+        if (namespace == null || namespace.isEmpty()) {
             log.warn(sm.getString("kubernetesMembershipProvider.noNamespace"));
             namespace = "tomcat";
         }
@@ -100,13 +101,13 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
     public void init(Properties properties) throws IOException {
         startTime = Instant.now();
 
-        connectionTimeout = Integer.parseInt(properties.getProperty("connectionTimeout", "1000"));
-        readTimeout = Integer.parseInt(properties.getProperty("readTimeout", "1000"));
+        CloudMembershipService service = (CloudMembershipService) this.service;
+        connectionTimeout = service.getConnectTimeout();
+        readTimeout = service.getReadTimeout();
+        expirationTime = service.getExpirationTime();
 
         localIp = InetAddress.getLocalHost().getHostAddress();
         port = Integer.parseInt(properties.getProperty("tcpListenPort"));
-
-        expirationTime = Long.parseLong(properties.getProperty("expirationTime", "5000"));
     }
 
     @Override
@@ -127,52 +128,54 @@ public abstract class CloudMembershipProvider extends MembershipProviderBase imp
         Member[] announcedMembers = fetchMembers();
         // Add new members or refresh the members in the membership
         for (Member member : announcedMembers) {
-            if (membership.memberAlive(member)) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Member added: " + member);
-                }
-                Runnable r = new Runnable() {
-                    @Override
-                    public void run(){
-                        String name = Thread.currentThread().getName();
-                        try {
-                            Thread.currentThread().setName("CloudMembership-memberAdded");
-                            membershipListener.memberAdded(member);
-                        } finally {
-                            Thread.currentThread().setName(name);
-                        }
-                    }
-                };
-                executor.execute(r);
-            }
+            updateMember(member, true);
         }
         // Remove non refreshed members from the membership
         Member[] expired = membership.expire(expirationTime);
         for (Member member : expired) {
-            if (log.isDebugEnabled()) {
-                log.debug("Member disappeared: " + member);
-            }
-            Runnable r = new Runnable() {
-                @Override
-                public void run(){
-                    String name = Thread.currentThread().getName();
-                    try {
-                        Thread.currentThread().setName("CloudMembership-memberDisappeared");
-                        membershipListener.memberDisappeared(member);
-                    } finally {
-                        Thread.currentThread().setName(name);
-                    }
-                }
-            };
-            executor.execute(r);
+            updateMember(member, false);
         }
     }
 
     /**
      * Fetch current cluster members from the cloud orchestration.
+     *
      * @return the member array
      */
     protected abstract Member[] fetchMembers();
+
+    /**
+     * Add or remove specified member.
+     *
+     * @param member the member to add
+     * @param add    true if the member is added, false otherwise
+     */
+    protected void updateMember(Member member, boolean add) {
+        if (add && !membership.memberAlive(member)) {
+            return;
+        }
+        if (log.isDebugEnabled()) {
+            String message = add ? sm.getString("cloudMembershipProvider.add", member) :
+                    sm.getString("cloudMembershipProvider.remove", member);
+            log.debug(message);
+        }
+        Runnable r = () -> {
+            Thread currentThread = Thread.currentThread();
+            String name = currentThread.getName();
+            try {
+                String threadName = add ? "CloudMembership-memberAdded" : "CloudMembership-memberDisappeared";
+                currentThread.setName(threadName);
+                if (add) {
+                    membershipListener.memberAdded(member);
+                } else {
+                    membershipListener.memberDisappeared(member);
+                }
+            } finally {
+                currentThread.setName(name);
+            }
+        };
+        executor.execute(r);
+    }
 
     @Override
     public void messageReceived(Serializable msg, Member sender) {

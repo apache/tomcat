@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.catalina.filters;
 
 import java.io.IOException;
@@ -24,10 +23,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -89,13 +88,12 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         doTest(encoding, expected, 1, false);
     }
 
-    private void doTest(String encoding, String expected, int mode, boolean useSetContentType)
-            throws Exception {
+    private void doTest(String encoding, String expected, int mode, boolean useSetContentType) throws Exception {
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add the Servlet
         CharsetServlet servlet = new CharsetServlet(mode, useSetContentType);
@@ -117,7 +115,7 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String, List<String>> headers = new HashMap<>();
+        Map<String,List<String>> headers = new HashMap<>();
         getUrl("http://localhost:" + getPort() + "/", new ByteChunk(), headers);
 
         String ct = getSingleHeader("Content-Type", headers).toLowerCase(Locale.ENGLISH);
@@ -131,14 +129,13 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         private final int mode;
         private final boolean useSetContentType;
 
-        public CharsetServlet(int mode, boolean useSetContentType) {
+        CharsetServlet(int mode, boolean useSetContentType) {
             this.mode = mode;
             this.useSetContentType = useSetContentType;
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             String value;
             switch (mode) {

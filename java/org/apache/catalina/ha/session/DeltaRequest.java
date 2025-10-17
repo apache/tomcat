@@ -16,20 +16,13 @@
  */
 package org.apache.catalina.ha.session;
 
-/**
- * This class is used to track the series of actions that happens when
- * a request is executed. These actions will then translate into invocations of methods
- * on the actual session.
- * This class is NOT thread safe. One DeltaRequest per session
- * @version 1.0
- */
-
 import java.io.ByteArrayOutputStream;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.security.Principal;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import org.apache.catalina.SessionListener;
 import org.apache.catalina.realm.GenericPrincipal;
@@ -37,7 +30,12 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
-
+/**
+ * This class is used to track the series of actions that happens when a request is executed. These actions will then
+ * translate into invocations of methods on the actual session.
+ * <p>
+ * This class is NOT thread safe. One DeltaRequest per session.
+ */
 public class DeltaRequest implements Externalizable {
 
     public static final Log log = LogFactory.getLog(DeltaRequest.class);
@@ -53,6 +51,7 @@ public class DeltaRequest implements Externalizable {
     public static final int TYPE_MAXINTERVAL = 3;
     public static final int TYPE_AUTHTYPE = 4;
     public static final int TYPE_LISTENER = 5;
+    public static final int TYPE_NOTE = 6;
 
     public static final int ACTION_SET = 0;
     public static final int ACTION_REMOVE = 1;
@@ -64,8 +63,8 @@ public class DeltaRequest implements Externalizable {
     public static final String NAME_LISTENER = "__SET__LISTENER__";
 
     private String sessionId;
-    private LinkedList<AttributeInfo> actions = new LinkedList<>();
-    private final LinkedList<AttributeInfo> actionPool = new LinkedList<>();
+    private final Deque<AttributeInfo> actions = new ArrayDeque<>();
+    private final Deque<AttributeInfo> actionPool = new ArrayDeque<>();
 
     private boolean recordAllActions = false;
 
@@ -74,19 +73,29 @@ public class DeltaRequest implements Externalizable {
     }
 
     public DeltaRequest(String sessionId, boolean recordAllActions) {
-        this.recordAllActions=recordAllActions;
-        if(sessionId != null)
+        this.recordAllActions = recordAllActions;
+        if (sessionId != null) {
             setSessionId(sessionId);
+        }
     }
 
 
     public void setAttribute(String name, Object value) {
-        int action = (value==null)?ACTION_REMOVE:ACTION_SET;
-        addAction(TYPE_ATTRIBUTE,action,name,value);
+        int action = (value == null) ? ACTION_REMOVE : ACTION_SET;
+        addAction(TYPE_ATTRIBUTE, action, name, value);
     }
 
     public void removeAttribute(String name) {
         addAction(TYPE_ATTRIBUTE, ACTION_REMOVE, name, null);
+    }
+
+    public void setNote(String name, Object value) {
+        int action = (value == null) ? ACTION_REMOVE : ACTION_SET;
+        addAction(TYPE_NOTE, action, name, value);
+    }
+
+    public void removeNote(String name) {
+        addAction(TYPE_NOTE, ACTION_REMOVE, name, null);
     }
 
     public void setMaxInactiveInterval(int interval) {
@@ -95,147 +104,171 @@ public class DeltaRequest implements Externalizable {
 
     /**
      * Only support principals from type {@link GenericPrincipal GenericPrincipal}
+     *
      * @param p Session principal
+     *
      * @see GenericPrincipal
      */
     public void setPrincipal(Principal p) {
-        int action = (p==null)?ACTION_REMOVE:ACTION_SET;
+        int action = (p == null) ? ACTION_REMOVE : ACTION_SET;
         GenericPrincipal gp = null;
         if (p != null) {
             if (p instanceof GenericPrincipal) {
                 gp = (GenericPrincipal) p;
-                if(log.isDebugEnabled())
-                    log.debug(sm.getString("deltaRequest.showPrincipal", p.getName() , getSessionId()));
-            } else
-                log.error(sm.getString("deltaRequest.wrongPrincipalClass",p.getClass().getName()));
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("deltaRequest.showPrincipal", p.getName(), getSessionId()));
+                }
+            } else {
+                log.error(sm.getString("deltaRequest.wrongPrincipalClass", p.getClass().getName()));
+            }
         }
         addAction(TYPE_PRINCIPAL, action, NAME_PRINCIPAL, gp);
     }
 
     public void setNew(boolean n) {
-        int action = ACTION_SET;
-        addAction(TYPE_ISNEW,action,NAME_ISNEW,Boolean.valueOf(n));
+        addAction(TYPE_ISNEW, ACTION_SET, NAME_ISNEW, Boolean.valueOf(n));
     }
 
     public void setAuthType(String authType) {
-        int action = (authType==null)?ACTION_REMOVE:ACTION_SET;
-        addAction(TYPE_AUTHTYPE,action,NAME_AUTHTYPE, authType);
+        int action = (authType == null) ? ACTION_REMOVE : ACTION_SET;
+        addAction(TYPE_AUTHTYPE, action, NAME_AUTHTYPE, authType);
     }
 
     public void addSessionListener(SessionListener listener) {
-        addAction(TYPE_LISTENER, ACTION_SET, NAME_LISTENER ,listener);
+        addAction(TYPE_LISTENER, ACTION_SET, NAME_LISTENER, listener);
     }
 
     public void removeSessionListener(SessionListener listener) {
-        addAction(TYPE_LISTENER, ACTION_REMOVE, NAME_LISTENER ,listener);
+        addAction(TYPE_LISTENER, ACTION_REMOVE, NAME_LISTENER, listener);
     }
 
-    protected void addAction(int type,
-                             int action,
-                             String name,
-                             Object value) {
-        AttributeInfo info = null;
-        if ( this.actionPool.size() > 0 ) {
+    protected void addAction(int type, int action, String name, Object value) {
+        AttributeInfo info;
+        if (!this.actionPool.isEmpty()) {
             try {
                 info = actionPool.removeFirst();
-            }catch ( Exception x ) {
-                log.error(sm.getString("deltaRequest.removeUnable"),x);
+            } catch (Exception e) {
+                log.error(sm.getString("deltaRequest.removeUnable"), e);
                 info = new AttributeInfo(type, action, name, value);
             }
-            info.init(type,action,name,value);
+            info.init(type, action, name, value);
         } else {
             info = new AttributeInfo(type, action, name, value);
         }
-        //if we have already done something to this attribute, make sure
-        //we don't send multiple actions across the wire
-        if ( !recordAllActions) {
+        // if we have already done something to this attribute, make sure
+        // we don't send multiple actions across the wire
+        if (!recordAllActions) {
             try {
                 actions.remove(info);
             } catch (java.util.NoSuchElementException x) {
-                //do nothing, we wanted to remove it anyway
+                // do nothing, we wanted to remove it anyway
             }
         }
-        //add the action
+        // add the action
         actions.addLast(info);
     }
 
     public void execute(DeltaSession session, boolean notifyListeners) {
-        if ( !this.sessionId.equals( session.getId() ) )
-            throw new java.lang.IllegalArgumentException(sm.getString("deltaRequest.ssid.mismatch"));
+        if (!this.sessionId.equals(session.getId())) {
+            throw new IllegalArgumentException(sm.getString("deltaRequest.ssid.mismatch"));
+        }
         session.access();
-        for ( int i=0; i<actions.size(); i++ ) {
-            AttributeInfo info = actions.get(i);
-            switch ( info.getType() ) {
+        for (AttributeInfo info : actions) {
+            switch (info.getType()) {
                 case TYPE_ATTRIBUTE:
-                    if ( info.getAction() == ACTION_SET ) {
-                        if ( log.isTraceEnabled() ) log.trace("Session.setAttribute('"+info.getName()+"', '"+info.getValue()+"')");
-                        session.setAttribute(info.getName(), info.getValue(),notifyListeners,false);
-                    }  else {
-                        if ( log.isTraceEnabled() ) log.trace("Session.removeAttribute('"+info.getName()+"')");
-                        session.removeAttribute(info.getName(),notifyListeners,false);
+                    if (info.getAction() == ACTION_SET) {
+                        if (log.isTraceEnabled()) {
+                            log.trace("Session.setAttribute('" + info.getName() + "', '" + info.getValue() + "')");
+                        }
+                        session.setAttribute(info.getName(), info.getValue(), notifyListeners, false);
+                    } else {
+                        if (log.isTraceEnabled()) {
+                            log.trace("Session.removeAttribute('" + info.getName() + "')");
+                        }
+                        session.removeAttribute(info.getName(), notifyListeners, false);
                     }
 
                     break;
                 case TYPE_ISNEW:
-                    if ( log.isTraceEnabled() ) log.trace("Session.setNew('"+info.getValue()+"')");
-                    session.setNew(((Boolean)info.getValue()).booleanValue(),false);
+                    if (log.isTraceEnabled()) {
+                        log.trace("Session.setNew('" + info.getValue() + "')");
+                    }
+                    session.setNew(((Boolean) info.getValue()).booleanValue(), false);
                     break;
                 case TYPE_MAXINTERVAL:
-                    if ( log.isTraceEnabled() ) log.trace("Session.setMaxInactiveInterval('"+info.getValue()+"')");
-                    session.setMaxInactiveInterval(((Integer)info.getValue()).intValue(),false);
+                    if (log.isTraceEnabled()) {
+                        log.trace("Session.setMaxInactiveInterval('" + info.getValue() + "')");
+                    }
+                    session.setMaxInactiveInterval(((Integer) info.getValue()).intValue(), false);
                     break;
                 case TYPE_PRINCIPAL:
                     Principal p = null;
                     if (info.getAction() == ACTION_SET) {
                         p = (Principal) info.getValue();
                     }
-                    session.setPrincipal(p,false);
+                    session.setPrincipal(p, false);
                     break;
                 case TYPE_AUTHTYPE:
                     String authType = null;
-                    if ( info.getAction() == ACTION_SET ) {
-                        authType = (String)info.getValue();
+                    if (info.getAction() == ACTION_SET) {
+                        authType = (String) info.getValue();
                     }
-                    session.setAuthType(authType,false);
+                    session.setAuthType(authType, false);
                     break;
                 case TYPE_LISTENER:
                     SessionListener listener = (SessionListener) info.getValue();
                     if (info.getAction() == ACTION_SET) {
-                        session.addSessionListener(listener,false);
+                        session.addSessionListener(listener, false);
                     } else {
-                        session.removeSessionListener(listener,false);
+                        session.removeSessionListener(listener, false);
                     }
                     break;
-                default :
-                    throw new java.lang.IllegalArgumentException(sm.getString("deltaRequest.invalidAttributeInfoType", info));
-            }//switch
-        }//for
+                case TYPE_NOTE:
+                    if (info.getAction() == ACTION_SET) {
+                        if (log.isTraceEnabled()) {
+                            log.trace("Session.setNote('" + info.getName() + "', '" + info.getValue() + "')");
+                        }
+                        session.setNote(info.getName(), info.getValue(), false);
+                    } else {
+                        if (log.isTraceEnabled()) {
+                            log.trace("Session.removeNote('" + info.getName() + "')");
+                        }
+                        session.removeNote(info.getName(), false);
+                    }
+
+                    break;
+                default:
+                    log.warn(sm.getString("deltaRequest.invalidAttributeInfoType", info));
+            }// switch
+        } // for
         session.endAccess();
         reset();
     }
 
     public void reset() {
-        while ( actions.size() > 0 ) {
+        while (!actions.isEmpty()) {
             try {
                 AttributeInfo info = actions.removeFirst();
                 info.recycle();
                 actionPool.addLast(info);
-            }catch  ( Exception x ) {
-                log.error(sm.getString("deltaRequest.removeUnable"),x);
+            } catch (Exception e) {
+                log.error(sm.getString("deltaRequest.removeUnable"), e);
             }
         }
-        actions.clear();
     }
 
     public String getSessionId() {
         return sessionId;
     }
+
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
-        if ( sessionId == null ) {
-            new Exception(sm.getString("deltaRequest.ssid.null")).fillInStackTrace().printStackTrace();
+        if (sessionId == null) {
+            String msg = sm.getString("deltaRequest.ssid.null");
+            log.error(msg, new Exception(msg));
         }
     }
+
     public int getSize() {
         return actions.size();
     }
@@ -246,58 +279,54 @@ public class DeltaRequest implements Externalizable {
     }
 
     @Override
-    public void readExternal(java.io.ObjectInput in) throws IOException,ClassNotFoundException {
-        //sessionId - String
-        //recordAll - boolean
-        //size - int
-        //AttributeInfo - in an array
+    public void readExternal(java.io.ObjectInput in) throws IOException, ClassNotFoundException {
+        // sessionId - String
+        // recordAll - boolean
+        // size - int
+        // AttributeInfo - in an array
         reset();
         sessionId = in.readUTF();
         recordAllActions = in.readBoolean();
         int cnt = in.readInt();
-        if (actions == null)
-            actions = new LinkedList<>();
-        else
-            actions.clear();
         for (int i = 0; i < cnt; i++) {
-            AttributeInfo info = null;
-            if (this.actionPool.size() > 0) {
+            AttributeInfo info;
+            if (!this.actionPool.isEmpty()) {
                 try {
                     info = actionPool.removeFirst();
-                } catch ( Exception x )  {
-                    log.error(sm.getString("deltaRequest.removeUnable"),x);
+                } catch (Exception e) {
+                    log.error(sm.getString("deltaRequest.removeUnable"), e);
                     info = new AttributeInfo();
                 }
-            }
-            else {
+            } else {
                 info = new AttributeInfo();
             }
             info.readExternal(in);
             actions.addLast(info);
-        }//for
+        } // for
     }
 
 
     @Override
-    public void writeExternal(java.io.ObjectOutput out ) throws java.io.IOException {
-        //sessionId - String
-        //recordAll - boolean
-        //size - int
-        //AttributeInfo - in an array
+    public void writeExternal(java.io.ObjectOutput out) throws IOException {
+        // sessionId - String
+        // recordAll - boolean
+        // size - int
+        // AttributeInfo - in an array
         out.writeUTF(getSessionId());
         out.writeBoolean(recordAllActions);
         out.writeInt(getSize());
-        for ( int i=0; i<getSize(); i++ ) {
-            AttributeInfo info = actions.get(i);
+        for (AttributeInfo info : actions) {
             info.writeExternal(out);
         }
     }
 
     /**
      * serialize DeltaRequest
+     *
      * @see DeltaRequest#writeExternal(java.io.ObjectOutput)
      *
      * @return serialized delta request
+     *
      * @throws IOException IO error serializing
      */
     protected byte[] serialize() throws IOException {
@@ -309,28 +338,22 @@ public class DeltaRequest implements Externalizable {
         return bos.toByteArray();
     }
 
-    private static class AttributeInfo implements java.io.Externalizable {
+    private static class AttributeInfo implements Externalizable {
         private String name = null;
         private Object value = null;
         private int action;
         private int type;
 
-        public AttributeInfo() {
+        AttributeInfo() {
             this(-1, -1, null, null);
         }
 
-        public AttributeInfo(int type,
-                             int action,
-                             String name,
-                             Object value) {
+        AttributeInfo(int type, int action, String name, Object value) {
             super();
-            init(type,action,name,value);
+            init(type, action, name, value);
         }
 
-        public void init(int type,
-                         int action,
-                         String name,
-                         Object value) {
+        public void init(int type, int action, String name, Object value) {
             this.name = name;
             this.value = value;
             this.action = action;
@@ -348,6 +371,7 @@ public class DeltaRequest implements Externalizable {
         public Object getValue() {
             return value;
         }
+
         @Override
         public int hashCode() {
             return name.hashCode();
@@ -360,52 +384,54 @@ public class DeltaRequest implements Externalizable {
         public void recycle() {
             name = null;
             value = null;
-            type=-1;
-            action=-1;
+            type = -1;
+            action = -1;
         }
 
         @Override
         public boolean equals(Object o) {
-            if ( ! (o instanceof AttributeInfo ) ) return false;
-            AttributeInfo other =  (AttributeInfo)o;
+            if (!(o instanceof AttributeInfo other)) {
+                return false;
+            }
             return other.getName().equals(this.getName());
         }
 
         @Override
-        public void readExternal(java.io.ObjectInput in ) throws IOException,ClassNotFoundException {
-            //type - int
-            //action - int
-            //name - String
-            //hasvalue - boolean
-            //value - object
+        public void readExternal(java.io.ObjectInput in) throws IOException, ClassNotFoundException {
+            // type - int
+            // action - int
+            // name - String
+            // hasvalue - boolean
+            // value - object
             type = in.readInt();
             action = in.readInt();
             name = in.readUTF();
             boolean hasValue = in.readBoolean();
-            if ( hasValue ) value = in.readObject();
+            if (hasValue) {
+                value = in.readObject();
+            }
         }
 
         @Override
         public void writeExternal(java.io.ObjectOutput out) throws IOException {
-            //type - int
-            //action - int
-            //name - String
-            //hasvalue - boolean
-            //value - object
+            // type - int
+            // action - int
+            // name - String
+            // hasvalue - boolean
+            // value - object
             out.writeInt(getType());
             out.writeInt(getAction());
             out.writeUTF(getName());
-            out.writeBoolean(getValue()!=null);
-            if (getValue()!=null) out.writeObject(getValue());
+            out.writeBoolean(getValue() != null);
+            if (getValue() != null) {
+                out.writeObject(getValue());
+            }
         }
 
         @Override
         public String toString() {
-            StringBuilder buf = new StringBuilder("AttributeInfo[type=");
-            buf.append(getType()).append(", action=").append(getAction());
-            buf.append(", name=").append(getName()).append(", value=").append(getValue());
-            buf.append(", addr=").append(super.toString()).append("]");
-            return buf.toString();
+            return "AttributeInfo[type=" + getType() + ", action=" + getAction() + ", name=" + getName() + ", value=" +
+                    getValue() + ", addr=" + super.toString() + ']';
         }
 
     }

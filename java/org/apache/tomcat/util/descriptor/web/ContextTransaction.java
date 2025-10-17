@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -25,13 +24,12 @@ import java.util.Map;
 
 
 /**
- * Representation of an application resource reference, as represented in
- * an <code>&lt;res-env-refy&gt;</code> element in the deployment descriptor.
- *
- * @author Craig R. McClanahan
+ * Representation of an application resource reference, as represented in an <code>&lt;res-env-ref&gt;</code> element in
+ * the deployment descriptor.
  */
 public class ContextTransaction implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------------- Properties
@@ -40,10 +38,11 @@ public class ContextTransaction implements Serializable {
     /**
      * Holder for our configured properties.
      */
-    private final Map<String, Object> properties = new HashMap<>();
+    private final Map<String,Object> properties = new HashMap<>();
 
     /**
      * @param name The property name
+     *
      * @return a configured property.
      */
     public Object getProperty(String name) {
@@ -52,7 +51,8 @@ public class ContextTransaction implements Serializable {
 
     /**
      * Set a configured property.
-     * @param name The property name
+     *
+     * @param name  The property name
      * @param value The property value
      */
     public void setProperty(String name, Object value) {
@@ -61,6 +61,7 @@ public class ContextTransaction implements Serializable {
 
     /**
      * Remove a configured property.
+     *
      * @param name The property name
      */
     public void removeProperty(String name) {
@@ -69,6 +70,7 @@ public class ContextTransaction implements Serializable {
 
     /**
      * List properties.
+     *
      * @return the property names iterator
      */
     public Iterator<String> listProperties() {
@@ -84,8 +86,6 @@ public class ContextTransaction implements Serializable {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("Transaction[");
-        sb.append("]");
-        return sb.toString();
+        return "Transaction[]";
     }
 }

@@ -19,9 +19,13 @@ package org.apache.el.lang;
 import java.beans.PropertyEditorManager;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Map;
+import java.util.function.BiPredicate;
+import java.util.function.Predicate;
 
-import javax.el.ELException;
-import javax.el.ELManager;
+import jakarta.el.ELException;
+import jakarta.el.ELManager;
+import jakarta.el.ELProcessor;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -215,7 +219,6 @@ public class TestELSupport {
         PropertyEditorManager.registerEditor(TesterType.class, TesterTypeEditorNoError.class);
         Object result = ELManager.getExpressionFactory().coerceToType(
                 "Foo", TesterType.class);
-        Assert.assertTrue(result instanceof TesterType);
         Assert.assertEquals("Foo", ((TesterType) result).getValue());
     }
 
@@ -224,7 +227,6 @@ public class TestELSupport {
         PropertyEditorManager.registerEditor(TesterType.class, TesterTypeEditorError.class);
         Object result = ELManager.getExpressionFactory().coerceToType(
                 "Foo", TesterType.class);
-        Assert.assertTrue(result instanceof TesterType);
         Assert.assertEquals("Foo", ((TesterType) result).getValue());
     }
 
@@ -277,5 +279,223 @@ public class TestELSupport {
         VALA2,
         VALB1,
         VALB2
+    }
+
+
+    @Test
+    public void testCoercetoFunctionalInterface01() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateA");
+        Object result = elp.eval("testPredicateA(x -> x.equals('data'))");
+        Assert.assertEquals("PASS", result);
+    }
+
+
+    @Test
+    public void testCoercetoFunctionalInterface02() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateA");
+        Object result = elp.eval("testPredicateA(x -> !x.equals('data'))");
+        Assert.assertEquals("BLOCK", result);
+    }
+
+
+    @Test
+    public void testCoercetoFunctionalInterface03() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateB");
+        Object result = elp.eval("testPredicateB(x -> x > 50)");
+        Assert.assertEquals("PASS", result);
+    }
+
+
+    @Test
+    public void testCoercetoFunctionalInterface04() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateB");
+        Object result = elp.eval("testPredicateB(x -> x < 50)");
+        Assert.assertEquals("BLOCK", result);
+    }
+
+
+    @Test(expected = ELException.class)
+    public void testCoercetoFunctionalInterface05() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateC");
+        elp.eval("testPredicateC(x -> x > 50)");
+    }
+
+
+    @Test
+    public void testCoercetoFunctionalInterface06() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testBiPredicateA");
+        Object result = elp.eval("testBiPredicateA((x,y) -> x.name().equals('VALA1') && y)");
+        Assert.assertEquals("PASS", result);
+    }
+
+
+    /*
+     * Note: The following tests use compareTo(). When the target object (Long or String) is examined by reflection
+     * both compareTo(Object) and compareTo(Long)/compareTo(String) methods will be found as potential matches. The
+     * method matching rules (see section 1.2.1.2 of the specification) require that overload resolution has a higher
+     * precedence than coercion resolution so it is always the compareTo(Object) method that will be used for the
+     * following tests resulting in a ClassCastException (which is wrapped in an ELException).
+     */
+
+    @Test(expected = ELException.class)
+    public void testCoercetoFunctionalInterface07() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateB");
+        // This should trigger an exception as String isn't assignable to Long
+        Object result = elp.eval("testPredicateB(x -> x.compareTo('data') == 0)");
+        Assert.assertEquals("BLOCK", result);
+    }
+
+
+    @Test(expected = ELException.class)
+    public void testCoercetoFunctionalInterface08() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateA");
+        // This should trigger an exception as Long isn't assignable to String
+        Object result = elp.eval("testPredicateA(x -> x.compareTo(1234) == 0)");
+        Assert.assertEquals("BLOCK", result);
+    }
+
+
+    @Test(expected = ELException.class)
+    public void testCoercetoFunctionalInterface09() throws Exception {
+        final ELProcessor elp = new ELProcessor();
+        elp.defineFunction("", "", "org.apache.el.lang.TestELSupport", "testPredicateB");
+        // This should trigger an exception as String isn't assignable to Long despite this String being coercible
+        Object result = elp.eval("testPredicateB(x -> x.compareTo('1234') == 0)");
+        Assert.assertEquals("BLOCK", result);
+    }
+
+
+    public static String testPredicateA(Predicate<String> filter) {
+        String s = "data";
+        if (filter.test(s)) {
+            return "PASS";
+        } else {
+            return "BLOCK";
+        }
+    }
+
+
+    public static String testPredicateB(Predicate<Long> filter) {
+        Long l = Long.valueOf(100);
+        if (filter.test(l)) {
+            return "PASS";
+        } else {
+            return "BLOCK";
+        }
+    }
+
+
+    public static String testPredicateC(Predicate<String> filter) {
+        String s = "text";
+        if (filter.test(s)) {
+            return "PASS";
+        } else {
+            return "BLOCK";
+        }
+    }
+
+
+    public static String testBiPredicateA(BiPredicate<TestEnumC,Boolean> filter) {
+        // Mainly interested in if these coerce correctly
+        if (filter.test(TestEnumC.VALA1, Boolean.TRUE)) {
+            return "PASS";
+        } else {
+            return "BLOCK";
+        }
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface01() {
+        Assert.assertTrue(ELSupport.isFunctionalInterface(Predicate.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface02() {
+        // Interface but more than one abstract method
+        Assert.assertFalse(ELSupport.isFunctionalInterface(Map.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface03() {
+        // Not an interface
+        Assert.assertFalse(ELSupport.isFunctionalInterface(String.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface04() {
+        // Extends a functional interface with no changes
+        Assert.assertTrue(ELSupport.isFunctionalInterface(FunctionalA.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface05() {
+        // Extends a functional interface with additional abstract method
+        Assert.assertFalse(ELSupport.isFunctionalInterface(FunctionalB.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface06() {
+        // Extends a functional interface with additional default method
+        Assert.assertTrue(ELSupport.isFunctionalInterface(FunctionalC.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface07() {
+        // Extends a functional interface and overrides method in Object
+        Assert.assertTrue(ELSupport.isFunctionalInterface(FunctionalD.class));
+    }
+
+
+    @Test
+    public void testIsFunctionalInterface08() {
+        // Extends a functional interface adds a method that looks like a
+        // method from Object
+        Assert.assertFalse(ELSupport.isFunctionalInterface(FunctionalE.class));
+    }
+
+
+    private interface FunctionalA<T> extends Predicate<T> {
+    }
+
+
+    private interface FunctionalB<T> extends Predicate<T> {
+        void extra();
+    }
+
+
+    private interface FunctionalC<T> extends Predicate<T> {
+        @SuppressWarnings("unused")
+        default void extra() {
+        }
+    }
+
+
+    private interface FunctionalD<T> extends Predicate<T> {
+        @Override
+        String toString();
+        @Override
+        int hashCode();
+        @Override
+        boolean equals(Object o);
+    }
+
+
+    private interface FunctionalE<T> extends Predicate<T> {
+        boolean equals(String s);
     }
 }

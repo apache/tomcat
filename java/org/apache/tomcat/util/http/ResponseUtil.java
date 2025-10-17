@@ -21,11 +21,11 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.http.parser.TokenList;
 
@@ -60,7 +60,7 @@ public class ResponseUtil {
         }
 
         // Short-cut if no headers have been set
-        if (varyHeaders.size() == 0) {
+        if (varyHeaders.isEmpty()) {
             adapter.addHeader(VARY_HEADER, name);
             return;
         }
@@ -76,14 +76,14 @@ public class ResponseUtil {
         // the existing values, check if the new value is already present and
         // then add it if not. The good news is field names are tokens which
         // makes parsing simpler.
-        Set<String> fieldNames = new HashSet<>();
+        LinkedHashSet<String> fieldNames = new LinkedHashSet<>();
 
         for (String varyHeader : varyHeaders) {
             StringReader input = new StringReader(varyHeader);
             try {
                 TokenList.parseTokenList(input, fieldNames);
-            } catch (IOException ioe) {
-                // Should never happen
+            } catch (IOException ignore) {
+                // Should never happen because a StringReader is used.
             }
         }
 
@@ -97,16 +97,18 @@ public class ResponseUtil {
         // Replace existing header(s) to ensure any invalid values are removed
         fieldNames.add(name);
         StringBuilder varyHeader = new StringBuilder();
-        varyHeader.append(name);
-        for (String fieldName : fieldNames) {
+        Iterator<String> iter = fieldNames.iterator();
+        // There must be at least one value as one is added just above
+        varyHeader.append(iter.next());
+        while (iter.hasNext()) {
             varyHeader.append(',');
-            varyHeader.append(fieldName);
+            varyHeader.append(iter.next());
         }
         adapter.setHeader(VARY_HEADER, varyHeader.toString());
     }
 
 
-    private static interface Adapter {
+    private interface Adapter {
 
         Collection<String> getHeaders(String name);
 
@@ -119,7 +121,7 @@ public class ResponseUtil {
     private static final class HeaderAdapter implements Adapter {
         private final MimeHeaders headers;
 
-        public HeaderAdapter(MimeHeaders headers) {
+        HeaderAdapter(MimeHeaders headers) {
             this.headers = headers;
         }
 
@@ -148,7 +150,7 @@ public class ResponseUtil {
     private static final class ResponseAdapter implements Adapter {
         private final HttpServletResponse response;
 
-        public ResponseAdapter(HttpServletResponse response) {
+        ResponseAdapter(HttpServletResponse response) {
             this.response = response;
         }
 

@@ -17,10 +17,7 @@
 package org.apache.catalina.startup;
 
 /**
- *
  * Used by {@link TomcatBaseTest}
- *
- *
  */
 public interface BytesStreamer {
     /**

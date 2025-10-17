@@ -29,10 +29,6 @@ import org.apache.tomcat.dbcp.dbcp2.BasicDataSourceFactory;
 import org.apache.tomcat.jdbc.pool.PoolConfiguration;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
-
-/**
- * @version 1.0
- */
 public abstract class DefaultTestCase {
 
     protected org.apache.tomcat.jdbc.pool.DataSource datasource;
@@ -96,11 +92,11 @@ public abstract class DefaultTestCase {
                         }
                     }
                 }
-                   if (get!=null) {
-                       Object value = get.invoke(datasource.getPoolProperties(), new Object[0]);
-                       if (value!=null) {
-                           p.setProperty(dbcpProperty, value.toString());
-                       }
+                if (get!=null) {
+                    Object value = get.invoke(datasource.getPoolProperties(), new Object[0]);
+                    if (value!=null) {
+                        p.setProperty(dbcpProperty, value.toString());
+                    }
                 }
             }
             tDatasource = BasicDataSourceFactory.createDataSource(p);
@@ -144,7 +140,7 @@ public abstract class DefaultTestCase {
 //        c3p0.setDriverClass(datasource.getPoolProperties().getDriverClassName());
 //        this.c3p0Datasource = c3p0;
 
-      /**
+      /*
         acquireIncrement
         acquireRetryAttempts
         acquireRetryDelay

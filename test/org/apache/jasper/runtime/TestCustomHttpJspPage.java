@@ -16,7 +16,7 @@
  */
 package org.apache.jasper.runtime;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,12 +30,28 @@ public class TestCustomHttpJspPage extends TomcatBaseTest {
      * Bug 58444
      */
     @Test
-    public void testCustomBasePageWhenUsingTagFiles() throws Exception {
+    public void testCustomBasePageWhenUsingTagFiles01() throws Exception {
         getTomcatInstanceTestWebapp(true, true);
 
         ByteChunk out = new ByteChunk();
 
-        int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug58444.jsp", out, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug58444a.jsp", out, null);
+
+        Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+
+        String result = out.toString();
+
+        Assert.assertTrue(result, result.contains("00-PASS"));
+    }
+
+
+    @Test
+    public void testCustomBasePageWhenUsingTagFiles02() throws Exception {
+        getTomcatInstanceTestWebapp(true, true);
+
+        ByteChunk out = new ByteChunk();
+
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug58444b.jsp", out, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 

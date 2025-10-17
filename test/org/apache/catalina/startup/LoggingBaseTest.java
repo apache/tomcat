@@ -59,6 +59,8 @@ public abstract class LoggingBaseTest {
 
     private List<File> deleteOnTearDown = new ArrayList<>();
 
+    protected boolean ignoreTearDown = false;
+
     /**
      * Provides name of the currently executing test method.
      */
@@ -112,7 +114,8 @@ public abstract class LoggingBaseTest {
         Path tempBasePath = FileSystems.getDefault().getPath(tempBase.getAbsolutePath());
         tempDir = Files.createTempDirectory(tempBasePath, "test").toFile();
 
-        System.setProperty("catalina.base", tempDir.getAbsolutePath());
+        System.setProperty(Constants.CATALINA_BASE_PROP, tempDir.getAbsolutePath());
+        System.setProperty("derby.system.home", tempDir.getAbsolutePath());
 
         // Configure logging
         System.setProperty("java.util.logging.manager",
@@ -121,6 +124,8 @@ public abstract class LoggingBaseTest {
                 new File(System.getProperty("tomcat.test.basedir"),
                         "conf/logging.properties").toString());
 
+        // tempDir contains log files which will be open until JULI shuts down
+        deleteOnClassTearDown.add(tempDir);
     }
 
     @Before
@@ -131,13 +136,17 @@ public abstract class LoggingBaseTest {
 
     @After
     public void tearDown() throws Exception {
+        boolean deleted = true;
         for (File file : deleteOnTearDown) {
-            ExpandWar.delete(file);
+            boolean result = ExpandWar.delete(file);
+            if (!result) {
+                log.info("Failed to delete [" + file.getAbsolutePath() + "]");
+            }
+            deleted = deleted & result;
         }
         deleteOnTearDown.clear();
 
-        // tempDir contains log files which will be open until JULI shuts down
-        deleteOnClassTearDown.add(tempDir);
+        Assert.assertTrue("Failed to delete at least one file", ignoreTearDown || deleted);
     }
 
     @AfterClass

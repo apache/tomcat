@@ -21,29 +21,28 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 
+/*
+ * This is a relative performance test so it remains part of the standard test run.
+ */
 public class TestCharsetCachePerformance {
 
     @Test
-    public void testNoCsCache() throws Exception {
-        doTest(new NoCsCache());
+    public void testCache() throws Exception {
+        long timeNone = doTest(new NoCsCache());
+        long timeFull = doTest(new FullCsCache());
+        long timeLazy = doTest(new LazyCsCache());
+
+        Assert.assertTrue("No cache was faster than full cache", timeFull < timeNone);
+        Assert.assertTrue("No cache was faster than lazy cache", timeLazy < timeNone);
+        // On average full cache is faster than lazy cache but they are close enough the test will fail sometimes
+        //Assert.assertTrue("Lazy cache was faster than full cache ", timeFull < timeLazy);
     }
 
 
-    @Test
-    public void testFullCsCache() throws Exception {
-        doTest(new FullCsCache());
-    }
-
-
-    @Test
-    public void testLazyCsCache() throws Exception {
-        doTest(new LazyCsCache());
-    }
-
-
-    private void doTest(CsCache cache) throws Exception {
+    private long doTest(CsCache cache) throws Exception {
         int threadCount = 10;
         int iterations = 10000000;
         String[] lookupNames = new String[] {
@@ -68,10 +67,12 @@ public class TestCharsetCachePerformance {
         long endTime = System.nanoTime();
 
         System.out.println(cache.getClass().getName() + ": " + (endTime - startTime) + "ns");
+
+        return endTime - startTime;
     }
 
 
-    private static interface CsCache {
+    private interface CsCache {
         Charset getCharset(String charsetName);
     }
 
@@ -124,7 +125,7 @@ public class TestCharsetCachePerformance {
         private final String[] lookupNames;
         private final int lookupNamesCount;
 
-        public TestCsCacheThread(int iterations, CsCache cache, String[] lookupNames) {
+        TestCsCacheThread(int iterations, CsCache cache, String[] lookupNames) {
             this.iterations = iterations;
             this.cache = cache;
             this.lookupNames = lookupNames;

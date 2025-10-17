@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="fhanik@apache.org">Filip Hanik</author>
     <title>The Cluster object</title>
   </properties>
 
@@ -56,6 +55,11 @@ Tomcat cluster. These include:</p>
   <li>a Virtual Private Network (VPN)</li>
   <li>IPSEC</li>
 </ul>
+
+<p>The <a href="cluster-interceptor.html#org.apache.catalina.tribes.group.interceptors.EncryptInterceptor_Attributes">EncryptInterceptor</a>
+provides confidentiality and integrity protection but it does not protect
+against all risks associated with running a Tomcat cluster on an untrusted
+network, particularly DoS attacks.</p>
 
 </section>
 <section name="Engine vs Host placement">
@@ -108,16 +112,6 @@ Tomcat cluster. These include:</p>
   </p>
 </section>
 
-<section name="Deprecated configuration options">
-  <p>
-    <b>Deprecated settings:</b> In the previous version of Tomcat you were able to control session
-       manager settings using manager.&lt;property&gt;=value.
-       This has been discontinued, as the way it was written interferes with
-       the ability to support multiple different manager classes under one cluster implementation,
-       as the same properties might have the different effect on different managers.
-  </p>
-</section>
-
 <section name="Attributes">
   <subsection name="SimpleTcpCluster Attributes">
   <attributes>
@@ -145,6 +139,40 @@ Tomcat cluster. These include:</p>
       to the order in which they were sent.
       </p>
       <p>
+        The various <code>channelSendOptions</code> values offer a tradeoff
+        between throughput on the sending node and the reliability of
+        replication should the sending or receiving node(s) fail. Here are
+        some common options. "Message" could be any message sent between nodes,
+        but only session-change messages are considered, here.
+      </p>
+      <p>
+        <code>channelSendOptions="8"</code> / <code>channelSendOptions="async"</code>
+        As far as the sender is concerned, the message is "sent"
+        as soon as it has been placed in the queue on the sender for
+        transmission to the other nodes. The message may not reach any or all
+        of the recipient nodes and may not be successfully processed on any
+        nodes that it does reach. This option offers the highest throughput on
+        the sender but the least reliability, as the triggering request will
+        complete without any knowledge of the success/failure of the session
+        replication.
+      </p>
+      <p>
+        <code>channelSendOptions="2"</code> / <code>channelSendOptions="use_ack"</code>
+        The sender will block the completion of the current request until all
+        of the receiving nodes have acknowledged that they have received the
+        message, but have not necessarily processed that message. This option
+        will result in lower throughput on the sending node, because the message
+        must be transmitted and the acknowledgement received, but the
+        reliability is greater than the asynchronous model.
+      </p>
+      <p>
+        <code>channelSendOptions="6"</code> / <code>channelSendOptions="sync,use_ack"</code>
+        The sender will block the completion of the current request until
+        all of the receiving nodes have acknowledged that they have received
+        <u>and</u> processed the message. This option will have the lowest
+        throughput (of these three) but the greatest reliability.
+      </p>
+      <p>
       You may also set these options as a comma separated string, e.g. "async, multicast", which
       will be translated into <code>Channel.SEND_OPTIONS_ASYNCHRONOUS | Channel.SEND_OPTIONS_MULTICAST</code>
       <br/>
@@ -161,6 +189,10 @@ Tomcat cluster. These include:</p>
                   Channel.SND_TX_SEQ (2) |
                   Channel.MBR_RX_SEQ (4) |
                   Channel.MBR_TX_SEQ (8);</source>
+      <p>When using the static membership service
+      <code>org.apache.catalina.tribes.membership.StaticMembershipService</code>
+      you must ensure that this attribute is configured to use the default
+      value.</p>
     </attribute>
 
     <attribute name="heartbeatBackgroundEnabled" required="false">

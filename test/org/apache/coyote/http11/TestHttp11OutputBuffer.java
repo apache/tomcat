@@ -16,13 +16,24 @@
  */
 package org.apache.coyote.http11;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.startup.SimpleHttpClient;
+import org.apache.catalina.startup.ExpectationClient;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.util.buf.ByteChunk;
 
 public class TestHttp11OutputBuffer extends TomcatBaseTest {
 
@@ -31,7 +42,7 @@ public class TestHttp11OutputBuffer extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
         ctx.addServletMappingDecoded("/echo", "echo");
@@ -56,34 +67,74 @@ public class TestHttp11OutputBuffer extends TomcatBaseTest {
         Assert.assertTrue(client.isResponseBodyOK());
     }
 
-    private static class ExpectationClient extends SimpleHttpClient {
 
-        private static final String BODY = "foo=bar";
+    @Test
+    public void testHTTPHeaderBelow128() throws Exception {
+        doTestHTTPHeaderValue("This should be OK", true);
+    }
 
-        public void doRequestHeaders() throws Exception {
-            StringBuilder requestHeaders = new StringBuilder();
-            requestHeaders.append("POST /echo HTTP/1.1").append(CRLF);
-            requestHeaders.append("Host: localhost").append(CRLF);
-            requestHeaders.append("Expect: 100-continue").append(CRLF);
-            requestHeaders.append("Content-Type: application/x-www-form-urlencoded").append(CRLF);
-            String len = Integer.toString(BODY.length());
-            requestHeaders.append("Content-length: ").append(len).append(CRLF);
-            requestHeaders.append(CRLF);
 
-            setRequest(new String[] {requestHeaders.toString()});
+    @Test
+    public void testHTTPHeader128To255() throws Exception {
+        doTestHTTPHeaderValue("\u00A0 should be OK", true);
+    }
 
-            processRequest(false);
+
+    @Test
+    public void testHTTPHeaderAbove255() throws Exception {
+        doTestHTTPHeaderValue("\u0100 should fail", false);
+    }
+
+
+    private void doTestHTTPHeaderValue(String customHeaderValue, boolean valid) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        Tomcat.addServlet(ctx, "header", new HeaderServlet(customHeaderValue));
+        ctx.addServletMappingDecoded("/header", "header");
+
+        tomcat.start();
+
+        Map<String, List<String>> resHeaders = new HashMap<>();
+        int rc = getUrl("http://localhost:" + getPort() + "/header", new ByteChunk(), resHeaders);
+
+        if (valid) {
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            List<String> values = resHeaders.get(HeaderServlet.CUSTOM_HEADER_NAME);
+            Assert.assertNotNull(values);
+            Assert.assertEquals(1, values.size());
+            Assert.assertEquals(customHeaderValue, values.get(0));
+        } else {
+            Assert.assertEquals(HttpServletResponse.SC_OK, rc);
+            List<String> values = resHeaders.get(HeaderServlet.CUSTOM_HEADER_NAME);
+            Assert.assertNull(values);
+            Assert.assertEquals(5, resHeaders.size());
         }
+    }
 
-        public void doRequestBody() throws Exception {
-            setRequest(new String[] { BODY });
 
-            processRequest(true);
+    private static class HeaderServlet extends HttpServlet {
+
+        private static final long serialVersionUID = 1L;
+
+        private static final String CUSTOM_HEADER_NAME = "X-Test";
+
+        private final String customHeaderValue;
+
+        HeaderServlet(String customHeaderValue) {
+            this.customHeaderValue = customHeaderValue;
         }
 
         @Override
-        public boolean isResponseBodyOK() {
-            return BODY.equals(getResponseBody());
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            resp.setContentType("text/plain");
+            resp.setCharacterEncoding("UTF-8");
+
+            resp.setHeader(CUSTOM_HEADER_NAME, customHeaderValue);
+
+            resp.flushBuffer();
         }
     }
 }

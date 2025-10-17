@@ -67,8 +67,8 @@ public class TestHttp2InitialConnection extends Http2TestBase {
 
 
     @Override
-    protected void doHttpUpgrade(String connection, String upgrade, String settings,
-            boolean validate) throws IOException {
+    protected void doHttpUpgrade(String connection, String upgrade, String settings, boolean validate)
+            throws IOException {
         StringBuilder request = new StringBuilder();
         request.append("GET /simple HTTP/1.1\r\n");
         for (String hostHeader : testData.getHostHeaders()) {
@@ -98,8 +98,7 @@ public class TestHttp2InitialConnection extends Http2TestBase {
         os.flush();
 
         if (validate) {
-            Assert.assertTrue("Failed to read HTTP Upgrade response",
-                    readHttpUpgradeResponse());
+            Assert.assertTrue("Failed to read HTTP Upgrade response", readHttpUpgradeResponse());
         }
     }
 
@@ -110,42 +109,33 @@ public class TestHttp2InitialConnection extends Http2TestBase {
             return super.getResponseBodyFrameTrace(streamId, body);
         } else if (testData.getExpectedStatus() == 400) {
             /*
-             * Need to be careful here. The test wants the exact content length
-             * in bytes.
-             * This will vary depending on where the test is run due to:
-             * - The length of the version string that appears once in the error
-             *   page
-             * - The status header uses a UTF-8 EN dash. When running in an IDE
-             *   the UTF-8 properties files will be used directly rather than
-             *   after native2ascii conversion.
+             * Need to be careful here. The test wants the exact content length in bytes. This will vary depending on
+             * where the test is run due to: - The length of the version string that appears once in the error page -
+             * The status header uses a UTF-8 EN dash. When running in an IDE the UTF-8 properties files will be used
+             * directly rather than after native2ascii conversion.
              *
              * Note: The status header appears twice in the error page.
              */
             int serverInfoLength = ServerInfo.getServerInfo().getBytes().length;
-            StringManager sm = StringManager.getManager(
-                    ErrorReportValve.class.getPackage().getName(), Locale.ENGLISH);
+            StringManager sm = StringManager.getManager(ErrorReportValve.class.getPackage().getName(), Locale.ENGLISH);
             String reason = sm.getString("http." + testData.getExpectedStatus() + ".reason");
             int descriptionLength = sm.getString("http." + testData.getExpectedStatus() + ".desc")
                     .getBytes(StandardCharsets.UTF_8).length;
             int statusHeaderLength = sm
-                    .getString("errorReportValve.statusHeader",
-                            String.valueOf(testData.getExpectedStatus()), reason)
+                    .getString("errorReportValve.statusHeader", String.valueOf(testData.getExpectedStatus()), reason)
                     .getBytes(StandardCharsets.UTF_8).length;
-            int typeLabelLength = sm.getString("errorReportValve.type")
-                    .getBytes(StandardCharsets.UTF_8).length;
+            int typeLabelLength = sm.getString("errorReportValve.type").getBytes(StandardCharsets.UTF_8).length;
             int statusReportLabelLength = sm.getString("errorReportValve.statusReport")
                     .getBytes(StandardCharsets.UTF_8).length;
             int descriptionLabelLength = sm.getString("errorReportValve.description")
                     .getBytes(StandardCharsets.UTF_8).length;
             // 196 bytes is the static length of the pure HTML code from the ErrorReportValve
-            int len = 196 + org.apache.catalina.util.TomcatCSS.TOMCAT_CSS
-                    .getBytes(StandardCharsets.UTF_8).length +
-                    typeLabelLength + statusReportLabelLength + descriptionLabelLength +
-                    descriptionLength + serverInfoLength + statusHeaderLength * 2;
+            int len = 196 + org.apache.catalina.util.TomcatCSS.TOMCAT_CSS.getBytes(StandardCharsets.UTF_8).length +
+                    typeLabelLength + statusReportLabelLength + descriptionLabelLength + descriptionLength +
+                    serverInfoLength + statusHeaderLength * 2;
             String contentLength = String.valueOf(len);
-            return getResponseBodyFrameTrace(streamId,
-                    testData.getExpectedStatus(), "text/html;charset=utf-8",
-                    "en", contentLength, contentLength);
+            return getResponseBodyFrameTrace(streamId, testData.getExpectedStatus(), "text/html;charset=utf-8", "en",
+                    contentLength, contentLength);
         } else {
             Assert.fail();
             // To keep the IDE happy
@@ -158,7 +148,7 @@ public class TestHttp2InitialConnection extends Http2TestBase {
         private final List<String> hostHeaders;
         private final int expectedStatus;
 
-        public TestData(List<String> hostHeaders, int expectedStatus) {
+        TestData(List<String> hostHeaders, int expectedStatus) {
             this.hostHeaders = hostHeaders;
             this.expectedStatus = expectedStatus;
         }

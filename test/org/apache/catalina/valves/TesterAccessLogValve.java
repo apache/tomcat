@@ -19,8 +19,9 @@ package org.apache.catalina.valves;
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.TimeUnit;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.junit.Assert;
 
@@ -44,8 +45,7 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
 
     @Override
     public void log(Request request, Response response, long time) {
-        entries.add(new Entry(request.getRequestURI(), response.getStatus(),
-                time));
+        entries.add(new Entry(request.getRequestURI(), response.getStatus(), TimeUnit.NANOSECONDS.toMillis(time)));
     }
 
     @Override
@@ -60,8 +60,7 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
     }
 
     @Override
-    public void invoke(Request request, Response response) throws IOException,
-            ServletException {
+    public void invoke(Request request, Response response) throws IOException, ServletException {
         // Just invoke next - access logging happens via log() method
         getNext().invoke(request, response);
     }
@@ -70,8 +69,7 @@ public class TesterAccessLogValve extends ValveBase implements AccessLog {
         return entries.size();
     }
 
-    public void validateAccessLog(int count, int status, long minTime,
-            long maxTime) throws Exception {
+    public void validateAccessLog(int count, int status, long minTime, long maxTime) throws Exception {
 
         // Wait (but not too long) until all expected entries appear (access log
         // entry will be made after response has been returned to user)

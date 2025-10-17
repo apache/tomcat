@@ -25,8 +25,6 @@ import org.apache.coyote.http11.OutputFilter;
 
 /**
  * Identity output filter.
- *
- * @author Remy Maucherat
  */
 public class IdentityOutputFilter implements OutputFilter {
 
@@ -55,7 +53,7 @@ public class IdentityOutputFilter implements OutputFilter {
     @Override
     public int doWrite(ByteBuffer chunk) throws IOException {
 
-        int result = -1;
+        int result;
 
         if (contentLength >= 0) {
             if (remaining > 0) {

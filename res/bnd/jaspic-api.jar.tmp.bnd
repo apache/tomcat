@@ -12,11 +12,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd, spec-defaults.bnd
+
 Bundle-Name: tomcat-jaspic-api
 Bundle-SymbolicName: org.apache.tomcat-jaspic-api
-Bundle-Version: @VERSION@
 Export-Package: \
-    javax.security.auth.message,\
-    javax.security.auth.message.callback,\
-    javax.security.auth.message.config,\
-    javax.security.auth.message.module
+    jakarta.security.auth.message.*;version=${jaspic.spec.version}
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JakartaAuthentication;\
+        version:Version=${jaspic.spec.version};\
+        uses:='${packages;NAMED;jakarta.security.auth.message.*}'
+
+-namesection: jakarta/security/auth/message*/;\
+    Specification-Title=Jakarta Authentication SPI for Containers;\
+    Specification-Version=${jaspic.spec.version};\
+    Specification-Vendor=Eclipse Foundation;\
+    Implementation-Title=jakarta.security.auth.message;\
+    Implementation-Version=${jaspic.spec.version}${jaspic.revision};\
+    Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.security.auth.message;\
+        access=32;\
+        version=${jaspic.spec.version}
+-jpms-module-info-options: \
+    jakarta.security.auth.message;\
+        substitute=jaspic-api

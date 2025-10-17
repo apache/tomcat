@@ -19,6 +19,7 @@ package org.apache.jasper.servlet;
 import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
@@ -107,16 +108,16 @@ public class TestTldScanner extends TomcatBaseTest {
 
         File webappDir = new File("webapps/examples");
         Assert.assertFalse(callback.scanFoundNoTLDs());
-        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-spec-1.2.5.jar");
+        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-spec-1.2.5-migrated-0.0.1.jar");
         Assert.assertTrue(callback.scanFoundNoTLDs());
-        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-impl-1.2.5.jar");
+        scan(callback, webappDir, "WEB-INF/lib/taglibs-standard-impl-1.2.5-migrated-0.0.1.jar");
         Assert.assertTrue(callback.scanFoundNoTLDs());
     }
 
     private static void scan(TldScanner.TldScannerCallback callback, File webapp, String path)
             throws Exception {
         String fullPath = new File(webapp, path).toURI().toString();
-        URL jarUrl = new URL("jar:" + fullPath + "!/");
+        URL jarUrl = URI.create("jar:" + fullPath + "!/").toURL();
         try (Jar jar = JarFactory.newInstance(jarUrl)) {
             callback.scan(jar, path, true);
         }

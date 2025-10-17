@@ -14,24 +14,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.core;
 
 
 import java.util.Enumeration;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletConfig;
+import jakarta.servlet.ServletContext;
 
 
 /**
  * Facade for the <b>StandardWrapper</b> object.
- *
- * @author Remy Maucherat
  */
-public final class StandardWrapperFacade
-    implements ServletConfig {
+public final class StandardWrapperFacade implements ServletConfig {
 
 
     // ----------------------------------------------------------- Constructors
@@ -39,6 +34,7 @@ public final class StandardWrapperFacade
 
     /**
      * Create a new facade around a StandardWrapper.
+     *
      * @param config the associated wrapper
      */
     public StandardWrapperFacade(StandardWrapper config) {
@@ -75,6 +71,10 @@ public final class StandardWrapperFacade
 
     @Override
     public ServletContext getServletContext() {
+        /*
+         * This method may be called concurrently but the same context object will always be returned. There is no
+         * concurrency issue here.
+         */
         if (context == null) {
             context = config.getServletContext();
             if (context instanceof ApplicationContext) {

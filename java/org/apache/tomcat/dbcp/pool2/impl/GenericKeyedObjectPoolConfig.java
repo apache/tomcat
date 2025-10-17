@@ -17,7 +17,7 @@
 package org.apache.tomcat.dbcp.pool2.impl;
 
 /**
- * A simple "struct" encapsulating the configuration for a
+ * A simple structure encapsulating the configuration for a
  * {@link GenericKeyedObjectPool}.
  *
  * <p>
@@ -31,29 +31,32 @@ package org.apache.tomcat.dbcp.pool2.impl;
 public class GenericKeyedObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
 
     /**
-     * The default value for the {@code maxTotalPerKey} configuration attribute.
+     * The default value for the {@code maxTotalPerKey} configuration attribute: {@value}.
+     *
      * @see GenericKeyedObjectPool#getMaxTotalPerKey()
      */
     public static final int DEFAULT_MAX_TOTAL_PER_KEY = 8;
 
     /**
-     * The default value for the {@code maxTotal} configuration attribute.
+     * The default value for the {@code maxTotal} configuration attribute: {@value}.
+     *
      * @see GenericKeyedObjectPool#getMaxTotal()
      */
     public static final int DEFAULT_MAX_TOTAL = -1;
 
     /**
-     * The default value for the {@code minIdlePerKey} configuration attribute.
+     * The default value for the {@code minIdlePerKey} configuration attribute: {@value}.
+     *
      * @see GenericKeyedObjectPool#getMinIdlePerKey()
      */
     public static final int DEFAULT_MIN_IDLE_PER_KEY = 0;
 
     /**
-     * The default value for the {@code maxIdlePerKey} configuration attribute.
+     * The default value for the {@code maxIdlePerKey} configuration attribute: {@value}.
+     *
      * @see GenericKeyedObjectPool#getMaxIdlePerKey()
      */
     public static final int DEFAULT_MAX_IDLE_PER_KEY = 8;
-
 
     private int minIdlePerKey = DEFAULT_MIN_IDLE_PER_KEY;
 
@@ -64,91 +67,23 @@ public class GenericKeyedObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
     private int maxTotal = DEFAULT_MAX_TOTAL;
 
     /**
-     * Create a new configuration with default settings.
+     * Constructs a new configuration with default settings.
      */
     public GenericKeyedObjectPoolConfig() {
     }
 
-    /**
-     * Get the value for the {@code maxTotal} configuration attribute
-     * for pools created with this configuration instance.
-     *
-     * @return  The current setting of {@code maxTotal} for this
-     *          configuration instance
-     *
-     * @see GenericKeyedObjectPool#getMaxTotal()
-     */
-    public int getMaxTotal() {
-        return maxTotal;
+    @SuppressWarnings("unchecked")
+    @Override
+    public GenericKeyedObjectPoolConfig<T> clone() {
+        try {
+            return (GenericKeyedObjectPoolConfig<T>) super.clone();
+        } catch (final CloneNotSupportedException e) {
+            throw new AssertionError(); // Can't happen
+        }
     }
 
     /**
-     * Set the value for the {@code maxTotal} configuration attribute for
-     * pools created with this configuration instance.
-     *
-     * @param maxTotal The new setting of {@code maxTotal}
-     *        for this configuration instance
-     *
-     * @see GenericKeyedObjectPool#setMaxTotal(int)
-     */
-    public void setMaxTotal(final int maxTotal) {
-        this.maxTotal = maxTotal;
-    }
-
-    /**
-     * Get the value for the {@code maxTotalPerKey} configuration attribute
-     * for pools created with this configuration instance.
-     *
-     * @return  The current setting of {@code maxTotalPerKey} for this
-     *          configuration instance
-     *
-     * @see GenericKeyedObjectPool#getMaxTotalPerKey()
-     */
-    public int getMaxTotalPerKey() {
-        return maxTotalPerKey;
-    }
-
-    /**
-     * Set the value for the {@code maxTotalPerKey} configuration attribute for
-     * pools created with this configuration instance.
-     *
-     * @param maxTotalPerKey The new setting of {@code maxTotalPerKey}
-     *        for this configuration instance
-     *
-     * @see GenericKeyedObjectPool#setMaxTotalPerKey(int)
-     */
-    public void setMaxTotalPerKey(final int maxTotalPerKey) {
-        this.maxTotalPerKey = maxTotalPerKey;
-    }
-
-    /**
-     * Get the value for the {@code minIdlePerKey} configuration attribute
-     * for pools created with this configuration instance.
-     *
-     * @return  The current setting of {@code minIdlePerKey} for this
-     *          configuration instance
-     *
-     * @see GenericKeyedObjectPool#getMinIdlePerKey()
-     */
-    public int getMinIdlePerKey() {
-        return minIdlePerKey;
-    }
-
-    /**
-     * Set the value for the {@code minIdlePerKey} configuration attribute for
-     * pools created with this configuration instance.
-     *
-     * @param minIdlePerKey The new setting of {@code minIdlePerKey}
-     *        for this configuration instance
-     *
-     * @see GenericKeyedObjectPool#setMinIdlePerKey(int)
-     */
-    public void setMinIdlePerKey(final int minIdlePerKey) {
-        this.minIdlePerKey = minIdlePerKey;
-    }
-
-    /**
-     * Get the value for the {@code maxIdlePerKey} configuration attribute
+     * Gets the value for the {@code maxIdlePerKey} configuration attribute
      * for pools created with this configuration instance.
      *
      * @return  The current setting of {@code maxIdlePerKey} for this
@@ -161,7 +96,46 @@ public class GenericKeyedObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
     }
 
     /**
-     * Set the value for the {@code maxIdlePerKey} configuration attribute for
+     * Gets the value for the {@code maxTotal} configuration attribute
+     * for pools created with this configuration instance.
+     *
+     * @return  The current setting of {@code maxTotal} for this
+     *          configuration instance
+     *
+     * @see GenericKeyedObjectPool#getMaxTotal()
+     */
+    public int getMaxTotal() {
+        return maxTotal;
+    }
+
+    /**
+     * Gets the value for the {@code maxTotalPerKey} configuration attribute
+     * for pools created with this configuration instance.
+     *
+     * @return  The current setting of {@code maxTotalPerKey} for this
+     *          configuration instance
+     *
+     * @see GenericKeyedObjectPool#getMaxTotalPerKey()
+     */
+    public int getMaxTotalPerKey() {
+        return maxTotalPerKey;
+    }
+
+    /**
+     * Gets the value for the {@code minIdlePerKey} configuration attribute
+     * for pools created with this configuration instance.
+     *
+     * @return  The current setting of {@code minIdlePerKey} for this
+     *          configuration instance
+     *
+     * @see GenericKeyedObjectPool#getMinIdlePerKey()
+     */
+    public int getMinIdlePerKey() {
+        return minIdlePerKey;
+    }
+
+    /**
+     * Sets the value for the {@code maxIdlePerKey} configuration attribute for
      * pools created with this configuration instance.
      *
      * @param maxIdlePerKey The new setting of {@code maxIdlePerKey}
@@ -173,14 +147,43 @@ public class GenericKeyedObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
         this.maxIdlePerKey = maxIdlePerKey;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public GenericKeyedObjectPoolConfig<T> clone() {
-        try {
-            return (GenericKeyedObjectPoolConfig<T>) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            throw new AssertionError(); // Can't happen
-        }
+    /**
+     * Sets the value for the {@code maxTotal} configuration attribute for
+     * pools created with this configuration instance.
+     *
+     * @param maxTotal The new setting of {@code maxTotal}
+     *        for this configuration instance
+     *
+     * @see GenericKeyedObjectPool#setMaxTotal(int)
+     */
+    public void setMaxTotal(final int maxTotal) {
+        this.maxTotal = maxTotal;
+    }
+
+    /**
+     * Sets the value for the {@code maxTotalPerKey} configuration attribute for
+     * pools created with this configuration instance.
+     *
+     * @param maxTotalPerKey The new setting of {@code maxTotalPerKey}
+     *        for this configuration instance
+     *
+     * @see GenericKeyedObjectPool#setMaxTotalPerKey(int)
+     */
+    public void setMaxTotalPerKey(final int maxTotalPerKey) {
+        this.maxTotalPerKey = maxTotalPerKey;
+    }
+
+    /**
+     * Sets the value for the {@code minIdlePerKey} configuration attribute for
+     * pools created with this configuration instance.
+     *
+     * @param minIdlePerKey The new setting of {@code minIdlePerKey}
+     *        for this configuration instance
+     *
+     * @see GenericKeyedObjectPool#setMinIdlePerKey(int)
+     */
+    public void setMinIdlePerKey(final int minIdlePerKey) {
+        this.minIdlePerKey = minIdlePerKey;
     }
 
     @Override

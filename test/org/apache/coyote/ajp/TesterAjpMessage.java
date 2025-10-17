@@ -16,20 +16,22 @@
  */
 package org.apache.coyote.ajp;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Extends {@link AjpMessage} to provide additional methods for reading from the
- * message.
- * TODO: See if it makes sense for any/all of these methods to be transferred to
- *       AjpMessage
+ * Extends {@link AjpMessage} to provide additional methods for reading from the message. TODO: See if it makes sense
+ * for any/all of these methods to be transferred to AjpMessage
  */
 public class TesterAjpMessage extends AjpMessage {
 
     private final List<Header> headers = new ArrayList<>();
     private final List<Attribute> attributes = new ArrayList<>();
+    private transient Charset charset = StandardCharsets.UTF_8;
 
 
     public TesterAjpMessage(int packetSize) {
@@ -41,7 +43,7 @@ public class TesterAjpMessage extends AjpMessage {
     }
 
     public int readInt() {
-        int val = (buf[pos++] & 0xFF ) << 8;
+        int val = (buf[pos++] & 0xFF) << 8;
         val += buf[pos++] & 0xFF;
         return val;
     }
@@ -52,23 +54,19 @@ public class TesterAjpMessage extends AjpMessage {
     }
 
     public String readString(int len) {
-        StringBuilder buffer = new StringBuilder(len);
-
-        for (int i = 0; i < len; i++) {
-            char c = (char) buf[pos++];
-            buffer.append(c);
-        }
+        CharBuffer buf = getCharset().decode(ByteBuffer.wrap(this.buf, pos, len));
+        pos += len;
         // Read end of string marker
         readByte();
 
-        return buffer.toString();
+        return new String(buf.array(), buf.arrayOffset(), buf.length());
     }
 
     public String readHeaderName() {
         byte b = readByte();
         if ((b & 0xFF) == 0xA0) {
             // Coded header
-            return Constants.getResponseHeaderForCode(readByte());
+            return Constants.getResponseHeaderForCode(readByte() - 1);
         } else {
             int len = (b & 0xFF) << 8;
             len += getByte() & 0xFF;
@@ -96,6 +94,13 @@ public class TesterAjpMessage extends AjpMessage {
         attributes.add(new Attribute(name, value));
     }
 
+    public Charset getCharset() {
+        return charset;
+    }
+
+    public void setCharset(Charset charset) {
+        this.charset = charset;
+    }
 
     @Override
     public void end() {
@@ -118,7 +123,7 @@ public class TesterAjpMessage extends AjpMessage {
 
         buf[0] = (byte) 0x12;
         buf[1] = (byte) 0x34;
-        buf[2] = (byte) ((dLen>>>8) & 0xFF);
+        buf[2] = (byte) ((dLen >>> 8) & 0xFF);
         buf[3] = (byte) (dLen & 0xFF);
     }
 
@@ -141,13 +146,13 @@ public class TesterAjpMessage extends AjpMessage {
         private final String name;
         private final String value;
 
-        public Header(int code, String value) {
+        Header(int code, String value) {
             this.code = code;
             this.name = null;
             this.value = value;
         }
 
-        public Header(String name, String value) {
+        Header(String name, String value) {
             this.code = 0;
             this.name = name;
             this.value = value;
@@ -169,13 +174,13 @@ public class TesterAjpMessage extends AjpMessage {
         private final String name;
         private final String value;
 
-        public Attribute(int code, String value) {
+        Attribute(int code, String value) {
             this.code = code;
             this.name = null;
             this.value = value;
         }
 
-        public Attribute(String name, String value) {
+        Attribute(String name, String value) {
             this.code = 0;
             this.name = name;
             this.value = value;

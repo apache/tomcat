@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.sql.SQLException;
@@ -39,7 +38,7 @@ public class SQLExceptionList extends SQLException {
      *
      * @param causeList a list of cause exceptions.
      */
-    public SQLExceptionList(List<? extends Throwable> causeList) {
+    public SQLExceptionList(final List<? extends Throwable> causeList) {
         super(String.format("%,d exceptions: %s", Integer.valueOf(causeList == null ? 0 : causeList.size()), causeList),
                 causeList == null ? null : causeList.get(0));
         this.causeList = causeList;

@@ -14,24 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el.lang;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serial;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.el.ValueExpression;
-import javax.el.VariableMapper;
+import jakarta.el.ValueExpression;
+import jakarta.el.VariableMapper;
 
 public class VariableMapperImpl extends VariableMapper implements Externalizable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private Map<String, ValueExpression> vars = new HashMap<>();
+    private Map<String,ValueExpression> vars = new HashMap<>();
 
     public VariableMapperImpl() {
         super();
@@ -43,8 +44,7 @@ public class VariableMapperImpl extends VariableMapper implements Externalizable
     }
 
     @Override
-    public ValueExpression setVariable(String variable,
-            ValueExpression expression) {
+    public ValueExpression setVariable(String variable, ValueExpression expression) {
         if (expression == null) {
             return vars.remove(variable);
         } else {
@@ -54,9 +54,8 @@ public class VariableMapperImpl extends VariableMapper implements Externalizable
 
     @SuppressWarnings("unchecked")
     @Override
-    public void readExternal(ObjectInput in) throws IOException,
-            ClassNotFoundException {
-        this.vars = (Map<String, ValueExpression>) in.readObject();
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        this.vars = (Map<String,ValueExpression>) in.readObject();
     }
 
     @Override

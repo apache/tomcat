@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="craigmcc@apache.org">Craig R. McClanahan</author>
         <title>Manager App How-To</title>
     </properties>
 
@@ -65,19 +64,22 @@ the following functions:</p>
     directory (unless it was deployed from file system).</li>
 </ul>
 
-<p>A default Tomcat installation includes the Manager. To add an instance of the
-Manager web application <code>Context</code> to a new host install the
-<code>manager.xml</code> context configuration file in the
+<p>A default Tomcat installation includes an instance of the Manager application
+configured for the default virtual host. If you create additional virtual hosts,
+you may wish to add an instance of the Manager application to one or more of
+those Hosts. To add an instance of the Manager web application
+<code>Context</code> to a new host install the <code>manager.xml</code> context
+configuration file in the
 <code>$CATALINA_BASE/conf/[enginename]/[hostname]</code> folder. Here is an
 example:</p>
 <source><![CDATA[<Context privileged="true" antiResourceLocking="false"
          docBase="${catalina.home}/webapps/manager">
-  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         allow="127\.0\.0\.1" />
+  <CookieProcessor className="org.apache.tomcat.util.http.Rfc6265CookieProcessor"
+                   sameSiteCookies="strict" />
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         allow="127.0.0.0/8,::1/128" />
+  <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
 </Context>]]></source>
-
-<p>If you have Tomcat configured to support multiple virtual hosts
-(websites) you would need to configure a Manager for each.</p>
 
 <p>There are three ways to use the <strong>Manager</strong> web application.</p>
 <ul>
@@ -152,7 +154,7 @@ To maintain the CSRF protection:</p>
 </ul>
 
 <p><strong>Note</strong> that JMX proxy interface is effectively low-level root-like
-administrative interface of Tomcat. One can do a lot, if he knows
+administrative interface of Tomcat. One can do a lot, if one knows
 what commands to call. You should be cautious when enabling the
 <strong>manager-jmx</strong> role.</p>
 
@@ -177,11 +179,11 @@ Exactly how the usernames/passwords are configured depends on which
     look something like this:
 <source><![CDATA[<user username="craigmcc" password="secret" roles="standard,manager-script" />]]></source>
     which defines the username and password used by this individual to
-    log on, and the role names he or she is associated with.  You can
+    log on, and the role names they are associated with.  You can
     add the <strong>manager-script</strong> role to the comma-delimited
     <code>roles</code> attribute for one or more existing users, and/or
     create new users with that assigned role.</li>
-<li><em>DataSourceRealm</em> or <em>JDBCRealm</em>
+<li><em>DataSourceRealm</em>
     &#8212; Your user and role information is stored in
     a database accessed via JDBC.  Add the <strong>manager-script</strong> role
     to one or more existing users, and/or create one or more new users
@@ -202,13 +204,13 @@ the role <strong>manager-script</strong>.</p>
 
 <p>In addition to the password restrictions, access to the Manager web
 application can be restricted by the <strong>remote IP address</strong> or host
-by adding a <code>RemoteAddrValve</code> or <code>RemoteHostValve</code>.
+by adding a <code>RemoteCIDRValve</code> or <code>RemoteHostValve</code>.
 See <a href="config/valve.html#Remote_Address_Filter">valves documentation</a>
 for details. Here is
 an example of restricting access to the localhost by IP address:</p>
 <source><![CDATA[<Context privileged="true">
-         <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-                allow="127\.0\.0\.1"/>
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         allow="127.0.0.0/8,::1/128" />
 </Context>]]></source>
 
 </section>
@@ -233,6 +235,25 @@ stored in your session and is included in all links on the page. If your next
 action does not have correct value of the token, the action will be denied.
 If the token has expired you can start again from the main page or
 <em>List Applications</em> page of Manager.</p>
+
+<p>To customize the subtitle of the HTML interface of the Manager web application,
+you can add any valid xml escaped html code to the <code>htmlSubTitle</code>
+initialisation parameter of the <code>HTMLManagerServlet</code>
+</p>
+
+<source><![CDATA[<servlet>
+  <servlet-name>HTMLManager</servlet-name>
+  <servlet-class>org.apache.catalina.manager.HTMLManagerServlet</servlet-class>
+  <init-param>
+    <param-name>htmlSubTitle</param-name>
+    <param-value>Company Inc.&lt;br&gt;&lt;i style=&apos;color:red&apos;&gt;Staging&lt;/i&gt;</param-value>
+  </init-param>
+  ...
+</servlet>]]></source>
+
+<p>The above string value would unescape and be appended to the title</p>
+
+<source><![CDATA[Company Inc.<br><i style='color:red'>Staging</i>]]></source>
 
 </section>
 
@@ -870,8 +891,7 @@ has been reloaded several times, it may be listed several times.</p>
 <source>http://localhost:8080/manager/text/sslConnectorCiphers</source>
 
 <p>The SSL Connector/Ciphers diagnostic lists the SSL/TLS ciphers that are currently
-configured for each connector. For NIO and NIO2, the names of the individual
-cipher suites are listed. For APR, the value of SSLCipherSuite is returned.</p>
+configured for each connector.</p>
 
 <p>The response will look something like this:</p>
 <source>OK - Connector / SSL Cipher information
@@ -918,8 +938,6 @@ currently configured for each virtual host.</p>
 <source>OK - Connector / Trusted Certificate information
 Connector[HTTP/1.1-8080]
 SSL is not enabled for this connector
-Connector[AJP/1.3-8009]
-SSL is not enabled for this connector
 Connector[HTTP/1.1-8443]-_default_
 [
 [
@@ -961,8 +979,8 @@ Full thread dump Java HotSpot(TM) Client VM (25.25-b02 mixed mode):
         at org.apache.tomcat.util.Diagnostics.getThreadDump(Diagnostics.java:409)
         at org.apache.catalina.manager.ManagerServlet.threadDump(ManagerServlet.java:557)
         at org.apache.catalina.manager.ManagerServlet.doGet(ManagerServlet.java:371)
-        at javax.servlet.http.HttpServlet.service(HttpServlet.java:618)
-        at javax.servlet.http.HttpServlet.service(HttpServlet.java:725)
+        at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:618)
+        at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:725)
 ...
 ]]></source>
 
@@ -1024,17 +1042,27 @@ href="config/listeners.html#StoreConfig_Lifecycle_Listener_-_org.apache.catalina
 <section name="Server Status">
 
 <p>From the following links you can view Status information about the server.
-Any one of <strong>manager-xxx</strong> roles allows access to this page.</p>
+The <code>manager-status</code> role or any one of the other
+<strong>manager-xxx</strong> roles allow access to this page.</p>
 
 <source>http://localhost:8080/manager/status
 http://localhost:8080/manager/status/all</source>
 
 <p>Displays server status information in HTML format.</p>
 
-<source>http://localhost:8080/manager/status?XML=true
-http://localhost:8080/manager/status/all?XML=true</source>
+<source>http://localhost:8080/manager/status?XML=true</source>
 
-<p>Displays server status information in XML format.</p>
+<p>Displays server status information in XML format. The XML format does
+not include the detailed per web application statistics.</p>
+
+<source>http://localhost:8080/manager/status?JSON=true
+http://localhost:8080/manager/status/all?JSON=true</source>
+
+<p>Displays server status information in JSON format. The JSON format does
+not include the per thread state information. If using a client visualization
+tool for active monitoring and server status alerts (such as Grafana), the JSON
+output provided by the Manager will likely provide the easiest and most secure
+solution.</p>
 
 <p>First, you have the server and JVM version number, JVM provider, OS name
 and number followed by the architecture type.</p>
@@ -1049,8 +1077,9 @@ The same information is available for both of them :
     current thread count and current thread busy.</p></li>
     <li><p>Request information : Max processing time and processing time,
     request and error count, bytes received and sent.</p></li>
-    <li><p>A table showing Stage, Time, Bytes Sent, Bytes Receive, Client,
-    VHost and Request. All existing threads are listed in the table.
+    <li><p>If not using the JSON format, the state of threads with Stage,
+    Time, Bytes Sent, Bytes Receive, Client, VHost and Request.
+    All existing threads are listed in the table.
     Here is the list of the possible thread stages :</p>
     <ul>
         <li><p><em>"Parse and Prepare Request"</em> : The request headers are
@@ -1077,7 +1106,8 @@ The same information is available for both of them :
 </ul>
 
 <p>If you are using <code>/status/all</code> command, additional information
-on each of deployed web applications will be available.</p>
+on each of deployed web applications will be available, except for the XML
+format.</p>
 
 </section>
 
@@ -1127,7 +1157,7 @@ on each of deployed web applications will be available.</p>
 
   <subsection name="JMX Get command">
   <p>
-    The JXMProxyServlet also supports a "get" command that you can use to
+    The JMXProxyServlet also supports a "get" command that you can use to
     fetch the value of a specific MBean's attribute. The general form of
     the <code>get</code> command is:
   </p>

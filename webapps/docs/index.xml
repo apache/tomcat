@@ -23,9 +23,6 @@
   &project;
 
   <properties>
-    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
-    <author email="remm@apache.org">Remy Maucherat</author>
-    <author email="yoavs@apache.org">Yoav Shapira</author>
     <title>Documentation Index</title>
   </properties>
 
@@ -35,9 +32,9 @@
 
 <p>This is the top-level entry point of the documentation bundle for the
 <strong>Apache Tomcat</strong> Servlet/JSP container.  Apache Tomcat version
-<version-major-minor/> implements the Servlet 4.0 and JavaServer Pages 2.3
-<a href="https://wiki.apache.org/tomcat/Specifications">specifications</a> from the
-<a href="https://www.jcp.org">Java Community Process</a>, and includes many
+<version-major-minor/> implements the Servlet 6.0 and Pages 4.0
+<a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">specifications</a> from
+<a href="https://jakarta.ee/">Jakarta EE</a>, and includes many
 additional features that make it a useful platform for developing and deploying
 web applications and web services.</p>
 
@@ -77,10 +74,6 @@ Apache Tomcat, and using many of the Apache Tomcat features.</p>
     - Description of how to configure <em>Realms</em> (databases of users,
     passwords, and their associated roles) for use in web applications that
     utilize <em>Container Managed Security</em>.</li>
-<li><a href="security-manager-howto.html"><strong>Security Manager</strong></a>
-    - Configuring and using a Java Security Manager to
-    support fine-grained control over the behavior of your web applications.
-    </li>
 <li><a href="jndi-resources-howto.html"><strong>JNDI Resources</strong></a>
     - Configuring standard and custom resources in the JNDI naming context
     that is provided to each web application.</li>
@@ -119,14 +112,11 @@ Apache Tomcat, and using many of the Apache Tomcat features.</p>
 <li><a href="logging.html"><strong>Logging</strong></a> -
     Configuring logging in Apache Tomcat.</li>
 <li><a href="apr.html"><strong>Apache Portable Runtime</strong></a> -
-    Using APR to provide superior performance, scalability and better
-    integration with native server technologies.</li>
+    Using APR to provide access to OpenSSL for TLS support.</li>
 <li><a href="virtual-hosting-howto.html"><strong>Virtual Hosting</strong></a> -
     Configuring virtual hosting in Apache Tomcat.</li>
 <li><a href="aio.html"><strong>Advanced IO</strong></a> -
     Extensions available over regular, blocking IO.</li>
-<li><a href="extras.html"><strong>Additional Components</strong></a> -
-    Obtaining additional, optional components.</li>
 <li><a href="maven-jars.html"><strong>Using Tomcat libraries with Maven</strong></a> -
     Obtaining Tomcat jars through Maven.</li>
 <li><a href="security-howto.html"><strong>Security Considerations</strong></a> -
@@ -143,6 +133,8 @@ Apache Tomcat, and using many of the Apache Tomcat features.</p>
     Using the regexp based rewrite valve for conditional URL and host rewrite.</li>
 <li><a href="cdi.html"><strong>CDI and JAX-RS support</strong></a> -
     Configuring CDI,JAX-RS and Eclipse Microprofile support.</li>
+<li><a href="graal.html"><strong>AOT compilation support</strong></a> -
+    Ahead of Time compilation support with GraalVM/Native Image.</li>
 </ol>
 
 </section>
@@ -165,34 +157,34 @@ are responsible for installing, configuring, and operating an Apache Tomcat serv
     - Complete documentation and HOWTOs on the JK native webserver connector,
       used to interface Apache Tomcat with servers like Apache HTTPd, IIS
       and others.</li>
-<li>Servlet 4.0
-    <a href="https://jcp.org/aboutJava/communityprocess/final/jsr369/index.html">
+<li>Servlet 6.0
+    <a href="https://jakarta.ee/specifications/servlet/6.0/">
     <strong>Specification</strong></a> and
-    <a href="https://javaee.github.io/javaee-spec/javadocs/javax/servlet/package-summary.html">
+    <a href="https://jakarta.ee/specifications/servlet/6.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>JSP 2.3
-    <a href="https://jcp.org/aboutJava/communityprocess/mrel/jsr245/index2.html">
+<li>JSP 4.0
+    <a href="https://jakarta.ee/specifications/pages/4.0/">
     <strong>Specification</strong></a> and
-    <a href="http://docs.oracle.com/javaee/7/api/javax/servlet/jsp/package-summary.html">
+    <a href="https://jakarta.ee/specifications/pages/4.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>EL 3.0
-    <a href="https://jcp.org/aboutJava/communityprocess/final/jsr341/index.html">
+<li>EL 6.0
+    <a href="https://jakarta.ee/specifications/expression-language/6.0/">
     <strong>Specification</strong></a> and
-    <a href="http://docs.oracle.com/javaee/7/api/javax/el/package-summary.html">
+    <a href="https://jakarta.ee/specifications/expression-language/6.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>WebSocket 1.1
-    <a href="https://jcp.org/aboutJava/communityprocess/mrel/jsr356/index.html">
+<li>WebSocket 2.1
+    <a href="https://jakarta.ee/specifications/websocket/2.1/">
     <strong>Specification</strong></a> and
-    <a href="http://docs.oracle.com/javaee/7/api/javax/websocket/package-summary.html">
+    <a href="https://jakarta.ee/specifications/websocket/2.1/apidocs">
     <strong>Javadoc</strong></a>
     </li>
-<li>JASPIC 1.1
-    <a href="https://jcp.org/aboutJava/communityprocess/mrel/jsr196/index.html">
+<li>Authentication 2.0
+    <a href="https://jakarta.ee/specifications/authentication/2.0/">
     <strong>Specification</strong></a> and
-    <a href="http://docs.oracle.com/javaee/7/api/javax/security/auth/message/package-summary.html">
+    <a href="https://jakarta.ee/specifications/authentication/2.0/apidocs">
     <strong>Javadoc</strong></a>
     </li>
 </ul>
@@ -213,15 +205,12 @@ the development of the <em>Apache Tomcat</em> project.</p>
 <li><a href="changelog.html"><strong>Changelog</strong></a> - Details the
     changes made to Apache Tomcat.
     </li>
-<li><a href="https://wiki.apache.org/tomcat/TomcatVersions"><strong>Status</strong></a> -
+<li><a href="https://cwiki.apache.org/confluence/display/TOMCAT/Tomcat+Versions"><strong>Status</strong></a> -
     Apache Tomcat development status.
     </li>
 <li><a href="developers.html"><strong>Developers</strong></a> - List of active
     Apache Tomcat contributors.
     </li>
-<li><a href="funcspecs/index.html"><strong>Functional Specifications</strong></a>
-    - Requirements specifications for features of the <em>Catalina</em> servlet
-    container portion of Apache Tomcat.</li>
 <li><a href="api/index.html"><strong>Javadocs</strong></a>
     - Javadoc API documentation for Apache Tomcat's internals.</li>
 <li><a href="architecture/index.html"><strong>Apache Tomcat Architecture</strong></a>

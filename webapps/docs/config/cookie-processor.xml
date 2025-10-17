@@ -35,9 +35,9 @@
 <section name="Introduction">
 
   <p>The <strong>CookieProcessor</strong> element represents the component that
-  parses received cookie headers into <code>javax.servlet.http.Cookie</code>
+  parses received cookie headers into <code>jakarta.servlet.http.Cookie</code>
   objects accessible through <code>HttpServletRequest.getCookies()</code> and
-  converts <code>javax.servlet.http.Cookie</code> objects added to the response
+  converts <code>jakarta.servlet.http.Cookie</code> objects added to the response
   through <code>HttpServletResponse.addCookie()</code> to the HTTP headers
   returned to the client.</p>
 
@@ -99,79 +99,20 @@
 
     <attributes>
 
-      <attribute name="sameSiteCookies" required="false">
-        <p>Enables setting same-site cookie attribute.</p>
-
-        <p>If value is <code>unset</code> then the same-site cookie attribute
-        won't be set. This is the default value.</p>
-
-        <p>If value is <code>none</code> then the same-site cookie attribute
-        will be set and the cookie will always be sent in cross-site requests.</p>
-
-        <p>If value is <code>lax</code> then the browser only sends the cookie
-        in same-site requests and cross-site top level GET requests.</p>
-
-        <p>If value is <code>strict</code> then the browser prevents sending the
-        cookie in any cross-site request.</p>
+      <attribute name="cookiesWithoutEquals" required="false">
+        <p>Determines how a cookie received from a user agent should be
+        interpreted when the name value pair does not contain an equals sign.
+        The default value is <code>ignore</code> which means the cookie will be
+        ignored. The other option is <code>name</code> which means that the
+        cookie will be treated as a cookie with a name but no value. In Tomcat
+        11 and earlier the default was <code>name</code>.</p>
       </attribute>
 
-    </attributes>
-
-  </subsection>
-
-  <subsection name="Legacy Cookie Processor - org.apache.tomcat.util.http.LegacyCookieProcessor">
-
-    <p>This is the legacy  cookie parser based on RFC6265, RFC2109 and RFC2616.
-    It implements a strict interpretation of the cookie specifications. Due to
-    various interoperability issues with browsers not all strict behaviours
-    are enabled by default and additional options are available to further
-    relax the behaviour of this cookie processor if required.</p>
-
-    <attributes>
-
-      <attribute name="allowEqualsInValue" required="false">
-        <p>If this is <code>true</code> Tomcat will allow '<code>=</code>'
-        characters when parsing unquoted cookie values. If <code>false</code>,
-        cookie values containing '<code>=</code>' will be terminated when the
-        '<code>=</code>' is encountered and the remainder of the cookie value
-        will be dropped.</p>
-        <p>If not set the specification compliant default value of
-        <code>false</code> will be used.</p>
-      </attribute>
-
-      <attribute name="allowHttpSepsInV0" required="false">
-        <p>If this is <code>true</code> Tomcat will allow HTTP separators in
-        cookie names and values.</p>
-        <p>If not specified, the default specification compliant value of
-        <code>false</code> will be used.</p>
-      </attribute>
-
-      <attribute name="allowNameOnly" required="false">
-        <p>If this is <code>true</code> Tomcat will allow name only cookies
-        (with or without trailing '<code>=</code>') when parsing cookie headers.
-        If <code>false</code>, name only cookies will be dropped.</p>
-        <p>If not set the specification compliant default value of
-        <code>false</code> will be used.</p>
-      </attribute>
-
-      <attribute name="alwaysAddExpires" required="false">
-        <p>If this is <code>true</code> Tomcat will always add an expires
-        parameter to a SetCookie header even for cookies with version greater
-        than zero. This is to work around a known IE6 and IE7 bug that causes I
-        to ignore the Max-Age parameter in a SetCookie header.</p>
-        <p>If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code> is set
-        to <code>true</code>, the default of this setting will be
-        <code>false</code>, else the default value will be <code>true</code>.
-        </p>
-      </attribute>
-
-      <attribute name="forwardSlashIsSeparator" required="false">
-        <p>If this is <code>true</code> Tomcat will treat the forward slash
-        character ('<code>/</code>') as an HTTP separator when processing cookie
-        headers. If <code>org.apache.catalina.STRICT_SERVLET_COMPLIANCE</code>
-        is set to <code>true</code>, the default of this setting will be
-        <code>true</code>, else the default value will be <code>false</code>.
-        </p>
+      <attribute name="partitioned" required="false">
+       <p>Should the Partitioned flag be set on cookies? Defaults to <code>false</code>.</p>
+       <p>Note: The name of the attribute used to indicate a partitioned cookie as part of
+       <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+       may change in a non-backwards compatible way once equivalent functionality is included in an RFC.</p>
       </attribute>
 
       <attribute name="sameSiteCookies" required="false">

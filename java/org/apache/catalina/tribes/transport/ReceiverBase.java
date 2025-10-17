@@ -53,19 +53,19 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private MessageListener listener;
     private String host = "auto";
     private InetAddress bind;
-    private int port  = 4000;
+    private int port = 4000;
     private int udpPort = -1;
     private int securePort = -1;
-    private int rxBufSize = 43800;
-    private int txBufSize = 25188;
-    private int udpRxBufSize = 43800;
-    private int udpTxBufSize = 25188;
+    private int rxBufSize = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
+    private int txBufSize = Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE;
+    private int udpRxBufSize = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
+    private int udpTxBufSize = Constants.DEFAULT_CLUSTER_ACK_BUFFER_SIZE;
 
     private volatile boolean listen = false;
     private RxTaskPool pool;
     private boolean direct = true;
     private long tcpSelectorTimeout = 5000;
-    //how many times to search for an available socket
+    // how many times to search for an available socket
     private int autoBind = 100;
     private int maxThreads = 15;
     private int minThreads = 6;
@@ -78,7 +78,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     private boolean soLingerOn = true;
     private int soLingerTime = 3;
     private int soTrafficClass = 0x04 | 0x08 | 0x010;
-    private int timeout = 3000; //3 seconds
+    private int timeout = 3000; // 3 seconds
     private boolean useBufferPool = true;
     private boolean daemon = true;
     private long maxIdleTime = 60000;
@@ -96,44 +96,42 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     @Override
     public void start() throws IOException {
-        if ( executor == null ) {
-            //executor = new ThreadPoolExecutor(minThreads,maxThreads,60,TimeUnit.SECONDS,new LinkedBlockingQueue<Runnable>());
+        if (executor == null) {
             String channelName = "";
-            if (channel.getName() != null) channelName = "[" + channel.getName() + "]";
+            if (channel.getName() != null) {
+                channelName = "[" + channel.getName() + "]";
+            }
             TaskThreadFactory tf = new TaskThreadFactory("Tribes-Task-Receiver" + channelName + "-");
             executor = ExecutorFactory.newThreadPool(minThreads, maxThreads, maxIdleTime, TimeUnit.MILLISECONDS, tf);
         }
         // register jmx
         JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
-        if (jmxRegistry != null) this.oname = jmxRegistry.registerJmx(",component=Receiver", this);
+        if (jmxRegistry != null) {
+            this.oname = jmxRegistry.registerJmx(",component=Receiver", this);
+        }
     }
 
     @Override
     public void stop() {
-        if ( executor != null ) executor.shutdownNow();//ignore left overs
+        if (executor != null) {
+            executor.shutdownNow();// ignore left overs
+        }
         executor = null;
         if (oname != null) {
             JmxRegistry jmxRegistry = JmxRegistry.getRegistry(channel);
-            if (jmxRegistry != null) jmxRegistry.unregisterJmx(oname);
+            if (jmxRegistry != null) {
+                jmxRegistry.unregisterJmx(oname);
+            }
             oname = null;
         }
         channel = null;
     }
 
-    /**
-     * getMessageListener
-     *
-     * @return MessageListener
-     */
     @Override
     public MessageListener getMessageListener() {
         return listener;
     }
 
-    /**
-     *
-     * @return The port
-     */
     @Override
     public int getPort() {
         return port;
@@ -147,11 +145,6 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         return txBufSize;
     }
 
-    /**
-     * setMessageListener
-     *
-     * @param listener MessageListener
-     */
     @Override
     public void setMessageListener(MessageListener listener) {
         this.listener = listener;
@@ -172,11 +165,12 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         if (bind == null) {
             try {
                 if ("auto".equals(host)) {
-                    host = java.net.InetAddress.getLocalHost().getHostAddress();
+                    host = InetAddress.getLocalHost().getHostAddress();
                 }
-                if (log.isDebugEnabled())
-                    log.debug("Starting replication listener on address:"+ host);
-                bind = java.net.InetAddress.getByName(host);
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("receiverBase.start", host));
+                }
+                bind = InetAddress.getByName(host);
             } catch (IOException ioe) {
                 log.error(sm.getString("receiverBase.bind.failed", host), ioe);
             }
@@ -185,14 +179,14 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     }
 
     /**
-     * Attempts to bind using the provided port and if that fails attempts to
-     * bind to each of the ports from portstart to (portstart + retries -1)
-     * until either there are no more ports or the bind is successful. The
-     * address to bind to is obtained via a call to {link {@link #getBind()}.
-     * @param socket        The socket to bind
-     * @param portstart     Starting port for bind attempts
-     * @param retries       Number of times to attempt to bind (port incremented
-     *                      between attempts)
+     * Attempts to bind using the provided port and if that fails attempts to bind to each of the ports from portstart
+     * to (portstart + retries -1) until either there are no more ports or the bind is successful. The address to bind
+     * to is obtained via a call to {@link #getBind()}.
+     *
+     * @param socket    The socket to bind
+     * @param portstart Starting port for bind attempts
+     * @param retries   Number of times to attempt to bind (port incremented between attempts)
+     *
      * @throws IOException Socket bind error
      */
     protected void bind(ServerSocket socket, int portstart, int retries) throws IOException {
@@ -206,11 +200,11 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                     setPort(port);
                     log.info(sm.getString("receiverBase.socket.bind", addr));
                     retries = 0;
-                } catch ( IOException x) {
+                } catch (IOException ioe) {
                     retries--;
-                    if ( retries <= 0 ) {
+                    if (retries <= 0) {
                         log.info(sm.getString("receiverBase.unable.bind", addr));
-                        throw x;
+                        throw ioe;
                     }
                     port++;
                 }
@@ -220,27 +214,29 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     /**
      * Same as bind() except it does it for the UDP port
+     *
      * @param socket    The socket to bind
      * @param portstart Starting port for bind attempts
-     * @param retries   Number of times to attempt to bind (port incremented
-     *                  between attempts)
+     * @param retries   Number of times to attempt to bind (port incremented between attempts)
+     *
      * @return int The retry count
+     *
      * @throws IOException Socket bind error
      */
     protected int bindUdp(DatagramSocket socket, int portstart, int retries) throws IOException {
         InetSocketAddress addr = null;
-        while ( retries > 0 ) {
+        while (retries > 0) {
             try {
                 addr = new InetSocketAddress(getBind(), portstart);
                 socket.bind(addr);
                 setUdpPort(portstart);
                 log.info(sm.getString("receiverBase.udp.bind", addr));
                 return 0;
-            }catch ( IOException x) {
+            } catch (IOException ioe) {
                 retries--;
-                if ( retries <= 0 ) {
+                if (retries <= 0) {
                     log.info(sm.getString("receiverBase.unable.bind.udp", addr));
-                    throw x;
+                    throw ioe;
                 }
                 portstart++;
                 try {
@@ -248,7 +244,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
                 } catch (InterruptedException ti) {
                     Thread.currentThread().interrupt();
                 }
-                retries = bindUdp(socket,portstart,retries);
+                retries = bindUdp(socket, portstart, retries);
             }
         }
         return retries;
@@ -257,14 +253,18 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     @Override
     public void messageDataReceived(ChannelMessage data) {
-        if ( this.listener != null ) {
-            if ( listener.accept(data) ) listener.messageReceived(data);
+        if (this.listener != null) {
+            if (listener.accept(data)) {
+                listener.messageReceived(data);
+            }
         }
     }
 
     public int getWorkerThreadOptions() {
         int options = 0;
-        if ( getDirect() ) options = options | OPTION_DIRECT_BUFFER;
+        if (getDirect()) {
+            options = options | OPTION_DIRECT_BUFFER;
+        }
         return options;
     }
 
@@ -272,14 +272,13 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     /**
      * @param bind The bind to set.
      */
-    public void setBind(java.net.InetAddress bind) {
+    public void setBind(InetAddress bind) {
         this.bind = bind;
     }
 
     public boolean getDirect() {
         return direct;
     }
-
 
 
     public void setDirect(boolean direct) {
@@ -395,6 +394,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     public void setAddress(String host) {
         this.host = host;
     }
+
     public void setHost(String host) {
         setAddress(host);
     }
@@ -413,7 +413,9 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     public void setAutoBind(int autoBind) {
         this.autoBind = autoBind;
-        if ( this.autoBind <= 0 ) this.autoBind = 1;
+        if (this.autoBind <= 0) {
+            this.autoBind = 1;
+        }
     }
 
     public void setMaxThreads(int maxThreads) {
@@ -479,7 +481,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     @Override
     public void heartbeat() {
-        //empty operation
+        // empty operation
     }
 
     @Override
@@ -520,6 +522,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
     // ---------------------------------------------- stats of the thread pool
     /**
      * Return the current number of threads that are managed by the pool.
+     *
      * @return the current number of threads that are managed by the pool
      */
     public int getPoolSize() {
@@ -532,6 +535,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     /**
      * Return the current number of threads that are in use.
+     *
      * @return the current number of threads that are in use
      */
     public int getActiveCount() {
@@ -544,6 +548,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     /**
      * Return the total number of tasks that have ever been scheduled for execution by the pool.
+     *
      * @return the total number of tasks that have ever been scheduled for execution by the pool
      */
     public long getTaskCount() {
@@ -556,6 +561,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
 
     /**
      * Return the total number of tasks that have completed execution by the pool.
+     *
      * @return the total number of tasks that have completed execution by the pool
      */
     public long getCompletedTaskCount() {
@@ -573,8 +579,7 @@ public abstract class ReceiverBase implements ChannelReceiver, ListenCallback, R
         final String namePrefix;
 
         TaskThreadFactory(String namePrefix) {
-            SecurityManager s = System.getSecurityManager();
-            group = (s != null) ? s.getThreadGroup() : Thread.currentThread().getThreadGroup();
+            group = Thread.currentThread().getThreadGroup();
             this.namePrefix = namePrefix;
         }
 

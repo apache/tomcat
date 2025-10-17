@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.threads;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -27,8 +28,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Class which wraps a ScheduledExecutorService, while preventing
- * lifecycle and configuration operations.
+ * Class which wraps a ScheduledExecutorService, while preventing lifecycle and configuration operations.
  */
 public class ScheduledThreadPoolExecutor implements ScheduledExecutorService {
 
@@ -36,6 +36,7 @@ public class ScheduledThreadPoolExecutor implements ScheduledExecutorService {
 
     /**
      * Builds a wrapper for the given executor.
+     *
      * @param executor the wrapped executor
      */
     public ScheduledThreadPoolExecutor(ScheduledExecutorService executor) {
@@ -50,7 +51,7 @@ public class ScheduledThreadPoolExecutor implements ScheduledExecutorService {
 
     @Override
     public List<Runnable> shutdownNow() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
@@ -64,8 +65,7 @@ public class ScheduledThreadPoolExecutor implements ScheduledExecutorService {
     }
 
     @Override
-    public boolean awaitTermination(long timeout, TimeUnit unit)
-            throws InterruptedException {
+    public boolean awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
         return executor.awaitTermination(timeout, unit);
     }
 
@@ -85,26 +85,23 @@ public class ScheduledThreadPoolExecutor implements ScheduledExecutorService {
     }
 
     @Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
-            throws InterruptedException {
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks) throws InterruptedException {
         return executor.invokeAll(tasks);
     }
 
     @Override
-    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout,
-            TimeUnit unit) throws InterruptedException {
+    public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+            throws InterruptedException {
         return executor.invokeAll(tasks, timeout, unit);
     }
 
     @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks)
-            throws InterruptedException, ExecutionException {
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks) throws InterruptedException, ExecutionException {
         return executor.invokeAny(tasks);
     }
 
     @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks,
-            long timeout, TimeUnit unit)
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
             throws InterruptedException, ExecutionException, TimeoutException {
         return executor.invokeAny(tasks, timeout, unit);
     }
@@ -115,26 +112,22 @@ public class ScheduledThreadPoolExecutor implements ScheduledExecutorService {
     }
 
     @Override
-    public ScheduledFuture<?> schedule(Runnable command, long delay,
-            TimeUnit unit) {
+    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
         return executor.schedule(command, delay, unit);
     }
 
     @Override
-    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay,
-            TimeUnit unit) {
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
         return executor.schedule(callable, delay, unit);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command,
-            long initialDelay, long period, TimeUnit unit) {
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
         return executor.scheduleAtFixedRate(command, initialDelay, period, unit);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,
-            long initialDelay, long delay, TimeUnit unit) {
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
         return executor.scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
 

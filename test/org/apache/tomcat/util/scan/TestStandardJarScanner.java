@@ -19,66 +19,20 @@ package org.apache.tomcat.util.scan;
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.tomcat.Jar;
 import org.apache.tomcat.JarScanType;
 import org.apache.tomcat.JarScannerCallback;
 import org.apache.tomcat.unittest.TesterServletContext;
-import org.apache.tomcat.util.compat.JreCompat;
 
 public class TestStandardJarScanner {
-
-    @Test
-    public void testWebappClassPath() {
-        Assume.assumeFalse("No URLClassLoader with Java 9", JreCompat.isJre9Available());
-
-        StandardJarScanner scanner = new StandardJarScanner();
-
-        scanner.setScanClassPath(true);
-        // When running the test on Java 9, one or more URLs to jimage files may
-        // be returned. By setting the scanAllFiles option, a callback will be
-        // generated for these files which in turn will mean the number of URLs
-        // and the number of call backs will agree and this test will pass.
-        // There is a TODO in StandardJarScanner to add 'proper' Java 9 support.
-        scanner.setScanAllFiles(true);
-
-        LoggingCallback callback = new LoggingCallback();
-
-        scanner.scan(JarScanType.PLUGGABILITY, new TesterServletContext(), callback);
-
-        List<String> callbacks = callback.getCallbacks();
-
-        ClassLoader cl = TesterServletContext.class.getClassLoader();
-        if (cl instanceof URLClassLoader) {
-            URL[] urls =  ((URLClassLoader) cl).getURLs();
-
-            int size;
-            if (urls == null) {
-                size = 0;
-            } else {
-                size = urls.length;
-            }
-            // Some JREs (Gump) construct a class path that includes JARs that
-            // reference additional JARs via the Class-Path attribute of the
-            // Manifest. These JARs are not returned in ClassLoader.getURLs().
-            // Therefore, this test looks for at least as many JARs as there are
-            // URLs but it can't check for an exact match.
-            Assert.assertTrue("[" + callbacks.size() + "] callbacks but expected at least [" +
-                    size + "]", callbacks.size() >= size);
-
-        } else {
-            Assert.fail("Unexpected class loader type: " + cl.getClass().getName());
-        }
-    }
-
 
     /**
      * Tomcat should ignore URLs which do not have a file part and do not use the file scheme.
@@ -93,7 +47,7 @@ public class TestStandardJarScanner {
                 URLClassLoader urlClassLoader;
                 try {
                     urlClassLoader = new URLClassLoader(
-                            new URL[] { new URL("http://felix.extensions:9/") });
+                            new URL[] { URI.create("http://felix.extensions:9/").toURL() });
                 } catch (MalformedURLException e) {
                     throw new RuntimeException(e);
                 }
@@ -123,10 +77,6 @@ public class TestStandardJarScanner {
         @Override
         public void scanWebInfClasses() throws IOException {
             callbacks.add("N/A::WEB-INF/classes::N/A");
-        }
-
-        public List<String> getCallbacks() {
-            return callbacks;
         }
     }
 }

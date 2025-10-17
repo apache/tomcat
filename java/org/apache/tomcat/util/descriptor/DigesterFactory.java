@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -31,13 +31,11 @@ import org.apache.tomcat.util.res.StringManager;
 import org.xml.sax.ext.EntityResolver2;
 
 /**
- * Wrapper class around the Digester that hide Digester's initialization
- * details.
+ * Wrapper class around the Digester that hide Digester's initialization details.
  */
 public class DigesterFactory {
 
-    private static final StringManager sm =
-            StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
 
     private static final Class<ServletContext> CLASS_SERVLET_CONTEXT;
     private static final Class<?> CLASS_JSP_CONTEXT;
@@ -46,7 +44,7 @@ public class DigesterFactory {
         CLASS_SERVLET_CONTEXT = ServletContext.class;
         Class<?> jspContext = null;
         try {
-            jspContext = Class.forName("javax.servlet.jsp.JspContext");
+            jspContext = Class.forName("jakarta.servlet.jsp.JspContext");
         } catch (ClassNotFoundException e) {
             // Ignore - JSP API is not present.
         }
@@ -55,20 +53,18 @@ public class DigesterFactory {
 
 
     /**
-     * Mapping of well-known public IDs used by the Servlet API to the matching
-     * local resource.
+     * Mapping of well-known public IDs used by the Servlet API to the matching local resource.
      */
     public static final Map<String,String> SERVLET_API_PUBLIC_IDS;
 
     /**
-     * Mapping of well-known system IDs used by the Servlet API to the matching
-     * local resource.
+     * Mapping of well-known system IDs used by the Servlet API to the matching local resource.
      */
     public static final Map<String,String> SERVLET_API_SYSTEM_IDS;
 
     static {
-        Map<String, String> publicIds = new HashMap<>();
-        Map<String, String> systemIds = new HashMap<>();
+        Map<String,String> publicIds = new HashMap<>();
+        Map<String,String> systemIds = new HashMap<>();
 
         // W3C
         add(publicIds, XmlIdentifiers.XSD_10_PUBLIC, locationFor("XMLSchema.dtd"));
@@ -125,11 +121,47 @@ public class DigesterFactory {
         addSelf(systemIds, "web-common_4_0.xsd");
         addSelf(systemIds, "javaee_8.xsd");
 
+        // from JakartaEE 9
+        add(systemIds, XmlIdentifiers.WEB_50_XSD, locationFor("web-app_5_0.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_FRAGMENT_50_XSD, locationFor("web-fragment_5_0.xsd"));
+        add(systemIds, XmlIdentifiers.TLD_30_XSD, locationFor("web-jsptaglibrary_3_0.xsd"));
+        addSelf(systemIds, "web-common_5_0.xsd");
+        addSelf(systemIds, "jakartaee_9.xsd");
+        addSelf(systemIds, "jsp_3_0.xsd");
+        addSelf(systemIds, "jakartaee_web_services_2_0.xsd");
+        addSelf(systemIds, "jakartaee_web_services_client_2_0.xsd");
+
+        // from JakartaEE 10
+        add(systemIds, XmlIdentifiers.WEB_60_XSD, locationFor("web-app_6_0.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_FRAGMENT_60_XSD, locationFor("web-fragment_6_0.xsd"));
+        add(systemIds, XmlIdentifiers.TLD_31_XSD, locationFor("web-jsptaglibrary_3_1.xsd"));
+        addSelf(systemIds, "web-common_6_0.xsd");
+        addSelf(systemIds, "jakartaee_10.xsd");
+        addSelf(systemIds, "jsp_3_1.xsd");
+        addSelf(systemIds, "jakartaee_web_services_2_0.xsd");
+        addSelf(systemIds, "jakartaee_web_services_client_2_0.xsd");
+
+        // from JakartaEE 11
+        add(systemIds, XmlIdentifiers.WEB_61_XSD, locationFor("web-app_6_1.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_FRAGMENT_61_XSD, locationFor("web-fragment_6_1.xsd"));
+        add(systemIds, XmlIdentifiers.TLD_40_XSD, locationFor("web-jsptaglibrary_4_0.xsd"));
+        addSelf(systemIds, "web-common_6_1.xsd");
+        addSelf(systemIds, "jakartaee_11.xsd");
+        addSelf(systemIds, "jsp_4_0.xsd");
+
+        // from JakartaEE 12
+        add(systemIds, XmlIdentifiers.WEB_62_XSD, locationFor("web-app_6_2.xsd"));
+        add(systemIds, XmlIdentifiers.WEB_FRAGMENT_62_XSD, locationFor("web-fragment_6_2.xsd"));
+        add(systemIds, XmlIdentifiers.TLD_41_XSD, locationFor("web-jsptaglibrary_4_1.xsd"));
+        addSelf(systemIds, "web-common_6_2.xsd");
+        addSelf(systemIds, "jakartaee_12.xsd");
+        addSelf(systemIds, "jsp_4_1.xsd");
+
         SERVLET_API_PUBLIC_IDS = Collections.unmodifiableMap(publicIds);
         SERVLET_API_SYSTEM_IDS = Collections.unmodifiableMap(systemIds);
     }
 
-    private static void addSelf(Map<String, String> ids, String id) {
+    private static void addSelf(Map<String,String> ids, String id) {
         String location = locationFor(id);
         if (location != null) {
             ids.put(id, location);
@@ -166,22 +198,21 @@ public class DigesterFactory {
 
     /**
      * Create a <code>Digester</code> parser.
-     * @param xmlValidation turn on/off xml validation
+     *
+     * @param xmlValidation     turn on/off xml validation
      * @param xmlNamespaceAware turn on/off namespace validation
-     * @param rule an instance of <code>RuleSet</code> used for parsing the xml.
-     * @param blockExternal turn on/off the blocking of external resources
+     * @param rule              an instance of <code>RuleSet</code> used for parsing the xml.
+     * @param blockExternal     turn on/off the blocking of external resources
+     *
      * @return a new digester
      */
-    public static Digester newDigester(boolean xmlValidation,
-                                       boolean xmlNamespaceAware,
-                                       RuleSet rule,
-                                       boolean blockExternal) {
+    public static Digester newDigester(boolean xmlValidation, boolean xmlNamespaceAware, RuleSet rule,
+            boolean blockExternal) {
         Digester digester = new Digester();
         digester.setNamespaceAware(xmlNamespaceAware);
         digester.setValidating(xmlValidation);
         digester.setUseContextClassLoader(true);
-        EntityResolver2 resolver = new LocalResolver(SERVLET_API_PUBLIC_IDS,
-                SERVLET_API_SYSTEM_IDS, blockExternal);
+        EntityResolver2 resolver = new LocalResolver(SERVLET_API_PUBLIC_IDS, SERVLET_API_SYSTEM_IDS, blockExternal);
         digester.setEntityResolver(resolver);
         if (rule != null) {
             digester.addRuleSet(rule);

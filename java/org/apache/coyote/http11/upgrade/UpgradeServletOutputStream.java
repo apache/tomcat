@@ -18,10 +18,10 @@ package org.apache.coyote.http11.upgrade;
 
 import java.io.IOException;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.WriteListener;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.WriteListener;
 
-import org.apache.coyote.ContainerThreadMarker;
+import org.apache.coyote.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.ExceptionUtils;
@@ -32,11 +32,11 @@ import org.apache.tomcat.util.res.StringManager;
 public class UpgradeServletOutputStream extends ServletOutputStream {
 
     private static final Log log = LogFactory.getLog(UpgradeServletOutputStream.class);
-    private static final StringManager sm =
-            StringManager.getManager(UpgradeServletOutputStream.class);
+    private static final StringManager sm = StringManager.getManager(UpgradeServletOutputStream.class);
 
     private final UpgradeProcessorBase processor;
     private final SocketWrapperBase<?> socketWrapper;
+    private final UpgradeInfo upgradeInfo;
 
     // Used to ensure that isReady() and onWritePossible() have a consistent
     // view of buffer and registered.
@@ -60,19 +60,18 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     private boolean registered = false;
 
 
-
-    public UpgradeServletOutputStream(UpgradeProcessorBase processor,
-            SocketWrapperBase<?> socketWrapper) {
+    public UpgradeServletOutputStream(UpgradeProcessorBase processor, SocketWrapperBase<?> socketWrapper,
+            UpgradeInfo upgradeInfo) {
         this.processor = processor;
         this.socketWrapper = socketWrapper;
+        this.upgradeInfo = upgradeInfo;
     }
 
 
     @Override
     public final boolean isReady() {
         if (listener == null) {
-            throw new IllegalStateException(
-                    sm.getString("upgrade.sos.canWrite.ise"));
+            throw new IllegalStateException(sm.getString("upgrade.sos.canWrite.ise"));
         }
         if (closed) {
             return false;
@@ -86,7 +85,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
                 // for write and multiple registrations will cause problems.
                 registered = true;
                 return false;
-            } else if (registered){
+            } else if (registered) {
                 // The socket is already registered for write and multiple
                 // registrations will cause problems.
                 return false;
@@ -102,12 +101,10 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
     @Override
     public final void setWriteListener(WriteListener listener) {
         if (listener == null) {
-            throw new IllegalArgumentException(
-                    sm.getString("upgrade.sos.writeListener.null"));
+            throw new IllegalArgumentException(sm.getString("upgrade.sos.writeListener.null"));
         }
         if (this.listener != null) {
-            throw new IllegalArgumentException(
-                    sm.getString("upgrade.sos.writeListener.set"));
+            throw new IllegalArgumentException(sm.getString("upgrade.sos.writeListener.set"));
         }
         if (closed) {
             throw new IllegalStateException(sm.getString("upgrade.sos.write.closed"));
@@ -117,7 +114,8 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         synchronized (registeredLock) {
             registered = true;
             // Container is responsible for first call to onDataAvailable().
-            if (ContainerThreadMarker.isContainerThread()) {
+            Request request = processor.getRequest();
+            if (request != null && request.isRequestThread()) {
                 processor.addDispatch(DispatchType.NON_BLOCKING_WRITE);
             } else {
                 socketWrapper.registerWriteInterest();
@@ -186,7 +184,7 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
             return;
         }
         closed = true;
-        flushInternal((listener == null), false);
+        flushInternal(listener == null, false);
     }
 
 
@@ -204,12 +202,9 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
      * Must hold writeLock to call this method.
      */
     private void writeInternal(byte[] b, int off, int len) throws IOException {
-        if (listener == null) {
-            // Simple case - blocking IO
-            socketWrapper.write(true, b, off, len);
-        } else {
-            socketWrapper.write(false, b, off, len);
-        }
+        // Blocking IO if no listener
+        socketWrapper.write(listener == null, b, off, len);
+        upgradeInfo.addBytesSent(len);
     }
 
 
@@ -245,31 +240,31 @@ public class UpgradeServletOutputStream extends ServletOutputStream {
         }
 
         if (fire) {
-            ClassLoader oldCL = processor.getUpgradeToken().getContextBind().bind(false, null);
+            ClassLoader oldCL = processor.getUpgradeToken().contextBind().bind(null);
             try {
                 listener.onWritePossible();
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 onError(t);
             } finally {
-                processor.getUpgradeToken().getContextBind().unbind(false, oldCL);
+                processor.getUpgradeToken().contextBind().unbind(oldCL);
             }
         }
     }
 
 
-    private final void onError(Throwable t) {
+    private void onError(Throwable t) {
         if (listener == null) {
             return;
         }
-        ClassLoader oldCL = processor.getUpgradeToken().getContextBind().bind(false, null);
+        ClassLoader oldCL = processor.getUpgradeToken().contextBind().bind(null);
         try {
             listener.onError(t);
         } catch (Throwable t2) {
             ExceptionUtils.handleThrowable(t2);
             log.warn(sm.getString("upgrade.sos.onErrorFail"), t2);
         } finally {
-            processor.getUpgradeToken().getContextBind().unbind(false, oldCL);
+            processor.getUpgradeToken().contextBind().unbind(oldCL);
         }
         try {
             close();

@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.realm;
 
 
@@ -31,20 +29,15 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>Implementation of the JAAS <code>CallbackHandler</code> interface,
- * used to negotiate delivery of the username and credentials that were
- * specified to our constructor.  No interaction with the user is required
- * (or possible).</p>
- *
- * <p>This <code>CallbackHandler</code> will pre-digest the supplied
- * password, if required by the <code>&lt;Realm&gt;</code> element in
- * <code>server.xml</code>.</p>
- * <p>At present, <code>JAASCallbackHandler</code> knows how to handle callbacks of
- * type <code>javax.security.auth.callback.NameCallback</code> and
- * <code>javax.security.auth.callback.PasswordCallback</code>.</p>
- *
- * @author Craig R. McClanahan
- * @author Andrew R. Jaquith
+ * Implementation of the JAAS <code>CallbackHandler</code> interface, used to negotiate delivery of the username and
+ * credentials that were specified to our constructor. No interaction with the user is required (or possible).
+ * <p>
+ * This <code>CallbackHandler</code> will pre-digest the supplied password, if required by the
+ * <code>&lt;Realm&gt;</code> element in <code>server.xml</code>.
+ * <p>
+ * At present, <code>JAASCallbackHandler</code> knows how to handle callbacks of type
+ * <code>javax.security.auth.callback.NameCallback</code> and
+ * <code>javax.security.auth.callback.PasswordCallback</code>.
  */
 public class JAASCallbackHandler implements CallbackHandler {
 
@@ -52,48 +45,42 @@ public class JAASCallbackHandler implements CallbackHandler {
 
 
     /**
-     * Construct a callback handler configured with the specified values.
-     * Note that if the <code>JAASRealm</code> instance specifies digested passwords,
-     * the <code>password</code> parameter will be pre-digested here.
+     * Construct a callback handler configured with the specified values. Note that if the <code>JAASRealm</code>
+     * instance specifies digested passwords, the <code>password</code> parameter will be pre-digested here.
      *
-     * @param realm Our associated JAASRealm instance
+     * @param realm    Our associated JAASRealm instance
      * @param username Username to be authenticated with
      * @param password Password to be authenticated with
      */
-    public JAASCallbackHandler(JAASRealm realm, String username,
-                               String password) {
+    public JAASCallbackHandler(JAASRealm realm, String username, String password) {
 
-        this(realm, username, password, null, null, null, null, null, null,
-                null);
+        this(realm, username, password, null, null, null, null, null, null, null, null);
     }
 
 
     /**
      * Construct a callback handler for DIGEST authentication.
      *
-     * @param realm         Our associated JAASRealm instance
-     * @param username      Username to be authenticated with
-     * @param password      Password to be authenticated with
-     * @param nonce         Server generated nonce
-     * @param nc            Nonce count
-     * @param cnonce        Client generated nonce
-     * @param qop           Quality of protection applied to the message
-     * @param realmName     Realm name
-     * @param md5a2         Second MD5 digest used to calculate the digest
-     *                      MD5(Method + ":" + uri)
-     * @param authMethod    The authentication method in use
+     * @param realm      Our associated JAASRealm instance
+     * @param username   Username to be authenticated with
+     * @param password   Password to be authenticated with
+     * @param nonce      Server generated nonce
+     * @param nc         Nonce count
+     * @param cnonce     Client generated nonce
+     * @param qop        Quality of protection applied to the message
+     * @param realmName  Realm name
+     * @param digestA2   Second digest calculated as digest(Method + ":" + uri)
+     * @param algorithm  The digest algorithm to use
+     * @param authMethod The authentication method in use
      */
-    public JAASCallbackHandler(JAASRealm realm, String username,
-                               String password, String nonce, String nc,
-                               String cnonce, String qop, String realmName,
-                               String md5a2, String authMethod) {
+    public JAASCallbackHandler(JAASRealm realm, String username, String password, String nonce, String nc,
+            String cnonce, String qop, String realmName, String digestA2, String algorithm, String authMethod) {
         this.realm = realm;
         this.username = username;
 
-        if (password != null && realm.hasMessageDigest()) {
+        if (password != null && realm.hasMessageDigest(algorithm)) {
             this.password = realm.getCredentialHandler().mutate(password);
-        }
-        else {
+        } else {
             this.password = password;
         }
         this.nonce = nonce;
@@ -101,8 +88,9 @@ public class JAASCallbackHandler implements CallbackHandler {
         this.cnonce = cnonce;
         this.qop = qop;
         this.realmName = realmName;
-        this.md5a2 = md5a2;
+        this.digestA2 = digestA2;
         this.authMethod = authMethod;
+        this.algorithm = algorithm;
     }
 
     // ----------------------------------------------------- Instance Variables
@@ -154,73 +142,68 @@ public class JAASCallbackHandler implements CallbackHandler {
     protected final String realmName;
 
     /**
-     * Second MD5 digest.
+     * Second digest.
      */
-    protected final String md5a2;
+    protected final String digestA2;
 
     /**
      * The authentication method to be used. If null, assume BASIC/FORM.
      */
     protected final String authMethod;
 
+    /**
+     * Algorithm.
+     */
+    protected final String algorithm;
+
     // --------------------------------------------------------- Public Methods
 
 
     /**
-     * Retrieve the information requested in the provided <code>Callbacks</code>.
-     * This implementation only recognizes {@link NameCallback},
-     * {@link PasswordCallback} and {@link TextInputCallback}.
-     * {@link TextInputCallback} is used to pass the various additional
-     * parameters required for DIGEST authentication.
+     * Retrieve the information requested in the provided <code>Callbacks</code>. This implementation only recognizes
+     * {@link NameCallback}, {@link PasswordCallback} and {@link TextInputCallback}. {@link TextInputCallback} is used
+     * to pass the various additional parameters required for DIGEST authentication.
      *
      * @param callbacks The set of <code>Callback</code>s to be processed
      *
-     * @exception IOException if an input/output error occurs
-     * @exception UnsupportedCallbackException if the login method requests
-     *  an unsupported callback type
+     * @exception IOException                  if an input/output error occurs
+     * @exception UnsupportedCallbackException if the login method requests an unsupported callback type
      */
     @Override
-    public void handle(Callback callbacks[])
-        throws IOException, UnsupportedCallbackException {
+    public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
 
-        for (int i = 0; i < callbacks.length; i++) {
-
-            if (callbacks[i] instanceof NameCallback) {
-                if (realm.getContainer().getLogger().isTraceEnabled())
-                    realm.getContainer().getLogger().trace(sm.getString("jaasCallback.username", username));
-                ((NameCallback) callbacks[i]).setName(username);
-            } else if (callbacks[i] instanceof PasswordCallback) {
-                final char[] passwordcontents;
-                if (password != null) {
-                    passwordcontents = password.toCharArray();
-                } else {
-                    passwordcontents = new char[0];
+        for (Callback callback : callbacks) {
+            switch (callback) {
+                case NameCallback nameCallback -> {
+                    if (realm.getContainer().getLogger().isTraceEnabled()) {
+                        realm.getContainer().getLogger().trace(sm.getString("jaasCallback.username", username));
+                    }
+                    nameCallback.setName(username);
                 }
-                ((PasswordCallback) callbacks[i]).setPassword
-                    (passwordcontents);
-            } else if (callbacks[i] instanceof TextInputCallback) {
-                TextInputCallback cb = ((TextInputCallback) callbacks[i]);
-                if (cb.getPrompt().equals("nonce")) {
-                    cb.setText(nonce);
-                } else if (cb.getPrompt().equals("nc")) {
-                    cb.setText(nc);
-                } else if (cb.getPrompt().equals("cnonce")) {
-                    cb.setText(cnonce);
-                } else if (cb.getPrompt().equals("qop")) {
-                    cb.setText(qop);
-                } else if (cb.getPrompt().equals("realmName")) {
-                    cb.setText(realmName);
-                } else if (cb.getPrompt().equals("md5a2")) {
-                    cb.setText(md5a2);
-                } else if (cb.getPrompt().equals("authMethod")) {
-                    cb.setText(authMethod);
-                } else if (cb.getPrompt().equals("catalinaBase")) {
-                    cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
-                } else {
-                    throw new UnsupportedCallbackException(callbacks[i]);
+                case PasswordCallback passwordCallback -> {
+                    final char[] passwordcontents;
+                    if (password != null) {
+                        passwordcontents = password.toCharArray();
+                    } else {
+                        passwordcontents = new char[0];
+                    }
+                    passwordCallback.setPassword(passwordcontents);
                 }
-            } else {
-                throw new UnsupportedCallbackException(callbacks[i]);
+                case TextInputCallback cb -> {
+                    switch (cb.getPrompt()) {
+                        case "nonce" -> cb.setText(nonce);
+                        case "nc" -> cb.setText(nc);
+                        case "cnonce" -> cb.setText(cnonce);
+                        case "qop" -> cb.setText(qop);
+                        case "realmName" -> cb.setText(realmName);
+                        case "digestA2" -> cb.setText(digestA2);
+                        case "authMethod" -> cb.setText(authMethod);
+                        case "algorithm" -> cb.setText(algorithm);
+                        case "catalinaBase" -> cb.setText(realm.getContainer().getCatalinaBase().getAbsolutePath());
+                        default -> throw new UnsupportedCallbackException(callback);
+                    }
+                }
+                case null, default -> throw new UnsupportedCallbackException(callback);
             }
         }
     }

@@ -34,12 +34,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * SSLUtil implementation for JSSE.
- *
- * @author Harish Prabandham
- * @author Costin Manolache
- * @author Stefan Freyr Stefansson
- * @author EKR
- * @author Jan Luehe
  */
 public class JSSEUtil extends SSLUtilBase {
 
@@ -52,12 +46,12 @@ public class JSSEUtil extends SSLUtilBase {
     private volatile Set<String> implementedCiphers;
 
 
-    public JSSEUtil (SSLHostConfigCertificate certificate) {
+    public JSSEUtil(SSLHostConfigCertificate certificate) {
         this(certificate, true);
     }
 
 
-    public JSSEUtil (SSLHostConfigCertificate certificate, boolean warnOnSkip) {
+    public JSSEUtil(SSLHostConfigCertificate certificate, boolean warnOnSkip) {
         super(certificate, warnOnSkip);
     }
 
@@ -90,8 +84,7 @@ public class JSSEUtil extends SSLUtilBase {
 
 
     @Override
-    public SSLContext createSSLContextInternal(List<String> negotiableProtocols)
-            throws NoSuchAlgorithmException {
+    public SSLContext createSSLContextInternal(List<String> negotiableProtocols) throws NoSuchAlgorithmException {
         return new JSSESSLContext(sslHostConfig.getSslProtocol());
     }
 
@@ -103,7 +96,7 @@ public class JSSEUtil extends SSLUtilBase {
                     SSLContext context;
                     try {
                         context = new JSSESSLContext(sslHostConfig.getSslProtocol());
-                        context.init(null,  null,  null);
+                        context.init(null, null, null);
                     } catch (NoSuchAlgorithmException | KeyManagementException e) {
                         // This is fatal for the connector so throw an exception to prevent
                         // it from starting
@@ -122,20 +115,20 @@ public class JSSEUtil extends SSLUtilBase {
                         String protocolUpper = protocol.toUpperCase(Locale.ENGLISH);
                         if (!"SSLV2HELLO".equals(protocolUpper) && !"SSLV3".equals(protocolUpper)) {
                             if (protocolUpper.contains("SSL")) {
-                                log.debug(sm.getString("jsse.excludeProtocol", protocol));
+                                log.debug(sm.getString("jsseUtil.excludeProtocol", protocol));
                                 continue;
                             }
                         }
                         implementedProtocols.add(protocol);
                     }
 
-                    if (implementedProtocols.size() == 0) {
-                        log.warn(sm.getString("jsse.noDefaultProtocols"));
+                    if (implementedProtocols.isEmpty()) {
+                        log.warn(sm.getString("jsseUtil.noDefaultProtocols"));
                     }
 
                     String[] implementedCipherSuiteArray = context.getSupportedSSLParameters().getCipherSuites();
                     // The IBM JRE will accept cipher suites names SSL_xxx or TLS_xxx but
-                    // only returns the SSL_xxx form for supported cipher suites. Therefore
+                    // only returns the SSL_xxx form for supported cipher suites. Therefore,
                     // need to filter the requested cipher suites using both forms with an
                     // IBM JRE.
                     if (JreVendor.IS_IBM_JVM) {
@@ -147,8 +140,7 @@ public class JSSEUtil extends SSLUtilBase {
                             }
                         }
                     } else {
-                        implementedCiphers = new HashSet<>(implementedCipherSuiteArray.length);
-                        implementedCiphers.addAll(Arrays.asList(implementedCipherSuiteArray));
+                        implementedCiphers = new HashSet<>(Arrays.asList(implementedCipherSuiteArray));
                     }
                     initialized = true;
                 }

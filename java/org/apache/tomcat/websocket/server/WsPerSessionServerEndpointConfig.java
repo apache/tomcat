@@ -20,22 +20,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.websocket.Decoder;
-import javax.websocket.Encoder;
-import javax.websocket.Extension;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.websocket.Decoder;
+import jakarta.websocket.Encoder;
+import jakarta.websocket.Extension;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 /**
- * Wraps the provided {@link ServerEndpointConfig} and provides a per session
- * view - the difference being that the map returned by {@link
- * #getUserProperties()} is unique to this instance rather than shared with the
- * wrapped {@link ServerEndpointConfig}.
+ * Wraps the provided {@link ServerEndpointConfig} and provides a per session view - the difference being that the map
+ * returned by {@link #getUserProperties()} is unique to this instance rather than shared with the wrapped
+ * {@link ServerEndpointConfig}.
  */
 class WsPerSessionServerEndpointConfig implements ServerEndpointConfig {
 
     private final ServerEndpointConfig perEndpointConfig;
-    private final Map<String,Object> perSessionUserProperties =
-            new ConcurrentHashMap<>();
+    private final Map<String,Object> perSessionUserProperties = new ConcurrentHashMap<>();
 
     WsPerSessionServerEndpointConfig(ServerEndpointConfig perEndpointConfig) {
         this.perEndpointConfig = perEndpointConfig;

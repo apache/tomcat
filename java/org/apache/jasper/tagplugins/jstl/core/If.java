@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.jasper.tagplugins.jstl.core;
 
 import org.apache.jasper.compiler.tagplugin.TagPlugin;
@@ -43,7 +41,7 @@ public final class If implements TagPlugin {
             }
             ctxt.generateJavaSource("_jspx_page_context.setAttribute(");
             ctxt.generateAttribute("var");
-            ctxt.generateJavaSource(", new Boolean(" + condV + ")," + scope + ");");
+            ctxt.generateJavaSource(", Boolean.valueOf(" + condV + ")," + scope + ");");
         }
         ctxt.generateJavaSource("if (" + condV + "){");
         ctxt.generateBody();

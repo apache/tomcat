@@ -19,11 +19,16 @@ package org.apache.catalina.webresources;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.security.cert.Certificate;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.Manifest;
+
+import org.apache.catalina.util.URLEncoder;
 
 public abstract class AbstractArchiveResource extends AbstractResource {
 
@@ -35,8 +40,23 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     private boolean readCerts = false;
     private Certificate[] certificates;
 
-    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet,
-            String webAppPath, String baseUrl, JarEntry jarEntry, String codeBaseUrl) {
+    /*
+     * Deprecated even though this is the "new" constructor as code needs to call the old constructor for now.
+     */
+    @Deprecated
+    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
+            JarEntry jarEntry) {
+        this(archiveResourceSet, webAppPath, baseUrl, jarEntry, null);
+    }
+
+    /*
+     * The expectation is that this will be deprecated and then removed once the SecurityManager has been fully removed
+     * from the JRE and it has been confirmed that the JRE no longer depends on code base.
+     *
+     * See https://bz.apache.org/bugzilla/show_bug.cgi?id=69426
+     */
+    protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
+            JarEntry jarEntry, String codeBaseUrl) {
         super(archiveResourceSet.getRoot(), webAppPath);
         this.archiveResourceSet = archiveResourceSet;
         this.baseUrl = baseUrl;
@@ -48,8 +68,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
             resourceName = resourceName.substring(0, resourceName.length() - 1);
         }
         String internalPath = archiveResourceSet.getInternalPath();
-        if (internalPath.length() > 0 && resourceName.equals(
-                internalPath.subSequence(1, internalPath.length()))) {
+        if (!internalPath.isEmpty() && resourceName.contentEquals(internalPath.subSequence(1, internalPath.length()))) {
             name = "";
         } else {
             int index = resourceName.lastIndexOf('/');
@@ -137,10 +156,10 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
     @Override
     public URL getURL() {
-        String url = baseUrl + resource.getName();
+        String url = baseUrl + URLEncoder.DEFAULT.encode(resource.getName(), StandardCharsets.UTF_8);
         try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
+            return new URI(url).toURL();
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("fileResource.getUrlFail", url), e);
             }
@@ -151,8 +170,8 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     @Override
     public URL getCodeBase() {
         try {
-            return new URL(codeBaseUrl);
-        } catch (MalformedURLException e) {
+            return new URI(codeBaseUrl).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("fileResource.getUrlFail", codeBaseUrl), e);
             }
@@ -166,9 +185,8 @@ public abstract class AbstractArchiveResource extends AbstractResource {
 
         if (len > Integer.MAX_VALUE) {
             // Can't create an array that big
-            throw new ArrayIndexOutOfBoundsException(sm.getString(
-                    "abstractResource.getContentTooLarge", getWebappPath(),
-                    Long.valueOf(len)));
+            throw new ArrayIndexOutOfBoundsException(
+                    sm.getString("abstractResource.getContentTooLarge", getWebappPath(), Long.valueOf(len)));
         }
 
         if (len < 0) {
@@ -197,8 +215,7 @@ public abstract class AbstractArchiveResource extends AbstractResource {
             readCerts = true;
         } catch (IOException ioe) {
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("abstractResource.getContentFail",
-                        getWebappPath()), ioe);
+                getLog().debug(sm.getString("abstractResource.getContentFail", getWebappPath()), ioe);
             }
             // Don't return corrupted content
             return null;
@@ -233,10 +250,9 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     protected abstract JarInputStreamWrapper getJarInputStreamWrapper();
 
     /**
-     * This wrapper assumes that the InputStream was created from a JarFile
-     * obtained from a call to getArchiveResourceSet().openJarFile(). If this is
-     * not the case then the usage counting in AbstractArchiveResourceSet will
-     * break and the JarFile may be unexpectedly closed.
+     * This wrapper assumes that the InputStream was created from a JarFile obtained from a call to
+     * getArchiveResourceSet().openJarFile(). If this is not the case then the usage counting in
+     * AbstractArchiveResourceSet will break and the JarFile may be unexpectedly closed.
      */
     protected class JarInputStreamWrapper extends InputStream {
 

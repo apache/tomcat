@@ -79,7 +79,7 @@ public final class Room {
 
         private final char flag;
 
-        private MessageType(char flag) {
+        MessageType(char flag) {
             this.flag = flag;
         }
 
@@ -193,7 +193,7 @@ public final class Room {
                     TIMER_DELAY, TIMER_DELAY);
         }
 
-        // Send him the current number of players and the current room image.
+        // Send the current number of players and the current room image.
         String content = String.valueOf(players.size());
         p.sendRoomMessage(MessageType.IMAGE_MESSAGE, content);
 
@@ -201,7 +201,9 @@ public final class Room {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         try {
             ImageIO.write(roomImage, "PNG", bout);
-        } catch (IOException e) { /* Should never happen */ }
+        } catch (IOException ignore) {
+            // Should never happen
+        }
 
 
         // Send the image as binary message.
@@ -215,7 +217,7 @@ public final class Room {
 
     /**
      * @see Player#removeFromRoom()
-     * @param p
+     * @param p player to remove
      */
     private void internalRemovePlayer(Player p) {
         boolean removed = players.remove(p);
@@ -239,9 +241,9 @@ public final class Room {
 
     /**
      * @see Player#handleDrawMessage(DrawMessage, long)
-     * @param p
-     * @param msg
-     * @param msgId
+     * @param p player
+     * @param msg message containing details of new shapes to draw
+     * @param msgId message ID
      */
     private void internalHandleDrawMessage(Player p, DrawMessage msg,
             long msgId) {
@@ -261,8 +263,8 @@ public final class Room {
      * {@link #broadcastDrawMessage(DrawMessage)}
      * as this method will buffer them and prefix them with the correct
      * last received Message ID.
-     * @param type
-     * @param content
+     * @param type message type
+     * @param content message content
      */
     private void broadcastRoomMessage(MessageType type, String content) {
         for (Player p : players) {
@@ -276,7 +278,7 @@ public final class Room {
      * and the {@link #drawmessageBroadcastTimer} will broadcast them
      * at a regular interval, prefixing them with the player's current
      * {@link Player#lastReceivedMessageId}.
-     * @param msg
+     * @param msg message to broadcast
      */
     private void broadcastDrawMessage(DrawMessage msg) {
         if (!BUFFER_DRAW_MESSAGES) {
@@ -315,8 +317,9 @@ public final class Room {
 
                     String s = String.valueOf(p.getLastReceivedMessageId())
                             + "," + msg.toString();
-                    if (i > 0)
-                        sb.append("|");
+                    if (i > 0) {
+                        sb.append('|');
+                    }
 
                     sb.append(s);
                 }
@@ -371,9 +374,9 @@ public final class Room {
 
                 // Run the cached runnables.
                 if (cachedRunnables != null) {
-                    for (int i = 0; i < cachedRunnables.size(); i++) {
+                    for (Runnable cachedRunnable : cachedRunnables) {
                         if (!closed) {
-                            cachedRunnables.get(i).run();
+                            cachedRunnable.run();
                         }
                     }
                     cachedRunnables = null;
@@ -481,8 +484,8 @@ public final class Room {
 
         /**
          * Sends the given room message.
-         * @param type
-         * @param content
+         * @param type message type
+         * @param content message content
          */
         private void sendRoomMessage(MessageType type, String content) {
             Objects.requireNonNull(content);

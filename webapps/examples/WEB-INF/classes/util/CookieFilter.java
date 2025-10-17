@@ -69,7 +69,7 @@ public class CookieFilter {
             return input;
         }
         String name = input.substring(0, i);
-        String value = input.substring(i + 1, input.length());
+        String value = input.substring(i + 1);
 
         return name + "=" + filter(name, value, sessionId);
     }

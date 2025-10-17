@@ -12,10 +12,34 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd, spec-defaults.bnd
+
 Bundle-Name: tomcat-annotations-api
 Bundle-SymbolicName: org.apache.tomcat-annotations-api
-Bundle-Version: @VERSION@
 Export-Package: \
-    javax.annotation,\
-    javax.annotation.security,\
-    javax.annotation.sql
+    jakarta.annotation.*;version=${annotation.spec.version}
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
+
+Provide-Capability: \
+    osgi.contract;\
+        osgi.contract=JakartaAnnotations;\
+        version:Version=${annotation.spec.version};\
+        uses:='${packages;NAMED;jakarta.annotation.*}'
+
+-namesection: jakarta/annotation*/;\
+    Specification-Title=Jakarta Annotations;\
+    Specification-Version=${annotation.spec.version};\
+    Specification-Vendor=Eclipse Foundation;\
+    Implementation-Title=jakarta.annotation;\
+    Implementation-Version=${annotation.spec.version}${annotation.revision};\
+    Implementation-Vendor=Apache Software Foundation
+
+-jpms-module-info: \
+    jakarta.annotation;\
+        access=32;\
+        version=${annotation.spec.version}
+-jpms-module-info-options: \
+    jakarta.annotation;\
+        substitute=annotations-api

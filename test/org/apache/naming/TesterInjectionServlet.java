@@ -19,10 +19,10 @@ package org.apache.naming;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.IntrospectionUtils;
 
@@ -58,7 +58,7 @@ public class TesterInjectionServlet extends HttpServlet {
         PrintWriter pw = resp.getWriter();
         pw.print(IntrospectionUtils.getProperty(this, injectionName));
 
-        // The property should tyake precedence over the field and this should
+        // The property should take precedence over the field and this should
         // be null
         if (getProperty2a() != null) {
             pw.println();

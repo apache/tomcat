@@ -17,28 +17,37 @@
 package org.apache.tomcat.dbcp.dbcp2;
 
 import java.lang.ref.WeakReference;
+import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.tomcat.dbcp.pool2.TrackedUse;
 
 /**
- * Tracks db connection usage for recovering and reporting abandoned db connections.
+ * Tracks connection usage for recovering and reporting abandoned connections.
  * <p>
  * The JDBC Connection, Statement, and ResultSet classes extend this class.
  * </p>
  *
  * @since 2.0
  */
-public class AbandonedTrace implements TrackedUse {
+public class AbandonedTrace implements TrackedUse, AutoCloseable {
+
+    static void add(final AbandonedTrace receiver, final AbandonedTrace trace) {
+        if (receiver != null) {
+            receiver.addTrace(trace);
+        }
+    }
 
     /** A list of objects created by children of this object. */
     private final List<WeakReference<AbandonedTrace>> traceList = new ArrayList<>();
 
     /** Last time this connection was used. */
-    private volatile long lastUsedMillis = 0;
+    private volatile Instant lastUsedInstant = Instant.EPOCH;
 
     /**
      * Creates a new AbandonedTrace without config and without doing abandoned tracing.
@@ -80,13 +89,40 @@ public class AbandonedTrace implements TrackedUse {
     }
 
     /**
+     * Subclasses can implement this nop.
+     *
+     * @throws SQLException Ignored here, for subclasses.
+     * @since 2.10.0
+     */
+    @Override
+    public void close() throws SQLException {
+        // nop
+    }
+
+    /**
+     * Closes this resource and if an exception is caught, then calls {@code exceptionHandler}.
+     *
+     * @param exceptionHandler Consumes exception thrown closing this resource.
+     * @since 2.10.0
+     */
+    protected void close(final Consumer<Exception> exceptionHandler) {
+        Utils.close(this, exceptionHandler);
+    }
+
+    /**
      * Gets the last time this object was used in milliseconds.
      *
      * @return long time in milliseconds.
      */
     @Override
+    @Deprecated
     public long getLastUsed() {
-        return lastUsedMillis;
+        return lastUsedInstant.toEpochMilli();
+    }
+
+    @Override
+    public Instant getLastUsedInstant() {
+        return lastUsedInstant;
     }
 
     /**
@@ -122,9 +158,7 @@ public class AbandonedTrace implements TrackedUse {
      *            AbandonedTrace parent object.
      */
     private void init(final AbandonedTrace parent) {
-        if (parent != null) {
-            parent.addTrace(this);
-        }
+        add(parent, this);
     }
 
     /**
@@ -153,7 +187,8 @@ public class AbandonedTrace implements TrackedUse {
                 if (trace != null && trace.equals(traceInList)) {
                     iter.remove();
                     break;
-                } else if (traceInList == null) {
+                }
+                if (traceInList == null) {
                     // Clean-up since we are here anyway
                     iter.remove();
                 }
@@ -165,7 +200,18 @@ public class AbandonedTrace implements TrackedUse {
      * Sets the time this object was last used to the current time in milliseconds.
      */
     protected void setLastUsed() {
-        lastUsedMillis = System.currentTimeMillis();
+        lastUsedInstant = Instant.now();
+    }
+
+    /**
+     * Sets the instant this object was last used.
+     *
+     * @param lastUsedInstant
+     *            instant.
+     * @since 2.10.0
+     */
+    protected void setLastUsed(final Instant lastUsedInstant) {
+        this.lastUsedInstant = lastUsedInstant;
     }
 
     /**
@@ -173,8 +219,10 @@ public class AbandonedTrace implements TrackedUse {
      *
      * @param lastUsedMillis
      *            time in milliseconds.
+     * @deprecated Use {@link #setLastUsed(Instant)}
      */
+    @Deprecated
     protected void setLastUsed(final long lastUsedMillis) {
-        this.lastUsedMillis = lastUsedMillis;
+        this.lastUsedInstant = Instant.ofEpochMilli(lastUsedMillis);
     }
 }

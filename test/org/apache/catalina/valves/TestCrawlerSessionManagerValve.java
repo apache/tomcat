@@ -20,9 +20,9 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpSessionBindingListener;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSessionBindingListener;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.MatcherAssert;
@@ -50,7 +50,6 @@ public class TestCrawlerSessionManagerValve {
         TEST_MANAGER = new StandardManager();
         TEST_MANAGER.setContext(new StandardContext());
     }
-
 
 
     @Test
@@ -152,7 +151,8 @@ public class TestCrawlerSessionManagerValve {
     private void verifyCrawlingContext(CrawlerSessionManagerValve valve, String contextPath)
             throws IOException, ServletException {
         HttpSession session = createSessionExpectations(valve, true);
-        Request request = createRequestExpectations("127.0.0.1", session, true, "localhost", contextPath, "tomcatBot 1.0");
+        Request request = createRequestExpectations("127.0.0.1", session, true, "localhost", contextPath,
+                "tomcatBot 1.0");
 
         EasyMock.replay(request, session);
 
@@ -165,8 +165,9 @@ public class TestCrawlerSessionManagerValve {
     private HttpSession createSessionExpectations(CrawlerSessionManagerValve valve, boolean isBot) {
         HttpSession session = EasyMock.createMock(HttpSession.class);
         if (isBot) {
-            EasyMock.expect(session.getId()).andReturn("id").times(2);
-            session.setAttribute(EasyMock.eq(valve.getClass().getName()), EasyMock.anyObject(HttpSessionBindingListener.class));
+            EasyMock.expect(session.getId()).andReturn("id").times(1);
+            session.setAttribute(EasyMock.eq(valve.getClass().getName()),
+                    EasyMock.anyObject(HttpSessionBindingListener.class));
             EasyMock.expectLastCall();
             session.setMaxInactiveInterval(60);
             EasyMock.expectLastCall();
@@ -185,12 +186,12 @@ public class TestCrawlerSessionManagerValve {
         EasyMock.expect(request.getRemoteAddr()).andReturn(ip);
         EasyMock.expect(request.getHost()).andReturn(simpleHostWithName(hostname));
         EasyMock.expect(request.getContext()).andReturn(simpleContextWithName(contextPath));
-        IExpectationSetters<HttpSession> setter = EasyMock.expect(request.getSession(false))
-                .andReturn(null);
+        IExpectationSetters<HttpSession> setter = EasyMock.expect(request.getSession(false)).andReturn(null);
         if (isBot) {
             setter.andReturn(session);
         }
-        EasyMock.expect(request.getHeaders("user-agent")).andAnswer(() -> Collections.enumeration(Arrays.asList(userAgent)));
+        EasyMock.expect(request.getHeaders("user-agent"))
+                .andAnswer(() -> Collections.enumeration(Arrays.asList(userAgent)));
         return request;
     }
 

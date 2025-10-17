@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="fhanik@apache.org">Filip Hanik</author>
     <title>The ClusterListener object</title>
   </properties>
 
@@ -49,19 +48,14 @@
 
 <section name="Attributes">
 
-  <subsection name="Common Attributes">
-
   <attributes>
 
     <attribute name="className" required="true">
-
+        Set value to <code>org.apache.catalina.ha.session.ClusterSessionListener</code>
     </attribute>
 
 
   </attributes>
-
-
-  </subsection>
 
 
 </section>

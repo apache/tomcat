@@ -14,17 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina;
 
 
 /**
- * Interface defining a listener for significant Container generated events.
- * Note that "container start" and "container stop" events are normally
- * LifecycleEvents, not ContainerEvents.
- *
- * @author Craig R. McClanahan
+ * Interface defining a listener for significant Container generated events. Note that "container start" and "container
+ * stop" events are normally LifecycleEvents, not ContainerEvents.
  */
 public interface ContainerListener {
 
@@ -34,7 +29,7 @@ public interface ContainerListener {
      *
      * @param event ContainerEvent that has occurred
      */
-    public void containerEvent(ContainerEvent event);
+    void containerEvent(ContainerEvent event);
 
 
 }

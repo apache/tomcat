@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
 
 
@@ -24,6 +22,7 @@ import java.lang.reflect.Method;
 import org.apache.catalina.Executor;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.IntrospectionUtils;
@@ -35,7 +34,6 @@ import org.xml.sax.Attributes;
 /**
  * Rule implementation that creates a connector.
  */
-
 public class ConnectorCreateRule extends Rule {
 
     private static final Log log = LogFactory.getLog(ConnectorCreateRule.class);
@@ -43,25 +41,16 @@ public class ConnectorCreateRule extends Rule {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Process the beginning of this element.
-     *
-     * @param namespace the namespace URI of the matching element, or an
-     *   empty string if the parser is not namespace aware or the element has
-     *   no namespace
-     * @param name the local name if the parser is namespace aware, or just
-     *   the element name otherwise
-     * @param attributes The attribute list for this element
-     */
     @Override
-    public void begin(String namespace, String name, Attributes attributes)
-            throws Exception {
-        Service svc = (Service)digester.peek();
+    public void begin(String namespace, String name, Attributes attributes) throws Exception {
+        Service svc = (Service) digester.peek();
         Executor ex = null;
-        if ( attributes.getValue("executor")!=null ) {
-            ex = svc.getExecutor(attributes.getValue("executor"));
+        String executorName = attributes.getValue("executor");
+        if (executorName != null) {
+            ex = svc.getExecutor(executorName);
         }
-        Connector con = new Connector(attributes.getValue("protocol"));
+        String protocolName = attributes.getValue("protocol");
+        Connector con = new Connector(protocolName);
         if (ex != null) {
             setExecutor(con, ex);
         }
@@ -70,35 +59,49 @@ public class ConnectorCreateRule extends Rule {
             setSSLImplementationName(con, sslImplementationName);
         }
         digester.push(con);
+
+        StringBuilder code = digester.getGeneratedCode();
+        if (code != null) {
+            code.append(System.lineSeparator());
+            code.append(Connector.class.getName()).append(' ').append(digester.toVariableName(con));
+            code.append(" = new ").append(Connector.class.getName());
+            code.append("(new ").append(con.getProtocolHandlerClassName()).append("());");
+            code.append(System.lineSeparator());
+            if (ex != null) {
+                code.append(digester.toVariableName(con)).append(".getProtocolHandler().setExecutor(");
+                code.append(digester.toVariableName(svc)).append(".getExecutor(\"").append(executorName);
+                code.append("\"));");
+                code.append(System.lineSeparator());
+            }
+            if (sslImplementationName != null) {
+                code.append("((").append(AbstractHttp11Protocol.class.getName()).append("<?>) ");
+                code.append(digester.toVariableName(con)).append(".getProtocolHandler()).setSslImplementationName(\"");
+                code.append(sslImplementationName).append("\");");
+                code.append(System.lineSeparator());
+            }
+        }
     }
 
     private static void setExecutor(Connector con, Executor ex) throws Exception {
-        Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(),"setExecutor",new Class[] {java.util.concurrent.Executor.class});
-        if (m!=null) {
-            m.invoke(con.getProtocolHandler(), new Object[] {ex});
-        }else {
+        Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(), "setExecutor",
+                new Class[] { java.util.concurrent.Executor.class });
+        if (m != null) {
+            m.invoke(con.getProtocolHandler(), ex);
+        } else {
             log.warn(sm.getString("connector.noSetExecutor", con));
         }
     }
 
     private static void setSSLImplementationName(Connector con, String sslImplementationName) throws Exception {
-        Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(),"setSslImplementationName",new Class[] {String.class});
+        Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(), "setSslImplementationName",
+                new Class[] { String.class });
         if (m != null) {
-            m.invoke(con.getProtocolHandler(), new Object[] {sslImplementationName});
+            m.invoke(con.getProtocolHandler(), sslImplementationName);
         } else {
             log.warn(sm.getString("connector.noSetSSLImplementationName", con));
         }
     }
 
-    /**
-     * Process the end of this element.
-     *
-     * @param namespace the namespace URI of the matching element, or an
-     *   empty string if the parser is not namespace aware or the element has
-     *   no namespace
-     * @param name the local name if the parser is namespace aware, or just
-     *   the element name otherwise
-     */
     @Override
     public void end(String namespace, String name) throws Exception {
         digester.pop();

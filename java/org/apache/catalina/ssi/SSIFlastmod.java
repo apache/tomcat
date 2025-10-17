@@ -25,34 +25,24 @@ import org.apache.catalina.util.Strftime;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Implements the Server-side #flastmod command
- *
- * @author Bip Thelin
- * @author Paul Speed
- * @author Dan Sandberg
- * @author David Becker
+ * Implements the Server-side #flastmod command.
  */
 public final class SSIFlastmod implements SSICommand {
     private static final StringManager sm = StringManager.getManager(SSIFlastmod.class);
-    /**
-     * @see SSICommand
-     */
+
     @Override
-    public long process(SSIMediator ssiMediator, String commandName,
-            String[] paramNames, String[] paramValues, PrintWriter writer) {
+    public long process(SSIMediator ssiMediator, String commandName, String[] paramNames, String[] paramValues,
+            PrintWriter writer) {
         long lastModified = 0;
         String configErrMsg = ssiMediator.getConfigErrMsg();
         for (int i = 0; i < paramNames.length; i++) {
             String paramName = paramNames[i];
             String paramValue = paramValues[i];
-            String substitutedValue = ssiMediator
-                    .substituteVariables(paramValue);
+            String substitutedValue = ssiMediator.substituteVariables(paramValue);
             try {
-                if (paramName.equalsIgnoreCase("file")
-                        || paramName.equalsIgnoreCase("virtual")) {
+                if (paramName.equalsIgnoreCase("file") || paramName.equalsIgnoreCase("virtual")) {
                     boolean virtual = paramName.equalsIgnoreCase("virtual");
-                    lastModified = ssiMediator.getFileLastModified(
-                            substitutedValue, virtual);
+                    lastModified = ssiMediator.getFileLastModified(substitutedValue, virtual);
                     Date date = new Date(lastModified);
                     String configTimeFmt = ssiMediator.getConfigTimeFmt();
                     writer.write(formatDate(date, configTimeFmt));
@@ -60,8 +50,8 @@ public final class SSIFlastmod implements SSICommand {
                     ssiMediator.log(sm.getString("ssiCommand.invalidAttribute", paramName));
                     writer.write(configErrMsg);
                 }
-            } catch (IOException e) {
-                ssiMediator.log(sm.getString("ssiFlastmod.noLastModified", substitutedValue), e);
+            } catch (IOException ioe) {
+                ssiMediator.log(sm.getString("ssiFlastmod.noLastModified", substitutedValue), ioe);
                 writer.write(configErrMsg);
             }
         }
@@ -69,7 +59,7 @@ public final class SSIFlastmod implements SSICommand {
     }
 
 
-    protected String formatDate(Date date, String configTimeFmt) {
+    private String formatDate(Date date, String configTimeFmt) {
         Strftime strftime = new Strftime(configTimeFmt, Locale.US);
         return strftime.format(date);
     }

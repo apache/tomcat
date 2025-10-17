@@ -2,10 +2,10 @@ Manifest-version: 1.0
 X-Compile-Source-JDK: @source.jdk@
 X-Compile-Target-JDK: @target.jdk@
 
-Name: javax/servlet/
-Specification-Title: Java API for Servlets
-Specification-Version: 4.0
-Specification-Vendor: Sun Microsystems, Inc.
-Implementation-Title: javax.servlet
-Implementation-Version: 4.0.@servlet.revision@
+Name: jakarta/servlet/
+Specification-Title: Jakarta Servlet
+Specification-Version: @servlet.spec.version@
+Specification-Vendor: Eclipse Foundation
+Implementation-Title: jakarta.servlet
+Implementation-Version: @servlet.spec.version@@servlet.revision@
 Implementation-Vendor: Apache Software Foundation

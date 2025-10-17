@@ -16,21 +16,19 @@
  */
 package listeners;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.http.HttpSessionAttributeListener;
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.http.HttpSessionAttributeListener;
+import jakarta.servlet.http.HttpSessionBindingEvent;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
 
 /**
  * Example listener for context-related application events, which were
  * introduced in the 2.3 version of the Servlet API. This listener merely
  * documents the occurrence of such events in the application log associated
  * with our servlet context.
- *
- * @author Craig R. McClanahan
  */
 public final class SessionListener implements ServletContextListener,
         HttpSessionAttributeListener, HttpSessionListener {
@@ -150,10 +148,11 @@ public final class SessionListener implements ServletContextListener,
      */
     private void log(String message) {
 
-        if (context != null)
+        if (context != null) {
             context.log("SessionListener: " + message);
-        else
+        } else {
             System.out.println("SessionListener: " + message);
+        }
 
     }
 

@@ -23,7 +23,7 @@
     &project;
 
   <properties>
-    <title>CDI 2, JAX-RS and dependent libraries support</title>
+    <title>CDI, JAX-RS and dependent libraries support</title>
   </properties>
 
 <body>
@@ -42,11 +42,11 @@
 
   </section>
 
-  <section name="CDI 2 support">
+  <section name="CDI support">
 
   <p>
-    CDI 2 support is provided by the <code>modules/owb</code> optional module.
-    It packages the Apache OpenWebBeans project and allows adding CDI 2 support
+    CDI support is provided by the <code>modules/owb</code> optional module.
+    It packages the Apache OpenWebBeans project and allows adding CDI support
     to the Tomcat container. The build process of the module uses Apache Maven,
     and is not available as a binary bundle as it is built using a number of
     publicly available JARs.
@@ -59,7 +59,8 @@ mvn clean && mvn package]]></source>
     The resulting JAR at
     <code>target/tomcat-owb-x.y.z.jar</code> (where x.y.z depends on the
     Apache OpenWebBeans version used during the build)
-    should then be placed into the <code>lib</code> folder of the Tomcat
+    should be processed by the Tomcat migration tool for Jakarta EE, and
+    then be placed into the <code>lib</code> folder of the Tomcat
     installation.<br/>
     CDI support can then be enabled for all webapps in the container by adding
     the following listener in <code>server.xml</code> nested inside the
@@ -68,7 +69,7 @@ mvn clean && mvn package]]></source>
     The listener will produce a non fatal error if the CDI container loading
     fails.<br/>
     CDI support can also be enabled at the individual webapp level by adding
-    the following listner to the webapp <code>context.xml</code> file nested
+    the following listener to the webapp <code>context.xml</code> file nested
     inside the <code>Server</code> element:
     <source><![CDATA[<Listener className="org.apache.webbeans.web.tomcat.OpenWebBeansContextLifecycleListener" />]]></source>
   </p>
@@ -82,7 +83,7 @@ mvn clean && mvn package]]></source>
     It packages the Apache CXF project and allows adding JAX-RS support
     to individual webapps. The build process of the module uses Apache Maven,
     and is not available as a binary bundle as it is built using a number of
-    publicly available JARs. The support depends on CDI 2 support, which should
+    publicly available JARs. The support depends on CDI support, which should
     have previously been installed at either the container or webapp level.
   </p>
 
@@ -98,81 +99,13 @@ mvn clean && mvn package]]></source>
   </p>
 
   <p>
-    If the CDI 2 support is available at the container
+    If the CDI support is available at the container
     level, the JAR can also be placed in the Tomcat <code>lib</code> folder,
     but in that case the CXF Servlet declaration must be individually added
     in each webapp as needed (it is normally loaded by the web fragment that is
     present in the JAR). The CXF Servlet class that should be used is
     <code>org.apache.cxf.cdi.CXFCdiServlet</code> and should be mapped to the
     desired root path where JAX-RS resources will be available.
-  </p>
-
-  </section>
-
-  <section name="Eclipse Microprofile support">
-
-  <p>
-    ASF artifacts are available that implement Eclipse Microprofile
-    specifications using CDI 2 extensions. Once the CDI 2 and JAX-RS support
-    is installed, they will be usable by individual webapps.
-  </p>
-
-  <p>
-    The following implementations are available (reference:
-    <code>org.apache.tomee.microprofile.TomEEMicroProfileListener</code>) as
-    Maven artifacts which must be added to the webapp <code>/WEB-INF/lib</code>
-    folders:
-    <ul>
-      <li><strong>Configuration</strong>:
-        Maven artifact:
-        <code>org.apache.geronimo.config:geronimo-config</code>
-        CDI extension class:
-        <code>org.apache.geronimo.config.cdi.ConfigExtension</code>
-      </li>
-      <li><strong>Fault Tolerance</strong>:
-        Maven artifact:
-        <code>org.apache.geronimo.safeguard:safeguard-parent</code>
-        CDI extension class:
-        <code>org.apache.safeguard.impl.cdi.SafeguardExtension</code>
-      </li>
-      <li><strong>Health</strong>:
-        Maven artifact:
-        <code>org.apache.geronimo:geronimo-health</code>
-        CDI extension class:
-        <code>org.apache.geronimo.microprofile.impl.health.cdi.GeronimoHealthExtension</code>
-      </li>
-      <li><strong>Metrics</strong>:
-        Maven artifact:
-        <code>org.apache.geronimo:geronimo-metrics</code>
-        CDI extension class:
-        <code>org.apache.geronimo.microprofile.metrics.cdi.MetricsExtension</code>
-      </li>
-      <li><strong>OpenTracing</strong>:
-        Maven artifact:
-        <code>org.apache.geronimo:geronimo-opentracing</code>
-        CDI extension class:
-        <code>org.apache.geronimo.microprofile.opentracing.microprofile.cdi.OpenTracingExtension</code>
-      </li>
-      <li><strong>OpenAPI</strong>:
-        Maven artifact:
-        <code>org.apache.geronimo:geronimo-openapi</code>
-        CDI extension class:
-        <code>org.apache.geronimo.microprofile.openapi.cdi.GeronimoOpenAPIExtension</code>
-      </li>
-      <li><strong>Rest client</strong>:
-        Maven artifact:
-        <code>org.apache.cxf:cxf-rt-rs-mp-client</code>
-        CDI extension class:
-        <code>org.apache.cxf.microprofile.client.cdi.RestClientExtension</code>
-      </li>
-      <li><strong>JSON Web Tokens</strong>:
-        Note: Fore reference only, unusable outside Apache TomEE;
-        Maven artifact:
-        <code>org.apache.tomee:mp-jwt</code>
-        CDI extension class:
-        <code>org.apache.tomee.microprofile.jwt.cdi.MPJWTCDIExtension</code>
-      </li>
-    </ul>
   </p>
 
   </section>

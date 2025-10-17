@@ -20,11 +20,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.el.ELContext;
-import javax.el.ELManager;
-import javax.el.ELProcessor;
-import javax.el.ExpressionFactory;
-import javax.el.ValueExpression;
+import jakarta.el.ELContext;
+import jakarta.el.ELManager;
+import jakarta.el.ELProcessor;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.ValueExpression;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -86,5 +86,20 @@ public class TestAstMapData {
 
         Assert.assertEquals(Map.class, ve.getType(context));
         Assert.assertEquals(simpleMap, ve.getValue(context));
+    }
+
+
+    @Test
+    public void testLiteralWithVariable() {
+        ELProcessor elp = new ELProcessor();
+
+        String key = "myKey";
+        String value = "myValue";
+        elp.setVariable("aaa", "'" + key + "'");
+        elp.setVariable("bbb", "'" + value + "'");
+
+        Object result = elp.eval("{ aaa : bbb }.get(aaa)");
+
+        Assert.assertEquals(value, result);
     }
 }

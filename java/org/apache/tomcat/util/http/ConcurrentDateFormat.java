@@ -25,9 +25,8 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- * A thread safe wrapper around {@link SimpleDateFormat} that does not make use
- * of ThreadLocal and - broadly - only creates enough SimpleDateFormat objects
- * to satisfy the concurrency requirements.
+ * A thread safe wrapper around {@link SimpleDateFormat} that does not make use of ThreadLocal and - broadly - only
+ * creates enough SimpleDateFormat objects to satisfy the concurrency requirements.
  */
 public class ConcurrentDateFormat {
 
@@ -60,6 +59,7 @@ public class ConcurrentDateFormat {
             sdf = createInstance();
         }
         Date result = sdf.parse(source);
+        sdf.setTimeZone(timezone);
         queue.add(sdf);
         return result;
     }

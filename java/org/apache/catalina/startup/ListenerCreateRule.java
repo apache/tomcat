@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.startup;
 
 
@@ -44,62 +42,79 @@ public class ListenerCreateRule extends ObjectCreateRule {
     }
 
     @Override
-    public void begin(String namespace, String name, Attributes attributes)
-            throws Exception {
+    public void begin(String namespace, String name, Attributes attributes) throws Exception {
         if ("true".equals(attributes.getValue("optional"))) {
             try {
                 super.begin(namespace, name, attributes);
             } catch (Exception e) {
                 String className = getRealClassName(attributes);
                 if (log.isDebugEnabled()) {
-                    log.info(sm.getString("listener.createFailed", className), e);
+                    log.debug(sm.getString("listener.createFailed", className), e);
                 } else {
                     log.info(sm.getString("listener.createFailed", className));
                 }
-                digester.push(new OptionalListener(className));
+                Object instance = new OptionalListener(className);
+                digester.push(instance);
+                StringBuilder code = digester.getGeneratedCode();
+                if (code != null) {
+                    code.append(OptionalListener.class.getName().replace('$', '.')).append(' ');
+                    code.append(digester.toVariableName(instance)).append(" = new ");
+                    code.append(OptionalListener.class.getName().replace('$', '.')).append("(\"").append(className)
+                            .append("\");");
+                    code.append(System.lineSeparator());
+                }
             }
         } else {
             super.begin(namespace, name, attributes);
         }
     }
 
-    public class OptionalListener implements LifecycleListener {
+    public static class OptionalListener implements LifecycleListener {
         protected final String className;
-        protected final HashMap<String, String> properties = new HashMap<>();
+        protected final HashMap<String,String> properties = new HashMap<>();
+
         public OptionalListener(String className) {
             this.className = className;
         }
+
         /**
          * @return the className
          */
         public String getClassName() {
             return className;
         }
+
         @Override
         public void lifecycleEvent(LifecycleEvent event) {
             // Do nothing
         }
+
         /**
          * Return a set of the property keys.
+         *
          * @return the set
          */
         public Set<String> getProperties() {
             return properties.keySet();
         }
+
         /**
          * Return a property from the protocol handler.
          *
          * @param name the property name
+         *
          * @return the property value
          */
         public Object getProperty(String name) {
             return properties.get(name);
         }
+
         /**
          * Set the given property.
          *
-         * @param name the property name
+         * @param name  the property name
          * @param value the property value
+         *
          * @return <code>true</code>
          */
         public boolean setProperty(String name, String value) {

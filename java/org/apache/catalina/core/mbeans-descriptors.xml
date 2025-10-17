@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean name="ApplicationFilterConfig"
@@ -152,10 +155,6 @@
                description="Object that creates and destroys servlets, filters, and listeners. Include dependency injection and postConstruct/preDestroy handling"
                type="org.apache.tomcat.InstanceManager" />
 
-    <attribute name="javaVMs"
-               description="The Java virtual machines on which this module is running"
-               type="[Ljava.lang.String;"/>
-
     <attribute name="loader"
                description="Associated loader."
                type="org.apache.catalina.Loader" />
@@ -204,6 +203,10 @@
     <attribute name="name"
                description="The name of this Context"
                type="java.lang.String"/>
+
+    <attribute name="parallelAnnotationScanning"
+               description="The parallel annotation scanning flag"
+               type="boolean"/>
 
     <attribute name="parentClassLoader"
                description="Parent class loader."
@@ -265,7 +268,7 @@
                type="boolean"/>
 
     <attribute name="server"
-               description="The J2EE Server this module is deployed on"
+               description="The Jakarta EE Server this module is deployed on"
                type="java.lang.String"/>
 
     <attribute name="sessionCookieName"
@@ -1118,6 +1121,10 @@
                type="java.lang.String"
                writeable="false" />
 
+    <attribute name="legacyAppBase"
+               description="The legacy (Java EE) application root for this Host"
+               type="java.lang.String"/>
+
     <attribute name="managedResource"
                description="The managed resource this MBean is associated with"
                type="java.lang.Object"/>
@@ -1509,10 +1516,6 @@
                type="int"
                writeable="false" />
 
-    <attribute name="prestartminSpareThreads"
-               description="Prestart threads?"
-               is="true"
-               type="boolean"/>
 
     <attribute name="queueSize"
                description="Number of tasks waiting to be processed"
@@ -1559,11 +1562,6 @@
                type="int"
                writeable="false" />
 
-    <attribute name="countAllocated"
-               description="The count of allocations that are currently active (even if they  are for the same instance, as will be true on a non-STM servlet)."
-               type="int"
-               writeable="false" />
-
     <attribute name="errorCount"
                description="Error count"
                type="int"
@@ -1582,10 +1580,6 @@
                description="Maximum processing time of a request"
                type="long"
                writeable="false" />
-
-    <attribute name="maxInstances"
-               description="Maximum number of STM instances."
-               type="int" />
 
     <attribute name="minTime"
                description="Minimum processing time of a request"
@@ -1613,12 +1607,6 @@
     <attribute name="servletClass"
                description="The run-as identity for this servlet."
                type="java.lang.String"
-               writeable="false" />
-
-    <attribute name="singleThreadModel"
-               description="Does this servlet implement the SingleThreadModel interface?"
-               type="java.lang.Boolean"
-               is="true"
                writeable="false" />
 
     <attribute name="stateName"

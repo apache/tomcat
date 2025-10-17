@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="fhanik@apache.org">Filip Hanik</author>
     <title>The Cluster Sender object</title>
   </properties>
 
@@ -62,11 +61,6 @@
  <p>
    The nested element <code>&lt;Transport&gt;</code> is not required, but encouraged, as this is where
    you would set all the socket options for the outgoing messages. Please see its attributes below.
-   There are two implementations, in a similar manner to the <a href="cluster-receiver.html">receiver</a>, one is non-blocking
-   based and the other is built using blocking IO. <br/>
-   <code>org.apache.catalina.tribes.transport.bio.PooledMultiSender</code> is the blocking implementation and
-   <code>org.apache.catalina.tribes.transport.nio.PooledParallelSender</code>.
-   Parallel delivery is not available for the blocking implementation due to the fact that it is blocking a thread on sending data.
  </p>
 </section>
 
@@ -81,9 +75,9 @@
   <subsection name="Common Transport Attributes">
     <attributes>
       <attribute name="className" required="true">
-        Required, an implementation of the <code>org.apache.catalina.tribes.transport.MultiPointSender</code>.<br/>
-        Non-blocking implementation is <code>org.apache.catalina.tribes.transport.nio.PooledParallelSender</code><br/>
-        Blocking implementation is <code>org.apache.catalina.tribes.transport.bio.PooledMultiSender</code>
+        The implementation of the sender component.
+        <code>org.apache.catalina.tribes.transport.nio.PooledParallelSender</code>
+        is provided by Tomcat.
       </attribute>
       <attribute name="rxBufSize" required="false">
         The receive buffer size on the socket.
@@ -91,7 +85,7 @@
       </attribute>
       <attribute name="txBufSize" required="false">
        The send buffer size on the socket.
-       Default value is <code>43800</code> bytes.
+       Default value is <code>65536</code> bytes.
       </attribute>
       <attribute name="udpRxBufSize" required="false">
         The receive buffer size on the datagram socket.
@@ -99,7 +93,7 @@
       </attribute>
       <attribute name="udpTxBufSize" required="false">
        The send buffer size on the datagram socket.
-       Default value is <code>43800</code> bytes.
+       Default value is <code>65536</code> bytes.
       </attribute>
       <attribute name="directBuffer" required="false">
        Possible values are <code>true</code> or <code>false</code>.
@@ -147,7 +141,7 @@
       <attribute name="soTrafficClass" required="false">
        Sets the traffic class level for the socket, the value is between 0 and 255.
        Default value is <code>int soTrafficClass = 0x04 | 0x08 | 0x010;</code>
-       Different values are defined in <a href="http://docs.oracle.com/javase/7/docs/api/java/net/Socket.html#setTrafficClass(int)">
+       Different values are defined in <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setTrafficClass(int)">
        java.net.Socket#setTrafficClass(int)</a>.
       </attribute>
       <attribute name="tcpNoDelay" required="false">

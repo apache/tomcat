@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina;
 
 import org.apache.catalina.connector.Request;
@@ -22,88 +21,70 @@ import org.apache.catalina.connector.Response;
 
 
 /**
- * Intended for use by a {@link Valve} to indicate that the {@link Valve}
- * provides access logging. It is used by the Tomcat internals to identify a
- * Valve that logs access requests so requests that are rejected
- * earlier in the processing chain can still be added to the access log.
- * Implementations of this interface should be robust against the provided
- * {@link Request} and {@link Response} objects being null, having null
- * attributes or any other 'oddness' that may result from attempting to log
- * a request that was almost certainly rejected because it was mal-formed.
+ * Intended for use by a {@link Valve} to indicate that the {@link Valve} provides access logging. It is used by the
+ * Tomcat internals to identify a Valve that logs access requests so requests that are rejected earlier in the
+ * processing chain can still be added to the access log. Implementations of this interface should be robust against the
+ * provided {@link Request} and {@link Response} objects being null, having null attributes or any other 'oddness' that
+ * may result from attempting to log a request that was almost certainly rejected because it was mal-formed.
  */
 public interface AccessLog {
 
     /**
-     * Name of request attribute used to override the remote address recorded by
-     * the AccessLog.
+     * Name of request attribute used to override the remote address recorded by the AccessLog.
      */
-    public static final String REMOTE_ADDR_ATTRIBUTE =
-            "org.apache.catalina.AccessLog.RemoteAddr";
+    String REMOTE_ADDR_ATTRIBUTE = "org.apache.catalina.AccessLog.RemoteAddr";
 
     /**
-     * Name of request attribute used to override remote host name recorded by
-     * the AccessLog.
+     * Name of request attribute used to override remote host name recorded by the AccessLog.
      */
-    public static final String REMOTE_HOST_ATTRIBUTE =
-            "org.apache.catalina.AccessLog.RemoteHost";
+    String REMOTE_HOST_ATTRIBUTE = "org.apache.catalina.AccessLog.RemoteHost";
 
     /**
-     * Name of request attribute used to override the protocol recorded by the
-     * AccessLog.
+     * Name of request attribute used to override the protocol recorded by the AccessLog.
      */
-    public static final String PROTOCOL_ATTRIBUTE =
-            "org.apache.catalina.AccessLog.Protocol";
+    String PROTOCOL_ATTRIBUTE = "org.apache.catalina.AccessLog.Protocol";
 
     /**
-     * Name of request attribute used to override the server name recorded by
-     * the AccessLog.
+     * Name of request attribute used to override the server name recorded by the AccessLog.
      */
-    public static final String SERVER_NAME_ATTRIBUTE =
-            "org.apache.catalina.AccessLog.ServerName";
+    String SERVER_NAME_ATTRIBUTE = "org.apache.catalina.AccessLog.ServerName";
 
     /**
-     * Name of request attribute used to override the server port recorded by
-     * the AccessLog.
+     * Name of request attribute used to override the server port recorded by the AccessLog.
      */
-    public static final String SERVER_PORT_ATTRIBUTE =
-            "org.apache.catalina.AccessLog.ServerPort";
+    String SERVER_PORT_ATTRIBUTE = "org.apache.catalina.AccessLog.ServerPort";
 
 
     /**
-     * Add the request/response to the access log using the specified processing
-     * time.
+     * Add the request/response to the access log using the specified processing time.
      *
-     * @param request   Request (associated with the response) to log
-     * @param response  Response (associated with the request) to log
-     * @param time      Time taken to process the request/response in
-     *                  milliseconds (use 0 if not known)
+     * @param request  Request (associated with the response) to log
+     * @param response Response (associated with the request) to log
+     * @param time     Time taken to process the request/response in nanoseconds (use 0 if not known); in Tomcat
+     *                     versions prior to 10, the time unit was milliseconds
      */
-    public void log(Request request, Response response, long time);
+    void log(Request request, Response response, long time);
 
     /**
-     * Should this valve set request attributes for IP address, hostname,
-     * protocol and port used for the request? This are typically used in
-     * conjunction with the {@link org.apache.catalina.valves.AccessLogValve}
-     * which will otherwise log the original values.
-     *
-     * The attributes set are:
+     * Should this valve use request attributes for IP address, hostname, protocol and port used for the request? The
+     * attributes used are:
      * <ul>
      * <li>org.apache.catalina.RemoteAddr</li>
      * <li>org.apache.catalina.RemoteHost</li>
      * <li>org.apache.catalina.Protocol</li>
+     * <li>org.apache.catalina.ServerName</li>
      * <li>org.apache.catalina.ServerPost</li>
      * </ul>
      *
-     * @param requestAttributesEnabled  <code>true</code> causes the attributes
-     *                                  to be set, <code>false</code> disables
-     *                                  the setting of the attributes.
+     * @param requestAttributesEnabled <code>true</code> causes the attributes to be used, <code>false</code> causes the
+     *                                     original values to be used.
      */
-    public void setRequestAttributesEnabled(boolean requestAttributesEnabled);
+    void setRequestAttributesEnabled(boolean requestAttributesEnabled);
 
     /**
      * @see #setRequestAttributesEnabled(boolean)
-     * @return <code>true</code> if the attributes will be logged, otherwise
-     *         <code>false</code>
+     *
+     * @return <code>true</code> if the attributes will be logged, otherwise <code>false</code>
      */
-    public boolean getRequestAttributesEnabled();
+    boolean getRequestAttributesEnabled();
 }

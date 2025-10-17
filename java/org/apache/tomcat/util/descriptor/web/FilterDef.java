@@ -16,27 +16,26 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.Filter;
+import jakarta.servlet.Filter;
 
 import org.apache.tomcat.util.res.StringManager;
 
 
 /**
- * Representation of a filter definition for a web application, as represented
- * in a <code>&lt;filter&gt;</code> element in the deployment descriptor.
- *
- * @author Craig R. McClanahan
+ * Representation of a filter definition for a web application, as represented in a <code>&lt;filter&gt;</code> element
+ * in the deployment descriptor.
  */
 public class FilterDef implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private static final StringManager sm =
-        StringManager.getManager(Constants.PACKAGE_NAME);
+    private static final StringManager sm = StringManager.getManager(Constants.PACKAGE_NAME);
 
     // ------------------------------------------------------------- Properties
 
@@ -98,8 +97,7 @@ public class FilterDef implements Serializable {
 
 
     /**
-     * The name of this filter, which must be unique among the filters
-     * defined for a particular web application.
+     * The name of this filter, which must be unique among the filters defined for a particular web application.
      */
     private String filterName = null;
 
@@ -108,9 +106,8 @@ public class FilterDef implements Serializable {
     }
 
     public void setFilterName(String filterName) {
-        if (filterName == null || filterName.equals("")) {
-            throw new IllegalArgumentException(
-                    sm.getString("filterDef.invalidFilterName", filterName));
+        if (filterName == null || filterName.isEmpty()) {
+            throw new IllegalArgumentException(sm.getString("filterDef.invalidFilterName", filterName));
         }
         this.filterName = filterName;
     }
@@ -131,12 +128,11 @@ public class FilterDef implements Serializable {
 
 
     /**
-     * The set of initialization parameters for this filter, keyed by
-     * parameter name.
+     * The set of initialization parameters for this filter, keyed by parameter name.
      */
-    private final Map<String, String> parameters = new HashMap<>();
+    private final Map<String,String> parameters = new HashMap<>();
 
-    public Map<String, String> getParameterMap() {
+    public Map<String,String> getParameterMap() {
         return this.parameters;
     }
 
@@ -162,17 +158,22 @@ public class FilterDef implements Serializable {
 
     public void setAsyncSupported(String asyncSupported) {
         this.asyncSupported = asyncSupported;
+        asyncSupportedBoolean = !("false".equalsIgnoreCase(asyncSupported));
     }
 
+    private boolean asyncSupportedBoolean = true;
+
+    public boolean getAsyncSupportedBoolean() {
+        return asyncSupportedBoolean;
+    }
 
     // --------------------------------------------------------- Public Methods
 
 
     /**
-     * Add an initialization parameter to the set of parameters associated
-     * with this filter.
+     * Add an initialization parameter to the set of parameters associated with this filter.
      *
-     * @param name The initialization parameter name
+     * @param name  The initialization parameter name
      * @param value The initialization parameter value
      */
     public void addInitParameter(String name, String value) {
@@ -192,13 +193,7 @@ public class FilterDef implements Serializable {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("FilterDef[");
-        sb.append("filterName=");
-        sb.append(this.filterName);
-        sb.append(", filterClass=");
-        sb.append(this.filterClass);
-        sb.append("]");
-        return sb.toString();
+        return "FilterDef[" + "filterName=" + this.filterName + ", filterClass=" + this.filterClass + ']';
     }
 
 

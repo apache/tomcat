@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ant.jmx;
 
 
@@ -33,10 +31,10 @@ import org.apache.tools.ant.BuildException;
  * <li>Bind Get result as Ant properties</li>
  * </ul>
  * <p>
- * Examples:
- * <br>
+ * Examples: <br>
  * Get an Mbean IDataSender attribute nrOfRequests and create a new ant property <em>IDataSender.9025.nrOfRequests</em>
  * </p>
+ *
  * <pre>
  *   &lt;jmx:get
  *           ref="jmx.server"
@@ -51,7 +49,6 @@ import org.apache.tools.ant.BuildException;
  * </p>
  * These tasks require Ant 1.6 or later interface.
  *
- * @author Peter Rossbach
  * @since 5.5.10
  */
 public class JMXAccessorGetTask extends JMXAccessorTask {
@@ -81,40 +78,40 @@ public class JMXAccessorGetTask extends JMXAccessorTask {
     // ------------------------------------------------------ protected Methods
 
     @Override
-    public String jmxExecute(MBeanServerConnection jmxServerConnection)
-        throws Exception {
+    public String jmxExecute(MBeanServerConnection jmxServerConnection) throws Exception {
 
         if (getName() == null) {
             throw new BuildException("Must specify a 'name'");
         }
         if ((attribute == null)) {
-            throw new BuildException(
-                    "Must specify a 'attribute' for get");
+            throw new BuildException("Must specify a 'attribute' for get");
         }
-        return  jmxGet(jmxServerConnection, getName());
-     }
+        return jmxGet(jmxServerConnection, getName());
+    }
 
 
     /**
      * Get property value.
      *
      * @param jmxServerConnection Connection to the JMX server
-     * @param name The MBean name
+     * @param name                The MBean name
+     *
      * @return The error message if any
+     *
      * @throws Exception An error occurred
      */
     protected String jmxGet(MBeanServerConnection jmxServerConnection, String name) throws Exception {
         String error = null;
-        if(isEcho()) {
-            handleOutput("MBean " + name + " get attribute " + attribute );
+        if (isEcho()) {
+            handleOutput("MBean " + name + " get attribute " + attribute);
         }
-        Object result = jmxServerConnection.getAttribute(
-                new ObjectName(name), attribute);
+        Object result = jmxServerConnection.getAttribute(new ObjectName(name), attribute);
         if (result != null) {
-            echoResult(attribute,result);
+            echoResult(attribute, result);
             createProperty(result);
-        } else
+        } else {
             error = "Attribute " + attribute + " is empty";
+        }
         return error;
     }
 }

@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
     <title>The Loader Component</title>
   </properties>
 
@@ -87,23 +86,6 @@
         application.  Set to <code>false</code> (the default) to have the
         class loader look inside the web application first, before asking
         parent class loaders to find requested classes or resources.</p>
-      </attribute>
-
-      <attribute name="reloadable" required="false">
-        <p>Set to <code>true</code> if you want Catalina to monitor classes in
-        <code>/WEB-INF/classes/</code> and <code>/WEB-INF/lib</code> for
-        changes, and automatically reload the web application if a change
-        is detected.  This feature is very useful during application
-        development, but it requires significant runtime overhead and is
-        not recommended for use on deployed production applications.  You
-        can use the <a href="../manager-howto.html">Manager</a> web
-        application, however, to trigger reloads of deployed applications
-        on demand.</p>
-
-        <p><strong>NOTE</strong> - The value for this property will be
-        inherited from the <code>reloadable</code> attribute you set on
-        the surrounding <a href="context.html">Context</a> component,
-        and any value you explicitly set here will be replaced.</p>
       </attribute>
 
     </attributes>

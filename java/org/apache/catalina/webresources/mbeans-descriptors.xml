@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
   <mbean         name="StandardRoot"
@@ -49,6 +52,11 @@
                  type="java.util.List"
             writeable="false"/>
 
+    <attribute   name="archiveIndexStrategy"
+          description="Strategy to use for the resources archive lookup"
+                 type="java.lang.String"
+            writeable="true"/>
+
   </mbean>
 
   <mbean         name="Cache"
@@ -68,17 +76,17 @@
             writeable="false"/>
 
     <attribute   name="maxSize"
-          description="The maximum permitted size of the cache in kB"
+          description="The maximum permitted size of the cache in KiB"
                  type="long"
             writeable="true"/>
 
     <attribute   name="objectMaxSize"
-          description="The maximum permitted size for a single object in the cache in kB"
+          description="The maximum permitted size for a single object in the cache in KiB"
                  type="int"
             writeable="true"/>
 
     <attribute   name="size"
-          description="The current estimate of the cache size in kB"
+          description="The current estimate of the cache size in KiB"
                  type="long"
             writeable="false"/>
 

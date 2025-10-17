@@ -41,8 +41,14 @@ import java.util.logging.Logger;
 import javax.sql.CommonDataSource;
 
 /**
- * Defines bridge methods to JDBC 4.1 (Java 7) methods to allow call sites to operate safely (without
- * {@link AbstractMethodError}) when using a JDBC driver written for JDBC 4.0 (Java 6).
+ * Defines bridge methods to JDBC 4.1 (Java 7 or above) methods to allow call sites to operate safely (without
+ * {@link AbstractMethodError}) when using a JDBC driver written for JDBC 4.0 (Java 6 or above).
+ * <p>
+ * There should be no need to this kind of code for JDBC 4.2 in Java 8 due to JDBC's use of default methods.
+ * </p>
+ * <p>
+ * This should probably be moved or at least copied in some form to Apache Commons DbUtils.
+ * </p>
  *
  * @since 2.6.0
  */
@@ -67,6 +73,29 @@ public class Jdbc41Bridge {
             connection.abort(executor);
         } catch (final AbstractMethodError e) {
             connection.close();
+        }
+    }
+
+    /**
+     * Delegates to {@link Statement#closeOnCompletion()} without throwing an {@link AbstractMethodError}.
+     * <p>
+     * If the JDBC driver does not implement {@link Statement#closeOnCompletion()}, then just check that the connection
+     * is closed to then throw an SQLException.
+     * </p>
+     *
+     * @param statement
+     *            See {@link Statement#closeOnCompletion()}
+     * @throws SQLException
+     *             See {@link Statement#closeOnCompletion()}
+     * @see Statement#closeOnCompletion()
+     */
+    public static void closeOnCompletion(final Statement statement) throws SQLException {
+        try {
+            statement.closeOnCompletion();
+        } catch (final AbstractMethodError e) {
+            if (statement.isClosed()) {
+                throw new SQLException("Statement closed");
+            }
         }
     }
 
@@ -309,6 +338,26 @@ public class Jdbc41Bridge {
     }
 
     /**
+     * Delegates to {@link CommonDataSource#getParentLogger()} without throwing an {@link AbstractMethodError}.
+     * <p>
+     * If the JDBC driver does not implement {@link CommonDataSource#getParentLogger()}, then return null.
+     * </p>
+     *
+     * @param commonDataSource
+     *            See {@link CommonDataSource#getParentLogger()}
+     * @return See {@link CommonDataSource#getParentLogger()}
+     * @throws SQLFeatureNotSupportedException
+     *             See {@link CommonDataSource#getParentLogger()}
+     */
+    public static Logger getParentLogger(final CommonDataSource commonDataSource) throws SQLFeatureNotSupportedException {
+        try {
+            return commonDataSource.getParentLogger();
+        } catch (final AbstractMethodError e) {
+            throw new SQLFeatureNotSupportedException("javax.sql.CommonDataSource#getParentLogger()");
+        }
+    }
+
+    /**
      * Delegates to {@link DatabaseMetaData#getPseudoColumns(String, String, String, String)} without throwing a
      * {@link AbstractMethodError}.
      * <p>
@@ -365,76 +414,6 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link Connection#setNetworkTimeout(Executor, int)} without throwing an {@link AbstractMethodError}.
-     * <p>
-     * If the JDBC driver does not implement {@link Connection#setNetworkTimeout(Executor, int)}, then do nothing.
-     * </p>
-     *
-     * @param connection
-     *            the receiver
-     * @param executor
-     *            See {@link Connection#setNetworkTimeout(Executor, int)}
-     * @param milliseconds
-     *            {@link Connection#setNetworkTimeout(Executor, int)}
-     * @throws SQLException
-     *             {@link Connection#setNetworkTimeout(Executor, int)}
-     * @see Connection#setNetworkTimeout(Executor, int)
-     */
-    public static void setNetworkTimeout(final Connection connection, final Executor executor, final int milliseconds)
-            throws SQLException {
-        try {
-            connection.setNetworkTimeout(executor, milliseconds);
-        } catch (final AbstractMethodError e) {
-            // do nothing
-        }
-    }
-
-    /**
-     * Delegates to {@link Connection#setSchema(String)} without throwing an {@link AbstractMethodError}.
-     * <p>
-     * If the JDBC driver does not implement {@link Connection#setSchema(String)}, then do nothing.
-     * </p>
-     *
-     * @param connection
-     *            the receiver
-     * @param schema
-     *            See {@link Connection#setSchema(String)}.
-     * @throws SQLException
-     *             See {@link Connection#setSchema(String)}.
-     * @see Connection#setSchema(String)
-     */
-    public static void setSchema(final Connection connection, final String schema) throws SQLException {
-        try {
-            connection.setSchema(schema);
-        } catch (final AbstractMethodError e) {
-            // do nothing
-        }
-    }
-
-    /**
-     * Delegates to {@link Statement#closeOnCompletion()} without throwing an {@link AbstractMethodError}.
-     * <p>
-     * If the JDBC driver does not implement {@link Statement#closeOnCompletion()}, then just check that the connection
-     * is closed to then throw an SQLException.
-     * </p>
-     *
-     * @param statement
-     *            See {@link Statement#closeOnCompletion()}
-     * @throws SQLException
-     *             See {@link Statement#closeOnCompletion()}
-     * @see Statement#closeOnCompletion()
-     */
-    public static void closeOnCompletion(final Statement statement) throws SQLException {
-        try {
-            statement.closeOnCompletion();
-        } catch (final AbstractMethodError e) {
-            if (statement.isClosed()) {
-                throw new SQLException("Statement closed");
-            }
-        }
-    }
-
-    /**
      * Delegates to {@link Statement#isCloseOnCompletion()} without throwing an {@link AbstractMethodError}.
      * <p>
      * If the JDBC driver does not implement {@link Statement#isCloseOnCompletion()}, then just check that the
@@ -460,22 +439,49 @@ public class Jdbc41Bridge {
     }
 
     /**
-     * Delegates to {@link CommonDataSource#getParentLogger()} without throwing an {@link AbstractMethodError}.
+     * Delegates to {@link Connection#setNetworkTimeout(Executor, int)} without throwing an {@link AbstractMethodError}.
      * <p>
-     * If the JDBC driver does not implement {@link CommonDataSource#getParentLogger()}, then return null.
+     * If the JDBC driver does not implement {@link Connection#setNetworkTimeout(Executor, int)}, then do nothing.
      * </p>
      *
-     * @param commonDataSource
-     *            See {@link CommonDataSource#getParentLogger()}
-     * @return See {@link CommonDataSource#getParentLogger()}
-     * @throws SQLFeatureNotSupportedException
-     *             See {@link CommonDataSource#getParentLogger()}
+     * @param connection
+     *            the receiver
+     * @param executor
+     *            See {@link Connection#setNetworkTimeout(Executor, int)}
+     * @param milliseconds
+     *            {@link Connection#setNetworkTimeout(Executor, int)}
+     * @throws SQLException
+     *             {@link Connection#setNetworkTimeout(Executor, int)}
+     * @see Connection#setNetworkTimeout(Executor, int)
      */
-    public static Logger getParentLogger(final CommonDataSource commonDataSource) throws SQLFeatureNotSupportedException {
+    public static void setNetworkTimeout(final Connection connection, final Executor executor, final int milliseconds)
+            throws SQLException {
         try {
-            return commonDataSource.getParentLogger();
-        } catch (final AbstractMethodError e) {
-            throw new SQLFeatureNotSupportedException("javax.sql.CommonDataSource#getParentLogger()");
+            connection.setNetworkTimeout(executor, milliseconds);
+        } catch (final AbstractMethodError ignored) {
+            // do nothing
+        }
+    }
+
+    /**
+     * Delegates to {@link Connection#setSchema(String)} without throwing an {@link AbstractMethodError}.
+     * <p>
+     * If the JDBC driver does not implement {@link Connection#setSchema(String)}, then do nothing.
+     * </p>
+     *
+     * @param connection
+     *            the receiver
+     * @param schema
+     *            See {@link Connection#setSchema(String)}.
+     * @throws SQLException
+     *             See {@link Connection#setSchema(String)}.
+     * @see Connection#setSchema(String)
+     */
+    public static void setSchema(final Connection connection, final String schema) throws SQLException {
+        try {
+            connection.setSchema(schema);
+        } catch (final AbstractMethodError ignored) {
+            // do nothing
         }
     }
 

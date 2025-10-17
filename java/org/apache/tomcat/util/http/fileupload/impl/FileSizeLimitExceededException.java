@@ -38,15 +38,15 @@ public class FileSizeLimitExceededException
     private String fieldName;
 
     /**
-     * Constructs a <code>SizeExceededException</code> with
+     * Constructs a {@code SizeExceededException} with
      * the specified detail message, and actual and permitted sizes.
      *
      * @param message   The detail message.
      * @param actual    The actual request size.
      * @param permitted The maximum permitted request size.
      */
-    public FileSizeLimitExceededException(String message, long actual,
-            long permitted) {
+    public FileSizeLimitExceededException(final String message, final long actual,
+            final long permitted) {
         super(message, actual, permitted);
     }
 
@@ -66,7 +66,7 @@ public class FileSizeLimitExceededException
      *
      * @param pFileName the file name of the item, which caused the exception.
      */
-    public void setFileName(String pFileName) {
+    public void setFileName(final String pFileName) {
         fileName = pFileName;
     }
 
@@ -87,7 +87,7 @@ public class FileSizeLimitExceededException
      * @param pFieldName the field name of the item,
      *        which caused the exception.
      */
-    public void setFieldName(String pFieldName) {
+    public void setFieldName(final String pFieldName) {
         fieldName = pFieldName;
     }
 

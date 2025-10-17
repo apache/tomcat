@@ -56,7 +56,7 @@ public class AcceptLanguage {
                 continue;
             }
 
-            if (languageTag.length() == 0) {
+            if (languageTag.isEmpty()) {
                 // No more data to read
                 break;
             }

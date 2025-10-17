@@ -26,9 +26,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.apache.catalina.Manager;
+import org.apache.catalina.startup.ExpandWar;
 import org.apache.tomcat.unittest.TesterContext;
 import org.apache.tomcat.unittest.TesterServletContext;
-import org.apache.tomcat.util.http.fileupload.FileUtils;
 
 public class FileStoreTest {
 
@@ -51,22 +51,21 @@ public class FileStoreTest {
 
 
     @AfterClass
-    public static void cleanup() throws IOException {
-        FileUtils.cleanDirectory(dir);
-        FileUtils.deleteDirectory(dir);
+    public static void cleanup() {
+        ExpandWar.delete(dir);
     }
 
 
     @Before
     public void beforeEachTest() throws IOException {
         fileStore.setDirectory(SESS_TEMPPATH);
-        if (!dir.mkdir()) {
+        if (!dir.exists() && !dir.mkdir()) {
+            Assert.fail(dir.getAbsolutePath());
+        }
+        if (!file1.exists() && !file1.createNewFile()) {
             Assert.fail();
         }
-        if (!file1.createNewFile()) {
-            Assert.fail();
-        }
-        if (!file2.createNewFile()) {
+        if (!file2.exists() && !file2.createNewFile()) {
             Assert.fail();
         }
     }

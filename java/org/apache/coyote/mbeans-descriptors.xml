@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
 
     <mbean name="RequestGroupInfo"
@@ -50,6 +53,36 @@
 
         <attribute name="bytesSent"
                    description="Amount of data sent, in bytes"
+                   type="long"
+                   writeable="false"/>
+
+        <operation name="resetCounters" description="Reset counters" impact="ACTION" returnType="void"/>
+
+    </mbean>
+
+    <mbean name="UpgradeGroupInfo"
+           description="Runtime information of a group of connections upgraded via the HTTP upgrade process"
+           domain="Catalina"
+           group="Connector"
+           type="org.apache.coyote.http11.upgrade.UpgradeGroupInfo">
+
+        <attribute name="bytesReceived"
+                   description="Amount of data received, in bytes"
+                   type="long"
+                   writeable="false"/>
+
+        <attribute name="bytesSent"
+                   description="Amount of data sent, in bytes"
+                   type="long"
+                   writeable="false"/>
+
+        <attribute name="msgsReceived"
+                   description="Number of messages received where applicable for the given protocol"
+                   type="long"
+                   writeable="false"/>
+
+        <attribute name="msgsSent"
+                   description="Number of messages sent where applicable for the given protocol"
                    type="long"
                    writeable="false"/>
 

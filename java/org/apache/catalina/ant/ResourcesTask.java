@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ant;
 
 
@@ -26,10 +24,8 @@ import org.apache.tools.ant.BuildException;
 
 
 /**
- * Ant task that implements the <code>/resources</code> command, supported by
- * the Tomcat manager application.
+ * Ant task that implements the <code>/resources</code> command, supported by the Tomcat manager application.
  *
- * @author Craig R. McClanahan
  * @since 4.1
  */
 public class ResourcesTask extends AbstractCatalinaTask {
@@ -39,8 +35,7 @@ public class ResourcesTask extends AbstractCatalinaTask {
 
 
     /**
-     * The fully qualified class name of the resource type being requested
-     * (if any).
+     * The fully qualified class name of the resource type being requested (if any).
      */
     protected String type = null;
 
@@ -67,11 +62,9 @@ public class ResourcesTask extends AbstractCatalinaTask {
         super.execute();
         if (type != null) {
             try {
-                execute("/resources?type=" +
-                        URLEncoder.encode(type, getCharset()));
+                execute("/resources?type=" + URLEncoder.encode(type, getCharset()));
             } catch (UnsupportedEncodingException e) {
-                throw new BuildException
-                    ("Invalid 'charset' attribute: " + getCharset());
+                throw new BuildException("Invalid 'charset' attribute: " + getCharset());
             }
         } else {
             execute("/resources");

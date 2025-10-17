@@ -20,8 +20,6 @@ import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
  * Constants.
- *
- * @author Remy Maucherat
  */
 public final class Constants {
 
@@ -71,54 +69,15 @@ public final class Constants {
 
 
     /**
-     * 'A'.
-     */
-    public static final byte A = (byte) 'A';
-
-
-    /**
-     * 'a'.
-     */
-    public static final byte a = (byte) 'a';
-
-
-    /**
-     * 'Z'.
-     */
-    public static final byte Z = (byte) 'Z';
-
-
-    /**
      * '?'.
      */
     public static final byte QUESTION = (byte) '?';
 
 
-    /**
-     * Lower case offset.
-     */
-    public static final byte LC_OFFSET = A - a;
-
-
     /* Various constant "strings" */
     public static final String CONNECTION = "Connection";
     public static final String CLOSE = "close";
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public static final byte[] CLOSE_BYTES = ByteChunk.convertToBytes(CLOSE);
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public static final String KEEPALIVE = "keep-alive";
     public static final String KEEP_ALIVE_HEADER_VALUE_TOKEN = "keep-alive";
-    /**
-     * @deprecated Unused. Will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public static final byte[] KEEPALIVE_BYTES = ByteChunk.convertToBytes(KEEPALIVE);
     public static final String CHUNKED = "chunked";
     public static final byte[] ACK_BYTES = ByteChunk.convertToBytes("HTTP/1.1 100 " + CRLF + CRLF);
     public static final String TRANSFERENCODING = "Transfer-Encoding";

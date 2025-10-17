@@ -14,64 +14,68 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import org.apache.jasper.JasperException;
 
 /**
- * Interface for handling JSP parse and javac compilation errors.
- *
- * An implementation of this interface may be registered with the
- * ErrorDispatcher by setting the XXX initialization parameter in the JSP
- * page compiler and execution servlet in Catalina's web.xml file to the
- * implementation's fully qualified class name.
- *
- * @author Jan Luehe
- * @author Kin-man Chung
+ * Interface for handling JSP parse and javac compilation errors. An implementation of this interface may be registered
+ * with the ErrorDispatcher by setting the XXX initialization parameter in the JSP page compiler and execution servlet
+ * in Catalina's web.xml file to the implementation's fully qualified class name.
  */
 public interface ErrorHandler {
 
     /**
      * Processes the given JSP parse error.
+     * <p>
+     * It is expected (and Jasper is coded based on this) that calls to this method will always result in a
+     * {@code JasperException} being thrown.
      *
-     * @param fname Name of the JSP file in which the parse error occurred
-     * @param line Parse error line number
-     * @param column Parse error column number
-     * @param msg Parse error message
+     * @param fname     Name of the JSP file in which the parse error occurred
+     * @param line      Parse error line number
+     * @param column    Parse error column number
+     * @param msg       Parse error message
      * @param exception Parse exception
+     *
      * @throws JasperException An error occurred
      */
-    public void jspError(String fname, int line, int column, String msg,
-            Exception exception) throws JasperException;
+    void jspError(String fname, int line, int column, String msg, Exception exception) throws JasperException;
 
     /**
      * Processes the given JSP parse error.
+     * <p>
+     * It is expected (and Jasper is coded based on this) that calls to this method will always result in a
+     * {@code JasperException} being thrown.
      *
-     * @param msg Parse error message
+     * @param msg       Parse error message
      * @param exception Parse exception
+     *
      * @throws JasperException An error occurred
      */
-    public void jspError(String msg, Exception exception)
-            throws JasperException;
+    void jspError(String msg, Exception exception) throws JasperException;
 
     /**
      * Processes the given javac compilation errors.
+     * <p>
+     * It is expected (and Jasper is coded based on this) that calls to this method will always result in a
+     * {@code JasperException} being thrown.
      *
-     * @param details Array of JavacErrorDetail instances corresponding to the
-     * compilation errors
+     * @param details Array of JavacErrorDetail instances corresponding to the compilation errors
+     *
      * @throws JasperException An error occurred
      */
-    public void javacError(JavacErrorDetail[] details)
-            throws JasperException;
+    void javacError(JavacErrorDetail[] details) throws JasperException;
 
     /**
      * Processes the given javac error report and exception.
+     * <p>
+     * It is expected (and Jasper is coded based on this) that calls to this method will always result in a
+     * {@code JasperException} being thrown.
      *
      * @param errorReport Compilation error report
-     * @param exception Compilation exception
+     * @param exception   Compilation exception
+     *
      * @throws JasperException An error occurred
      */
-    public void javacError(String errorReport, Exception exception)
-            throws JasperException;
+    void javacError(String errorReport, Exception exception) throws JasperException;
 }

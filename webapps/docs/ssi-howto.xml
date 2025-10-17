@@ -23,7 +23,6 @@
 &project;
 
 <properties>
-<author email="glenn@apache.org">Glenn L. Nielsen</author>
 <title>SSI How To</title>
 </properties>
 
@@ -61,16 +60,14 @@ is mapped to the URL pattern "*.shtml".</p>
 is mapped to the URL pattern "*.shtml", though it can be mapped to "*" as
 it will selectively enable/disable SSI processing based on mime types.  The
 contentType init param allows you to apply SSI processing to JSP pages,
-javascript, or any other content you wish.</p>
+JavaScript, or any other content you wish.</p>
 <p>By default SSI support is disabled in Tomcat.</p>
 </section>
 
 <section name="Installation">
 
 <p><strong>CAUTION</strong> - SSI directives can be used to execute programs
-external to the Tomcat JVM. If you are using the Java SecurityManager this
-will bypass your security policy configuration in <code>catalina.policy.</code>
-</p>
+external to the Tomcat JVM.</p>
 
 <p>To use the SSI servlet, remove the XML comments from around the SSI servlet
 and servlet-mapping configuration in
@@ -142,11 +139,11 @@ false.</li>
  whose type will be processed by the SSI servlet. The directives take the form of an HTML
  comment. The directive is replaced by the results of interpreting it before sending the
  page to the client. The general form of a directive is: </p>
-<p> <code>&lt;!--#directive [parm=value] --&gt;</code></p>
+<p> <code>&lt;!--#directive [param=value] --&gt;</code></p>
 <p>The directives are:</p>
 <ul>
 <li>
-<strong>config</strong> - <code>&lt;!--#config errmsg=&quot;Error occured&quot; sizefmt=&quot;abbrev&quot;
+<strong>config</strong> - <code>&lt;!--#config errmsg=&quot;Error occurred&quot; sizefmt=&quot;abbrev&quot;
 timefmt=&quot;%B %Y&quot; --&gt;</code>
 Used to set SSI error message, the format of dates and file sizes processed by SSI.<br/>
 All are optional but at least one must be used. The available options are as follows:
@@ -232,7 +229,7 @@ Apache Introduction to SSI</a> for more information on using SSI directives.</p>
 
 <section name="Variables">
 <p>
-SSI variables are implemented via request attributes on the <b>javax.servlet.ServletRequest</b> object
+SSI variables are implemented via request attributes on the <b>jakarta.servlet.ServletRequest</b> object
 and are not limited to the SSI servlet. Variables starting with the names
 "java.", "javax.", "sun" or "org.apache.catalina.ssi.SSIMediator." are reserved
 and cannot be used.

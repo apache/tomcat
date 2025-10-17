@@ -14,22 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.tribes.transport;
+
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A very simple thread pool class.  The pool size is set at
- * construction time and remains fixed.  Threads are cycled
+ * A very simple thread pool class. The pool size is set at construction time and remains fixed. Threads are cycled
  * through a FIFO idle queue.
- * @version 1.0
  */
 public class RxTaskPool {
 
-    final List<AbstractRxTask> idle = new LinkedList<>();
-    final List<AbstractRxTask> used = new LinkedList<>();
+    final List<AbstractRxTask> idle = new ArrayList<>();
+    final List<AbstractRxTask> used = new ArrayList<>();
 
     final Object mutex = new Object();
     boolean running = true;
@@ -40,7 +38,7 @@ public class RxTaskPool {
     private final TaskCreator creator;
 
 
-    public RxTaskPool (int maxTasks, int minTasks, TaskCreator creator) throws Exception {
+    public RxTaskPool(int maxTasks, int minTasks, TaskCreator creator) throws Exception {
         // fill up the pool with worker threads
         this.maxTasks = maxTasks;
         this.minTasks = minTasks;
@@ -50,61 +48,60 @@ public class RxTaskPool {
     protected void configureTask(AbstractRxTask task) {
         synchronized (task) {
             task.setTaskPool(this);
-//            task.setName(task.getClass().getName() + "[" + inc() + "]");
-//            task.setDaemon(true);
-//            task.setPriority(Thread.MAX_PRIORITY);
-//            task.start();
         }
     }
 
     /**
-     * Find an idle worker thread, if any.  Could return null.
+     * Find an idle worker thread, if any. Could return null.
+     *
      * @return a worker
      */
-    public AbstractRxTask getRxTask()
-    {
+    public AbstractRxTask getRxTask() {
         AbstractRxTask worker = null;
         synchronized (mutex) {
-            while ( worker == null && running ) {
-                if (idle.size() > 0) {
+            while (worker == null && running) {
+                if (!idle.isEmpty()) {
                     try {
-                        worker = idle.remove(0);
-                    } catch (java.util.NoSuchElementException x) {
-                        //this means that there are no available workers
-                        worker = null;
+                        worker = idle.removeFirst();
+                    } catch (java.util.NoSuchElementException ignore) {
+                        // Should never happen as access to idle is always synchronized on mutex
                     }
-                } else if ( used.size() < this.maxTasks && creator != null) {
+                } else if (used.size() < this.maxTasks && creator != null) {
                     worker = creator.createRxTask();
                     configureTask(worker);
                 } else {
                     try {
                         mutex.wait();
-                    } catch (java.lang.InterruptedException x) {
+                    } catch (InterruptedException x) {
                         Thread.currentThread().interrupt();
                     }
                 }
-            }//while
-            if ( worker != null ) used.add(worker);
+            }
+            if (worker != null) {
+                used.add(worker);
+            }
         }
         return worker;
     }
 
     public int available() {
-        return idle.size();
+        synchronized (mutex) {
+            return idle.size();
+        }
     }
 
     /**
-     * Called by the worker thread to return itself to the
-     * idle pool.
+     * Called by the worker thread to return itself to the idle pool.
+     *
      * @param worker The worker
      */
-    public void returnWorker (AbstractRxTask worker) {
-        if ( running ) {
+    public void returnWorker(AbstractRxTask worker) {
+        if (running) {
             synchronized (mutex) {
                 used.remove(worker);
-                //if ( idle.size() < minThreads && !idle.contains(worker)) idle.add(worker);
-                if ( idle.size() < maxTasks && !idle.contains(worker)) idle.add(worker); //let max be the upper limit
-                else {
+                if (idle.size() < maxTasks && !idle.contains(worker)) {
+                    idle.add(worker); // let max be the upper limit
+                } else {
                     worker.close();
                 }
                 mutex.notifyAll();
@@ -126,7 +123,7 @@ public class RxTaskPool {
         running = false;
         synchronized (mutex) {
             Iterator<AbstractRxTask> i = idle.iterator();
-            while ( i.hasNext() ) {
+            while (i.hasNext()) {
                 AbstractRxTask worker = i.next();
                 returnWorker(worker);
                 i.remove();
@@ -146,7 +143,7 @@ public class RxTaskPool {
         return this.creator;
     }
 
-    public static interface TaskCreator  {
-        public AbstractRxTask createRxTask();
+    public interface TaskCreator {
+        AbstractRxTask createRxTask();
     }
 }

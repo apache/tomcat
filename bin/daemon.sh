@@ -90,7 +90,6 @@ test ".$MAX_FD" = . && MAX_FD="maximum"
 #
 test ".$TOMCAT_USER" = . && TOMCAT_USER=tomcat
 # Set JAVA_HOME to working JDK or JRE
-# JAVA_HOME=/opt/jdk-1.6.0.22
 # If not set we'll try to guess the JAVA_HOME
 # from java binary if on the PATH
 #
@@ -149,13 +148,14 @@ if [ -r "$CATALINA_BASE/bin/tomcat-juli.jar" ] ; then
 else
   CLASSPATH="$CLASSPATH:$CATALINA_HOME/bin/tomcat-juli.jar"
 fi
+
 # Set juli LogManager config file if it is present and an override has not been issued
-if [ -z "$LOGGING_CONFIG" ]; then
+if [ -z "$CATALINA_LOGGING_CONFIG" ]; then
   if [ -r "$CATALINA_BASE/conf/logging.properties" ]; then
-    LOGGING_CONFIG="-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
+    CATALINA_LOGGING_CONFIG="-Djava.util.logging.config.file=$CATALINA_BASE/conf/logging.properties"
   else
     # Bugzilla 45585
-    LOGGING_CONFIG="-Dnop"
+    CATALINA_LOGGING_CONFIG="-Dnop"
   fi
 fi
 
@@ -183,17 +183,11 @@ if [ "$cygwin" = "false" ]; then
     fi
 fi
 
-# Java 9 no longer supports the java.endorsed.dirs
-# system property. Only try to use it if
-# JAVA_ENDORSED_DIRS was explicitly set
-# or CATALINA_HOME/endorsed exists.
-ENDORSED_PROP=ignore.endorsed.dirs
-if [ -n "$JAVA_ENDORSED_DIRS" ]; then
-    ENDORSED_PROP=java.endorsed.dirs
+# Set UMASK unless it has been overridden
+if [ -z "$UMASK" ]; then
+    UMASK="0027"
 fi
-if [ -d "$CATALINA_HOME/endorsed" ]; then
-    ENDORSED_PROP=java.endorsed.dirs
-fi
+umask $UMASK
 
 # ----- Execute The Requested Command -----------------------------------------
 case "$1" in
@@ -204,12 +198,12 @@ case "$1" in
       -java-home "\"$JAVA_HOME\"" \
       -pidfile "\"$CATALINA_PID\"" \
       -wait $SERVICE_START_WAIT_TIME \
+      -umask $UMASK \
       -nodetach \
       -outfile "\"&1\"" \
       -errfile "\"&2\"" \
       -classpath "\"$CLASSPATH\"" \
-      "\"$LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
-      -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+      "\"$CATALINA_LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMP\"" \
@@ -223,11 +217,11 @@ case "$1" in
       -user $TOMCAT_USER \
       -pidfile "\"$CATALINA_PID\"" \
       -wait $SERVICE_START_WAIT_TIME \
+      -umask $UMASK \
       -outfile "\"$CATALINA_OUT\"" \
       -errfile "\"&1\"" \
       -classpath "\"$CLASSPATH\"" \
-      "\"$LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
-      -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
+      "\"$CATALINA_LOGGING_CONFIG\"" "$JAVA_OPTS" "$CATALINA_OPTS" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMP\"" \
@@ -240,7 +234,6 @@ case "$1" in
       -stop \
       -pidfile "\"$CATALINA_PID\"" \
       -classpath "\"$CLASSPATH\"" \
-      -D$ENDORSED_PROP="\"$JAVA_ENDORSED_DIRS\"" \
       -Dcatalina.base="\"$CATALINA_BASE\"" \
       -Dcatalina.home="\"$CATALINA_HOME\"" \
       -Djava.io.tmpdir="\"$CATALINA_TMP\"" \

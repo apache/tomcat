@@ -16,8 +16,8 @@
   limitations under the License.
 -->
 <!DOCTYPE module PUBLIC
-    "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
-    "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
 <module name="Checker">
   <!-- When adding checks, keep to the order checks are listed under         -->
   <!-- 'Standard Checks' in the Checkstyle documentation:                    -->
@@ -31,7 +31,7 @@
   <module name="RegexpHeader">
     <property name="headerFile" value="${basedir}/res/checkstyle/header-al2.txt"/>
     <property name="multiLines" value="1, 2, 3, 4"/>
-    <property name="fileExtensions" value="java,xml,jsp,txt,sh,bat,properties"/>
+    <property name="fileExtensions" value="java,xml,jsp,txt,sh,bat,properties,yaml"/>
   </module>
 
   <!-- Whitespace -->
@@ -53,24 +53,30 @@
     <module name="AvoidNestedBlocks">
       <property name="allowInSwitchCase" value="true"/>
     </module>
-    <!-- ~2800 errors
     <module name="NeedBraces"/>
-    -->
 
     <!-- Coding -->
     <module name="IllegalInstantiation"/>
 
     <!-- Imports -->
-    <module name="AvoidStarImport"/>
+    <module name="AvoidStarImport">
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Compatibility.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Macros.*"/>
+    </module>
     <module name="AvoidStaticImport">
-        <property name="excludes"
-                  value="org.apache.catalina.startup.SimpleHttpClient.CRLF"/>
+        <property name="excludes" value="org.apache.catalina.startup.SimpleHttpClient.CRLF"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Compatibility.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Macros.*"/>
+        <property name="excludes" value="org.hamcrest.MatcherAssert.*"/>
+        <property name="excludes" value="org.hamcrest.core.IsInstanceOf.*"/>
     </module>
     <module name="IllegalImport">
         <property name="illegalPkgs" value="sun,junit.framework"/>
     </module>
     <module name="ImportOrder">
-        <property name="groups" value="java,javax,org.hamcrest,org.junit,org,async,jsp2,util"/>
+        <property name="groups" value="java,javax,jakarta,org.hamcrest,org.junit,org,async,jsp2,util"/>
         <property name="ordered" value="true"/>
         <property name="separated" value="true"/>
         <property name="option" value="above"/>
@@ -78,24 +84,49 @@
     <module name="RedundantImport"/>
     <module name="UnusedImports"/>
 
+    <!-- Javadoc Comments -->
+    <module name="InvalidJavadocPosition"/>
+    <module name="JavadocBlockTagLocation"/>
+    <module name="JavadocContentLocationCheck"/>
+    <module name="JavadocMethod">
+        <property name="accessModifiers" value="public,protected"/>
+    </module>
+    <module name="JavadocMissingLeadingAsterisk"/>
+    <module name="JavadocMissingWhitespaceAfterAsterisk"/>
+    <module name="JavadocStyle">
+        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1400 errors -->
+        <property name="checkFirstSentence" value="false"/>
+        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1300 errors -->
+        <property name="checkEmptyJavadoc" value="false"/>
+        <!-- Does not handle HTML tags in {@code ...} correctly -->
+        <property name="checkHtml" value="false"/>
+    </module>
+    <!-- ~10000 errors
+    <module name="MissingJavadocMethod"/>
+    -->
+    <!-- ~1600 errors
+    <module name="MissingJavadocType"/>
+    -->
+    <module name="NonEmptyAtclauseDescription"/>
+    <!-- ~500 errors
+    <module name="RequireEmptyLineBeforeBlockTagGroup"/>
+    -->
+    <module name="SingleLineJavadoc"/>
+
     <!-- Miscellaneous -->
-    <!-- ~5000 errors
     <module name="Indentation">
         <property name="lineWrappingIndentation" value="8"/>
     </module>
-    -->
 
     <!-- Modifiers -->
     <module name="ModifierOrder"/>
-    <!-- ~1750 errors
     <module name="RedundantModifier"/>
-    -->
 
     <!-- Whitespace -->
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
-    <!--  ~ 1100 errors
+    <!--  ~ 600 errors
     <module name="OperatorWrap">
       <property name="option" value="eol"/>
     </module>

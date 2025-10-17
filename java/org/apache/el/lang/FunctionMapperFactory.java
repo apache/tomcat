@@ -14,18 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el.lang;
 
 import java.lang.reflect.Method;
 
-import javax.el.FunctionMapper;
+import jakarta.el.FunctionMapper;
 
 import org.apache.el.util.MessageFactory;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public class FunctionMapperFactory extends FunctionMapper {
 
     protected FunctionMapperImpl memento = null;
@@ -39,9 +35,6 @@ public class FunctionMapperFactory extends FunctionMapper {
     }
 
 
-    /* (non-Javadoc)
-     * @see javax.el.FunctionMapper#resolveFunction(java.lang.String, java.lang.String)
-     */
     @Override
     public Method resolveFunction(String prefix, String localName) {
         if (this.memento == null) {

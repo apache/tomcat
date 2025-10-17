@@ -17,60 +17,43 @@
  */
 package org.apache.tomcat.util.file;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URI;
 
 /**
- * This class is used to obtain {@link InputStream}s for configuration files
- * from a given location String. This allows greater flexibility than these
- * files having to be loaded directly from a file system.
+ * This class is used to obtain {@link InputStream}s for configuration files from a given location String. This allows
+ * greater flexibility than these files having to be loaded directly from a file system.
  */
 public class ConfigFileLoader {
 
     private static ConfigurationSource source;
 
-    public static final ConfigurationSource getSource() {
-        if (ConfigFileLoader.source == null) {
-            // TODO: Add logging in Tomcat 10 when the default is silently used, or remove the default
+    /**
+     * Get the configured configuration source. If none has been configured, a default source based on the calling
+     * directory will be used.
+     *
+     * @return the configuration source in use
+     */
+    public static ConfigurationSource getSource() {
+        if (source == null) {
             return ConfigurationSource.DEFAULT;
         }
         return source;
     }
 
-    public static final void setSource(ConfigurationSource source) {
+    /**
+     * Set the configuration source used by Tomcat to locate various configuration resources.
+     *
+     * @param source The source
+     */
+    public static void setSource(ConfigurationSource source) {
         if (ConfigFileLoader.source == null) {
             ConfigFileLoader.source = source;
         }
     }
 
     private ConfigFileLoader() {
-        // Utility class. Hide the default constructor.
+        // Hide the constructor
     }
 
-
-    /**
-     * Load the resource from the specified location.
-     *
-     * @param location The location for the resource of interest. The location
-     *                 may be a URL or a file path. Relative paths will be
-     *                 resolved against CATALINA_BASE.
-     *
-     * @return The InputStream for the given resource. The caller is responsible
-     *         for closing this stream when it is no longer used.
-     *
-     * @throws IOException If an InputStream cannot be created using the
-     *                     provided location
-     */
-    @Deprecated
-    public static InputStream getInputStream(String location) throws IOException {
-        return getSource().getResource(location).getInputStream();
-    }
-
-
-    @Deprecated
-    public static URI getURI(String location) {
-        return getSource().getURI(location);
-    }
 
 }

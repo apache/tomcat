@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
     <title>The Realm Component</title>
   </properties>
 
@@ -88,126 +87,6 @@
     <strong>Realm</strong> implementations available.  As a result,
     the <code>className</code> attribute MUST be used to select the
     implementation you wish to use.</p>
-
-  </subsection>
-
-
-  <subsection name="JDBC Database Realm - org.apache.catalina.realm.JDBCRealm">
-
-    <p>The <strong>JDBC Database Realm</strong> connects Tomcat to
-    a relational database, accessed through an appropriate JDBC driver,
-    to perform lookups of usernames, passwords, and their associated
-    roles.  Because the lookup is done each time that it is required,
-    changes to the database will be immediately reflected in the
-    information used to authenticate new logins.</p>
-
-    <p>A rich set of additional attributes lets you configure the required
-    connection to the underlying database, as well as the table and
-    column names used to retrieve the required information:</p>
-
-    <attributes>
-
-      <attribute name="allRolesMode" required="false">
-        <p>This attribute controls how the special role name <code>*</code> is
-        handled when processing authorization constraints in web.xml. By
-        default, the specification compliant value of <code>strict</code> is
-        used which means that the user must be assigned one of the roles defined
-        in web.xml. The alternative values are <code>authOnly</code> which means
-        that the user must be authenticated but no check is made for assigned
-        roles and <code>strictAuthOnly</code> which means that the user must be
-        authenticated and no check will be made for assigned roles unless roles
-        are defined in web.xml in which case the user must be assigned at least
-        one of those roles.</p>
-        <p>When this attribute has the value of <code>authOnly</code> or
-        <code>strictAuthOnly</code>, the <strong>roleNameCol</strong> and
-        <strong>userRoleTable</strong> attributes become optional. If those two
-        attributes are omitted, the user's roles will not be loaded by this
-        Realm.</p>
-      </attribute>
-
-      <attribute name="connectionName" required="true">
-        <p>The database username to use when establishing the JDBC
-        connection.</p>
-      </attribute>
-
-      <attribute name="connectionPassword" required="true">
-        <p>The database password to use when establishing the JDBC
-        connection.</p>
-      </attribute>
-
-      <attribute name="connectionURL" required="true">
-        <p>The connection URL to be passed to the JDBC driver when
-        establishing a database connection.</p>
-      </attribute>
-
-      <attribute name="driverName" required="true">
-        <p>Fully qualified Java class name of the JDBC driver to be
-        used to connect to the authentication database.</p>
-      </attribute>
-
-      <attribute name="roleNameCol" required="false">
-        <p>Name of the column, in the "user roles" table, which contains
-        a role name assigned to the corresponding user.</p>
-        <p>This attribute is <strong>required</strong> in majority of
-        configurations. See <strong>allRolesMode</strong> attribute for
-        a rare case when it can be omitted.</p>
-      </attribute>
-
-      <attribute name="stripRealmForGss" required="false">
-        <p>When processing users authenticated via the GSS-API, this attribute
-        controls if any &quot;@...&quot; is removed from the end of the user
-        name. If not specified, the default is <code>true</code>.</p>
-      </attribute>
-
-      <attribute name="transportGuaranteeRedirectStatus" required="false">
-        <p>The HTTP status code to use when the container needs to issue an HTTP
-           redirect to meet the requirements of a configured transport
-           guarantee. The provided status code is not validated. If not
-           specified, the default value of <code>302</code> is used.</p>
-      </attribute>
-
-      <attribute name="userCredCol" required="true">
-        <p>Name of the column, in the "users" table, which contains
-        the user's credentials (i.e. password).  If a
-        <code>CredentialHandler</code> is specified, this component
-        will assume that the passwords have been encoded with the
-        specified algorithm.  Otherwise, they will be assumed to be
-        in clear text.</p>
-      </attribute>
-
-      <attribute name="userNameCol" required="true">
-        <p>Name of the column, in the "users" and "user roles" table,
-        that contains the user's username.</p>
-      </attribute>
-
-      <attribute name="userRoleTable" required="false">
-        <p>Name of the "user roles" table, which must contain columns
-        named by the <code>userNameCol</code> and <code>roleNameCol</code>
-        attributes.</p>
-        <p>This attribute is <strong>required</strong> in majority of
-        configurations. See <strong>allRolesMode</strong> attribute for
-        a rare case when it can be omitted.</p>
-      </attribute>
-
-      <attribute name="userTable" required="true">
-        <p>Name of the "users" table, which must contain columns named
-        by the <code>userNameCol</code> and <code>userCredCol</code>
-        attributes.</p>
-      </attribute>
-
-      <attribute name="X509UsernameRetrieverClassName" required="false">
-        <p>When using X509 client certificates, this specifies the class name
-        that will be used to retrieve the user name from the certificate.
-        The class must implement the
-        <code>org.apache.catalina.realm.X509UsernameRetriever</code>
-        interface. The default is to use the certificate's SubjectDN
-        as the username.</p>
-      </attribute>
-    </attributes>
-
-    <p>See the <a href="../realm-howto.html">Container-Managed Security Guide</a> for more
-    information on setting up container managed security using the
-    JDBC Database Realm component.</p>
 
   </subsection>
 
@@ -340,7 +219,6 @@
     roles. Changes to the directory are immediately reflected in the
     information used to authenticate new logins.</p>
 
-
     <p>The directory realm supports a variety of approaches to using
     LDAP for authentication:</p>
 
@@ -399,9 +277,14 @@
       </attribute>
 
       <attribute name="authentication" required="false">
-        <p>A string specifying the type of authentication to use.
-        "none", "simple", "strong" or a provider specific definition
-        can be used. If no value is given the providers default is used.</p>
+        <p>A string specifying the type of authentication to use. "none",
+        "simple", "strong" or a provider specific definition can be used. If the
+        provider specific mechanism "GSSAPI" is specified and supported by the
+        provider, there are some circumstances, such as handling calls to
+        <code>HttpServletRequest.login(String username, String password)</code>,
+        where "GSSAPI" will not be used and the user will be
+        authenticated as described in <code>userPassword</code>. If no value is
+        given, the providers default is used.</p>
       </attribute>
 
       <attribute name="cipherSuites" required="false">
@@ -431,6 +314,13 @@
         specified an anonymous connection is made, which is often
         sufficient unless you specify the <code>userPassword</code>
         property.</p>
+      </attribute>
+
+      <attribute name="connectionPoolSize" required="false">
+        <p>The JNDI realm can use a pool of connections to the directory server
+        to avoid blocking on a single connection. This attribute value is the
+        maximum pool size. If not specified, it will use <code>1</code>, which
+        means a single connection will be used.</p>
       </attribute>
 
       <attribute name="connectionTimeout" required="false">
@@ -475,8 +365,8 @@
       </attribute>
 
       <attribute name="protocol" required="false">
-         <p>A string specifying the security protocol to use. If not given
-         the providers default is used.</p>
+         <p>A string specifying the TLS protocol to use. If not given, the
+         Java runtime's default is used.</p>
       </attribute>
 
       <attribute name="readTimeout" required="false">
@@ -584,7 +474,7 @@
         connection. This attribute should be a comma-separated list of values
         selected from <code>auth-conf</code>, <code>auth-int</code> and
         <code>auth</code>. See <a
-        href="http://docs.oracle.com/javase/7/docs/api/javax/security/sasl/Sasl.html#QOP"
+        href="https://docs.oracle.com/en/java/javase/21/docs/api/java.security.sasl/javax/security/sasl/Sasl.html#QOP"
         rel="nofollow">Java documentation</a> for more details.</p>
         <p>The default value is <code>auth-conf</code>.</p>
       </attribute>
@@ -622,12 +512,23 @@
            specified, the default value of <code>302</code> is used.</p>
       </attribute>
 
+      <attribute name="useContextClassLoader" required="false">
+        <p>Instructs JNDIRealm to use the context class loader when opening the
+        connection for the JNDI provider. The default value is
+        <code>true</code>. To load classes using the container's classloader,
+        specify <code>false</code>.</p>
+      </attribute>
+
       <attribute name="useDelegatedCredential" required="false">
         <p>When the JNDIRealm is used with the SPNEGO authenticator, delegated
         credentials for the user may be available. If such credentials are
         present, this attribute controls whether or not they are used to
-        connect to the directory. If not specified, the default value of
-        <code>true</code> is used.</p>
+        connect to the directory. If delegated credentials are present but not
+        used because this attribute is <code>false</code>, the behaviour will be
+        as described in <code>roleSearchAsUser</code>, <code>userPattern</code>
+        and <code>userSearchAsUser</code> when delegated credentials are not
+        used. If not specified, the default value of <code>true</code> is
+        used.</p>
       </attribute>
 
       <attribute name="userBase" required="false">
@@ -761,9 +662,27 @@
         one of those roles.</p>
       </attribute>
 
+      <attribute name="localJndiResource" required="false">
+        <p>When the realm is nested inside a Context element, this allows the
+        realm to use a UserDatabase defined for the Context rather than a global
+        UserDatabase. If not specified, the default is <code>false</code>: use a
+        global UserDatabase.</p>
+      </attribute>
+
       <attribute name="resourceName" required="true">
         <p>The name of the global <code>UserDatabase</code> resource
         that this realm will use for user, password and role information.</p>
+      </attribute>
+
+      <attribute name="useStaticPrincipal" required="false">
+        <p>This allows using a static <code>Principal</code> instance
+        disconnected from the database if needed. This makes the behavior of
+        authenticated principals equivalent to that of the other realms.
+        If there is a plan to use serialization, it is best to set this to
+        <code>true</code> as the principal will always be replaced by this
+        equivalent static principal when serializing.
+        If not specified, the default is <code>false</code>: use a
+        Principal connected to the UserDatabase.</p>
       </attribute>
 
       <attribute name="transportGuaranteeRedirectStatus" required="false">

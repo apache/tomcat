@@ -28,15 +28,15 @@ public class SizeLimitExceededException
     private static final long serialVersionUID = -2474893167098052828L;
 
     /**
-     * Constructs a <code>SizeExceededException</code> with
+     * Constructs a {@code SizeExceededException} with
      * the specified detail message, and actual and permitted sizes.
      *
      * @param message   The detail message.
      * @param actual    The actual request size.
      * @param permitted The maximum permitted request size.
      */
-    public SizeLimitExceededException(String message, long actual,
-            long permitted) {
+    public SizeLimitExceededException(final String message, final long actual,
+            final long permitted) {
         super(message, actual, permitted);
     }
 

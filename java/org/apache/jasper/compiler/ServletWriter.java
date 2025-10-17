@@ -20,9 +20,6 @@ import java.io.PrintWriter;
 
 /**
  * This is what is used to generate servlets.
- *
- * @author Anil K. Vijendran
- * @author Kin-man Chung
  */
 public class ServletWriter implements AutoCloseable {
 
@@ -56,7 +53,7 @@ public class ServletWriter implements AutoCloseable {
     }
 
 
-    // -------------------- Access informations --------------------
+    // -------------------- Access information --------------------
 
     public int getJavaLine() {
         return javaLine;
@@ -67,18 +64,21 @@ public class ServletWriter implements AutoCloseable {
 
     public void pushIndent() {
         virtual_indent += TAB_WIDTH;
-        if (virtual_indent >= 0 && virtual_indent <= SPACES.length())
+        if (virtual_indent >= 0 && virtual_indent <= SPACES.length()) {
             indent = virtual_indent;
+        }
     }
 
     public void popIndent() {
         virtual_indent -= TAB_WIDTH;
-        if (virtual_indent >= 0 && virtual_indent <= SPACES.length())
+        if (virtual_indent >= 0 && virtual_indent <= SPACES.length()) {
             indent = virtual_indent;
+        }
     }
 
     /**
      * Prints the given string followed by '\n'
+     *
      * @param s The string
      */
     public void println(String s) {
@@ -95,14 +95,15 @@ public class ServletWriter implements AutoCloseable {
     }
 
     /**
-     * Prints the current indention
+     * Prints the current indentation
      */
     public void printin() {
         writer.print(SPACES.substring(0, indent));
     }
 
     /**
-     * Prints the current indention, followed by the given string
+     * Prints the current indentation, followed by the given string
+     *
      * @param s The string
      */
     public void printin(String s) {
@@ -111,7 +112,8 @@ public class ServletWriter implements AutoCloseable {
     }
 
     /**
-     * Prints the current indention, and then the string, and a '\n'.
+     * Prints the current indentation, and then the string, and a '\n'.
+     *
      * @param s The string
      */
     public void printil(String s) {
@@ -121,9 +123,8 @@ public class ServletWriter implements AutoCloseable {
     }
 
     /**
-     * Prints the given char.
+     * Prints the given char. Use println() to print a '\n'.
      *
-     * Use println() to print a '\n'.
      * @param c The char
      */
     public void print(char c) {
@@ -132,6 +133,7 @@ public class ServletWriter implements AutoCloseable {
 
     /**
      * Prints the given int.
+     *
      * @param i The int
      */
     public void print(int i) {
@@ -139,10 +141,8 @@ public class ServletWriter implements AutoCloseable {
     }
 
     /**
-     * Prints the given string.
+     * Prints the given string. The string must not contain any '\n', otherwise the line count will be off.
      *
-     * The string must not contain any '\n', otherwise the line count will be
-     * off.
      * @param s The string
      */
     public void print(String s) {
@@ -150,17 +150,15 @@ public class ServletWriter implements AutoCloseable {
     }
 
     /**
-     * Prints the given string.
+     * Prints the given string. If the string spans multiple lines, the line count will be adjusted accordingly.
      *
-     * If the string spans multiple lines, the line count will be adjusted
-     * accordingly.
      * @param s The string
      */
     public void printMultiLn(String s) {
         int index = 0;
 
         // look for hidden newlines inside strings
-        while ((index=s.indexOf('\n',index)) > -1 ) {
+        while ((index = s.indexOf('\n', index)) > -1) {
             javaLine++;
             index++;
         }

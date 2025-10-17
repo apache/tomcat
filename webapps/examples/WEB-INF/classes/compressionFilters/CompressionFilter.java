@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package compressionFilters;
 
 import java.io.IOException;
@@ -23,20 +23,17 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.servlet.FilterChain;
-import javax.servlet.GenericFilter;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.GenericFilter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * Implementation of <code>javax.servlet.Filter</code> used to compress
+ * Implementation of <code>jakarta.servlet.Filter</code> used to compress
  * the ServletResponse if it is bigger than a threshold.
- *
- * @author Amy Roh
- * @author Dmitri Valdin
  */
 public class CompressionFilter extends GenericFilter {
 
@@ -50,7 +47,7 @@ public class CompressionFilter extends GenericFilter {
     /**
      * Minimal reasonable buffer.
      */
-    // 8KB is what tomcat would use by default anyway
+    // 8 KiB is what tomcat would use by default anyway
     private static final int MIN_BUFFER = 8192;
 
     /**
@@ -117,8 +114,7 @@ public class CompressionFilter extends GenericFilter {
             }
 
             if (values.size() > 0) {
-                compressionMimeTypes = values.toArray(
-                        new String[values.size()]);
+                compressionMimeTypes = values.toArray(new String[0]);
             } else {
                 compressionMimeTypes = null;
             }
@@ -169,7 +165,7 @@ public class CompressionFilter extends GenericFilter {
             }
 
             // Are we allowed to compress ?
-            String s = ((HttpServletRequest)request).getParameter("gzip");
+            String s = request.getParameter("gzip");
             if ("false".equals(s)) {
                 if (debug > 0) {
                     System.out.println("got parameter gzip=false --> don't compress, just chain filter");
@@ -179,7 +175,7 @@ public class CompressionFilter extends GenericFilter {
             }
 
             Enumeration<String> e =
-                ((HttpServletRequest)request).getHeaders("Accept-Encoding");
+                    ((HttpServletRequest)request).getHeaders("Accept-Encoding");
             while (e.hasMoreElements()) {
                 String name = e.nextElement();
                 if (name.indexOf("gzip") != -1) {
@@ -198,7 +194,7 @@ public class CompressionFilter extends GenericFilter {
         if (supportCompression) {
             if (response instanceof HttpServletResponse) {
                 CompressionServletResponseWrapper wrappedResponse =
-                    new CompressionServletResponseWrapper((HttpServletResponse)response);
+                        new CompressionServletResponseWrapper((HttpServletResponse)response);
                 wrappedResponse.setDebugLevel(debug);
                 wrappedResponse.setCompressionThreshold(compressionThreshold);
                 wrappedResponse.setCompressionBuffer(compressionBuffer);

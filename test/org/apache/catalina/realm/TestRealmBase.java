@@ -21,8 +21,8 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletSecurityElement;
-import javax.servlet.annotation.ServletSecurity;
+import jakarta.servlet.ServletSecurityElement;
+import jakarta.servlet.annotation.ServletSecurity;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,6 +36,7 @@ import org.apache.tomcat.unittest.TesterRequest;
 import org.apache.tomcat.unittest.TesterResponse;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
+import org.apache.tomcat.util.http.Method;
 
 public class TestRealmBase {
 
@@ -614,7 +615,7 @@ public class TestRealmBase {
                 new SecurityConstraint[] { constraintOne, constraintTwo };
 
         // Set up the mock request and response
-        Request request = new Request(null);
+        Request request = new Request(null, null);
         Response response = new TesterResponse();
         Context context = new TesterContext();
         for (String applicationRole : applicationRoles) {
@@ -625,7 +626,7 @@ public class TestRealmBase {
         // Set up an authenticated user
         // Configure the users in the Realm
         if (userRoles != null) {
-            GenericPrincipal gp = new GenericPrincipal(USER1, PWD, userRoles);
+            GenericPrincipal gp = new GenericPrincipal(USER1, userRoles);
             request.setUserPrincipal(gp);
         }
 
@@ -639,7 +640,7 @@ public class TestRealmBase {
 
     /*
      * This test case covers the special case in section 13.4.1 of the Servlet
-     * 3.1 specification for {@link javax.servlet.annotation.HttpConstraint}.
+     * 3.1 specification for {@link jakarta.servlet.annotation.HttpConstraint}.
      */
     @Test
     public void testHttpConstraint() throws IOException {
@@ -659,7 +660,7 @@ public class TestRealmBase {
         SecurityConstraint deleteConstraint = new SecurityConstraint();
         deleteConstraint.addAuthRole(ROLE1);
         SecurityCollection deleteCollection = new SecurityCollection();
-        deleteCollection.addMethod("DELETE");
+        deleteCollection.addMethod(Method.DELETE);
         deleteCollection.addPatternDecoded("/*");
         deleteConstraint.addCollection(deleteCollection);
 
@@ -676,14 +677,14 @@ public class TestRealmBase {
         // Create the principals
         List<String> userRoles1 = new ArrayList<>();
         userRoles1.add(ROLE1);
-        GenericPrincipal gp1 = new GenericPrincipal(USER1, PWD, userRoles1);
+        GenericPrincipal gp1 = new GenericPrincipal(USER1, userRoles1);
 
         List<String> userRoles2 = new ArrayList<>();
         userRoles2.add(ROLE2);
-        GenericPrincipal gp2 = new GenericPrincipal(USER2, PWD, userRoles2);
+        GenericPrincipal gp2 = new GenericPrincipal(USER2, userRoles2);
 
         List<String> userRoles99 = new ArrayList<>();
-        GenericPrincipal gp99 = new GenericPrincipal(USER99, PWD, userRoles99);
+        GenericPrincipal gp99 = new GenericPrincipal(USER99, userRoles99);
 
         // Add the constraints to the context
         for (SecurityConstraint constraint : constraints) {
@@ -692,7 +693,7 @@ public class TestRealmBase {
         context.addConstraint(deleteConstraint);
 
         // All users should be able to perform a GET
-        request.setMethod("GET");
+        request.setMethod(Method.GET);
 
         SecurityConstraint[] constraintsGet =
                 mapRealm.findSecurityConstraints(request, context);
@@ -712,7 +713,7 @@ public class TestRealmBase {
 
         // Only user1 should be able to perform a POST as only that user has
         // role1.
-        request.setMethod("POST");
+        request.setMethod(Method.POST);
 
         SecurityConstraint[] constraintsPost =
                 mapRealm.findSecurityConstraints(request, context);
@@ -732,7 +733,7 @@ public class TestRealmBase {
 
         // Only users with application roles (role1 or role2 so user1 or user2)
         // should be able to perform a PUT.
-        request.setMethod("PUT");
+        request.setMethod(Method.PUT);
 
         SecurityConstraint[] constraintsPut =
                 mapRealm.findSecurityConstraints(request, context);
@@ -751,7 +752,7 @@ public class TestRealmBase {
                 request, response, constraintsPut, null));
 
         // Any authenticated user should be able to perform a TRACE.
-        request.setMethod("TRACE");
+        request.setMethod(Method.TRACE);
 
         SecurityConstraint[] constraintsTrace =
                 mapRealm.findSecurityConstraints(request, context);
@@ -771,7 +772,7 @@ public class TestRealmBase {
 
         // Only user1 should be able to perform a DELETE as only that user has
         // role1.
-        request.setMethod("DELETE");
+        request.setMethod(Method.DELETE);
 
         SecurityConstraint[] constraintsDelete =
                 mapRealm.findSecurityConstraints(request, context);

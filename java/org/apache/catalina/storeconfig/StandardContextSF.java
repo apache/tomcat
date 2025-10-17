@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.storeconfig;
 
 import java.io.File;
@@ -29,6 +28,7 @@ import java.util.List;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.Loader;
@@ -56,32 +56,28 @@ import org.apache.tomcat.util.http.CookieProcessor;
  */
 public class StandardContextSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(StandardContextSF.class);
+    private static final Log log = LogFactory.getLog(StandardContextSF.class);
 
     /**
-     * Store a Context as Separate file as configFile value from context exists.
-     * filename can be relative to catalina.base.
+     * Store a Context as Separate file as configFile value from context exists. filename can be relative to
+     * catalina.base.
      *
-     * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter,
-     *      int, java.lang.Object)
+     * @see org.apache.catalina.storeconfig.IStoreFactory#store(java.io.PrintWriter, int, java.lang.Object)
      */
     @Override
-    public void store(PrintWriter aWriter, int indent, Object aContext)
-            throws Exception {
+    public void store(PrintWriter aWriter, int indent, Object aContext) throws Exception {
 
         if (aContext instanceof StandardContext) {
-            StoreDescription desc = getRegistry().findDescription(
-                    aContext.getClass());
-            if (desc.isStoreSeparate()) {
-                URL configFile = ((StandardContext) aContext)
-                        .getConfigFile();
+            StoreDescription desc = getRegistry().findDescription(aContext.getClass());
+            if (desc != null && desc.isStoreSeparate()) {
+                URL configFile = ((StandardContext) aContext).getConfigFile();
                 if (configFile != null) {
                     if (desc.isExternalAllowed()) {
-                        if (desc.isBackup())
+                        if (desc.isBackup()) {
                             storeWithBackup((StandardContext) aContext);
-                        else
-                            storeContextSeparate(aWriter, indent,
-                                    (StandardContext) aContext);
+                        } else {
+                            storeContextSeparate(aWriter, indent, (StandardContext) aContext);
+                        }
                         return;
                     }
                 } else if (desc.isExternalOnly()) {
@@ -93,11 +89,11 @@ public class StandardContextSF extends StoreFactoryBase {
                     String baseName = cn.getBaseName();
                     File xml = new File(configBase, baseName + ".xml");
                     context.setConfigFile(xml.toURI().toURL());
-                    if (desc.isBackup())
+                    if (desc.isBackup()) {
                         storeWithBackup((StandardContext) aContext);
-                    else
-                        storeContextSeparate(aWriter, indent,
-                                (StandardContext) aContext);
+                    } else {
+                        storeContextSeparate(aWriter, indent, (StandardContext) aContext);
+                    }
                     return;
                 }
             }
@@ -107,32 +103,29 @@ public class StandardContextSF extends StoreFactoryBase {
     }
 
     /**
-     * Store a Context without backup add separate file or when configFile =
-     * null a aWriter.
+     * Store a Context without backup add separate file or when configFile = null a aWriter.
      *
-     * @param aWriter Current output writer
-     * @param indent Indentation level
+     * @param aWriter  Current output writer
+     * @param indent   Indentation level
      * @param aContext The context which will be stored
+     *
      * @throws Exception Configuration storing error
      */
-    protected void storeContextSeparate(PrintWriter aWriter, int indent,
-            StandardContext aContext) throws Exception {
+    protected void storeContextSeparate(PrintWriter aWriter, int indent, StandardContext aContext) throws Exception {
         URL configFile = aContext.getConfigFile();
         if (configFile != null) {
             File config = new File(configFile.toURI());
             if (!config.isAbsolute()) {
-                config = new File(System.getProperty("catalina.base"),
-                        config.getPath());
+                config = new File(System.getProperty(Globals.CATALINA_BASE_PROP), config.getPath());
             }
-            if( (!config.isFile()) || (!config.canWrite())) {
+            if ((!config.isFile()) || (!config.canWrite())) {
                 throw new IOException(sm.getString("standardContextSF.cannotWriteFile", configFile));
             }
             if (log.isInfoEnabled()) {
                 log.info(sm.getString("standardContextSF.storeContext", aContext.getPath(), config));
             }
             try (FileOutputStream fos = new FileOutputStream(config);
-                    PrintWriter writer = new PrintWriter(new OutputStreamWriter(
-                            fos , getRegistry().getEncoding()))) {
+                    PrintWriter writer = new PrintWriter(new OutputStreamWriter(fos, getRegistry().getEncoding()))) {
                 storeXMLHead(writer);
                 super.store(writer, -2, aContext);
             }
@@ -145,16 +138,15 @@ public class StandardContextSF extends StoreFactoryBase {
      * Store the Context with a Backup.
      *
      * @param aContext The context which will be stored
+     *
      * @throws Exception Configuration storing error
      */
     protected void storeWithBackup(StandardContext aContext) throws Exception {
         StoreFileMover mover = getConfigFileWriter(aContext);
         if (mover != null) {
             // Bugzilla 37781 Check to make sure we can write this output file
-            if ((mover.getConfigOld() == null)
-                    || (mover.getConfigOld().isDirectory())
-                    || (mover.getConfigOld().exists() &&
-                            !mover.getConfigOld().canWrite())) {
+            if ((mover.getConfigOld() == null) || (mover.getConfigOld().isDirectory()) ||
+                    (mover.getConfigOld().exists() && !mover.getConfigOld().canWrite())) {
                 throw new IOException(sm.getString("standardContextSF.moveFailed", mover.getConfigOld()));
             }
             File dir = mover.getConfigSave().getParentFile();
@@ -162,8 +154,8 @@ public class StandardContextSF extends StoreFactoryBase {
                 throw new IOException(sm.getString("standardContextSF.cannotWriteFile", mover.getConfigSave()));
             }
             if (log.isInfoEnabled()) {
-                log.info(sm.getString("standardContextSF.storeContextWithBackup",
-                        aContext.getPath(), mover.getConfigSave()));
+                log.info(sm.getString("standardContextSF.storeContextWithBackup", aContext.getPath(),
+                        mover.getConfigSave()));
             }
             try (PrintWriter writer = mover.getWriter()) {
                 storeXMLHead(writer);
@@ -177,42 +169,36 @@ public class StandardContextSF extends StoreFactoryBase {
      * Get explicit writer for context (context.getConfigFile()).
      *
      * @param context The context which will be stored
+     *
      * @return The file mover
+     *
      * @throws Exception Error getting a writer for the configuration file
      */
-    protected StoreFileMover getConfigFileWriter(Context context)
-            throws Exception {
+    protected StoreFileMover getConfigFileWriter(Context context) throws Exception {
         URL configFile = context.getConfigFile();
         StoreFileMover mover = null;
         if (configFile != null) {
             File config = new File(configFile.toURI());
             if (!config.isAbsolute()) {
-                config = new File(System.getProperty("catalina.base"),
-                        config.getPath());
+                config = new File(System.getProperty(Globals.CATALINA_BASE_PROP), config.getPath());
             }
             // Open an output writer for the new configuration file
-            mover = new StoreFileMover("", config.getCanonicalPath(),
-                    getRegistry().getEncoding());
+            mover = new StoreFileMover("", config.getCanonicalPath(), getRegistry().getEncoding());
         }
         return mover;
     }
 
     /**
      * Store the specified context element children.
-     *
-     * @param aWriter Current output writer
-     * @param indent Indentation level
-     * @param aContext Context to store
-     * @param parentDesc The element description
-     * @throws Exception Configuration storing error
+     * <p>
+     * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aContext,
-            StoreDescription parentDesc) throws Exception {
-        if (aContext instanceof StandardContext) {
-            StandardContext context = (StandardContext) aContext;
+    public void storeChildren(PrintWriter aWriter, int indent, Object aContext, StoreDescription parentDesc)
+            throws Exception {
+        if (aContext instanceof StandardContext context) {
             // Store nested <Listener> elements
-            LifecycleListener listeners[] = context.findLifecycleListeners();
+            LifecycleListener[] listeners = context.findLifecycleListeners();
             List<LifecycleListener> listenersArray = new ArrayList<>();
             for (LifecycleListener listener : listeners) {
                 if (!(listener instanceof ThreadLocalLeakPreventionListener)) {
@@ -222,7 +208,7 @@ public class StandardContextSF extends StoreFactoryBase {
             storeElementArray(aWriter, indent, listenersArray.toArray());
 
             // Store nested <Valve> elements
-            Valve valves[] = context.getPipeline().getValves();
+            Valve[] valves = context.getPipeline().getValves();
             storeElementArray(aWriter, indent, valves);
 
             // Store nested <Loader> elements
@@ -252,17 +238,14 @@ public class StandardContextSF extends StoreFactoryBase {
             storeElement(aWriter, indent, resources);
 
             // Store nested <WrapperListener> elements
-            String wLifecycles[] = context.findWrapperLifecycles();
-            getStoreAppender().printTagArray(aWriter, "WrapperListener",
-                    indent + 2, wLifecycles);
+            String[] wLifecycles = context.findWrapperLifecycles();
+            getStoreAppender().printTagArray(aWriter, "WrapperListener", indent + 2, wLifecycles);
             // Store nested <WrapperLifecycle> elements
-            String wListeners[] = context.findWrapperListeners();
-            getStoreAppender().printTagArray(aWriter, "WrapperLifecycle",
-                    indent + 2, wListeners);
+            String[] wListeners = context.findWrapperListeners();
+            getStoreAppender().printTagArray(aWriter, "WrapperLifecycle", indent + 2, wListeners);
 
             // Store nested <Parameter> elements
-            ApplicationParameter[] appParams = context
-                    .findApplicationParameters();
+            ApplicationParameter[] appParams = context.findApplicationParameters();
             storeElementArray(aWriter, indent, appParams);
 
             // Store nested naming resources elements (EJB,Resource,...)
@@ -272,8 +255,7 @@ public class StandardContextSF extends StoreFactoryBase {
             // Store nested watched resources <WatchedResource>
             String[] wresources = context.findWatchedResources();
             wresources = filterWatchedResources(context, wresources);
-            getStoreAppender().printTagArray(aWriter, "WatchedResource",
-                    indent + 2, wresources);
+            getStoreAppender().printTagArray(aWriter, "WatchedResource", indent + 2, wresources);
 
             // Store nested <JarScanner> elements
             JarScanner jarScanner = context.getJarScanner();
@@ -286,14 +268,15 @@ public class StandardContextSF extends StoreFactoryBase {
     }
 
     /**
-     * Return a File object representing the "configuration root" directory for
-     * our associated Host.
+     * Return a File object representing the "configuration root" directory for our associated Host.
+     *
      * @param context The context instance
+     *
      * @return a file to the configuration base path
      */
     protected File configBase(Context context) {
 
-        File file = new File(System.getProperty("catalina.base"), "conf");
+        File file = new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf");
         Container host = context.getParent();
 
         if (host instanceof Host) {
@@ -304,8 +287,8 @@ public class StandardContextSF extends StoreFactoryBase {
             file = new File(file, host.getName());
             try {
                 file = file.getCanonicalFile();
-            } catch (IOException e) {
-                log.error(sm.getString("standardContextSF.canonicalPathError"), e);
+            } catch (IOException ioe) {
+                log.error(sm.getString("standardContextSF.canonicalPathError"), ioe);
             }
         }
         return file;
@@ -314,46 +297,56 @@ public class StandardContextSF extends StoreFactoryBase {
 
     /**
      * Filter out the default watched resources, to remove standard ones.
-     *
-     * @param context The context instance
-     * @param wresources The raw watched resources list
-     * @return The filtered watched resources
-     * @throws Exception Configuration storing error
+     * <p>
      * TODO relative watched resources
+     * <p>
      * TODO absolute handling configFile
+     * <p>
      * TODO Filename case handling for Windows?
+     * <p>
      * TODO digester variable substitution $catalina.base, $catalina.home
+     *
+     * @param context    The context instance
+     * @param wresources The raw watched resources list
+     *
+     * @return The filtered watched resources
+     *
+     * @throws Exception Configuration storing error
      */
-    protected String[] filterWatchedResources(StandardContext context,
-            String[] wresources) throws Exception {
+    protected String[] filterWatchedResources(StandardContext context, String[] wresources) throws Exception {
         File configBase = configBase(context);
-        String confContext = new File(System.getProperty("catalina.base"),
-                "conf/context.xml").getCanonicalPath();
-        String confWeb = new File(System.getProperty("catalina.base"),
-                "conf/web.xml").getCanonicalPath();
-        String confHostDefault = new File(configBase, "context.xml.default")
-                .getCanonicalPath();
-        String configFile = (context.getConfigFile() != null ? new File(context.getConfigFile().toURI()).getCanonicalPath() : null);
+        String confContext =
+                new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf/context.xml").getCanonicalPath();
+        String confWeb = new File(System.getProperty(Globals.CATALINA_BASE_PROP), "conf/web.xml").getCanonicalPath();
+        String confHostDefault = new File(configBase, "context.xml.default").getCanonicalPath();
+        String configFile =
+                (context.getConfigFile() != null ? new File(context.getConfigFile().toURI()).getCanonicalPath() : null);
         String webxml = "WEB-INF/web.xml";
         String tomcatwebxml = "WEB-INF/tomcat-web.xml";
 
         List<String> resource = new ArrayList<>();
-        for (int i = 0; i < wresources.length; i++) {
-            if (wresources[i].equals(confContext))
+        for (String wresource : wresources) {
+            if (wresource.equals(confContext)) {
                 continue;
-            if (wresources[i].equals(confWeb))
+            }
+            if (wresource.equals(confWeb)) {
                 continue;
-            if (wresources[i].equals(confHostDefault))
+            }
+            if (wresource.equals(confHostDefault)) {
                 continue;
-            if (wresources[i].equals(configFile))
+            }
+            if (wresource.equals(configFile)) {
                 continue;
-            if (wresources[i].equals(webxml))
+            }
+            if (wresource.equals(webxml)) {
                 continue;
-            if (wresources[i].equals(tomcatwebxml))
+            }
+            if (wresource.equals(tomcatwebxml)) {
                 continue;
-            resource.add(wresources[i]);
+            }
+            resource.add(wresource);
         }
-        return resource.toArray(new String[resource.size()]);
+        return resource.toArray(new String[0]);
     }
 
 }

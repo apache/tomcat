@@ -69,7 +69,9 @@ public class TestDataIntegrity {
                 public void run() {
                     try {
                         long start = System.currentTimeMillis();
-                        for (int i = 0; i < msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(),0);
+                        for (int i = 0; i < msgCount; i++) {
+                            channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(),0);
+                        }
                         System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
                     }catch ( Exception x ) {
                         x.printStackTrace();
@@ -77,49 +79,67 @@ public class TestDataIntegrity {
                 }
             };
         }
-        for (int x=0; x<threads.length; x++ ) { threads[x].start();}
-        for (int x=0; x<threads.length; x++ ) { threads[x].join();}
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        for (Thread thread : threads) {
+            thread.join();
+        }
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
-        while ( (System.currentTimeMillis()-start)<15000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
+        while ( (System.currentTimeMillis()-start)<15000 && msgCount*threadCount!=listener1.count) {
+            Thread.sleep(500);
+        }
         System.err.println("Finished NO_ACK ["+listener1.count+"]");
         Assert.assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
 
     @Test
     public void testDataSendASYNCM() throws Exception {
-            System.err.println("Starting ASYNC MULTI THREAD");
-            Thread[] threads = new Thread[threadCount];
-            for (int x=0; x<threads.length; x++ ) {
-                threads[x] = new Thread() {
-                    @Override
-                    public void run() {
-                        try {
-                            long start = System.currentTimeMillis();
-                            for (int i = 0; i < msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(),Channel.SEND_OPTIONS_ASYNCHRONOUS);
-                            System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
-                        }catch ( Exception x ) {
-                            x.printStackTrace();
+        System.err.println("Starting ASYNC MULTI THREAD");
+        Thread[] threads = new Thread[threadCount];
+        for (int x=0; x<threads.length; x++ ) {
+            threads[x] = new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        long start = System.currentTimeMillis();
+                        for (int i = 0; i < msgCount; i++) {
+                            channel1.send(new Member[] {channel2.getLocalMember(false)}, Data.createRandomData(),Channel.SEND_OPTIONS_ASYNCHRONOUS);
                         }
+                        System.out.println("Thread["+this.getName()+"] sent "+msgCount+" messages in "+(System.currentTimeMillis()-start)+" ms.");
+                    }catch ( Exception x ) {
+                        x.printStackTrace();
                     }
-                };
-            }
-            for (int x=0; x<threads.length; x++ ) { threads[x].start();}
-            for (int x=0; x<threads.length; x++ ) { threads[x].join();}
-            //sleep for 50 sec, let the other messages in
-            long start = System.currentTimeMillis();
-            while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count) Thread.sleep(500);
-            System.err.println("Finished ASYNC MULTI THREAD ["+listener1.count+"]");
-            Assert.assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
+                }
+            };
+        }
+        for (Thread thread : threads) {
+            thread.start();
+        }
+        for (Thread thread : threads) {
+            thread.join();
+        }
+        //sleep for 50 sec, let the other messages in
+        long start = System.currentTimeMillis();
+        while ( (System.currentTimeMillis()-start)<25000 && msgCount*threadCount!=listener1.count) {
+            Thread.sleep(500);
+        }
+        System.err.println("Finished ASYNC MULTI THREAD ["+listener1.count+"]");
+        Assert.assertEquals("Checking success messages.",msgCount*threadCount,listener1.count);
     }
 
     @Test
     public void testDataSendASYNC() throws Exception {
         System.err.println("Starting ASYNC");
-        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_ASYNCHRONOUS);
+        for (int i=0; i<msgCount; i++) {
+            channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_ASYNCHRONOUS);
+        }
         //sleep for 50 sec, let the other messages in
         long start = System.currentTimeMillis();
-        while ( (System.currentTimeMillis()-start)<5000 && msgCount!=listener1.count) Thread.sleep(500);
+        while ( (System.currentTimeMillis()-start)<5000 && msgCount!=listener1.count) {
+            Thread.sleep(500);
+        }
         System.err.println("Finished ASYNC");
         Assert.assertEquals("Checking success messages.",msgCount,listener1.count);
     }
@@ -127,7 +147,9 @@ public class TestDataIntegrity {
     @Test
     public void testDataSendACK() throws Exception {
         System.err.println("Starting ACK");
-        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_USE_ACK);
+        for (int i=0; i<msgCount; i++) {
+            channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_USE_ACK);
+        }
         Thread.sleep(250);
         System.err.println("Finished ACK");
         Assert.assertEquals("Checking success messages.",msgCount,listener1.count);
@@ -136,7 +158,9 @@ public class TestDataIntegrity {
     @Test
     public void testDataSendSYNCACK() throws Exception {
         System.err.println("Starting SYNC_ACK");
-        for (int i=0; i<msgCount; i++) channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK);
+        for (int i=0; i<msgCount; i++) {
+            channel1.send(new Member[] {channel2.getLocalMember(false)},Data.createRandomData(),Channel.SEND_OPTIONS_SYNCHRONIZED_ACK|Channel.SEND_OPTIONS_USE_ACK);
+        }
         Thread.sleep(250);
         System.err.println("Finished SYNC_ACK");
         Assert.assertEquals("Checking success messages.",msgCount,listener1.count);
@@ -183,7 +207,9 @@ public class TestDataIntegrity {
 
         public static boolean verify(Data d) {
             boolean result = (d.length == d.data.length);
-            for ( int i=0; result && (i<d.data.length); i++ ) result = result && d.data[i] == d.key;
+            for ( int i=0; result && (i<d.data.length); i++ ) {
+                result = result && d.data[i] == d.key;
+            }
             return result;
         }
     }

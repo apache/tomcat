@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="fhanik@apache.org">Filip Hanik</author>
         <title>Apache Tomcat - Using Tomcat libraries with Maven</title>
     </properties>
 
@@ -46,10 +45,10 @@
     <subsection name="Tomcat Releases">
       <p>
         Stable releases are published to the
-        <a href="https://repo2.maven.org/maven2/org/apache/tomcat/">Central
-        Maven Repositories</a>. The URL for this is
+        <a href="https://repo.maven.apache.org/maven2/org/apache/tomcat/">Maven
+        Central Repository</a>. The URL for this is
       </p>
-      <source>https://repo2.maven.org/maven2/org/apache/tomcat/</source>
+      <source>https://repo.maven.apache.org/maven2/org/apache/tomcat/</source>
     </subsection>
 
 </section>

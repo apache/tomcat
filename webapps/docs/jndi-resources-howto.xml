@@ -23,8 +23,6 @@
     &project;
 
     <properties>
-      <author email="craigmcc@apache.org">Craig R. McClanahan</author>
-      <author email="yoavs@apache.org">Yoav Shapira</author>
       <title>JNDI Resources How-To</title>
     </properties>
 
@@ -39,19 +37,18 @@
 <p>Tomcat provides a JNDI <strong>InitialContext</strong> implementation
 instance for each web application running under it, in a manner that is
 compatible with those provided by a
-<a href="http://www.oracle.com/technetwork/java/javaee/overview/index.html">
-Java Enterprise Edition</a> application server. The Java EE standard provides
-a standard set of elements in the <code>/WEB-INF/web.xml</code> file to
-reference/define resources.</p>
+<a href="https://jakarta.ee/">Jakarta EE</a> application server. The Jakarta EE
+standard provides a standard set of elements in the
+<code>/WEB-INF/web.xml</code> file to reference/define resources.</p>
 
 <p>See the following Specifications for more information about programming APIs
-for JNDI, and for the features supported by Java Enterprise Edition (Java EE)
-servers, which Tomcat emulates for the services that it provides:</p>
+for JNDI, and for the features supported by Jakarta EE servers, which Tomcat
+emulates for the services that it provides:</p>
 <ul>
 <li><a href="http://docs.oracle.com/javase/7/docs/technotes/guides/jndi/index.html">
     Java Naming and Directory Interface</a> (included in JDK 1.4 onwards)</li>
-<li><a href="http://www.oracle.com/technetwork/java/javaee/documentation/index.html">
-    Java EE Platform Specification</a> (in particular, see Chapter 5 on <em>Naming</em>)</li>
+<li><a href="https://jakarta.ee/specifications/platform/9/"> Jakarta EE Platform
+    Specification</a> (in particular, see Chapter 5 on <em>Naming</em>)</li>
 </ul>
 
 </section>
@@ -67,7 +64,7 @@ resources:</p>
     will operate.</li>
 <li><code><strong>&lt;resource-ref&gt;</strong></code> - Resource reference,
     which is typically to an object factory for resources such as a JDBC
-    <code>DataSource</code>, a JavaMail <code>Session</code>, or custom
+    <code>DataSource</code>, a Jakarta Mail <code>Session</code>, or custom
     object factories configured into Tomcat.</li>
 <li><code><strong>&lt;resource-env-ref&gt;</strong></code> - Resource
     environment reference, a new variation of <code>resource-ref</code>
@@ -215,7 +212,7 @@ conn.close();]]></source>
   <p><em>NOTE</em> - Of the standard resource factories, only the
   "JDBC Data Source" and "User Transaction" factories are mandated to
   be available on other platforms, and then they are required only if
-  the platform implements the Java Enterprise Edition (Java EE) specs.
+  the platform implements the Jakarta EE specs.
   All other standard resource factories, plus custom resource factories
   that you write yourself, are specific to Tomcat and cannot be assumed
   to be available on other containers.</p>
@@ -290,7 +287,7 @@ public class MyBean {
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
+    <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
     Specification</a> for details.</p>
 
   <h5>3.  Code Your Application's Use Of This Resource</h5>
@@ -328,114 +325,32 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
     <code>foo</code> property (although we could have), the bean will
     contain whatever default value is set up by its constructor.</p>
 
-    <p>Some beans have properties with types that cannot automatically be
-    converted from a string value. Setting such properties using the Tomcat
-    BeanFactory will fail with a NamingException. In cases were those beans
-    provide methods to set the properties from a string value, the Tomcat
-    BeanFactory can be configured to use these methods. The configuration is
-    done with the <code>forceString</code> attribute.</p>
+    <p>If the bean property is of type <code>String</code>, the BeanFactory
+    will call the property setter using the provided property value. If the
+    bean property type is a primitive or a primitive wrapper, the
+    BeanFactory will convert the value to the appropriate primitive or
+    primitive wrapper and then use that value when calling the setter. Some
+    beans have properties with types that cannot automatically be converted
+    from <code>String</code>. If the bean provides an alternative setter with
+    the same name that does take a <code>String</code>, the BeanFactory will
+    attempt to use that setter. If the BeanFactory cannot use the value or
+    perform an appropriate conversion, setting the property will fail with a
+    NamingException.</p>
 
-    <p>Assume our bean looks like this:</p>
-
-<source><![CDATA[package com.mycompany;
-
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-
-public class MyBean2 {
-
-  private InetAddress local = null;
-
-  public InetAddress getLocal() {
-    return local;
-  }
-
-  public void setLocal(InetAddress ip) {
-    local = ip;
-  }
-
-  public void setLocal(String localHost) {
-    try {
-      local = InetAddress.getByName(localHost);
-    } catch (UnknownHostException ex) {
-    }
-  }
-
-  private InetAddress remote = null;
-
-  public InetAddress getRemote() {
-    return remote;
-  }
-
-  public void setRemote(InetAddress ip) {
-    remote = ip;
-  }
-
-  public void host(String remoteHost) {
-    try {
-      remote = InetAddress.getByName(remoteHost);
-    } catch (UnknownHostException ex) {
-    }
-  }
-
-}]]></source>
-
-    <p>The bean has two properties, both are of type <code>InetAddress</code>.
-    The first property <code>local</code> has an additional setter taking a
-    string argument. By default the Tomcat BeanFactory would try to use the
-    automatically detected setter with the same argument type as the property
-    type and then throw a NamingException, because it is not prepared to convert
-    the given string attribute value to <code>InetAddress</code>.
-    We can tell the Tomcat BeanFactory to use the other setter like that:</p>
-
-<source><![CDATA[<Context ...>
-  ...
-  <Resource name="bean/MyBeanFactory" auth="Container"
-            type="com.mycompany.MyBean2"
-            factory="org.apache.naming.factory.BeanFactory"
-            forceString="local"
-            local="localhost"/>
-  ...
-</Context>]]></source>
-
-    <p>The bean property <code>remote</code> can also be set from a string,
-    but one has to use the non-standard method name <code>host</code>.
-    To set <code>local</code> and <code>remote</code> use the following
-    configuration:</p>
-
-<source><![CDATA[<Context ...>
-  ...
-  <Resource name="bean/MyBeanFactory" auth="Container"
-            type="com.mycompany.MyBean2"
-            factory="org.apache.naming.factory.BeanFactory"
-            forceString="local,remote=host"
-            local="localhost"
-            remote="tomcat.apache.org"/>
-  ...
-</Context>]]></source>
-
-    <p>Multiple property descriptions can be combined in
-    <code>forceString</code> by concatenation with comma as a separator.
-    Each property description consists of either only the property name
-    in which case the BeanFactory calls the setter method. Or it consist
-    of <code>name=method</code> in which case the property named
-    <code>name</code> is set by calling method <code>method</code>.
-    For properties of types <code>String</code> or of primitive type
-    or of their associated primitive wrapper classes using
-    <code>forceString</code> is not needed. The correct setter will be
-    automatically detected and argument conversion will be applied.</p>
+    <p>The <code>forceString</code> property available in earlier Tomcat
+    releases has been removed as a security hardening measure.</p>
 
   </subsection>
 
 
-  <subsection name="UserDatabase Resources">
+  <subsection name="Memory UserDatabase Resources">
 
     <h5>0.  Introduction</h5>
 
     <p>UserDatabase resources are typically configured as global resources for
     use by a UserDatabase realm. Tomcat includes a UserDatabaseFactory that
     creates UserDatabase resources backed by an XML file - usually
-    <code>tomcat-users.xml</code></p>
+    <code>tomcat-users.xml</code>.</p>
 
     <p>The steps required to set up a global UserDatabase resource are described
     below.</p>
@@ -476,13 +391,13 @@ public class MyBean2 {
     </p>
 
     <p>The <code>readonly</code> attribute is optional and defaults to
-    <code>true</code> if not supplied. If the XML is writeable then it will be
+    <code>true</code> if not supplied. If the XML is writable then it will be
     written to when Tomcat starts. <strong>WARNING:</strong> When the file is
     written it will inherit the default file permissions for the user Tomcat
     is running as. Ensure that these are appropriate to maintain the security
     of your installation.</p>
 
-    <p>If referenced in a Realm, the UserDatabse will, by default, monitor
+    <p>If referenced in a Realm, the UserDatabase will, by default, monitor
     <code>pathname</code> for changes and reload the file if a change in the
     last modified time is observed. This can be disabled by setting the
     <code>watchSource</code> attribute to <code>false</code>.
@@ -496,19 +411,225 @@ public class MyBean2 {
   </subsection>
 
 
-  <subsection name="JavaMail Sessions">
+  <subsection name="DataSource UserDatabase Resources">
+
+    <h5>0.  Introduction</h5>
+
+    <p>Tomcat also include a <code>UserDatabase</code> that uses a
+    <code>DataSource</code> resource as the backend. The backend resource
+    must be declared in the same JNDI context as the user database that will use
+    it.</p>
+
+    <p>The steps required to set up a global UserDatabase resource are described
+    below.</p>
+
+    <h5>1. Database schema</h5>
+
+    <p>The database schema for the user database is flexible. It can be the same
+    as the schema used for the <code>DataSourceRealm</code>, with only a table
+    for users (user name, password), and another one listing the roles
+    associated with each user. To support the full <code>UserDatabase</code>
+    features, it must include additional tables for groups, and is
+    compatible with referential integrity between users, groups and roles.</p>
+
+    <p>The full featured schema with groups and referential integrity
+    could be:</p>
+
+<source><![CDATA[create table users (
+  user_name         varchar(32) not null primary key,
+  user_pass         varchar(64) not null,
+  user_fullname     varchar(128)
+  -- Add more attributes as needed
+);
+
+create table roles (
+  role_name         varchar(32) not null primary key,
+  role_description  varchar(128)
+);
+
+create table groups (
+  group_name        varchar(32) not null primary key,
+  group_description varchar(128)
+);
+
+create table user_roles (
+  user_name         varchar(32) references users(user_name),
+  role_name         varchar(32) references roles(role_name),
+  primary key (user_name, role_name)
+);
+
+create table user_groups (
+  user_name         varchar(32) references users(user_name),
+  group_name        varchar(32) references groups(group_name),
+  primary key (user_name, group_name)
+);
+
+create table group_roles (
+  group_name        varchar(32) references groups(group_name),
+  role_name         varchar(32) references roles(role_name),
+  primary key (group_name, role_name)
+);
+]]></source>
+
+    <p>The minimal schema without the ability to use groups will be
+    (it is the same as for the <code>DataSourceRealm</code>):</p>
+
+<source><![CDATA[create table users (
+  user_name         varchar(32) not null primary key,
+  user_pass         varchar(64) not null,
+  -- Add more attributes as needed
+);
+
+create table user_roles (
+  user_name         varchar(32),
+  role_name         varchar(32),
+  primary key (user_name, role_name)
+);
+]]></source>
+
+    <h5>2.  Declare Your Resource</h5>
+
+    <p>Next, modify <code>$CATALINA_BASE/conf/server.xml</code> to create the
+    UserDatabase resource based on your <code>DataSource</code> and its schema.
+    It should look something like this:</p>
+
+<source><![CDATA[<Resource name="UserDatabase" auth="Container"
+              type="org.apache.catalina.UserDatabase"
+              description="User database that can be updated and saved"
+              factory="org.apache.catalina.users.DataSourceUserDatabaseFactory"
+              dataSourceName="jdbc/authority" readonly="false"
+              userTable="users" userNameCol="user_name" userCredCol="user_pass"
+              userRoleTable="user_roles" roleNameCol="role_name"
+              roleTable="roles" groupTable="groups" userGroupTable="user_groups"
+              groupRoleTable="group_roles" groupNameCol="group_name" />]]></source>
+
+    <p>The <code>dataSourceName</code> attribute is the JNDI name of the
+    <code>DataSource</code> that will be the backend for the
+    <code>UserDatabase</code>. It must be declared in the same JNDI
+    <code>Context</code> as the <code>UserDatabase</code>. Please refer to the
+    <a href="#JDBC_Data_Sources"><code>DataSource</code> resources</a>
+    documentation for further instructions.</p>
+
+    <p>The <code>readonly</code> attribute is optional and defaults to
+    <code>true</code> if not supplied. If the database is writable then changes
+    made through the Tomcat management to the <code>UserDatabase</code> can
+    be persisted to the database using the <code>save</code> operation.</p>
+
+    <p>Alternately, changes can also be made directly to the backend database.
+    </p>
+
+    <h5>3.  Resource configuration</h5>
+
+    <attributes>
+
+      <attribute name="dataSourceName" required="true">
+        <p>The name of the JNDI JDBC DataSource for this UserDatabase.</p>
+      </attribute>
+
+      <attribute name="groupNameCol" required="false">
+        <p>Name of the column, in the "groups", "group roles" and "user groups"
+        tables, that contains the group's name.</p>
+      </attribute>
+
+      <attribute name="groupRoleTable" required="false">
+        <p>Name of the "group roles" table, which must contain columns
+        named by the <code>groupNameCol</code> and <code>roleNameCol</code>
+        attributes.</p>
+      </attribute>
+
+      <attribute name="groupTable" required="false">
+        <p>Name of the "groups" table, which must contain columns named
+        by the <code>groupNameCol</code> attribute.</p>
+      </attribute>
+
+      <attribute name="readonly" required="false">
+        <p>If this is set to <code>true</code>, then changes to the
+        <code>UserDatabase</code> can be persisted to the
+        <code>DataSource</code> by using the <code>save</code> method.
+        The default value is <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="roleAndGroupDescriptionCol" required="false">
+        <p>Name of the column, in the "roles" and "groups" tables, that contains
+        the description for the roles and groups.</p>
+      </attribute>
+
+      <attribute name="roleNameCol" required="false">
+        <p>Name of the column, in the "roles", "user roles" and "group roles"
+        tables, which contains a role name assigned to the corresponding
+        user.</p>
+        <p>This attribute is <strong>required</strong> in majority of
+        configurations. See <strong>allRolesMode</strong> attribute of the
+        associated realm for a rare case when it can be omitted.</p>
+      </attribute>
+
+      <attribute name="roleTable" required="false">
+        <p>Name of the "roles" table, which must contain columns named
+        by the <code>roleNameCol</code> attribute.</p>
+      </attribute>
+
+      <attribute name="userCredCol" required="true">
+        <p>Name of the column, in the "users" table, which contains
+        the user's credentials (i.e. password).  If a
+        <code>CredentialHandler</code> is specified, this component
+        will assume that the passwords have been encoded with the
+        specified algorithm.  Otherwise, they will be assumed to be
+        in clear text.</p>
+      </attribute>
+
+      <attribute name="userGroupTable" required="false">
+        <p>Name of the "user groups" table, which must contain columns
+        named by the <code>userNameCol</code> and <code>groupNameCol</code>
+        attributes.</p>
+      </attribute>
+
+      <attribute name="userNameCol" required="true">
+        <p>Name of the column, in the "users", "user groups" and "user roles"
+        tables, that contains the user's username.</p>
+      </attribute>
+
+      <attribute name="userFullNameCol" required="false">
+        <p>Name of the column, in the "users" table, that contains the user's
+        full name.</p>
+      </attribute>
+
+      <attribute name="userRoleTable" required="false">
+        <p>Name of the "user roles" table, which must contain columns
+        named by the <code>userNameCol</code> and <code>roleNameCol</code>
+        attributes.</p>
+        <p>This attribute is <strong>required</strong> in majority of
+        configurations. See <strong>allRolesMode</strong> attribute of the
+        associated realm for a rare case when it can be omitted.</p>
+      </attribute>
+
+      <attribute name="userTable" required="true">
+        <p>Name of the "users" table, which must contain columns named
+        by the <code>userNameCol</code> and <code>userCredCol</code>
+        attributes.</p>
+      </attribute>
+
+    </attributes>
+
+    <h5>4.  Configure the Realm</h5>
+
+    <p>Configure a UserDatabase Realm to use this resource as described in the
+    <a href="config/realm.html">Realm configuration documentation</a>.</p>
+
+  </subsection>
+
+  <subsection name="Jakarta Mail Sessions">
 
     <h5>0.  Introduction</h5>
 
     <p>In many web applications, sending electronic mail messages is a
     required part of the system's functionality.  The
-    <a href="http://www.oracle.com/technetwork/java/javamail/index.html">Java Mail</a> API
+    <a href="https://jakartaee.github.io/mail-api/">Jakarta Mail</a> API
     makes this process relatively straightforward, but requires many
     configuration details that the client application must be aware of
     (including the name of the SMTP host to be used for message sending).</p>
 
     <p>Tomcat includes a standard resource factory that will create
-    <code>javax.mail.Session</code> session instances for you, already
+    <code>jakarta.mail.Session</code> session instances for you, already
     configured to connect to an SMTP server.
     In this way, the application is totally insulated from changes in the
     email server configuration environment - it simply asks for, and receives,
@@ -527,7 +648,7 @@ public class MyBean2 {
     might look like this:</p>
 <source><![CDATA[<resource-ref>
   <description>
-    Resource reference to a factory for javax.mail.Session
+    Resource reference to a factory for jakarta.mail.Session
     instances that may be used for sending electronic mail
     messages, preconfigured to connect to the appropriate
     SMTP server.
@@ -536,7 +657,7 @@ public class MyBean2 {
     mail/Session
   </res-ref-name>
   <res-type>
-    javax.mail.Session
+    jakarta.mail.Session
   </res-type>
   <res-auth>
     Container
@@ -546,7 +667,7 @@ public class MyBean2 {
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
+    <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
     Specification</a> for details.</p>
 
     <h5>2.  Code Your Application's Use Of This Resource</h5>
@@ -580,7 +701,7 @@ Transport.send(message);]]></source>
 <source><![CDATA[<Context ...>
   ...
   <Resource name="mail/Session" auth="Container"
-            type="javax.mail.Session"
+            type="jakarta.mail.Session"
             mail.smtp.host="localhost"/>
   ...
 </Context>]]></source>
@@ -592,50 +713,44 @@ Transport.send(message);]]></source>
 
     <p>Additional resource attributes and values will be converted to properties
     and values and passed to
-    <code>javax.mail.Session.getInstance(java.util.Properties)</code> as part of
+    <code>jakarta.mail.Session.getInstance(java.util.Properties)</code> as part of
     the <code>java.util.Properties</code> collection. In addition to the
-    properties defined in Annex A of the JavaMail specification, individual
+    properties defined in Appendix A of the Jakarta Mail specification, individual
     providers may also support additional properties.
     </p>
 
     <p>If the resource is configured with a <code>password</code> attribute and
     either a <code>mail.smtp.user</code> or <code>mail.user</code> attribute
     then Tomcat&apos;s resource factory will configure and add a
-    <code>javax.mail.Authenticator</code> to the mail session.</p>
+    <code>jakarta.mail.Authenticator</code> to the mail session.</p>
 
-    <h5>4.  Install the JavaMail libraries</h5>
+    <h5>4.  Install the Jakarta Mail API</h5>
 
-    <p><a href="http://javamail.java.net/">
-    Download the JavaMail API</a>.</p>
+    <p><a href="https://search.maven.org/artifact/jakarta.mail/jakarta.mail-api/2.1.0/jar">
+    Download the Jakarta Mail API</a>.</p>
 
-    <p>Unpackage the distribution and place mail.jar  into $CATALINA_HOME/lib so
-    that it is available to Tomcat during the initialization of the mail Session
-    Resource. <strong>Note:</strong> placing this jar in both $CATALINA_HOME/lib
-    and a  web application's lib folder will cause an error, so ensure you have
-    it in the $CATALINA_HOME/lib location only.
+    <p>Unpackage the distribution and place jakarta.mail-api-2.1.0.jar into
+    $CATALINA_HOME/lib so that it is available to Tomcat during the
+    initialization of the mail Session Resource.
+    <strong>Note:</strong> placing this jar in both $CATALINA_HOME/lib and a web
+    application's lib folder will cause an error, so ensure you have it in the
+    $CATALINA_HOME/lib location only.
     </p>
 
-    <h5>5.  Restart Tomcat</h5>
+    <h5>5.  Install a compatible implementation</h5>
+
+    <p>Select and <a href="https://jakarta.ee/specifications/mail/2.1/">
+    download a compatible implementation</a>.</p>
+
+    <p>Unpackage the implementation and place the jar file(s) into
+    $CATALINA_HOME/lib.</p>
+
+    <p>Note: Other implementations may be available</p>
+
+    <h5>6.  Restart Tomcat</h5>
 
     <p>For the additional JAR to be visible to Tomcat, it is necessary for the
     Tomcat instance to be restarted.</p>
-
-
-    <h5>Example Application</h5>
-
-    <p>The <code>/examples</code> application included with Tomcat contains
-    an example of utilizing this resource factory.  It is accessed via the
-    "JSP Examples" link.  The source code for the servlet that actually
-    sends the mail message is in
-    <code>/WEB-INF/classes/SendMailServlet.java</code>.</p>
-
-    <p><strong>WARNING</strong> - The default configuration assumes that there
-    is an SMTP server listing on port 25 on <code>localhost</code>. If this is
-    not the case, edit the
-    <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
-    this web application and modify the parameter value for the
-    <code>mail.smtp.host</code> parameter to be the host name of an SMTP server
-    on your network.</p>
 
   </subsection>
 
@@ -644,12 +759,12 @@ Transport.send(message);]]></source>
     <h5>0.  Introduction</h5>
 
     <p>Many web applications need to access a database via a JDBC driver,
-    to support the functionality required by that application.  The Java EE
-    Platform Specification requires Java EE Application Servers to make
+    to support the functionality required by that application.  The Jakarta EE
+    Platform Specification requires Jakarta EE Application Servers to make
     available a <em>DataSource</em> implementation (that is, a connection
     pool for JDBC connections) for this purpose.  Tomcat offers exactly
     the same support, so that database-based applications you develop on
-    Tomcat using this service will run unchanged on any Java EE server.</p>
+    Tomcat using this service will run unchanged on any Jakarta EE server.</p>
 
     <p>For information about JDBC, you should consult the following:</p>
     <ul>
@@ -662,10 +777,10 @@ Transport.send(message);]]></source>
         The JDBC 2.0 Standard Extension API (including the
         <code>javax.sql.DataSource</code> API).  This package is now known
         as the "JDBC Optional Package".</li>
-    <li><a href="http://www.oracle.com/technetwork/java/javaee/overview/index.htm">
-        http://www.oracle.com/technetwork/java/javaee/overview/index.htm</a> -
-        The Java EE Platform Specification (covers the JDBC facilities that
-        all Java EE platforms must provide to applications).</li>
+    <li><a href="https://jakarta.ee/specifications/platform/9/">
+        https://jakarta.ee/specifications/platform/9/</a> -
+        The Jakarta EE Platform Specification (covers the JDBC facilities that
+        all Jakarta EE platforms must provide to applications).</li>
     </ul>
 
     <p><strong>NOTE</strong> - The default data source support in Tomcat
@@ -715,7 +830,7 @@ Transport.send(message);]]></source>
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
+    <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
     Specification</a> for details.</p>
 
     <h5>3.  Code Your Application's Use Of This Resource</h5>
@@ -974,8 +1089,8 @@ public class MyBeanFactory implements ObjectFactory {
 
   <p>In this example, we are unconditionally creating a new instance of
   the <code>com.mycompany.MyBean</code> class, and populating its properties
-  based on the parameters included in the <code>&lt;ResourceParams&gt;</code>
-  element that configures this factory (see below).  You should note that any
+  based on the parameters included in the <code>&lt;Resource&gt;</code>
+  element that configures this resource (see below).  You should note that any
   parameter named <code>factory</code> should be skipped - that parameter is
   used to specify the name of the factory class itself (in this case,
   <code>com.mycompany.MyBeanFactory</code>) rather than a property of the
@@ -1015,7 +1130,7 @@ public class MyBeanFactory implements ObjectFactory {
     <p><strong>WARNING</strong> - Be sure you respect the element ordering
     that is required by the DTD for web application deployment descriptors!
     See the
-    <a href="https://wiki.apache.org/tomcat/Specifications">Servlet
+    <a href="https://cwiki.apache.org/confluence/display/TOMCAT/Specifications">Servlet
     Specification</a> for details.</p>
 
   <h4>3.  Code Your Application's Use Of This Resource</h4>

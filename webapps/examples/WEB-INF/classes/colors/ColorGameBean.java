@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package colors;
 
 public class ColorGameBean {
@@ -24,7 +24,7 @@ public class ColorGameBean {
     private String color2 = background;
     private String hint = "no";
     private int attempts = 0;
-        private int intval = 0;
+    private int intval = 0;
     private boolean tookHints = false;
 
     public void processRequest() {
@@ -35,14 +35,14 @@ public class ColorGameBean {
         if (! color1.equals(foreground)) {
             if (color1.equalsIgnoreCase("black") ||
                         color1.equalsIgnoreCase("cyan")) {
-                        background = color1;
-                }
+                background = color1;
+            }
         }
 
         if (! color2.equals(background)) {
             if (color2.equalsIgnoreCase("black") ||
                         color2.equalsIgnoreCase("cyan")) {
-                        foreground = color2;
+                foreground = color2;
             }
         }
 
@@ -58,17 +58,18 @@ public class ColorGameBean {
     }
 
     public void setAction(String x) {
-        if (!tookHints)
+        if (!tookHints) {
             tookHints = x.equalsIgnoreCase("Hint");
+        }
         hint = x;
     }
 
     public String getColor2() {
-         return background;
+        return background;
     }
 
     public String getColor1() {
-         return foreground;
+        return foreground;
     }
 
     public int getAttempts() {
@@ -81,10 +82,10 @@ public class ColorGameBean {
 
     public boolean getSuccess() {
         if (background.equalsIgnoreCase("black") ||
-            background.equalsIgnoreCase("cyan")) {
+                background.equalsIgnoreCase("cyan")) {
 
             if (foreground.equalsIgnoreCase("black") ||
-                foreground.equalsIgnoreCase("cyan")) {
+                    foreground.equalsIgnoreCase("cyan")) {
                 return true;
             }
             return false;
@@ -104,10 +105,10 @@ public class ColorGameBean {
 
     public void setIntval(int value) {
         intval = value;
-        }
+    }
 
     public int getIntval() {
         return intval;
-        }
+    }
 }
 

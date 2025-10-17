@@ -32,7 +32,8 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 import javax.security.auth.spi.LoginModule;
-import javax.servlet.http.HttpServletRequest;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.catalina.CredentialHandler;
 import org.apache.juli.logging.Log;
@@ -41,37 +42,30 @@ import org.apache.tomcat.util.IntrospectionUtils;
 import org.apache.tomcat.util.digester.Digester;
 
 /**
- * <p>Implementation of the JAAS <strong>LoginModule</strong> interface,
- * primarily for use in testing <code>JAASRealm</code>.  It utilizes an
- * XML-format data file of username/password/role information identical to
- * that supported by <code>org.apache.catalina.realm.MemoryRealm</code>.</p>
- *
- * <p>This class recognizes the following string-valued options, which are
- * specified in the configuration file and passed to {@link
- * #initialize(Subject, CallbackHandler, Map, Map)} in the <code>options</code>
- * argument:</p>
+ * <p>
+ * Implementation of the JAAS <strong>LoginModule</strong> interface, primarily for use in testing
+ * <code>JAASRealm</code>. It utilizes an XML-format data file of username/password/role information identical to that
+ * supported by <code>org.apache.catalina.realm.MemoryRealm</code>.
+ * </p>
+ * <p>
+ * This class recognizes the following string-valued options, which are specified in the configuration file and passed
+ * to {@link #initialize(Subject, CallbackHandler, Map, Map)} in the <code>options</code> argument:
+ * </p>
  * <ul>
- * <li><strong>pathname</strong> - Relative (to the pathname specified by the
- *     "catalina.base" system property) or absolute pathname to the
- *     XML file containing our user information, in the format supported by
- *     {@link MemoryRealm}.  The default value matches the MemoryRealm
- *     default.</li>
- * <li><strong>credentialHandlerClassName</strong> - The fully qualified class
- *     name of the CredentialHandler to use. If not specified, {@link
- *     MessageDigestCredentialHandler} will be used.</li>
- * <li>Any additional options will be used to identify and call setters on the
- *     {@link CredentialHandler}. For example, <code>algorithm=SHA256</code>
- *     would result in a call to {@link
- *     MessageDigestCredentialHandler#setAlgorithm(String)} with a parameter of
- *     <code>"SHA256"</code></li>
+ * <li><strong>pathname</strong> - Relative (to the pathname specified by the "catalina.base" system property) or
+ * absolute pathname to the XML file containing our user information, in the format supported by {@link MemoryRealm}.
+ * The default value matches the MemoryRealm default.</li>
+ * <li><strong>credentialHandlerClassName</strong> - The fully qualified class name of the CredentialHandler to use. If
+ * not specified, {@link MessageDigestCredentialHandler} will be used.</li>
+ * <li>Any additional options will be used to identify and call setters on the {@link CredentialHandler}. For example,
+ * <code>algorithm=SHA256</code> would result in a call to {@link MessageDigestCredentialHandler#setAlgorithm(String)}
+ * with a parameter of <code>"SHA256"</code></li>
  * </ul>
- *
- * <p><strong>IMPLEMENTATION NOTE</strong> - This class implements
- * <code>Realm</code> only to satisfy the calling requirements of the
- * <code>GenericPrincipal</code> constructor.  It does not actually perform
- * the functionality required of a <code>Realm</code> implementation.</p>
- *
- * @author Craig R. McClanahan
+ * <p>
+ * <strong>IMPLEMENTATION NOTE</strong> - This class implements <code>Realm</code> only to satisfy the calling
+ * requirements of the <code>GenericPrincipal</code> constructor. It does not actually perform the functionality
+ * required of a <code>Realm</code> implementation.
+ * </p>
  */
 public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     // We need to extend MemoryRealm to avoid class cast
@@ -106,15 +100,13 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
 
 
     /**
-     * The <code>Principal</code> identified by our validation, or
-     * <code>null</code> if validation failed.
+     * The <code>Principal</code> identified by our validation, or <code>null</code> if validation failed.
      */
     protected Principal principal = null;
 
 
     /**
-     * The state information that is shared with other configured
-     * <code>LoginModule</code> instances.
+     * The state information that is shared with other configured <code>LoginModule</code> instances.
      */
     protected Map<String,?> sharedState = null;
 
@@ -128,22 +120,12 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     // --------------------------------------------------------- Public Methods
 
     public JAASMemoryLoginModule() {
-        if (log.isDebugEnabled()) {
-            log.debug("MEMORY LOGIN MODULE");
+        if (log.isTraceEnabled()) {
+            log.trace("MEMORY LOGIN MODULE");
         }
     }
 
-    /**
-     * Phase 2 of authenticating a <code>Subject</code> when Phase 1
-     * fails.  This method is called if the <code>LoginContext</code>
-     * failed somewhere in the overall authentication chain.
-     *
-     * @return <code>true</code> if this method succeeded, or
-     *  <code>false</code> if this <code>LoginModule</code> should be
-     *  ignored
-     *
-     * @exception LoginException if the abort fails
-     */
+
     @Override
     public boolean abort() throws LoginException {
 
@@ -156,31 +138,19 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         if (committed) {
             logout();
         } else {
-            committed = false;
             principal = null;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Abort");
+        if (log.isTraceEnabled()) {
+            log.trace("Abort");
         }
         return true;
     }
 
 
-    /**
-     * Phase 2 of authenticating a <code>Subject</code> when Phase 1
-     * was successful.  This method is called if the <code>LoginContext</code>
-     * succeeded in the overall authentication chain.
-     *
-     * @return <code>true</code> if the authentication succeeded, or
-     *  <code>false</code> if this <code>LoginModule</code> should be
-     *  ignored
-     *
-     * @exception LoginException if the commit fails
-     */
     @Override
     public boolean commit() throws LoginException {
-        if (log.isDebugEnabled()) {
-            log.debug("commit " + principal);
+        if (log.isTraceEnabled()) {
+            log.trace("commit " + principal);
         }
 
         // If authentication was not successful, just return false
@@ -194,9 +164,9 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             // Add the roles as additional subjects as per the contract with the
             // JAASRealm
             if (principal instanceof GenericPrincipal) {
-                String roles[] = ((GenericPrincipal) principal).getRoles();
-                for (int i = 0; i < roles.length; i++) {
-                    subject.getPrincipals().add(new GenericPrincipal(roles[i], null, null));
+                String[] roles = ((GenericPrincipal) principal).getRoles();
+                for (String role : roles) {
+                    subject.getPrincipals().add(new GenericPrincipal(role));
                 }
 
             }
@@ -207,23 +177,11 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     }
 
 
-    /**
-     * Initialize this <code>LoginModule</code> with the specified
-     * configuration information.
-     *
-     * @param subject The <code>Subject</code> to be authenticated
-     * @param callbackHandler A <code>CallbackHandler</code> for communicating
-     *  with the end user as necessary
-     * @param sharedState State information shared with other
-     *  <code>LoginModule</code> instances
-     * @param options Configuration information for this specific
-     *  <code>LoginModule</code> instance
-     */
     @Override
-    public void initialize(Subject subject, CallbackHandler callbackHandler,
-                           Map<String,?> sharedState, Map<String,?> options) {
-        if (log.isDebugEnabled()) {
-            log.debug("Init");
+    public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String,?> sharedState,
+            Map<String,?> options) {
+        if (log.isTraceEnabled()) {
+            log.trace("Init");
         }
 
         // Save configuration values
@@ -262,8 +220,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             // Skip any non-String values since any value we are interested in
             // will be a String.
             if (entry.getValue() instanceof String) {
-                IntrospectionUtils.setProperty(credentialHandler, entry.getKey(),
-                        (String) entry.getValue());
+                IntrospectionUtils.setProperty(credentialHandler, entry.getKey(), (String) entry.getValue());
             }
         }
         setCredentialHandler(credentialHandler);
@@ -273,22 +230,13 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     }
 
 
-    /**
-     * Phase 1 of authenticating a <code>Subject</code>.
-     *
-     * @return <code>true</code> if the authentication succeeded, or
-     *  <code>false</code> if this <code>LoginModule</code> should be
-     *  ignored
-     *
-     * @exception LoginException if the authentication fails
-     */
     @Override
     public boolean login() throws LoginException {
         // Set up our CallbackHandler requests
         if (callbackHandler == null) {
             throw new LoginException(sm.getString("jaasMemoryLoginModule.noCallbackHandler"));
         }
-        Callback callbacks[] = new Callback[9];
+        Callback[] callbacks = new Callback[10];
         callbacks[0] = new NameCallback("Username: ");
         callbacks[1] = new PasswordCallback("Password: ", false);
         callbacks[2] = new TextInputCallback("nonce");
@@ -296,32 +244,35 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         callbacks[4] = new TextInputCallback("cnonce");
         callbacks[5] = new TextInputCallback("qop");
         callbacks[6] = new TextInputCallback("realmName");
-        callbacks[7] = new TextInputCallback("md5a2");
-        callbacks[8] = new TextInputCallback("authMethod");
+        callbacks[7] = new TextInputCallback("digestA2");
+        callbacks[8] = new TextInputCallback("algorithm");
+        callbacks[9] = new TextInputCallback("authMethod");
 
         // Interact with the user to retrieve the username and password
-        String username = null;
-        String password = null;
-        String nonce = null;
-        String nc = null;
-        String cnonce = null;
-        String qop = null;
-        String realmName = null;
-        String md5a2 = null;
-        String authMethod = null;
+        String username;
+        String password;
+        String nonce;
+        String nc;
+        String cnonce;
+        String qop;
+        String realmName;
+        String digestA2;
+        String algorithm;
+        String authMethod;
 
         try {
             callbackHandler.handle(callbacks);
             username = ((NameCallback) callbacks[0]).getName();
-            password =
-                new String(((PasswordCallback) callbacks[1]).getPassword());
+            char[] passwordArray = ((PasswordCallback) callbacks[1]).getPassword();
+            password = (passwordArray == null) ? null : new String(passwordArray);
             nonce = ((TextInputCallback) callbacks[2]).getText();
             nc = ((TextInputCallback) callbacks[3]).getText();
             cnonce = ((TextInputCallback) callbacks[4]).getText();
             qop = ((TextInputCallback) callbacks[5]).getText();
             realmName = ((TextInputCallback) callbacks[6]).getText();
-            md5a2 = ((TextInputCallback) callbacks[7]).getText();
-            authMethod = ((TextInputCallback) callbacks[8]).getText();
+            digestA2 = ((TextInputCallback) callbacks[7]).getText();
+            algorithm = ((TextInputCallback) callbacks[8]).getText();
+            authMethod = ((TextInputCallback) callbacks[9]).getText();
         } catch (IOException | UnsupportedCallbackException e) {
             throw new LoginException(sm.getString("jaasMemoryLoginModule.callbackHandlerError", e.toString()));
         }
@@ -331,8 +282,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             // BASIC or FORM
             principal = super.authenticate(username, password);
         } else if (authMethod.equals(HttpServletRequest.DIGEST_AUTH)) {
-            principal = super.authenticate(username, password, nonce, nc,
-                    cnonce, qop, realmName, md5a2);
+            principal = super.authenticate(username, password, nonce, nc, cnonce, qop, realmName, digestA2, algorithm);
         } else if (authMethod.equals(HttpServletRequest.CLIENT_CERT_AUTH)) {
             principal = super.getPrincipal(username);
         } else {
@@ -340,7 +290,7 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug("login " + username + " " + principal);
+            log.debug(sm.getString("jaasMemoryLoginModule.login", username, principal));
         }
 
         // Report results based on success or failure
@@ -352,14 +302,6 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
     }
 
 
-    /**
-     * Log out this user.
-     *
-     * @return <code>true</code> in all cases because the
-     *  <code>LoginModule</code> should not be ignored
-     *
-     * @exception LoginException if logging out failed
-     */
     @Override
     public boolean logout() throws LoginException {
         subject.getPrincipals().remove(principal);
@@ -415,10 +357,10 @@ public class JAASMemoryLoginModule extends MemoryRealm implements LoginModule {
             return null;
         }
 
-        Callback callbacks[] = new Callback[1];
+        Callback[] callbacks = new Callback[1];
         callbacks[0] = new TextInputCallback("catalinaBase");
 
-        String result = null;
+        String result;
 
         try {
             callbackHandler.handle(callbacks);

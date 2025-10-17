@@ -20,46 +20,51 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.util.Locale;
 import java.util.Map;
 
-import org.apache.tomcat.util.security.MD5Encoder;
+import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Authenticator supporting the DIGEST auth method.
+ * Authenticator supporting the DIGEST authentication method.
  */
 public class DigestAuthenticator extends Authenticator {
 
+    private static final StringManager sm = StringManager.getManager(DigestAuthenticator.class);
+
     public static final String schemeName = "digest";
-    private SecureRandom cnonceGenerator;
+    private static final Object cnonceGeneratorLock = new Object();
+    private static volatile SecureRandom cnonceGenerator;
     private int nonceCount = 0;
     private long cNonce;
 
     @Override
-    public String getAuthorization(String requestUri, String WWWAuthenticate,
-            Map<String, Object> userProperties) throws AuthenticationException {
+    public String getAuthorization(String requestUri, String authenticateHeader, String userName, String userPassword,
+            String userRealm) throws AuthenticationException {
 
-        String userName = (String) userProperties.get(Constants.WS_AUTHENTICATION_USER_NAME);
-        String password = (String) userProperties.get(Constants.WS_AUTHENTICATION_PASSWORD);
+        validateUsername(userName);
+        validatePassword(userPassword);
 
-        if (userName == null || password == null) {
-            throw new AuthenticationException(
-                    "Failed to perform Digest authentication due to  missing user/password");
-        }
+        Map<String,String> parameterMap = parseAuthenticateHeader(authenticateHeader);
+        String realm = parameterMap.get("realm");
 
-        Map<String, String> wwwAuthenticate = parseWWWAuthenticateHeader(WWWAuthenticate);
+        validateRealm(userRealm, realm);
 
-        String realm = wwwAuthenticate.get("realm");
-        String nonce = wwwAuthenticate.get("nonce");
-        String messageQop = wwwAuthenticate.get("qop");
-        String algorithm = wwwAuthenticate.get("algorithm") == null ? "MD5"
-                : wwwAuthenticate.get("algorithm");
-        String opaque = wwwAuthenticate.get("opaque");
+        String nonce = parameterMap.get("nonce");
+        String messageQop = parameterMap.get("qop");
+        String algorithm = parameterMap.get("algorithm") == null ? "MD5" : parameterMap.get("algorithm");
+        String opaque = parameterMap.get("opaque");
 
         StringBuilder challenge = new StringBuilder();
 
         if (!messageQop.isEmpty()) {
             if (cnonceGenerator == null) {
-                cnonceGenerator = new SecureRandom();
+                synchronized (cnonceGeneratorLock) {
+                    if (cnonceGenerator == null) {
+                        cnonceGenerator = new SecureRandom();
+                    }
+                }
             }
 
             cNonce = cnonceGenerator.nextLong();
@@ -67,80 +72,84 @@ public class DigestAuthenticator extends Authenticator {
         }
 
         challenge.append("Digest ");
-        challenge.append("username =\"" + userName + "\",");
-        challenge.append("realm=\"" + realm + "\",");
-        challenge.append("nonce=\"" + nonce + "\",");
-        challenge.append("uri=\"" + requestUri + "\",");
+        challenge.append("username =\"").append(userName).append("\",");
+        challenge.append("realm=\"").append(realm).append("\",");
+        challenge.append("nonce=\"").append(nonce).append("\",");
+        challenge.append("uri=\"").append(requestUri).append("\",");
 
         try {
-            challenge.append("response=\"" + calculateRequestDigest(requestUri, userName, password,
-                    realm, nonce, messageQop, algorithm) + "\",");
+            challenge.append("response=\"");
+            challenge.append(
+                    calculateRequestDigest(requestUri, userName, userPassword, realm, nonce, messageQop, algorithm));
+            challenge.append("\",");
         }
 
         catch (NoSuchAlgorithmException e) {
-            throw new AuthenticationException(
-                    "Unable to generate request digest " + e.getMessage());
+            throw new AuthenticationException(sm.getString("digestAuthenticator.algorithm", e.getMessage()));
         }
 
-        challenge.append("algorithm=" + algorithm + ",");
-        challenge.append("opaque=\"" + opaque + "\",");
+        challenge.append("algorithm=").append(algorithm).append(",");
+        challenge.append("opaque=\"").append(opaque).append("\",");
 
         if (!messageQop.isEmpty()) {
-            challenge.append("qop=\"" + messageQop + "\"");
-            challenge.append(",cnonce=\"" + cNonce + "\",");
-            challenge.append("nc=" + String.format("%08X", Integer.valueOf(nonceCount)));
+            challenge.append("qop=\"").append(messageQop).append("\"");
+            challenge.append(",cnonce=\"").append(cNonce).append("\",");
+            challenge.append("nc=").append(String.format("%08X", Integer.valueOf(nonceCount)));
         }
 
         return challenge.toString();
 
     }
 
-    private String calculateRequestDigest(String requestUri, String userName, String password,
-            String realm, String nonce, String qop, String algorithm)
-            throws NoSuchAlgorithmException {
+    private String calculateRequestDigest(String requestUri, String userName, String password, String realm,
+            String nonce, String qop, String algorithm) throws NoSuchAlgorithmException {
+
+        boolean session = false;
+        if (algorithm.endsWith("-sess")) {
+            algorithm = algorithm.substring(0, algorithm.length() - 5);
+            session = true;
+        }
 
         StringBuilder preDigest = new StringBuilder();
         String A1;
 
-        if (algorithm.equalsIgnoreCase("MD5"))
+        if (session) {
+            A1 = encode(algorithm, userName + ":" + realm + ":" + password) + ":" + nonce + ":" + cNonce;
+        } else {
             A1 = userName + ":" + realm + ":" + password;
-
-        else
-            A1 = encodeMD5(userName + ":" + realm + ":" + password) + ":" + nonce + ":" + cNonce;
+        }
 
         /*
-         * If the "qop" value is "auth-int", then A2 is: A2 = Method ":"
-         * digest-uri-value ":" H(entity-body) since we do not have an entity-body, A2 =
-         * Method ":" digest-uri-value for auth and auth_int
+         * If the "qop" value is "auth-int", then A2 is: A2 = Method ":" digest-uri-value ":" H(entity-body) since we do
+         * not have an entity-body, A2 = Method ":" digest-uri-value for auth and auth_int
          */
         String A2 = "GET:" + requestUri;
 
-        preDigest.append(encodeMD5(A1));
-        preDigest.append(":");
+        preDigest.append(encode(algorithm, A1));
+        preDigest.append(':');
         preDigest.append(nonce);
 
-        if (qop.toLowerCase().contains("auth")) {
-            preDigest.append(":");
+        if (qop.toLowerCase(Locale.ENGLISH).contains("auth")) {
+            preDigest.append(':');
             preDigest.append(String.format("%08X", Integer.valueOf(nonceCount)));
-            preDigest.append(":");
+            preDigest.append(':');
             preDigest.append(String.valueOf(cNonce));
-            preDigest.append(":");
+            preDigest.append(':');
             preDigest.append(qop);
         }
 
-        preDigest.append(":");
-        preDigest.append(encodeMD5(A2));
+        preDigest.append(':');
+        preDigest.append(encode(algorithm, A2));
 
-        return encodeMD5(preDigest.toString());
-
+        return encode(algorithm, preDigest.toString());
     }
 
-    private String encodeMD5(String value) throws NoSuchAlgorithmException {
+    private String encode(String algorithm, String value) throws NoSuchAlgorithmException {
         byte[] bytesOfMessage = value.getBytes(StandardCharsets.ISO_8859_1);
-        MessageDigest md = MessageDigest.getInstance("MD5");
+        MessageDigest md = MessageDigest.getInstance(algorithm);
         byte[] thedigest = md.digest(bytesOfMessage);
 
-        return MD5Encoder.encode(thedigest);
+        return HexUtils.toHexString(thedigest);
     }
 
     @Override

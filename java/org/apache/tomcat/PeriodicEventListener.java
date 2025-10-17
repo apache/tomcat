@@ -14,12 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.tomcat;
 
 public interface PeriodicEventListener {
     /**
      * Execute a periodic task, such as reloading, etc.
      */
-    public void periodicEvent();
+    void periodicEvent();
 }

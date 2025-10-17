@@ -16,8 +16,8 @@
   limitations under the License.
 -->
 <!DOCTYPE import-control PUBLIC
-    "-//Puppy Crawl//DTD Import Control 1.1//EN"
-    "http://www.puppycrawl.com/dtds/import_control_1_1.dtd">
+    "-//Checkstyle//DTD ImportControl Configuration 1.4//EN"
+    "https://checkstyle.org/dtds/import_control_1_4.dtd">
 
 <import-control pkg="org.apache">
   <!-- Anything in J2SE is OK but need to list javax by package as not
@@ -30,19 +30,23 @@
   <allow pkg="javax.net"/>
   <allow pkg="javax.rmi"/>
   <allow pkg="javax.security"/>
+  <disallow pkg="javax.security.auth.message"/>
+  <allow pkg="jakarta.security.auth.message"/>
   <allow pkg="javax.sql"/>
   <allow pkg="javax.xml"/>
   <allow pkg="org.w3c.dom"/>
   <allow pkg="org.xml.sax"/>
   <allow pkg="org.ietf.jgss"/>
+  <allow pkg="aQute.bnd.annotation.spi"/>
   <subpackage name="catalina">
-    <allow pkg="javax.annotation"/>
-    <allow pkg="javax.ejb"/>
-    <allow pkg="javax.persistence"/>
-    <allow pkg="javax.servlet"/>
+    <allow pkg="jakarta.annotation"/>
+    <allow pkg="jakarta.ejb"/>
+    <allow pkg="jakarta.persistence"/>
+    <allow pkg="jakarta.servlet"/>
+    <allow pkg="jakarta.xml.ws"/>
+    <disallow pkg="org\.apache\.catalina\.ha.*" regex="true"/>
+    <disallow pkg="org\.apache\.catalina\.tribes.*" regex="true"/>
     <allow pkg="org.apache.catalina"/>
-    <disallow pkg="org.apache.catalina.ha"/>
-    <disallow pkg="org.apache.catalina.tribes"/>
     <allow pkg="org.apache.coyote"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.naming"/>
@@ -50,18 +54,18 @@
     <subpackage name="ant">
       <allow pkg="org.apache.tools.ant"/>
       <allow class="org.apache.tomcat.util.Base64"/>
-      <disallow pkg="javax.annotation"/>
-      <disallow pkg="javax.ejb"/>
-      <disallow pkg="javax.persistence"/>
-      <disallow pkg="javax.servlet"/>
+      <disallow pkg="jakarta.annotation"/>
+      <disallow pkg="jakarta.ejb"/>
+      <disallow pkg="jakarta.persistence"/>
+      <disallow pkg="jakarta.servlet"/>
       <disallow pkg="org.apache.coyote"/>
       <disallow pkg="org.apache.juli"/>
       <disallow pkg="org.apache.naming"/>
     </subpackage>
     <subpackage name="ha">
-      <disallow pkg="javax.annotation"/>
-      <disallow pkg="javax.ejb"/>
-      <disallow pkg="javax.persistence"/>
+      <disallow pkg="jakarta.annotation"/>
+      <disallow pkg="jakarta.ejb"/>
+      <disallow pkg="jakarta.persistence"/>
       <disallow pkg="org.apache.coyote"/>
       <disallow pkg="org.apache.naming"/>
       <allow pkg="org.apache.catalina.ha"/>
@@ -72,10 +76,10 @@
       <allow pkg="org.apache.catalina.tribes"/>
     </subpackage>
     <subpackage name="tribes">
-      <disallow pkg="javax.annotation"/>
-      <disallow pkg="javax.ejb"/>
-      <disallow pkg="javax.persistence"/>
-      <disallow pkg="javax.servlet"/>
+      <disallow pkg="jakarta.annotation"/>
+      <disallow pkg="jakarta.ejb"/>
+      <disallow pkg="jakarta.persistence"/>
+      <disallow pkg="jakarta.servlet"/>
       <disallow pkg="org\.apache\.catalina(?!\.tribes).*" regex="true"/>
       <disallow pkg="org.apache.coyote"/>
       <disallow pkg="org.apache.naming"/>
@@ -90,7 +94,7 @@
     </subpackage>
   </subpackage>
   <subpackage name="coyote">
-    <allow pkg="javax.servlet"/>
+    <allow pkg="jakarta.servlet"/>
     <allow pkg="org.apache.coyote"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.tomcat"/>
@@ -98,16 +102,18 @@
     <allow pkg="org.apache.tomcat.util"/>
   </subpackage>
   <subpackage name="el">
-    <allow pkg="javax.el"/>
+    <allow pkg="jakarta.el"/>
     <allow pkg="org.apache.el"/>
   </subpackage>
   <subpackage name="jasper">
-    <allow pkg="javax.el"/>
-    <allow pkg="javax.servlet"/>
+    <allow pkg="javax.tools"/>
+    <allow pkg="jakarta.el"/>
+    <allow pkg="jakarta.servlet"/>
     <allow pkg="org.apache.el"/>
     <allow pkg="org.apache.jasper"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.tomcat" exact-match="true"/>
+    <allow pkg="org.apache.tomcat.util.buf"/>
     <allow pkg="org.apache.tomcat.util.descriptor"/>
     <allow pkg="org.apache.tomcat.util.scan"/>
     <allow pkg="org.apache.tomcat.util.security"/>
@@ -118,10 +124,11 @@
     <allow pkg="org.apache.juli"/>
   </subpackage>
   <subpackage name="naming">
-    <allow pkg="javax.mail"/>
+    <allow pkg="jakarta.mail"/>
     <allow pkg="javax.wsdl"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.naming"/>
+    <allow class="org.apache.tomcat.util.ExceptionUtils"/>
     <allow class="org.apache.tomcat.util.buf.UDecoder"/>
     <allow class="org.apache.tomcat.util.buf.UEncoder"/>
     <allow class="org.apache.tomcat.util.http.FastHttpDateFormat"/>
@@ -130,7 +137,7 @@
     </subpackage>
   </subpackage>
   <subpackage name="tomcat">
-    <allow pkg="javax.servlet"/>
+    <allow pkg="jakarta.servlet"/>
     <subpackage name="buildutil">
       <allow pkg="org.apache.tools.ant"/>
       <allow pkg="org.apache.tomcat.util"/>
@@ -141,7 +148,8 @@
         <allow pkg="org.apache.tomcat.dbcp.dbcp2"/>
         <allow pkg="org.apache.tomcat.dbcp.pool2"/>
         <subpackage name="managed">
-          <allow pkg="javax.transaction"/>
+          <allow pkg="jakarta.transaction"/>
+          <allow pkg="javax.transaction.xa"/>
         </subpackage>
       </subpackage>
       <subpackage name="pool2">
@@ -169,18 +177,18 @@
       </subpackage>
     </subpackage>
     <subpackage name="websocket">
-      <allow pkg="javax.websocket"/>
+      <allow pkg="jakarta.websocket"/>
       <allow pkg="org.apache.juli"/>
       <allow pkg="org.apache.tomcat"/>
       <allow pkg="org.apache.tomcat.util"/>
       <!-- Ideally want to remove this -->
       <allow pkg="org.apache.tomcat.websocket.pojo"/>
-      <disallow pkg="javax.servlet"/>
+      <disallow pkg="jakarta.servlet"/>
       <subpackage name="pojo">
         <allow pkg="org.apache.tomcat.websocket"/>
       </subpackage>
       <subpackage name="server">
-        <allow pkg="javax.servlet"/>
+        <allow pkg="jakarta.servlet"/>
         <allow pkg="org.apache.coyote.http11.upgrade"/>
         <allow pkg="org.apache.tomcat.websocket"/>
       </subpackage>

@@ -19,10 +19,10 @@ package org.apache.catalina.startup;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 /**
  * A test servlet that will always encode the url in case the client requires
@@ -37,7 +37,7 @@ public class TesterServletEncodeUrl extends HttpServlet {
      * <p>
      * The request parameter <code>nextUrl</code> specifies the url to which the
      * caller would like to go next. If supplied, put an encoded url into the
-     * returned html page as a hyperlink.
+     * returned HTML page as a hyperlink.
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

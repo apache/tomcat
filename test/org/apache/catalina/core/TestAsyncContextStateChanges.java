@@ -25,15 +25,15 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.AsyncContext;
-import javax.servlet.AsyncEvent;
-import javax.servlet.AsyncListener;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.AsyncContext;
+import jakarta.servlet.AsyncEvent;
+import jakarta.servlet.AsyncListener;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -41,6 +41,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.connector.TestCoyoteAdapter;
@@ -76,9 +77,9 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
     private ServletRequest servletRequest = null;
     private AsyncContext asyncContext = null;
     private AtomicBoolean failed = new AtomicBoolean();
-    private CountDownLatch servletLatch;
-    private CountDownLatch threadLatch;
-    private CountDownLatch closeLatch;
+    private CountDownLatch servletStartLatch;
+    private CountDownLatch threadCompleteLatch;
+    private CountDownLatch clientDisconnectLatch;
     private CountDownLatch endLatch;
     private boolean dispatch;
 
@@ -90,16 +91,16 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
         // Initialise tracking fields
         failed.set(true);
-        servletLatch = new CountDownLatch(1);
-        threadLatch = new CountDownLatch(1);
-        closeLatch = new CountDownLatch(1);
+        servletStartLatch = new CountDownLatch(1);
+        threadCompleteLatch = new CountDownLatch(1);
+        clientDisconnectLatch = new CountDownLatch(1);
         endLatch = new CountDownLatch(1);
 
         // Setup Tomcat instance
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         AsyncServlet bug63816Servlet = new AsyncServlet();
         Wrapper wrapper = Tomcat.addServlet(ctx, "bug63816Servlet", bug63816Servlet);
@@ -110,18 +111,21 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
         Client client = new Client();
         client.setPort(getPort());
-        client.setRequest(new String[] { "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
-                                         "Host: localhost:" + SimpleHttpClient.CRLF +
-                                         SimpleHttpClient.CRLF});
+        // @formatter:off
+        client.setRequest(new String[] {
+                "GET / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + CRLF +
+                    CRLF});
+        // @formatter:on
         client.connect();
         client.sendRequest();
 
         // Wait for Servlet to start processing request
-        servletLatch.await();
+        servletStartLatch.await();
 
         if (asyncEnd.isError()) {
             client.disconnect();
-            closeLatch.countDown();
+            clientDisconnectLatch.countDown();
             try {
                 endLatch.await();
             } catch (InterruptedException e) {
@@ -150,9 +154,8 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            servletLatch.countDown();
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+            servletStartLatch.countDown();
 
             if (dispatch) {
                 return;
@@ -180,15 +183,14 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                     t.run();
                     break;
                 }
-                case THREAD_AFTER_EXIT: {
+                case THREAD_COMPLETES_AFTER_SERVLET_EXIT: {
                     t.start();
-                    threadLatch.countDown();
                     break;
                 }
-                case THREAD_BEFORE_EXIT: {
+                case THREAD_COMPLETES_BEFORE_SERVLET_EXIT: {
                     t.start();
                     try {
-                        threadLatch.await();
+                        threadCompleteLatch.await();
                     } catch (InterruptedException e) {
                         // Ignore
                     }
@@ -204,19 +206,15 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
         @Override
         public void run() {
-            if (endTiming == EndTiming.THREAD_AFTER_EXIT) {
+            if (endTiming == EndTiming.THREAD_COMPLETES_AFTER_SERVLET_EXIT) {
                 try {
-                    threadLatch.await();
                     /*
-                     * As much as I dislike it, I don't see any easy way around
-                     * this hack. The latch above is released as the Servlet
-                     * exits but we need to wait for the post processing to
-                     * complete for the test to work as intended. In real-world
-                     * applications this does mean that there is a real chance
-                     * of an ISE. We may need to increase this delay for some CI
-                     * systems.
+                     * As much as I dislike it, I don't see any easy way around this hack. The thread is started as the
+                     * Servlet exits but we need to wait for the post processing to complete for the test to work as
+                     * intended. In real-world applications this does mean that there is a real chance of an ISE. We may
+                     * need to increase this delay for some CI systems.
                      */
-                    Thread.sleep(1000);
+                    sleep(1000);
                 } catch (InterruptedException e) {
                     // Ignore
                 }
@@ -225,7 +223,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
             // Trigger the error if necessary
             if (asyncEnd.isError()) {
                 try {
-                    closeLatch.await();
+                    clientDisconnectLatch.await();
                 } catch (InterruptedException e) {
                     // Ignore
                 }
@@ -235,15 +233,17 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                     resp.setCharacterEncoding("UTF-8");
                     OutputStream os = resp.getOutputStream();
                     resp.setContentType("text/plain");
-                    for (int i = 0; i < 16; i++) {
+                    // Needs to be large enough to fill buffers and trigger
+                    // the IOE for the test to work as expected.
+                    for (int i = 0; i < 64; i++) {
                         os.write(TestCoyoteAdapter.TEXT_8K.getBytes(StandardCharsets.UTF_8));
                     }
-                } catch (IOException e) {
-                    // Expected
+                } catch (IOException ignore) {
+                    // Ignore - The test intends to trigger the IOE
                 }
             }
 
-            if (endTiming != EndTiming.THREAD_AFTER_EXIT) {
+            if (endTiming != EndTiming.THREAD_COMPLETES_AFTER_SERVLET_EXIT) {
                 try {
                     switch (asyncEnd) {
                         case COMPLETE:
@@ -268,8 +268,8 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
                         failed.set(false);
                     }
                 } finally {
-                    if (endTiming == EndTiming.THREAD_BEFORE_EXIT) {
-                        threadLatch.countDown();
+                    if (endTiming == EndTiming.THREAD_COMPLETES_BEFORE_SERVLET_EXIT) {
+                        threadCompleteLatch.countDown();
                     }
                 }
             }
@@ -288,9 +288,9 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
         @Override
         public void onTimeout(AsyncEvent event) throws IOException {
-            // Need to handle timeouts for THREAD_AFTER_EXIT in the listener to
+            // Need to handle timeouts for THREAD_COMPLETES_AFTER_SERVLET_EXIT in the listener to
             // avoid concurrency issues.
-            if (endTiming == EndTiming.THREAD_AFTER_EXIT) {
+            if (endTiming == EndTiming.THREAD_COMPLETES_AFTER_SERVLET_EXIT) {
                 switch (asyncEnd) {
                     case COMPLETE: {
                         asyncContext.complete();
@@ -313,9 +313,9 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
         @Override
         public void onError(AsyncEvent event) throws IOException {
-            // Need to handle errors for THREAD_AFTER_EXIT in the listener to
+            // Need to handle errors for THREAD_COMPLETES_AFTER_SERVLET_EXIT in the listener to
             // avoid concurrency issues.
-            if (endTiming == EndTiming.THREAD_AFTER_EXIT) {
+            if (endTiming == EndTiming.THREAD_COMPLETES_AFTER_SERVLET_EXIT) {
                 switch (asyncEnd) {
                     case ERROR_COMPLETE: {
                         asyncContext.complete();
@@ -345,17 +345,17 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
     public enum AsyncEnd {
 
-        NONE          ( true, false),
-        COMPLETE      (false, false),
-        DISPATCH      (false, false),
-        ERROR_NONE    ( true,  true),
-        ERROR_COMPLETE(false,  true),
-        ERROR_DISPATCH(false,  true);
+        NONE(true, false),
+        COMPLETE(false, false),
+        DISPATCH(false, false),
+        ERROR_NONE(true, true),
+        ERROR_COMPLETE(false, true),
+        ERROR_DISPATCH(false, true);
 
         final boolean none;
         final boolean error;
 
-        private AsyncEnd(boolean none, boolean error) {
+        AsyncEnd(boolean none, boolean error) {
             this.none = none;
             this.error = error;
         }
@@ -372,7 +372,7 @@ public class TestAsyncContextStateChanges extends TomcatBaseTest {
 
     public enum EndTiming {
         INLINE,
-        THREAD_BEFORE_EXIT,
-        THREAD_AFTER_EXIT
+        THREAD_COMPLETES_BEFORE_SERVLET_EXIT,
+        THREAD_COMPLETES_AFTER_SERVLET_EXIT
     }
 }

@@ -14,12 +14,11 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net.openssl.ciphers;
 
 import org.apache.tomcat.util.net.Constants;
 
-enum Protocol {
+public enum Protocol {
 
     SSLv3(Constants.SSL_PROTO_SSLv3),
     SSLv2(Constants.SSL_PROTO_SSLv2),
@@ -29,14 +28,13 @@ enum Protocol {
 
     private final String openSSLName;
 
-    private Protocol(String openSSLName) {
+    Protocol(String openSSLName) {
         this.openSSLName = openSSLName;
     }
 
     /**
-     * The name returned by OpenSSL in the protocol column when using
-     * <code>openssl ciphers -v</code>. This is currently only used by the unit
-     * tests hence it is package private.
+     * The name returned by OpenSSL in the protocol column when using <code>openssl ciphers -v</code>. This is currently
+     * only used by the unit tests hence it is package private.
      */
     String getOpenSSLName() {
         return openSSLName;

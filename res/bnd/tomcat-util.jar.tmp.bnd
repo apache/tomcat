@@ -12,16 +12,31 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd
+
 Bundle-Name: tomcat-util
 Bundle-SymbolicName: org.apache.tomcat-util
-Bundle-Version: @VERSION@
 Export-Package: \
     org.apache.tomcat.util,\
     org.apache.tomcat.util.buf,\
-    org.apache.tomcat.util.codec.binary,\
     org.apache.tomcat.util.collections,\
     org.apache.tomcat.util.compat,\
+    org.apache.tomcat.util.concurrent,\
     org.apache.tomcat.util.file,\
     org.apache.tomcat.util.res,\
     org.apache.tomcat.util.security,\
     org.apache.tomcat.util.threads
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
+
+-includepackage: \
+    org.apache.tomcat.util.json
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version}
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=${Bundle-Name}

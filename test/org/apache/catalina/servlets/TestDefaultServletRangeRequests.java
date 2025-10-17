@@ -16,7 +16,9 @@
  */
 package org.apache.catalina.servlets;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -30,14 +32,19 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.catalina.util.IOTools;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.HexUtils;
+import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 @RunWith(Parameterized.class)
 public class TestDefaultServletRangeRequests extends TomcatBaseTest {
 
-    @Parameterized.Parameters(name = "{index} rangeHeader [{0}]")
+    @Parameterized.Parameters(name = "{index} rangeHeader [{0}], ifRangeHeader [{1}]")
     public static Collection<Object[]> parameters() {
 
         // Get the length of the file used for this test
@@ -45,46 +52,97 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         File index = new File("test/webapp/index.html");
         long len = index.length();
         String strLen = Long.toString(len);
+        String lastModified = FastHttpDateFormat.formatDate(index.lastModified());
+        String weakETag = "W/\"" + strLen + "-" + Long.toString(index.lastModified()) + "\"";
+        String strongETag = "\"\"";
+        try (FileInputStream is = new FileInputStream(index)) {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            IOTools.flow(is, os);
+            strongETag = "\"" + HexUtils.toHexString(ConcurrentMessageDigest.digestSHA256(os.toByteArray())) + "\"";
+        } catch (Exception e) {
+        }
 
         List<Object[]> parameterSets = new ArrayList<>();
 
-        parameterSets.add(new Object[] { "", Integer.valueOf(200), strLen, "" });
+        parameterSets.add(new Object[] { "", null, Integer.valueOf(200), strLen, "" });
         // Invalid
-        parameterSets.add(new Object[] { "bytes", Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes=", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=", null, Integer.valueOf(416), "", "*/" + len });
         // Invalid with unknown type
-        parameterSets.add(new Object[] { "unknown", Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "unknown=", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "unknown", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "unknown=", null, Integer.valueOf(416), "", "*/" + len });
         // Invalid ranges
-        parameterSets.add(new Object[] { "bytes=-", Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes=10-b", Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes=b-10", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=-", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=10-b", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=b-10", null, Integer.valueOf(416), "", "*/" + len });
+        // Invalid ranges (out of range)
+        parameterSets.add(new Object[] { "bytes=1000-2000", null, Integer.valueOf(416), "", "*/" + len });
+        // Valid overlapping ranges (up to 2)
+        parameterSets.add(new Object[] { "bytes=1-100, 30-50", null, Integer.valueOf(206), "", "30-50/" + len });
+        parameterSets.add(new Object[] { "bytes=1-100, 90-150", null, Integer.valueOf(206), "", "1-100/" + len });
+        // Invalid overlapping ranges (3 or more)
+        parameterSets.add(new Object[] { "bytes=1-100, 30-50, 10-20", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes=1-100, 90-150, 10-20", null, Integer.valueOf(416), "", "*/" + len });
         // Invalid no equals
-        parameterSets.add(new Object[] { "bytes 1-10", Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes1-10", Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes10-", Integer.valueOf(416), "", "*/" + len });
-        parameterSets.add(new Object[] { "bytes-10", Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes 1-10", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes1-10", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes10-", null, Integer.valueOf(416), "", "*/" + len });
+        parameterSets.add(new Object[] { "bytes-10", null, Integer.valueOf(416), "", "*/" + len });
         // Unknown types
-        parameterSets.add(new Object[] { "unknown=1-2", Integer.valueOf(200), strLen, "" });
-        parameterSets.add(new Object[] { "bytesX=1-2", Integer.valueOf(200), strLen, "" });
-        parameterSets.add(new Object[] { "Xbytes=1-2", Integer.valueOf(200), strLen, "" });
+        parameterSets.add(new Object[] { "unknown=1-2", null, Integer.valueOf(200), strLen, "" });
+        parameterSets.add(new Object[] { "bytesX=1-2", null, Integer.valueOf(200), strLen, "" });
+        parameterSets.add(new Object[] { "Xbytes=1-2", null, Integer.valueOf(200), strLen, "" });
         // Valid range
-        parameterSets.add(new Object[] { "bytes=0-9", Integer.valueOf(206), "10", "0-9/" + len });
-        parameterSets.add(new Object[] { "bytes=-100", Integer.valueOf(206), "100", (len - 100) + "-" + (len - 1) + "/" + len });
-        parameterSets.add(new Object[] { "bytes=100-", Integer.valueOf(206), "" + (len - 100), "100-" + (len - 1) + "/" + len });
+        parameterSets.add(new Object[] {
+                "bytes=0-9", null, Integer.valueOf(206), "10", "0-9/" + len });
+        parameterSets.add(new Object[] {
+                "bytes=0-9,10-10", null, Integer.valueOf(206), null, "0-9/" + len });
+        parameterSets.add(new Object[] {
+                "bytes=-100", null, Integer.valueOf(206), "100", (len - 100) + "-" + (len - 1) + "/" + len });
+        parameterSets.add(new Object[] {
+                "bytes=100-", null, Integer.valueOf(206), "" + (len - 100), "100-" + (len - 1) + "/" + len });
         // Valid range (too much)
-        parameterSets.add(new Object[] { "bytes=0-1000", Integer.valueOf(206), strLen, "0-" +  (len - 1) + "/" + len });
-        parameterSets.add(new Object[] { "bytes=-1000", Integer.valueOf(206), strLen, "0-" + (len - 1) + "/" + len });
+        parameterSets.add(new Object[] {
+                "bytes=0-1000", null, Integer.valueOf(206), strLen, "0-" +  (len - 1) + "/" + len });
+        parameterSets.add(new Object[] {
+                "bytes=-1000", null, Integer.valueOf(206), strLen, "0-" + (len - 1) + "/" + len });
+
+        /* If-Range tests */
+        // Valid
+        parameterSets.add(new Object[] {
+                "bytes=0-9", lastModified, Integer.valueOf(206), "10", "0-9/" + len });
+        // Nonsense data (request rejected)
+        parameterSets.add(new Object[] { "bytes=0-9", "a-b-c", Integer.valueOf(400), null, "" });
+        parameterSets.add(new Object[] { "bytes=0-9", "W\"123\"", Integer.valueOf(400), null, "" });
+        parameterSets.add(new Object[] { "bytes=0-9", "\"123\"W", Integer.valueOf(400), null, "" });
+        // More than one (request rejected)
+        parameterSets.add(new Object[] {
+                "bytes=0-9", "\"46273648\", " + weakETag, Integer.valueOf(400), null, "" });
+        // Different date (return whole entity)
+        parameterSets.add(new Object[] {
+                "bytes=0-9", FastHttpDateFormat.formatDate(1000), Integer.valueOf(200), strLen, "" });
+        // Valid weak etag
+        parameterSets.add(new Object[] {
+                "bytes=0-9", weakETag, Integer.valueOf(200), strLen, "" });
+        // Invalid strong etag
+        parameterSets.add(new Object[] {
+                "bytes=0-9", "\"46273648\"", Integer.valueOf(200), strLen, "" });
+        // Valid strong etag
+        parameterSets.add(new Object[] {
+                "bytes=0-9", strongETag, Integer.valueOf(206), "10", "0-9/" + len });
+
         return parameterSets;
     }
 
     @Parameter(0)
     public String rangeHeader;
     @Parameter(1)
-    public int responseCodeExpected;
+    public String ifRangeHeader;
     @Parameter(2)
-    public String contentLengthExpected;
+    public int responseCodeExpected;
     @Parameter(3)
+    public String contentLengthExpected;
+    @Parameter(4)
     public String responseRangeExpected;
 
     @Test
@@ -95,7 +153,10 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         File appDir = new File("test/webapp");
         Context ctxt = tomcat.addContext("", appDir.getAbsolutePath());
 
-        Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+        Wrapper wrapper = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
+        if (ifRangeHeader != null && ifRangeHeader.startsWith("\"")) {
+            wrapper.addInitParameter("useStrongETags", "true");
+        }
         ctxt.addServletMappingDecoded("/", "default");
 
         tomcat.start();
@@ -105,12 +166,19 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
         ByteChunk responseBody = new ByteChunk();
         Map<String,List<String>> responseHeaders = new HashMap<>();
 
-        int rc = getUrl(path, responseBody, buildRangeHeader(rangeHeader), responseHeaders);
+        Map<String,List<String>> requestHeaders = buildRangeHeader(rangeHeader);
+        if (ifRangeHeader != null) {
+            List<String> values = new ArrayList<>(1);
+            values.add(ifRangeHeader);
+            requestHeaders.put("If-Range", values);
+        }
+
+        int rc = getUrl(path, responseBody, requestHeaders, responseHeaders);
 
         // Check the result
         Assert.assertEquals(responseCodeExpected, rc);
 
-        if (contentLengthExpected.length() > 0) {
+        if (contentLengthExpected != null && contentLengthExpected.length() > 0) {
             String contentLength = responseHeaders.get("Content-Length").get(0);
             Assert.assertEquals(contentLengthExpected, contentLength);
         }
@@ -121,7 +189,14 @@ public class TestDefaultServletRangeRequests extends TomcatBaseTest {
             if (headerValues != null && headerValues.size() == 1) {
                 responseRange = headerValues.get(0);
             }
-            Assert.assertEquals("bytes " + responseRangeExpected, responseRange);
+            if (responseRange != null) {
+                Assert.assertEquals("bytes " + responseRangeExpected, responseRange);
+            } else {
+                Assert.assertTrue(
+                        "Expected `Content-Range: " + "bytes " + responseRangeExpected +
+                                "` in multipart/byteranges response body not found!",
+                        responseBody.toString().contains("bytes " + responseRangeExpected));
+            }
         }
     }
 

@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="fhanik@apache.org">Filip Hanik</author>
     <title>The Channel Interceptor object</title>
   </properties>
 
@@ -36,7 +35,7 @@
 <section name="Introduction">
   <p>
   Apache Tribes supports an interceptor architecture to intercept both messages and membership notifications.
-  This architecture allows decoupling of logic and opens the way for some very useful feature add ons.
+  This architecture allows decoupling of logic and opens the way for some very useful feature add-ons.
   </p>
 </section>
 
@@ -132,7 +131,7 @@
        is sent synchronously, if <code>false</code> an error is thrown.
      </attribute>
      <attribute name="maxQueueSize" required="false">
-       Size in bytes of the dispatch queue, the default value is <code> 1024*1024*64 (64MB)</code> sets the maximum queue size for the dispatch queue
+       Size in bytes of the dispatch queue, the default value is <code> 1024*1024*64 (64 MiB)</code> sets the maximum queue size for the dispatch queue
        if the queue fills up, one can trigger the behavior, if <code>alwaysSend</code> is set to true, the message will be sent synchronously
        if the flag is false, an error is thrown
      </attribute>
@@ -200,12 +199,12 @@
   <subsection name="org.apache.catalina.tribes.group.interceptors.EncryptInterceptor Attributes">
    <p>
      The EncryptInterceptor adds encryption to the channel messages carrying
-     session data between nodes. Added in Tomcat 9.0.13.
+     session data between nodes.
    </p>
    <p>
      If using the <code>TcpFailureDetector</code>, the <code>EncryptInterceptor</code>
      <i>must</i> be inserted into the interceptor chain <i>before</i> the
-     <code>TcpFailureDetector</code>. This is becuase when validating cluster
+     <code>TcpFailureDetector</code>. This is because when validating cluster
      members, <code>TcpFailureDetector</code> writes channel data directly
      to the other members without using the remainder of the interceptor chain,
      but on the receiving side, the message still goes through the chain (in reverse).

@@ -14,27 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.compiler;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.jsp.tagext.FunctionInfo;
+import jakarta.servlet.jsp.tagext.FunctionInfo;
 
 import org.apache.jasper.JasperException;
 
 /**
- * This class defines internal representation for an EL Expression
- *
- * It currently only defines functions.  It can be expanded to define
- * all the components of an EL expression, if need to.
- *
- * @author Kin-man Chung
+ * This class defines internal representation for an EL Expression. It currently only defines functions. It can be
+ * expanded to define all the components of an EL expression, if need to.
  */
-
-abstract class ELNode {
+public abstract class ELNode {
 
     public abstract void accept(Visitor v) throws JasperException;
 
@@ -49,7 +43,7 @@ abstract class ELNode {
 
         Root(ELNode.Nodes expr, char type) {
             this.expr = expr;
-        this.type = type;
+            this.type = type;
         }
 
         @Override
@@ -88,8 +82,7 @@ abstract class ELNode {
     }
 
     /**
-     * Represents anything in EL expression, other than functions, including
-     * function arguments etc
+     * Represents anything in EL expression, other than functions, including function arguments etc.
      */
     public static class ELText extends ELNode {
 
@@ -110,9 +103,7 @@ abstract class ELNode {
     }
 
     /**
-     * Represents a function
-     * Currently only include the prefix and function name, but not its
-     * arguments.
+     * Represents a function. Currently only include the prefix and function name, but not its arguments.
      */
     public static class Function extends ELNode {
 
@@ -185,13 +176,13 @@ abstract class ELNode {
      */
     public static class Nodes {
 
-        /* Name used for creating a map for the functions in this
-           EL expression, for communication to Generator.
+        /*
+         * Name used for creating a map for the functions in this EL expression, for communication to Generator.
          */
-        private String mapName = null;    // The function map associated this EL
+        private String mapName = null; // The function map associated this EL
         private final List<ELNode> list;
 
-        public Nodes() {
+        Nodes() {
             list = new ArrayList<>();
         }
 
@@ -217,7 +208,7 @@ abstract class ELNode {
         }
 
         public boolean isEmpty() {
-            return list.size() == 0;
+            return list.isEmpty();
         }
 
         /**

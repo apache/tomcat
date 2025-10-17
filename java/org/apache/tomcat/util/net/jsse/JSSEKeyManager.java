@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.tomcat.util.net.jsse;
 
 import java.net.Socket;
@@ -27,24 +26,20 @@ import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509KeyManager;
 
 /**
- * X509KeyManager which allows selection of a specific keypair and certificate
- * chain (identified by their keystore alias name) to be used by the server to
- * authenticate itself to SSL clients.
- *
- * @author Jan Luehe
+ * X509KeyManager which allows selection of a specific key pair and certificate chain (identified by their keystore
+ * alias name) to be used by the server to authenticate itself to SSL clients.
  */
 public final class JSSEKeyManager extends X509ExtendedKeyManager {
 
-    private X509KeyManager delegate;
-    private String serverKeyAlias;
+    private final X509KeyManager delegate;
+    private final String serverKeyAlias;
 
 
     /**
      * Constructor.
      *
-     * @param mgr The X509KeyManager used as a delegate
-     * @param serverKeyAlias The alias name of the server's keypair and
-     * supporting certificate chain
+     * @param mgr            The X509KeyManager used as a delegate
+     * @param serverKeyAlias The alias name of the server's key pair and supporting certificate chain
      */
     public JSSEKeyManager(X509KeyManager mgr, String serverKeyAlias) {
         super();
@@ -54,9 +49,8 @@ public final class JSSEKeyManager extends X509ExtendedKeyManager {
 
 
     /**
-     * Returns the server key alias that was provided in the constructor or the
-     * result from {@link X509KeyManager#chooseServerAlias(String, Principal[],
-     * Socket)} for the delegate if no alias is specified.
+     * Returns the server key alias that was provided in the constructor or the result from
+     * {@link X509KeyManager#chooseServerAlias(String, Principal[], Socket)} for the delegate if no alias is specified.
      */
     @Override
     public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket) {
@@ -69,14 +63,13 @@ public final class JSSEKeyManager extends X509ExtendedKeyManager {
 
 
     /**
-     * Returns the server key alias that was provided in the constructor or the
-     * result from {@link X509ExtendedKeyManager#chooseEngineServerAlias(String,
-     * Principal[], SSLEngine)} for the delegate if no alias is specified.
+     * Returns the server key alias that was provided in the constructor or the result from
+     * {@link X509ExtendedKeyManager#chooseEngineServerAlias(String, Principal[], SSLEngine)} for the delegate if no
+     * alias is specified.
      */
     @Override
-    public String chooseEngineServerAlias(String keyType, Principal[] issuers,
-            SSLEngine engine) {
-        if (serverKeyAlias!=null) {
+    public String chooseEngineServerAlias(String keyType, Principal[] issuers, SSLEngine engine) {
+        if (serverKeyAlias != null) {
             return serverKeyAlias;
         }
 
@@ -85,8 +78,7 @@ public final class JSSEKeyManager extends X509ExtendedKeyManager {
 
 
     @Override
-    public String chooseClientAlias(String[] keyType, Principal[] issuers,
-                                    Socket socket) {
+    public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket) {
         return delegate.chooseClientAlias(keyType, issuers, socket);
     }
 
@@ -116,8 +108,7 @@ public final class JSSEKeyManager extends X509ExtendedKeyManager {
 
 
     @Override
-    public String chooseEngineClientAlias(String[] keyType, Principal[] issuers,
-            SSLEngine engine) {
+    public String chooseEngineClientAlias(String[] keyType, Principal[] issuers, SSLEngine engine) {
         return delegate.chooseClientAlias(keyType, issuers, null);
     }
 }

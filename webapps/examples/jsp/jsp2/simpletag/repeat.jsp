@@ -14,7 +14,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 --%>
-<%@ taglib prefix="mytag" uri="/WEB-INF/jsp2/jsp2-example-taglib.tld" %>
+<%@ taglib prefix="mytag" uri="/WEB-INF/jsp/jsp2-example-taglib.tld" %>
 <html>
   <head>
     <title>JSP 2.0 Examples - Repeat SimpleTag Handler</title>

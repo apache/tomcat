@@ -20,7 +20,6 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   version="3.0">
 
-
   <!-- Output method -->
   <xsl:output method="html"
               html-version="5.0"
@@ -28,41 +27,41 @@
               indent="no"
               doctype-system="about:legacy-compat"/>
 
-
-  <!-- Defined parameters (overrideable) -->
-  <xsl:param    name="home-name"           select="'The Tomcat Project'"/>
-  <xsl:param    name="home-href"           select="'https://tomcat.apache.org/'"/>
+  <!-- Defined parameters (overridable) -->
   <xsl:param    name="home-logo"           select="'/images/tomcat.png'"/>
   <xsl:param    name="home-stylesheet"     select="'/images/docs-stylesheet.css'"/>
   <xsl:param    name="apache-logo"         select="'/images/asf-logo.svg'"/>
   <xsl:param    name="subdir"              select="''"/>
   <xsl:param    name="relative-path"       select="'.'"/>
-  <xsl:param    name="version"             select="'9.0.x'"/>
-  <xsl:param    name="majorversion"        select="'9'"/>
-  <xsl:param    name="majorminorversion"   select="'9.0'"/>
-  <xsl:param    name="minjavaversion"      select="'8'"/>
+  <!-- Keep versions in sync with build.xml -->
+  <xsl:param    name="version"             select="'12.0.x'"/>
+  <xsl:param    name="majorversion"        select="'12'"/>
+  <xsl:param    name="majorminorversion"   select="'12.0'"/>
+  <xsl:param    name="minjavaversion"      select="'21'"/>
+  <xsl:param    name="buildjavaversion"    select="'22'"/>
+  <xsl:param    name="antversionrequired"  select="'1.10.2'"/>
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
   <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>
   <xsl:param    name="year"                select="'yyyy'"/>
   <xsl:param    name="buglink"             select="'https://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
+  <xsl:param    name="prlink"              select="'https://github.com/apache/tomcat/pull/'"/>
   <xsl:param    name="revlink"             select="'https://svn.apache.org/viewvc?view=rev&amp;rev='"/>
-  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-9.0-doc'"/>
-  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-9.html'"/>
-  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-90.cgi'"/>
+  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-12.0-doc'"/>
+  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-12.html'"/>
+  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-12.cgi'"/>
   <xsl:param    name="sitedir"             select="''"/>
   <xsl:param    name="filename"            select="'-'"/>
 
-  <!-- Defined variables (non-overrideable) -->
-  <xsl:variable name="commentslink"><xsl:value-of select="$relative-path"/>/comments.html</xsl:variable>
+  <!-- Defined variables (non-overridable) -->
   <xsl:variable name="project-xml-filename"><xsl:value-of select="$subdir"/>project.xml</xsl:variable>
   <xsl:variable name="project"
-              select="document($project-xml-filename)/project"/>
+                select="document($project-xml-filename)/project"/>
 
   <!-- Process an entire document into an HTML page -->
   <xsl:template match="document">
 <html lang="en">
 <head>
-  <!-- Note: XLST seems to always output a
+  <!-- Note: XSLT seems to always output a
        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
        when method="html",
        therefore we can't use
@@ -87,89 +86,43 @@
         <xsl:value-of select="@email"/>
       </xsl:variable>
     -->
-    <meta name="author" content="{$name}"/>
   </xsl:for-each>
+</head>
 
-  <!-- Script for ASF Comments System. -->
-  <!--
-    Use data-* attributes for retrieval of XSLT-generated data
-    in JavaScript.
-    Use this approach rather than directly inserting text
-    in a JS string literal as that would cause
-    problems when the string contains special characters
-    like ", ', \n etc.
-  -->
-  <xsl:variable name="comments-identifier">
-    <xsl:value-of select="$sitedir"/><xsl:value-of select="$subdir"/><xsl:value-of select="substring($filename,1,string-length($filename)-4)"/>
-  </xsl:variable>
-  <xsl:if test="not(properties/no-comments)">
-  <script type="application/javascript"
-      data-comments-identifier="{$comments-identifier}"><![CDATA[
-    "use strict"; // Enable strict mode
-
-    (function() {
-      var thisScript = document.currentScript;
-      if (!thisScript) { // Workaround for IE <= 11
-        var scripts = document.getElementsByTagName("script");
-        thisScript = scripts[scripts.length - 1];
-      }
-      document.addEventListener("DOMContentLoaded", (function() {
-        var commentsDiv = document.getElementById("comments_thread");
-        var commentsShortname = "tomcat";
-        var commentsIdentifier = "https://tomcat.apache.org/" +
-          thisScript.getAttribute("data-comments-identifier") + ".html";
-
-        (function(w, d) {
-          if (w.location.hostname.toLowerCase() == "tomcat.apache.org") {
-            var s = d.createElement("script");
-            s.type = "application/javascript";
-            s.async = true;
-            s.src = "https://comments.apache.org/show_comments.lua?site=" +
-              encodeURIComponent(commentsShortname) +
-              "&page=" + encodeURIComponent(commentsIdentifier);
-            d.head.appendChild(s);
-          } else {
-            commentsDiv.appendChild(d.createTextNode("Comments are disabled for this page at the moment."));
-          }
-        })(window, document);
-      }), false);
-    })();
-  ]]></script>
-  </xsl:if>
-  </head>
-
-  <body>
+<body>
   <div id="wrapper">
   <!-- Header -->
-  <header><div id="header">
-    <div>
+  <header>
+    <div id="header">
       <div>
-        <xsl:if test="$project/logo">
-          <xsl:variable name="src">
-            <xsl:value-of select="$relative-path"/><xsl:value-of select="$home-logo"/>
-          </xsl:variable>
-          <div class="logo noPrint">
-            <a href="{$project/@href}"><img alt="Tomcat Home" src="{$src}"/></a>
-          </div>
-        </xsl:if>
+        <div>
+          <xsl:if test="$project/logo">
+            <xsl:variable name="src">
+              <xsl:value-of select="$relative-path"/><xsl:value-of select="$home-logo"/>
+            </xsl:variable>
+            <div class="logo noPrint">
+              <a href="{$project/@href}"><img alt="Tomcat Home" src="{$src}"/></a>
+            </div>
+          </xsl:if>
 
-        <div style="height: 1px;"/>
-        <xsl:variable name="src">
-          <xsl:value-of select="$relative-path"/><xsl:value-of select="$apache-logo"/>
-        </xsl:variable>
-        <div class="asfLogo noPrint">
-          <a href="https://www.apache.org/" target="_blank"><img src="{$src}" alt="The Apache Software Foundation" style="width: 266px; height: 83px;"/></a>
+          <div style="height: 1px;"/>
+          <xsl:variable name="src">
+            <xsl:value-of select="$relative-path"/><xsl:value-of select="$apache-logo"/>
+          </xsl:variable>
+          <div class="asfLogo noPrint">
+            <a href="https://www.apache.org/" target="_blank"><img src="{$src}" alt="The Apache Software Foundation" style="width: 266px; height: 83px;"/></a>
+          </div>
+          <h1><xsl:value-of select="$project/title"/></h1>
+          <div class="versionInfo">
+            Version <xsl:value-of select="$version"/>,
+            <time datetime="{$build-date-iso-8601}"><xsl:value-of select="$build-date"/></time>
+          </div>
+          <div style="height: 1px;"/>
+          <div style="clear: left;"/>
         </div>
-        <h1><xsl:value-of select="$project/title"/></h1>
-        <div class="versionInfo">
-          Version <xsl:value-of select="$version"/>,
-          <time datetime="{$build-date-iso-8601}"><xsl:value-of select="$build-date"/></time>
-        </div>
-        <div style="height: 1px;"/>
-        <div style="clear: left;"/>
       </div>
     </div>
-  </div></header>
+  </header>
 
   <div id="middle">
     <div>
@@ -184,61 +137,37 @@
       <div id="mainRight">
         <div id="content">
           <!-- Main Part -->
-            <h2><xsl:value-of select="properties/title"/></h2>
-            <xsl:apply-templates select="body/section"/>
-
-            <!-- Comments Section -->
-            <xsl:if test="not(properties/no-comments)">
-              <div class="noprint">
-                <h3 id="comments_section">
-                  Comments
-                </h3>
-
-                <div class="text">
-                  <p class="notice">
-                    <strong>Notice:</strong> This comments section collects your suggestions
-                    on improving documentation for Apache Tomcat.<br/><br/>
-                    If you have trouble and need help, read
-                    <a href="https://tomcat.apache.org/findhelp.html">Find Help</a> page
-                    and ask your question on the tomcat-users
-                    <a href="https://tomcat.apache.org/lists.html">mailing list</a>.
-                    Do not ask such questions here. This is not a Q&amp;A section.<br/><br/>
-                    The Apache Comments System is explained <a href="{$commentslink}">here</a>.
-                    Comments may be removed by our moderators if they are either
-                    implemented or considered invalid/off-topic.
-                  </p>
-                  <div id="comments_thread"/>
-                </div>
-              </div>
-            </xsl:if>
-
+          <h2><xsl:value-of select="properties/title"/></h2>
+          <xsl:apply-templates select="body/section"/>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Footer -->
-  <footer><div id="footer">
+  <footer>
+    <div id="footer">
     Copyright © 1999-<xsl:value-of select="$year"/>, The Apache Software Foundation
-  </div></footer>
-</div>
+    <br/>
+    Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo
+    are either registered trademarks or trademarks of the Apache Software
+    Foundation.
+    </div>
+  </footer>
+  </div>
 </body>
 </html>
-
-
   </xsl:template>
-
 
   <!-- Process a menu for the navigation bar -->
   <xsl:template match="menu">
-  <div>
-    <h2><xsl:value-of select="@name"/></h2>
-    <ul>
-      <xsl:apply-templates select="item"/>
-    </ul>
-  </div>
+    <div>
+      <h2><xsl:value-of select="@name"/></h2>
+      <ul>
+        <xsl:apply-templates select="item"/>
+      </ul>
+    </div>
   </xsl:template>
-
 
   <!-- Process a menu item for the navigation bar -->
   <xsl:template match="item">
@@ -247,7 +176,6 @@
     </xsl:variable>
     <li><a href="{$href}"><xsl:value-of select="@name"/></a></li>
   </xsl:template>
-
 
   <!-- Process a documentation section -->
   <xsl:template match="section">
@@ -265,7 +193,6 @@
       <xsl:value-of select="translate($name2, ' #', '__')"/>
     </xsl:variable>
 
-
     <!-- Section heading -->
     <h3 id="{$name}">
       <xsl:if test="@rtext">
@@ -280,9 +207,7 @@
     <div class="text">
       <xsl:apply-templates/>
     </div>
-
   </xsl:template>
-
 
   <!-- Process a documentation subsection -->
   <xsl:template match="subsection">
@@ -293,8 +218,7 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="
-              count(//*[self::section or self::subsection][@name=current()/@name]) &gt; 1
-              ">
+              count(//*[self::section or self::subsection][@name=current()/@name]) &gt; 1">
             <xsl:value-of select="concat(parent::*[self::section or self::subsection]/@name, '/')"/>
           </xsl:if>
           <xsl:value-of select="@name"/>
@@ -317,9 +241,7 @@
         <xsl:apply-templates/>
       </div>
     </div>
-
   </xsl:template>
-
 
   <!-- Generate table of contents -->
   <xsl:template match="toc">
@@ -334,8 +256,7 @@
         </xsl:when>
         <xsl:otherwise>
           <xsl:if test="local-name()='subsection' and
-              count(//*[self::section or self::subsection][@name=current()/@name]) &gt; 1
-              ">
+              count(//*[self::section or self::subsection][@name=current()/@name]) &gt; 1">
             <xsl:value-of select="concat(parent::*[self::section or self::subsection]/@name, '/')"/>
           </xsl:if>
           <xsl:value-of select="@name"/>
@@ -352,17 +273,16 @@
     </li>
   </xsl:template>
 
-
   <!-- Process a source code example -->
   <xsl:template match="source">
-  <div class="codeBox">
-    <pre>
-      <xsl:if test="@wrapped='true'">
-        <xsl:attribute name="class">wrap</xsl:attribute>
-      </xsl:if>
-      <code><xsl:apply-templates/></code>
-    </pre>
-  </div>
+    <div class="codeBox">
+      <pre>
+        <xsl:if test="@wrapped='true'">
+          <xsl:attribute name="class">wrap</xsl:attribute>
+        </xsl:if>
+        <code><xsl:apply-templates/></code>
+      </pre>
+    </div>
   </xsl:template>
 
   <!-- Process an attributes list with nested attribute elements -->
@@ -377,7 +297,7 @@
         </th>
       </tr>
       <xsl:for-each select="attribute">
-        <tr>
+        <tr id="{concat(../../../@name, '_', ../../@name, '_', @name)}">
           <td>
             <xsl:if test="@required = 'true'">
               <strong><code class="attributeName"><xsl:value-of select="@name"/></code></strong>
@@ -428,73 +348,79 @@
   <xsl:template match="changelog/add">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/add.gif</xsl:variable>
     <li>
-    <img alt="Add: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Add: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <xsl:template match="changelog/update">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/update.gif</xsl:variable>
     <li>
-    <img alt="Update: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Update: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <xsl:template match="changelog/design">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/design.gif</xsl:variable>
     <li>
-    <img alt="Design: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Design: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <xsl:template match="changelog/docs">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/docs.gif</xsl:variable>
     <li>
-    <img alt="Docs: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Docs: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <xsl:template match="changelog/fix">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/fix.gif</xsl:variable>
     <li>
-    <img alt="Fix: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Fix: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <xsl:template match="changelog/scode">
     <xsl:variable name="src"><xsl:value-of select="$relative-path"/>/images/code.gif</xsl:variable>
     <li>
-    <img alt="Code: " class="icon" src="{$src}"/><xsl:apply-templates/>
-  </li>
+      <img alt="Code: " class="icon" src="{$src}"/><xsl:apply-templates/>
+    </li>
   </xsl:template>
 
   <!-- Link to a bug report -->
   <xsl:template match="bug">
-      <xsl:variable name="link"><xsl:value-of select="$buglink"/><xsl:value-of select="text()"/></xsl:variable>
-      <a href="{$link}"><xsl:apply-templates/></a>
+    <xsl:variable name="link"><xsl:value-of select="$buglink"/><xsl:value-of select="text()"/></xsl:variable>
+    <a href="{$link}"><xsl:apply-templates/></a>
+  </xsl:template>
+
+  <!-- Link to a pull request -->
+  <xsl:template match="pr">
+    <xsl:variable name="link"><xsl:value-of select="$prlink"/><xsl:value-of select="text()"/></xsl:variable>
+    <a href="{$link}">#<xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Link to a SVN revision report -->
   <xsl:template match="rev">
-      <xsl:variable name="link"><xsl:value-of select="$revlink"/><xsl:value-of select="text()"/></xsl:variable>
-      <a href="{$link}">r<xsl:apply-templates/></a>
+    <xsl:variable name="link"><xsl:value-of select="$revlink"/><xsl:value-of select="text()"/></xsl:variable>
+    <a href="{$link}">r<xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Link to online docs -->
   <xsl:template match="doc">
-      <xsl:variable name="link"><xsl:value-of select="$doclink"/><xsl:value-of select="@path"/></xsl:variable>
-      <a href="{$link}"><xsl:apply-templates/></a>
+    <xsl:variable name="link"><xsl:value-of select="$doclink"/><xsl:value-of select="@path"/></xsl:variable>
+    <a href="{$link}"><xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Link to security page -->
   <xsl:template match="security">
-      <xsl:variable name="link"><xsl:value-of select="$sylink"/></xsl:variable>
-      <a href="{$link}"><xsl:apply-templates/></a>
+    <xsl:variable name="link"><xsl:value-of select="$sylink"/></xsl:variable>
+    <a href="{$link}"><xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Link to download page -->
   <xsl:template match="download">
-      <xsl:variable name="link"><xsl:value-of select="$dllink"/></xsl:variable>
-      <a href="{$link}"><xsl:apply-templates/></a>
+    <xsl:variable name="link"><xsl:value-of select="$dllink"/></xsl:variable>
+    <a href="{$link}"><xsl:apply-templates/></a>
   </xsl:template>
 
   <!-- Version numbers -->
@@ -506,6 +432,12 @@
   </xsl:template>
   <xsl:template match="min-java-version">
     <xsl:value-of select="$minjavaversion"/>
+  </xsl:template>
+  <xsl:template match="build-java-version">
+    <xsl:value-of select="$buildjavaversion"/>
+  </xsl:template>
+  <xsl:template match="ant-version-required">
+    <xsl:value-of select="$antversionrequired"/>
   </xsl:template>
 
   <!-- Process everything else by just passing it through -->

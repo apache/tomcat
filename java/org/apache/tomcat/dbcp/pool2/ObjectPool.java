@@ -31,14 +31,14 @@ import java.util.NoSuchElementException;
  *     obj = pool.borrowObject();
  *     <code style="color:#00C">try</code> {
  *         <code style="color:#0C0">//...use the object...</code>
- *     } <code style="color:#00C">catch</code>(Exception e) {
+ *     } <code style="color:#00C">catch</code> (Exception e) {
  *         <code style="color:#0C0">// invalidate the object</code>
  *         pool.invalidateObject(obj);
  *         <code style="color:#0C0">// do not return the object to the pool twice</code>
  *         obj = <code style="color:#00C">null</code>;
  *     } <code style="color:#00C">finally</code> {
  *         <code style="color:#0C0">// make sure the object is returned to the pool</code>
- *         <code style="color:#00C">if</code>(<code style="color:#00C">null</code> != obj) {
+ *         <code style="color:#00C">if</code> (<code style="color:#00C">null</code> != obj) {
  *             pool.returnObject(obj);
  *        }
  *     }
@@ -54,7 +54,6 @@ import java.util.NoSuchElementException;
  * @see PooledObjectFactory
  * @see KeyedObjectPool
  * @see BaseObjectPool
- *
  * @since 2.0
  */
 public interface ObjectPool<T> extends Closeable {
@@ -62,7 +61,7 @@ public interface ObjectPool<T> extends Closeable {
     /**
      * Creates an object using the {@link PooledObjectFactory factory} or other
      * implementation dependent mechanism, passivate it, and then place it in
-     * the idle object pool. <code>addObject</code> is useful for "pre-loading"
+     * the idle object pool. {@code addObject} is useful for "pre-loading"
      * a pool with idle objects. (Optional operation).
      *
      * @throws Exception
@@ -72,17 +71,15 @@ public interface ObjectPool<T> extends Closeable {
      * @throws UnsupportedOperationException
      *              when this pool cannot add new idle objects.
      */
-    void addObject() throws Exception, IllegalStateException,
-            UnsupportedOperationException;
+    void addObject() throws Exception;
 
     /**
-     * Calls {@link ObjectPool#addObject()} <code>count</code>
+     * Calls {@link ObjectPool#addObject()} {@code count}
      * number of times.
      *
      * @param count
      *            the number of idle objects to add.
-     * @throws Exception
-     *             when {@link ObjectPool#addObject()} fails.
+     * @throws Exception See {@link ObjectPool#addObject()}.
      * @since 2.8.0
      */
     default void addObjects(final int count) throws Exception {
@@ -92,7 +89,7 @@ public interface ObjectPool<T> extends Closeable {
     }
 
     /**
-     * Obtains an instance from this pool.
+     * Borrows an instance from this pool.
      * <p>
      * Instances returned from this method will have been either newly created
      * with {@link PooledObjectFactory#makeObject} or will be a previously
@@ -106,13 +103,12 @@ public interface ObjectPool<T> extends Closeable {
      * method as defined in an implementation or sub-interface.
      * </p>
      * <p>
-     * The behaviour of this method when the pool has been exhausted
+     * The behavior of this method when the pool has been exhausted
      * is not strictly specified (although it may be specified by
      * implementations).
      * </p>
      *
      * @return an instance from this pool.
-     *
      * @throws IllegalStateException
      *              after {@link #close close} has been called on this pool.
      * @throws Exception
@@ -122,8 +118,7 @@ public interface ObjectPool<T> extends Closeable {
      *              when the pool is exhausted and cannot or will not return
      *              another instance.
      */
-    T borrowObject() throws Exception, NoSuchElementException,
-            IllegalStateException;
+    T borrowObject() throws Exception;
 
     /**
      * Clears any objects sitting idle in the pool, releasing any associated
@@ -135,7 +130,7 @@ public interface ObjectPool<T> extends Closeable {
      *
      * @throws Exception if the pool cannot be cleared
      */
-    void clear() throws Exception, UnsupportedOperationException;
+    void clear() throws Exception;
 
     /**
      * Closes this pool, and free any resources associated with it.
@@ -151,14 +146,14 @@ public interface ObjectPool<T> extends Closeable {
     void close();
 
     /**
-     * Returns the number of instances currently borrowed from this pool. Returns
+     * Gets the number of instances currently borrowed from this pool. Returns
      * a negative value if this information is not available.
      * @return the number of instances currently borrowed from this pool.
      */
     int getNumActive();
 
     /**
-     * Returns the number of instances currently idle in this pool. This may be
+     * Gets the number of instances currently idle in this pool. This may be
      * considered an approximation of the number of objects that can be
      * {@link #borrowObject borrowed} without creating any new instances.
      * Returns a negative value if this information is not available.
@@ -169,7 +164,7 @@ public interface ObjectPool<T> extends Closeable {
     /**
      * Invalidates an object from the pool.
      * <p>
-     * By contract, <code>obj</code> <strong>must</strong> have been obtained
+     * By contract, {@code obj} <strong>must</strong> have been obtained
      * using {@link #borrowObject} or a related method as defined in an
      * implementation or sub-interface.
      * </p>
@@ -179,18 +174,38 @@ public interface ObjectPool<T> extends Closeable {
      * </p>
      *
      * @param obj a {@link #borrowObject borrowed} instance to be disposed.
-     *
      * @throws Exception if the instance cannot be invalidated
      */
     void invalidateObject(T obj) throws Exception;
 
     /**
-     * Returns an instance to the pool. By contract, <code>obj</code>
+     * Invalidates an object from the pool, using the provided
+     * {@link DestroyMode}
+     * <p>
+     * By contract, {@code obj} <strong>must</strong> have been obtained
+     * using {@link #borrowObject} or a related method as defined in an
+     * implementation or sub-interface.
+     * </p>
+     * <p>
+     * This method should be used when an object that has been borrowed is
+     * determined (due to an exception or other problem) to be invalid.
+     * </p>
+     *
+     * @param obj a {@link #borrowObject borrowed} instance to be disposed.
+     * @param destroyMode destroy activation context provided to the factory
+     * @throws Exception if the instance cannot be invalidated
+     * @since 2.9.0
+     */
+    default void invalidateObject(final T obj, final DestroyMode destroyMode) throws Exception {
+        invalidateObject(obj);
+    }
+
+    /**
+     * Returns an instance to the pool. By contract, {@code obj}
      * <strong>must</strong> have been obtained using {@link #borrowObject()} or
      * a related method as defined in an implementation or sub-interface.
      *
      * @param obj a {@link #borrowObject borrowed} instance to be returned.
-     *
      * @throws IllegalStateException
      *              if an attempt is made to return an object to the pool that
      *              is in any state other than allocated (i.e. borrowed).
@@ -201,4 +216,5 @@ public interface ObjectPool<T> extends Closeable {
      * @throws Exception if an instance cannot be returned to the pool
      */
     void returnObject(T obj) throws Exception;
+
 }

@@ -142,9 +142,9 @@ public class TestMediaType {
         StringReader sr = new StringReader(sb.toString());
         MediaType m = MediaType.parseMediaType(sr);
 
-        Assert.assertEquals("foo/bar; charset=UTF-8; a=b", m.toString());
+        Assert.assertEquals("foo/bar;charset=UTF-8;a=b", m.toString());
         Assert.assertEquals(CHARSET, m.getCharset());
-        Assert.assertEquals("foo/bar; a=b", m.toStringNoCharset());
+        Assert.assertEquals("foo/bar;a=b", m.toStringNoCharset());
     }
 
 
@@ -158,7 +158,7 @@ public class TestMediaType {
         MediaType m = MediaType.parseMediaType(sr);
 
         Assert.assertEquals(CHARSET_WS, m.getCharset());
-        Assert.assertEquals(TYPES.replaceAll(" ", ""),
+        Assert.assertEquals(TYPES.replace(" ", ""),
                 m.toStringNoCharset());
     }
 
@@ -184,8 +184,8 @@ public class TestMediaType {
         Assert.assertEquals("\"application/smil;charset=UTF-8\"",
                 m.getParameterValue("Type"));
 
-        String expected = "multipart/related; boundary=1_4F50BD36_CDF8C28; " +
-                "start=\"<31671603.smil>\"; " +
+        String expected = "multipart/related;boundary=1_4F50BD36_CDF8C28;" +
+                "start=\"<31671603.smil>\";" +
                 "type=\"application/smil;charset=UTF-8\"";
         Assert.assertEquals(expected, m.toString());
         Assert.assertEquals(expected, m.toStringNoCharset());
@@ -211,7 +211,7 @@ public class TestMediaType {
         Assert.assertEquals("UTF-8", m.getCharset());
 
         // Note: Invalid input is filtered out
-        Assert.assertEquals("text/html; charset=UTF-8", m.toString());
+        Assert.assertEquals("text/html;charset=UTF-8", m.toString());
         Assert.assertEquals("UTF-8", m.getCharset());
     }
 
@@ -231,7 +231,7 @@ public class TestMediaType {
         Assert.assertEquals("UTF-8", m.getParameterValue("charset"));
         Assert.assertEquals("UTF-8", m.getCharset());
 
-        Assert.assertEquals("text/html; charset=UTF-8", m.toString());
+        Assert.assertEquals("text/html;charset=UTF-8", m.toString());
     }
 
 
@@ -260,9 +260,9 @@ public class TestMediaType {
         Assert.assertEquals(SUBTYPE.trim(), m.getSubtype());
 
         // Check the parameters
-        for (int i = 0; i <  parameters.length; i++) {
-            Assert.assertEquals(parameters[i].getValue().trim(),
-                    m.getParameterValue(parameters[i].getName().trim()));
+        for (Parameter parameter : parameters) {
+            Assert.assertEquals(parameter.getValue().trim(),
+                    m.getParameterValue(parameter.getName().trim()));
         }
     }
 
@@ -271,7 +271,7 @@ public class TestMediaType {
         private final String name;
         private final String value;
 
-        public Parameter(String name,String value) {
+        Parameter(String name,String value) {
             this.name = name;
             this.value = value;
         }
@@ -292,17 +292,17 @@ public class TestMediaType {
         public String toString(String lws) {
             StringBuilder sb = new StringBuilder();
             sb.append(lws);
-            sb.append(";");
+            sb.append(';');
             sb.append(lws);
             sb.append(name);
             sb.append(lws);
-            sb.append("=");
+            sb.append('=');
             sb.append(lws);
             sb.append(value);
             sb.append(lws);
             return sb.toString();
         }
-}
+    }
 
     @Test
     public void testCase() throws Exception {
@@ -312,6 +312,16 @@ public class TestMediaType {
         Assert.assertEquals("1", m.getParameterValue("A"));
         Assert.assertEquals("1", m.getParameterValue("a"));
         Assert.assertEquals("2", m.getParameterValue("B"));
+        Assert.assertEquals("2", m.getParameterValue("b"));
+    }
+
+    @Test
+    public void testEmptyParameter() throws Exception {
+        // RFC 9110
+        StringReader sr = new StringReader("type/sub-type;;a=1;;b=2;;");
+        MediaType m = MediaType.parseMediaType(sr);
+
+        Assert.assertEquals("1", m.getParameterValue("a"));
         Assert.assertEquals("2", m.getParameterValue("b"));
     }
 }

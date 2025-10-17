@@ -27,11 +27,10 @@ import java.util.Map;
 
 import org.apache.tomcat.util.http.fileupload.FileItemHeaders;
 
-
 /**
  * Default implementation of the {@link FileItemHeaders} interface.
  *
- * @since 1.2.1
+ * @since FileUpload 1.2.1
  */
 public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
 
@@ -41,44 +40,16 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
     private static final long serialVersionUID = -4455695752627032559L;
 
     /**
-     * Map of <code>String</code> keys to a <code>List</code> of
-     * <code>String</code> instances.
+     * Map of {@code String} keys to a {@code List} of
+     * {@code String} instances.
      */
-    private final Map<String,List<String>> headerNameToValueListMap =
-            new LinkedHashMap<>();
+    private final Map<String, List<String>> headerNameToValueListMap = new LinkedHashMap<>();
 
     /**
-     * {@inheritDoc}
+     * Constructs a new instance.
      */
-    @Override
-    public String getHeader(String name) {
-        String nameLower = name.toLowerCase(Locale.ENGLISH);
-        List<String> headerValueList = headerNameToValueListMap.get(nameLower);
-        if (null == headerValueList) {
-            return null;
-        }
-        return headerValueList.get(0);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterator<String> getHeaderNames() {
-        return headerNameToValueListMap.keySet().iterator();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterator<String> getHeaders(String name) {
-        String nameLower = name.toLowerCase(Locale.ENGLISH);
-        List<String> headerValueList = headerNameToValueListMap.get(nameLower);
-        if (null == headerValueList) {
-            headerValueList = Collections.emptyList();
-        }
-        return headerValueList.iterator();
+    public FileItemHeadersImpl() {
+        // empty
     }
 
     /**
@@ -87,14 +58,36 @@ public class FileItemHeadersImpl implements FileItemHeaders, Serializable {
      * @param name name of this header
      * @param value value of this header
      */
-    public synchronized void addHeader(String name, String value) {
-        String nameLower = name.toLowerCase(Locale.ENGLISH);
+    public synchronized void addHeader(final String name, final String value) {
+        final String nameLower = name.toLowerCase(Locale.ROOT);
+        final List<String> headerValueList = headerNameToValueListMap.
+                computeIfAbsent(nameLower, k -> new ArrayList<>());
+        headerValueList.add(value);
+    }
+
+    @Override
+    public String getHeader(final String name) {
+        final String nameLower = name.toLowerCase(Locale.ROOT);
+        final List<String> headerValueList = headerNameToValueListMap.get(nameLower);
+        if (null == headerValueList) {
+            return null;
+        }
+        return headerValueList.get(0);
+    }
+
+    @Override
+    public Iterator<String> getHeaderNames() {
+        return headerNameToValueListMap.keySet().iterator();
+    }
+
+    @Override
+    public Iterator<String> getHeaders(final String name) {
+        final String nameLower = name.toLowerCase(Locale.ROOT);
         List<String> headerValueList = headerNameToValueListMap.get(nameLower);
         if (null == headerValueList) {
-            headerValueList = new ArrayList<>();
-            headerNameToValueListMap.put(nameLower, headerValueList);
+            headerValueList = Collections.emptyList();
         }
-        headerValueList.add(value);
+        return headerValueList.iterator();
     }
 
 }

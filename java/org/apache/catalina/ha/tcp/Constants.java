@@ -14,15 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ha.tcp;
 
 /**
- * Manifest constants for the <code>org.apache.catalina.ha.tcp</code>
- * package.
- *
- * @author Peter Rossbach
+ * Manifest constants for the <code>org.apache.catalina.ha.tcp</code> package.
  */
 public class Constants {
 

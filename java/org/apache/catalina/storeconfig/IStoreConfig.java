@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
@@ -36,8 +35,7 @@ public interface IStoreConfig {
     /**
      * Set Configuration Registry
      *
-     * @param aRegistry
-     *            aregistry that handle the store operations
+     * @param aRegistry aregistry that handle the store operations
      */
     void setRegistry(StoreRegistry aRegistry);
 
@@ -61,10 +59,10 @@ public interface IStoreConfig {
     void storeConfig();
 
     /**
-     * Store the specified Server properties.
+     * Write the configuration information for this entire <code>Server</code> out to the server.xml configuration file.
      *
-     * @param aServer
-     *            Object to be stored
+     * @param aServer Server instance
+     *
      * @return <code>true</code> if the store operation was successful
      */
     boolean store(Server aServer);
@@ -72,12 +70,10 @@ public interface IStoreConfig {
     /**
      * Store the specified Server properties.
      *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aServer
-     *            Object to be stored
+     * @param aWriter PrintWriter to which we are storing
+     * @param indent  Number of spaces to indent this element
+     * @param aServer Object to be stored
+     *
      * @throws Exception Store error occurred
      */
     void store(PrintWriter aWriter, int indent, Server aServer) throws Exception;
@@ -85,12 +81,10 @@ public interface IStoreConfig {
     /**
      * Store the specified Service properties.
      *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aService
-     *            Object to be stored
+     * @param aWriter  PrintWriter to which we are storing
+     * @param indent   Number of spaces to indent this element
+     * @param aService Object to be stored
+     *
      * @throws Exception Store error occurred
      */
     void store(PrintWriter aWriter, int indent, Service aService) throws Exception;
@@ -98,12 +92,10 @@ public interface IStoreConfig {
     /**
      * Store the specified Host properties.
      *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aHost
-     *            Object to be stored
+     * @param aWriter PrintWriter to which we are storing
+     * @param indent  Number of spaces to indent this element
+     * @param aHost   Object to be stored
+     *
      * @throws Exception Store error occurred
      */
     void store(PrintWriter aWriter, int indent, Host aHost) throws Exception;
@@ -111,8 +103,8 @@ public interface IStoreConfig {
     /**
      * Store the specified Context properties.
      *
-     * @param aContext
-     *            Object to be stored
+     * @param aContext Object to be stored
+     *
      * @return <code>true</code> if the store operation was successful
      */
     boolean store(Context aContext);
@@ -120,12 +112,10 @@ public interface IStoreConfig {
     /**
      * Store the specified Context properties.
      *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aContext
-     *            Object to be stored
+     * @param aWriter  PrintWriter to which we are storing
+     * @param indent   Number of spaces to indent this element
+     * @param aContext Object to be stored
+     *
      * @throws Exception Store error occurred
      */
     void store(PrintWriter aWriter, int indent, Context aContext) throws Exception;

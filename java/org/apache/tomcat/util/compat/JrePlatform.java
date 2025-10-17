@@ -16,8 +16,6 @@
  */
 package org.apache.tomcat.util.compat;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.Locale;
 
 public class JrePlatform {
@@ -26,30 +24,17 @@ public class JrePlatform {
 
     static {
         /*
-         * There are a few places where a) the behaviour of the Java API depends
-         * on the underlying platform and b) those behavioural differences have
-         * an impact on Tomcat.
+         * There are a few places where a) the behaviour of the Java API depends on the underlying platform and b) those
+         * behavioural differences have an impact on Tomcat.
          *
-         * Tomcat therefore needs to be able to determine the platform it is
-         * running on to account for those differences.
+         * Tomcat therefore needs to be able to determine the platform it is running on to account for those
+         * differences.
          *
          * In an ideal world this code would not exist.
          */
 
         // This check is derived from the check in Apache Commons Lang
-        String osName;
-        if (System.getSecurityManager() == null) {
-            osName = System.getProperty(OS_NAME_PROPERTY);
-        } else {
-            osName = AccessController.doPrivileged(
-                    new PrivilegedAction<String>() {
-
-                    @Override
-                    public String run() {
-                        return System.getProperty(OS_NAME_PROPERTY);
-                    }
-                });
-        }
+        String osName = System.getProperty(OS_NAME_PROPERTY);
 
         IS_MAC_OS = osName.toLowerCase(Locale.ENGLISH).startsWith("mac os x");
 

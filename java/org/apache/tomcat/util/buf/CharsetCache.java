@@ -19,6 +19,7 @@ package org.apache.tomcat.util.buf;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -29,7 +30,7 @@ public class CharsetCache {
     static final String[] INITIAL_CHARSETS = new String[] { "iso-8859-1", "utf-8" };
 
     /*
-     *  Note: Package private to enable testing without reflection
+     * Note: Package private to enable testing without reflection
      */
     static final String[] LAZY_CHARSETS = new String[] {
             // Initial set from Oracle JDK 8 u192
@@ -150,13 +151,19 @@ public class CharsetCache {
             "ibm-1146", "ibm-1147", "ibm-1148", "ibm-1149", "ibm-29626c", "ibm-858", "ibm-eucjp", "ibm1140", "ibm1141",
             "ibm1142", "ibm1143", "ibm1144", "ibm1145", "ibm1146", "ibm1147", "ibm1148", "ibm1149", "ibm29626c",
             "ibm858", "x-ibm29626c",
+            // Added from OpenJDK 15 ea24
+            "iso8859_16",
             // Added from HPE JVM 1.8.0.17-hp-ux
-            "cp1051", "cp1386", "cshproman8", "hp-roman8", "ibm-1051", "r8", "roman8", "roman9"
-            };
+            "cp1051", "cp1386", "cshproman8", "hp-roman8", "ibm-1051", "r8", "roman8", "roman9",
+            // Added from OpenJDK 21 ea18
+            "gb18030-2022"
+            // If you add and entry to this list, ensure you run
+            // TestCharsetUtil#testIsAsciiSupersetAll()
+    };
 
-    private static final Charset DUMMY_CHARSET = new DummyCharset("Dummy",  null);
+    private static final Charset DUMMY_CHARSET = new DummyCharset("Dummy", null);
 
-    private ConcurrentMap<String,Charset> cache = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String,Charset> cache = new ConcurrentHashMap<>();
 
     public CharsetCache() {
         // Pre-populate the cache
@@ -186,15 +193,15 @@ public class CharsetCache {
 
         if (result == DUMMY_CHARSET) {
             // Name is known but the Charset is not in the cache
-            Charset charset = Charset.forName(lcCharsetName);
-            if (charset == null) {
-                // Charset not available in this JVM - remove cache entry
-                cache.remove(lcCharsetName);
-                result = null;
-            } else {
+            try {
+                Charset charset = Charset.forName(lcCharsetName);
                 // Charset is available - populate cache entry
                 addToCache(lcCharsetName, charset);
                 result = charset;
+            } catch (UnsupportedCharsetException e) {
+                // Charset not available in this JVM - remove cache entry
+                cache.remove(lcCharsetName);
+                result = null;
             }
         }
 
@@ -203,8 +210,7 @@ public class CharsetCache {
 
 
     /*
-     * Placeholder Charset implementation for entries that will be loaded lazily
-     * into the cache.
+     * Placeholder Charset implementation for entries that will be loaded lazily into the cache.
      */
     private static class DummyCharset extends Charset {
 

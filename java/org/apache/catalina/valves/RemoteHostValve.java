@@ -18,7 +18,7 @@ package org.apache.catalina.valves;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
+import jakarta.servlet.ServletException;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -26,11 +26,8 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * Concrete implementation of <code>RequestFilterValve</code> that filters
- * based on the remote client's host name optionally combined with the
- * server connector port number.
- *
- * @author Craig R. McClanahan
+ * Concrete implementation of <code>RequestFilterValve</code> that filters based on the remote client's host name
+ * optionally combined with the server connector port number.
  */
 public final class RemoteHostValve extends RequestFilterValve {
 
@@ -43,8 +40,7 @@ public final class RemoteHostValve extends RequestFilterValve {
     public void invoke(Request request, Response response) throws IOException, ServletException {
         String property;
         if (getAddConnectorPort()) {
-            property = request.getRequest().getRemoteHost() + ";" +
-                    request.getConnector().getPortWithOffset();
+            property = request.getRequest().getRemoteHost() + ";" + request.getConnector().getPortWithOffset();
         } else {
             property = request.getRequest().getRemoteHost();
         }

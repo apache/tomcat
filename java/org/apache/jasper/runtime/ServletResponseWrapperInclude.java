@@ -14,28 +14,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.jasper.runtime;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-import javax.servlet.jsp.JspWriter;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponseWrapper;
+import jakarta.servlet.jsp.JspWriter;
 
 /**
- * ServletResponseWrapper used by the JSP 'include' action.
- *
- * This wrapper response object is passed to RequestDispatcher.include(), so
- * that the output of the included resource is appended to that of the
- * including page.
- *
- * @author Pierre Delisle
+ * ServletResponseWrapper used by the JSP 'include' action. This wrapper response object is passed to
+ * RequestDispatcher.include(), so that the output of the included resource is appended to that of the including page.
  */
-
 public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
 
     /**
@@ -45,15 +38,14 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
 
     private final JspWriter jspWriter;
 
-    public ServletResponseWrapperInclude(ServletResponse response,
-                                         JspWriter jspWriter) {
-        super((HttpServletResponse)response);
+    public ServletResponseWrapperInclude(ServletResponse response, JspWriter jspWriter) {
+        super((HttpServletResponse) response);
         this.printWriter = new PrintWriter(jspWriter);
         this.jspWriter = jspWriter;
     }
 
     /**
-     * Returns a wrapper around the JspWriter of the including page.
+     * @return a wrapper around the JspWriter of the including page.
      */
     @Override
     public PrintWriter getWriter() throws IOException {
@@ -66,14 +58,14 @@ public class ServletResponseWrapperInclude extends HttpServletResponseWrapper {
     }
 
     /**
-     * Clears the output buffer of the JspWriter associated with the including
-     * page.
+     * Clears the output buffer of the JspWriter associated with the including page.
      */
     @Override
     public void resetBuffer() {
         try {
             jspWriter.clearBuffer();
         } catch (IOException ioe) {
+            // Ignore
         }
     }
 }

@@ -36,7 +36,7 @@ public class SnakeTimer {
 
     private static Timer gameTimer = null;
 
-    private static final long TICK_DELAY = 100;
+    static final long TICK_DELAY = 100;
 
     private static final ConcurrentHashMap<Integer, Snake> snakes =
             new ConcurrentHashMap<>();
@@ -64,21 +64,20 @@ public class SnakeTimer {
 
     protected static void tick() {
         StringBuilder sb = new StringBuilder();
-        for (Iterator<Snake> iterator = SnakeTimer.getSnakes().iterator();
+        for (Iterator<Snake> iterator = getSnakes().iterator();
                 iterator.hasNext();) {
             Snake snake = iterator.next();
-            snake.update(SnakeTimer.getSnakes());
+            snake.update(getSnakes());
             sb.append(snake.getLocationsJson());
             if (iterator.hasNext()) {
                 sb.append(',');
             }
         }
-        broadcast(String.format("{\"type\": \"update\", \"data\" : [%s]}",
-                sb.toString()));
+        broadcast(String.format("{\"type\": \"update\", \"data\" : [%s]}", sb.toString()));
     }
 
     protected static void broadcast(String message) {
-        for (Snake snake : SnakeTimer.getSnakes()) {
+        for (Snake snake : getSnakes()) {
             try {
                 snake.sendMessage(message);
             } catch (IllegalStateException ise) {

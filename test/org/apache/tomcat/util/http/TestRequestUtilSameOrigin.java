@@ -20,8 +20,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,6 +42,8 @@ public class TestRequestUtilSameOrigin {
         TesterRequest request2 = new TesterRequest("ws", "example.com", 80);
         TesterRequest request3 = new TesterRequest("http", "example.com", 443);
         TesterRequest request4 = new TesterRequest("http", "example.com", 8080);
+        TesterRequest request5 = new TesterRequest(null, "example.com", 80);
+        TesterRequest request6 = new TesterRequest("http", null, 8080);
 
         parameterSets.add(new Object[] { request1, "http://example.com", Boolean.TRUE });
         parameterSets.add(new Object[] { request1, "http://example.com:80", Boolean.TRUE });
@@ -58,6 +60,14 @@ public class TestRequestUtilSameOrigin {
         parameterSets.add(new Object[] { request4, "http://example.com", Boolean.FALSE });
         parameterSets.add(new Object[] { request4, "http://example.com:80", Boolean.FALSE });
         parameterSets.add(new Object[] { request4, "http://example.com:8080", Boolean.TRUE});
+
+        parameterSets.add(new Object[]{ request5, "http://example.com:80", Boolean.FALSE});
+        parameterSets.add(new Object[]{ request5, "://example.com:80", Boolean.FALSE});
+        parameterSets.add(new Object[]{ request5, "example.com:80", Boolean.FALSE});
+
+        parameterSets.add(new Object[]{ request6, "http://example.com:80", Boolean.FALSE});
+        parameterSets.add(new Object[]{ request6, "http://:80", Boolean.FALSE});
+        parameterSets.add(new Object[]{ request6, "http://", Boolean.FALSE});
 
         return parameterSets;
     }
@@ -83,8 +93,8 @@ public class TestRequestUtilSameOrigin {
         private final String host;
         private final int port;
 
-        public TesterRequest(String scheme, String host, int port) {
-            super(new Request(null));
+        TesterRequest(String scheme, String host, int port) {
+            super(new Request(null, null));
             this.scheme = scheme;
             this.host = host;
             this.port = port;

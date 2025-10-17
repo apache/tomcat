@@ -15,6 +15,9 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
+<!DOCTYPE mbeans-descriptors PUBLIC
+   "-//Apache Software Foundation//DTD Model MBeans Configuration File"
+   "http://jakarta.apache.org/commons/dtds/mbeans-descriptors.dtd">
 <mbeans-descriptors>
   <mbean         name="MemoryUserDatabase"
             className="org.apache.catalina.mbeans.MemoryUserDatabaseMBean"
@@ -47,9 +50,8 @@
                  type="boolean"
             writeable="false"/>
 
-    <attribute   name="writeable"
-          description="Check if user database is writeable"
-               impact="INFO"
+    <attribute   name="writable"
+          description="Check if user database is writable"
                    is="true"
            writeable="false"/>
 
@@ -151,5 +153,352 @@
                impact="ACTION"
            returnType="void">
     </operation>
+
   </mbean>
+
+  <mbean         name="SparseUserDatabase"
+            className="org.apache.catalina.mbeans.SparseUserDatabaseMBean"
+          description="In-memory user and group database"
+               domain="Users"
+                group="UserDatabase"
+                 type="org.apache.catalina.users.SparseUserDatabase">
+
+    <attribute   name="groups"
+          description="MBean Names of all defined groups"
+                 type="[Ljava.lang.String;"
+            writeable="false"/>
+
+    <attribute   name="roles"
+          description="MBean Names of all defined roles"
+                 type="[Ljava.lang.String;"
+            writeable="false"/>
+
+    <attribute   name="users"
+          description="MBean Names of all defined users"
+                 type="[Ljava.lang.String;"
+            writeable="false"/>
+
+    <attribute   name="readonly"
+          description="No persistent save of the user database"
+                 type="boolean"
+            writeable="false"/>
+
+    <operation   name="createGroup"
+          description="Create new group and return MBean name"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="groupname"
+          description="Group name of the new group"
+                 type="java.lang.String"/>
+      <parameter name="description"
+          description="Description of the new group"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="createRole"
+          description="Create new role and return MBean name"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="rolename"
+          description="Role name of the new role"
+                 type="java.lang.String"/>
+      <parameter name="description"
+          description="Description of the new role"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="createUser"
+          description="Create new user and return MBean name"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="username"
+          description="User name of the new user"
+                 type="java.lang.String"/>
+      <parameter name="password"
+          description="Password of the new user"
+                 type="java.lang.String"/>
+      <parameter name="fullName"
+          description="Full name of the new user"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="findGroup"
+          description="Return MBean Name of the specified group (if any)"
+               impact="INFO"
+           returnType="java.lang.String">
+      <parameter name="groupname"
+          description="Group name of the requested group"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="findRole"
+          description="Return MBean Name of the specified role (if any)"
+               impact="INFO"
+           returnType="java.lang.String">
+      <parameter name="rolename"
+          description="Role name of the requested role"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="findUser"
+          description="Return MBean Name of the specified user (if any)"
+               impact="INFO"
+           returnType="java.lang.String">
+      <parameter name="username"
+          description="User name of the requested user"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="removeGroup"
+          description="Remove existing group (and all user memberships)"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="groupname"
+          description="Group name of the group to remove"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="removeRole"
+          description="Remove existing role"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="rolename"
+          description="Role name of the role to remove"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="removeUser"
+          description="Remove existing user (and all group memberships)"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="username"
+          description="User name of the user to remove"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="save"
+          description="Save current users and groups to persistent storage"
+               impact="ACTION"
+           returnType="void">
+    </operation>
+
+  </mbean>
+
+  <mbean         name="DataSourceUserDatabase"
+            className="org.apache.catalina.mbeans.DataSourceUserDatabaseMBean"
+          description="Lazy load user and group database"
+               domain="Catalina"
+                group="UserDatabase"
+                 type="org.apache.catalina.users.DataSourceUserDatabase">
+
+    <attribute   name="readonly"
+          description="No persistent save of the user database"
+                 type="boolean"
+            writeable="false"/>
+
+    <attribute   name="dataSourceName"
+          description="The name of the JNDI JDBC DataSource"
+                 type="java.lang.String"
+            writeable="false"/>
+
+    <attribute   name="groups"
+          description="Names of all defined groups"
+                 type="[Ljava.lang.String;"
+            writeable="false"/>
+
+    <attribute   name="roles"
+          description="Names of all defined roles"
+                 type="[Ljava.lang.String;"
+            writeable="false"/>
+
+    <attribute   name="users"
+          description="Names of all defined users"
+                 type="[Ljava.lang.String;"
+            writeable="false"/>
+
+    <operation   name="createGroup"
+          description="Create new group and return name"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="groupname"
+          description="Group name of the new group"
+                 type="java.lang.String"/>
+      <parameter name="description"
+          description="Description of the new group"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="createRole"
+          description="Create new role and return name"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="rolename"
+          description="Role name of the new role"
+                 type="java.lang.String"/>
+      <parameter name="description"
+          description="Description of the new role"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="createUser"
+          description="Create new user and return name"
+               impact="ACTION"
+           returnType="java.lang.String">
+      <parameter name="username"
+          description="User name of the new user"
+                 type="java.lang.String"/>
+      <parameter name="password"
+          description="Password of the new user"
+                 type="java.lang.String"/>
+      <parameter name="fullName"
+          description="Full name of the new user"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="removeGroup"
+          description="Remove existing group (and all user memberships)"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="groupname"
+          description="Group name of the group to remove"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="removeRole"
+          description="Remove existing role"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="rolename"
+          description="Role name of the role to remove"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="removeUser"
+          description="Remove existing user (and all group memberships)"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="username"
+          description="User name of the user to remove"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="changeUserPassword"
+          description="Set new user credentials"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="username"
+          description="User name of the user"
+                 type="java.lang.String"/>
+      <parameter name="password"
+          description="New credentials"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="addUserRole"
+          description="Add role to user"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="username"
+          description="User name of the user"
+                 type="java.lang.String"/>
+      <parameter name="rolename"
+          description="Role name of the role"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="removeUserRole"
+          description="Remove role from user"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="username"
+          description="User name of the user"
+                 type="java.lang.String"/>
+      <parameter name="rolename"
+          description="Role name of the role"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="getUserRoles"
+          description="Get user roles"
+               impact="ACTION"
+           returnType="[Ljava.lang.String;">
+      <parameter name="username"
+          description="User name of the user"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="addUserGroup"
+          description="Add group to user"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="username"
+          description="User name of the user"
+                 type="java.lang.String"/>
+      <parameter name="groupname"
+          description="Group name of the group"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="removeUserGroup"
+          description="Remove group from user"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="username"
+          description="User name of the user"
+                 type="java.lang.String"/>
+      <parameter name="groupname"
+          description="Group name of the group"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="getUserGroups"
+          description="Get user groups"
+               impact="ACTION"
+           returnType="[Ljava.lang.String;">
+      <parameter name="username"
+          description="User name of the user"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="addGroupRole"
+          description="Add role to group"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="groupname"
+          description="Group name of the group"
+                 type="java.lang.String"/>
+      <parameter name="rolename"
+          description="Role name of the role"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="removeGroupRole"
+          description="Remove role from group"
+               impact="ACTION"
+           returnType="void">
+      <parameter name="groupname"
+          description="Group name of the group"
+                 type="java.lang.String"/>
+      <parameter name="rolename"
+          description="Role name of the role"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="getGroupRoles"
+          description="Get group roles"
+               impact="ACTION"
+           returnType="[Ljava.lang.String;">
+      <parameter name="groupname"
+          description="Group name of the group"
+                 type="java.lang.String"/>
+    </operation>
+
+    <operation   name="save"
+          description="Save current users and groups to persistent storage"
+               impact="ACTION"
+           returnType="void">
+    </operation>
+
+  </mbean>
+
 </mbeans-descriptors>

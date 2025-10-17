@@ -14,7 +14,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-
 package org.apache.coyote.http11.filters;
 
 import java.io.IOException;
@@ -30,17 +29,13 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Identity input filter.
- *
- * @author Remy Maucherat
  */
 public class IdentityInputFilter implements InputFilter, ApplicationBufferHandler {
 
-    private static final StringManager sm = StringManager.getManager(
-            IdentityInputFilter.class.getPackage().getName());
+    private static final StringManager sm = StringManager.getManager(IdentityInputFilter.class);
 
 
     // -------------------------------------------------------------- Constants
-
 
     protected static final String ENCODING_NAME = "identity";
     protected static final ByteChunk ENCODING = new ByteChunk();
@@ -48,15 +43,12 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
 
     // ----------------------------------------------------- Static Initializer
 
-
     static {
-        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1),
-                0, ENCODING_NAME.length());
+        ENCODING.setBytes(ENCODING_NAME.getBytes(StandardCharsets.ISO_8859_1), 0, ENCODING_NAME.length());
     }
 
 
     // ----------------------------------------------------- Instance Variables
-
 
     /**
      * Content length.
@@ -95,7 +87,7 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
     @Override
     public int doRead(ApplicationBufferHandler handler) throws IOException {
 
-        int result = -1;
+        int result;
 
         if (contentLength >= 0) {
             if (remaining > 0) {
@@ -120,6 +112,8 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
                 }
                 result = -1;
             }
+        } else {
+            result = -1;
         }
 
         return result;
@@ -131,7 +125,7 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
 
 
     /**
-     * Read the content length from the request.
+     * {@inheritDoc} Read the content length from the request.
      */
     @Override
     public void setRequest(Request request) {
@@ -151,7 +145,7 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
 
             int nread = buffer.doRead(this);
             tempRead = null;
-            if (nread > 0 ) {
+            if (nread > 0) {
                 swallowed += nread;
                 remaining = remaining - nread;
                 if (maxSwallowSizeExceeded && swallowed > maxSwallowSize) {
@@ -171,27 +165,19 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
     }
 
 
-    /**
-     * Amount of bytes still available in a buffer.
-     */
     @Override
     public int available() {
-        return 0;
+        // No data buffered here. Try the next filter in the chain.
+        return buffer.available();
     }
 
 
-    /**
-     * Set the next buffer in the filter pipeline.
-     */
     @Override
     public void setBuffer(InputBuffer buffer) {
         this.buffer = buffer;
     }
 
 
-    /**
-     * Make the filter ready to process the next request.
-     */
     @Override
     public void recycle() {
         contentLength = -1;
@@ -199,10 +185,6 @@ public class IdentityInputFilter implements InputFilter, ApplicationBufferHandle
     }
 
 
-    /**
-     * Return the name of the associated encoding; Here, the value is
-     * "identity".
-     */
     @Override
     public ByteChunk getEncodingName() {
         return ENCODING;

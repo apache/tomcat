@@ -25,8 +25,6 @@
 
   <properties>
     <title>Logging in Tomcat</title>
-    <author>Allistair Crossley</author>
-    <author email="yoavs@apache.org">Yoav Shapira</author>
   </properties>
 
 <body>
@@ -49,9 +47,11 @@
       To configure Tomcat to use an alternative logging framework for its
       internal logging, follow the instructions provided by the alternative
       logging framework for redirecting logging for applications that use
-      <code>java.util.logging</code>. Keep in mind that the alternative logging
-      framework will need to be capable of working in an environment where
-      different loggers with the same name may exist in different class loaders.
+      <code>java.util.logging</code>. Links to some of these instructions are
+      provided towards the end of this page. Keep in mind that the alternative
+      logging framework will need to be capable of working in an environment
+      where different loggers with the same name may exist in different class
+      loaders.
     </p>
 
     <p>
@@ -66,17 +66,17 @@
       </li>
       <li>
         Use the logging API provided by the Java Servlets specification,
-        <code>javax.servlet.ServletContext.log(...)</code>
+        <code>jakarta.servlet.ServletContext.log(...)</code>
       </li>
     </ul>
 
     <p>
       The logging frameworks used by different web applications are independent.
       See <a href="class-loader-howto.html">class loading</a> for more details.
-      The exception to this rule is <code>java.util.logging</code>. If it used
-      directly or indirectly by your logging library then elements of it will be
-      shared across web applications because it is loaded by the system class
-      loader.
+      The exception to this rule is <code>java.util.logging</code>. If it is
+      used directly or indirectly by your logging library then elements of it
+      will be shared across web applications because it is loaded by the system
+      class loader.
     </p>
 
     <subsection name="Java logging API &#8212; java.util.logging">
@@ -115,7 +115,7 @@
     <subsection name="Servlets logging API">
 
     <p>
-      The calls to <code>javax.servlet.ServletContext.log(...)</code> to write
+      The calls to <code>jakarta.servlet.ServletContext.log(...)</code> to write
       log messages are handled by internal Tomcat logging. Such messages are
       logged to the category named
     </p>
@@ -171,7 +171,7 @@
       <code>true</code>, the calls to <code>System.out/err</code> during request
       processing will be intercepted, and their output will be fed to the
       logging subsystem using the
-      <code>javax.servlet.ServletContext.log(...)</code> calls.<br />
+      <code>jakarta.servlet.ServletContext.log(...)</code> calls.<br />
       <strong>Note</strong>, that the <code>swallowOutput</code>  feature is
       actually a trick, and it has its limitations.
       It works only with direct calls to <code>System.out/err</code>,
@@ -320,39 +320,39 @@ java.util.logging.ConsoleHandler.level=ALL</source>
   <p>
     Example logging.properties file to be placed in $CATALINA_BASE/conf:
   </p>
-  <source><![CDATA[handlers = 1catalina.org.apache.juli.FileHandler, \
-           2localhost.org.apache.juli.FileHandler, \
-           3manager.org.apache.juli.FileHandler, \
+  <source><![CDATA[handlers = 1catalina.org.apache.juli.AsyncFileHandler, \
+           2localhost.org.apache.juli.AsyncFileHandler, \
+           3manager.org.apache.juli.AsyncFileHandler, \
            java.util.logging.ConsoleHandler
 
-.handlers = 1catalina.org.apache.juli.FileHandler, java.util.logging.ConsoleHandler
+.handlers = 1catalina.org.apache.juli.AsyncFileHandler, java.util.logging.ConsoleHandler
 
 ############################################################
 # Handler specific properties.
 # Describes specific configuration info for Handlers.
 ############################################################
 
-1catalina.org.apache.juli.FileHandler.level = FINE
-1catalina.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
-1catalina.org.apache.juli.FileHandler.prefix = catalina.
-1catalina.org.apache.juli.FileHandler.maxDays = 90
-1catalina.org.apache.juli.FileHandler.encoding = UTF-8
+1catalina.org.apache.juli.AsyncFileHandler.level = ALL
+1catalina.org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+1catalina.org.apache.juli.AsyncFileHandler.prefix = catalina.
+1catalina.org.apache.juli.AsyncFileHandler.maxDays = 90
+1catalina.org.apache.juli.AsyncFileHandler.encoding = UTF-8
 
-2localhost.org.apache.juli.FileHandler.level = FINE
-2localhost.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
-2localhost.org.apache.juli.FileHandler.prefix = localhost.
-2localhost.org.apache.juli.FileHandler.maxDays = 90
-2localhost.org.apache.juli.FileHandler.encoding = UTF-8
+2localhost.org.apache.juli.AsyncFileHandler.level = ALL
+2localhost.org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+2localhost.org.apache.juli.AsyncFileHandler.prefix = localhost.
+2localhost.org.apache.juli.AsyncFileHandler.maxDays = 90
+2localhost.org.apache.juli.AsyncFileHandler.encoding = UTF-8
 
-3manager.org.apache.juli.FileHandler.level = FINE
-3manager.org.apache.juli.FileHandler.directory = ${catalina.base}/logs
-3manager.org.apache.juli.FileHandler.prefix = manager.
-3manager.org.apache.juli.FileHandler.bufferSize = 16384
-3manager.org.apache.juli.FileHandler.maxDays = 90
-3manager.org.apache.juli.FileHandler.encoding = UTF-8
+3manager.org.apache.juli.AsyncFileHandler.level = ALL
+3manager.org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+3manager.org.apache.juli.AsyncFileHandler.prefix = manager.
+3manager.org.apache.juli.AsyncFileHandler.bufferSize = 16384
+3manager.org.apache.juli.AsyncFileHandler.maxDays = 90
+3manager.org.apache.juli.AsyncFileHandler.encoding = UTF-8
 
-java.util.logging.ConsoleHandler.level = FINE
-java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter
+java.util.logging.ConsoleHandler.level = ALL
+java.util.logging.ConsoleHandler.formatter = org.apache.juli.OneLineFormatter
 java.util.logging.ConsoleHandler.encoding = UTF-8
 
 ############################################################
@@ -362,11 +362,11 @@ java.util.logging.ConsoleHandler.encoding = UTF-8
 
 org.apache.catalina.core.ContainerBase.[Catalina].[localhost].level = INFO
 org.apache.catalina.core.ContainerBase.[Catalina].[localhost].handlers = \
-   2localhost.org.apache.juli.FileHandler
+   2localhost.org.apache.juli.AsyncFileHandler
 
 org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].level = INFO
 org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].handlers = \
-   3manager.org.apache.juli.FileHandler
+   3manager.org.apache.juli.AsyncFileHandler
 
 # For example, set the org.apache.catalina.util.LifecycleBase logger to log
 # each component that extends LifecycleBase changing state:
@@ -376,19 +376,21 @@ org.apache.catalina.core.ContainerBase.[Catalina].[localhost].[/manager].handler
       Example logging.properties for the servlet-examples web application to be
       placed in WEB-INF/classes inside the web application:
     </p>
-    <source><![CDATA[handlers = org.apache.juli.FileHandler, java.util.logging.ConsoleHandler
+    <source><![CDATA[handlers = org.apache.juli.AsyncFileHandler, java.util.logging.ConsoleHandler
 
 ############################################################
 # Handler specific properties.
 # Describes specific configuration info for Handlers.
 ############################################################
 
-org.apache.juli.FileHandler.level = FINE
-org.apache.juli.FileHandler.directory = ${catalina.base}/logs
-org.apache.juli.FileHandler.prefix = ${classloader.webappName}.
+org.apache.juli.AsyncFileHandler.level = ALL
+org.apache.juli.AsyncFileHandler.directory = ${catalina.base}/logs
+org.apache.juli.AsyncFileHandler.prefix = ${classloader.webappName}.
+org.apache.juli.AsyncFileHandler.encoding = UTF-8
 
-java.util.logging.ConsoleHandler.level = FINE
-java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]]></source>
+java.util.logging.ConsoleHandler.level = ALL
+java.util.logging.ConsoleHandler.formatter = org.apache.juli.OneLineFormatter
+java.util.logging.ConsoleHandler.encoding = UTF-8]]></source>
 
 
     <subsection name="Documentation references">
@@ -398,8 +400,8 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]
           <a href="api/org/apache/juli/package-summary.html"><code>org.apache.juli</code></a>
           package.
         </li>
-        <li>Oracle Java 8 Javadoc for the
-          <a href="https://docs.oracle.com/javase/8/docs/api/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
+        <li>Oracle Java 21 Javadoc for the
+          <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.logging/java/util/logging/package-summary.html"><code>java.util.logging</code></a>
           package.
         </li>
       </ul>
@@ -410,15 +412,12 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]
       <ul>
         <li>Consider removing <code>ConsoleHandler</code> from configuration. By
         default (thanks to the <code>.handlers</code> setting) logging goes both
-        to a <code>FileHandler</code> and to a <code>ConsoleHandler</code>. The
+        to a <code>AsyncFileHandler</code> and to a <code>ConsoleHandler</code>. The
         output of the latter one is usually captured into a file, such as
         <code>catalina.out</code>. Thus you end up with two copies of the same
         messages.</li>
-        <li>Consider removing <code>FileHandler</code>s for the applications
+        <li>Consider removing <code>AsyncFileHandler</code>s for the applications
         that you do not use. E.g., the one for <code>host-manager</code>.</li>
-        <li>The handlers by default use the system default encoding to write
-        the log files. It can be configured with <code>encoding</code> property.
-        See Javadoc for details.</li>
         <li>Consider configuring an
         <a href="config/valve.html#Access_Logging">Access log</a>.</li>
       </ul>
@@ -426,5 +425,12 @@ java.util.logging.ConsoleHandler.formatter = java.util.logging.OneLineFormatter]
 
   </section>
 
+  <section name="Using Log4j">
+
+    <p>The Log4j project provides <a
+    href="https://logging.apache.org/log4j/2.x/jakarta.html#replace-tomcat"
+    >instructions for using Log4J for Tomcat's internal logging</a>.</p>
+
+  </section>
 </body>
 </document>

@@ -19,7 +19,7 @@
   Supplementary build targets for the Tomcat project under NetBeans.
   Use the project root as basedir to be consistent with standard build.
 -->
-<project basedir=".." name="Tomcat_8.0">
+<project basedir=".." name="Tomcat_@VERSION_MAJOR_MINOR@">
 
   <!--
        load the standard and user Tomcat build properties now,
@@ -75,7 +75,7 @@
            includes="${files}"
            debug="true"
            deprecation="${compile.deprecation}"
-           source="${compile.source}"
+           source="${compile.release}"
            encoding="ISO-8859-1"
            includeantruntime="false">
       <classpath path="${nb-test.classpath}"/>
@@ -88,8 +88,8 @@
           message="Property 'test.entry' must be set in project.xml."/>
     <!--
          the runtests macro runs a single test if test.entry is a class name
-         Note: we must ONLY run one of the test targets, otherwise test-apr
-               will run last and wipe out the test results!
+         Note: we must ONLY run one of the test targets, otherwise the target
+               that runs last and wipe out the other test results!
          Note: the test targets all depend on deploy
       -->
     <ant target="test-nio" inheritall="false">
@@ -123,7 +123,6 @@
       <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
       <jvmarg value="-Djava.compiler=none"/>
 
-      <jvmarg value="${test.jvmarg.egd}"/>
       <jvmarg value="-Djava.library.path=${test.apr.loc}"/>
       <jvmarg value="${nb-junit.formatter}"/>
 

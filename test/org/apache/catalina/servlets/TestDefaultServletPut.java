@@ -41,9 +41,9 @@ import org.apache.tomcat.util.buf.ByteChunk;
 public class TestDefaultServletPut extends TomcatBaseTest {
 
     private static final String START_TEXT= "Starting text";
-    private static final String START_LEN = Integer.toString(START_TEXT.length());
+    private static final int START_LEN = START_TEXT.length();
     private static final String PATCH_TEXT= "Ending *";
-    private static final String PATCH_LEN = Integer.toString(PATCH_TEXT.length());
+    private static final int PATCH_LEN = PATCH_TEXT.length();
     private static final String END_TEXT= "Ending * text";
 
     @Parameterized.Parameters(name = "{index} rangeHeader [{0}]")
@@ -52,28 +52,47 @@ public class TestDefaultServletPut extends TomcatBaseTest {
 
         // Valid partial PUT
         parameterSets.add(new Object[] {
-                "Content-Range: bytes=0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT });
+                "Content-Range: bytes 0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] {
+                "Content-Range: ByTeS 0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.TRUE, END_TEXT, Boolean.TRUE });
         // Full PUT
         parameterSets.add(new Object[] {
-                "", null, PATCH_TEXT });
+                "", null, PATCH_TEXT, Boolean.TRUE });
         // Invalid range
         parameterSets.add(new Object[] {
-                "Content-Range: apples=0-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT });
+                "Content-Range: apples 0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes00-" + PATCH_LEN + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT });
+                "Content-Range: bytes00-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes=9-7/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT });
+                "Content-Range: bytes0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes=-7/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT });
+                "Content-Range: bytes=0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes=9-/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT });
+                "Content-Range: bytes@0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes=9-X/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT });
+                "Content-Range: bytes 9-7/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes=0-5/" + CRLF, Boolean.FALSE, START_TEXT });
+                "Content-Range: bytes -7/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
         parameterSets.add(new Object[] {
-                "Content-Range: bytes=0-5/0x5" + CRLF, Boolean.FALSE, START_TEXT });
-
+                "Content-Range: bytes 9-/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] {
+                "Content-Range: bytes 9-X/" + START_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] {
+                "Content-Range: bytes 0-5/" + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] {
+                "Content-Range: bytes 0-5/0x5" + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] {
+                "Content-Range: bytes 0-" + (PATCH_LEN) + "/" + PATCH_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+        // Valid partial PUT but partial PUT is disabled
+        parameterSets.add(new Object[] {
+                "Content-Range: bytes 0-" + (PATCH_LEN-1) + "/" + START_LEN + CRLF, Boolean.TRUE, START_TEXT, Boolean.FALSE });
+        // Errors due to incorrect length
+        parameterSets.add(new Object[] {
+                "Content-Range: bytes 0-1/" + PATCH_LEN + CRLF, Boolean.FALSE, START_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] { "Content-Range: bytes 0-" + PATCH_LEN + "/20" + CRLF, Boolean.FALSE,
+                START_TEXT, Boolean.TRUE });
+        parameterSets.add(new Object[] { "Content-Range: bytes 0-" + (PATCH_LEN - 2) + "/20" + CRLF, Boolean.FALSE,
+                START_TEXT, Boolean.TRUE });
         return parameterSets;
     }
 
@@ -88,6 +107,9 @@ public class TestDefaultServletPut extends TomcatBaseTest {
 
     @Parameter(2)
     public String expectedEndText;
+
+    @Parameter(3)
+    public boolean allowPartialPut;
 
     @Override
     public void setUp() throws Exception {
@@ -107,6 +129,7 @@ public class TestDefaultServletPut extends TomcatBaseTest {
 
         Wrapper w = Tomcat.addServlet(ctxt, "default", DefaultServlet.class.getName());
         w.addInitParameter("readonly", "false");
+        w.addInitParameter("allowPartialPut", Boolean.toString(allowPartialPut));
         ctxt.addServletMappingDecoded("/", "default");
 
         tomcat.start();
@@ -117,13 +140,15 @@ public class TestDefaultServletPut extends TomcatBaseTest {
         // Full PUT
         PutClient putClient = new PutClient(getPort());
 
+        // @formatter:off
         putClient.setRequest(new String[] {
                 "PUT /test.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                "Content-Length: " + START_LEN + CRLF +
-                CRLF +
-                START_TEXT
+                    "Host: localhost:" + getPort() + CRLF +
+                    "Content-Length: " + START_LEN + CRLF +
+                    CRLF +
+                    START_TEXT
         });
+        // @formatter:on
         putClient.connect();
         putClient.processRequest(false);
         Assert.assertTrue(putClient.isResponse201());
@@ -133,19 +158,21 @@ public class TestDefaultServletPut extends TomcatBaseTest {
 
         // Partial PUT
         putClient.connect();
+        // @formatter:off
         putClient.setRequest(new String[] {
                 "PUT /test.txt HTTP/1.1" + CRLF +
-                "Host: localhost:" + getPort() + CRLF +
-                contentRangeHeader +
-                "Content-Length: " + PATCH_LEN + CRLF +
-                CRLF +
-                PATCH_TEXT
+                    "Host: localhost:" + getPort() + CRLF +
+                    contentRangeHeader +
+                    "Content-Length: " + PATCH_LEN + CRLF +
+                    CRLF +
+                    PATCH_TEXT
         });
+        // @formatter:on
         putClient.processRequest(false);
         if (contentRangeHeaderValid == null) {
             // Not present (so will do a full PUT, replacing the existing)
             Assert.assertTrue(putClient.isResponse204());
-        } else if (contentRangeHeaderValid.booleanValue()) {
+        } else if (contentRangeHeaderValid.booleanValue() && allowPartialPut) {
             // Valid
             Assert.assertTrue(putClient.isResponse204());
         } else {
@@ -172,7 +199,7 @@ public class TestDefaultServletPut extends TomcatBaseTest {
 
     private static class PutClient extends SimpleHttpClient {
 
-        public PutClient(int port) {
+        PutClient(int port) {
             setPort(port);
         }
 

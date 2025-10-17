@@ -60,7 +60,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
         String type = ref.getClassName();
         Object o =
-            ClassLoaderUtil.loadClass(
+                ClassLoaderUtil.loadClass(
                 type,
                 GenericNamingResourcesFactory.class.getClassLoader(),
                 Thread.currentThread().getContextClassLoader()).getConstructor().newInstance();
@@ -75,7 +75,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
             if (setProperty(o, param, value)) {
 
             } else {
-                log.debug("Property not configured["+param+"]. No setter found on["+o+"].");
+                log.debug("Property not configured[" + param + "]. No setter found on[" + type + "].");
             }
         }
         return o;
@@ -83,20 +83,21 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
     @SuppressWarnings("null") // setPropertyMethodVoid can't be null when used
     private static boolean setProperty(Object o, String name, String value) {
-        if (log.isDebugEnabled())
-            log.debug("IntrospectionUtils: setProperty(" +
+        if (log.isTraceEnabled()) {
+            log.trace("IntrospectionUtils: setProperty(" +
                     o.getClass() + " " + name + "=" + value + ")");
+        }
 
         String setter = "set" + capitalize(name);
 
         try {
-            Method methods[] = o.getClass().getMethods();
+            Method[] methods = o.getClass().getMethods();
             Method setPropertyMethodVoid = null;
             Method setPropertyMethodBool = null;
 
             // First, the ideal case - a setFoo( String ) method
             for (int i = 0; i < methods.length; i++) {
-                Class<?> paramT[] = methods[i].getParameterTypes();
+                Class<?>[] paramT = methods[i].getParameterTypes();
                 if (setter.equals(methods[i].getName()) && paramT.length == 1
                         && "java.lang.String".equals(paramT[0].getName())) {
 
@@ -113,7 +114,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
                     // match - find the type and invoke it
                     Class<?> paramType = methods[i].getParameterTypes()[0];
-                    Object params[] = new Object[1];
+                    Object[] params = new Object[1];
 
                     // Try a setFoo ( int )
                     if ("java.lang.Integer".equals(paramType.getName())
@@ -126,11 +127,11 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                     // Try a setFoo ( long )
                     }else if ("java.lang.Long".equals(paramType.getName())
                                 || "long".equals(paramType.getName())) {
-                            try {
-                                params[0] = Long.valueOf(value);
-                            } catch (NumberFormatException ex) {
-                                ok = false;
-                            }
+                        try {
+                            params[0] = Long.valueOf(value);
+                        } catch (NumberFormatException ex) {
+                            ok = false;
+                        }
 
                         // Try a setFoo ( boolean )
                     } else if ("java.lang.Boolean".equals(paramType.getName())
@@ -143,16 +144,18 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
                         try {
                             params[0] = InetAddress.getByName(value);
                         } catch (UnknownHostException exc) {
-                            if (log.isDebugEnabled())
+                            if (log.isDebugEnabled()) {
                                 log.debug("IntrospectionUtils: Unable to resolve host name:" + value);
+                            }
                             ok = false;
                         }
 
                         // Unknown type
                     } else {
-                        if (log.isDebugEnabled())
+                        if (log.isDebugEnabled()) {
                             log.debug("IntrospectionUtils: Unknown type " +
                                     paramType.getName());
+                        }
                     }
 
                     if (ok) {
@@ -174,7 +177,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
 
             // Ok, no setXXX found, try a setProperty("name", "value")
             if (setPropertyMethodBool != null || setPropertyMethodVoid != null) {
-                Object params[] = new Object[2];
+                Object[] params = new Object[2];
                 params[0] = name;
                 params[1] = value;
                 if (setPropertyMethodBool != null) {
@@ -199,24 +202,24 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
         } catch (IllegalArgumentException ex2) {
             log.warn("IAE " + o + " " + name + " " + value, ex2);
         } catch (SecurityException ex1) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("IntrospectionUtils: SecurityException for " +
                         o.getClass() + " " + name + "=" + value + ")", ex1);
+            }
         } catch (IllegalAccessException iae) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("IntrospectionUtils: IllegalAccessException for " +
                         o.getClass() + " " + name + "=" + value + ")", iae);
+            }
         } catch (InvocationTargetException ie) {
             Throwable cause = ie.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
                 log.debug("IntrospectionUtils: InvocationTargetException for " +
                         o.getClass() + " " + name + "=" + value + ")", ie);
+            }
         }
         return false;
     }
@@ -225,7 +228,7 @@ public class GenericNamingResourcesFactory implements ObjectFactory {
         if (name == null || name.length() == 0) {
             return name;
         }
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toUpperCase(chars[0]);
         return new String(chars);
     }

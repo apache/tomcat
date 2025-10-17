@@ -12,17 +12,36 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+-include: build-defaults.bnd
+
 Bundle-Name: tomcat-jasper
 Bundle-SymbolicName: org.apache.tomcat-jasper
-Bundle-Version: @VERSION@
 Export-Package: \
     org.apache.jasper,\
     org.apache.jasper.compiler,\
     org.apache.jasper.compiler.tagplugin,\
     org.apache.jasper.el,\
+    org.apache.jasper.optimizations,\
     org.apache.jasper.runtime,\
     org.apache.jasper.security,\
     org.apache.jasper.servlet,\
     org.apache.jasper.tagplugins.jstl,\
     org.apache.jasper.tagplugins.jstl.core,\
     org.apache.jasper.util
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
+
+-includepackage: \
+    org.apache.jasper.resources
+
+-includeresource.meta-inf: /META-INF/=${tomcat.output}/manifests/jasper.jar/
+
+-jpms-module-info: \
+    ${module.name};\
+        access=32;\
+        version=${Bundle-Version};\
+        modules='ecj'
+-jpms-module-info-options: \
+    ${module.name};\
+        substitute=jasper

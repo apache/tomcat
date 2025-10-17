@@ -1,19 +1,19 @@
 /*
-* Licensed to the Apache Software Foundation (ASF) under one or more
-* contributor license agreements.  See the NOTICE file distributed with
-* this work for additional information regarding copyright ownership.
-* The ASF licenses this file to You under the Apache License, Version 2.0
-* (the "License"); you may not use this file except in compliance with
-* the License.  You may obtain a copy of the License at
-*
-*     http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.tomcat.buildutil.translate;
 
 import java.io.File;
@@ -26,15 +26,27 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class Utils {
 
-    private static final Pattern ADD_CONTINUATION = Pattern.compile("\\n", Pattern.MULTILINE);
-    private static final Pattern ESCAPE_LEADING_SPACE = Pattern.compile("^(\\s)", Pattern.MULTILINE);
-    private static final Pattern FIX_SINGLE_QUOTE = Pattern.compile("(?<!')'(?!')", Pattern.MULTILINE);
+    private static final Pattern ESCAPE_LEADING_SPACE = Pattern.compile("^( )", Pattern.MULTILINE);
+
+    private static final Set<String> KEYS_WITH_UNNECESSARY_ESCAPING = new HashSet<>();
+
+    // Package private so it is visible to tests
+    static final String PADDING = "POEDITOR_EXPORT_PADDING_DO_NOT_DELETE";
+
+    static {
+        KEYS_WITH_UNNECESSARY_ESCAPING.add("arrays.malformed.arrays");
+        KEYS_WITH_UNNECESSARY_ESCAPING.add("jsp.error.attribute.deferredmix");
+        KEYS_WITH_UNNECESSARY_ESCAPING.add("jsp.error.el.template.deferred");
+    }
+
 
     private Utils() {
         // Utility class. Hide default constructor.
@@ -52,27 +64,65 @@ public class Utils {
         try (FileInputStream fis = new FileInputStream(f);
                 Reader r = new InputStreamReader(fis, StandardCharsets.UTF_8)) {
             props.load(r);
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
         }
         return props;
     }
 
 
-    static String formatValue(String in) {
-        String result = ADD_CONTINUATION.matcher(in).replaceAll("\\\\n\\\\\n");
-        if (result.endsWith("\\\n")) {
+    static String formatValueExport(String in) {
+        String result;
+
+        if (in.startsWith("\n")) {
+            result = PADDING + in;
+        } else {
+            result = in;
+        }
+
+        return formatValueCommon(result);
+    }
+
+
+    static String formatValueImport(String in) {
+        String result;
+
+        if (in.startsWith(PADDING)) {
+            result = in.substring(PADDING.length());
+        } else {
+            result = in;
+        }
+
+        return formatValueCommon(result);
+    }
+
+
+    /*
+     * Values containing "[{n}]" and "'" need to have the "'" escaped as "''". POEditor attempts to do this
+     * automatically but does it for any value containing "{" or "}" leading to some unnecessary escaping. This method
+     * undoes the unnecessary escaping.
+     */
+    static String fixUnnecessaryEscaping(String key, String value) {
+        if (KEYS_WITH_UNNECESSARY_ESCAPING.contains(key)) {
+            return value.replace("''", "'");
+        }
+        return value;
+    }
+
+
+    /*
+     * Common formatting to convert a String for storage as a value in a property file.
+     */
+    static String formatValueCommon(String in) {
+        String result = in.replace("\n", "\\n\\\n");
+        if (result.endsWith("\\n\\\n")) {
             result = result.substring(0, result.length() - 2);
         }
+
         result = ESCAPE_LEADING_SPACE.matcher(result).replaceAll("\\\\$1");
 
-        if (result.contains("\n\\\t")) {
-            result = result.replace("\n\\\t", "\n\\t");
-        }
+        result = result.replace("\t", "\\t");
 
-        if (result.contains("[{0}]")) {
-            result = FIX_SINGLE_QUOTE.matcher(result).replaceAll("''");
-        }
         return result;
     }
 
@@ -101,10 +151,10 @@ public class Utils {
         }
 
         // Determine language
-        String language = Utils.getLanguage(name);
+        String language = getLanguage(name);
 
         String keyPrefix = getKeyPrefix(root, f);
-        Properties props = Utils.load(f);
+        Properties props = load(f);
 
         // Create a Map for the language if one does not exist.
         Properties translation = translations.get(language);
@@ -129,6 +179,9 @@ public class Utils {
         prefix = prefix.substring(root.getCanonicalPath().length() + 1);
         prefix = prefix.replace(File.separatorChar, '.');
         prefix = prefix + Constants.END_PACKAGE_MARKER;
+        // POEditor uses javax package names.
+        // Renaming here is less work than renaming terms in POEditor
+        prefix = prefix.replace(Constants.JAKARTA_EE_SUBSTRING, Constants.JAVA_EE_SUBSTRING);
         return prefix;
     }
 
@@ -139,11 +192,20 @@ public class Utils {
                 Writer w = new OutputStreamWriter(fos, StandardCharsets.UTF_8)) {
             String[] keys = translation.keySet().toArray(new String[0]);
             Arrays.sort(keys);
-            for (Object key : keys) {
-                w.write(key + "=" + Utils.formatValue(translation.getProperty((String) key)) + "\n");
+            for (String key : keys) {
+                w.write(key + "=" + formatValueExport(translation.getProperty(key)) + "\n");
             }
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }
+    }
+
+
+    static void insertEditInstructions(Writer w) throws IOException {
+        w.write(System.lineSeparator());
+        w.write("# Do not edit this file directly.");
+        w.write(System.lineSeparator());
+        w.write("# To edit translations see: https://tomcat.apache.org/getinvolved.html#Translations");
+        w.write(System.lineSeparator());
     }
 }

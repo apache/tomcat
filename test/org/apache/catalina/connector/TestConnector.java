@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.Servlet;
+import jakarta.servlet.Servlet;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -36,6 +36,7 @@ import org.apache.catalina.startup.TesterServlet;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.Method;
 
 /**
  * Test cases for {@link Connector}.
@@ -47,8 +48,7 @@ public class TestConnector extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         Context root = tomcat.addContext("", TEMP_DIR);
-        Wrapper w =
-            Tomcat.addServlet(root, "tester", new TesterServlet());
+        Wrapper w = Tomcat.addServlet(root, "tester", new TesterServlet());
         w.setAsyncSupported(true);
         root.addServletMappingDecoded("/", "tester");
 
@@ -68,8 +68,7 @@ public class TestConnector extends TomcatBaseTest {
         connector.stop();
 
         try {
-            rc = getUrl("http://localhost:" + getPort() + "/", bc, 1000,
-                    null, null);
+            rc = getUrl("http://localhost:" + getPort() + "/", bc, 1000, null, null);
         } catch (SocketTimeoutException ste) {
             // May also see this with NIO
             // Make sure the test passes if we do
@@ -101,7 +100,7 @@ public class TestConnector extends TomcatBaseTest {
     }
 
 
-    @Test(expected=LifecycleException.class)
+    @Test(expected = LifecycleException.class)
     public void testInvalidProtocolThrows() throws Exception {
         doTestInvalidProtocol(true);
     }
@@ -121,7 +120,7 @@ public class TestConnector extends TomcatBaseTest {
     }
 
 
-    @Test(expected=LifecycleException.class)
+    @Test(expected = LifecycleException.class)
     public void testDuplicatePortThrows() throws Exception {
         doTestDuplicatePort(true);
     }
@@ -198,14 +197,13 @@ public class TestConnector extends TomcatBaseTest {
 
         ByteChunk bc = new ByteChunk();
         Map<String,List<String>> respHeaders = new HashMap<>();
-        int rc = methodUrl("http://localhost:" + getPort() + "/index.html",
-                bc, 30000, null, respHeaders, "OPTIONS");
+        int rc = methodUrl("http://localhost:" + getPort() + "/index.html", bc, 30000, null, respHeaders, Method.OPTIONS);
 
         Assert.assertEquals(200, rc);
 
         boolean foundTrace = false;
         for (String header : respHeaders.get("Allow")) {
-            if (header.contains("TRACE")) {
+            if (header.contains(Method.TRACE)) {
                 foundTrace = true;
                 break;
             }

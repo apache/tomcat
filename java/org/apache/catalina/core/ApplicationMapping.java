@@ -16,8 +16,8 @@
  */
 package org.apache.catalina.core;
 
-import javax.servlet.http.HttpServletMapping;
-import javax.servlet.http.MappingMatch;
+import jakarta.servlet.http.HttpServletMapping;
+import jakarta.servlet.http.MappingMatch;
 
 import org.apache.catalina.mapper.MappingData;
 
@@ -56,8 +56,8 @@ public class ApplicationMapping {
                     case EXTENSION:
                         String path = mappingData.wrapperPath.toString();
                         int extIndex = path.lastIndexOf('.');
-                        mapping = new MappingImpl(path.substring(1, extIndex),
-                                "*" + path.substring(extIndex), mappingData.matchType, servletName);
+                        mapping = new MappingImpl(path.substring(1, extIndex), "*" + path.substring(extIndex),
+                                mappingData.matchType, servletName);
                         break;
                     case PATH:
                         String matchValue;
@@ -80,20 +80,8 @@ public class ApplicationMapping {
         mapping = null;
     }
 
-    private static class MappingImpl implements HttpServletMapping {
-
-        private final String matchValue;
-        private final String pattern;
-        private final MappingMatch mappingType;
-        private final String servletName;
-
-        public MappingImpl(String matchValue, String pattern, MappingMatch mappingType,
-                String servletName) {
-            this.matchValue = matchValue;
-            this.pattern = pattern;
-            this.mappingType = mappingType;
-            this.servletName = servletName;
-        }
+    private record MappingImpl(String matchValue, String pattern, MappingMatch mappingType, String servletName)
+            implements HttpServletMapping {
 
         @Override
         public String getMatchValue() {
@@ -106,13 +94,13 @@ public class ApplicationMapping {
         }
 
         @Override
-        public MappingMatch getMappingMatch() {
-            return mappingType;
+        public String getServletName() {
+            return servletName;
         }
 
         @Override
-        public String getServletName() {
-            return servletName;
+        public MappingMatch getMappingMatch() {
+            return mappingType;
         }
     }
 }

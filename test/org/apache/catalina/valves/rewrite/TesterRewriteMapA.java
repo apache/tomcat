@@ -21,7 +21,7 @@ import java.util.Map;
 
 public class TesterRewriteMapA implements RewriteMap {
 
-    private static final Map<String,String> map = new HashMap<>();
+    private static final Map<String, String> map = new HashMap<>();
 
     static {
         map.put("a", "aa");
@@ -31,8 +31,12 @@ public class TesterRewriteMapA implements RewriteMap {
 
     @Override
     public String setParameters(String params) {
+        throw new IllegalStateException();
+    }
+
+    @Override
+    public void setParameters(String... params) {
         // NO-OP
-        return null;
     }
 
     @Override

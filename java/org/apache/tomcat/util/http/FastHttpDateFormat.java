@@ -16,7 +16,6 @@
  */
 package org.apache.tomcat.util.http;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Locale;
@@ -26,8 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Utility class to generate HTTP dates.
- *
- * @author Remy Maucherat
  */
 public final class FastHttpDateFormat {
 
@@ -36,16 +33,8 @@ public final class FastHttpDateFormat {
 
 
     private static final int CACHE_SIZE =
-        Integer.parseInt(System.getProperty("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", "1000"));
+            Integer.getInteger("org.apache.tomcat.util.http.FastHttpDateFormat.CACHE_SIZE", 1000).intValue();
 
-
-    /**
-     * The only date format permitted when generating HTTP headers.
-     *
-     * @deprecated Unused. This will be removed in Tomcat 10.
-     */
-    @Deprecated
-    public static final String RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 
     // HTTP date formats
     private static final String DATE_RFC5322 = "EEE, dd MMM yyyy HH:mm:ss z";
@@ -66,14 +55,14 @@ public final class FastHttpDateFormat {
         FORMAT_OBSOLETE_RFC850 = new ConcurrentDateFormat(DATE_OBSOLETE_RFC850, Locale.US, tz);
         FORMAT_OBSOLETE_ASCTIME = new ConcurrentDateFormat(DATE_OBSOLETE_ASCTIME, Locale.US, tz);
 
-        httpParseFormats = new ConcurrentDateFormat[] {
-                FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME };
+        httpParseFormats =
+                new ConcurrentDateFormat[] { FORMAT_RFC5322, FORMAT_OBSOLETE_RFC850, FORMAT_OBSOLETE_ASCTIME };
     }
 
     /**
      * Instant on which the currentDate object was generated.
      */
-    private static volatile long currentDateGenerated = 0L;
+    private static volatile long currentDateGeneratedInSeconds = 0L;
 
 
     /**
@@ -84,14 +73,16 @@ public final class FastHttpDateFormat {
 
     /**
      * Formatter cache.
+     * <p>
+     * Note: This needs to be a ConcurrentHashMap for correct operation so declare it as such (rather than as Map).
      */
-    private static final Map<Long, String> formatCache = new ConcurrentHashMap<>(CACHE_SIZE);
+    private static final ConcurrentHashMap<Long,String> formatCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
 
     /**
      * Parser cache.
      */
-    private static final Map<String, Long> parseCache = new ConcurrentHashMap<>(CACHE_SIZE);
+    private static final Map<String,Long> parseCache = new ConcurrentHashMap<>(CACHE_SIZE);
 
 
     // --------------------------------------------------------- Public Methods
@@ -99,13 +90,15 @@ public final class FastHttpDateFormat {
 
     /**
      * Get the current date in HTTP format.
+     *
      * @return the HTTP date
      */
-    public static final String getCurrentDate() {
-        long now = System.currentTimeMillis();
-        if ((now - currentDateGenerated) > 1000) {
-            currentDate = FORMAT_RFC5322.format(new Date(now));
-            currentDateGenerated = now;
+    public static String getCurrentDate() {
+        // according rfc5322, date/time data is accurate to the second.
+        long nowInSeconds = System.currentTimeMillis() / 1000L;
+        if (nowInSeconds != currentDateGeneratedInSeconds) {
+            currentDate = FORMAT_RFC5322.format(new Date(nowInSeconds * 1000L));
+            currentDateGeneratedInSeconds = nowInSeconds;
         }
         return currentDate;
     }
@@ -113,25 +106,12 @@ public final class FastHttpDateFormat {
 
     /**
      * Get the HTTP format of the specified date.
-     * @param value The date
-     * @param threadLocalformat Ignored. The local ConcurrentDateFormat will
-     *                          always be used.
-     * @return the HTTP date
      *
-     * @deprecated Unused. This will be removed in Tomcat 10
-     */
-    @Deprecated
-    public static final String formatDate(long value, DateFormat threadLocalformat) {
-        return formatDate(value);
-    }
-
-
-    /**
-     * Get the HTTP format of the specified date.
      * @param value The date
+     *
      * @return the HTTP date
      */
-    public static final String formatDate(long value) {
+    public static String formatDate(long value) {
         Long longValue = Long.valueOf(value);
         String cachedDate = formatCache.get(longValue);
         if (cachedDate != null) {
@@ -146,27 +126,12 @@ public final class FastHttpDateFormat {
 
     /**
      * Try to parse the given date as an HTTP date.
-     * @param value The HTTP date
-     * @param threadLocalformats Ignored. The local array of
-     *                           ConcurrentDateFormat will always be used.
-     * @return the date as a long
      *
-     * @deprecated Unused. This will be removed in Tomcat 10
-     *             Use {@link #parseDate(String)}
-     */
-    @Deprecated
-    public static final long parseDate(String value, DateFormat[] threadLocalformats) {
-        return parseDate(value);
-    }
-
-
-    /**
-     * Try to parse the given date as an HTTP date.
      * @param value The HTTP date
-     * @return the date as a long or <code>-1</code> if the value cannot be
-     *         parsed
+     *
+     * @return the date as a long or <code>-1</code> if the value cannot be parsed
      */
-    public static final long parseDate(String value) {
+    public static long parseDate(String value) {
 
         Long cachedDate = parseCache.get(value);
         if (cachedDate != null) {

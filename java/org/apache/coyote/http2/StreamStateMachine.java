@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,32 +25,27 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * See <a href="https://tools.ietf.org/html/rfc7540#section-5.1">state
- * diagram</a> in RFC 7540.
- * <br>
+ * See <a href="https://tools.ietf.org/html/rfc7540#section-5.1">state diagram</a> in RFC 7540. <br>
  * The following additions are supported by this state machine:
  * <ul>
  * <li>differentiate between closed (normal) and closed caused by reset</li>
  * </ul>
- *
  */
 class StreamStateMachine {
 
     private static final Log log = LogFactory.getLog(StreamStateMachine.class);
     private static final StringManager sm = StringManager.getManager(StreamStateMachine.class);
 
-    private final Stream stream;
+    private final String connectionId;
+    private final String streamId;
+
     private State state;
 
 
-    StreamStateMachine(Stream stream) {
-        this.stream = stream;
+    StreamStateMachine(String connectionId, String streamId) {
+        this.connectionId = connectionId;
+        this.streamId = streamId;
         stateChange(null, State.IDLE);
-    }
-
-
-    final synchronized void sentPushPromise() {
-        stateChange(State.IDLE, State.RESERVED_LOCAL);
     }
 
 
@@ -78,20 +74,17 @@ class StreamStateMachine {
 
 
     /**
-     * Marks the stream as reset. This method will not change the stream state
-     * if:
+     * Marks the stream as reset. This method will not change the stream state if:
      * <ul>
      * <li>The stream is already reset</li>
      * <li>The stream is already closed</li>
      * </ul>
      *
-     * @throws IllegalStateException If the stream is in a state that does not
-     *         permit resets
+     * @throws IllegalStateException If the stream is in a state that does not permit resets
      */
     public synchronized void sendReset() {
         if (state == State.IDLE) {
-            throw new IllegalStateException(sm.getString("streamStateMachine.debug.change",
-                    stream.getConnectionId(), stream.getIdentifier(), state));
+            throw new IllegalStateException(sm.getString("streamStateMachine.invalidReset", connectionId, streamId));
         }
         if (state.canReset()) {
             stateChange(state, State.CLOSED_RST_TX);
@@ -107,9 +100,8 @@ class StreamStateMachine {
     private void stateChange(State oldState, State newState) {
         if (state == oldState) {
             state = newState;
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("streamStateMachine.debug.change", stream.getConnectionId(),
-                        stream.getIdentifier(), oldState, newState));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("streamStateMachine.debug.change", connectionId, streamId, oldState, newState));
             }
         }
     }
@@ -120,13 +112,13 @@ class StreamStateMachine {
         // the current state of this stream.
         if (!isFrameTypePermitted(frameType)) {
             if (state.connectionErrorForInvalidFrame) {
-                throw new ConnectionException(sm.getString("streamStateMachine.invalidFrame",
-                        stream.getConnectionId(), stream.getIdentifier(), state, frameType),
+                throw new ConnectionException(
+                        sm.getString("streamStateMachine.invalidFrame", connectionId, streamId, state, frameType),
                         state.errorCodeForInvalidFrame);
             } else {
-                throw new StreamException(sm.getString("streamStateMachine.invalidFrame",
-                        stream.getConnectionId(), stream.getIdentifier(), state, frameType),
-                        state.errorCodeForInvalidFrame, stream.getIdAsInt());
+                throw new StreamException(
+                        sm.getString("streamStateMachine.invalidFrame", connectionId, streamId, state, frameType),
+                        state.errorCodeForInvalidFrame, Integer.parseInt(streamId));
             }
         }
     }
@@ -160,8 +152,12 @@ class StreamStateMachine {
         stateChange(State.IDLE, State.CLOSED_FINAL);
     }
 
+    final synchronized String getCurrentStateName() {
+        return state.name();
+    }
 
     private enum State {
+        // @formatter:off
         IDLE               (false, false, false, true,
                             Http2Error.PROTOCOL_ERROR, FrameType.HEADERS,
                                                        FrameType.PRIORITY),
@@ -208,25 +204,23 @@ class StreamStateMachine {
                                                        FrameType.WINDOW_UPDATE),
         CLOSED_FINAL       (false, false, false, true,
                             Http2Error.PROTOCOL_ERROR, FrameType.PRIORITY);
+        // @formatter:on
 
         private final boolean canRead;
         private final boolean canWrite;
         private final boolean canReset;
         private final boolean connectionErrorForInvalidFrame;
         private final Http2Error errorCodeForInvalidFrame;
-        private final Set<FrameType> frameTypesPermitted = new HashSet<>();
+        private final Set<FrameType> frameTypesPermitted;
 
-        private State(boolean canRead, boolean canWrite, boolean canReset,
-                boolean connectionErrorForInvalidFrame, Http2Error errorCode,
-                FrameType... frameTypes) {
+        State(boolean canRead, boolean canWrite, boolean canReset, boolean connectionErrorForInvalidFrame,
+                Http2Error errorCode, FrameType... frameTypes) {
             this.canRead = canRead;
             this.canWrite = canWrite;
             this.canReset = canReset;
             this.connectionErrorForInvalidFrame = connectionErrorForInvalidFrame;
             this.errorCodeForInvalidFrame = errorCode;
-            for (FrameType frameType : frameTypes) {
-                frameTypesPermitted.add(frameType);
-            }
+            frameTypesPermitted = new HashSet<>(Arrays.asList(frameTypes));
         }
 
         public boolean isActive() {

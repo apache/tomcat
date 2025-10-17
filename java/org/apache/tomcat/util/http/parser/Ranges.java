@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class Ranges {
 
@@ -28,8 +29,13 @@ public class Ranges {
     private final List<Entry> entries;
 
 
-    private Ranges(String units, List<Entry> entries) {
-        this.units = units;
+    public Ranges(String units, List<Entry> entries) {
+        // Units are lower case (RFC 9110, section 14.1)
+        if (units == null) {
+            this.units = null;
+        } else {
+            this.units = units.toLowerCase(Locale.ENGLISH);
+        }
         this.entries = Collections.unmodifiableList(entries);
     }
 
@@ -79,12 +85,12 @@ public class Ranges {
 
         // Units (required)
         String units = HttpParser.readToken(input);
-        if (units == null || units.length() == 0) {
+        if (units == null || units.isEmpty()) {
             return null;
         }
 
         // Must be followed by '='
-        if (HttpParser.skipConstant(input, "=") == SkipResult.NOT_FOUND) {
+        if (HttpParser.skipConstant(input, "=") != SkipResult.FOUND) {
             return null;
         }
 
@@ -95,7 +101,7 @@ public class Ranges {
         do {
             long start = HttpParser.readLong(input);
             // Must be followed by '-'
-            if (HttpParser.skipConstant(input, "-") == SkipResult.NOT_FOUND) {
+            if (HttpParser.skipConstant(input, "-") != SkipResult.FOUND) {
                 return null;
             }
             long end = HttpParser.readLong(input);
@@ -113,11 +119,6 @@ public class Ranges {
                 return null;
             }
         } while (skipResult == SkipResult.FOUND);
-
-        // There must be at least one entry
-        if (entries.size() == 0) {
-            return null;
-        }
 
         return new Ranges(units, entries);
     }

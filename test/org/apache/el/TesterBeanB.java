@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el;
 
 public class TesterBeanB {
@@ -36,7 +35,7 @@ public class TesterBeanB {
         return "Hello " + to + " from " + name;
     }
 
-    public String echo(String...strings) {
+    public String echo(String... strings) {
         if (strings == null) {
             return null;
         }

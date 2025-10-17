@@ -14,8 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
 package org.apache.catalina.ant;
 
 
@@ -23,10 +21,8 @@ import org.apache.tools.ant.BuildException;
 
 
 /**
- * Ant task that implements the <code>/undeploy</code> command, supported by
- * the Tomcat manager application.
+ * Ant task that implements the <code>/undeploy</code> command, supported by the Tomcat manager application.
  *
- * @author Craig R. McClanahan
  * @since 4.1
  */
 public class UndeployTask extends AbstractCatalinaCommandTask {

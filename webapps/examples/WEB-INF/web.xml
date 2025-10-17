@@ -15,11 +15,11 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
-                      http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
-  version="4.0"
+  xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd"
+  version="6.2"
   metadata-complete="true">
 
     <description>
@@ -65,6 +65,19 @@
         </init-param>
     </filter>
 
+    <!-- Configured to set X-FRAME-OPTIONS. Disable HSTS in case it          -->
+    <!-- interferes with an existing setting. Keep X-Content-Type-Options    -->
+    <!-- and X-XSS-Protection as they are page specific.                     -->
+    <filter>
+        <filter-name>HTTP header security filter</filter-name>
+        <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
+        <async-supported>true</async-supported>
+        <init-param>
+            <param-name>hstsEnabled</param-name>
+            <param-value>false</param-value>
+        </init-param>
+    </filter>
+
     <!-- Define filter mappings for the timing filters -->
     <!--
     <filter-mapping>
@@ -86,6 +99,12 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 -->
+
+    <!-- Enable header security filter for all requests -->
+    <filter-mapping>
+        <filter-name>HTTP header security filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
 
     <!-- Define example application events listeners -->
     <listener>
@@ -192,7 +211,7 @@
                http://tomcat.apache.org/jsp2-example-taglib
             </taglib-uri>
             <taglib-location>
-               /WEB-INF/jsp2/jsp2-example-taglib.tld
+               /WEB-INF/jsp/jsp2-example-taglib.tld
             </taglib-location>
         </taglib>
 
@@ -364,16 +383,6 @@
       <url-pattern>/servlets/nonblocking/numberwriter</url-pattern>
     </servlet-mapping>
 
-    <!-- Server Push examples -->
-    <servlet>
-      <servlet-name>simpleimagepush</servlet-name>
-      <servlet-class>http2.SimpleImagePush</servlet-class>
-    </servlet>
-    <servlet-mapping>
-      <servlet-name>simpleimagepush</servlet-name>
-      <url-pattern>/servlets/serverpush/simpleimage</url-pattern>
-    </servlet-mapping>
-
     <!-- Trailer examples -->
     <servlet>
       <servlet-name>responsetrailer</servlet-name>
@@ -395,5 +404,10 @@
     <listener>
         <listener-class>websocket.drawboard.DrawboardContextListener</listener-class>
     </listener>
+
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/jsp/403.jsp</location>
+    </error-page>
 
 </web-app>

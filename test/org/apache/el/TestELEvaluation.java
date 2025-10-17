@@ -14,14 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.el;
 
 import java.io.File;
 import java.util.Date;
 
-import javax.el.ELException;
-import javax.el.ValueExpression;
+import jakarta.el.ELException;
+import jakarta.el.ValueExpression;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,15 +29,13 @@ import org.apache.el.lang.ELSupport;
 import org.apache.jasper.el.ELContextImpl;
 
 /**
- * Tests the EL engine directly. Similar tests may be found in
- * {@link org.apache.jasper.compiler.TestAttributeParser} and
- * {@link TestELInJsp}.
+ * Tests the EL engine directly. Similar tests may be found in {@link org.apache.jasper.compiler.TestAttributeParser}
+ * and {@link TestELInJsp}.
  */
 public class TestELEvaluation {
 
     /**
-     * Test use of spaces in ternary expressions. This was primarily an EL
-     * parser bug.
+     * Test use of spaces in ternary expressions. This was primarily an EL parser bug.
      */
     @Test
     public void testBug42565() {
@@ -66,12 +63,9 @@ public class TestELEvaluation {
      */
     @Test
     public void testBug44994() {
-        Assert.assertEquals("none", evaluateExpression(
-                "${0 lt 0 ? 1 lt 0 ? 'many': 'one': 'none'}"));
-        Assert.assertEquals("one", evaluateExpression(
-                "${0 lt 1 ? 1 lt 1 ? 'many': 'one': 'none'}"));
-        Assert.assertEquals("many", evaluateExpression(
-                "${0 lt 2 ? 1 lt 2 ? 'many': 'one': 'none'}"));
+        Assert.assertEquals("none", evaluateExpression("${0 lt 0 ? 1 lt 0 ? 'many': 'one': 'none'}"));
+        Assert.assertEquals("one", evaluateExpression("${0 lt 1 ? 1 lt 1 ? 'many': 'one': 'none'}"));
+        Assert.assertEquals("many", evaluateExpression("${0 lt 2 ? 1 lt 2 ? 'many': 'one': 'none'}"));
     }
 
     @Test
@@ -98,8 +92,8 @@ public class TestELEvaluation {
         Assert.assertEquals("\\\\", evaluateExpression("\\\\"));
 
         /*
-         * LiteralExpressions can only contain ${ or #{ if escaped with \
-         * \ is not an escape character in any other circumstances including \\
+         * LiteralExpressions can only contain ${ or #{ if escaped with \ \ is not an escape character in any other
+         * circumstances including \\
          */
         Assert.assertEquals("\\", evaluateExpression("\\"));
         Assert.assertEquals("$", evaluateExpression("$"));
@@ -163,27 +157,31 @@ public class TestELEvaluation {
         Assert.assertEquals("''", evaluateExpression("${\"\'\'\"}"));
     }
 
-    private void compareBoth(String msg, int expected, Object o1, Object o2){
+    private void compareBoth(String msg, int expected, Object o1, Object o2) {
         int i1 = ELSupport.compare(null, o1, o2);
         int i2 = ELSupport.compare(null, o2, o1);
-        Assert.assertEquals(msg,expected, i1);
-        Assert.assertEquals(msg,expected, -i2);
+        if (expected == -1) {
+            Assert.assertTrue(msg, i1 < 0);
+            Assert.assertTrue(msg, i2 > 0);
+        } else if (expected == 0) {
+            Assert.assertTrue(msg, i1 == 0);
+            Assert.assertTrue(msg, i2 == 0);
+        } else {
+            Assert.assertTrue(msg, i1 > 0);
+            Assert.assertTrue(msg, i2 < 0);
+        }
     }
 
     @Test
-    public void testElSupportCompare(){
+    public void testElSupportCompare() {
         compareBoth("Nulls should compare equal", 0, null, null);
-        compareBoth("Null should compare equal to \"\"", 0, "", null);
-        compareBoth("Null should be less than File()",-1, null, new File(""));
-        compareBoth("Null should be less than Date()",-1, null, new Date());
-        compareBoth("Date(0) should be less than Date(1)",-1, new Date(0), new Date(1));
+        compareBoth("Date(0) should be less than Date(1)", -1, new Date(0), new Date(1));
         try {
-            compareBoth("Should not compare",0, new Date(), new File(""));
+            compareBoth("Should not compare", 0, new Date(), new File(""));
             Assert.fail("Expecting ClassCastException");
-        } catch (ClassCastException expected) {
+        } catch (ELException expected) {
             // Expected
         }
-        Assert.assertTrue(null == null);
     }
 
     /**
@@ -251,14 +249,52 @@ public class TestELEvaluation {
         Assert.assertEquals("RUOK", evaluateExpression("${fn:concat2('RU', fn:toArray('O','K'))}"));
     }
 
+    @Test
+    public void testElvis01() throws Exception {
+        Assert.assertEquals("true", evaluateExpression("${'true'?:'FAIL'}"));
+    }
+
+    @Test
+    public void testElvis02() throws Exception {
+        // null coerces to false
+        Assert.assertEquals("OK", evaluateExpression("${null?:'OK'}"));
+    }
+
+    @Test
+    public void testElvis03() throws Exception {
+        Assert.assertEquals("OK", evaluateExpression("${'false'?:'OK'}"));
+    }
+
+    @Test
+    public void testElvis04() throws Exception {
+        // Any string other "true" (ignoring case) coerces to false
+        evaluateExpression("${'error'?:'OK'}");
+    }
+
+    @Test(expected = ELException.class)
+    public void testElvis05() throws Exception {
+        // Non-string values do not coerce
+        evaluateExpression("${1234?:'OK'}");
+    }
+
+    @Test
+    public void testNullCoalescing01() throws Exception {
+        Assert.assertEquals("OK", evaluateExpression("${'OK'??'FAIL'}"));
+    }
+
+    @Test
+    public void testNullCoalescing02() throws Exception {
+        Assert.assertEquals("OK", evaluateExpression("${null??'OK'}"));
+    }
+
+
     // ************************************************************************
 
     private String evaluateExpression(String expression) {
         ExpressionFactoryImpl exprFactory = new ExpressionFactoryImpl();
-        ELContextImpl ctx = new ELContextImpl(exprFactory);
+        ELContextImpl ctx = new ELContextImpl();
         ctx.setFunctionMapper(new TesterFunctions.FMapper());
-        ValueExpression ve = exprFactory.createValueExpression(ctx, expression,
-                String.class);
+        ValueExpression ve = exprFactory.createValueExpression(ctx, expression, String.class);
         return (String) ve.getValue(ctx);
     }
 }

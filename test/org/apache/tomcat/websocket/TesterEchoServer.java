@@ -17,14 +17,17 @@
 package org.apache.tomcat.websocket;
 
 import java.io.IOException;
+import java.io.Writer;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.ServletContextEvent;
-import javax.websocket.DeploymentException;
-import javax.websocket.OnMessage;
-import javax.websocket.Session;
-import javax.websocket.server.ServerContainer;
-import javax.websocket.server.ServerEndpoint;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.Session;
+import jakarta.websocket.server.ServerContainer;
+import jakarta.websocket.server.ServerEndpoint;
 
 import org.apache.tomcat.websocket.server.Constants;
 import org.apache.tomcat.websocket.server.WsContextListener;
@@ -42,9 +45,8 @@ public class TesterEchoServer {
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
-            ServerContainer sc =
-                    (ServerContainer) sce.getServletContext().getAttribute(
-                            Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
+            ServerContainer sc = (ServerContainer) sce.getServletContext()
+                    .getAttribute(Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
             try {
                 sc.addEndpoint(Async.class);
                 sc.addEndpoint(Basic.class);
@@ -66,10 +68,10 @@ public class TesterEchoServer {
         public void echoTextMessage(Session session, String msg, boolean last) {
             try {
                 session.getBasicRemote().sendText(msg, last);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -77,14 +79,13 @@ public class TesterEchoServer {
 
 
         @OnMessage
-        public void echoBinaryMessage(Session session, ByteBuffer msg,
-                boolean last) {
+        public void echoBinaryMessage(Session session, ByteBuffer msg, boolean last) {
             try {
                 session.getBasicRemote().sendBinary(msg, last);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -98,10 +99,10 @@ public class TesterEchoServer {
         public void echoTextMessage(Session session, String msg) {
             try {
                 session.getBasicRemote().sendText(msg);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -112,10 +113,10 @@ public class TesterEchoServer {
         public void echoBinaryMessage(Session session, ByteBuffer msg) {
             try {
                 session.getBasicRemote().sendBinary(msg);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -132,10 +133,10 @@ public class TesterEchoServer {
         public void echoTextMessage(Session session, String msg) {
             try {
                 session.getBasicRemote().sendText(msg);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -146,10 +147,10 @@ public class TesterEchoServer {
         public void echoBinaryMessage(Session session, ByteBuffer msg) {
             try {
                 session.getBasicRemote().sendBinary(msg);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -166,10 +167,10 @@ public class TesterEchoServer {
         public void echoTextMessage(Session session, String msg) {
             try {
                 session.getBasicRemote().sendText(msg);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -180,10 +181,10 @@ public class TesterEchoServer {
         public void echoBinaryMessage(Session session, ByteBuffer msg) {
             try {
                 session.getBasicRemote().sendBinary(msg);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -194,20 +195,53 @@ public class TesterEchoServer {
     @ServerEndpoint("/echoWriterError")
     public static class WriterError {
 
+        public static final String MSG_ERROR = "error";
+        public static final String MSG_COUNT = "count";
+        public static final String RESULT_PASS = "PASS";
+        public static final String RESULT_FAIL = "FAIL";
+
+        private AtomicInteger errorCount = new AtomicInteger(0);
+
         @OnMessage
-        public void echoTextMessage(Session session, @SuppressWarnings("unused") String msg) {
-            try {
-                session.getBasicRemote().getSendWriter();
-                // Simulate an error
-                throw new RuntimeException();
-            } catch (IOException e) {
+        public void echoTextMessage(Session session, String msg) {
+            try (Writer w = session.getBasicRemote().getSendWriter()) {
+                if (MSG_ERROR.equals(msg)) {
+                    // Simulate an error
+                    throw new RuntimeException();
+                } else if (MSG_COUNT.equals(msg)) {
+                    int count = 0;
+                    while (count < 200 && errorCount.get() == 0) {
+                        // 200 * 50 == 10,000ms == 10s
+                        try {
+                            Thread.sleep(50);
+                        } catch (InterruptedException e) {
+                            // Ignore
+                        }
+                        count++;
+                    }
+                    if (errorCount.get() == 1) {
+                        w.write(RESULT_PASS);
+                    } else {
+                        w.write(RESULT_FAIL);
+                    }
+                } else {
+                    // Default is echo
+                    w.write(msg);
+                }
+            } catch (IOException ioe) {
                 // Should not happen
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
+        }
+
+
+        @OnError
+        public void onError(@SuppressWarnings("unused") Throwable t) {
+            errorCount.incrementAndGet();
         }
     }
 
@@ -218,10 +252,10 @@ public class TesterEchoServer {
         public void echoTextMessage(Session session, String msg) {
             try {
                 session.getBasicRemote().sendText(msg);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 try {
                     session.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }

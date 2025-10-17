@@ -19,19 +19,19 @@ package org.apache.tomcat.websocket.server;
 import java.net.URI;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.servlet.ServletContextEvent;
-import javax.websocket.ClientEndpoint;
-import javax.websocket.CloseReason;
-import javax.websocket.ContainerProvider;
-import javax.websocket.DeploymentException;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
-import javax.websocket.server.ServerContainer;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.websocket.ClientEndpoint;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.OnClose;
+import jakarta.websocket.OnError;
+import jakarta.websocket.OnMessage;
+import jakarta.websocket.OnOpen;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
+import jakarta.websocket.server.ServerContainer;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,7 +47,7 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
     public void testOnErrorNotCalledWhenClosingConnection() throws Throwable {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(Bug58624ServerConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -67,7 +67,7 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
             count++;
             Thread.sleep(100);
         }
-        Assert.assertNotEquals(0,  Bug58624ServerEndpoint.getOpenSessionCount());
+        Assert.assertNotEquals(0, Bug58624ServerEndpoint.getOpenSessionCount());
 
         // Now close the session
         session.close();
@@ -78,10 +78,10 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
             count++;
             Thread.sleep(100);
         }
-        Assert.assertEquals(0,  Bug58624ServerEndpoint.getOpenSessionCount());
+        Assert.assertEquals(0, Bug58624ServerEndpoint.getOpenSessionCount());
 
         // Ensure no errors were reported on the server
-        Assert.assertEquals(0,  Bug58624ServerEndpoint.getErrorCount());
+        Assert.assertEquals(0, Bug58624ServerEndpoint.getErrorCount());
 
         if (client.getError() != null) {
             throw client.getError();
@@ -114,11 +114,10 @@ public class TestCloseBug58624 extends WebSocketBaseTest {
         public void contextInitialized(ServletContextEvent sce) {
             super.contextInitialized(sce);
 
-            ServerContainer sc = (ServerContainer) sce.getServletContext().getAttribute(
-                    Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
+            ServerContainer sc = (ServerContainer) sce.getServletContext()
+                    .getAttribute(Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
 
-            ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(
-                    Bug58624ServerEndpoint.class, PATH).build();
+            ServerEndpointConfig sec = ServerEndpointConfig.Builder.create(Bug58624ServerEndpoint.class, PATH).build();
 
             try {
                 sc.addEndpoint(sec);

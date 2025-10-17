@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
@@ -29,57 +28,40 @@ import org.apache.juli.logging.LogFactory;
  */
 public class LoaderSF extends StoreFactoryBase {
 
-    private static Log log = LogFactory.getLog(LoaderSF.class);
+    private static final Log log = LogFactory.getLog(LoaderSF.class);
 
-    /**
-     * Store the only the Loader elements, when not default
-     *
-     * @see NamingResourcesSF#storeChildren(PrintWriter, int, Object, StoreDescription)
-     */
     @Override
-    public void store(PrintWriter aWriter, int indent, Object aElement)
-            throws Exception {
-        StoreDescription elementDesc = getRegistry().findDescription(
-                aElement.getClass());
+    public void store(PrintWriter aWriter, int indent, Object aElement) throws Exception {
+        StoreDescription elementDesc = getRegistry().findDescription(aElement.getClass());
         if (elementDesc != null) {
             Loader loader = (Loader) aElement;
             if (!isDefaultLoader(loader)) {
-                if (log.isDebugEnabled())
-                    log.debug("store " + elementDesc.getTag() + "( " + aElement
-                            + " )");
+                if (log.isTraceEnabled()) {
+                    log.trace("store " + elementDesc.getTag() + "( " + aElement + " )");
+                }
                 getStoreAppender().printIndent(aWriter, indent + 2);
-                getStoreAppender().printTag(aWriter, indent + 2, loader,
-                        elementDesc);
+                getStoreAppender().printTag(aWriter, indent + 2, loader, elementDesc);
             }
         } else {
             if (log.isWarnEnabled()) {
-                log
-                        .warn("Descriptor for element"
-                                + aElement.getClass()
-                                + " not configured or element class not StandardManager!");
+                log.warn(sm.getString("factory.storeNoDescriptor", aElement.getClass()));
             }
         }
     }
 
     /**
-     * Is this an instance of the default <code>Loader</code> configuration,
-     * with all-default properties?
+     * Is this an instance of the default <code>Loader</code> configuration, with all-default properties?
      *
-     * @param loader
-     *            Loader to be tested
+     * @param loader Loader to be tested
+     *
      * @return <code>true</code> if this is an instance of the default loader
      */
     protected boolean isDefaultLoader(Loader loader) {
 
-        if (!(loader instanceof WebappLoader)) {
+        if (!(loader instanceof WebappLoader wloader)) {
             return false;
         }
-        WebappLoader wloader = (WebappLoader) loader;
-        if ((wloader.getDelegate() != false)
-                || !wloader.getLoaderClass().equals(
-                        "org.apache.catalina.loader.WebappClassLoader")) {
-            return false;
-        }
-        return true;
+        return (!wloader.getDelegate()) &&
+                wloader.getLoaderClass().equals("org.apache.catalina.loader.WebappClassLoader");
     }
 }
