@@ -19,7 +19,6 @@ package org.apache.tomcat.jdbc.test;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.DriverPropertyInfo;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
 import java.sql.Savepoint;
@@ -29,6 +28,7 @@ import java.util.logging.Logger;
 
 import javax.sql.PooledConnection;
 
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -144,25 +144,23 @@ public class TestValidation extends DefaultTestCase {
 
     @Test
     public void returnClosedConnection() throws SQLException {
-        datasource.setDriverClassName("org.h2.Driver");
-        datasource.setUrl("jdbc:h2:~/.h2/test;QUERY_TIMEOUT=0;DB_CLOSE_ON_EXIT=FALSE");
+        ConnectionPool pool = datasource.createPool();
+        pool.resetStats();
         Assert.assertFalse(datasource.getPoolProperties().isTestOnBorrow());
         Assert.assertFalse(datasource.getPoolProperties().isTestOnReturn());
         Assert.assertFalse(datasource.getPoolProperties().isTestWhileIdle());
         try (Connection connection = datasource.getConnection()) {
-            // this gets the real connection and closes it to simulate close by driver because of I/O error
-            final Connection realConnection = connection.getMetaData().getConnection();
+            Assert.assertEquals("size", 1, pool.getSize());
+            Connection realConnection = ((PooledConnection) connection).getConnection();
             Assert.assertNotSame(connection, realConnection);
             realConnection.close();
+            Assert.assertTrue(realConnection.isClosed());
+            Assert.assertFalse(connection.isClosed());
         }
-        try (Connection connection = datasource.getConnection()) {
-            try (Statement statement = connection.createStatement()) {
-                try (ResultSet resultSet = statement.executeQuery("select 1")) {
-                    Assert.assertTrue(resultSet.next());
-                    Assert.assertEquals(1, resultSet.getInt(1));
-                }
-            }
-        }
+        Assert.assertEquals("borrowed", 1, pool.getBorrowedCount());
+        Assert.assertEquals("returned", 1, pool.getReturnedCount());
+        Assert.assertEquals("released", 1, pool.getReleasedCount());
+        Assert.assertEquals("size", 0, pool.getSize());
     }
 
     @Test
