@@ -16,18 +16,21 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 
 /**
- * <p>Representation of a security role reference for a web application, as
- * represented in a <code>&lt;security-role-ref&gt;</code> element
- * in the deployment descriptor.</p>
+ * <p>
+ * Representation of a security role reference for a web application, as represented in a
+ * <code>&lt;security-role-ref&gt;</code> element in the deployment descriptor.
+ * </p>
  *
  * @since Tomcat 5.5
  */
 public class SecurityRoleRef implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 
@@ -59,7 +62,6 @@ public class SecurityRoleRef implements Serializable {
     public void setLink(String link) {
         this.link = link;
     }
-
 
 
     // --------------------------------------------------------- Public Methods

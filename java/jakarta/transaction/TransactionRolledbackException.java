@@ -16,8 +16,11 @@
  */
 package jakarta.transaction;
 
+import java.io.Serial;
+
 public class TransactionRolledbackException extends java.rmi.RemoteException {
 
+    @Serial
     private static final long serialVersionUID = -3142798139623020577L;
 
     public TransactionRolledbackException() {

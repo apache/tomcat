@@ -18,6 +18,7 @@ package org.apache.catalina.authenticator;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,40 +35,28 @@ import org.apache.catalina.startup.TesterServletEncodeUrl;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
 /**
- * Test BasicAuthenticator and NonLoginAuthenticator when a
- * SingleSignOn Valve is active.
- *
+ * Test BasicAuthenticator and NonLoginAuthenticator when a SingleSignOn Valve is active.
  * <p>
- * In the absence of SSO support, a webapp using NonLoginAuthenticator
- * simply cannot access protected resources. These tests exercise the
- * the way successfully authenticating a different webapp under the
- * BasicAuthenticator triggers the additional SSO logic for both webapps.
- *
+ * In the absence of SSO support, a webapp using NonLoginAuthenticator simply cannot access protected resources. These
+ * tests exercise the the way successfully authenticating a different webapp under the BasicAuthenticator triggers the
+ * additional SSO logic for both webapps.
  * <p>
- * The two Authenticators are thoroughly exercised by two other unit test
- * classes: TestBasicAuthParser and TestNonLoginAndBasicAuthenticator.
- * This class mainly examines the way the Single SignOn Valve interacts with
- * two webapps when the second cannot be authenticated directly, but needs
- * to inherit its authentication via the other.
- *
+ * The two Authenticators are thoroughly exercised by two other unit test classes: TestBasicAuthParser and
+ * TestNonLoginAndBasicAuthenticator. This class mainly examines the way the Single SignOn Valve interacts with two
+ * webapps when the second cannot be authenticated directly, but needs to inherit its authentication via the other.
  * <p>
- * When the server and client can both use cookies, the authentication
- * is preserved through the exchange of a JSSOSESSIONID cookie, which
- * is different to the individual and unique JSESSIONID cookies assigned
- * separately to the two webapp sessions.
- *
+ * When the server and client can both use cookies, the authentication is preserved through the exchange of a
+ * JSSOSESSIONID cookie, which is different to the individual and unique JSESSIONID cookies assigned separately to the
+ * two webapp sessions.
  * <p>
- * The other situation examined is where the server returns authentication
- * cookies, but the client is configured to ignore them. The Tomcat
- * documentation clearly states that SSO <i>requires</i> the client to
- * support cookies, so access to resources in other webapp containers
- * receives no SSO assistance.
+ * The other situation examined is where the server returns authentication cookies, but the client is configured to
+ * ignore them. The Tomcat documentation clearly states that SSO <i>requires</i> the client to support cookies, so
+ * access to resources in other webapp containers receives no SSO assistance.
  */
 public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
@@ -95,8 +84,8 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
     // now compute some delays - beware of the units!
     private static final int EXTRA_DELAY_SECS = 5;
-    private static final int TIMEOUT_WAIT_SECS =  EXTRA_DELAY_SECS +
-            (MANAGER_SCAN_INTERVAL_SECS * MANAGER_EXPIRE_SESSIONS_FAST) * 5;
+    private static final int TIMEOUT_WAIT_SECS =
+            EXTRA_DELAY_SECS + (MANAGER_SCAN_INTERVAL_SECS * MANAGER_EXPIRE_SESSIONS_FAST) * 5;
 
     private static final String CLIENT_AUTH_HEADER = "authorization";
     private static final String SERVER_AUTH_HEADER = "WWW-Authenticate";
@@ -105,14 +94,9 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
     private static final String ENCODE_SESSION_PARAM = "jsessionid";
     private static final String ENCODE_SSOSESSION_PARAM = "jssosessionid";
 
-    private static final
-            TestSSOnonLoginAndBasicAuthenticator.BasicCredentials
-                    NO_CREDENTIALS = null;
-    private static final
-            TestSSOnonLoginAndBasicAuthenticator.BasicCredentials
-                    GOOD_CREDENTIALS =
-                new TestSSOnonLoginAndBasicAuthenticator.BasicCredentials(
-                            NICE_METHOD, USER, PWD);
+    private static final TestSSOnonLoginAndBasicAuthenticator.BasicCredentials NO_CREDENTIALS = null;
+    private static final TestSSOnonLoginAndBasicAuthenticator.BasicCredentials GOOD_CREDENTIALS =
+            new TestSSOnonLoginAndBasicAuthenticator.BasicCredentials(NICE_METHOD, USER, PWD);
 
     private Tomcat tomcat;
     private Context basicContext;
@@ -121,22 +105,18 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
     private String encodedURL;
 
     /*
-     * Run some checks without an established SSO session
-     * to make sure the test environment is correct.
+     * Run some checks without an established SSO session to make sure the test environment is correct.
      */
     @Test
     public void testEssentialEnvironment() throws Exception {
 
         // should be permitted to access an unprotected resource.
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PUBLIC,
-                       USE_COOKIES, HttpServletResponse.SC_OK);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PUBLIC, USE_COOKIES, HttpServletResponse.SC_OK);
 
         // should not be permitted to access a protected resource
         // with the two Authenticators used in the remaining tests.
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
-                USE_COOKIES, HttpServletResponse.SC_FORBIDDEN);
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, USE_COOKIES,
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED, USE_COOKIES, HttpServletResponse.SC_FORBIDDEN);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS, USE_COOKIES,
                 HttpServletResponse.SC_UNAUTHORIZED);
     }
 
@@ -144,23 +124,19 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
     public void testEssentialEnvironmentWithoutCookies() throws Exception {
 
         // should be permitted to access an unprotected resource.
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PUBLIC,
-                       NO_COOKIES, HttpServletResponse.SC_OK);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PUBLIC, NO_COOKIES, HttpServletResponse.SC_OK);
 
         // should not be permitted to access a protected resource
         // with the two Authenticators used in the remaining tests.
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
-                NO_COOKIES, HttpServletResponse.SC_FORBIDDEN);
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES,
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED, NO_COOKIES, HttpServletResponse.SC_FORBIDDEN);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS, NO_COOKIES,
                 HttpServletResponse.SC_UNAUTHORIZED);
     }
 
     /*
-     * Logon to access a protected resource using BASIC authentication,
-     * which will establish an SSO session.
-     * Wait until the SSO session times-out, then try to re-access
-     * the resource. This should be rejected with SC_FORBIDDEN 401 status.
+     * Logon to access a protected resource using BASIC authentication, which will establish an SSO session. Wait until
+     * the SSO session times-out, then try to re-access the resource. This should be rejected with SC_FORBIDDEN 401
+     * status.
      *
      * Note: this test should run for ~10 seconds.
      */
@@ -169,77 +145,57 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
         setRapidSessionTimeoutDetection();
 
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, USE_COOKIES,
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS, USE_COOKIES,
                 HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, USE_COOKIES,
-                HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS, USE_COOKIES, HttpServletResponse.SC_OK);
 
         // verify the SSOID exists as a cookie
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, USE_COOKIES,
-                HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS, USE_COOKIES, HttpServletResponse.SC_OK);
 
         // make the session time out and lose authentication
         doImminentSessionTimeout(basicContext);
 
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, USE_COOKIES,
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS, USE_COOKIES,
                 HttpServletResponse.SC_UNAUTHORIZED);
     }
 
 
     /*
-     * Logon to access a protected resource using BASIC authentication,
-     * which will establish an SSO session.
-     * Immediately try to access a protected resource in the NonLogin
-     * webapp while providing the SSO session cookie received from the
-     * first webapp. This should be successful with SC_OK 200 status.
+     * Logon to access a protected resource using BASIC authentication, which will establish an SSO session. Immediately
+     * try to access a protected resource in the NonLogin webapp while providing the SSO session cookie received from
+     * the first webapp. This should be successful with SC_OK 200 status.
      */
     @Test
     public void testBasicLoginThenAcceptWithCookies() throws Exception {
 
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES,
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS, NO_COOKIES,
                 HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, USE_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS, USE_COOKIES, HttpServletResponse.SC_OK);
 
         // send the cookie which proves we have an authenticated SSO session
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
-                       USE_COOKIES, HttpServletResponse.SC_OK);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED, USE_COOKIES, HttpServletResponse.SC_OK);
     }
 
     /*
-     * Logon to access a protected resource using BASIC authentication,
-     * which will establish an SSO session.
-     * Immediately try to access a protected resource in the NonLogin
-     * webapp, but without sending the SSO session cookie.
-     * This should be rejected with SC_FORBIDDEN 403 status.
+     * Logon to access a protected resource using BASIC authentication, which will establish an SSO session. Immediately
+     * try to access a protected resource in the NonLogin webapp, but without sending the SSO session cookie. This
+     * should be rejected with SC_FORBIDDEN 403 status.
      */
     @Test
     public void testBasicLoginThenRejectWithoutCookie() throws Exception {
 
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, USE_COOKIES,
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS, USE_COOKIES,
                 HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, USE_COOKIES,
-                HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS, USE_COOKIES, HttpServletResponse.SC_OK);
 
         // fail to send the authentication cookie to the other webapp.
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
-                NO_COOKIES, HttpServletResponse.SC_FORBIDDEN);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED, NO_COOKIES, HttpServletResponse.SC_FORBIDDEN);
     }
 
     /*
-     * Logon to access a protected resource using BASIC authentication,
-     * which will establish an SSO session.
-     * Then try to access a protected resource in the NonLogin
-     * webapp by sending the JSESSIONID from the redirect header.
-     * The access request should be rejected because the Basic webapp's
-     * sessionID is not valid for any other container.
+     * Logon to access a protected resource using BASIC authentication, which will establish an SSO session. Then try to
+     * access a protected resource in the NonLogin webapp by sending the JSESSIONID from the redirect header. The access
+     * request should be rejected because the Basic webapp's sessionID is not valid for any other container.
      */
     @Test
     public void testBasicAccessThenAcceptAuthWithUri() throws Exception {
@@ -247,20 +203,16 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         setAlwaysUseSession();
 
         // first, fail to access the protected resource without credentials
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, NO_COOKIES,
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS, NO_COOKIES,
                 HttpServletResponse.SC_UNAUTHORIZED);
 
         // now, access the protected resource with good credentials
         // to establish the session
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, NO_COOKIES,
-                HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
 
         // next, access it again to harvest the session id url parameter
         String forwardParam = "?nextUrl=" + CONTEXT_PATH_LOGIN + URI_PROTECTED;
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED + forwardParam,
-                GOOD_CREDENTIALS, NO_COOKIES,
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED + forwardParam, GOOD_CREDENTIALS, NO_COOKIES,
                 HttpServletResponse.SC_OK);
 
         // verify the sessionID was encoded in the absolute URL
@@ -268,9 +220,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         Assert.assertTrue(firstEncodedURL.contains(ENCODE_SESSION_PARAM));
 
         // access the protected resource with the encoded url (with session id)
-        doTestBasic(firstEncodedURL + forwardParam,
-                NO_CREDENTIALS, NO_COOKIES,
-                HttpServletResponse.SC_OK);
+        doTestBasic(firstEncodedURL + forwardParam, NO_CREDENTIALS, NO_COOKIES, HttpServletResponse.SC_OK);
 
         // verify the sessionID has not changed
         // verify the SSO sessionID was not encoded
@@ -283,25 +233,21 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         String sessionId = secondEncodedURL.substring(ix);
 
         // expect to fail using that sessionID in a different container
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED + ";" + sessionId,
-                NO_COOKIES, HttpServletResponse.SC_FORBIDDEN);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED + ";" + sessionId, NO_COOKIES,
+                HttpServletResponse.SC_FORBIDDEN);
     }
 
     /*
-     * Logon to access a protected resource using BASIC authentication,
-     * which will establish an SSO session.
-     * Immediately try to access a protected resource in the NonLogin
-     * webapp while providing the SSO session cookie received from the
-     * first webapp. This should be successful with SC_OK 200 status.
+     * Logon to access a protected resource using BASIC authentication, which will establish an SSO session. Immediately
+     * try to access a protected resource in the NonLogin webapp while providing the SSO session cookie received from
+     * the first webapp. This should be successful with SC_OK 200 status.
      *
-     * Then, wait long enough for the BASIC session to expire. (The SSO
-     * session should remain active because the NonLogin session has
-     * not yet expired).
-     * Try to access the protected resource again, before the SSO session
-     * has expired. This should be successful with SC_OK 200 status.
+     * Then, wait long enough for the BASIC session to expire. (The SSO session should remain active because the
+     * NonLogin session has not yet expired). Try to access the protected resource again, before the SSO session has
+     * expired. This should be successful with SC_OK 200 status.
      *
-     * Finally, wait for the non-login session to expire and try again..
-     * This should be rejected with SC_FORBIDDEN 403 status.
+     * Finally, wait for the non-login session to expire and try again.. This should be rejected with SC_FORBIDDEN 403
+     * status.
      *
      * (see bugfix https://bz.apache.org/bugzilla/show_bug.cgi?id=52303)
      *
@@ -313,14 +259,10 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         setRapidSessionTimeoutDetection();
 
         // begin with a repeat of testBasicLoginAcceptProtectedWithCookies
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, USE_COOKIES,
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS, USE_COOKIES,
                 HttpServletResponse.SC_UNAUTHORIZED);
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                GOOD_CREDENTIALS, USE_COOKIES,
-                HttpServletResponse.SC_OK);
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
-                       USE_COOKIES, HttpServletResponse.SC_OK);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, GOOD_CREDENTIALS, USE_COOKIES, HttpServletResponse.SC_OK);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED, USE_COOKIES, HttpServletResponse.SC_OK);
 
         // wait long enough for the BASIC session to expire,
         // but not long enough for the NonLogin session expiry.
@@ -328,24 +270,20 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
 
         // this successful NonLogin access should replenish the
         // the individual session expiry time and keep the SSO session alive
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED,
-                       USE_COOKIES, HttpServletResponse.SC_OK);
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED, USE_COOKIES, HttpServletResponse.SC_OK);
 
         // wait long enough for the NonLogin session to expire,
         // which will also tear down the SSO session at the same time.
         doImminentSessionTimeout(nonloginContext);
 
-        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED, USE_COOKIES,
-                HttpServletResponse.SC_FORBIDDEN);
-        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED,
-                NO_CREDENTIALS, USE_COOKIES,
+        doTestNonLogin(CONTEXT_PATH_NOLOGIN + URI_PROTECTED, USE_COOKIES, HttpServletResponse.SC_FORBIDDEN);
+        doTestBasic(CONTEXT_PATH_LOGIN + URI_PROTECTED, NO_CREDENTIALS, USE_COOKIES,
                 HttpServletResponse.SC_UNAUTHORIZED);
 
     }
 
 
-    public void doTestNonLogin(String uri, boolean useCookie,
-            int expectedRC) throws Exception {
+    public void doTestNonLogin(String uri, boolean useCookie, int expectedRC) throws Exception {
 
         Map<String,List<String>> reqHeaders = new HashMap<>();
         Map<String,List<String>> respHeaders = new HashMap<>();
@@ -355,8 +293,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         }
 
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl(HTTP_PREFIX + getPort() + uri, bc, reqHeaders,
-                respHeaders);
+        int rc = getUrl(HTTP_PREFIX + getPort() + uri, bc, reqHeaders, respHeaders);
 
         if (expectedRC != HttpServletResponse.SC_OK) {
             Assert.assertEquals(expectedRC, rc);
@@ -364,10 +301,9 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         } else {
             Assert.assertEquals("OK", bc.toString());
         }
-}
+    }
 
-    private void doTestBasic(String uri,
-            TestSSOnonLoginAndBasicAuthenticator.BasicCredentials credentials,
+    private void doTestBasic(String uri, TestSSOnonLoginAndBasicAuthenticator.BasicCredentials credentials,
             boolean useCookie, int expectedRC) throws Exception {
 
         Map<String,List<String>> reqHeaders = new HashMap<>();
@@ -384,8 +320,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         }
 
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl(HTTP_PREFIX + getPort() + uri, bc, reqHeaders,
-                respHeaders);
+        int rc = getUrl(HTTP_PREFIX + getPort() + uri, bc, reqHeaders, respHeaders);
 
         Assert.assertEquals("Unexpected Return Code", expectedRC, rc);
         if (expectedRC != HttpServletResponse.SC_OK) {
@@ -430,8 +365,6 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
     }
 
 
-
-
     /*
      * setup two webapps for every test
      *
@@ -469,13 +402,11 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
     private void setUpNonLogin() throws Exception {
 
         // Must have a real docBase for webapps - just use temp
-        nonloginContext = tomcat.addContext(CONTEXT_PATH_NOLOGIN,
-                System.getProperty("java.io.tmpdir"));
+        nonloginContext = tomcat.addContext(CONTEXT_PATH_NOLOGIN, System.getProperty("java.io.tmpdir"));
         nonloginContext.setSessionTimeout(LONG_SESSION_TIMEOUT_MINS);
 
         // Add protected servlet to the context
-        Tomcat.addServlet(nonloginContext, "TesterServlet1",
-                new TesterServletEncodeUrl());
+        Tomcat.addServlet(nonloginContext, "TesterServlet1", new TesterServletEncodeUrl());
         nonloginContext.addServletMappingDecoded(URI_PROTECTED, "TesterServlet1");
 
         SecurityCollection collection1 = new SecurityCollection();
@@ -486,8 +417,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         nonloginContext.addConstraint(sc1);
 
         // Add unprotected servlet to the context
-        Tomcat.addServlet(nonloginContext, "TesterServlet2",
-                new TesterServletEncodeUrl());
+        Tomcat.addServlet(nonloginContext, "TesterServlet2", new TesterServletEncodeUrl());
         nonloginContext.addServletMappingDecoded(URI_PUBLIC, "TesterServlet2");
 
         SecurityCollection collection2 = new SecurityCollection();
@@ -508,13 +438,11 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
     private void setUpLogin() throws Exception {
 
         // Must have a real docBase for webapps - just use temp
-        basicContext = tomcat.addContext(CONTEXT_PATH_LOGIN,
-                System.getProperty("java.io.tmpdir"));
+        basicContext = tomcat.addContext(CONTEXT_PATH_LOGIN, System.getProperty("java.io.tmpdir"));
         basicContext.setSessionTimeout(SHORT_SESSION_TIMEOUT_MINS);
 
         // Add protected servlet to the context
-        Tomcat.addServlet(basicContext, "TesterServlet3",
-                new TesterServletEncodeUrl());
+        Tomcat.addServlet(basicContext, "TesterServlet3", new TesterServletEncodeUrl());
         basicContext.addServletMappingDecoded(URI_PROTECTED, "TesterServlet3");
         SecurityCollection collection = new SecurityCollection();
         collection.addPatternDecoded(URI_PROTECTED);
@@ -524,8 +452,7 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         basicContext.addConstraint(sc);
 
         // Add unprotected servlet to the context
-        Tomcat.addServlet(basicContext, "TesterServlet4",
-                new TesterServletEncodeUrl());
+        Tomcat.addServlet(basicContext, "TesterServlet4", new TesterServletEncodeUrl());
         basicContext.addServletMappingDecoded(URI_PUBLIC, "TesterServlet4");
         SecurityCollection collection2 = new SecurityCollection();
         collection2.addPatternDecoded(URI_PUBLIC);
@@ -580,25 +507,19 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
     }
 
     /*
-     * Force non-default behaviour for both Authenticators.
-     * The session id will not be regenerated after authentication,
-     * which is less secure but needed for browsers that will not
-     * handle cookies.
+     * Force non-default behaviour for both Authenticators. The session id will not be regenerated after authentication,
+     * which is less secure but needed for browsers that will not handle cookies.
      */
     private void setAlwaysUseSession() {
 
-        ((AuthenticatorBase) basicContext.getAuthenticator())
-                .setAlwaysUseSession(true);
-        ((AuthenticatorBase) nonloginContext.getAuthenticator())
-                .setAlwaysUseSession(true);
+        ((AuthenticatorBase) basicContext.getAuthenticator()).setAlwaysUseSession(true);
+        ((AuthenticatorBase) nonloginContext.getAuthenticator()).setAlwaysUseSession(true);
     }
 
     /*
-     * Force faster timeout for an active Container than can
-     * be defined in web.xml. By getting to the active Session we
-     * can choose seconds instead of minutes.
-     * Note: shamelessly cloned from ManagerBase - beware of synch issues
-     *       on the underlying sessions.
+     * Force faster timeout for an active Container than can be defined in web.xml. By getting to the active Session we
+     * can choose seconds instead of minutes. Note: shamelessly cloned from ManagerBase - beware of synch issues on the
+     * underlying sessions.
      */
     private void doImminentSessionTimeout(Context activeContext) {
 
@@ -636,22 +557,18 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
     }
 
     /*
-     * Force rapid timeout scanning for both webapps
-     * The StandardManager default service cycle time is 10 seconds,
-     * with a session expiry scan every 6 cycles.
+     * Force rapid timeout scanning for both webapps The StandardManager default service cycle time is 10 seconds, with
+     * a session expiry scan every 6 cycles.
      */
     private void setRapidSessionTimeoutDetection() {
 
-        ((ManagerBase) basicContext.getManager())
-                .setProcessExpiresFrequency(MANAGER_EXPIRE_SESSIONS_FAST);
-        ((ManagerBase) nonloginContext.getManager())
-                .setProcessExpiresFrequency(MANAGER_EXPIRE_SESSIONS_FAST);
+        ((ManagerBase) basicContext.getManager()).setProcessExpiresFrequency(MANAGER_EXPIRE_SESSIONS_FAST);
+        ((ManagerBase) nonloginContext.getManager()).setProcessExpiresFrequency(MANAGER_EXPIRE_SESSIONS_FAST);
     }
 
     /*
-     * Encapsulate the logic to generate an HTTP header
-     * for BASIC Authentication.
-     * Note: only used internally, so no need to validate arguments.
+     * Encapsulate the logic to generate an HTTP header for BASIC Authentication. Note: only used internally, so no need
+     * to validate arguments.
      */
     private static final class BasicCredentials {
 
@@ -660,16 +577,14 @@ public class TestSSOnonLoginAndBasicAuthenticator extends TomcatBaseTest {
         private final String password;
         private final String credentials;
 
-        private BasicCredentials(String aMethod,
-                String aUsername, String aPassword) {
+        private BasicCredentials(String aMethod, String aUsername, String aPassword) {
             method = aMethod;
             username = aUsername;
             password = aPassword;
             String userCredentials = username + ":" + password;
-            byte[] credentialsBytes =
-                    userCredentials.getBytes(StandardCharsets.ISO_8859_1);
-            String base64auth = Base64.encodeBase64String(credentialsBytes);
-            credentials= method + " " + base64auth;
+            byte[] credentialsBytes = userCredentials.getBytes(StandardCharsets.ISO_8859_1);
+            String base64auth = Base64.getEncoder().encodeToString(credentialsBytes);
+            credentials = method + " " + base64auth;
         }
 
         private String getCredentials() {

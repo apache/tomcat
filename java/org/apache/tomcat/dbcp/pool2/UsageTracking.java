@@ -22,7 +22,6 @@ package org.apache.tomcat.dbcp.pool2;
  * more informed decisions and reporting to be made regarding abandoned objects.
  *
  * @param <T> The type of object provided by the pool.
- *
  * @since 2.0
  */
 public interface UsageTracking<T> {

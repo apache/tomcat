@@ -21,6 +21,9 @@ import org.junit.Test;
 
 import org.apache.tomcat.util.buf.MessageBytes;
 
+/*
+ * This is an absolute performance test with an upper limit. Therefore it is executed as part of a standard test run.
+ */
 public class TestMapperPerformance extends TestMapper {
 
     @Test

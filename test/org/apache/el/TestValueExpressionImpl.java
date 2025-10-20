@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.el.ELBaseTest;
 import jakarta.el.ELContext;
@@ -241,5 +242,146 @@ public class TestValueExpressionImpl extends ELBaseTest {
         ve.setValue(context, null);
 
         Assert.assertEquals("", beanB.getName());
+    }
+
+
+    @Test
+    public void testOptional01() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        final String data = "some data";
+
+        TesterBeanJ beanJ = new TesterBeanJ();
+        TesterBeanJ beanJ2 = new TesterBeanJ();
+        beanJ2.setData(data);
+        beanJ.setBean(beanJ2);
+
+        ValueExpression var = factory.createValueExpression(beanJ, TesterBeanJ.class);
+        context.getVariableMapper().setVariable("beanJ", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanJ.optionalBean.map(b -> b.data)}",
+                Optional.class);
+
+        @SuppressWarnings("unchecked")
+        Optional<String> result = (Optional<String>) ve.getValue(context);
+        Assert.assertEquals(data, result.get());
+    }
+
+
+    @Test
+    public void testOptional02() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanJ beanJ = new TesterBeanJ();
+
+        ValueExpression var = factory.createValueExpression(beanJ, TesterBeanJ.class);
+        context.getVariableMapper().setVariable("beanJ", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanJ.optionalBean.map(b -> b.data)}",
+                Optional.class);
+
+        @SuppressWarnings("unchecked")
+        Optional<String> result = (Optional<String>) ve.getValue(context);
+        Assert.assertTrue(result.isEmpty());
+    }
+
+
+    @Test
+    public void testOptional03() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        final String data = "some data";
+
+        TesterBeanJ beanJ = new TesterBeanJ();
+        TesterBeanJ beanJ2 = new TesterBeanJ();
+        beanJ2.setData(data);
+        beanJ.setBean(beanJ2);
+
+        ValueExpression var = factory.createValueExpression(beanJ, TesterBeanJ.class);
+        context.getVariableMapper().setVariable("beanJ", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanJ.optionalBean.get().data}", String.class);
+
+        String result = (String) ve.getValue(context);
+        Assert.assertEquals(data, result);
+    }
+
+
+    @Test
+    public void testOptional04() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanJ beanJ = new TesterBeanJ();
+
+        ValueExpression var = factory.createValueExpression(beanJ, TesterBeanJ.class);
+        context.getVariableMapper().setVariable("beanJ", var);
+
+        ValueExpression ve = factory.createValueExpression(context,
+                "${beanJ.optionalBean.map(b -> b.data).orElse(null)}", String.class);
+
+        String result = (String) ve.getValue(context);
+        // Result is null but is coerced to String which makes it ""
+        Assert.assertNotNull(result);
+        Assert.assertTrue(result.isEmpty());
+    }
+
+
+    @Test
+    public void testArrayLength01() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanA beanA = new TesterBeanA();
+        beanA.setValArray(new String[3]);
+
+        ValueExpression var = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.valArray.length}", Integer.class);
+
+        // Check the result
+        Integer result = (Integer) ve.getValue(context);
+        Assert.assertEquals(Integer.valueOf(3), result);
+    }
+
+
+    @Test
+    public void testArrayLength02() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanA beanA = new TesterBeanA();
+        beanA.setValArray(new String[0]);
+
+        ValueExpression var = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.valArray.length}", Integer.class);
+
+        // Check the result
+        Integer result = (Integer) ve.getValue(context);
+        Assert.assertEquals(Integer.valueOf(0), result);
+    }
+
+
+    @Test
+    public void testArrayLength03() {
+        ExpressionFactory factory = ExpressionFactory.newInstance();
+        ELContext context = new ELContextImpl();
+
+        TesterBeanA beanA = new TesterBeanA();
+
+        ValueExpression var = factory.createValueExpression(beanA, TesterBeanA.class);
+        context.getVariableMapper().setVariable("beanA", var);
+
+        ValueExpression ve = factory.createValueExpression(context, "${beanA.valArray.length}", Integer.class);
+
+        // Check the result
+        Integer result = (Integer) ve.getValue(context);
+        Assert.assertNull(result);
     }
 }

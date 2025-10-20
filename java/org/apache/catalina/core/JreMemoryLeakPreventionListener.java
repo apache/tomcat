@@ -17,6 +17,7 @@
 package org.apache.catalina.core;
 
 import java.net.URLConnection;
+import java.security.SecureRandom;
 import java.sql.DriverManager;
 import java.util.StringTokenizer;
 
@@ -63,7 +64,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     }
 
     /**
-     * Protect against resources being read for JAR files and, as a side-effect, the JAR file becoming locked. Note this
+     * Protect against resources being read for JAR files and, as a side effect, the JAR file becoming locked. Note this
      * disables caching for all {@link URLConnection}s, regardless of type. Defaults to <code>true</code>.
      */
     private boolean urlCacheProtection = true;
@@ -77,9 +78,9 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
     }
 
     /**
-     * The first access to {@link DriverManager} will trigger the loading of all {@link java.sql.Driver}s in the the
-     * current class loader. The web application level memory leak protection can take care of this in most cases but
-     * triggering the loading here has fewer side-effects.
+     * The first access to {@link DriverManager} will trigger the loading of all {@link java.sql.Driver}s in the current
+     * class loader. The web application level memory leak protection can take care of this in most cases but triggering
+     * the loading here has fewer side effects.
      */
     private boolean driverManagerProtection = true;
 
@@ -93,7 +94,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
     /**
      * List of comma-separated fully qualified class names to load and initialize during the startup of this Listener.
-     * This allows to pre-load classes that are known to provoke classloader leaks if they are loaded during a request
+     * This allows to preload classes that are known to provoke classloader leaks if they are loaded during a request
      * processing.
      */
     private String classesToInitialize = null;
@@ -104,6 +105,20 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
 
     public void setClassesToInitialize(String classesToInitialize) {
         this.classesToInitialize = classesToInitialize;
+    }
+
+    /**
+     * Initialize JVM seed generator. On some platforms, the JVM will create a thread for this task, which can get
+     * associated with a web application depending on the timing.
+     */
+    private boolean initSeedGenerator = false;
+
+    public boolean getInitSeedGenerator() {
+        return this.initSeedGenerator;
+    }
+
+    public void setInitSeedGenerator(boolean initSeedGenerator) {
+        this.initSeedGenerator = initSeedGenerator;
     }
 
 
@@ -168,6 +183,14 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
                 // Set the default URL caching policy to not to cache
                 if (urlCacheProtection) {
                     URLConnection.setDefaultUseCaches("JAR", false);
+                }
+
+                /*
+                 * Initialize the SeedGenerator of the JVM, as some platforms use a thread which could end up being
+                 * associated with a webapp rather than the container.
+                 */
+                if (initSeedGenerator) {
+                    SecureRandom.getSeed(1);
                 }
 
                 if (classesToInitialize != null) {

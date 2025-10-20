@@ -26,9 +26,10 @@ Export-Package: \
     org.apache.catalina.tribes.membership,\
     org.apache.catalina.tribes.tipis,\
     org.apache.catalina.tribes.transport,\
-    org.apache.catalina.tribes.transport.bio,\
     org.apache.catalina.tribes.transport.nio,\
     org.apache.catalina.tribes.util
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
     org.apache.catalina.tribes.membership.cloud

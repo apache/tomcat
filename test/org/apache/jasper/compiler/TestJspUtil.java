@@ -41,7 +41,7 @@ public class TestJspUtil extends TomcatBaseTest {
             if (line.startsWith("<p>")) {
                 line = line.substring(3, line.length() - 4);
                 String[] parts = line.split(":");
-                Assert.assertEquals(parts[0],  parts[1], parts[2]);
+                Assert.assertEquals(parts[0], parts[1], parts[2]);
             }
         }
         Assert.assertEquals(bc.toString(), HttpServletResponse.SC_OK, rc);

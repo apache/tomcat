@@ -35,14 +35,14 @@ import org.apache.tomcat.websocket.TestWsWebSocketContainer.EndpointA;
  * significantly extends the length of a test run when using multiple test
  * threads.
  */
-public class TestWsWebSocketContainerSessionExpirySession  extends WsWebSocketContainerBaseTest {
+public class TestWsWebSocketContainerSessionExpirySession extends WsWebSocketContainerBaseTest {
 
     @Test
     public void testSessionExpirySession() throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(TesterEchoServer.Config.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
@@ -50,22 +50,18 @@ public class TestWsWebSocketContainerSessionExpirySession  extends WsWebSocketCo
         tomcat.start();
 
         // Need access to implementation methods for configuring unit tests
-        WsWebSocketContainer wsContainer = (WsWebSocketContainer)
-                ContainerProvider.getWebSocketContainer();
+        WsWebSocketContainer wsContainer = (WsWebSocketContainer) ContainerProvider.getWebSocketContainer();
 
         // 5 second timeout
         wsContainer.setDefaultMaxSessionIdleTimeout(5000);
         wsContainer.setProcessPeriod(1);
 
         EndpointA endpointA = new EndpointA();
-        Session s1a = connectToEchoServer(wsContainer, endpointA,
-                TesterEchoServer.Config.PATH_BASIC);
+        Session s1a = connectToEchoServer(wsContainer, endpointA, TesterEchoServer.Config.PATH_BASIC);
         s1a.setMaxIdleTimeout(3000);
-        Session s2a = connectToEchoServer(wsContainer, endpointA,
-                TesterEchoServer.Config.PATH_BASIC);
+        Session s2a = connectToEchoServer(wsContainer, endpointA, TesterEchoServer.Config.PATH_BASIC);
         s2a.setMaxIdleTimeout(6000);
-        Session s3a = connectToEchoServer(wsContainer, endpointA,
-                TesterEchoServer.Config.PATH_BASIC);
+        Session s3a = connectToEchoServer(wsContainer, endpointA, TesterEchoServer.Config.PATH_BASIC);
         s3a.setMaxIdleTimeout(9000);
 
         // Check all three sessions are open
@@ -77,7 +73,7 @@ public class TestWsWebSocketContainerSessionExpirySession  extends WsWebSocketCo
 
             int count = 0;
             while (getOpenCount(setA) == expected && count < 50) {
-                count ++;
+                count++;
                 Thread.sleep(100);
             }
 

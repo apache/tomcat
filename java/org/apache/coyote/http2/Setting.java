@@ -23,7 +23,9 @@ enum Setting {
     INITIAL_WINDOW_SIZE(4),
     MAX_FRAME_SIZE(5),
     MAX_HEADER_LIST_SIZE(6),
+    ENABLE_CONNECT_PROTOCOL(8),
     NO_RFC7540_PRIORITIES(9),
+    TLS_RENEG_PERMITTED(10),
     UNKNOWN(Integer.MAX_VALUE);
 
     private final int id;
@@ -42,31 +44,17 @@ enum Setting {
     }
 
     static Setting valueOf(int i) {
-        switch (i) {
-            case 1: {
-                return HEADER_TABLE_SIZE;
-            }
-            case 2: {
-                return ENABLE_PUSH;
-            }
-            case 3: {
-                return MAX_CONCURRENT_STREAMS;
-            }
-            case 4: {
-                return INITIAL_WINDOW_SIZE;
-            }
-            case 5: {
-                return MAX_FRAME_SIZE;
-            }
-            case 6: {
-                return MAX_HEADER_LIST_SIZE;
-            }
-            case 9: {
-                return NO_RFC7540_PRIORITIES;
-            }
-            default: {
-                return Setting.UNKNOWN;
-            }
-        }
+        return switch (i) {
+            case 1 -> HEADER_TABLE_SIZE;
+            case 2 -> ENABLE_PUSH;
+            case 3 -> MAX_CONCURRENT_STREAMS;
+            case 4 -> INITIAL_WINDOW_SIZE;
+            case 5 -> MAX_FRAME_SIZE;
+            case 6 -> MAX_HEADER_LIST_SIZE;
+            case 8 -> ENABLE_CONNECT_PROTOCOL;
+            case 9 -> NO_RFC7540_PRIORITIES;
+            case 10 -> TLS_RENEG_PERMITTED;
+            default -> UNKNOWN;
+        };
     }
 }

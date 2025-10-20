@@ -16,13 +16,15 @@
  */
 package jakarta.servlet.jsp;
 
+import java.io.Serial;
+
 /**
- * A generic exception known to the JSP engine; uncaught
- * JspExceptions will result in an invocation of the errorpage
+ * A generic exception known to the JSP engine; uncaught JspExceptions will result in an invocation of the error page
  * machinery.
  */
 public class JspException extends Exception {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 
@@ -35,12 +37,10 @@ public class JspException extends Exception {
 
 
     /**
-     * Constructs a new JSP exception with the
-     * specified message. The message can be written
-     * to the server log and/or displayed for the user.
+     * Constructs a new JSP exception with the specified message. The message can be written to the server log and/or
+     * displayed for the user.
      *
-     * @param msg   a <code>String</code> specifying the text of the exception
-     *              message
+     * @param msg a <code>String</code> specifying the text of the exception message
      */
     public JspException(String msg) {
         super(msg);
@@ -48,18 +48,14 @@ public class JspException extends Exception {
 
 
     /**
-     * Constructs a new <code>JSPException</code> with the specified detail
-     * message and cause. The cause is saved for later retrieval by the
-     * <code>java.lang.Throwable.getCause()</code> method.
+     * Constructs a new <code>JSPException</code> with the specified detail message and cause. The cause is saved for
+     * later retrieval by the <code>java.lang.Throwable.getCause()</code> method.
      *
      * @see java.lang.Exception#Exception(String, Throwable)
      *
-     * @param message       a <code>String</code> containing the text of the
-     *                      exception message
-     *
-     * @param cause         the <code>Throwable</code> exception that
-     *                      interfered with the JSP's normal operation,
-     *                      making this JSP exception necessary
+     * @param message a <code>String</code> containing the text of the exception message
+     * @param cause   the <code>Throwable</code> exception that interfered with the JSP's normal operation, making this
+     *                    JSP exception necessary
      */
 
     public JspException(String message, Throwable cause) {
@@ -68,15 +64,13 @@ public class JspException extends Exception {
 
 
     /**
-     * Constructs a new <code>JSPException</code> with the specified cause.
-     * The cause is saved for later retrieval by the
-     * <code>java.lang.Throwable.getCause()</code> method.
+     * Constructs a new <code>JSPException</code> with the specified cause. The cause is saved for later retrieval by
+     * the <code>java.lang.Throwable.getCause()</code> method.
      *
      * @see java.lang.Exception#Exception(Throwable)
      *
-     * @param cause         the <code>Throwable</code> exception that
-     *                      interfered with the JSP's normal operation, making
-     *                      the JSP exception necessary
+     * @param cause the <code>Throwable</code> exception that interfered with the JSP's normal operation, making the JSP
+     *                  exception necessary
      */
 
     public JspException(Throwable cause) {

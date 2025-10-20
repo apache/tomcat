@@ -26,9 +26,6 @@ import org.apache.tomcat.util.net.SSLHostConfig;
  * Abstract the protocol implementation, including threading, etc. This is the main interface to be implemented by a
  * coyote protocol. Adapter is the main interface to be implemented by a coyote servlet container.
  *
- * @author Remy Maucherat
- * @author Costin Manolache
- *
  * @see Adapter
  */
 public interface ProtocolHandler {
@@ -131,7 +128,7 @@ public interface ProtocolHandler {
 
     /**
      * Close the server socket (to prevent further connections) if the server socket was bound on {@link #start()}
-     * (rather than on {@link #init()} but do not perform any further shutdown.
+     * (rather than on {@link #init()}) but do not perform any further shutdown.
      */
     void closeServerSocketGraceful();
 
@@ -161,6 +158,19 @@ public interface ProtocolHandler {
      * @param sslHostConfig the configuration
      */
     void addSslHostConfig(SSLHostConfig sslHostConfig);
+
+
+    /**
+     * Add a new SSL configuration for a virtual host.
+     *
+     * @param sslHostConfig the configuration
+     * @param replace       If {@code true} replacement of an existing configuration is permitted, otherwise any such
+     *                          attempted replacement will trigger an exception
+     *
+     * @throws IllegalArgumentException If the host name is not valid or if a configuration has already been provided
+     *                                      for that host and replacement is not allowed
+     */
+    void addSslHostConfig(SSLHostConfig sslHostConfig, boolean replace);
 
 
     /**

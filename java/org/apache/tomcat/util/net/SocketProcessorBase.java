@@ -42,7 +42,7 @@ public abstract class SocketProcessorBase<S> implements Runnable {
         lock.lock();
         try {
             // It is possible that processing may be triggered for read and
-            // write at the same time. The sync above makes sure that processing
+            // write at the same time. The lock above makes sure that processing
             // does not occur in parallel. The test below ensures that if the
             // first event to be processed results in the socket being closed,
             // the subsequent events are not processed.

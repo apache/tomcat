@@ -22,12 +22,10 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.websocket.Util;
 
 /**
- * Stores the parameter type and name for a parameter that needs to be passed to
- * an onXxx method of {@link jakarta.websocket.Endpoint}. The name is only present
- * for parameters annotated with
- * {@link jakarta.websocket.server.PathParam}. For the
- * {@link jakarta.websocket.Session} and {@link java.lang.Throwable} parameters,
- * {@link #getName()} will always return <code>null</code>.
+ * Stores the parameter type and name for a parameter that needs to be passed to an onXxx method of
+ * {@link jakarta.websocket.Endpoint}. The name is only present for parameters annotated with
+ * {@link jakarta.websocket.server.PathParam}. For the {@link jakarta.websocket.Session} and {@link java.lang.Throwable}
+ * parameters, {@link #getName()} will always return <code>null</code>.
  */
 public class PojoPathParam {
 
@@ -37,7 +35,7 @@ public class PojoPathParam {
     private final String name;
 
 
-    public PojoPathParam(Class<?> type, String name)  throws DeploymentException {
+    public PojoPathParam(Class<?> type, String name) throws DeploymentException {
         if (name != null) {
             // Annotated as @PathParam so validate type
             validateType(type);

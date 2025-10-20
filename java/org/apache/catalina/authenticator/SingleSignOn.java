@@ -28,6 +28,7 @@ import jakarta.servlet.http.Cookie;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
+import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Realm;
@@ -50,8 +51,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <li>The web applications themselves must use one of the standard Authenticators found in the
  * <code>org.apache.catalina.authenticator</code> package.</li>
  * </ul>
- *
- * @author Craig R. McClanahan
  */
 public class SingleSignOn extends ValveBase {
 
@@ -76,7 +75,7 @@ public class SingleSignOn extends ValveBase {
      * The cache of SingleSignOnEntry instances for authenticated Principals, keyed by the cookie value that is used to
      * select them.
      */
-    protected Map<String, SingleSignOnEntry> cache = new ConcurrentHashMap<>();
+    protected Map<String,SingleSignOnEntry> cache = new ConcurrentHashMap<>();
 
     /**
      * Indicates whether this valve should require a downstream Authenticator to reauthenticate each request, or if it
@@ -112,7 +111,7 @@ public class SingleSignOn extends ValveBase {
      * @param cookieDomain cookie domain name
      */
     public void setCookieDomain(String cookieDomain) {
-        if (cookieDomain != null && cookieDomain.trim().length() == 0) {
+        if (cookieDomain != null && cookieDomain.trim().isEmpty()) {
             this.cookieDomain = null;
         } else {
             this.cookieDomain = cookieDomain;
@@ -208,8 +207,8 @@ public class SingleSignOn extends ValveBase {
         request.removeNote(Constants.REQ_SSOID_NOTE);
 
         // Has a valid user already been authenticated?
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug(sm.getString("singleSignOn.debug.invoke", request.getRequestURI()));
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(sm.getString("singleSignOn.debug.invoke", request.getRequestURI()));
         }
         if (request.getUserPrincipal() != null) {
             if (containerLog.isDebugEnabled()) {
@@ -221,11 +220,11 @@ public class SingleSignOn extends ValveBase {
         }
 
         // Check for the single sign on cookie
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug(sm.getString("singleSignOn.debug.cookieCheck"));
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(sm.getString("singleSignOn.debug.cookieCheck"));
         }
         Cookie cookie = null;
-        Cookie cookies[] = request.getCookies();
+        Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie value : cookies) {
                 if (cookieName.equals(value.getName())) {
@@ -243,8 +242,8 @@ public class SingleSignOn extends ValveBase {
         }
 
         // Look up the cached Principal associated with this cookie value
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug(sm.getString("singleSignOn.debug.principalCheck", cookie.getValue()));
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace(sm.getString("singleSignOn.debug.principalCheck", cookie.getValue()));
         }
         SingleSignOnEntry entry = cache.get(cookie.getValue());
         if (entry != null) {
@@ -273,14 +272,17 @@ public class SingleSignOn extends ValveBase {
             if (domain != null) {
                 cookie.setDomain(domain);
             }
-            // This is going to trigger a Set-Cookie header. While the value is
-            // not security sensitive, ensure that expectations for secure and
-            // httpOnly are met
+            /*
+             * This is going to trigger a Set-Cookie header. While the value is not security sensitive, ensure that
+             * expectations for secure, httpOnly and Partitioned are met.
+             */
             cookie.setSecure(request.isSecure());
             if (request.getServletContext().getSessionCookieConfig().isHttpOnly() ||
                     request.getContext().getUseHttpOnly()) {
                 cookie.setHttpOnly(true);
             }
+            cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR,
+                    Boolean.toString(request.getContext().getUsePartitioned()));
 
             response.addCookie(cookie);
         }
@@ -296,7 +298,7 @@ public class SingleSignOn extends ValveBase {
      * Process a session destroyed event by removing references to that session from the caches and - if the session
      * destruction is the result of a logout - destroy the associated SSO session.
      *
-     * @param ssoId   The ID of the SSO session which which the destroyed session was associated
+     * @param ssoId   The id of the SSO session with which the destroyed session was associated
      * @param session The session that has been destroyed
      */
     public void sessionDestroyed(String ssoId, Session session) {
@@ -310,7 +312,7 @@ public class SingleSignOn extends ValveBase {
         // session was logged out, we'll log out of all session associated with
         // the SSO.
         if (((session.getMaxInactiveInterval() > 0) &&
-                (session.getIdleTimeInternal() >= session.getMaxInactiveInterval() * 1000)) ||
+                (session.getIdleTimeInternal() >= session.getMaxInactiveInterval() * 1000L)) ||
                 (!session.getManager().getContext().getState().isAvailable())) {
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug(sm.getString("singleSignOn.debug.sessionTimeout", ssoId, session));
@@ -381,7 +383,7 @@ public class SingleSignOn extends ValveBase {
 
         // Expire any associated sessions
         Set<SingleSignOnSessionKey> ssoKeys = sso.findSessions();
-        if (ssoKeys.size() == 0) {
+        if (ssoKeys.isEmpty()) {
             if (containerLog.isDebugEnabled()) {
                 containerLog.debug(sm.getString("singleSignOn.debug.deregisterNone", ssoId));
             }
@@ -420,11 +422,11 @@ public class SingleSignOn extends ValveBase {
             containerLog.warn(sm.getString("singleSignOn.sessionExpire.managerNotFound", key));
             return;
         }
-        Session session = null;
+        Session session;
         try {
             session = manager.findSession(key.getSessionId());
-        } catch (IOException e) {
-            containerLog.warn(sm.getString("singleSignOn.sessionExpire.managerError", key), e);
+        } catch (IOException ioe) {
+            containerLog.warn(sm.getString("singleSignOn.sessionExpire.managerError", key), ioe);
             return;
         }
         if (session == null) {
@@ -553,9 +555,9 @@ public class SingleSignOn extends ValveBase {
         // Remove the inactive session from SingleSignOnEntry
         entry.removeSession(session);
 
-        // If there are not sessions left in the SingleSignOnEntry,
+        // If there are no sessions left in the SingleSignOnEntry,
         // deregister the entry.
-        if (entry.findSessions().size() == 0) {
+        if (entry.findSessions().isEmpty()) {
             deregister(ssoId);
         }
     }
@@ -567,21 +569,71 @@ public class SingleSignOn extends ValveBase {
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
-        Container c = getContainer();
-        while (c != null && !(c instanceof Engine)) {
-            c = c.getParent();
+    protected void startInternal() throws LifecycleException {
+        Container container = getContainer();
+        while (container != null && !(container instanceof Engine)) {
+            container = container.getParent();
         }
-        if (c != null) {
-            engine = (Engine) c;
+        if (container != null) {
+            engine = (Engine) container;
+        }
+        // Starting with the associated container, verify it has a realm associated,
+        // and that no child container returns a different realm
+        container = getContainer();
+        Realm containerRealm = container.getRealm();
+        if (containerRealm == null) {
+            containerLog.warn(sm.getString("singleSignOn.noRealm", container.getName()));
+        } else {
+            if (container instanceof Engine) {
+                for (Container host : engine.findChildren()) {
+                    if (host.getRealm() != containerRealm) {
+                        containerLog.warn(sm.getString("singleSignOn.duplicateRealm", host.getName()));
+                    } else {
+                        for (Container context : host.findChildren()) {
+                            if (context.getRealm() != containerRealm) {
+                                containerLog.warn(sm.getString("singleSignOn.duplicateRealm", context.getName()));
+                            }
+                        }
+                    }
+                }
+            } else if (container instanceof Host) {
+                for (Container context : container.findChildren()) {
+                    if (context.getRealm() != containerRealm) {
+                        containerLog.warn(sm.getString("singleSignOn.duplicateRealm", context.getName()));
+                    }
+                }
+            }
         }
         super.startInternal();
     }
 
 
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
         super.stopInternal();
         engine = null;
+    }
+
+    protected void sessionChangedId(String ssoId, Session session, String oldSessionId) {
+        if (containerLog.isDebugEnabled()) {
+            containerLog.debug(sm.getString("singleSignOn.debug.sessionChangedId", session, oldSessionId, ssoId));
+        }
+
+        SingleSignOnEntry entry = cache.get(ssoId);
+        if (entry == null) {
+            return;
+        }
+
+        /*
+         * Associate the new sessionId with this SingleSignOnEntry. A SessionListener will be registered for the new
+         * sessionID. If not, then we would not notice any subsequent Session.SESSION_DESTROYED_EVENT for the session.
+         */
+        entry.addSession(this, ssoId, session);
+
+        /*
+         * Remove the obsolete sessionId from the SingleSignOnEntry. The sessionId part of the SingleSignOnSessionKey is
+         * final.
+         */
+        entry.removeSession(session, oldSessionId);
     }
 }

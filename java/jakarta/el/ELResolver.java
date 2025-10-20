@@ -16,14 +16,7 @@
  */
 package jakarta.el;
 
-/**
- * @author Jacob Hookom [jacob/hookom.net]
- */
 public abstract class ELResolver {
-
-    public static final String TYPE = "type";
-
-    public static final String RESOLVABLE_AT_DESIGN_TIME = "resolvableAtDesignTime";
 
     /**
      * Obtain the value of the given property on the given object using the given context.
@@ -43,7 +36,7 @@ public abstract class ELResolver {
     public abstract Object getValue(ELContext context, Object base, Object property);
 
     /**
-     * Invokes a method on the the given object. This default implementation always returns <code>null</code>.
+     * Invokes a method on the given object.
      *
      * @param context    The EL context for this evaluation
      * @param base       The base object on which the method is to be found
@@ -51,7 +44,7 @@ public abstract class ELResolver {
      * @param paramTypes The types of the parameters of the method to invoke
      * @param params     The parameters with which to invoke the method
      *
-     * @return Always <code>null</code>
+     * @return This default implementation always returns <code>null</code>
      *
      * @since EL 2.2
      */
@@ -60,13 +53,15 @@ public abstract class ELResolver {
     }
 
     /**
-     * Obtain the type of the given property on the given object using the given context.
+     * Obtain the most generally acceptable type that may be used to set the given property on the given object using
+     * the given context.
      *
      * @param context  The EL context for this evaluation
      * @param base     The base object on which the property is to be found
      * @param property The property whose type is to be returned
      *
-     * @return the type of the provided property
+     * @return the most general type that maybe used to set the provided property or {@code null} if the resolver is
+     *             read-only.
      *
      * @throws NullPointerException      If the supplied context is <code>null</code>
      * @throws PropertyNotFoundException If the base/property combination provided to the resolver is one that the
@@ -115,24 +110,43 @@ public abstract class ELResolver {
      * @param context The context in which the examination takes place
      * @param base    The object to examine
      *
-     * @return {code null} if the most common type cannot be determine, otherwise the most common type
+     * @return {code null} if the most common type cannot be determined, otherwise the most common type
      */
     public abstract Class<?> getCommonPropertyType(ELContext context, Object base);
 
     /**
-     * Converts the given object to the given type. This default implementation always returns <code>null</code>.
+     * Converts the given object to the given type.
      *
      * @param <T>     The type to which the object should be converted
      * @param context The EL context for this evaluation
      * @param obj     The object to convert
      * @param type    The type to which the object should be converted
      *
-     * @return Always <code>null</code>
+     * @return This default implementation always returns <code>null</code>
      *
      * @since EL 3.0
      */
     public <T> T convertToType(ELContext context, Object obj, Class<T> type) {
         context.setPropertyResolved(false);
         return null;
+    }
+
+    /**
+     * This class is used as a key for {@link ELContext#getContext(Class)}. The key references a context object that if
+     * present and set to {@code Boolean#TRUE}, indicates that the identifier being resolved is a single, stand-alone
+     * identifier. This allows {@link ELResolver} instances - and in particular
+     * {@code jakarta.servlet.jsp.el.ImportELResolver} - to optimise the resolution of the identifier and avoid
+     * unnecessary and expensive class loader lookups.
+     * <p>
+     * The EL implementation is required to set this key with the value {@code Boolean#TRUE} when resolving a single,
+     * stand-alone identifier.
+     *
+     * @since EL 6.1
+     */
+    public static class StandaloneIdentifierMarker {
+
+        private StandaloneIdentifierMarker() {
+            // Non-public default constructor as there is no need to create instances of this class.
+        }
     }
 }

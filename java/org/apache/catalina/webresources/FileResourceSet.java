@@ -86,7 +86,7 @@ public class FileResourceSet extends AbstractFileResourceSet {
         if (webAppMount.startsWith(path)) {
             String name = path.substring(0, path.length() - 1);
             name = name.substring(name.lastIndexOf('/') + 1);
-            if (name.length() > 0) {
+            if (!name.isEmpty()) {
                 return new VirtualResource(root, path, name);
             }
         }
@@ -160,7 +160,7 @@ public class FileResourceSet extends AbstractFileResourceSet {
 
     @Override
     protected void checkType(File file) {
-        if (file.isFile() == false) {
+        if (!file.isFile()) {
             throw new IllegalArgumentException(
                     sm.getString("fileResourceSet.notFile", getBase(), File.separator, getInternalPath()));
         }

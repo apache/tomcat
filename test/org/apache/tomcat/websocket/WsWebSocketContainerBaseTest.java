@@ -39,10 +39,9 @@ public class WsWebSocketContainerBaseTest extends WebSocketBaseTest {
     }
 
 
-    protected Session connectToEchoServer(WebSocketContainer wsContainer,
-            Endpoint endpoint, String path) throws Exception {
-        return wsContainer.connectToServer(endpoint,
-                ClientEndpointConfig.Builder.create().build(),
+    protected Session connectToEchoServer(WebSocketContainer wsContainer, Endpoint endpoint, String path)
+            throws Exception {
+        return wsContainer.connectToServer(endpoint, ClientEndpointConfig.Builder.create().build(),
                 new URI("ws://" + getHostName() + ":" + getPort() + path));
     }
 }

@@ -95,8 +95,8 @@ public class ProxyConnection extends JdbcInterceptor {
         }
         if (compare(CLOSE_VAL,method)) {
             if (connection==null)
-             {
-              return null; //noop for already closed.
+            {
+                return null; //noop for already closed.
             }
             PooledConnection poolc = this.connection;
             this.connection = null;
@@ -106,7 +106,7 @@ public class ProxyConnection extends JdbcInterceptor {
             return this.toString();
         } else if (compare(GETCONNECTION_VAL,method) && connection!=null) {
             return connection.getConnection();
-        } else if (method.getDeclaringClass().isAssignableFrom(XAConnection.class)) {
+        } else if (method.getDeclaringClass().isAssignableFrom(XAConnection.class) && connection != null) {
             try {
                 return method.invoke(connection.getXAConnection(),args);
             }catch (Throwable t) {
@@ -118,7 +118,7 @@ public class ProxyConnection extends JdbcInterceptor {
             }
         }
         if (isClosed()) {
-          throw new SQLException("Connection has already been closed.");
+            throw new SQLException("Connection has already been closed.");
         }
         if (compare(UNWRAP_VAL,method)) {
             return unwrap((Class<?>)args[0]);

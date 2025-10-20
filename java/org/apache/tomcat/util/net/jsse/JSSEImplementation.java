@@ -26,13 +26,6 @@ import org.apache.tomcat.util.net.SSLImplementation;
 import org.apache.tomcat.util.net.SSLSupport;
 import org.apache.tomcat.util.net.SSLUtil;
 
-/* JSSEImplementation:
-
-   Concrete implementation class for JSSE
-
-   @author EKR
- */
-
 public class JSSEImplementation extends SSLImplementation {
 
     public JSSEImplementation() {
@@ -43,7 +36,7 @@ public class JSSEImplementation extends SSLImplementation {
     }
 
     @Override
-    public SSLSupport getSSLSupport(SSLSession session, Map<String, List<String>> additionalAttributes) {
+    public SSLSupport getSSLSupport(SSLSession session, Map<String,List<String>> additionalAttributes) {
         return new JSSESupport(session, additionalAttributes);
     }
 

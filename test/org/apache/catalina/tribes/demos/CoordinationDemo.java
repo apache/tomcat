@@ -41,6 +41,7 @@ public class CoordinationDemo {
     StringBuilder statusLine = new StringBuilder();
     Status[] status = null;
     BufferedReader reader = null;
+
     /**
      * Construct and show the application.
      */
@@ -56,8 +57,8 @@ public class CoordinationDemo {
 
     public void clearScreen() {
         StringBuilder buf = new StringBuilder(700);
-        for (int i=0; i<CLEAR_SCREEN; i++ ) {
-          buf.append("\n");
+        for (int i = 0; i < CLEAR_SCREEN; i++) {
+            buf.append("\n");
         }
         System.out.println(buf);
     }
@@ -73,51 +74,51 @@ public class CoordinationDemo {
 
     public synchronized void printScreen() {
         clearScreen();
-        System.out.println(" ###."+getHeader());
-        for ( int i=0; i<status.length; i++ ) {
-            System.out.print(leftfill(String.valueOf(i+1)+".",5," "));
-            if ( status[i] != null ) {
-              System.out.print(status[i].getStatusLine());
+        System.out.println(" ###." + getHeader());
+        for (int i = 0; i < status.length; i++) {
+            System.out.print(leftfill(String.valueOf(i + 1) + ".", 5, " "));
+            if (status[i] != null) {
+                System.out.print(status[i].getStatusLine());
             }
         }
         System.out.println("\n\n");
-        System.out.println("Overall status:"+statusLine);
+        System.out.println("Overall status:" + statusLine);
         printMenuOptions();
 
     }
 
     public String getHeader() {
-        //member - 30
-        //running- 10
-        //coord - 30
-        //view-id - 24
-        //view count - 8
+        // member - 30
+        // running- 10
+        // coord - 30
+        // view-id - 24
+        // view count - 8
 
         StringBuilder buf = new StringBuilder();
-        buf.append(leftfill("Member",30," "));
-        buf.append(leftfill("Running",10," "));
-        buf.append(leftfill("Coord",30," "));
-        buf.append(leftfill("View-id(short)",24," "));
-        buf.append(leftfill("Count",8," "));
+        buf.append(leftfill("Member", 30, " "));
+        buf.append(leftfill("Running", 10, " "));
+        buf.append(leftfill("Coord", 30, " "));
+        buf.append(leftfill("View-id(short)", 24, " "));
+        buf.append(leftfill("Count", 8, " "));
         buf.append("\n");
 
-        buf.append(rightfill("==="+new java.sql.Timestamp(System.currentTimeMillis()).toString(),SCREEN_WIDTH,"="));
+        buf.append(rightfill("===" + new java.sql.Timestamp(System.currentTimeMillis()).toString(), SCREEN_WIDTH, "="));
         buf.append("\n");
         return buf.toString();
     }
 
     public String[] tokenize(String line) {
-        StringTokenizer tz = new StringTokenizer(line," ");
+        StringTokenizer tz = new StringTokenizer(line, " ");
         String[] result = new String[tz.countTokens()];
-        for (int i=0; i<result.length; i++ ) {
-          result[i] = tz.nextToken();
+        for (int i = 0; i < result.length; i++) {
+            result[i] = tz.nextToken();
         }
         return result;
     }
 
     public void waitForInput() throws IOException {
-        for ( int i=0; i<status.length; i++ ) {
-          status[i] = new Status(this);
+        for (int i = 0; i < status.length; i++) {
+            status[i] = new Status(this);
         }
         printScreen();
         String l = reader.readLine();
@@ -127,7 +128,7 @@ public class CoordinationDemo {
         } else {
             args = tokenize(l);
         }
-        while ( args.length >= 1 && (!"quit".equalsIgnoreCase(args[0]))) {
+        while (args.length >= 1 && (!"quit".equalsIgnoreCase(args[0]))) {
             if ("start".equalsIgnoreCase(args[0])) {
                 cmdStart(args);
             } else if ("stop".equalsIgnoreCase(args[0])) {
@@ -141,12 +142,12 @@ public class CoordinationDemo {
             }
         }
         for (Status value : status) {
-          value.stop();
+            value.stop();
         }
     }
 
     private void cmdStop(String[] args) {
-        if ( args.length == 1 ) {
+        if (args.length == 1) {
             setSystemStatus("System shutting down...");
             Thread[] t = new Thread[CHANNEL_COUNT];
             for (int i = 0; i < status.length; i++) {
@@ -159,26 +160,30 @@ public class CoordinationDemo {
                 };
             }
             for (int i = 0; i < status.length; i++) {
-              if (MULTI_THREAD ) {
-                t[i].start();
-              } else {
-                t[i].run();
-              }
+                if (MULTI_THREAD) {
+                    t[i].start();
+                } else {
+                    t[i].run();
+                }
             }
             setSystemStatus("System stopped.");
         } else {
             int index = -1;
-            try { index = Integer.parseInt(args[1])-1;}catch ( Exception x ) {setSystemStatus("Invalid index:"+args[1]);}
-            if ( index >= 0 ) {
-                setSystemStatus("Stopping member:"+(index+1));
+            try {
+                index = Integer.parseInt(args[1]) - 1;
+            } catch (Exception x) {
+                setSystemStatus("Invalid index:" + args[1]);
+            }
+            if (index >= 0) {
+                setSystemStatus("Stopping member:" + (index + 1));
                 status[index].stop();
-                setSystemStatus("Member stopped:"+(index+1));
+                setSystemStatus("Member stopped:" + (index + 1));
             }
         }
     }
 
     private void cmdStart(String[] args) {
-        if ( args.length == 1 ) {
+        if (args.length == 1) {
             setSystemStatus("System starting up...");
             Thread[] t = new Thread[CHANNEL_COUNT];
             for (int i = 0; i < status.length; i++) {
@@ -191,56 +196,60 @@ public class CoordinationDemo {
                 };
             }
             for (int i = 0; i < status.length; i++) {
-              if (MULTI_THREAD ) {
-                t[i].start();
-              } else {
-                t[i].run();
-              }
+                if (MULTI_THREAD) {
+                    t[i].start();
+                } else {
+                    t[i].run();
+                }
             }
             setSystemStatus("System started.");
         } else {
             int index = -1;
-            try { index = Integer.parseInt(args[1])-1;}catch ( Exception x ) {setSystemStatus("Invalid index:"+args[1]);}
-            if ( index >= 0 ) {
-                setSystemStatus("Starting member:"+(index+1));
+            try {
+                index = Integer.parseInt(args[1]) - 1;
+            } catch (Exception x) {
+                setSystemStatus("Invalid index:" + args[1]);
+            }
+            if (index >= 0) {
+                setSystemStatus("Starting member:" + (index + 1));
                 status[index].start();
-                setSystemStatus("Member started:"+(index+1));
+                setSystemStatus("Member started:" + (index + 1));
             }
         }
     }
 
     public void setSystemStatus(String status) {
-        statusLine.delete(0,statusLine.length());
+        statusLine.delete(0, statusLine.length());
         statusLine.append(status);
     }
 
 
     public static void setEvents(String events) {
-        java.util.Arrays.fill(VIEW_EVENTS,false);
-        StringTokenizer t = new StringTokenizer(events,",");
-        while (t.hasMoreTokens() ) {
+        java.util.Arrays.fill(VIEW_EVENTS, false);
+        StringTokenizer t = new StringTokenizer(events, ",");
+        while (t.hasMoreTokens()) {
             int idx = Integer.parseInt(t.nextToken());
             VIEW_EVENTS[idx] = true;
         }
     }
 
-    public static void run(String[] args,CoordinationDemo demo) throws Exception {
+    public static void run(String[] args, CoordinationDemo demo) throws Exception {
         usage();
-        java.util.Arrays.fill(VIEW_EVENTS,true);
+        java.util.Arrays.fill(VIEW_EVENTS, true);
 
-        for (int i=0; i<args.length; i++ ) {
-            if ( "-c".equals(args[i]) ) {
-              CHANNEL_COUNT = Integer.parseInt(args[++i]);
-            } else if ( "-t".equals(args[i]) ) {
-              MULTI_THREAD = Boolean.parseBoolean(args[++i]);
-            } else if ( "-s".equals(args[i]) ) {
-              SLEEP_TIME = Long.parseLong(args[++i]);
-            } else if ( "-sc".equals(args[i]) ) {
-              CLEAR_SCREEN = Integer.parseInt(args[++i]);
-            } else if ( "-p".equals(args[i]) ) {
-              setEvents(args[++i]);
-            } else if ( "-h".equals(args[i]) ) {
-              System.exit(0);
+        for (int i = 0; i < args.length; i++) {
+            if ("-c".equals(args[i])) {
+                CHANNEL_COUNT = Integer.parseInt(args[++i]);
+            } else if ("-t".equals(args[i])) {
+                MULTI_THREAD = Boolean.parseBoolean(args[++i]);
+            } else if ("-s".equals(args[i])) {
+                SLEEP_TIME = Long.parseLong(args[++i]);
+            } else if ("-sc".equals(args[i])) {
+                CLEAR_SCREEN = Integer.parseInt(args[++i]);
+            } else if ("-p".equals(args[i])) {
+                setEvents(args[++i]);
+            } else if ("-h".equals(args[i])) {
+                System.exit(0);
             }
         }
         demo.init();
@@ -249,37 +258,43 @@ public class CoordinationDemo {
 
     private static void usage() {
         System.out.println("Usage:");
-        System.out.println("\tjava org.apache.catalina.tribes.demos.CoordinationDemo -c channel-count(int) -t multi-thread(true|false) -s sleep-time(ms) -sc clear-screen(int) -p view_events_csv(1,2,5,7)");
+        System.out.println(
+                "\tjava org.apache.catalina.tribes.demos.CoordinationDemo -c channel-count(int) -t multi-thread(true|false) -s sleep-time(ms) -sc clear-screen(int) -p view_events_csv(1,2,5,7)");
         System.out.println("Example:");
-        System.out.println("\tjava o.a.c.t.d.CoordinationDemo -> starts demo single threaded start/stop with 5 channels");
-        System.out.println("\tjava o.a.c.t.d.CoordinationDemo -c 10 -> starts demo single threaded start/stop with 10 channels");
-        System.out.println("\tjava o.a.c.t.d.CoordinationDemo -c 7 -t true -s 1000 -sc 50-> starts demo multi threaded start/stop with 7 channels and 1 second sleep time between events and 50 lines to clear screen");
-        System.out.println("\tjava o.a.c.t.d.CoordinationDemo -t true -p 12 -> starts demo multi threaded start/stop with 5 channels and only prints the EVT_CONF_RX event");
+        System.out
+                .println("\tjava o.a.c.t.d.CoordinationDemo -> starts demo single threaded start/stop with 5 channels");
+        System.out.println(
+                "\tjava o.a.c.t.d.CoordinationDemo -c 10 -> starts demo single threaded start/stop with 10 channels");
+        System.out.println(
+                "\tjava o.a.c.t.d.CoordinationDemo -c 7 -t true -s 1000 -sc 50-> starts demo multi threaded start/stop with 7 channels and 1 second sleep time between events and 50 lines to clear screen");
+        System.out.println(
+                "\tjava o.a.c.t.d.CoordinationDemo -t true -p 12 -> starts demo multi threaded start/stop with 5 channels and only prints the EVT_CONF_RX event");
         System.out.println();
     }
+
     public static void main(String[] args) throws Exception {
         CoordinationDemo demo = new CoordinationDemo();
-        run(args,demo);
+        run(args, demo);
     }
 
     public static String leftfill(String value, int length, String ch) {
-        return fill(value,length,ch,true);
+        return fill(value, length, ch, true);
     }
 
     public static String rightfill(String value, int length, String ch) {
-        return fill(value,length,ch,false);
+        return fill(value, length, ch, false);
     }
 
     public static String fill(String value, int length, String ch, boolean left) {
         StringBuilder buf = new StringBuilder();
-        if ( !left ) {
-          buf.append(value.trim());
+        if (!left) {
+            buf.append(value.trim());
         }
-        for (int i=value.trim().length(); i<length; i++ ) {
-          buf.append(ch);
+        for (int i = value.trim().length(); i < length; i++) {
+            buf.append(ch);
         }
-        if ( left ) {
-          buf.append(value.trim());
+        if (left) {
+            buf.append(value.trim());
         }
         return buf.toString();
     }
@@ -298,46 +313,49 @@ public class CoordinationDemo {
         }
 
         public String getStatusLine() {
-            //member - 30
-            //running- 10
-            //coord - 30
-            //view-id - 24
-            //view count - 8
+            // member - 30
+            // running- 10
+            // coord - 30
+            // view-id - 24
+            // view count - 8
             StringBuilder buf = new StringBuilder();
             String local = "";
             String coord = "";
             String viewId = "";
             String count = "0";
-            if ( channel != null ) {
+            if (channel != null) {
                 Member lm = channel.getLocalMember(false);
-                local = lm!=null?lm.getName():"";
-                coord = interceptor!=null && interceptor.getCoordinator()!=null?interceptor.getCoordinator().getName():"";
+                local = lm != null ? lm.getName() : "";
+                coord = interceptor != null && interceptor.getCoordinator() != null
+                        ? interceptor.getCoordinator().getName()
+                        : "";
                 if (interceptor != null) {
-                    viewId = getByteString(interceptor.getViewId()!=null?interceptor.getViewId().getBytes():new byte[0]);
+                    viewId = getByteString(
+                            interceptor.getViewId() != null ? interceptor.getViewId().getBytes() : new byte[0]);
                     count = String.valueOf(interceptor.getView().length);
                 }
             }
-            buf.append(leftfill(local,30," "));
+            buf.append(leftfill(local, 30, " "));
             buf.append(leftfill(startstatus, 10, " "));
             buf.append(leftfill(coord, 30, " "));
             buf.append(leftfill(viewId, 24, " "));
             buf.append(leftfill(count, 8, " "));
             buf.append("\n");
-            buf.append("Status:"+status);
+            buf.append("Status:" + status);
             buf.append("\n");
             return buf.toString();
         }
 
         public String getByteString(byte[] b) {
-            if ( b == null ) {
-              return "{}";
+            if (b == null) {
+                return "{}";
             }
-            return Arrays.toString(b,0,Math.min(b.length,4));
+            return Arrays.toString(b, 0, Math.min(b.length, 4));
         }
 
         public void start() {
             try {
-                if ( channel == null ) {
+                if (channel == null) {
                     channel = createChannel();
                     startstatus = "starting";
                     channel.start(Channel.DEFAULT);
@@ -345,18 +363,20 @@ public class CoordinationDemo {
                 } else {
                     status = "Channel already started.";
                 }
-            } catch ( Exception x ) {
+            } catch (Exception x) {
                 synchronized (System.err) {
                     System.err.println("Start failed:");
                     StackTraceElement[] els = x.getStackTrace();
                     for (StackTraceElement el : els) {
-                      System.err.println(el.toString());
+                        System.err.println(el.toString());
                     }
                 }
-                status = "Start failed:"+x.getMessage();
+                status = "Start failed:" + x.getMessage();
                 error = x;
                 startstatus = "failed";
-                try { channel.stop(Channel.DEFAULT);}catch(Exception ignore){
+                try {
+                    channel.stop(Channel.DEFAULT);
+                } catch (Exception ignore) {
                     // Ignore
                 }
                 channel = null;
@@ -366,24 +386,24 @@ public class CoordinationDemo {
 
         public void stop() {
             try {
-                if ( channel != null ) {
+                if (channel != null) {
                     channel.stop(Channel.DEFAULT);
                     status = "Channel Stopped";
                 } else {
                     status = "Channel Already Stopped";
                 }
-            }catch ( Exception x )  {
+            } catch (Exception x) {
                 synchronized (System.err) {
                     System.err.println("Stop failed:");
                     StackTraceElement[] els = x.getStackTrace();
                     for (StackTraceElement el : els) {
-                      System.err.println(el.toString());
+                        System.err.println(el.toString());
                     }
                 }
 
-                status = "Stop failed:"+x.getMessage();
+                status = "Stop failed:" + x.getMessage();
                 error = x;
-            }finally {
+            } finally {
                 startstatus = "stopped";
                 channel = null;
                 interceptor = null;
@@ -392,17 +412,19 @@ public class CoordinationDemo {
 
         public GroupChannel createChannel() {
             channel = new GroupChannel();
-            ((ReceiverBase)channel.getChannelReceiver()).setAutoBind(100);
+            ((ReceiverBase) channel.getChannelReceiver()).setAutoBind(100);
             interceptor = new NonBlockingCoordinator() {
                 @Override
                 public void fireInterceptorEvent(InterceptorEvent event) {
                     status = event.getEventTypeDesc();
                     int type = event.getEventType();
                     boolean display = VIEW_EVENTS[type];
-                    if ( display ) {
-                      parent.printScreen();
+                    if (display) {
+                        parent.printScreen();
                     }
-                    try { Thread.sleep(SLEEP_TIME); }catch ( Exception x){
+                    try {
+                        Thread.sleep(SLEEP_TIME);
+                    } catch (Exception x) {
                         // Ignore
                     }
                 }

@@ -25,6 +25,8 @@ Export-Package: \
     org.apache.catalina.ha.deploy,\
     org.apache.catalina.ha.session,\
     org.apache.catalina.ha.tcp
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -jpms-module-info: \
     ${module.name};\

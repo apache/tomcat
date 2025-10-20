@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.authenticator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,11 +36,10 @@ import org.apache.tomcat.util.buf.ByteChunk;
  * <p>
  * <b>IMPLEMENTATION NOTE</b> - It is assumed that this object is accessed only from the context of a single thread, so
  * no synchronization around internal collection classes is performed.
- *
- * @author Craig R. McClanahan
  */
 public final class SavedRequest implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -60,7 +60,7 @@ public final class SavedRequest implements Serializable {
      * The set of Headers associated with this Request. Each key is a header name, while the value is a List containing
      * one or more actual values for this header. The values are returned as an Iterator when you ask for them.
      */
-    private final Map<String, List<String>> headers = new HashMap<>();
+    private final Map<String,List<String>> headers = new HashMap<>();
 
     public void addHeader(String name, String value) {
         headers.computeIfAbsent(name, k -> new ArrayList<>()).add(value);
@@ -163,6 +163,7 @@ public final class SavedRequest implements Serializable {
         this.body = body;
     }
 
+
     /**
      * The content type of the request, used if this is a POST.
      */
@@ -174,5 +175,19 @@ public final class SavedRequest implements Serializable {
 
     public void setContentType(String contentType) {
         this.contentType = contentType;
+    }
+
+
+    /**
+     * The original maxInactiveInterval for the session.
+     */
+    private Integer originalMaxInactiveInterval = null;
+
+    public Integer getOriginalMaxInactiveIntervalOptional() {
+        return originalMaxInactiveInterval;
+    }
+
+    public void setOriginalMaxInactiveInterval(int originalMaxInactiveInterval) {
+        this.originalMaxInactiveInterval = Integer.valueOf(originalMaxInactiveInterval);
     }
 }

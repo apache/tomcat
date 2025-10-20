@@ -31,17 +31,18 @@ import org.apache.tomcat.util.res.StringManager;
 /**
  * Implement a map for the txt: and rnd: mod_rewrite capabilities.
  */
-public class RandomizedTextRewriteMap implements RewriteMap{
+public class RandomizedTextRewriteMap implements RewriteMap {
 
     protected static final StringManager sm = StringManager.getManager(RandomizedTextRewriteMap.class);
 
     private static final Random random = new Random();
-    private final Map<String, String[]> map = new HashMap<>();
+    private final Map<String,String[]> map = new HashMap<>();
 
     /**
      * Create a map from a text file according to the mod_rewrite syntax.
+     *
      * @param txtFilePath the text file path
-     * @param useRandom if the map should produce random results
+     * @param useRandom   if the map should produce random results
      */
     public RandomizedTextRewriteMap(String txtFilePath, boolean useRandom) {
         String line;
@@ -49,14 +50,17 @@ public class RandomizedTextRewriteMap implements RewriteMap{
                 BufferedReader reader = new BufferedReader(new InputStreamReader(txtResource.getInputStream()))) {
             while ((line = reader.readLine()) != null) {
                 if (line.startsWith("#") || line.isEmpty()) {
-                    //Ignore comment or empty lines
+                    // Ignore comment line or empty lines
                     continue;
+                } else if (line.indexOf('#') > 0) {
+                    // Ignore comment characters after '#'
+                    line = line.substring(0, line.indexOf('#')).trim();
                 }
                 String[] keyValuePair = line.split(" ", 2);
                 if (keyValuePair.length > 1) {
                     String key = keyValuePair[0];
                     String value = keyValuePair[1];
-                    String[] possibleValues = null;
+                    String[] possibleValues;
                     if (useRandom && value.contains("|")) {
                         possibleValues = value.split("\\|");
                     } else {
@@ -68,8 +72,8 @@ public class RandomizedTextRewriteMap implements RewriteMap{
                     throw new IllegalArgumentException(sm.getString("rewriteMap.txtInvalidLine", line, txtFilePath));
                 }
             }
-        } catch (IOException e) {
-            throw new IllegalArgumentException(sm.getString("rewriteMap.txtReadError", txtFilePath), e);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(sm.getString("rewriteMap.txtReadError", txtFilePath), ioe);
         }
     }
 

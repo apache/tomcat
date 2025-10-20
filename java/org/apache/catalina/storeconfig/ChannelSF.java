@@ -33,24 +33,14 @@ public class ChannelSF extends StoreFactoryBase {
 
     /**
      * Store the specified Channel children.
-     *
-     * @param aWriter
-     *            PrintWriter to which we are storing
-     * @param indent
-     *            Number of spaces to indent this element
-     * @param aChannel
-     *            Channel whose properties are being stored
-     *
-     * @exception Exception
-     *                if an exception occurs while storing
+     * <p>
+     * {@inheritDoc}
      */
     @Override
-    public void storeChildren(PrintWriter aWriter, int indent, Object aChannel,
-            StoreDescription parentDesc) throws Exception {
-        if (aChannel instanceof Channel) {
-            Channel channel = (Channel) aChannel;
-            if (channel instanceof ManagedChannel) {
-                ManagedChannel managedChannel = (ManagedChannel) channel;
+    public void storeChildren(PrintWriter aWriter, int indent, Object aChannel, StoreDescription parentDesc)
+            throws Exception {
+        if (aChannel instanceof Channel channel) {
+            if (channel instanceof ManagedChannel managedChannel) {
                 // Store nested <Membership> element
                 MembershipService service = managedChannel.getMembershipService();
                 if (service != null) {
@@ -72,6 +62,6 @@ public class ChannelSF extends StoreFactoryBase {
                     storeElement(aWriter, indent, interceptor);
                 }
             }
-       }
+        }
     }
 }

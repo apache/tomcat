@@ -24,7 +24,7 @@ package org.apache.tomcat.util.http.fileupload;
  * and it might vanish for a refactored 2.x version moving the new method into
  * RequestContext again.
  *
- * @since 1.3
+ * @since FileUpload 1.3
  */
 public interface UploadContext extends RequestContext {
 
@@ -32,7 +32,7 @@ public interface UploadContext extends RequestContext {
      * Retrieve the content length of the request.
      *
      * @return The content length of the request.
-     * @since 1.3
+     * @since FileUpload 1.3
      */
     long contentLength();
 

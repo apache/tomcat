@@ -168,9 +168,9 @@ public class FileItemIteratorImpl implements FileItemIterator {
                 protected void raiseError(final long pSizeMax, final long pCount)
                         throws IOException {
                     final FileUploadException ex = new SizeLimitExceededException(
-                    String.format("the request was rejected because its size (%s) exceeds the configured maximum (%s)",
+                            String.format("the request was rejected because its size (%s) exceeds the configured maximum (%s)",
                             Long.valueOf(pCount), Long.valueOf(pSizeMax)),
-                           pCount, pSizeMax);
+                            pCount, pSizeMax);
                     throw new FileUploadIOException(ex);
                 }
             };
@@ -198,6 +198,7 @@ public class FileItemIteratorImpl implements FileItemIterator {
                     String.format("The boundary specified in the %s header is too long", FileUploadBase.CONTENT_TYPE), iae);
         }
         multiPartStream.setHeaderEncoding(charEncoding);
+        multiPartStream.setPartHeaderSizeMax(fileUploadBase.getPartHeaderSizeMax());
     }
 
     public MultipartStream getMultiPartStream() throws FileUploadException, IOException {

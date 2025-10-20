@@ -35,30 +35,40 @@ public abstract class AbstractArchiveResource extends AbstractResource {
     private final AbstractArchiveResourceSet archiveResourceSet;
     private final String baseUrl;
     private final JarEntry resource;
+    private final String codeBaseUrl;
     private final String name;
     private boolean readCerts = false;
     private Certificate[] certificates;
 
-
+    /*
+     * Deprecated even though this is the "new" constructor as code needs to call the old constructor for now.
+     */
     @Deprecated
     protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
-            JarEntry jarEntry, @SuppressWarnings("unused") String codeBaseUrl) {
-        this(archiveResourceSet, webAppPath, baseUrl, jarEntry);
+            JarEntry jarEntry) {
+        this(archiveResourceSet, webAppPath, baseUrl, jarEntry, null);
     }
 
+    /*
+     * The expectation is that this will be deprecated and then removed once the SecurityManager has been fully removed
+     * from the JRE and it has been confirmed that the JRE no longer depends on code base.
+     *
+     * See https://bz.apache.org/bugzilla/show_bug.cgi?id=69426
+     */
     protected AbstractArchiveResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
-            JarEntry jarEntry) {
+            JarEntry jarEntry, String codeBaseUrl) {
         super(archiveResourceSet.getRoot(), webAppPath);
         this.archiveResourceSet = archiveResourceSet;
         this.baseUrl = baseUrl;
         this.resource = jarEntry;
+        this.codeBaseUrl = codeBaseUrl;
 
         String resourceName = resource.getName();
         if (resourceName.charAt(resourceName.length() - 1) == '/') {
             resourceName = resourceName.substring(0, resourceName.length() - 1);
         }
         String internalPath = archiveResourceSet.getInternalPath();
-        if (internalPath.length() > 0 && resourceName.equals(internalPath.subSequence(1, internalPath.length()))) {
+        if (!internalPath.isEmpty() && resourceName.contentEquals(internalPath.subSequence(1, internalPath.length()))) {
             name = "";
         } else {
             int index = resourceName.lastIndexOf('/');
@@ -149,9 +159,21 @@ public abstract class AbstractArchiveResource extends AbstractResource {
         String url = baseUrl + URLEncoder.DEFAULT.encode(resource.getName(), StandardCharsets.UTF_8);
         try {
             return new URI(url).toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             if (getLog().isDebugEnabled()) {
                 getLog().debug(sm.getString("fileResource.getUrlFail", url), e);
+            }
+            return null;
+        }
+    }
+
+    @Override
+    public URL getCodeBase() {
+        try {
+            return new URI(codeBaseUrl).toURL();
+        } catch (MalformedURLException | URISyntaxException e) {
+            if (getLog().isDebugEnabled()) {
+                getLog().debug(sm.getString("fileResource.getUrlFail", codeBaseUrl), e);
             }
             return null;
         }

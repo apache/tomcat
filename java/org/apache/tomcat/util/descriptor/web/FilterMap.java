@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,12 +27,9 @@ import jakarta.servlet.DispatcherType;
 import org.apache.tomcat.util.buf.UDecoder;
 
 /**
- * Representation of a filter mapping for a web application, as represented
- * in a <code>&lt;filter-mapping&gt;</code> element in the deployment
- * descriptor.  Each filter mapping must contain a filter name plus either
- * a URL pattern or a servlet name.
- *
- * @author Craig R. McClanahan
+ * Representation of a filter mapping for a web application, as represented in a <code>&lt;filter-mapping&gt;</code>
+ * element in the deployment descriptor. Each filter mapping must contain a filter name plus either a URL pattern or a
+ * servlet name.
  */
 public class FilterMap extends XmlEncodingBase implements Serializable {
 
@@ -39,11 +37,11 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
     // ------------------------------------------------------------- Properties
 
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * The name of this filter to be executed when this mapping matches
-     * a particular request.
+     * The name of this filter to be executed when this mapping matches a particular request.
      */
 
     public static final int ERROR = 1;
@@ -130,6 +128,7 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
     public void addURLPattern(String urlPattern) {
         addURLPatternDecoded(UDecoder.URLDecode(urlPattern, getCharset()));
     }
+
     public void addURLPatternDecoded(String urlPattern) {
         if ("*".equals(urlPattern)) {
             this.matchAllUrlPatterns = true;
@@ -142,10 +141,10 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
     }
 
     /**
-     * This method will be used to set the current state of the FilterMap
-     * representing the state of when filters should be applied.
-     * @param dispatcherString the dispatcher type which should
-     *  match this filter
+     * This method will be used to set the current state of the FilterMap representing the state of when filters should
+     * be applied.
+     *
+     * @param dispatcherString the dispatcher type which should match this filter
      */
     public void setDispatcher(String dispatcherString) {
         String dispatcher = dispatcherString.toUpperCase(Locale.ENGLISH);
@@ -159,10 +158,10 @@ public class FilterMap extends XmlEncodingBase implements Serializable {
         } else if (dispatcher.equals(DispatcherType.REQUEST.name())) {
             // apply REQUEST to the global dispatcherMapping.
             dispatcherMapping |= REQUEST;
-        }  else if (dispatcher.equals(DispatcherType.ERROR.name())) {
+        } else if (dispatcher.equals(DispatcherType.ERROR.name())) {
             // apply ERROR to the global dispatcherMapping.
             dispatcherMapping |= ERROR;
-        }  else if (dispatcher.equals(DispatcherType.ASYNC.name())) {
+        } else if (dispatcher.equals(DispatcherType.ASYNC.name())) {
             // apply ERROR to the global dispatcherMapping.
             dispatcherMapping |= ASYNC;
         }

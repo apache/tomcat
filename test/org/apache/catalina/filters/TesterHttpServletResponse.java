@@ -201,7 +201,8 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     }
 
     public void recycle() {
-        /* NOOP */}
+        /* NOOP */
+    }
 
     /**
      * @param b Unused
@@ -349,8 +350,13 @@ public class TesterHttpServletResponse implements HttpServletResponse {
     }
 
     @Override
-    public void sendRedirect(String location) throws IOException {
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
         /* NOOP */}
+
+    @Override
+    public void sendEarlyHints() {
+        /* NOOP */
+    }
 
     @Override
     public void setDateHeader(String name, long value) {
@@ -365,11 +371,11 @@ public class TesterHttpServletResponse implements HttpServletResponse {
         /* NOOP */}
 
     @Override
-    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+    public void setTrailerFields(Supplier<Map<String,String>> supplier) {
         /* NOOP */ }
 
     @Override
-    public Supplier<Map<String, String>> getTrailerFields() {
+    public Supplier<Map<String,String>> getTrailerFields() {
         return null;
     }
 }

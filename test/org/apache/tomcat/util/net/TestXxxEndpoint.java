@@ -26,7 +26,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 
 import org.apache.catalina.connector.Connector;
@@ -51,7 +50,8 @@ public class TestXxxEndpoint extends TomcatBaseTest {
 
         tomcat.getConnector().stop();
         Exception e = null;
-        try (ServerSocket s = new ServerSocket(port, 100, InetAddress.getByName("localhost"))){
+        try (@SuppressWarnings("unused")
+        ServerSocket s = new ServerSocket(port, 100, InetAddress.getByName("localhost"))){
         } catch (Exception e1) {
             e = e1;
         }
@@ -77,7 +77,8 @@ public class TestXxxEndpoint extends TomcatBaseTest {
 
         tomcat.getConnector().stop();
         Exception e = null;
-        try (ServerSocket s = new ServerSocket(port, 100, InetAddress.getByName("localhost"))) {
+        try (@SuppressWarnings("unused")
+        ServerSocket s = new ServerSocket(port, 100, InetAddress.getByName("localhost"))) {
             // This should not throw an Exception
         } catch (Exception e1) {
             e = e1;
@@ -90,8 +91,11 @@ public class TestXxxEndpoint extends TomcatBaseTest {
     public void testUnixDomainSocket() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         Connector c = tomcat.getConnector();
-        Assume.assumeTrue("NIO Unix domain sockets have to be supported for this test",
-                c.getProtocolHandlerClassName().contains("NioProtocol"));
+
+        if (!c.getProtocolHandlerClassName().contains("NioProtocol")) {
+            // Only the NIO connector supports UnixDomainSockets
+            return;
+        }
 
         File tempPath = File.createTempFile("uds-tomcat-test-", ".sock");
         String unixDomainSocketPath = tempPath.getAbsolutePath();

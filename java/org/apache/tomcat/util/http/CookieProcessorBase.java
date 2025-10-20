@@ -26,12 +26,11 @@ public abstract class CookieProcessorBase implements CookieProcessor {
 
     private static final String COOKIE_DATE_PATTERN = "EEE, dd MMM yyyy HH:mm:ss z";
 
-    protected static final ThreadLocal<DateFormat> COOKIE_DATE_FORMAT =
-            ThreadLocal.withInitial(() -> {
-                DateFormat df = new SimpleDateFormat(COOKIE_DATE_PATTERN, Locale.US);
-                df.setTimeZone(TimeZone.getTimeZone("GMT"));
-                return df;
-            });
+    protected static final ThreadLocal<DateFormat> COOKIE_DATE_FORMAT = ThreadLocal.withInitial(() -> {
+        DateFormat df = new SimpleDateFormat(COOKIE_DATE_PATTERN, Locale.US);
+        df.setTimeZone(TimeZone.getTimeZone("GMT"));
+        return df;
+    });
 
     protected static final String ANCIENT_DATE;
 
@@ -41,11 +40,62 @@ public abstract class CookieProcessorBase implements CookieProcessor {
 
     private SameSiteCookies sameSiteCookies = SameSiteCookies.UNSET;
 
+    private boolean partitioned = false;
+
+    private CookiesWithoutEquals cookiesWithoutEquals = CookiesWithoutEquals.IGNORE;
+
+
+    public String getCookiesWithoutEquals() {
+        return cookiesWithoutEquals.getValue();
+    }
+
+
+    protected CookiesWithoutEquals getCookiesWithoutEqualsInternal() {
+        return cookiesWithoutEquals;
+    }
+
+
+    public void setCookiesWithoutEquals(String cookiesWithoutEquals) {
+        this.cookiesWithoutEquals = CookiesWithoutEquals.fromString(cookiesWithoutEquals);
+    }
+
+
     public SameSiteCookies getSameSiteCookies() {
         return sameSiteCookies;
     }
 
     public void setSameSiteCookies(String sameSiteCookies) {
         this.sameSiteCookies = SameSiteCookies.fromString(sameSiteCookies);
+    }
+
+
+    /**
+     * Should the {@code Partitioned} attribute be added by default to cookies created for this web application.
+     * <p>
+     * The name of the attribute used to indicate a partitioned cookie as part of
+     * <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+     * may change in a non-backwards compatible way once equivalent functionality is included in an RFC.
+     *
+     * @return {@code true} if the {@code Partitioned} attribute should be added by default to cookies created for this
+     *             web application, otherwise {@code false}
+     */
+    public boolean getPartitioned() {
+        return partitioned;
+    }
+
+
+    /**
+     * Configure whether the {@code Partitioned} attribute should be added by default to cookies created for this web
+     * application.
+     * <p>
+     * The name of the attribute used to indicate a partitioned cookie as part of
+     * <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+     * may change in a non-backwards compatible way once equivalent functionality is included in an RFC.
+     *
+     * @param partitioned {@code true} if the {@code Partitioned} attribute should be added by default to cookies
+     *                        created for this web application, otherwise {@code false}
+     */
+    public void setPartitioned(boolean partitioned) {
+        this.partitioned = partitioned;
     }
 }

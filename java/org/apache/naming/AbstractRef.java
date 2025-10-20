@@ -16,6 +16,7 @@
  */
 package org.apache.naming;
 
+import java.io.Serial;
 import java.util.Enumeration;
 
 import javax.naming.Context;
@@ -24,6 +25,7 @@ import javax.naming.Reference;
 
 public abstract class AbstractRef extends Reference {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 
@@ -37,10 +39,6 @@ public abstract class AbstractRef extends Reference {
     }
 
 
-    /**
-     * Retrieves the class name of the factory of the object to which this
-     * reference refers.
-     */
     @Override
     public final String getFactoryClassName() {
         String factory = super.getFactoryClassName();
@@ -60,9 +58,6 @@ public abstract class AbstractRef extends Reference {
     protected abstract String getDefaultFactoryClassName();
 
 
-    /**
-     * Return a String rendering of this object.
-     */
     @Override
     public final String toString() {
         StringBuilder sb = new StringBuilder(this.getClass().getSimpleName());

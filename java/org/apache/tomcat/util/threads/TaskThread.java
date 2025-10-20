@@ -18,14 +18,15 @@ package org.apache.tomcat.util.threads;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
  * A Thread implementation that records the time at which it was created.
- *
  */
 public class TaskThread extends Thread {
 
     private static final Log log = LogFactory.getLog(TaskThread.class);
+    private static final StringManager sm = StringManager.getManager(TaskThread.class);
     private final long creationTime;
 
     public TaskThread(ThreadGroup group, Runnable target, String name) {
@@ -33,8 +34,7 @@ public class TaskThread extends Thread {
         this.creationTime = System.currentTimeMillis();
     }
 
-    public TaskThread(ThreadGroup group, Runnable target, String name,
-            long stackSize) {
+    public TaskThread(ThreadGroup group, Runnable target, String name, long stackSize) {
         super(group, new WrappingRunnable(target), name, stackSize);
         this.creationTime = System.currentTimeMillis();
     }
@@ -47,25 +47,21 @@ public class TaskThread extends Thread {
     }
 
     /**
-     * Wraps a {@link Runnable} to swallow any {@link StopPooledThreadException}
-     * instead of letting it go and potentially trigger a break in a debugger.
+     * Wraps a {@link Runnable} to swallow any {@link StopPooledThreadException} instead of letting it go and
+     * potentially trigger a break in a debugger.
      */
-    private static class WrappingRunnable implements Runnable {
-        private Runnable wrappedRunnable;
-        WrappingRunnable(Runnable wrappedRunnable) {
-            this.wrappedRunnable = wrappedRunnable;
-        }
+    private record WrappingRunnable(Runnable wrappedRunnable) implements Runnable {
         @Override
         public void run() {
             try {
                 wrappedRunnable.run();
-            } catch(StopPooledThreadException exc) {
-                //expected : we just swallow the exception to avoid disturbing
-                //debuggers like eclipse's
-                log.debug("Thread exiting on purpose", exc);
+            } catch (StopPooledThreadException exc) {
+                // expected : we just swallow the exception to avoid disturbing debuggers like eclipse's
+                if (log.isDebugEnabled()) {
+                    log.debug(sm.getString("taskThread.exiting"), exc);
+                }
             }
         }
-
     }
 
 }

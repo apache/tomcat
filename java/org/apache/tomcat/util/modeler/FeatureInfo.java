@@ -16,20 +16,19 @@
  */
 package org.apache.tomcat.util.modeler;
 
-
+import java.io.Serial;
 import java.io.Serializable;
 
 import javax.management.MBeanFeatureInfo;
 
-
 /**
- * <p>Convenience base class for <code>AttributeInfo</code> and
- * <code>OperationInfo</code> classes that will be used to collect configuration
- * information for the <code>ModelMBean</code> beans exposed for management.</p>
- *
- * @author Craig R. McClanahan
+ * <p>
+ * Convenience base class for <code>AttributeInfo</code> and <code>OperationInfo</code> classes that will be used to
+ * collect configuration information for the <code>ModelMBean</code> beans exposed for management.
+ * </p>
  */
 public class FeatureInfo implements Serializable {
+    @Serial
     private static final long serialVersionUID = -911529176124712296L;
 
     protected String description = null;
@@ -49,22 +48,32 @@ public class FeatureInfo implements Serializable {
         return this.description;
     }
 
+    /**
+     * Set the human-readable description of this feature.
+     *
+     * @param description The new description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
 
     /**
-     * @return the name of this feature, which must be unique among features
-     *  in the same collection.
+     * @return the name of this feature, which must be unique among features in the same collection.
      */
     public String getName() {
         return this.name;
     }
 
+    /**
+     * Set the name of this feature, which must be unique among features in the same collection.
+     *
+     * @param name The new name
+     */
     public void setName(String name) {
         this.name = name;
     }
+
 
     /**
      * @return the fully qualified Java class name of this element.
@@ -73,9 +82,12 @@ public class FeatureInfo implements Serializable {
         return this.type;
     }
 
+    /**
+     * Set the fully qualified Java class name of this element.
+     *
+     * @param type The new fully qualified Java class name
+     */
     public void setType(String type) {
         this.type = type;
     }
-
-
 }

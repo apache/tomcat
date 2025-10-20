@@ -20,16 +20,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.tomcat.util.codec.binary.Base64;
-
 /**
  * Utility class to decode MIME texts.
  *
- * @since 1.3
+ * @since FileUpload 1.3
  */
 public final class MimeUtility {
 
@@ -74,13 +73,6 @@ public final class MimeUtility {
         MIME2JAVA.put("euckr", "KSC5601");
         MIME2JAVA.put("us-ascii", "ISO-8859-1");
         MIME2JAVA.put("x-us-ascii", "ISO-8859-1");
-    }
-
-    /**
-     * Hidden constructor, this class must not be instantiated.
-     */
-    private MimeUtility() {
-        // do nothing
     }
 
     /**
@@ -208,7 +200,7 @@ public final class MimeUtility {
         }
 
         // pull out the character set information (this is the MIME name at this point).
-        final String charset = word.substring(2, charsetPos).toLowerCase(Locale.ENGLISH);
+        final String charset = word.substring(2, charsetPos).toLowerCase(Locale.ROOT);
 
         // now pull out the encoding token the same way.
         final int encodingPos = word.indexOf('?', charsetPos + 1);
@@ -238,7 +230,7 @@ public final class MimeUtility {
             byte[] decodedData;
             // Base64 encoded?
             if (encoding.equals(BASE64_ENCODING_MARKER)) {
-                decodedData = Base64.decodeBase64(encodedText);
+                decodedData = Base64.getDecoder().decode(encodedText);
             } else if (encoding.equals(QUOTEDPRINTABLE_ENCODING_MARKER)) { // maybe quoted printable.
                 byte[] encodedData = encodedText.getBytes(StandardCharsets.US_ASCII);
                 QuotedPrintableDecoder.decode(encodedData, out);
@@ -267,13 +259,20 @@ public final class MimeUtility {
             return null;
         }
 
-        final String mappedCharset = MIME2JAVA.get(charset.toLowerCase(Locale.ENGLISH));
+        final String mappedCharset = MIME2JAVA.get(charset.toLowerCase(Locale.ROOT));
         // if there is no mapping, then the original name is used.  Many of the MIME character set
         // names map directly back into Java.  The reverse isn't necessarily true.
         if (mappedCharset == null) {
             return charset;
         }
         return mappedCharset;
+    }
+
+    /**
+     * Hidden constructor, this class must not be instantiated.
+     */
+    private MimeUtility() {
+        // do nothing
     }
 
 }

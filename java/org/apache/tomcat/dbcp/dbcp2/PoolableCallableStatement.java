@@ -44,7 +44,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
     private final PStmtKey key;
 
     /**
-     * Constructor.
+     * Constructs a new instance.
      *
      * @param callableStatement
      *            the underlying {@link CallableStatement}
@@ -76,9 +76,7 @@ public class PoolableCallableStatement extends DelegatingCallableStatement {
     @Override
     public void activate() throws SQLException {
         setClosedInternal(false);
-        if (getConnectionInternal() != null) {
-            getConnectionInternal().addTrace(this);
-        }
+        add(getConnectionInternal(), this);
         super.activate();
     }
 

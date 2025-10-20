@@ -24,6 +24,8 @@ Export-Package: \
     org.apache.tomcat.util.descriptor.web,\
     org.apache.tomcat.util.digester,\
     org.apache.tomcat.util.scan
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -jpms-module-info: \
     ${module.name};\

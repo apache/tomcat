@@ -59,7 +59,7 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.enableNaming();
 
         // No file system docBase required
-        org.apache.catalina.Context ctx = tomcat.addContext("", null);
+        org.apache.catalina.Context ctx = getProgrammaticRootContext();
 
         // Create the resource
         ContextResource cr = new ContextResource();
@@ -120,7 +120,7 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.enableNaming();
 
         // No file system docBase required
-        org.apache.catalina.Context ctx = tomcat.addContext("", null);
+        org.apache.catalina.Context ctx = getProgrammaticRootContext();
 
         // Create the resource
         ContextResource cr = new ContextResource();
@@ -154,7 +154,7 @@ public class TestNamingContext extends TomcatBaseTest {
             try {
                 Context ctx = new InitialContext();
                 NamingEnumeration<Binding> enm =
-                    ctx.listBindings("java:comp/env/list");
+                        ctx.listBindings("java:comp/env/list");
                 while (enm.hasMore()) {
                     Binding b = enm.next();
                     out.print(b.getObject().getClass().getName());
@@ -171,7 +171,7 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.enableNaming();
 
         // No file system docBase required
-        org.apache.catalina.Context ctx = tomcat.addContext("", null);
+        org.apache.catalina.Context ctx = getProgrammaticRootContext();
 
         // Create the resource
         ContextResource cr = new ContextResource();
@@ -230,7 +230,7 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.enableNaming();
 
         // No file system docBase required
-        StandardContext ctx = (StandardContext) tomcat.addContext("", null);
+        StandardContext ctx = (StandardContext) getProgrammaticRootContext();
 
         ctx.setJndiExceptionOnFailedWrite(exceptionOnFailedWrite);
 
@@ -288,7 +288,7 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.enableNaming();
 
         // No file system docBase required
-        org.apache.catalina.Context ctx = tomcat.addContext("", null);
+        org.apache.catalina.Context ctx = getProgrammaticRootContext();
 
         // Create the resource
         ContextEnvironment env = new ContextEnvironment();
@@ -345,7 +345,7 @@ public class TestNamingContext extends TomcatBaseTest {
         tomcat.enableNaming();
 
         File appDir =
-            new File("test/webapp");
+                new File("test/webapp");
         // app dir is relative to server home
         org.apache.catalina.Context ctxt =
                 tomcat.addWebapp(null, "/test", appDir.getAbsolutePath());

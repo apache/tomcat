@@ -35,8 +35,8 @@
 <section name="Introduction">
 
   <p>Tomcat implements <a
-  href="https://jakarta.ee/specifications/authentication/3.0/">Jakarta
-  Authentication 3.0</a>. The implementation is primarily intended to enable the
+  href="https://jakarta.ee/specifications/authentication/3.1/">Jakarta
+  Authentication 3.1</a>. The implementation is primarily intended to enable the
   integration of 3rd party authentication implementations with Tomcat.</p>
 
   <p>Jakarta Authentication may be configured in one of two ways:</p>

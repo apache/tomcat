@@ -30,15 +30,13 @@ public class RequestUtil {
 
 
     /**
-     * Normalize a relative URI path that may have relative values ("/./",
-     * "/../", and so on ) it it.  <strong>WARNING</strong> - This method is
-     * useful only for normalizing application-generated paths.  It does not
-     * try to perform security checks for malicious input.
+     * Normalize a relative URI path. This method normalizes "/./", "/../", "//" and "\". If the input path is an
+     * attempt to 'escape the root' (e.g. /../input.txt) then {@code null} is returned to prevent attempts to 'escape
+     * the root'. <strong>WARNING</strong> - No other URI validation checks are performed.
      *
      * @param path Relative path to be normalized
      *
-     * @return The normalized path or <code>null</code> if the path cannot be
-     *         normalized
+     * @return The normalized path or {@code null} if the input path attempts to 'escape the root'.
      */
     public static String normalize(String path) {
         return normalize(path, true);
@@ -46,16 +44,14 @@ public class RequestUtil {
 
 
     /**
-     * Normalize a relative URI path that may have relative values ("/./",
-     * "/../", and so on ) it it.  <strong>WARNING</strong> - This method is
-     * useful only for normalizing application-generated paths.  It does not
-     * try to perform security checks for malicious input.
+     * Normalize a relative URI path. This method normalizes "/./", "/../" and "//". This method optionally normalizes
+     * "\". If the input path is an attempt to 'escape the root' (e.g. /../input.txt) then {@code null} is returned to
+     * prevent attempts to 'escape the root'. <strong>WARNING</strong> - No other URI validation checks are performed.
      *
-     * @param path Relative path to be normalized
-     * @param replaceBackSlash Should '\\' be replaced with '/'
+     * @param path             Relative path to be normalized
+     * @param replaceBackSlash Should '\\' be normalized to '/'
      *
-     * @return The normalized path or <code>null</code> if the path cannot be
-     *         normalized
+     * @return The normalized path or {@code null} if the input path attempts to 'escape the root'.
      */
     public static String normalize(String path, boolean replaceBackSlash) {
 
@@ -106,7 +102,7 @@ public class RequestUtil {
                 break;
             }
             if (index == 0) {
-                return null;  // Trying to go outside our context
+                return null; // Trying to go outside our context
             }
             int index2 = normalized.lastIndexOf('/', index - 1);
             normalized = normalized.substring(0, index2) + normalized.substring(index + 3);
@@ -127,26 +123,19 @@ public class RequestUtil {
         // Build scheme://host:port from request
         StringBuilder target = new StringBuilder();
         String scheme = request.getScheme();
-        if (scheme == null) {
-            return false;
-        } else {
-            scheme = scheme.toLowerCase(Locale.ENGLISH);
-        }
-        target.append(scheme);
-        target.append("://");
-
         String host = request.getServerName();
-        if (host == null) {
+        if (scheme == null || host == null) {
             return false;
         }
-        target.append(host);
+        scheme = scheme.toLowerCase(Locale.ENGLISH);
+        target.append(scheme).append("://").append(host);
 
         int port = request.getServerPort();
         // Origin may or may not include the (default) port.
         // At this point target doesn't include a port.
         if (target.length() == origin.length()) {
             // origin and target can only be equal if both are using default
-            // ports. Therefore only append the port to the target if a
+            // ports. Therefore, only append the port to the target if a
             // non-default port is used.
             if (("http".equals(scheme) || "ws".equals(scheme)) && port != 80 ||
                     ("https".equals(scheme) || "wss".equals(scheme)) && port != 443) {
@@ -165,7 +154,7 @@ public class RequestUtil {
 
         // Both scheme and host are case-insensitive but the CORS spec states
         // this check should be case-sensitive
-        return origin.equals(target.toString());
+        return origin.contentEquals(target);
     }
 
 
@@ -178,7 +167,9 @@ public class RequestUtil {
      * </ul>
      *
      * @param origin The origin URI
+     *
      * @return <code>true</code> if the origin was valid
+     *
      * @see <a href="http://tools.ietf.org/html/rfc952">RFC952</a>
      */
     public static boolean isValidOrigin(String origin) {

@@ -19,11 +19,13 @@ package org.apache.tomcat.websocket.server;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -61,12 +63,9 @@ public class WsHandshakeRequest implements HandshakeRequest {
 
         // ParameterMap
         Map<String,String[]> originalParameters = request.getParameterMap();
-        Map<String,List<String>> newParameters =
-                new HashMap<>(originalParameters.size());
+        Map<String,List<String>> newParameters = new HashMap<>(originalParameters.size());
         for (Entry<String,String[]> entry : originalParameters.entrySet()) {
-            newParameters.put(entry.getKey(),
-                    Collections.unmodifiableList(
-                            Arrays.asList(entry.getValue())));
+            newParameters.put(entry.getKey(), Collections.unmodifiableList(Arrays.asList(entry.getValue())));
         }
         for (Entry<String,String> entry : pathParams.entrySet()) {
             newParameters.put(entry.getKey(), Collections.singletonList(entry.getValue()));
@@ -80,8 +79,7 @@ public class WsHandshakeRequest implements HandshakeRequest {
         while (headerNames.hasMoreElements()) {
             String headerName = headerNames.nextElement();
 
-            newHeaders.put(headerName, Collections.unmodifiableList(
-                    Collections.list(request.getHeaders(headerName))));
+            newHeaders.put(headerName, Collections.unmodifiableList(Collections.list(request.getHeaders(headerName))));
         }
 
         headers = Collections.unmodifiableMap(newHeaders);
@@ -127,12 +125,9 @@ public class WsHandshakeRequest implements HandshakeRequest {
     }
 
     /**
-     * Called when the HandshakeRequest is no longer required. Since an instance
-     * of this class retains a reference to the current HttpServletRequest that
-     * reference needs to be cleared as the HttpServletRequest may be reused.
-     *
-     * There is no reason for instances of this class to be accessed once the
-     * handshake has been completed.
+     * Called when the HandshakeRequest is no longer required. Since an instance of this class retains a reference to
+     * the current HttpServletRequest that reference needs to be cleared as the HttpServletRequest may be reused. There
+     * is no reason for instances of this class to be accessed once the handshake has been completed.
      */
     void finished() {
         request = null;
@@ -152,25 +147,20 @@ public class WsHandshakeRequest implements HandshakeRequest {
             port = 80;
         }
 
-        if ("http".equals(scheme)) {
-            uri.append("ws");
-        } else if ("https".equals(scheme)) {
-            uri.append("wss");
-        } else if ("wss".equals(scheme) || "ws".equals(scheme)) {
-            uri.append(scheme);
-        } else {
-            // Should never happen
-            throw new IllegalArgumentException(
-                    sm.getString("wsHandshakeRequest.unknownScheme", scheme));
+        switch (scheme) {
+            case "http" -> uri.append("ws");
+            case "https" -> uri.append("wss");
+            case "wss", "ws" -> uri.append(scheme);
+            case null, default ->
+                // Should never happen
+                throw new IllegalArgumentException(sm.getString("wsHandshakeRequest.unknownScheme", scheme));
         }
 
         uri.append("://");
         uri.append(req.getServerName());
 
-        if ((scheme.equals("http") && (port != 80))
-            || (scheme.equals("ws") && (port != 80))
-            || (scheme.equals("wss") && (port != 443))
-            || (scheme.equals("https") && (port != 443))) {
+        if ((scheme.equals("http") && (port != 80)) || (scheme.equals("ws") && (port != 80)) ||
+                (scheme.equals("wss") && (port != 443)) || (scheme.equals("https") && (port != 443))) {
             uri.append(':');
             uri.append(port);
         }
@@ -186,8 +176,47 @@ public class WsHandshakeRequest implements HandshakeRequest {
             return new URI(uri.toString());
         } catch (URISyntaxException e) {
             // Should never happen
-            throw new IllegalArgumentException(
-                    sm.getString("wsHandshakeRequest.invalidUri", uri.toString()), e);
+            throw new IllegalArgumentException(sm.getString("wsHandshakeRequest.invalidUri", uri.toString()), e);
         }
+    }
+
+    @Override
+    public X509Certificate[] getUserX509CertificateChain() {
+        return (X509Certificate[]) request.getAttribute(Constants.CERTIFICATE_SERVLET_REQUEST_ATTRIBUTE);
+    }
+
+    @Override
+    public String getLocalAddress() {
+        return request.getLocalAddr();
+    }
+
+    @Override
+    public String getLocalHostName() {
+        return request.getLocalName();
+    }
+
+    @Override
+    public int getLocalPort() {
+        return request.getLocalPort();
+    }
+
+    @Override
+    public String getRemoteAddress() {
+        return request.getRemoteAddr();
+    }
+
+    @Override
+    public String getRemoteHostName() {
+        return request.getRemoteHost();
+    }
+
+    @Override
+    public int getRemotePort() {
+        return request.getRemotePort();
+    }
+
+    @Override
+    public Locale getPreferredLocale() {
+        return request.getLocale();
     }
 }

@@ -48,7 +48,7 @@ public class TestSessionCookieConfig extends TomcatBaseTest {
         Assert.assertTrue(responseHeaders.containsKey("Set-Cookie"));
 
         List<String> setCookieHeaders = responseHeaders.get("Set-Cookie");
-        Assert.assertEquals(1,  setCookieHeaders.size());
+        Assert.assertEquals(1, setCookieHeaders.size());
 
         String setCookieHeader = setCookieHeaders.get(0);
         Assert.assertTrue(setCookieHeader.contains("; aaa=bbb"));

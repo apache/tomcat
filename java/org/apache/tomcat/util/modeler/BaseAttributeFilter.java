@@ -17,6 +17,7 @@
 package org.apache.tomcat.util.modeler;
 
 
+import java.io.Serial;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,25 +27,24 @@ import javax.management.NotificationFilter;
 
 
 /**
- * <p>Implementation of <code>NotificationFilter</code> for attribute change
- * notifications.  This class is used by <code>BaseModelMBean</code> to
- * construct attribute change notification event filters when a filter is not
- * supplied by the application.</p>
- *
- * @author Craig R. McClanahan
+ * <p>
+ * Implementation of <code>NotificationFilter</code> for attribute change notifications. This class is used by
+ * <code>BaseModelMBean</code> to construct attribute change notification event filters when a filter is not supplied by
+ * the application.
+ * </p>
  */
 public class BaseAttributeFilter implements NotificationFilter {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Construct a new filter that accepts only the specified attribute
-     * name.
+     * Construct a new filter that accepts only the specified attribute name.
      *
-     * @param name Name of the attribute to be accepted by this filter, or
-     *  <code>null</code> to accept all attribute names
+     * @param name Name of the attribute to be accepted by this filter, or <code>null</code> to accept all attribute
+     *                 names
      */
     public BaseAttributeFilter(String name) {
 
@@ -60,10 +60,10 @@ public class BaseAttributeFilter implements NotificationFilter {
 
 
     /**
-     * The set of attribute names that are accepted by this filter.  If this
-     * list is empty, all attribute names are accepted.
+     * The set of attribute names that are accepted by this filter. If this list is empty, all attribute names are
+     * accepted.
      */
-    private Set<String> names = new HashSet<>();
+    private final Set<String> names = new HashSet<>();
 
 
     // --------------------------------------------------------- Public Methods
@@ -84,8 +84,7 @@ public class BaseAttributeFilter implements NotificationFilter {
 
 
     /**
-     * Clear all accepted names from this filter, so that it will accept
-     * all attribute names.
+     * Clear all accepted names from this filter, so that it will accept all attribute names.
      */
     public void clear() {
 
@@ -97,9 +96,9 @@ public class BaseAttributeFilter implements NotificationFilter {
 
 
     /**
-     * Return the set of names that are accepted by this filter.  If this
-     * filter accepts all attribute names, a zero length array will be
-     * returned.
+     * Return the set of names that are accepted by this filter. If this filter accepts all attribute names, a zero
+     * length array will be returned.
+     *
      * @return the array of names
      */
     public String[] getNames() {
@@ -112,13 +111,13 @@ public class BaseAttributeFilter implements NotificationFilter {
 
 
     /**
-     * <p>Test whether notification enabled for this event.
-     * Return true if:</p>
+     * <p>
+     * Test whether notification enabled for this event. Return true if:
+     * </p>
      * <ul>
      * <li>This is an attribute change notification</li>
-     * <li>Either the set of accepted names is empty (implying that all
-     *     attribute names are of interest) or the set of accepted names
-     *     includes the name of the attribute in this notification</li>
+     * <li>Either the set of accepted names is empty (implying that all attribute names are of interest) or the set of
+     * accepted names includes the name of the attribute in this notification</li>
      * </ul>
      */
     @Override
@@ -127,16 +126,14 @@ public class BaseAttributeFilter implements NotificationFilter {
         if (notification == null) {
             return false;
         }
-        if (!(notification instanceof AttributeChangeNotification)) {
+        if (!(notification instanceof AttributeChangeNotification acn)) {
             return false;
         }
-        AttributeChangeNotification acn =
-            (AttributeChangeNotification) notification;
         if (!AttributeChangeNotification.ATTRIBUTE_CHANGE.equals(acn.getType())) {
             return false;
         }
         synchronized (names) {
-            if (names.size() < 1) {
+            if (names.isEmpty()) {
                 return true;
             } else {
                 return names.contains(acn.getAttributeName());
@@ -147,8 +144,7 @@ public class BaseAttributeFilter implements NotificationFilter {
 
 
     /**
-     * Remove an attribute name from the set of names accepted by this
-     * filter.
+     * Remove an attribute name from the set of names accepted by this filter.
      *
      * @param name Name of the attribute to be removed
      */

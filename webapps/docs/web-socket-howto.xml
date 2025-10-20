@@ -64,6 +64,23 @@
    the timeout to use in milliseconds. For an infinite timeout, use
    <code>-1</code>.</p>
 
+<p>The time Tomcat waits for a peer to send a WebSocket session close message
+   after Tomcat has sent a close message to the peer defaults to 30000
+   milliseconds (30 seconds). This may be changed by setting the property
+   <code>org.apache.tomcat.websocket.SESSION_CLOSE_TIMEOUT</code> in the user
+   properties collection attached to the WebSocket session. The value assigned
+   to this property should be a <code>Long</code> and represents the timeout to
+   use in milliseconds. Values less than or equal to zero will be ignored.</p>
+
+<p>The write timeout Tomcat uses when writing a session close message when the
+   close is abnormal defaults to 50 milliseconds. This may be changed by setting
+   the property
+   <code>org.apache.tomcat.websocket.ABNORMAL_SESSION_CLOSE_SEND_TIMEOUT</code>
+   in the user properties collection attached to the WebSocket session. The
+   value assigned to this property should be a <code>Long</code> and represents
+   the timeout to use in milliseconds. Values less than or equal to zero will be
+   ignored.</p>
+
 <p>In addition to the <code>Session.setMaxIdleTimeout(long)</code> method which
    is part of the Jakarta WebSocket API, Tomcat provides greater control of the
    timing out the session due to lack of activity. Setting the property

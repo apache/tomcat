@@ -40,9 +40,9 @@ public class TestMaxConnections extends TomcatBaseTest {
     public void testConnector() throws Exception {
         init();
         ConnectThread[] t = new ConnectThread[10];
-        for (int i=0; i<t.length; i++) {
+        for (int i = 0; i < t.length; i++) {
             t[i] = new ConnectThread();
-            t[i].setName("ConnectThread["+i+"]");
+            t[i].setName("ConnectThread[" + i + "]");
         }
         for (ConnectThread thread : t) {
             thread.start();
@@ -90,18 +90,21 @@ public class TestMaxConnections extends TomcatBaseTest {
 
             long start = System.currentTimeMillis();
             // Open connection
-            connect(connectTimeout,soTimeout);
+            connect(connectTimeout, soTimeout);
 
             // Send request in two parts
             String[] request = new String[1];
+            // @formatter:off
             request[0] =
-                "GET /test HTTP/1.0" + CRLF + CRLF;
+                    "GET /test HTTP/1.0" + CRLF +
+                    CRLF;
+            // @formatter:on
             setRequest(request);
             boolean passed = false;
             processRequest(false); // blocks until response has been read
             long stop = System.currentTimeMillis();
-            log.info(Thread.currentThread().getName()+" Request complete:"+(stop-start)+" ms.");
-            passed = (this.readLine()==null);
+            log.info(Thread.currentThread().getName() + " Request complete:" + (stop - start) + " ms.");
+            passed = (this.readLine() == null);
             // Close the connection
             disconnect();
             reset();
@@ -123,14 +126,13 @@ public class TestMaxConnections extends TomcatBaseTest {
         private static int maxConnections = 0;
 
         @Override
-        protected void service(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             increment();
 
             System.out.println("Processing thread: " + Thread.currentThread().getName());
             try {
-                Thread.sleep(TestMaxConnections.soTimeout*4/5);
+                Thread.sleep(soTimeout * 4 / 5);
             } catch (InterruptedException x) {
 
             }

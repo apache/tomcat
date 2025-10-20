@@ -40,15 +40,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpUpgradeHandler;
 import jakarta.servlet.http.Part;
-import jakarta.servlet.http.PushBuilder;
 
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Facade class that wraps a Coyote request object. All methods are delegated to the wrapped request.
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class RequestFacade implements HttpServletRequest {
 
@@ -59,7 +55,7 @@ public class RequestFacade implements HttpServletRequest {
     /**
      * The wrapped request.
      */
-    protected Request request = null;
+    protected Request request;
 
 
     /**
@@ -169,7 +165,7 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public Map<String, String[]> getParameterMap() {
+    public Map<String,String[]> getParameterMap() {
         checkFacade();
         return request.getParameterMap();
     }
@@ -342,6 +338,12 @@ public class RequestFacade implements HttpServletRequest {
     }
 
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Tomcat neither normalizes nor decodes the returned value. It will be identical to the part of the request URI
+     * provided by the user agent that was used to determine the context path.
+     */
     @Override
     public String getContextPath() {
         checkFacade();
@@ -413,7 +415,6 @@ public class RequestFacade implements HttpServletRequest {
 
     @Override
     public HttpSession getSession() {
-        checkFacade();
         return getSession(true);
     }
 
@@ -568,22 +569,9 @@ public class RequestFacade implements HttpServletRequest {
 
     @Override
     public <T extends HttpUpgradeHandler> T upgrade(Class<T> httpUpgradeHandlerClass)
-            throws java.io.IOException, ServletException {
+            throws IOException, ServletException {
         checkFacade();
         return request.upgrade(httpUpgradeHandlerClass);
-    }
-
-
-    @Override
-    public PushBuilder newPushBuilder() {
-        checkFacade();
-        return request.newPushBuilder();
-    }
-
-
-    public PushBuilder newPushBuilder(HttpServletRequest request) {
-        checkFacade();
-        return this.request.newPushBuilder(request);
     }
 
 
@@ -595,7 +583,7 @@ public class RequestFacade implements HttpServletRequest {
 
 
     @Override
-    public Map<String, String> getTrailerFields() {
+    public Map<String,String> getTrailerFields() {
         checkFacade();
         return request.getTrailerFields();
     }

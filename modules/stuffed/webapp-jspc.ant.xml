@@ -15,7 +15,7 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<project name="Webapp JSP precompilation and packaging for Maven shade plugin" default="package" basedir=".">
+<project name="Webapp JSP precompilation and packaging for Maven shade plugin" default="package" basedir="." xmlns:if="ant:if">
 
   <property name="webapp.name" value="examples" />
 
@@ -31,13 +31,27 @@
     <!-- Will contain the webapp classes -->
     <mkdir dir="${basedir}/src/main/java" />
     <mkdir dir="${basedir}/src/main/resources" />
+    <mkdir dir="${basedir}/target/classes" />
 
-    <!-- JSP precompilation -->
+    <!-- Copy all webapp classes to the mvn target location -->
+    <copy todir="${basedir}/target/classes">
+        <fileset id="webappclasses" dir="${basedir}/webapps/${webapp.name}/WEB-INF/classes" includes="**/*.class" erroronmissingdir="false" />
+    </copy>
+
+  	<!-- Warn about any JARs in /WEB-INF/lib -->
+    <fileset id="webappjars" dir="${basedir}/webapps/${webapp.name}/WEB-INF/lib" includes="**/*.jar" erroronmissingdir="false" />
+    <pathconvert refid="webappjars" property="webinflib" setonempty="false"/>
+    <pathconvert refid="webappclasses" property="webinfclasses" setonempty="false"/>
+    <echo if:set="webinflib">JARs from /WEB-INF/lib need to be made available to Maven as dependencies.</echo>
+    <echo if:set="webinfclasses">Classes from /WEB-INF/classes will be packaged to the shaded JAR, but they will not be available during compilation. If needed during that step, they need to be packaged as JARs and made available to Maven as dependencies.</echo>
+
+  	<!-- JSP precompilation -->
     <jasper validateXml="false" package="${webapp.name}.org.apache.jsp"
             uriroot="${basedir}/webapps/${webapp.name}"
             webXml="${basedir}/webapps/${webapp.name}/WEB-INF/tomcat-web.xml"
             outputDir="${basedir}/src/main/java" />
-    <!-- Copy all webapp classes to the mvn compile location -->
+
+  	<!-- Copy all webapp sources to the mvn compile location -->
     <copy todir="${basedir}/src/main/java">
         <fileset dir="${basedir}/webapps/${webapp.name}/WEB-INF/classes" includes="**/*.java" erroronmissingdir="false" />
     </copy>

@@ -22,17 +22,11 @@ import java.io.IOException;
 
 
 /**
- * A <b>Store</b> is the abstraction of a Catalina component that provides
- * persistent storage and loading of Sessions and their associated user data.
- * Implementations are free to save and load the Sessions to any media they
- * wish, but it is assumed that saved Sessions are persistent across
- * server or context restarts.
- *
- * @author Craig R. McClanahan
+ * A <b>Store</b> is the abstraction of a Catalina component that provides persistent storage and loading of Sessions
+ * and their associated user data. Implementations are free to save and load the Sessions to any media they wish, but it
+ * is assumed that saved Sessions are persistent across server or context restarts.
  */
 public interface Store {
-
-    // ------------------------------------------------------------- Properties
 
     /**
      * @return the Manager instance associated with this Store.
@@ -56,9 +50,6 @@ public interface Store {
     int getSize() throws IOException;
 
 
-    // --------------------------------------------------------- Public Methods
-
-
     /**
      * Add a property change listener to this component.
      *
@@ -68,9 +59,8 @@ public interface Store {
 
 
     /**
-     * @return an array containing the session identifiers of all Sessions
-     * currently saved in this Store.  If there are no such Sessions, a
-     * zero-length array is returned.
+     * @return an array containing the session identifiers of all Sessions currently saved in this Store. If there are
+     *             no such Sessions, a zero-length array is returned.
      *
      * @exception IOException if an input/output error occurred
      */
@@ -78,24 +68,32 @@ public interface Store {
 
 
     /**
-     * Load and return the Session associated with the specified session
-     * identifier from this Store, without removing it.  If there is no
-     * such stored Session, return <code>null</code>.
+     * Load and return the Session associated with the specified session identifier from this Store, without removing
+     * it. If there is no such stored Session, return <code>null</code>.
+     * <p>
+     * Implementations should expect, and correctly handle, concurrent calls to any method but in particular calls to
+     * {@code #load(String)}, {@code #save(Session)} and {@code #remove(String)} for the same session.
+     * <p>
+     * The session ID is user provided so stores must treat it as untrusted data.
      *
      * @param id Session identifier of the session to load
      *
      * @exception ClassNotFoundException if a deserialization error occurs
-     * @exception IOException if an input/output error occurs
+     * @exception IOException            if an input/output error occurs
+     *
      * @return the loaded Session instance
      */
-    Session load(String id)
-        throws ClassNotFoundException, IOException;
+    Session load(String id) throws ClassNotFoundException, IOException;
 
 
     /**
-     * Remove the Session with the specified session identifier from
-     * this Store, if present.  If no such Session is present, this method
-     * takes no action.
+     * Remove the Session with the specified session identifier from this Store, if present. If no such Session is
+     * present, this method takes no action.
+     * <p>
+     * Implementations should expect, and correctly handle, concurrent calls to any method but in particular calls to
+     * {@code #load(String)}, {@code #save(Session)} and {@code #remove(String)} for the same session.
+     * <p>
+     * The session ID is user provided so stores must treat it as untrusted data.
      *
      * @param id Session identifier of the Session to be removed
      *
@@ -121,14 +119,15 @@ public interface Store {
 
 
     /**
-     * Save the specified Session into this Store.  Any previously saved
-     * information for the associated session identifier is replaced.
+     * Save the specified Session into this Store. Any previously saved information for the associated session
+     * identifier is replaced.
+     * <p>
+     * Implementations should expect, and correctly handle, concurrent calls to any method but in particular calls to
+     * {@code #load(String)}, {@code #save(Session)} and {@code #remove(String)} for the same session.
      *
      * @param session Session to be saved
      *
      * @exception IOException if an input/output error occurs
      */
     void save(Session session) throws IOException;
-
-
 }

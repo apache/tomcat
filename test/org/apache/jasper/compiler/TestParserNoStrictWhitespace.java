@@ -23,9 +23,8 @@ import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
 
 /**
- * Tests duplicate those in {@link TestParser} where the strict whitespace
- * parsing is enabled by default. Strict whitespace parsing is disabled for
- * these tests in web.xml.
+ * Tests duplicate those in {@link TestParser} where the strict whitespace parsing is enabled by default. Strict
+ * whitespace parsing is disabled for these tests in web.xml.
  */
 public class TestParserNoStrictWhitespace extends TomcatBaseTest {
 

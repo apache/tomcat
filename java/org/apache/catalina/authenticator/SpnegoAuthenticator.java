@@ -19,10 +19,9 @@ package org.apache.catalina.authenticator;
 import java.io.File;
 import java.io.IOException;
 import java.security.Principal;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
+import java.util.Base64;
 import java.util.LinkedHashMap;
+import java.util.concurrent.CompletionException;
 import java.util.regex.Pattern;
 
 import javax.security.auth.Subject;
@@ -32,13 +31,11 @@ import javax.security.auth.login.LoginException;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.compat.JreVendor;
 import org.ietf.jgss.GSSContext;
 import org.ietf.jgss.GSSCredential;
@@ -88,7 +85,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
     }
 
     public void setNoKeepAliveUserAgents(String noKeepAliveUserAgents) {
-        if (noKeepAliveUserAgents == null || noKeepAliveUserAgents.length() == 0) {
+        if (noKeepAliveUserAgents == null || noKeepAliveUserAgents.isEmpty()) {
             this.noKeepAliveUserAgents = null;
         } else {
             this.noKeepAliveUserAgents = Pattern.compile(noKeepAliveUserAgents);
@@ -164,10 +161,12 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             return false;
         }
 
-        authorizationBC.setOffset(authorizationBC.getOffset() + 10);
+        authorizationBC.setStart(authorizationBC.getStart() + 10);
 
-        byte[] decoded = Base64.decodeBase64(authorizationBC.getBuffer(), authorizationBC.getOffset(),
+        byte[] encoded = new byte[authorizationBC.getLength()];
+        System.arraycopy(authorizationBC.getBuffer(), authorizationBC.getStart(), encoded, 0,
                 authorizationBC.getLength());
+        byte[] decoded = Base64.getDecoder().decode(encoded);
 
         if (getApplyJava8u40Fix()) {
             SpnegoTokenFixer.fix(decoded);
@@ -184,8 +183,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
         LoginContext lc = null;
         GSSContext gssContext = null;
-        byte[] outToken = null;
-        Principal principal = null;
+        byte[] outToken;
+        Principal principal;
         try {
             try {
                 lc = new LoginContext(getLoginConfigName());
@@ -208,11 +207,11 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             } else {
                 credentialLifetime = GSSCredential.DEFAULT_LIFETIME;
             }
-            final PrivilegedExceptionAction<GSSCredential> action = () -> manager.createCredential(null,
-                    credentialLifetime, new Oid("1.3.6.1.5.5.2"), GSSCredential.ACCEPT_ONLY);
-            gssContext = manager.createContext(Subject.doAs(subject, action));
+            gssContext = manager.createContext(Subject.callAs(subject, () -> manager.createCredential(null,
+                    credentialLifetime, new Oid("1.3.6.1.5.5.2"), GSSCredential.ACCEPT_ONLY)));
 
-            outToken = Subject.doAs(lc.getSubject(), new AcceptAction(gssContext, decoded));
+            final GSSContext gssContextFinal = gssContext;
+            outToken = Subject.callAs(subject, () -> gssContextFinal.acceptSecContext(decoded, 0, decoded.length));
 
             if (outToken == null) {
                 if (log.isDebugEnabled()) {
@@ -224,9 +223,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
                 return false;
             }
 
-            principal = Subject.doAs(subject,
-                    new AuthenticateAction(context.getRealm(), gssContext, storeDelegatedCredential));
-
+            principal = Subject.callAs(subject,
+                    () -> context.getRealm().authenticate(gssContextFinal, storeDelegatedCredential));
         } catch (GSSException e) {
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("spnegoAuthenticator.ticketValidateFail"), e);
@@ -234,7 +232,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
-        } catch (PrivilegedActionException e) {
+        } catch (CompletionException e) {
             Throwable cause = e.getCause();
             if (cause instanceof GSSException) {
                 if (log.isDebugEnabled()) {
@@ -264,7 +262,8 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
         }
 
         // Send response token on success and failure
-        response.setHeader(AUTH_HEADER_NAME, AUTH_HEADER_VALUE_NEGOTIATE + " " + Base64.encodeBase64String(outToken));
+        response.setHeader(AUTH_HEADER_NAME,
+                AUTH_HEADER_VALUE_NEGOTIATE + " " + Base64.getEncoder().encodeToString(outToken));
 
         if (principal != null) {
             register(request, response, principal, Constants.SPNEGO_METHOD, principal.getName(), null);
@@ -292,52 +291,12 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * This class gets a gss credential via a privileged action.
-     */
-    public static class AcceptAction implements PrivilegedExceptionAction<byte[]> {
-
-        GSSContext gssContext;
-
-        byte[] decoded;
-
-        public AcceptAction(GSSContext context, byte[] decodedToken) {
-            this.gssContext = context;
-            this.decoded = decodedToken;
-        }
-
-        @Override
-        public byte[] run() throws GSSException {
-            return gssContext.acceptSecContext(decoded, 0, decoded.length);
-        }
-    }
-
-
-    public static class AuthenticateAction implements PrivilegedAction<Principal> {
-
-        private final Realm realm;
-        private final GSSContext gssContext;
-        private final boolean storeDelegatedCredential;
-
-        public AuthenticateAction(Realm realm, GSSContext gssContext, boolean storeDelegatedCredential) {
-            this.realm = realm;
-            this.gssContext = gssContext;
-            this.storeDelegatedCredential = storeDelegatedCredential;
-        }
-
-        @Override
-        public Principal run() {
-            return realm.authenticate(gssContext, storeDelegatedCredential);
-        }
-    }
-
-
-    /**
      * This class implements a hack around an incompatibility between the SPNEGO implementation in Windows and the
      * SPNEGO implementation in Java 8 update 40 onwards. It was introduced by the change to fix this bug:
-     * https://bugs.openjdk.java.net/browse/JDK-8048194 (note: the change applied is not the one suggested in the bug
-     * report)
+     * <a href="https://bugs.openjdk.java.net/browse/JDK-8048194">JDK-8048194</a> (note: the change applied is not the
+     * one suggested in the bug report)
      * <p>
-     * It is not clear to me if Windows, Java or Tomcat is at fault here. I think it is Java but I could be wrong.
+     * It is not clear to me if Windows, Java or Tomcat is at fault here. I think it is Java, but I could be wrong.
      * <p>
      * This hack works by re-ordering the list of mechTypes in the NegTokenInit token.
      */
@@ -399,7 +358,7 @@ public class SpnegoAuthenticator extends AuthenticatorBase {
             // Read the mechTypes into an ordered set
             int mechTypesLen = lengthAsInt();
             int mechTypesStart = pos;
-            LinkedHashMap<String, int[]> mechTypeEntries = new LinkedHashMap<>();
+            LinkedHashMap<String,int[]> mechTypeEntries = new LinkedHashMap<>();
             while (pos < mechTypesStart + mechTypesLen) {
                 int[] value = new int[2];
                 value[0] = pos;

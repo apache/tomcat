@@ -44,7 +44,7 @@ public class TesterRequest extends Request {
 
 
     public TesterRequest(boolean withSession) {
-        super(null);
+        super(null, null);
         context = new TesterContext();
         servletContext = new TesterServletContext();
         context.setServletContext(servletContext);

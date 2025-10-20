@@ -32,7 +32,7 @@ public class WarResource extends AbstractSingleArchiveResource {
 
     public WarResource(AbstractArchiveResourceSet archiveResourceSet, String webAppPath, String baseUrl,
             JarEntry jarEntry) {
-        super(archiveResourceSet, webAppPath, "war:" + baseUrl + UriUtil.getWarSeparator(), jarEntry);
+        super(archiveResourceSet, webAppPath, "war:" + baseUrl + UriUtil.getWarSeparator(), jarEntry, baseUrl);
     }
 
 

@@ -16,6 +16,9 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,6 +44,10 @@ public class TestRfc9218 extends Http2TestBase {
             readSimpleGetResponse();
         }
 
+        String trace = output.getTrace();
+        System.out.println(trace);
+        output.clearTrace();
+
         // At this point the connection window should be 1k
 
         // Process a request on stream 17. This should consume the connection window.
@@ -48,6 +55,8 @@ public class TestRfc9218 extends Http2TestBase {
         // 17-headers, 17-1k-body
         parser.readFrame();
         parser.readFrame();
+        trace = output.getTrace();
+        System.out.println(trace);
         output.clearTrace();
 
         // Send additional requests. Connection window is empty so only headers will be returned.
@@ -57,6 +66,8 @@ public class TestRfc9218 extends Http2TestBase {
         // 19-headers, 21-headers
         parser.readFrame();
         parser.readFrame();
+        trace = output.getTrace();
+        System.out.println(trace);
         output.clearTrace();
 
         // At this point 17, 19 and 21 are all blocked because the connection window is zero.
@@ -100,7 +111,7 @@ public class TestRfc9218 extends Http2TestBase {
         parser.readFrame();
         parser.readFrame();
 
-        String trace = output.getTrace();
+        trace = output.getTrace();
         Assert.assertTrue(trace.contains("17-Body-877\n"));
         trace = trace.replace("17-Body-877\n", "");
         Assert.assertTrue(trace.contains("19-Body-1170\n"));
@@ -136,17 +147,27 @@ public class TestRfc9218 extends Http2TestBase {
         // 19 - 7021 body left
         // 21 - 6143 body left
 
+        // BZ 69614 - invalid priority update frames should be ignored
+        sendInvalidPriorityUpdate(17);
+
         // Re-order the priorities
         sendPriorityUpdate(17, 2, true);
 
         /*
          * Add 8k to the connection window. Should clear the connection window over allocation and fully allocate 17
-         * with the remainder split equally between 17 and 21.
+         * with the remainder split proportionally between 19 and 21.
          */
         sendWindowUpdate(0, 1024 * 8);
-        parser.readFrame();
-        parser.readFrame();
-        parser.readFrame();
+        // Use try/catch as third read has been failing on some tests runs
+        try {
+            parser.readFrame();
+            parser.readFrame();
+            parser.readFrame();
+        } catch (IOException ioe) {
+            // Dump for debugging purposes
+            ioe.printStackTrace();
+            // Continue - we'll get trace dumped to stdout below
+        }
 
         trace = output.getTrace();
         System.out.println(trace);
@@ -160,6 +181,39 @@ public class TestRfc9218 extends Http2TestBase {
         trace = trace.replace("21-Body-1365\n", "");
         Assert.assertEquals(0, trace.length());
 
-        // Test doesn't read the read of the body for streams 19 and 21.
+        // 19 - 5641 body left
+        // 21 - 4778 body left
+
+        // Add 16k to the connection window. Should fully allocate 19 and 21.
+        sendWindowUpdate(0, 1024 * 16);
+
+        try {
+            parser.readFrame();
+            parser.readFrame();
+        } catch (IOException ioe) {
+            // Dump for debugging purposes
+            ioe.printStackTrace();
+        }
+    }
+
+
+    private void sendInvalidPriorityUpdate(int streamId) throws IOException {
+        byte[] payload = "u=1:i".getBytes(StandardCharsets.US_ASCII);
+
+        byte[] priorityUpdateFrame = new byte[13 + payload.length];
+
+        // length
+        ByteUtil.setThreeBytes(priorityUpdateFrame, 0, 4 + payload.length);
+        // type
+        priorityUpdateFrame[3] = FrameType.PRIORITY_UPDATE.getIdByte();
+        // Stream ID
+        ByteUtil.set31Bits(priorityUpdateFrame, 5, 0);
+
+        // Payload
+        ByteUtil.set31Bits(priorityUpdateFrame, 9, streamId);
+        System.arraycopy(payload, 0, priorityUpdateFrame, 13, payload.length);
+
+        os.write(priorityUpdateFrame);
+        os.flush();
     }
 }

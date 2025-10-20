@@ -37,27 +37,21 @@ import org.apache.tomcat.websocket.Util;
 /**
  * Text specific concrete implementation for handling whole messages.
  */
-public class PojoMessageHandlerWholeText
-        extends PojoMessageHandlerWholeBase<String> {
+public class PojoMessageHandlerWholeText extends PojoMessageHandlerWholeBase<String> {
 
-    private static final StringManager sm =
-            StringManager.getManager(PojoMessageHandlerWholeText.class);
+    private static final StringManager sm = StringManager.getManager(PojoMessageHandlerWholeText.class);
 
     private final Class<?> primitiveType;
 
-    public PojoMessageHandlerWholeText(Object pojo, Method method,
-            Session session, EndpointConfig config,
-            List<Class<? extends Decoder>> decoderClazzes, Object[] params,
-            int indexPayload, boolean convert, int indexSession,
-            long maxMessageSize) {
-        super(pojo, method, session, params, indexPayload, convert,
-                indexSession, maxMessageSize);
+    public PojoMessageHandlerWholeText(Object pojo, Method method, Session session, EndpointConfig config,
+            List<Class<? extends Decoder>> decoderClazzes, Object[] params, int indexPayload, boolean convert,
+            int indexSession, long maxMessageSize) {
+        super(pojo, method, session, params, indexPayload, convert, indexSession, maxMessageSize);
 
         // Update max text size handled by session
         if (maxMessageSize > -1 && maxMessageSize > session.getMaxTextMessageBufferSize()) {
             if (maxMessageSize > Integer.MAX_VALUE) {
-                throw new IllegalArgumentException(sm.getString(
-                        "pojoMessageHandlerWhole.maxBufferSize"));
+                throw new IllegalArgumentException(sm.getString("pojoMessageHandlerWhole.maxBufferSize"));
             }
             session.setMaxTextMessageBufferSize((int) maxMessageSize);
         }
@@ -110,8 +104,7 @@ public class PojoMessageHandlerWholeText
                 try {
                     return ((TextStream<?>) decoder).decode(r);
                 } catch (IOException ioe) {
-                    throw new DecodeException(message, sm.getString(
-                            "pojoMessageHandlerWhole.decodeIoFail"), ioe);
+                    throw new DecodeException(message, sm.getString("pojoMessageHandlerWhole.decodeIoFail"), ioe);
                 }
             }
         }

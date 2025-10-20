@@ -27,22 +27,19 @@ import jakarta.websocket.Session;
 import org.apache.tomcat.websocket.WsSession;
 
 /**
- * Common implementation code for the POJO partial message handlers. All
- * the real work is done in this class and in the superclass.
+ * Common implementation code for the POJO partial message handlers. All the real work is done in this class and in the
+ * superclass.
  *
- * @param <T>   The type of message to handle
+ * @param <T> The type of message to handle
  */
-public abstract class PojoMessageHandlerPartialBase<T>
-        extends PojoMessageHandlerBase<T> implements MessageHandler.Partial<T> {
+public abstract class PojoMessageHandlerPartialBase<T> extends PojoMessageHandlerBase<T>
+        implements MessageHandler.Partial<T> {
 
     private final int indexBoolean;
 
-    public PojoMessageHandlerPartialBase(Object pojo, Method method,
-            Session session, Object[] params, int indexPayload,
-            boolean convert, int indexBoolean, int indexSession,
-            long maxMessageSize) {
-        super(pojo, method, session, params, indexPayload, convert,
-                indexSession, maxMessageSize);
+    public PojoMessageHandlerPartialBase(Object pojo, Method method, Session session, Object[] params, int indexPayload,
+            boolean convert, int indexBoolean, int indexSession, long maxMessageSize) {
+        super(pojo, method, session, params, indexPayload, convert, indexSession, maxMessageSize);
         this.indexBoolean = indexBoolean;
     }
 
@@ -50,8 +47,7 @@ public abstract class PojoMessageHandlerPartialBase<T>
     @Override
     public final void onMessage(T message, boolean last) {
         if (params.length == 1 && params[0] instanceof DecodeException) {
-            ((WsSession) session).getLocal().onError(session,
-                    (DecodeException) params[0]);
+            ((WsSession) session).getLocal().onError(session, (DecodeException) params[0]);
             return;
         }
         Object[] parameters = params.clone();
@@ -69,8 +65,10 @@ public abstract class PojoMessageHandlerPartialBase<T>
         Object result = null;
         try {
             result = method.invoke(pojo, parameters);
-        } catch (IllegalAccessException | InvocationTargetException e) {
-            handlePojoMethodException(e);
+        } catch (InvocationTargetException e) {
+            handlePojoMethodInvocationTargetException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
         }
         processResult(result);
     }

@@ -26,14 +26,13 @@ import org.apache.catalina.tribes.Member;
 
 
 /**
- * A <b>CatalinaCluster</b> interface allows to plug in and out the
- * different cluster implementations
+ * A <b>CatalinaCluster</b> interface allows to plug in and out the different cluster implementations
  */
 public interface CatalinaCluster extends Cluster {
-    // ----------------------------------------------------- Instance Variables
 
     /**
      * Sends a message to all the members in the cluster
+     *
      * @param msg ClusterMessage
      */
     void send(ClusterMessage msg);
@@ -41,7 +40,7 @@ public interface CatalinaCluster extends Cluster {
     /**
      * Sends a message to a specific member in the cluster.
      *
-     * @param msg ClusterMessage
+     * @param msg  ClusterMessage
      * @param dest Member
      */
     void send(ClusterMessage msg, Member dest);
@@ -49,8 +48,8 @@ public interface CatalinaCluster extends Cluster {
     /**
      * Sends a message with the specified sendOptions to a specific member in the cluster.
      *
-     * @param msg ClusterMessage
-     * @param dest Member
+     * @param msg         ClusterMessage
+     * @param dest        Member
      * @param sendOptions sendOptions
      */
     void send(ClusterMessage msg, Member dest, int sendOptions);
@@ -70,14 +69,37 @@ public interface CatalinaCluster extends Cluster {
      */
     Member getLocalMember();
 
+    /**
+     * Add cluster valve. Cluster Valves are only add to container when cluster is started.
+     *
+     * @param valve The new cluster Valve.
+     */
     void addValve(Valve valve);
 
+    /**
+     * Add cluster message listener and register cluster to this listener.
+     *
+     * @param listener The new listener
+     */
     void addClusterListener(ClusterListener listener);
 
+    /**
+     * Remove message listener and deregister Cluster from listener.
+     *
+     * @param listener The listener to remove
+     */
     void removeClusterListener(ClusterListener listener);
 
+    /**
+     * Set a new Deployer, must be set before the cluster started.
+     *
+     * @param deployer The associated deployer
+     */
     void setClusterDeployer(ClusterDeployer deployer);
 
+    /**
+     * @return the current Deployer
+     */
     ClusterDeployer getClusterDeployer();
 
     /**
@@ -87,24 +109,38 @@ public interface CatalinaCluster extends Cluster {
 
     /**
      * Get Manager
+     *
      * @param name The manager name
+     *
      * @return The manager
      */
     Manager getManager(String name);
 
     /**
      * Get a new cluster name for a manager.
-     * @param name Override name (optional)
+     *
+     * @param name    Override name (optional)
      * @param manager The manager
+     *
      * @return the manager name in the cluster
      */
     String getManagerName(String name, Manager manager);
 
+    /**
+     * @return the current cluster valves
+     */
     Valve[] getValves();
 
+    /**
+     * Set the channel associated with the cluster.
+     *
+     * @param channel the channel
+     */
     void setChannel(Channel channel);
 
+    /**
+     * @return the channel associated with the cluster
+     */
     Channel getChannel();
-
 
 }

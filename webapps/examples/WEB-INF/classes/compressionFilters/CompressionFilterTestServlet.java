@@ -26,8 +26,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 /**
- * Very Simple test servlet to test compression filter
- * @author Amy Roh
+ * Very Simple test servlet to test compression filter.
  */
 public class CompressionFilterTestServlet extends HttpServlet {
 

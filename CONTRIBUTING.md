@@ -43,12 +43,12 @@ the issues marked 'Beginner', link below. Please note that the Beginner keyword
 is pretty new to the project, so if there aren't any issues in the filter feel
 free to ask on the [dev list](https://tomcat.apache.org/lists.html#tomcat-dev).
 
-* [Beginner issues](https://bz.apache.org/bugzilla/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&bug_status=NEEDINFO&keywords=Beginner&keywords_type=allwords&list_id=160824&product=Tomcat%207&product=Tomcat%208.5&product=Tomcat%209&query_format=advanced) -
+* [Beginner issues](https://bz.apache.org/bugzilla/buglist.cgi?bug_status=__open__&keywords=Beginner&keywords_type=allwords&product=Tomcat%209&product=Tomcat%2010&product=Tomcat%2011&query_format=advanced) -
 issues which should only require a few lines of code, and a test or two to
 resolve.
 
 The list above shows all bugs that are marked 'Beginner' and are open in the
-currently supported Tomcat versions (7, 8.5, and 9).
+currently supported Tomcat versions (9.0, 10.1, 11.0 and 12.0).
 
 If you prefer C over Java, you may also take a look at the tomcat-native and
 Tomcat Connectors products in Bugzilla.
@@ -82,9 +82,8 @@ can download the sources from the "Source Code Distributions" section of the
 Download Page. There is one such page for every major Tomcat version:
 
 - [Tomcat 11](https://tomcat.apache.org/download-11.cgi)
+- [Tomcat 10](https://tomcat.apache.org/download-10.cgi)
 - [Tomcat 9](https://tomcat.apache.org/download-90.cgi)
-- [Tomcat 8](https://tomcat.apache.org/download-80.cgi)
-- [Tomcat 7](https://tomcat.apache.org/download-70.cgi)
 
 ##### Manual Patch Generation
 

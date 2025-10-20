@@ -35,7 +35,7 @@ public class TestSizePreservation {
 
     private void initSimplePoolProperties() {
         PoolConfiguration p = new DefaultProperties();
-        ds = new org.apache.tomcat.jdbc.pool.DataSource();
+        ds = new DataSource();
         ds.setPoolProperties(p);
 
         ds.getPoolProperties().setDriverClassName(Driver.class.getName());

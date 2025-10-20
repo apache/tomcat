@@ -19,6 +19,7 @@ package org.apache.catalina.authenticator;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Map;
@@ -34,13 +35,12 @@ import org.apache.catalina.Session;
  * <code>AuthenticatorBase</code> subclasses that need it in order to perform reauthentications when SingleSignOn is in
  * use.
  *
- * @author B Stansberry, based on work by Craig R. McClanahan
- *
  * @see SingleSignOn
  * @see AuthenticatorBase#reauthenticateFromSSO
  */
 public class SingleSignOnEntry implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ------------------------------------------------------ Instance Fields
@@ -52,7 +52,7 @@ public class SingleSignOnEntry implements Serializable {
     // Marked as transient so special handling can be applied to serialization
     private transient Principal principal = null;
 
-    private final Map<SingleSignOnSessionKey, SingleSignOnSessionKey> sessionKeys = new ConcurrentHashMap<>();
+    private final Map<SingleSignOnSessionKey,SingleSignOnSessionKey> sessionKeys = new ConcurrentHashMap<>();
 
     private String username = null;
 
@@ -102,9 +102,21 @@ public class SingleSignOnEntry implements Serializable {
     }
 
     /**
+     * Removes the given <code>Session</code> from the list of those associated with this SSO, using the previous
+     * sessionId
+     *
+     * @param session      the <code>Session</code> to remove.
+     * @param oldSessionId the previous sessionId of the <code>Session</code> to remove.
+     */
+    public void removeSession(Session session, String oldSessionId) {
+        SingleSignOnSessionKey key = new SingleSignOnSessionKey(session, oldSessionId);
+        sessionKeys.remove(key);
+    }
+
+    /**
      * Returns the HTTP Session identifiers associated with this SSO.
      *
-     * @return The identifiers for the HTTP sessions that are current associated with this SSo entry
+     * @return the identifiers for the HTTP sessions that are currently associated with this SSO entry
      */
     public Set<SingleSignOnSessionKey> findSessions() {
         return sessionKeys.keySet();
@@ -148,9 +160,9 @@ public class SingleSignOnEntry implements Serializable {
     }
 
     /**
-     * Gets the user name provided by the user as part of the authentication process.
+     * Gets the username provided by the user as part of the authentication process.
      *
-     * @return The user name that was authenticated as part of the authentication that triggered the creation of the SSO
+     * @return The username that was authenticated as part of the authentication that triggered the creation of the SSO
      *             entry
      */
     public String getUsername() {
@@ -171,11 +183,12 @@ public class SingleSignOnEntry implements Serializable {
         this.authType = authType;
         this.username = username;
         this.password = password;
-        this.canReauthenticate = (HttpServletRequest.BASIC_AUTH.equals(authType) ||
-                HttpServletRequest.FORM_AUTH.equals(authType));
+        this.canReauthenticate =
+                (HttpServletRequest.BASIC_AUTH.equals(authType) || HttpServletRequest.FORM_AUTH.equals(authType));
     }
 
 
+    @Serial
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
         if (principal instanceof Serializable) {
@@ -186,6 +199,7 @@ public class SingleSignOnEntry implements Serializable {
         }
     }
 
+    @Serial
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         boolean hasPrincipal = in.readBoolean();

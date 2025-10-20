@@ -19,10 +19,10 @@ package org.apache.coyote.ajp;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.tomcat.util.http.Method;
+
 /**
  * Constants.
- *
- * @author Remy Maucherat
  */
 public final class Constants {
 
@@ -104,10 +104,10 @@ public final class Constants {
     public static final int MAX_SEND_SIZE = MAX_PACKET_SIZE - SEND_HEAD_LEN;
 
     // Translates integer codes to names of HTTP methods
-    private static final String[] methodTransArray = { "OPTIONS", "GET", "HEAD", "POST", "PUT", "DELETE", "TRACE",
-            "PROPFIND", "PROPPATCH", "MKCOL", "COPY", "MOVE", "LOCK", "UNLOCK", "ACL", "REPORT", "VERSION-CONTROL",
-            "CHECKIN", "CHECKOUT", "UNCHECKOUT", "SEARCH", "MKWORKSPACE", "UPDATE", "LABEL", "MERGE",
-            "BASELINE-CONTROL", "MKACTIVITY" };
+    private static final String[] methodTransArray =
+            { Method.OPTIONS, Method.GET, Method.HEAD, Method.POST, Method.PUT, Method.DELETE, Method.TRACE, Method.PROPFIND, Method.PROPPATCH, Method.MKCOL, Method.COPY,
+                    Method.MOVE, Method.LOCK, Method.UNLOCK, "ACL", "REPORT", "VERSION-CONTROL", "CHECKIN", "CHECKOUT", "UNCHECKOUT",
+                    "SEARCH", "MKWORKSPACE", "UPDATE", "LABEL", "MERGE", "BASELINE-CONTROL", "MKACTIVITY" };
 
     /**
      * Converts an AJP coded HTTP method to the method name.
@@ -139,9 +139,9 @@ public final class Constants {
     public static final int SC_REQ_USER_AGENT = 14;
 
     // Translates integer codes to request header names
-    private static final String[] headerTransArray = { "accept", "accept-charset", "accept-encoding", "accept-language",
-            "authorization", "connection", "content-type", "content-length", "cookie", "cookie2", "host", "pragma",
-            "referer", "user-agent" };
+    private static final String[] headerTransArray =
+            { "accept", "accept-charset", "accept-encoding", "accept-language", "authorization", "connection",
+                    "content-type", "content-length", "cookie", "cookie2", "host", "pragma", "referer", "user-agent" };
 
     /**
      * Converts an AJP coded HTTP request header to the header name.
@@ -169,16 +169,11 @@ public final class Constants {
         return responseTransArray[code];
     }
 
-    private static final Map<String, Integer> responseTransMap = new HashMap<>(20);
+    private static final Map<String,Integer> responseTransMap = new HashMap<>(20);
 
     static {
-        try {
-            int i;
-            for (i = 0; i < SC_RESP_AJP13_MAX; i++) {
-                responseTransMap.put(getResponseHeaderForCode(i), Integer.valueOf(0xA001 + i));
-            }
-        } catch (Exception e) {
-            // Do nothing
+        for (int i = 0; i < SC_RESP_AJP13_MAX; i++) {
+            responseTransMap.put(getResponseHeaderForCode(i), Integer.valueOf(0xA001 + i));
         }
     }
 

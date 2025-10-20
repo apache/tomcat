@@ -40,7 +40,7 @@ public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool
      *          method
      */
     @Override
-    public void addObject() throws Exception, UnsupportedOperationException {
+    public void addObject() throws Exception {
         throw new UnsupportedOperationException();
     }
 
@@ -49,7 +49,6 @@ public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool
      * closed.
      *
      * @throws IllegalStateException when this pool has been closed.
-     *
      * @see #isClosed()
      */
     protected final void assertOpen() throws IllegalStateException {
@@ -68,7 +67,7 @@ public abstract class BaseObjectPool<T> extends BaseObject implements ObjectPool
      *          method
      */
     @Override
-    public void clear() throws Exception, UnsupportedOperationException {
+    public void clear() throws Exception {
         throw new UnsupportedOperationException();
     }
 

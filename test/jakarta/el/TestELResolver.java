@@ -119,8 +119,8 @@ public class TestELResolver {
     public void testDefaultConvertToType() {
         ELContext context = new TesterELContext(new StaticFieldELResolver());
 
-        ValueExpression ve = ELManager.getExpressionFactory().createValueExpression(context, "${!Boolean.FALSE}",
-                Boolean.class);
+        ValueExpression ve =
+                ELManager.getExpressionFactory().createValueExpression(context, "${!Boolean.FALSE}", Boolean.class);
 
         Boolean result = (Boolean) ve.getValue(context);
 

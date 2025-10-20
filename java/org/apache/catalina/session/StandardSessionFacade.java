@@ -23,8 +23,6 @@ import jakarta.servlet.http.HttpSession;
 
 /**
  * Facade for the StandardSession object.
- *
- * @author Remy Maucherat
  */
 public class StandardSessionFacade implements HttpSession {
 
@@ -119,5 +117,11 @@ public class StandardSessionFacade implements HttpSession {
     @Override
     public boolean isNew() {
         return session.isNew();
+    }
+
+
+    @Override
+    public Accessor getAccessor() {
+        return session.getAccessor();
     }
 }

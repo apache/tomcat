@@ -36,7 +36,7 @@ import org.apache.catalina.Service;
  */
 public abstract class FrameworkListener implements LifecycleListener, ContainerListener {
 
-    protected final ConcurrentHashMap<Context, LifecycleListener> contextListeners = new ConcurrentHashMap<>();
+    protected final ConcurrentHashMap<Context,LifecycleListener> contextListeners = new ConcurrentHashMap<>();
 
     /**
      * Create a lifecycle listener which will then be added to the specified context.
@@ -50,8 +50,7 @@ public abstract class FrameworkListener implements LifecycleListener, ContainerL
     @Override
     public void lifecycleEvent(LifecycleEvent event) {
         Lifecycle lifecycle = event.getLifecycle();
-        if (Lifecycle.BEFORE_START_EVENT.equals(event.getType()) && lifecycle instanceof Server) {
-            Server server = (Server) lifecycle;
+        if (Lifecycle.BEFORE_START_EVENT.equals(event.getType()) && lifecycle instanceof Server server) {
             registerListenersForServer(server);
         }
     }

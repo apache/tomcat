@@ -34,7 +34,6 @@ import org.apache.tomcat.dbcp.pool2.TrackedUse;
  * </p>
  *
  * @param <T> the type of object in the pool
- *
  * @since 2.0
  */
 public class DefaultPooledObject<T> implements PooledObject<T> {
@@ -130,9 +129,7 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         }
         if (state == PooledObjectState.EVICTION_RETURN_TO_HEAD) {
             state = PooledObjectState.IDLE;
-            if (!idleQueue.offerFirst(this)) {
-                // TODO - Should never happen
-            }
+            idleQueue.offerFirst(this);
         }
 
         return false;
@@ -338,6 +335,5 @@ public class DefaultPooledObject<T> implements PooledObject<T> {
         lastUseInstant = now();
         usedBy.fillInStackTrace();
     }
-
 
 }

@@ -29,25 +29,19 @@ public interface FilterRegistration extends Registration {
     /**
      * Add a mapping for this filter to one or more named Servlets.
      *
-     * @param dispatcherTypes The dispatch types to which this filter should
-     *                        apply
-     * @param isMatchAfter    Should this filter be applied after any mappings
-     *                        defined in the deployment descriptor
-     *                        (<code>true</code>) or before?
-     * @param servletNames    Requests mapped to these servlets will be
-     *                        processed by this filter
-     * @throws IllegalArgumentException if the list of servlet names is empty
-     *                                  or null
-     * @throws IllegalStateException if the associated ServletContext has
-     *                               already been initialised
+     * @param dispatcherTypes The dispatch types to which this filter should apply
+     * @param isMatchAfter    Should this filter be applied after any mappings defined in the deployment descriptor
+     *                            (<code>true</code>) or before?
+     * @param servletNames    Requests mapped to these servlets will be processed by this filter
+     *
+     * @throws IllegalArgumentException if the list of servlet names is empty or null
+     * @throws IllegalStateException    if the associated ServletContext has already been initialised
      */
-    void addMappingForServletNames(
-            EnumSet<DispatcherType> dispatcherTypes,
-            boolean isMatchAfter, String... servletNames);
+    void addMappingForServletNames(EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter,
+            String... servletNames);
 
     /**
-     * Gets the currently available servlet name mappings of the Filter
-     * represented by this FilterRegistration.
+     * Gets the currently available servlet name mappings of the Filter represented by this FilterRegistration.
      *
      * @return a Collection of the Servlet name mappings
      */
@@ -56,33 +50,26 @@ public interface FilterRegistration extends Registration {
     /**
      * Add a mapping for this filter to one or more URL patterns.
      *
-     * @param dispatcherTypes The dispatch types to which this filter should
-     *                        apply
-     * @param isMatchAfter    Should this filter be applied after any mappings
-     *                        defined in the deployment descriptor
-     *                        (<code>true</code>) or before?
-     * @param urlPatterns     The URL patterns to which this filter should be
-     *                        applied
-     * @throws IllegalArgumentException if the list of URL patterns is empty or
-     *                                  null
-     * @throws IllegalStateException if the associated ServletContext has
-     *                               already been initialised
+     * @param dispatcherTypes The dispatch types to which this filter should apply
+     * @param isMatchAfter    Should this filter be applied after any mappings defined in the deployment descriptor
+     *                            (<code>true</code>) or before?
+     * @param urlPatterns     The URL patterns to which this filter should be applied
+     *
+     * @throws IllegalArgumentException if the list of URL patterns is empty or null
+     * @throws IllegalStateException    if the associated ServletContext has already been initialised
      */
-    void addMappingForUrlPatterns(
-            EnumSet<DispatcherType> dispatcherTypes,
-            boolean isMatchAfter, String... urlPatterns);
+    void addMappingForUrlPatterns(EnumSet<DispatcherType> dispatcherTypes, boolean isMatchAfter, String... urlPatterns);
 
     /**
-     * Gets the currently available URL pattern mappings of the Filter
-     * represented by this FilterRegistration.
+     * Gets the currently available URL pattern mappings of the Filter represented by this FilterRegistration.
      *
      * @return a Collection of the URL pattern mappings
      */
     Collection<String> getUrlPatternMappings();
 
     /**
-     * Interface through which a Filter registered via one of the addFilter
-     * methods on ServletContext may be further configured.
+     * Interface through which a Filter registered via one of the addFilter methods on ServletContext may be further
+     * configured.
      */
     interface Dynamic extends FilterRegistration, Registration.Dynamic {
         // No additional methods

@@ -24,7 +24,6 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.LinkedHashMap;
@@ -121,6 +120,18 @@ public class BasicDataSourceFactory implements ObjectFactory {
      */
     private static final String PROP_DISCONNECTION_SQL_CODES = "disconnectionSqlCodes";
 
+    /**
+     * Property key for specifying the SQL State codes that should be ignored during disconnection checks.
+     * <p>
+     * The value for this property must be a comma-separated string of SQL State codes, where each code represents
+     * a state that will be excluded from being treated as a fatal disconnection. The expected format is a series
+     * of SQL State codes separated by commas, with no spaces between them (e.g., "08003,08004").
+     * </p>
+     * @since 2.13.0
+     */
+    private static final String PROP_DISCONNECTION_IGNORE_SQL_CODES = "disconnectionIgnoreSqlCodes";
+
+
     /*
      * Block with obsolete properties from DBCP 1.x. Warn users that these are ignored and they should use the 2.x
      * properties.
@@ -150,8 +161,8 @@ public class BasicDataSourceFactory implements ObjectFactory {
             PROP_CLEAR_STATEMENT_POOL_ON_RETURN,
             PROP_MAX_OPEN_PREPARED_STATEMENTS, PROP_CONNECTION_PROPERTIES, PROP_MAX_CONN_LIFETIME_MILLIS,
             PROP_LOG_EXPIRED_CONNECTIONS, PROP_ROLLBACK_ON_RETURN, PROP_ENABLE_AUTO_COMMIT_ON_RETURN,
-            PROP_DEFAULT_QUERY_TIMEOUT, PROP_FAST_FAIL_VALIDATION, PROP_DISCONNECTION_SQL_CODES, PROP_JMX_NAME,
-            PROP_REGISTER_CONNECTION_MBEAN, PROP_CONNECTION_FACTORY_CLASS_NAME);
+            PROP_DEFAULT_QUERY_TIMEOUT, PROP_FAST_FAIL_VALIDATION, PROP_DISCONNECTION_SQL_CODES, PROP_DISCONNECTION_IGNORE_SQL_CODES,
+            PROP_JMX_NAME, PROP_REGISTER_CONNECTION_MBEAN, PROP_CONNECTION_FACTORY_CLASS_NAME);
 
     /**
      * Obsolete properties from DBCP 1.x. with warning strings suggesting new properties. LinkedHashMap will guarantee
@@ -228,25 +239,32 @@ public class BasicDataSourceFactory implements ObjectFactory {
         getOptional(properties, PROP_DEFAULT_TRANSACTION_ISOLATION).ifPresent(value -> {
             value = value.toUpperCase(Locale.ROOT);
             int level = PoolableConnectionFactory.UNKNOWN_TRANSACTION_ISOLATION;
-            if ("NONE".equals(value)) {
-                level = Connection.TRANSACTION_NONE;
-            } else if ("READ_COMMITTED".equals(value)) {
-                level = Connection.TRANSACTION_READ_COMMITTED;
-            } else if ("READ_UNCOMMITTED".equals(value)) {
-                level = Connection.TRANSACTION_READ_UNCOMMITTED;
-            } else if ("REPEATABLE_READ".equals(value)) {
-                level = Connection.TRANSACTION_REPEATABLE_READ;
-            } else if ("SERIALIZABLE".equals(value)) {
-                level = Connection.TRANSACTION_SERIALIZABLE;
-            } else {
-                try {
-                    level = Integer.parseInt(value);
-                } catch (final NumberFormatException e) {
-                    System.err.println("Could not parse defaultTransactionIsolation: " + value);
-                    System.err.println("WARNING: defaultTransactionIsolation not set");
-                    System.err.println("using default value of database driver");
-                    level = PoolableConnectionFactory.UNKNOWN_TRANSACTION_ISOLATION;
-                }
+            switch (value) {
+                case "NONE":
+                    level = Connection.TRANSACTION_NONE;
+                    break;
+                case "READ_COMMITTED":
+                    level = Connection.TRANSACTION_READ_COMMITTED;
+                    break;
+                case "READ_UNCOMMITTED":
+                    level = Connection.TRANSACTION_READ_UNCOMMITTED;
+                    break;
+                case "REPEATABLE_READ":
+                    level = Connection.TRANSACTION_REPEATABLE_READ;
+                    break;
+                case "SERIALIZABLE":
+                    level = Connection.TRANSACTION_SERIALIZABLE;
+                    break;
+                default:
+                    try {
+                        level = Integer.parseInt(value);
+                    } catch (final NumberFormatException e) {
+                        System.err.println("Could not parse defaultTransactionIsolation: " + value);
+                        System.err.println("WARNING: defaultTransactionIsolation not set");
+                        System.err.println("using default value of database driver");
+                        level = PoolableConnectionFactory.UNKNOWN_TRANSACTION_ISOLATION;
+                    }
+                    break;
             }
             dataSource.setDefaultTransactionIsolation(level);
         });
@@ -303,6 +321,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
         acceptDurationOfSeconds(properties, PROP_DEFAULT_QUERY_TIMEOUT, dataSource::setDefaultQueryTimeout);
         acceptBoolean(properties, PROP_FAST_FAIL_VALIDATION, dataSource::setFastFailValidation);
         getOptional(properties, PROP_DISCONNECTION_SQL_CODES).ifPresent(v -> dataSource.setDisconnectionSqlCodes(parseList(v, ',')));
+        getOptional(properties, PROP_DISCONNECTION_IGNORE_SQL_CODES).ifPresent(v -> dataSource.setDisconnectionIgnoreSqlCodes(parseList(v, ',')));
         acceptString(properties, PROP_CONNECTION_FACTORY_CLASS_NAME, dataSource::setConnectionFactoryClassName);
 
         // DBCP-215
@@ -331,7 +350,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
         if (propText != null) {
             try {
                 p.load(new ByteArrayInputStream(propText.replace(';', '\n').getBytes(StandardCharsets.ISO_8859_1)));
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new SQLException(propText, e);
             }
         }
@@ -339,7 +358,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
     }
 
     /**
-     * Parse list of property values from a delimited string
+     * Parses list of property values from a delimited string
      *
      * @param value
      *            delimited list of values
@@ -347,9 +366,9 @@ public class BasicDataSourceFactory implements ObjectFactory {
      *            character used to separate values in the list
      * @return String Collection of values
      */
-    private static Collection<String> parseList(final String value, final char delimiter) {
+    private static List<String> parseList(final String value, final char delimiter) {
         final StringTokenizer tokenizer = new StringTokenizer(value, Character.toString(delimiter));
-        final Collection<String> tokens = new ArrayList<>(tokenizer.countTokens());
+        final List<String> tokens = new ArrayList<>(tokenizer.countTokens());
         while (tokenizer.hasMoreTokens()) {
             tokens.add(tokenizer.nextToken());
         }
@@ -420,20 +439,18 @@ public class BasicDataSourceFactory implements ObjectFactory {
      *            container for info messages
      */
     private void validatePropertyNames(final Reference ref, final Name name, final List<String> warnMessages,
-        final List<String> infoMessages) {
+            final List<String> infoMessages) {
         final String nameString = name != null ? "Name = " + name.toString() + " " : "";
-        if (NUPROP_WARNTEXT != null && !NUPROP_WARNTEXT.isEmpty()) {
-            NUPROP_WARNTEXT.forEach((propertyName, value) -> {
-                final RefAddr ra = ref.get(propertyName);
-                if (ra != null && !ALL_PROPERTY_NAMES.contains(ra.getType())) {
-                    final StringBuilder stringBuilder = new StringBuilder(nameString);
-                    final String propertyValue = Objects.toString(ra.getContent(), null);
-                    stringBuilder.append(value).append(" You have set value of \"").append(propertyValue).append("\" for \"").append(propertyName)
+        NUPROP_WARNTEXT.forEach((propertyName, value) -> {
+            final RefAddr ra = ref.get(propertyName);
+            if (ra != null && !ALL_PROPERTY_NAMES.contains(ra.getType())) {
+                final StringBuilder stringBuilder = new StringBuilder(nameString);
+                final String propertyValue = Objects.toString(ra.getContent(), null);
+                stringBuilder.append(value).append(" You have set value of \"").append(propertyValue).append("\" for \"").append(propertyName)
                         .append("\" property, which is being ignored.");
-                    warnMessages.add(stringBuilder.toString());
-                }
-            });
-        }
+                warnMessages.add(stringBuilder.toString());
+            }
+        });
 
         final Enumeration<RefAddr> allRefAddrs = ref.getAll();
         while (allRefAddrs.hasMoreElements()) {
@@ -445,7 +462,7 @@ public class BasicDataSourceFactory implements ObjectFactory {
                 final String propertyValue = Objects.toString(ra.getContent(), null);
                 final StringBuilder stringBuilder = new StringBuilder(nameString);
                 stringBuilder.append("Ignoring unknown property: ").append("value of \"").append(propertyValue).append("\" for \"").append(propertyName)
-                    .append("\" property");
+                        .append("\" property");
                 infoMessages.add(stringBuilder.toString());
             }
         }

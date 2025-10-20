@@ -20,9 +20,6 @@ import jakarta.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public abstract class BooleanNode extends SimpleNode {
 
     public BooleanNode(int i) {
@@ -30,8 +27,7 @@ public abstract class BooleanNode extends SimpleNode {
     }
 
     @Override
-    public Class<?> getType(EvaluationContext ctx)
-            throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         return Boolean.class;
     }
 }

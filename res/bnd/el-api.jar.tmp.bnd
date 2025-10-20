@@ -18,10 +18,12 @@
 Bundle-Name: tomcat-el-api
 Bundle-SymbolicName: org.apache.tomcat-el-api
 Export-Package: jakarta.el;version=${el.spec.version}
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaEL;\
+        osgi.contract=JakartaExpressionLanguage;\
         version:Version=${el.spec.version};\
         uses:='${packages;NAMED;jakarta.el.*}'
 

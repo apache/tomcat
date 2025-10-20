@@ -17,6 +17,7 @@
 package org.apache.catalina.ha.session;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -26,7 +27,6 @@ import org.junit.Test;
 import org.apache.catalina.Manager;
 import org.apache.catalina.session.StandardManager;
 import org.apache.tomcat.unittest.TesterContext;
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 
 public class TestDeltaRequest {
 
@@ -44,7 +44,7 @@ public class TestDeltaRequest {
         original.setAttribute("A", "One");
         original.setAttribute("B", "Two");
 
-        // Seralize original request
+        // Serialize original request
         byte[] bytes;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 ObjectOutputStream oos = new ObjectOutputStream(baos)) {

@@ -27,6 +27,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.coyote.ContinueResponseTiming;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
+import org.apache.tomcat.util.http.Method;
 
 /**
  * Unit tests for Section 8.1 of <a href="https://tools.ietf.org/html/rfc7540">RFC 7540</a>. <br>
@@ -63,16 +64,21 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         byte[] trailerFrameHeader = new byte[9];
         ByteBuffer trailerPayload = ByteBuffer.allocate(256);
 
-        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null,
-                trailerFrameHeader, trailerPayload, 3);
+        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null, true, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
         // Body
         writeFrame(dataFrameHeader, dataPayload);
+
+        sendSimpleGetRequest(5);
+
         // Trailers
+        buildTrailerHeaders(trailerFrameHeader, trailerPayload, 3);
         writeFrame(trailerFrameHeader, trailerPayload);
 
+        parser.readFrame();
+        parser.readFrame();
         parser.readFrame();
         parser.readFrame();
         parser.readFrame();
@@ -85,10 +91,33 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
             len = "256";
         }
 
-        Assert.assertEquals("0-WindowSize-[256]\n" + "3-WindowSize-[256]\n" + "3-HeadersStart\n" +
-                "3-Header-[:status]-[200]\n" + "3-Header-[content-length]-[" + len + "]\n" + "3-Header-[date]-[" +
-                DEFAULT_DATE + "]\n" + "3-HeadersEnd\n" + "3-Body-" + len + "\n" + "3-EndOfStream\n",
-                output.getTrace());
+        /*
+         * There is no guaranteed order between stream 3 and stream 5. It all depends on server side timing. Also need
+         * to ensure no unexpected frames are received.
+         */
+        String stream0WindowSize = "0-WindowSize-[256]\n";
+        String stream3WindowSize = "3-WindowSize-[256]\n";
+        String stream3Headers = "3-HeadersStart\n" + "3-Header-[:status]-[200]\n" +
+                "3-Header-[content-length]-[" + len + "]\n" + "3-Header-[date]-[" + DEFAULT_DATE + "]\n" +
+                "3-HeadersEnd\n";
+        String stream3Body = "3-Body-" + len + "\n" + "3-EndOfStream\n";
+        String stream5Headers = "5-HeadersStart\n" + "5-Header-[:status]-[200]\n" +
+                "5-Header-[content-type]-[application/octet-stream]\n" + "5-Header-[content-length]-[8192]\n" +
+                "5-Header-[date]-[" + DEFAULT_DATE + "]\n" + "5-HeadersEnd\n";
+        String stream5Body = "5-Body-8192\n" + "5-EndOfStream\n";
+
+        String trace = output.getTrace();
+        System.out.println(trace);
+
+        Assert.assertTrue(trace, trace.contains(stream0WindowSize));
+        Assert.assertTrue(trace, trace.contains(stream3WindowSize));
+        Assert.assertTrue(trace, trace.contains(stream3Headers));
+        Assert.assertTrue(trace, trace.contains(stream3Body));
+        Assert.assertTrue(trace, trace.contains(stream5Headers));
+        Assert.assertTrue(trace, trace.contains(stream5Body));
+        Assert.assertEquals("Unexpected data in trace - " + trace, stream0WindowSize.length() +
+                stream3WindowSize.length() + stream3Headers.length() + stream3Body.length() + stream5Headers.length() +
+                stream5Body.length(), trace.length());
     }
 
 
@@ -138,7 +167,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         ByteBuffer dataPayload = ByteBuffer.allocate(256);
 
         buildPostRequest(headersFrameHeader, headersPayload, true, null, -1, "/simple", dataFrameHeader, dataPayload,
-                null, null, null, 3);
+                null, false, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
@@ -167,7 +196,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(5);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
@@ -182,7 +211,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(5);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
@@ -200,7 +229,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header("x-test", "test"));
@@ -232,7 +261,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header("host", "localhost:" + getPort()));
@@ -256,7 +285,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header("host", "localhost:" + getPort()));
@@ -281,7 +310,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
         headers.add(new Header(":path", "/simple"));
@@ -306,7 +335,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":authority", "localhost"));
         headers.add(new Header(":path", "/simple"));
@@ -368,7 +397,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
 
     private void doTestHostHeaderInconsistent(String authority, String host) throws Exception {
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":authority", authority));
         headers.add(new Header(":path", "/simple"));
@@ -417,7 +446,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "abcd"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
         headers.add(new Header(":path", "/simple"));
@@ -442,7 +471,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "ab!cd"));
         headers.add(new Header(":authority", "localhost:" + getPort()));
         headers.add(new Header(":path", "/simple"));
@@ -457,7 +486,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", ""));
         headers.add(new Header(":authority", "localhost:" + getPort()));
         headers.add(new Header(":path", "/simple"));
@@ -472,7 +501,7 @@ public class TestHttp2Section_8_1 extends Http2TestBase {
         http2Connect();
 
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":authority", "localhost:" + getPort()));
         headers.add(new Header(":path", "/simple"));
         headers.add(new Header("host", "localhost:" + getPort()));

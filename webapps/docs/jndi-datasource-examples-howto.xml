@@ -23,10 +23,6 @@
     &project;
 
     <properties>
-        <author email="leslie.hughes@rubus.com">Les Hughes</author>
-        <author email="david-tomcat@haraburda.com">David Haraburda</author>
-        <author>Glenn Nielsen</author>
-        <author email="yoavs@apache.org">Yoav Shapira</author>
         <title>JNDI Datasource How-To</title>
     </properties>
 
@@ -72,7 +68,7 @@ the section about Automatic Application Deployment in the latter reference.
 <section name="DriverManager, the service provider mechanism and memory leaks">
 
 <p><code>java.sql.DriverManager</code> supports the
-<a href="http://docs.oracle.com/javase/6/docs/api/index.html?java/sql/DriverManager.html">service
+<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/java/sql/DriverManager.html">service
 provider</a> mechanism. This feature is that all the available JDBC drivers
 that announce themselves by providing a <code>META-INF/services/java.sql.Driver</code>
 file are automatically discovered, loaded and registered,
@@ -298,8 +294,8 @@ resource to your <a href="config/context.html">Context</a>.</p>
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-  version="6.0">
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd"
+  version="6.2">
   <description>MySQL Test App</description>
   <resource-ref>
       <description>DB Connection</description>

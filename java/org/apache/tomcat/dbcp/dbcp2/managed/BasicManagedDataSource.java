@@ -73,7 +73,7 @@ public class BasicManagedDataSource extends BasicDataSource {
             throw new SQLException("Transaction manager must be set before a connection can be created");
         }
 
-        // If xa data source is not specified a DriverConnectionFactory is created and wrapped with a
+        // If XA data source is not specified a DriverConnectionFactory is created and wrapped with a
         // LocalXAConnectionFactory
         if (xaDataSource == null) {
             final ConnectionFactory connectionFactory = super.createConnectionFactory();
@@ -88,22 +88,21 @@ public class BasicManagedDataSource extends BasicDataSource {
             Class<?> xaDataSourceClass = null;
             try {
                 xaDataSourceClass = Class.forName(xaDataSource);
-            } catch (final Exception t) {
-                final String message = "Cannot load XA data source class '" + xaDataSource + "'";
-                throw new SQLException(message, t);
+            } catch (final Exception e) {
+                throw new SQLException("Cannot load XA data source class '" + xaDataSource + "'", e);
             }
 
             try {
                 xaDataSourceInstance = (XADataSource) xaDataSourceClass.getConstructor().newInstance();
-            } catch (final Exception t) {
-                final String message = "Cannot create XA data source of class '" + xaDataSource + "'";
-                throw new SQLException(message, t);
+            } catch (final Exception e) {
+                throw new SQLException("Cannot create XA data source of class '" + xaDataSource + "'", e);
             }
         }
 
         // finally, create the XAConnectionFactory using the XA data source
+        @SuppressWarnings("deprecation")
         final XAConnectionFactory xaConnectionFactory = new DataSourceXAConnectionFactory(getTransactionManager(),
-                xaDataSourceInstance, getUsername(), Utils.toCharArray(getPassword()), getTransactionSynchronizationRegistry());
+                xaDataSourceInstance, getUserName(), Utils.toCharArray(getPassword()), getTransactionSynchronizationRegistry());
         transactionRegistry = xaConnectionFactory.getTransactionRegistry();
         return xaConnectionFactory;
     }
@@ -129,8 +128,7 @@ public class BasicManagedDataSource extends BasicDataSource {
             throws SQLException {
         PoolableConnectionFactory connectionFactory = null;
         try {
-            connectionFactory = new PoolableManagedConnectionFactory((XAConnectionFactory) driverConnectionFactory,
-                    getRegisteredJmxName());
+            connectionFactory = new PoolableManagedConnectionFactory((XAConnectionFactory) driverConnectionFactory, getRegisteredJmxName());
             connectionFactory.setValidationQuery(getValidationQuery());
             connectionFactory.setValidationQueryTimeout(getValidationQueryTimeoutDuration());
             connectionFactory.setConnectionInitSql(getConnectionInitSqls());
@@ -149,6 +147,7 @@ public class BasicManagedDataSource extends BasicDataSource {
             connectionFactory.setDefaultQueryTimeout(getDefaultQueryTimeoutDuration());
             connectionFactory.setFastFailValidation(getFastFailValidation());
             connectionFactory.setDisconnectionSqlCodes(getDisconnectionSqlCodes());
+            connectionFactory.setDisconnectionIgnoreSqlCodes(getDisconnectionIgnoreSqlCodes());
             validateConnectionFactory(connectionFactory);
         } catch (final RuntimeException e) {
             throw e;
@@ -237,17 +236,14 @@ public class BasicManagedDataSource extends BasicDataSource {
     }
 
     /**
-     * <p>
      * Sets the XADataSource instance used by the XAConnectionFactory.
-     * </p>
      * <p>
-     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first time one of the following methods is
+     * invoked: {@link #getConnection()}, {@link #setLogWriter(java.io.PrintWriter)}, {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()},
+     * {@link #getLogWriter()}.
      * </p>
      *
-     * @param xaDataSourceInstance
-     *            XADataSource instance
+     * @param xaDataSourceInstance XADataSource instance
      */
     public synchronized void setXaDataSourceInstance(final XADataSource xaDataSourceInstance) {
         this.xaDataSourceInstance = xaDataSourceInstance;

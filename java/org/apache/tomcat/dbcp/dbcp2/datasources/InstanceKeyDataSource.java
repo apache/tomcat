@@ -126,7 +126,7 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     private boolean defaultTestOnBorrow = BaseObjectPoolConfig.DEFAULT_TEST_ON_BORROW;
     private boolean defaultTestOnReturn = BaseObjectPoolConfig.DEFAULT_TEST_ON_RETURN;
     private boolean defaultTestWhileIdle = BaseObjectPoolConfig.DEFAULT_TEST_WHILE_IDLE;
-    private Duration defaultDurationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_TIME_BETWEEN_EVICTION_RUNS;
+    private Duration defaultDurationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS;
 
     // Connection factory properties
     private String validationQuery;
@@ -1017,14 +1017,14 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
     public void setDefaultTransactionIsolation(final int defaultTransactionIsolation) {
         assertInitializationAllowed();
         switch (defaultTransactionIsolation) {
-        case Connection.TRANSACTION_NONE:
-        case Connection.TRANSACTION_READ_COMMITTED:
-        case Connection.TRANSACTION_READ_UNCOMMITTED:
-        case Connection.TRANSACTION_REPEATABLE_READ:
-        case Connection.TRANSACTION_SERIALIZABLE:
-            break;
-        default:
-            throw new IllegalArgumentException(BAD_TRANSACTION_ISOLATION);
+            case Connection.TRANSACTION_NONE:
+            case Connection.TRANSACTION_READ_COMMITTED:
+            case Connection.TRANSACTION_READ_UNCOMMITTED:
+            case Connection.TRANSACTION_REPEATABLE_READ:
+            case Connection.TRANSACTION_SERIALIZABLE:
+                break;
+            default:
+                throw new IllegalArgumentException(BAD_TRANSACTION_ISOLATION);
         }
         this.defaultTransactionIsolation = defaultTransactionIsolation;
     }
@@ -1109,18 +1109,15 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * <p>
-     * Sets the maximum permitted lifetime of a connection. A value of zero or less indicates an
-     * infinite lifetime.
+     * Sets the maximum permitted lifetime of a connection. A value of zero or less indicates an infinite lifetime.
      * </p>
      * <p>
-     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first time one of the following methods is
+     * invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)}, {@link #setLoginTimeout(Duration)}, {@link #getLoginTimeoutDuration()},
+     * {@link #getLogWriter()}.
      * </p>
      *
-     * @param maxConnLifetimeMillis
-     *            The maximum permitted lifetime of a connection. A value of zero or less indicates an
-     *            infinite lifetime.
+     * @param maxConnLifetimeMillis The maximum permitted lifetime of a connection. A value of zero or less indicates an infinite lifetime.
      * @since 2.9.0
      */
     public void setMaxConnLifetime(final Duration maxConnLifetimeMillis) {
@@ -1129,18 +1126,15 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
 
     /**
      * <p>
-     * Sets the maximum permitted lifetime of a connection in milliseconds. A value of zero or less indicates an
-     * infinite lifetime.
+     * Sets the maximum permitted lifetime of a connection in milliseconds. A value of zero or less indicates an infinite lifetime.
      * </p>
      * <p>
-     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first time one of the following methods is
+     * invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)}, {@link #setLoginTimeout(Duration)}, {@link #getLoginTimeoutDuration()},
+     * {@link #getLogWriter()}.
      * </p>
      *
-     * @param maxConnLifetimeMillis
-     *            The maximum permitted lifetime of a connection in milliseconds. A value of zero or less indicates an
-     *            infinite lifetime.
+     * @param maxConnLifetimeMillis The maximum permitted lifetime of a connection in milliseconds. A value of zero or less indicates an infinite lifetime.
      * @deprecated Use {@link #setMaxConnLifetime(Duration)}.
      */
     @Deprecated
@@ -1324,5 +1318,4 @@ public abstract class InstanceKeyDataSource implements DataSource, Referenceable
         }
         throw new SQLException(this + " is not a wrapper for " + iface);
     }
-    /* JDBC_4_ANT_KEY_END */
 }

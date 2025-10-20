@@ -70,7 +70,7 @@ public class TestOrderInterceptor {
                 public void run() {
                     try {
                         channels[j].start(Channel.DEFAULT);
-                        Thread.sleep(50);
+                        sleep(50);
                     } catch (Exception x) {
                         x.printStackTrace();
                     }
@@ -79,7 +79,7 @@ public class TestOrderInterceptor {
         }
         TesterUtil.addRandomDomain(channels);
         for ( int i=0; i<channelCount; i++ ) {
-          threads[i].start();
+            threads[i].start();
         }
 
         int totalSleep = 0;
@@ -174,9 +174,9 @@ public class TestOrderInterceptor {
             total++;
             Integer i = (Integer)msg;
             if ( i.intValue() != cnt ) {
-              fail = true;
+                fail = true;
             } else {
-              cnt++;
+                cnt++;
             }
             System.out.println("Listener["+id+"] Message received:"+i+" Count:"+total+" Fail:"+fail);
 

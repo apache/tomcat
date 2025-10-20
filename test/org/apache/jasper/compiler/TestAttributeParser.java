@@ -26,14 +26,13 @@ import org.apache.el.TesterFunctions;
 import org.apache.jasper.el.ELContextImpl;
 
 /**
- * Test the EL processing from JSP attributes. Similar tests may be found in
- * {@link org.apache.el.TestELEvaluation} and {@link org.apache.el.TestELInJsp}.
+ * Test the EL processing from JSP attributes. Similar tests may be found in {@link org.apache.el.TestELEvaluation} and
+ * {@link org.apache.el.TestELInJsp}.
  */
 public class TestAttributeParser {
 
     /**
-     * Test use of spaces in ternary expressions. This was primarily an EL
-     * parser bug.
+     * Test use of spaces in ternary expressions. This was primarily an EL parser bug.
      */
     @Test
     public void testBug42565() {
@@ -57,25 +56,20 @@ public class TestAttributeParser {
 
 
     /**
-     * Test use nested ternary expressions. Full tests in
-     * {@link org.apache.el.TestELEvaluation}. This is just a smoke test to
-     * ensure JSP attribute processing doesn't cause any additional issues.
+     * Test use nested ternary expressions. Full tests in {@link org.apache.el.TestELEvaluation}. This is just a smoke
+     * test to ensure JSP attribute processing doesn't cause any additional issues.
      */
     @Test
     public void testBug44994() {
-        Assert.assertEquals("none",
-                evalAttr("${0 lt 0 ? 1 lt 0 ? 'many': 'one': 'none'}", '\"'));
-        Assert.assertEquals("one",
-                evalAttr("${0 lt 1 ? 1 lt 1 ? 'many': 'one': 'none'}", '\"'));
-        Assert.assertEquals("many",
-                evalAttr("${0 lt 2 ? 1 lt 2 ? 'many': 'one': 'none'}", '\"'));
+        Assert.assertEquals("none", evalAttr("${0 lt 0 ? 1 lt 0 ? 'many': 'one': 'none'}", '\"'));
+        Assert.assertEquals("one", evalAttr("${0 lt 1 ? 1 lt 1 ? 'many': 'one': 'none'}", '\"'));
+        Assert.assertEquals("many", evalAttr("${0 lt 2 ? 1 lt 2 ? 'many': 'one': 'none'}", '\"'));
     }
 
 
     /**
-     * Test the quoting requirements of JSP attributes. This doesn't make use of
-     * EL. See {@link #testBug45451()} for a test that combines JSP attribute
-     * quoting and EL quoting.
+     * Test the quoting requirements of JSP attributes. This doesn't make use of EL. See {@link #testBug45451()} for a
+     * test that combines JSP attribute quoting and EL quoting.
      */
     @Test
     public void testBug45015() {
@@ -153,10 +147,8 @@ public class TestAttributeParser {
 
     @Test
     public void testScriptExpressionLiterals() {
-        Assert.assertEquals(" \"hello world\" ", parseScriptExpression(
-                " \"hello world\" ", (char) 0));
-        Assert.assertEquals(" \"hello \\\"world\" ", parseScriptExpression(
-                " \"hello \\\\\"world\" ", (char) 0));
+        Assert.assertEquals(" \"hello world\" ", parseScriptExpression(" \"hello world\" ", (char) 0));
+        Assert.assertEquals(" \"hello \\\"world\" ", parseScriptExpression(" \"hello \\\\\"world\" ", (char) 0));
     }
 
     private String evalAttr(String expression, char quote) {
@@ -165,14 +157,11 @@ public class TestAttributeParser {
         ELContextImpl ctx = new ELContextImpl();
         ctx.setFunctionMapper(new TesterFunctions.FMapper());
         ValueExpression ve = exprFactory.createValueExpression(ctx,
-                AttributeParser.getUnquoted(expression, quote, false, false,
-                        false, false),
-                String.class);
+                AttributeParser.getUnquoted(expression, quote, false, false, false, false), String.class);
         return (String) ve.getValue(ctx);
     }
 
     private String parseScriptExpression(String expression, char quote) {
-        return AttributeParser.getUnquoted(expression, quote, false, false,
-                false, false);
+        return AttributeParser.getUnquoted(expression, quote, false, false, false, false);
     }
 }

@@ -45,7 +45,7 @@ public final class TestNetMask {
     public Boolean matches;
 
 
-    @Parameters(name="{index}: mask [{0}], input [{1}]")
+    @Parameters(name = "{index}: mask [{0}], input [{1}]")
     public static Collection<Object[]> inputs() {
         List<Object[]> result = new ArrayList<>();
 
@@ -130,8 +130,7 @@ public final class TestNetMask {
             Assert.assertNotNull(netMask);
         } else {
             Assert.assertNotNull(exception);
-            Assert.assertEquals(IllegalArgumentException.class.getName(),
-                    exception.getClass().getName());
+            Assert.assertEquals(IllegalArgumentException.class.getName(), exception.getClass().getName());
             return;
         }
 
@@ -163,5 +162,15 @@ public final class TestNetMask {
         }
 
         Assert.assertEquals(mask, netMask.toString());
+
+        NetMask nm1, nm2, nm3;
+        nm1 = new NetMask("192.168.0.0/24");
+        nm2 = new NetMask("192.168.0.0/24");
+        nm3 = new NetMask("192.168.1.0/24");
+
+        Assert.assertEquals(nm1, nm2);
+        Assert.assertEquals(nm1.hashCode(), nm2.hashCode());
+
+        Assert.assertNotEquals(nm1, nm3);
     }
 }

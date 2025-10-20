@@ -27,9 +27,6 @@ import jakarta.servlet.WriteListener;
 /**
  * Implementation of <b>ServletOutputStream</b> that works with
  * the CompressionServletResponseWrapper implementation.
- *
- * @author Amy Roh
- * @author Dmitri Valdin
  */
 public class CompressionResponseStream extends ServletOutputStream {
 

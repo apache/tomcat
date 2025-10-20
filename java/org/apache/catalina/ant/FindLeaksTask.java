@@ -19,16 +19,14 @@ package org.apache.catalina.ant;
 import org.apache.tools.ant.BuildException;
 
 /**
- * Ant task that implements the <code>/findleaks</code> command, supported by
- * the Tomcat manager application.
+ * Ant task that implements the <code>/findleaks</code> command, supported by the Tomcat manager application.
  */
 public class FindLeaksTask extends AbstractCatalinaTask {
 
     private boolean statusLine = true;
 
     /**
-     * Sets the statusLine parameter that controls if the response includes a
-     * status line or not.
+     * Sets the statusLine parameter that controls if the response includes a status line or not.
      *
      * @param statusLine <code>true</code> if the status line should be included
      */
@@ -37,11 +35,9 @@ public class FindLeaksTask extends AbstractCatalinaTask {
     }
 
     /**
-     * Returns the statusLine parameter that controls if the response includes a
-     * status line or not.
+     * Returns the statusLine parameter that controls if the response includes a status line or not.
      *
-     * @return <code>true</code> if the status line should be included,
-     *         otherwise <code>false</code>
+     * @return <code>true</code> if the status line should be included, otherwise <code>false</code>
      */
     public boolean getStatusLine() {
         return statusLine;

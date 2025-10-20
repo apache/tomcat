@@ -35,6 +35,7 @@ public class TestThreadNameCache {
         Method getThreadName = olf.getClass().getDeclaredMethod("getThreadName", long.class);
         getThreadName.setAccessible(true);
         Thread thread = new Thread() {
+            @SuppressWarnings("deprecation")
             @Override
             public void run() {
                 setName(THREAD_NAME);

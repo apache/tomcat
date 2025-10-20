@@ -60,11 +60,11 @@ public class ELManager {
         getELContext().getVariableMapper().setVariable(variable, expression);
     }
 
-    public void importStatic(String staticMemberName) throws jakarta.el.ELException {
+    public void importStatic(String staticMemberName) throws ELException {
         getELContext().getImportHandler().importStatic(staticMemberName);
     }
 
-    public void importClass(String className) throws jakarta.el.ELException {
+    public void importClass(String className) throws ELException {
         getELContext().getImportHandler().importClass(className);
     }
 
@@ -73,7 +73,7 @@ public class ELManager {
     }
 
     public Object defineBean(String name, Object bean) {
-        Map<String, Object> localBeans = getELContext().getLocalBeans();
+        Map<String,Object> localBeans = getELContext().getLocalBeans();
 
         if (bean == null) {
             return localBeans.remove(name);

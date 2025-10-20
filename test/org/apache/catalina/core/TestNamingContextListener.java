@@ -49,7 +49,7 @@ public class TestNamingContextListener extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Enable JNDI - it is disabled by default
         tomcat.enableNaming();
@@ -74,8 +74,7 @@ public class TestNamingContextListener extends TomcatBaseTest {
             javax.naming.Context initCtx;
             try {
                 initCtx = new InitialContext();
-                javax.naming.Context envCtx =
-                    (javax.naming.Context) initCtx.lookup("java:comp/env");
+                javax.naming.Context envCtx = (javax.naming.Context) initCtx.lookup("java:comp/env");
                 String value = (String) envCtx.lookup(BUG49132_NAME);
                 if (!BUG49132_VALUE.equals(value)) {
                     throw new RuntimeException();
@@ -91,7 +90,7 @@ public class TestNamingContextListener extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Enable JNDI - it is disabled by default
         tomcat.enableNaming();
@@ -141,27 +140,23 @@ public class TestNamingContextListener extends TomcatBaseTest {
         }
     }
 
-    public static final class Bug54096Listener implements
-            ServletContextListener {
+    public static final class Bug54096Listener implements ServletContextListener {
 
         @Override
         public void contextInitialized(ServletContextEvent sce) {
             javax.naming.Context initCtx;
             try {
                 initCtx = new InitialContext();
-                javax.naming.Context envCtx =
-                    (javax.naming.Context) initCtx.lookup("java:comp/env");
+                javax.naming.Context envCtx = (javax.naming.Context) initCtx.lookup("java:comp/env");
 
                 // Validate entry A
-                Bug54096EnvA valueA =
-                        (Bug54096EnvA) envCtx.lookup(BUG54096_NameA);
+                Bug54096EnvA valueA = (Bug54096EnvA) envCtx.lookup(BUG54096_NameA);
                 if (!BUG54096_ValueA.equals(valueA.getValue())) {
                     throw new RuntimeException();
                 }
 
                 // Validate entry B
-                Bug54096EnvB valueB =
-                        (Bug54096EnvB) envCtx.lookup(BUG54096_NameB);
+                Bug54096EnvB valueB = (Bug54096EnvB) envCtx.lookup(BUG54096_NameB);
                 if (BUG54096_ValueB.charAt(0) != valueB.getValue()) {
                     throw new RuntimeException();
                 }

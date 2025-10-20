@@ -16,6 +16,8 @@
  */
 package org.apache.naming;
 
+import java.io.Serial;
+
 import javax.naming.RefAddr;
 import javax.naming.StringRefAddr;
 
@@ -24,6 +26,7 @@ import javax.naming.StringRefAddr;
  */
 public class LookupRef extends AbstractRef {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     /**
@@ -39,7 +42,7 @@ public class LookupRef extends AbstractRef {
 
     public LookupRef(String resourceType, String factory, String factoryLocation, String lookupName) {
         super(resourceType, factory, factoryLocation);
-        if (lookupName != null && !lookupName.equals("")) {
+        if (lookupName != null && !lookupName.isEmpty()) {
             RefAddr ref = new StringRefAddr(LOOKUP_NAME, lookupName);
             add(ref);
         }

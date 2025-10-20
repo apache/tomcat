@@ -19,6 +19,7 @@ package org.apache.tomcat.dbcp.pool2.impl;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 
 /**
  * CallStack strategy that uses the stack trace from a {@link Throwable}. This
@@ -33,13 +34,32 @@ public class ThrowableCallStack implements CallStack {
     /**
      * A snapshot of a throwable.
      */
-    private static class Snapshot extends Throwable {
+    private static final class Snapshot extends Throwable {
+
         private static final long serialVersionUID = 1L;
-        private final long timestampMillis = System.currentTimeMillis();
+        private final Instant timestamp;
+
+        /**
+         * Constructs a new instance with its message set to the now instant.
+         */
+        Snapshot() {
+            this(Instant.now());
+        }
+
+        /**
+         * Constructs a new instance and use the timestamp as the message with using {@link DateTimeFormatter#ISO_INSTANT} for more precision.
+         *
+         * @param timestamp normally the now instant.
+         */
+        private Snapshot(final Instant timestamp) {
+            super(timestamp.toString());
+            this.timestamp = timestamp;
+        }
     }
 
     private final String messageFormat;
 
+    // We keep the SimpleDateFormat for backward compatibility instead of a DateTimeFormatter.
     //@GuardedBy("dateFormat")
     private final DateFormat dateFormat;
 
@@ -77,7 +97,8 @@ public class ThrowableCallStack implements CallStack {
             message = messageFormat;
         } else {
             synchronized (dateFormat) {
-                message = dateFormat.format(Long.valueOf(snapshotRef.timestampMillis));
+                // The throwable message is in {@link DateTimeFormatter#ISO_INSTANT} format for more precision.
+                message = dateFormat.format(Long.valueOf(snapshotRef.timestamp.toEpochMilli()));
             }
         }
         writer.println(message);

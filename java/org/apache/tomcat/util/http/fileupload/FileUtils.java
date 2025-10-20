@@ -258,7 +258,7 @@ public class FileUtils {
      * @param file file with parent to create, must not be {@code null}
      * @throws NullPointerException if the file is {@code null}
      * @throws IOException          if the parent directory cannot be created
-     * @since 2.5
+     * @since IO 2.5
      */
     public static void forceMkdirParent(final File file) throws IOException {
         final File parent = file.getParentFile();
@@ -282,7 +282,7 @@ public class FileUtils {
      * @param file the file to check
      * @return true if the file is a Symbolic Link
      * @throws IOException if an IO error occurs while checking the file
-     * @since 2.0
+     * @since IO 2.0
      */
     public static boolean isSymlink(File file) throws IOException {
         if (file == null) {

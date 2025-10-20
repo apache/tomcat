@@ -28,24 +28,47 @@ import org.apache.tomcat.util.http.fileupload.InvalidFileNameException;
 public final class Streams {
 
     /**
-     * Private constructor, to prevent instantiation.
-     * This class has only static methods.
-     */
-    private Streams() {
-        // Does nothing
-    }
-
-    /**
      * Default buffer size for use in
      * {@link #copy(InputStream, OutputStream, boolean)}.
      */
     public static final int DEFAULT_BUFFER_SIZE = 8192;
 
     /**
+     * Checks, whether the given file name is valid in the sense,
+     * that it doesn't contain any NUL characters. If the file name
+     * is valid, it will be returned without any modifications. Otherwise,
+     * an {@link InvalidFileNameException} is raised.
+     *
+     * @param fileName The file name to check
+     * @return Unmodified file name, if valid.
+     * @throws InvalidFileNameException The file name was found to be invalid.
+     */
+    public static String checkFileName(final String fileName) {
+        if (fileName != null  &&  fileName.indexOf('\u0000') != -1) {
+            // fileName.replace("\u0000", "\\0")
+            final StringBuilder sb = new StringBuilder();
+            for (int i = 0;  i < fileName.length();  i++) {
+                final char c = fileName.charAt(i);
+                switch (c) {
+                    case 0:
+                        sb.append("\\0");
+                        break;
+                    default:
+                        sb.append(c);
+                        break;
+                }
+            }
+            throw new InvalidFileNameException(fileName,
+                    "Invalid file name: " + sb);
+        }
+        return fileName;
+    }
+
+     /**
      * Copies the contents of the given {@link InputStream}
      * to the given {@link OutputStream}. Shortcut for
      * <pre>
-     *   copy(pInputStream, pOutputStream, new byte[8192]);
+     *   copy(pInputStream, outputStream, new byte[8192]);
      * </pre>
      *
      * @param inputStream The input stream, which is being read.
@@ -54,10 +77,10 @@ public final class Streams {
      * @param outputStream The output stream, to which data should
      * be written. May be null, in which case the input streams
      * contents are simply discarded.
-     * @param closeOutputStream True guarantees, that
-     * {@link OutputStream#close()} is called on the stream.
-     * False indicates, that only
+     * @param closeOutputStream True guarantees, that {@link OutputStream#close()}
+     * is called on the stream. False indicates, that only
      * {@link OutputStream#flush()} should be called finally.
+     *
      * @return Number of bytes, which have been copied.
      * @throws IOException An I/O error occurred.
      */
@@ -88,9 +111,9 @@ public final class Streams {
     public static long copy(final InputStream inputStream,
             final OutputStream outputStream, final boolean closeOutputStream,
             final byte[] buffer)
-    throws IOException {
+        throws IOException {
         try (OutputStream out = outputStream;
-              InputStream in = inputStream) {
+                InputStream in = inputStream) {
             long total = 0;
             for (;;) {
                 final int res = in.read(buffer);
@@ -116,35 +139,12 @@ public final class Streams {
         }
     }
 
-    /**
-     * Checks, whether the given file name is valid in the sense,
-     * that it doesn't contain any NUL characters. If the file name
-     * is valid, it will be returned without any modifications. Otherwise,
-     * an {@link InvalidFileNameException} is raised.
-     *
-     * @param fileName The file name to check
-     * @return Unmodified file name, if valid.
-     * @throws InvalidFileNameException The file name was found to be invalid.
+   /**
+     * Private constructor, to prevent instantiation.
+     * This class has only static methods.
      */
-    public static String checkFileName(final String fileName) {
-        if (fileName != null  &&  fileName.indexOf('\u0000') != -1) {
-            // pFileName.replace("\u0000", "\\0")
-            final StringBuilder sb = new StringBuilder();
-            for (int i = 0;  i < fileName.length();  i++) {
-                final char c = fileName.charAt(i);
-                switch (c) {
-                    case 0:
-                        sb.append("\\0");
-                        break;
-                    default:
-                        sb.append(c);
-                        break;
-                }
-            }
-            throw new InvalidFileNameException(fileName,
-                    "Invalid file name: " + sb);
-        }
-        return fileName;
+    private Streams() {
+        // Does nothing
     }
 
 }

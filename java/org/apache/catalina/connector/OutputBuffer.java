@@ -33,14 +33,12 @@ import org.apache.coyote.CloseNowException;
 import org.apache.coyote.Response;
 import org.apache.tomcat.util.buf.C2BConverter;
 import org.apache.tomcat.util.buf.CharsetHolder;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * The buffer used by Tomcat response. This is a derivative of the Tomcat 3.3 OutputBuffer, with the removal of some of
  * the state handling (which in Coyote is mostly the Processor's responsibility).
- *
- * @author Costin Manolache
- * @author Remy Maucherat
  */
 public class OutputBuffer extends Writer {
 
@@ -51,7 +49,7 @@ public class OutputBuffer extends Writer {
     /**
      * Encoder cache.
      */
-    private final Map<Charset, C2BConverter> encoders = new HashMap<>();
+    private final Map<Charset,C2BConverter> encoders = new HashMap<>();
 
 
     /**
@@ -112,7 +110,7 @@ public class OutputBuffer extends Writer {
     /**
      * Associated Coyote response.
      */
-    private Response coyoteResponse;
+    private final Response coyoteResponse;
 
 
     /**
@@ -126,28 +124,20 @@ public class OutputBuffer extends Writer {
     /**
      * Create the buffer with the specified initial size.
      *
-     * @param size Buffer size to use
+     * @param size           Buffer size to use
+     * @param coyoteResponse The associated Coyote response
      */
-    public OutputBuffer(int size) {
+    public OutputBuffer(int size, Response coyoteResponse) {
         defaultBufferSize = size;
         bb = ByteBuffer.allocate(size);
         clear(bb);
         cb = CharBuffer.allocate(size);
         clear(cb);
+        this.coyoteResponse = coyoteResponse;
     }
 
 
     // ------------------------------------------------------------- Properties
-
-    /**
-     * Associated Coyote response.
-     *
-     * @param coyoteResponse Associated Coyote response
-     */
-    public void setResponse(Response coyoteResponse) {
-        this.coyoteResponse = coyoteResponse;
-    }
-
 
     /**
      * Is the response output suspended ?
@@ -228,19 +218,18 @@ public class OutputBuffer extends Writer {
             flushCharBuffer();
         }
 
-        if ((!coyoteResponse.isCommitted()) && (coyoteResponse.getContentLengthLong() == -1)) {
-            // If this didn't cause a commit of the response, the final content
-            // length can be calculated.
-            if (!coyoteResponse.isCommitted()) {
-                coyoteResponse.setContentLength(bb.remaining());
-            }
+        // Content length can be calculated if:
+        // - the response has not been committed
+        // AND
+        // - the content length has not been explicitly set
+        // AND
+        // - some content has been written OR this is NOT a HEAD request
+        if (!coyoteResponse.isCommitted() && coyoteResponse.getContentLengthLong() == -1 &&
+                (bb.remaining() > 0 || !Method.HEAD.equals(coyoteResponse.getRequest().getMethod()))) {
+            coyoteResponse.setContentLength(bb.remaining());
         }
 
-        if (coyoteResponse.getStatus() == HttpServletResponse.SC_SWITCHING_PROTOCOLS) {
-            doFlush(true);
-        } else {
-            doFlush(false);
-        }
+        doFlush(coyoteResponse.getStatus() == HttpServletResponse.SC_SWITCHING_PROTOCOLS);
         closed = true;
 
         // The request should have been completely read by the time the response
@@ -280,7 +269,7 @@ public class OutputBuffer extends Writer {
         try {
             doFlush = true;
             if (initial) {
-                coyoteResponse.sendHeaders();
+                coyoteResponse.commit();
                 initial = false;
             }
             if (cb.remaining() > 0) {
@@ -319,9 +308,6 @@ public class OutputBuffer extends Writer {
         if (closed) {
             return;
         }
-        if (coyoteResponse == null) {
-            return;
-        }
 
         // If we really have something to write
         if (buf.remaining() > 0) {
@@ -329,25 +315,24 @@ public class OutputBuffer extends Writer {
             try {
                 coyoteResponse.doWrite(buf);
             } catch (CloseNowException e) {
-                // Catch this sub-class as it requires specific handling.
+                // Catch this subclass as it requires specific handling.
                 // Examples where this exception is thrown:
                 // - HTTP/2 stream timeout
                 // Prevent further output for this response
                 closed = true;
                 throw e;
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 // An IOException on a write is almost always due to
                 // the remote client aborting the request. Wrap this
                 // so that it can be handled better by the error dispatcher.
-                coyoteResponse.setErrorException(e);
-                throw new ClientAbortException(e);
+                throw new ClientAbortException(ioe);
             }
         }
 
     }
 
 
-    public void write(byte b[], int off, int len) throws IOException {
+    public void write(byte[] b, int off, int len) throws IOException {
 
         if (suspended) {
             return;
@@ -369,14 +354,14 @@ public class OutputBuffer extends Writer {
     }
 
 
-    private void writeBytes(byte b[], int off, int len) throws IOException {
+    private void writeBytes(byte[] b, int off, int len) throws IOException {
 
         if (closed) {
-            return;
+            throw new IOException(sm.getString("outputBuffer.closed"));
         }
 
         append(b, off, len);
-        bytesWritten += len;
+        updateBytesWritten(len);
 
         // if called from within flush(), then immediately flush
         // remaining bytes
@@ -390,12 +375,12 @@ public class OutputBuffer extends Writer {
     private void writeBytes(ByteBuffer from) throws IOException {
 
         if (closed) {
-            return;
+            throw new IOException(sm.getString("outputBuffer.closed"));
         }
 
         int remaining = from.remaining();
         append(from);
-        bytesWritten += remaining;
+        updateBytesWritten(remaining);
 
         // if called from within flush(), then immediately flush
         // remaining bytes
@@ -408,6 +393,10 @@ public class OutputBuffer extends Writer {
 
     public void writeByte(int b) throws IOException {
 
+        if (closed) {
+            throw new IOException(sm.getString("outputBuffer.closed"));
+        }
+
         if (suspended) {
             return;
         }
@@ -417,8 +406,24 @@ public class OutputBuffer extends Writer {
         }
 
         transfer((byte) b, bb);
-        bytesWritten++;
+        updateBytesWritten(1);
+    }
 
+
+    private void updateBytesWritten(int increment) throws IOException {
+        bytesWritten += increment;
+        int contentLength = coyoteResponse.getContentLength();
+
+        /*
+         * Handle the requirements of section 5.7 of the Servlet specification - Closure of the Response Object.
+         *
+         * Currently, this just handles the simple case. There is work in progress to better define what should happen
+         * if an attempt is made to write > content-length bytes. When that work is complete, this is likely where the
+         * implementation will end up.
+         */
+        if (contentLength != -1 && bytesWritten >= contentLength) {
+            close();
+        }
     }
 
 
@@ -442,12 +447,12 @@ public class OutputBuffer extends Writer {
             }
             if (from.remaining() > 0) {
                 flushByteBuffer();
-            } else if (conv.isUndeflow() && bb.limit() > bb.capacity() - 4) {
+            } else if (conv.isUnderflow() && bb.limit() > bb.capacity() - 4) {
                 // Handle an edge case. There are no more chars to write at the
                 // moment but there is a leftover character in the converter
                 // which must be part of a surrogate pair. The byte buffer does
                 // not have enough space left to output the bytes for this pair
-                // once it is complete )it will require 4 bytes) so flush now to
+                // once it is complete (it will require 4 bytes) so flush now to
                 // prevent the bytes for the leftover char and the rest of the
                 // surrogate pair yet to be written from being lost.
                 // See TestOutputBuffer#testUtf8SurrogateBody()
@@ -475,7 +480,7 @@ public class OutputBuffer extends Writer {
 
 
     @Override
-    public void write(char c[]) throws IOException {
+    public void write(char[] c) throws IOException {
 
         if (suspended) {
             return;
@@ -487,7 +492,7 @@ public class OutputBuffer extends Writer {
 
 
     @Override
-    public void write(char c[], int off, int len) throws IOException {
+    public void write(char[] c, int off, int len) throws IOException {
 
         if (suspended) {
             return;
@@ -546,15 +551,11 @@ public class OutputBuffer extends Writer {
             return;
         }
 
-        Charset charset = null;
-
-        if (coyoteResponse != null) {
-            CharsetHolder charsetHolder = coyoteResponse.getCharsetHolder();
-            // setCharacterEncoding() was called with an invalid character set
-            // Trigger an UnsupportedEncodingException
-            charsetHolder.validate();
-            charset = charsetHolder.getCharset();
-        }
+        CharsetHolder charsetHolder = coyoteResponse.getCharsetHolder();
+        // setCharacterEncoding() was called with an invalid character set
+        // Trigger an UnsupportedEncodingException
+        charsetHolder.validate();
+        Charset charset = charsetHolder.getCharset();
 
         if (charset == null) {
             charset = org.apache.coyote.Constants.DEFAULT_BODY_CHARSET;
@@ -649,7 +650,7 @@ public class OutputBuffer extends Writer {
      *
      * @throws IOException Writing overflow data to the output channel failed
      */
-    public void append(byte src[], int off, int len) throws IOException {
+    public void append(byte[] src, int off, int len) throws IOException {
         if (bb.remaining() == 0) {
             appendByteArray(src, off, len);
         } else {
@@ -672,7 +673,7 @@ public class OutputBuffer extends Writer {
      *
      * @throws IOException Writing overflow data to the output channel failed
      */
-    public void append(char src[], int off, int len) throws IOException {
+    public void append(char[] src, int off, int len) throws IOException {
         // if we have limit and we're below
         if (len <= cb.capacity() - cb.limit()) {
             transfer(src, off, len, cb);
@@ -717,7 +718,13 @@ public class OutputBuffer extends Writer {
         }
     }
 
-    private void appendByteArray(byte src[], int off, int len) throws IOException {
+
+    public void setErrorException(Exception e) {
+        coyoteResponse.setErrorException(e);
+    }
+
+
+    private void appendByteArray(byte[] src, int off, int len) throws IOException {
         if (len == 0) {
             return;
         }

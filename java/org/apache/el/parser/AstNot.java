@@ -22,24 +22,18 @@ import jakarta.el.ELException;
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstNot extends SimpleNode {
     public AstNot(int id) {
         super(id);
     }
 
     @Override
-    public Class<?> getType(EvaluationContext ctx)
-            throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         return Boolean.class;
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         Object obj = this.children[0].getValue(ctx);
         Boolean b = ELSupport.coerceToBoolean(ctx, obj, true);
         return Boolean.valueOf(!b.booleanValue());

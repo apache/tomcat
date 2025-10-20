@@ -141,6 +141,12 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
+  </Match>
+    <!-- NPE is expected if Connector definition is invalid -->
+    <Class name="org.apache.catalina.connector.Connector"/>
+    <Method name="startInternal"/>
+    <Bug pattern="NP_NULL_ON_SOME_PATH"/>
+  <Match>
     <!-- req.getRemoteUser(), req.getAuthType(), request.getQueryString() can
     return null because o.a.t.util.buf.MessageBytes.toString() can return NULL
     -->
@@ -185,6 +191,12 @@
     <Class name="org.apache.catalina.core.AsyncContextImpl"/>
     <Method name="logDebug"/>
     <Bug code="RCN"/>
+  </Match>
+  <Match>
+    <!-- Sync isn't guarding this object -->
+    <Class name="org.apache.catalina.core.ContainerBase"/>
+    <Method name="setStartStopThreads"/>
+    <Bug pattern="IS2_INCONSISTENT_SYNC"/>
   </Match>
   <Match>
     <!-- Exception caught deliberately -->
@@ -624,12 +636,6 @@
     <Bug pattern="RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" />
   </Match>
   <Match>
-    <!-- Monitor only used for election -->
-    <Class name="org.apache.catalina.tribes.group.interceptors.NonBlockingCoordinator"/>
-    <Method name="startElection"/>
-    <Bug pattern="WA_NOT_IN_LOOP"/>
-  </Match>
-  <Match>
     <Class name="org.apache.catalina.tribes.group.interceptors.TcpFailureDetector"/>
     <Method name="memberAlive"/>
     <Bug code="DE"/>
@@ -651,11 +657,6 @@
     <Class name="org.apache.catalina.tribes.group.GroupChannel" />
     <Field name="utilityExecutor" />
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
-  </Match>
-  <Match>
-    <Class name="org.apache.catalina.tribes.group.RpcChannel"/>
-    <Method name="send"/>
-    <Bug pattern="WA_NOT_IN_LOOP"/>
   </Match>
   <Match>
     <!-- Class lock is not an instance lock -->
@@ -836,13 +837,6 @@
     <Bug pattern="IS2_INCONSISTENT_SYNC" />
   </Match>
   <Match>
-    <!-- Non-constant strings are configuration settings rather than client
-         supplied -->
-    <Class name="org.apache.catalina.valves.JDBCAccessLogValve" />
-    <Method name="open" />
-    <Bug code="SQL" />
-  </Match>
-  <Match>
     <!-- NO-OPs due to remaining FIXMEs -->
     <Class name="org.apache.catalina.valves.rewrite.ResolverImpl"/>
     <Method name="resolveSsl"/>
@@ -885,6 +879,15 @@
       <Field name="cachedContent"/>
     </Or>
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Delegation to URL methods is deliberate -->
+    <Class name="org.apache.catalina.webresources.CachedResource$CachedResourceURLStreamHandler"/>
+    <Or>
+      <Method name="equals"/>
+      <Method name="hashCode"/>
+    </Or>
+    <Bug pattern="DMI_BLOCKING_METHODS_ON_URL"/>
   </Match>
   <Match>
     <!-- Class lock is not an instance lock -->
@@ -1001,12 +1004,6 @@
     <Class name="org.apache.coyote.http2.WindowAllocationManager" />
     <Method name="notify" />
     <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
-  </Match>
-  <Match>
-    <!-- Monitor is used for a single condition. -->
-    <Class name="org.apache.coyote.http2.WindowAllocationManager" />
-    <Method name="waitFor" />
-    <Bug pattern="WA_NOT_IN_LOOP" />
   </Match>
   <Match>
     <!-- Returning null is required by the EL specification -->
@@ -1596,46 +1593,15 @@
     <!-- Object is only ever set to null, sync therefore is still valid -->
     <Or>
       <Class name="org.apache.tomcat.util.net.NioEndpoint$SocketProcessor"/>
-      <Class name="org.apache.tomcat.util.net.Nio2Endpoint$SocketProcessor"/>
     </Or>
     <Method name="run"/>
     <Bug code="ML"/>
-  </Match>
-  <Match>
-    <!-- Single condition so no need for wait to be in loop -->
-    <Class name="org.apache.tomcat.util.net.NioEndpoint$NioSocketWrapper"/>
-    <Method name="fillReadBuffer"/>
-    <Bug pattern="WA_NOT_IN_LOOP" />
   </Match>
   <Match>
     <!-- Single condition so notify() is OK -->
     <Class name="org.apache.tomcat.util.net.NioEndpoint$Poller"/>
     <Method name="processKey"/>
     <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL" />
-  </Match>
-  <Match>
-    <!-- Single condition so no need for wait to be in loop -->
-    <Class name="org.apache.tomcat.util.net.Nio2Endpoint$Nio2SocketWrapper"/>
-    <Or>
-      <Method name="read"/>
-      <Method name="write"/>
-    </Or>
-    <Bug pattern="WA_NOT_IN_LOOP" />
-  </Match>
-  <Match>
-    <!-- Single wait so no need for notifyAll() -->
-    <Class name="org.apache.tomcat.util.net.Nio2Endpoint$Nio2SocketWrapper$VectoredIOCompletionHandler"/>
-    <Or>
-      <Method name="completed"/>
-      <Method name="failed"/>
-    </Or>
-    <Bug pattern="NO_NOTIFY_NOT_NOTIFYALL " />
-  </Match>
-  <Match>
-    <!-- NPE should never happen but it is caught as a precaution -->
-    <Class name="org.apache.tomcat.util.net.Nio2Endpoint$SocketProcessor" />
-    <Method name="doRun" />
-    <Bug pattern="DCN_NULLPOINTER_EXCEPTION" />
   </Match>
   <Match>
     <Class name="org.apache.tomcat.util.net.SecureNioChannel"/>
@@ -1647,18 +1613,6 @@
     <Class name="org.apache.tomcat.util.net.SecureNioChannel" />
     <Method name="processSNI"/>
     <Bug code="SF" />
-  </Match>
-  <Match>
-    <!-- Fall-through expected -->
-    <Class name="org.apache.tomcat.util.net.SecureNio2Channel" />
-    <Method name="processSNI"/>
-    <Bug code="SF" />
-  </Match>
-  <Match>
-  <!-- Single condition so fine -->
-    <Class name="org.apache.tomcat.util.net.SocketWrapperBase" />
-    <Method name="vectoredOperation"/>
-    <Bug pattern="WA_NOT_IN_LOOP" />
   </Match>
   <Match>
   <!-- Single condition so notify is fine -->
@@ -1699,12 +1653,6 @@
     <Class name="org.apache.tomcat.util.threads.ThreadPoolExecutor" />
     <Method name="runWorker" />
     <Bug pattern="VO_VOLATILE_INCREMENT " />
-  </Match>
-  <Match>
-    <!-- Monitor is used for a single condition. No need for loop. -->
-    <Class name="org.apache.tomcat.util.threads.InlineExecutorService" />
-    <Method name="awaitTermination" />
-    <Bug pattern="WA_NOT_IN_LOOP" />
   </Match>
   <Match>
     <!-- Random will be SecureRandom and will be used multiple times. -->
@@ -1764,6 +1712,15 @@
     <Class name="org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer" />
     <Field name="buffers" />
     <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY" />
+  </Match>
+  <Match>
+    <!-- Locks are released then re-obtained which is the opposite order to normal. -->
+    <Class name="org.apache.tomcat.websocket.server.WsRemoteEndpointImplServer" />
+    <Method name="acquireMessagePartInProgressSemaphore" />
+    <Or>
+      <Bug pattern="UL_UNRELEASED_LOCK" />
+      <Bug pattern="UL_UNRELEASED_LOCK_EXCEPTION_PATH" />
+    </Or>
   </Match>
 
   <!-- Example code -->
@@ -2558,6 +2515,30 @@
     </Or>
   </Match>
   <Match>
+    <!-- Array contents is not mutated -->
+    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
+    <Field name="data"/>
+    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestClose" />
+    <Method name="setUp" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock" />
+    <Method name="testTemporaryDeadlockOnClientClose" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
+    <!-- Statics are used deliberately as they are simpler -->
+    <Class name="org.apache.tomcat.websocket.server.TestWsRemoteEndpointImplServerDeadlock$Bug66508Endpoint" />
+    <Method name="onOpen" />
+    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
+  </Match>
+  <Match>
     <!-- Return value of latch is intentionally ignored -->
     <Or>
       <Class name="org.apache.tomcat.websocket.TestWebSocketFrameClient"/>
@@ -2583,18 +2564,6 @@
       <Field name="running" />
       <Field name="timeout" />
     </Or>
-    <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
-  </Match>
-  <Match>
-    <!-- Array contents is not mutated -->
-    <Class name="org.apache.tomcat.websocket.pojo.TestEncodingDecoding$MsgByte"/>
-    <Field name="data"/>
-    <Bug pattern="VO_VOLATILE_REFERENCE_TO_ARRAY"/>
-  </Match>
-  <Match>
-    <!-- Statics are used deliberately as they are simpler -->
-    <Class name="org.apache.tomcat.websocket.server.TestClose" />
-    <Method name="setUp" />
     <Bug pattern="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"/>
   </Match>
   <Match>

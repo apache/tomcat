@@ -48,7 +48,7 @@
                  type="boolean"/>
 
     <attribute   name="allowedRequestAttributesPattern"
-          description="Regular expression that any custom request attributes muct match else the request will be rejected"
+          description="Regular expression that any custom request attributes must match else the request will be rejected"
                  type="java.lang.String"/>
 
     <attribute   name="allowTrace"
@@ -107,7 +107,7 @@
                  type="int"/>
 
     <attribute   name="maxParameterCount"
-          description="The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 10000 by default. A value of less than 0 means no limit."
+          description="The maximum number of parameters (GET plus POST) which will be automatically parsed by the container. 1000 by default. A value of less than 0 means no limit."
                  type="int"/>
 
     <attribute   name="maxPostSize"

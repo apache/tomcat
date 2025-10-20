@@ -16,21 +16,20 @@
  */
 package org.apache.coyote.http11.upgrade;
 
+import java.util.concurrent.atomic.LongAdder;
+
 /**
- * Structure to hold statistical information about connections that have been
- * established using the HTTP/1.1 upgrade mechanism. Bytes sent/received will
- * always be populated. Messages sent/received will be populated if that makes
- * sense for the protocol and the information is exposed by the protocol
- * implementation.
+ * Structure to hold statistical information about connections that have been established using the HTTP/1.1 upgrade
+ * mechanism. Bytes sent/received will always be populated. Messages sent/received will be populated if that makes sense
+ * for the protocol and the information is exposed by the protocol implementation.
  */
-public class UpgradeInfo  {
+public class UpgradeInfo {
 
     private UpgradeGroupInfo groupInfo = null;
-    private volatile long bytesSent = 0;
-    private volatile long bytesReceived = 0;
-    private volatile long msgsSent = 0;
-    private volatile long msgsReceived = 0;
-
+    private final LongAdder bytesSent = new LongAdder();
+    private final LongAdder bytesReceived = new LongAdder();
+    private final LongAdder msgsSent = new LongAdder();
+    private final LongAdder msgsReceived = new LongAdder();
 
 
     public UpgradeGroupInfo getGlobalProcessor() {
@@ -52,45 +51,65 @@ public class UpgradeInfo  {
 
 
     public long getBytesSent() {
-        return bytesSent;
+        return bytesSent.longValue();
     }
+
     public void setBytesSent(long bytesSent) {
-        this.bytesSent = bytesSent;
+        this.bytesSent.reset();
+        if (bytesSent > 0) {
+            this.bytesSent.add(bytesSent);
+        }
     }
+
     public void addBytesSent(long bytesSent) {
-        this.bytesSent += bytesSent;
+        this.bytesSent.add(bytesSent);
     }
 
 
     public long getBytesReceived() {
-        return bytesReceived;
+        return bytesReceived.longValue();
     }
+
     public void setBytesReceived(long bytesReceived) {
-        this.bytesReceived = bytesReceived;
+        this.bytesReceived.reset();
+        if (bytesReceived > 0) {
+            this.bytesReceived.add(bytesReceived);
+        }
     }
+
     public void addBytesReceived(long bytesReceived) {
-        this.bytesReceived += bytesReceived;
+        this.bytesReceived.add(bytesReceived);
     }
 
 
     public long getMsgsSent() {
-        return msgsSent;
+        return msgsSent.longValue();
     }
+
     public void setMsgsSent(long msgsSent) {
-        this.msgsSent = msgsSent;
+        this.msgsSent.reset();
+        if (msgsSent > 0) {
+            this.msgsSent.add(msgsSent);
+        }
     }
+
     public void addMsgsSent(long msgsSent) {
-        this.msgsSent += msgsSent;
+        this.msgsSent.add(msgsSent);
     }
 
 
     public long getMsgsReceived() {
-        return msgsReceived;
+        return msgsReceived.longValue();
     }
+
     public void setMsgsReceived(long msgsReceived) {
-        this.msgsReceived = msgsReceived;
+        this.msgsReceived.reset();
+        if (msgsReceived > 0) {
+            this.msgsReceived.add(msgsReceived);
+        }
     }
+
     public void addMsgsReceived(long msgsReceived) {
-        this.msgsReceived += msgsReceived;
+        this.msgsReceived.add(msgsReceived);
     }
 }

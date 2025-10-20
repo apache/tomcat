@@ -32,7 +32,7 @@ public class RpcMessage implements Externalizable {
     protected boolean reply = false;
 
     public RpcMessage() {
-        //for serialization
+        // for serialization
     }
 
     public RpcMessage(byte[] rpcId, byte[] uuid, Serializable message) {
@@ -42,7 +42,7 @@ public class RpcMessage implements Externalizable {
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException,ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         reply = in.readBoolean();
         int length = in.readInt();
         uuid = new byte[length];
@@ -50,7 +50,7 @@ public class RpcMessage implements Externalizable {
         length = in.readInt();
         rpcId = new byte[length];
         in.readFully(rpcId);
-        message = (Serializable)in.readObject();
+        message = (Serializable) in.readObject();
     }
 
     @Override
@@ -65,15 +65,8 @@ public class RpcMessage implements Externalizable {
 
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder("RpcMessage[");
-        buf.append(super.toString());
-        buf.append("] rpcId=");
-        buf.append(Arrays.toString(rpcId));
-        buf.append("; uuid=");
-        buf.append(Arrays.toString(uuid));
-        buf.append("; msg=");
-        buf.append(message);
-        return buf.toString();
+        return "RpcMessage[" + super.toString() + "] rpcId=" + Arrays.toString(rpcId) + "; uuid=" +
+                Arrays.toString(uuid) + "; msg=" + message;
     }
 
     public static class NoRpcChannelReply extends RpcMessage {
@@ -82,7 +75,7 @@ public class RpcMessage implements Externalizable {
         }
 
         public NoRpcChannelReply(byte[] rpcid, byte[] uuid) {
-            super(rpcid,uuid,null);
+            super(rpcid, uuid, null);
             reply = true;
         }
 

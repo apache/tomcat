@@ -33,6 +33,8 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
 
     protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
+    public static final String LEGACY_SERVER_EMBED_XML = "server-embed.xml";
+
     private final String serverXmlPath;
     private final File catalinaBaseFile;
     private final URI catalinaBaseUri;
@@ -45,7 +47,7 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
 
     @Override
     public Resource getServerXml() throws IOException {
-        IOException ioe = null;
+        IOException ioException = null;
         Resource result = null;
         try {
             if (serverXmlPath == null || serverXmlPath.equals(Catalina.SERVER_XML)) {
@@ -53,23 +55,24 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
             } else {
                 result = getResource(serverXmlPath);
             }
-        } catch (IOException e) {
-            ioe = e;
+        } catch (IOException ioe) {
+            ioException = ioe;
         }
         if (result == null) {
             // Compatibility with legacy server-embed.xml location
-            InputStream stream = getClass().getClassLoader().getResourceAsStream("server-embed.xml");
+            InputStream stream = getClass().getClassLoader().getResourceAsStream(LEGACY_SERVER_EMBED_XML);
             if (stream != null) {
                 try {
-                    result = new Resource(stream, getClass().getClassLoader().getResource("server-embed.xml").toURI());
+                    result = new Resource(stream,
+                            getClass().getClassLoader().getResource(LEGACY_SERVER_EMBED_XML).toURI());
                 } catch (URISyntaxException e) {
                     stream.close();
                 }
             }
         }
 
-        if (result == null && ioe != null) {
-            throw ioe;
+        if (result == null && ioException != null) {
+            throw ioException;
         } else {
             return result;
         }
@@ -105,7 +108,7 @@ public class CatalinaBaseConfigurationSource implements ConfigurationSource {
         }
 
         // Then try URI.
-        URI uri = null;
+        URI uri;
         try {
             uri = getURIInternal(name);
         } catch (IllegalArgumentException e) {

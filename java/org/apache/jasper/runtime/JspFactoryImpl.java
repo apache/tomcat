@@ -31,8 +31,6 @@ import org.apache.jasper.Constants;
 
 /**
  * Implementation of JspFactory.
- *
- * @author Anil K. Vijendran
  */
 public class JspFactoryImpl extends JspFactory {
 
@@ -40,9 +38,8 @@ public class JspFactoryImpl extends JspFactory {
     private int poolSize = -1;
 
     @Override
-    public PageContext getPageContext(Servlet servlet, ServletRequest request,
-            ServletResponse response, String errorPageURL, boolean needsSession,
-            int bufferSize, boolean autoflush) {
+    public PageContext getPageContext(Servlet servlet, ServletRequest request, ServletResponse response,
+            String errorPageURL, boolean needsSession, int bufferSize, boolean autoflush) {
 
         PageContext pc;
         if (poolSize > 0) {
@@ -60,9 +57,8 @@ public class JspFactoryImpl extends JspFactory {
         }
 
         try {
-            pc.initialize(servlet, request, response, errorPageURL,
-                    needsSession, bufferSize, autoflush);
-        } catch (IOException ioe) {
+            pc.initialize(servlet, request, response, errorPageURL, needsSession, bufferSize, autoflush);
+        } catch (IOException ignore) {
             // Implementation never throws IOE but can't change the signature
             // since it is part of the JSP API
         }
@@ -72,7 +68,7 @@ public class JspFactoryImpl extends JspFactory {
 
     @Override
     public void releasePageContext(PageContext pc) {
-        if( pc == null ) {
+        if (pc == null) {
             return;
         }
 
@@ -96,7 +92,7 @@ public class JspFactoryImpl extends JspFactory {
         this.poolSize = poolSize;
     }
 
-    private static final class PageContextPool  {
+    private static final class PageContextPool {
 
         private final PageContext[] pool;
 
@@ -125,8 +121,7 @@ public class JspFactoryImpl extends JspFactory {
     }
 
     @Override
-    public JspApplicationContext getJspApplicationContext(
-            final ServletContext context) {
+    public JspApplicationContext getJspApplicationContext(final ServletContext context) {
         return JspApplicationContextImpl.getInstance(context);
     }
 }

@@ -22,25 +22,23 @@ import jakarta.el.ELException;
 import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstAnd extends BooleanNode {
     public AstAnd(int id) {
         super(id);
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
-        Object obj = children[0].getValue(ctx);
-        Boolean b = ELSupport.coerceToBoolean(ctx, obj, true);
-        if (!b.booleanValue()) {
-            return b;
+    public Object getValue(EvaluationContext ctx) throws ELException {
+        int i = 0;
+        while (i < children.length - 1) {
+            Object obj = children[i].getValue(ctx);
+            Boolean b = ELSupport.coerceToBoolean(ctx, obj, true);
+            if (!b.booleanValue()) {
+                return b;
+            }
+            i++;
         }
-        obj = children[1].getValue(ctx);
-        b = ELSupport.coerceToBoolean(ctx, obj, true);
-        return b;
+        Object obj = children[i].getValue(ctx);
+        return ELSupport.coerceToBoolean(ctx, obj, true);
     }
 }

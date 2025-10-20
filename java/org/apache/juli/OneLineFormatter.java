@@ -17,6 +17,7 @@
 package org.apache.juli;
 
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.management.ManagementFactory;
@@ -24,7 +25,6 @@ import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.logging.Formatter;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
@@ -41,8 +41,8 @@ public class OneLineFormatter extends Formatter {
     private static final Object threadMxBeanLock = new Object();
     private static volatile ThreadMXBean threadMxBean = null;
     private static final int THREAD_NAME_CACHE_SIZE = 10000;
-    private static final ThreadLocal<ThreadNameCache> threadNameCache = ThreadLocal
-            .withInitial(() -> new ThreadNameCache(THREAD_NAME_CACHE_SIZE));
+    private static final ThreadLocal<ThreadNameCache> threadNameCache =
+            ThreadLocal.withInitial(() -> new ThreadNameCache(THREAD_NAME_CACHE_SIZE));
 
     /* Timestamp format */
     private static final String DEFAULT_TIME_FORMAT = "dd-MMM-yyyy HH:mm:ss.SSS";
@@ -50,12 +50,12 @@ public class OneLineFormatter extends Formatter {
     /**
      * The size of our global date format cache
      */
-    private static final int globalCacheSize = 30;
+    private static final int GLOBAL_CACHE_SIZE = 30;
 
     /**
      * The size of our thread local date format cache
      */
-    private static final int localCacheSize = 5;
+    private static final int LOCAL_CACHE_SIZE = 5;
 
     /**
      * Thread local date format cache.
@@ -99,9 +99,9 @@ public class OneLineFormatter extends Formatter {
             cachedTimeFormat = timeFormat;
         }
 
-        final DateFormatCache globalDateCache = new DateFormatCache(globalCacheSize, cachedTimeFormat, null);
-        localDateCache = ThreadLocal
-                .withInitial(() -> new DateFormatCache(localCacheSize, cachedTimeFormat, globalDateCache));
+        final DateFormatCache globalDateCache = new DateFormatCache(GLOBAL_CACHE_SIZE, cachedTimeFormat, null);
+        localDateCache =
+                ThreadLocal.withInitial(() -> new DateFormatCache(LOCAL_CACHE_SIZE, cachedTimeFormat, globalDateCache));
     }
 
 
@@ -129,14 +129,7 @@ public class OneLineFormatter extends Formatter {
         // Thread
         sb.append(' ');
         sb.append('[');
-        final String threadName = Thread.currentThread().getName();
-        if (threadName != null && threadName.startsWith(AsyncFileHandler.THREAD_PREFIX)) {
-            // If using the async handler can't get the thread name from the
-            // current thread.
-            sb.append(getThreadName(record.getLongThreadID()));
-        } else {
-            sb.append(threadName);
-        }
+        sb.append(resolveThreadName(record));
         sb.append(']');
 
         // Source
@@ -147,7 +140,7 @@ public class OneLineFormatter extends Formatter {
 
         // Message
         sb.append(' ');
-        sb.append(formatMessage(record));
+        sb.append(LogUtil.escape(formatMessage(record)));
 
         // New line for next record
         sb.append(System.lineSeparator());
@@ -158,10 +151,21 @@ public class OneLineFormatter extends Formatter {
             PrintWriter pw = new IndentingPrintWriter(sw);
             record.getThrown().printStackTrace(pw);
             pw.close();
-            sb.append(sw.getBuffer());
+            sb.append(LogUtil.escape(sw.toString()));
         }
 
         return sb.toString();
+    }
+
+    protected String resolveThreadName(LogRecord record) {
+        final String threadName = Thread.currentThread().getName();
+        if (threadName != null && threadName.startsWith(AsyncFileHandler.THREAD_PREFIX)) {
+            // If using the async handler can't get the thread name from the
+            // current thread.
+            return getThreadName(record.getLongThreadID());
+        } else {
+            return threadName;
+        }
     }
 
     protected void addTimestamp(StringBuilder buf, long timestamp) {
@@ -209,16 +213,20 @@ public class OneLineFormatter extends Formatter {
 
     /**
      * LogRecord has threadID but no thread name.
+     *
+     * @param logRecordThreadId the thread id
+     *
+     * @return the thread name
      */
-    private static String getThreadName(long logRecordThreadId) {
-        Map<Long, String> cache = threadNameCache.get();
+    protected static String getThreadName(long logRecordThreadId) {
+        Map<Long,String> cache = threadNameCache.get();
         String result = cache.get(Long.valueOf(logRecordThreadId));
 
         if (result != null) {
             return result;
         }
 
-        // Double checked locking OK as threadMxBean is volatile
+        // Double-checked locking OK as threadMxBean is volatile
         if (threadMxBean == null) {
             synchronized (threadMxBeanLock) {
                 if (threadMxBean == null) {
@@ -241,8 +249,9 @@ public class OneLineFormatter extends Formatter {
     /*
      * This is an LRU cache.
      */
-    private static class ThreadNameCache extends LinkedHashMap<Long, String> {
+    private static class ThreadNameCache extends LinkedHashMap<Long,String> {
 
+        @Serial
         private static final long serialVersionUID = 1L;
 
         private final int cacheSize;
@@ -253,7 +262,7 @@ public class OneLineFormatter extends Formatter {
         }
 
         @Override
-        protected boolean removeEldestEntry(Entry<Long, String> eldest) {
+        protected boolean removeEldestEntry(Map.Entry<Long,String> eldest) {
             return (size() > cacheSize);
         }
     }
@@ -278,6 +287,10 @@ public class OneLineFormatter extends Formatter {
 
 
     private enum MillisHandling {
-        NONE, APPEND, REPLACE_S, REPLACE_SS, REPLACE_SSS,
+        NONE,
+        APPEND,
+        REPLACE_S,
+        REPLACE_SS,
+        REPLACE_SSS,
     }
 }

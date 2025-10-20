@@ -118,7 +118,7 @@ public class TestJNDIRealmIntegration {
     public int poolSize;
 
     @Test
-    public void testAuthenication() throws Exception {
+    public void testAuthentication() throws Exception {
         JNDIRealm realm = new JNDIRealm();
         realm.containerLog = LogFactory.getLog(TestJNDIRealmIntegration.class);
 

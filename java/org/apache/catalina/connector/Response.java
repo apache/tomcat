@@ -62,9 +62,6 @@ import org.apache.tomcat.util.security.Escape;
 
 /**
  * Wrapper object for the Coyote response.
- *
- * @author Remy Maucherat
- * @author Craig R. McClanahan
  */
 public class Response implements HttpServletResponse {
 
@@ -73,49 +70,10 @@ public class Response implements HttpServletResponse {
 
     private static final MediaTypeCache MEDIA_TYPE_CACHE = new MediaTypeCache(100);
 
-    // ----------------------------------------------------- Instance Variables
-
-    public Response() {
-        this(OutputBuffer.DEFAULT_BUFFER_SIZE);
-    }
-
-
-    public Response(int outputBufferSize) {
-        outputBuffer = new OutputBuffer(outputBufferSize);
-    }
-
-
-    // ------------------------------------------------------------- Properties
-
     /**
      * Coyote response.
      */
-    protected org.apache.coyote.Response coyoteResponse;
-
-    /**
-     * Set the Coyote response.
-     *
-     * @param coyoteResponse The Coyote response
-     */
-    public void setCoyoteResponse(org.apache.coyote.Response coyoteResponse) {
-        this.coyoteResponse = coyoteResponse;
-        outputBuffer.setResponse(coyoteResponse);
-    }
-
-    /**
-     * @return the Coyote response.
-     */
-    public org.apache.coyote.Response getCoyoteResponse() {
-        return this.coyoteResponse;
-    }
-
-
-    /**
-     * @return the Context within which this Request is being processed.
-     */
-    public Context getContext() {
-        return request.getContext();
-    }
+    protected final org.apache.coyote.Response coyoteResponse;
 
 
     /**
@@ -178,23 +136,43 @@ public class Response implements HttpServletResponse {
     protected final CharChunk redirectURLCC = new CharChunk();
 
 
-    /*
-     * Not strictly required but it makes generating HTTP/2 push requests a lot easier if these are retained until the
-     * response is recycled.
-     */
-    private final List<Cookie> cookies = new ArrayList<>();
-
     private HttpServletResponse applicationResponse = null;
 
 
+    public Response(org.apache.coyote.Response coyoteResponse) {
+        this(coyoteResponse, OutputBuffer.DEFAULT_BUFFER_SIZE);
+    }
+
+
+    public Response(org.apache.coyote.Response coyoteResponse, int outputBufferSize) {
+        this.coyoteResponse = coyoteResponse;
+        outputBuffer = new OutputBuffer(outputBufferSize, coyoteResponse);
+    }
+
+
     // --------------------------------------------------------- Public Methods
+
+    /**
+     * @return the Coyote response.
+     */
+    public org.apache.coyote.Response getCoyoteResponse() {
+        return this.coyoteResponse;
+    }
+
+
+    /**
+     * @return the Context within which this Request is being processed.
+     */
+    public Context getContext() {
+        return request.getContext();
+    }
+
 
     /**
      * Release all object references, and initialize instance variables, in preparation for reuse of this object.
      */
     public void recycle() {
 
-        cookies.clear();
         outputBuffer.recycle();
         usingOutputStream = false;
         usingWriter = false;
@@ -220,11 +198,6 @@ public class Response implements HttpServletResponse {
             writer.recycle();
         }
 
-    }
-
-
-    public List<Cookie> getCookies() {
-        return cookies;
     }
 
 
@@ -285,7 +258,7 @@ public class Response implements HttpServletResponse {
     /**
      * @return the Request with which this Response is associated.
      */
-    public org.apache.catalina.connector.Request getRequest() {
+    public Request getRequest() {
         return this.request;
     }
 
@@ -294,7 +267,7 @@ public class Response implements HttpServletResponse {
      *
      * @param request The new associated request
      */
-    public void setRequest(org.apache.catalina.connector.Request request) {
+    public void setRequest(Request request) {
         this.request = request;
     }
 
@@ -369,12 +342,10 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * Set the error flag.
-     *
-     * @return <code>false</code> if the error flag was already set
+     * Set the error flag if not already set.
      */
-    public boolean setError() {
-        return getCoyoteResponse().setError();
+    public void setError() {
+        getCoyoteResponse().setError();
     }
 
 
@@ -398,6 +369,11 @@ public class Response implements HttpServletResponse {
     }
 
 
+    public void resetError() {
+        getCoyoteResponse().resetError();
+    }
+
+
     /**
      * Perform whatever actions are required to flush and close the output stream or writer, in a single operation.
      *
@@ -417,10 +393,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * @return the content type that was set or calculated for this response, or <code>null</code> if no content type
-     *             was set.
-     */
     @Override
     public String getContentType() {
         return getCoyoteResponse().getContentType();
@@ -453,29 +425,18 @@ public class Response implements HttpServletResponse {
     // ------------------------------------------------ ServletResponse Methods
 
 
-    /**
-     * Flush the buffer and commit this response.
-     *
-     * @exception IOException if an input/output error occurs
-     */
     @Override
     public void flushBuffer() throws IOException {
         outputBuffer.flush();
     }
 
 
-    /**
-     * @return the actual buffer size used for this Response.
-     */
     @Override
     public int getBufferSize() {
         return outputBuffer.getBufferSize();
     }
 
 
-    /**
-     * @return the character encoding used for this Response.
-     */
     @Override
     public String getCharacterEncoding() {
         String charset = getCoyoteResponse().getCharsetHolder().getName();
@@ -494,12 +455,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * @return the servlet output stream associated with this Response.
-     *
-     * @exception IllegalStateException if <code>getWriter</code> has already been called for this response
-     * @exception IOException           if an input/output error occurs
-     */
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
 
@@ -516,21 +471,12 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * @return the Locale assigned to this response.
-     */
     @Override
     public Locale getLocale() {
         return getCoyoteResponse().getLocale();
     }
 
 
-    /**
-     * @return the writer associated with this Response.
-     *
-     * @exception IllegalStateException if <code>getOutputStream</code> has already been called for this response
-     * @exception IOException           if an input/output error occurs
-     */
     @Override
     public PrintWriter getWriter() throws IOException {
 
@@ -559,22 +505,12 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Has the output of this response already been committed?
-     *
-     * @return <code>true</code> if the response has been committed
-     */
     @Override
     public boolean isCommitted() {
         return getCoyoteResponse().isCommitted();
     }
 
 
-    /**
-     * Clear any content written to the buffer.
-     *
-     * @exception IllegalStateException if this response has already been committed
-     */
     @Override
     public void reset() {
         // Ignore any call from an included servlet
@@ -590,11 +526,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Reset the data buffer but not any status or header information.
-     *
-     * @exception IllegalStateException if the response has already been committed
-     */
     @Override
     public void resetBuffer() {
         resetBuffer(false);
@@ -627,13 +558,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the buffer size to be used for this Response.
-     *
-     * @param size The new buffer size
-     *
-     * @exception IllegalStateException if this method is called after output has been committed for this response
-     */
     @Override
     public void setBufferSize(int size) {
 
@@ -646,11 +570,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the content length (in bytes) for this Response.
-     *
-     * @param length The new content length
-     */
     @Override
     public void setContentLength(int length) {
 
@@ -673,11 +592,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the content type for this Response.
-     *
-     * @param type The new content type
-     */
     @Override
     public void setContentType(String type) {
 
@@ -731,12 +645,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Overrides the name of the character encoding used in the body of the request. This method must be called prior to
-     * reading request parameters or reading input using getReader().
-     *
-     * @param encoding String containing the name of the character encoding.
-     */
     @Override
     public void setCharacterEncoding(String encoding) {
 
@@ -762,11 +670,7 @@ public class Response implements HttpServletResponse {
             log.warn(sm.getString("coyoteResponse.encoding.invalid", encoding), e);
             return;
         }
-        if (encoding == null) {
-            isCharacterEncodingSet = false;
-        } else {
-            isCharacterEncodingSet = true;
-        }
+        isCharacterEncodingSet = encoding != null;
     }
 
 
@@ -789,19 +693,10 @@ public class Response implements HttpServletResponse {
         }
 
         getCoyoteResponse().setCharsetHolder(CharsetHolder.getInstance(charset));
-        if (charset == null) {
-            isCharacterEncodingSet = false;
-        } else {
-            isCharacterEncodingSet = true;
-        }
+        isCharacterEncodingSet = charset != null;
     }
 
 
-    /**
-     * Set the Locale that is appropriate for this response, including setting the appropriate character encoding.
-     *
-     * @param locale The new locale
-     */
     @Override
     public void setLocale(Locale locale) {
 
@@ -909,8 +804,6 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        cookies.add(cookie);
-
         String header = generateCookieString(cookie);
         // if we reached here, no exception, cookie is valid
         addHeader("Set-Cookie", header, getContext().getCookieProcessor().getCharset());
@@ -955,16 +848,10 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Add the specified date header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Date value to be set
-     */
     @Override
     public void addDateHeader(String name, long value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -981,12 +868,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Add the specified header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Value to be set
-     */
     @Override
     public void addHeader(String name, String value) {
         addHeader(name, value, null);
@@ -995,7 +876,7 @@ public class Response implements HttpServletResponse {
 
     private void addHeader(String name, String value, Charset charset) {
 
-        if (name == null || name.length() == 0 || value == null) {
+        if (name == null || name.isEmpty() || value == null) {
             return;
         }
 
@@ -1035,16 +916,10 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Add the specified integer header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Integer value to be set
-     */
     @Override
     public void addIntHeader(String name, int value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -1062,13 +937,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Has the specified header been set already in this response?
-     *
-     * @param name Name of the header to check
-     *
-     * @return <code>true</code> if the header has been set
-     */
     @Override
     public boolean containsHeader(String name) {
         // Need special handling for Content-Type and Content-Length due to
@@ -1090,24 +958,17 @@ public class Response implements HttpServletResponse {
 
 
     @Override
-    public void setTrailerFields(Supplier<Map<String, String>> supplier) {
+    public void setTrailerFields(Supplier<Map<String,String>> supplier) {
         getCoyoteResponse().setTrailerFields(supplier);
     }
 
 
     @Override
-    public Supplier<Map<String, String>> getTrailerFields() {
+    public Supplier<Map<String,String>> getTrailerFields() {
         return getCoyoteResponse().getTrailerFields();
     }
 
 
-    /**
-     * Encode the session identifier associated with this response into the specified redirect URL, if necessary.
-     *
-     * @param url URL to be encoded
-     *
-     * @return <code>true</code> if the URL was encoded
-     */
     @Override
     public String encodeRedirectURL(String url) {
         if (isEncodeable(toAbsolute(url))) {
@@ -1118,13 +979,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Encode the session identifier associated with this response into the specified URL, if necessary.
-     *
-     * @param url URL to be encoded
-     *
-     * @return <code>true</code> if the URL was encoded
-     */
     @Override
     public String encodeURL(String url) {
 
@@ -1156,10 +1010,8 @@ public class Response implements HttpServletResponse {
      *
      * @param continueResponseTiming Indicates when the request for the ACK originated so it can be compared with the
      *                                   configured timing for ACK responses.
-     *
-     * @exception IOException if an input/output error occurs
      */
-    public void sendAcknowledgement(ContinueResponseTiming continueResponseTiming) throws IOException {
+    public void sendAcknowledgement(ContinueResponseTiming continueResponseTiming) {
 
         if (isCommitted()) {
             return;
@@ -1174,13 +1026,30 @@ public class Response implements HttpServletResponse {
     }
 
 
+    @Override
+    public void sendEarlyHints() {
+        if (isCommitted()) {
+            return;
+        }
+
+        // Ignore any call from an included servlet
+        if (included) {
+            return;
+        }
+
+        getCoyoteResponse().action(ActionCode.EARLY_HINTS, null);
+    }
+
+
     /**
-     * Send an error response with the specified status and a default message.
-     *
-     * @param status HTTP status code to send
-     *
-     * @exception IllegalStateException if this response has already been committed
-     * @exception IOException           if an input/output error occurs
+     * {@inheritDoc}
+     * <p>
+     * <i>Deprecated functionality</i>: calling <code>sendError</code> with a status code of 103 differs from the usual
+     * behavior. Sending 103 will trigger the container to send a "103 Early Hints" informational response including all
+     * current headers. The application can continue to use the request and response after calling sendError with a 103
+     * status code, including triggering a more typical response of any type.
+     * <p>
+     * Starting with Tomcat 12, applications should use {@link #sendEarlyHints}.
      */
     @Override
     public void sendError(int status) throws IOException {
@@ -1189,13 +1058,14 @@ public class Response implements HttpServletResponse {
 
 
     /**
-     * Send an error response with the specified status and message.
-     *
-     * @param status  HTTP status code to send
-     * @param message Corresponding message to send
-     *
-     * @exception IllegalStateException if this response has already been committed
-     * @exception IOException           if an input/output error occurs
+     * {@inheritDoc}
+     * <p>
+     * <i>Deprecated functionality</i>: calling <code>sendError</code> with a status code of 103 differs from the usual
+     * behavior. Sending 103 will trigger the container to send a "103 Early Hints" informational response including all
+     * current headers. The application can continue to use the request and response after calling sendError with a 103
+     * status code, including triggering a more typical response of any type.
+     * <p>
+     * Starting with Tomcat 12, applications should use {@link #sendEarlyHints}.
      */
     @Override
     public void sendError(int status, String message) throws IOException {
@@ -1209,43 +1079,25 @@ public class Response implements HttpServletResponse {
             return;
         }
 
-        setError();
+        if (HttpServletResponse.SC_EARLY_HINTS == status) {
+            sendEarlyHints();
+        } else {
+            setError();
 
-        getCoyoteResponse().setStatus(status);
-        getCoyoteResponse().setMessage(message);
+            getCoyoteResponse().setStatus(status);
+            getCoyoteResponse().setMessage(message);
 
-        // Clear any data content that has been buffered
-        resetBuffer();
+            // Clear any data content that has been buffered
+            resetBuffer();
 
-        // Cause the response to be finished (from the application perspective)
-        setSuspended(true);
+            // Cause the response to be finished (from the application perspective)
+            setSuspended(true);
+        }
     }
 
 
-    /**
-     * Send a temporary redirect to the specified redirect location URL.
-     *
-     * @param location Location URL to redirect to
-     *
-     * @exception IllegalStateException if this response has already been committed
-     * @exception IOException           if an input/output error occurs
-     */
     @Override
-    public void sendRedirect(String location) throws IOException {
-        sendRedirect(location, SC_FOUND);
-    }
-
-
-    /**
-     * Internal method that allows a redirect to be sent with a status other than {@link HttpServletResponse#SC_FOUND}
-     * (302). No attempt is made to validate the status code.
-     *
-     * @param location Location URL to redirect to
-     * @param status   HTTP status code that will be sent
-     *
-     * @throws IOException an IO exception occurred
-     */
-    public void sendRedirect(String location, int status) throws IOException {
+    public void sendRedirect(String location, int status, boolean clearBuffer) throws IOException {
         if (isCommitted()) {
             throw new IllegalStateException(sm.getString("coyoteResponse.sendRedirect.ise"));
         }
@@ -1256,7 +1108,9 @@ public class Response implements HttpServletResponse {
         }
 
         // Clear any data content that has been buffered
-        resetBuffer(true);
+        if (clearBuffer) {
+            resetBuffer(true);
+        }
 
         // Generate a temporary redirect to the specified location
         try {
@@ -1274,7 +1128,7 @@ public class Response implements HttpServletResponse {
             }
             setStatus(status);
             setHeader("Location", locationUri);
-            if (context != null && context.getSendRedirectBody()) {
+            if (clearBuffer && context != null && context.getSendRedirectBody()) {
                 PrintWriter writer = getWriter();
                 writer.print(sm.getString("coyoteResponse.sendRedirect.note", Escape.htmlElementContent(locationUri)));
                 flushBuffer();
@@ -1289,16 +1143,10 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the specified date header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Date value to be set
-     */
     @Override
     public void setDateHeader(String name, long value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -1315,16 +1163,10 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the specified header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Value to be set
-     */
     @Override
     public void setHeader(String name, String value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -1348,16 +1190,10 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the specified integer header to the specified value.
-     *
-     * @param name  Name of the header to set
-     * @param value Integer value to be set
-     */
     @Override
     public void setIntHeader(String name, int value) {
 
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             return;
         }
 
@@ -1375,11 +1211,6 @@ public class Response implements HttpServletResponse {
     }
 
 
-    /**
-     * Set the HTTP status to be returned with this response.
-     *
-     * @param status The new HTTP status
-     */
     @Override
     public void setStatus(int status) {
 
@@ -1443,11 +1274,11 @@ public class Response implements HttpServletResponse {
 
     private static boolean doIsEncodeable(Context context, Request hreq, Session session, String location) {
         // Is this a valid absolute URL?
-        URL url = null;
+        URL url;
         try {
             URI uri = new URI(location);
             url = uri.toURL();
-        } catch (MalformedURLException | URISyntaxException e) {
+        } catch (MalformedURLException | URISyntaxException | IllegalArgumentException e) {
             return false;
         }
 
@@ -1485,9 +1316,7 @@ public class Response implements HttpServletResponse {
                 return false;
             }
             String tok = ";" + SessionConfig.getSessionUriParamName(context) + "=" + session.getIdInternal();
-            if (file.indexOf(tok, contextPath.length()) >= 0) {
-                return false;
-            }
+            return file.indexOf(tok, contextPath.length()) < 0;
         }
 
         // This URL belongs to our web application, so it is encodeable
@@ -1510,7 +1339,7 @@ public class Response implements HttpServletResponse {
     protected String toAbsolute(String location) {
 
         if (location == null) {
-            return location;
+            return null;
         }
 
         boolean leadingSlash = location.startsWith("/");
@@ -1525,8 +1354,8 @@ public class Response implements HttpServletResponse {
                 redirectURLCC.append(':');
                 redirectURLCC.append(location, 0, location.length());
                 return redirectURLCC.toString();
-            } catch (IOException e) {
-                throw new IllegalArgumentException(location, e);
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException(location, ioe);
             }
 
         } else if (leadingSlash || !UriUtil.hasScheme(location)) {
@@ -1557,8 +1386,8 @@ public class Response implements HttpServletResponse {
                 redirectURLCC.append(location, 0, location.length());
 
                 normalize(redirectURLCC);
-            } catch (IOException e) {
-                throw new IllegalArgumentException(location, e);
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException(location, ioe);
             }
 
             return redirectURLCC.toString();
@@ -1592,15 +1421,14 @@ public class Response implements HttpServletResponse {
         if (cc.endsWith("/.") || cc.endsWith("/..")) {
             try {
                 cc.append('/');
-            } catch (IOException e) {
-                throw new IllegalArgumentException(cc.toString(), e);
+            } catch (IOException ioe) {
+                throw new IllegalArgumentException(cc.toString(), ioe);
             }
         }
 
         char[] c = cc.getChars();
         int start = cc.getStart();
         int end = cc.getEnd();
-        int index = 0;
         int startIndex = 0;
 
         // Advance past the first three / characters (should place index just
@@ -1611,7 +1439,7 @@ public class Response implements HttpServletResponse {
         }
 
         // Remove /./
-        index = startIndex;
+        int index = startIndex;
         while (true) {
             index = cc.indexOf("/./", 0, 3, index);
             if (index < 0) {
@@ -1674,10 +1502,7 @@ public class Response implements HttpServletResponse {
             return false;
         }
         pos = uri.indexOf('/', pos + 3);
-        if (pos < 0) {
-            return false;
-        }
-        return true;
+        return pos >= 0;
     }
 
     /**
@@ -1689,7 +1514,7 @@ public class Response implements HttpServletResponse {
      * @return the encoded URL
      */
     protected String toEncoded(String url, String sessionId) {
-        if ((url == null) || (sessionId == null)) {
+        if (url == null || sessionId == null) {
             return url;
         }
 
@@ -1707,7 +1532,7 @@ public class Response implements HttpServletResponse {
             path = path.substring(0, pound);
         }
         StringBuilder sb = new StringBuilder(path);
-        if (sb.length() > 0) { // jsessionid can't be first.
+        if (!sb.isEmpty()) { // jsessionid can't be first.
             sb.append(';');
             sb.append(SessionConfig.getSessionUriParamName(request.getContext()));
             sb.append('=');

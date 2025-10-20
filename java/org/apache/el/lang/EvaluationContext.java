@@ -39,8 +39,7 @@ public final class EvaluationContext extends ELContext {
 
     private LambdaExpressionNestedState lambdaExpressionNestedState;
 
-    public EvaluationContext(ELContext elContext, FunctionMapper fnMapper,
-            VariableMapper varMapper) {
+    public EvaluationContext(ELContext elContext, FunctionMapper fnMapper, VariableMapper varMapper) {
         this.elContext = elContext;
         this.fnMapper = fnMapper;
         this.varMapper = varMapper;
@@ -88,7 +87,7 @@ public final class EvaluationContext extends ELContext {
     @Override
     public Locale getLocale() {
         return elContext.getLocale();
-        }
+    }
 
     @Override
     public void setLocale(Locale locale) {
@@ -141,7 +140,7 @@ public final class EvaluationContext extends ELContext {
     }
 
     @Override
-    public void enterLambdaScope(Map<String, Object> arguments) {
+    public void enterLambdaScope(Map<String,Object> arguments) {
         elContext.enterLambdaScope(arguments);
     }
 
@@ -178,10 +177,10 @@ public final class EvaluationContext extends ELContext {
 
 
     public void setLambdaExpressionNestedState(LambdaExpressionNestedState lambdaExpressionNestedState) {
-      if (this.lambdaExpressionNestedState != null) {
-          // Should never happen
-          throw new IllegalStateException(MessageFactory.get("error.lambda.wrongNestedState"));
-      }
+        if (this.lambdaExpressionNestedState != null) {
+            // Should never happen
+            throw new IllegalStateException(MessageFactory.get("error.lambda.wrongNestedState"));
+        }
 
         this.lambdaExpressionNestedState = lambdaExpressionNestedState;
     }

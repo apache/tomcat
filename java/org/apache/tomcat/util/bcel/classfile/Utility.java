@@ -28,10 +28,7 @@ import org.apache.tomcat.util.bcel.Const;
 final class Utility {
 
     /**
-     * Shorten long class name <em>str</em>, i.e., chop off the <em>prefix</em>,
-     * if the
-     * class name starts with this string and the flag <em>chopit</em> is true.
-     * Slashes <em>/</em> are converted to dots <em>.</em>.
+     * Shorten long class names, <em>java/lang/String</em> becomes <em>String</em>.
      *
      * @param str The long class name
      * @return Compacted class name

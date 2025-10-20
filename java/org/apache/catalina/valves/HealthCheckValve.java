@@ -26,7 +26,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.apache.catalina.util.LifecycleBase;
 import org.apache.tomcat.util.buf.MessageBytes;
 
 
@@ -72,7 +71,7 @@ public class HealthCheckValve extends ValveBase {
     }
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         super.startInternal();
         context = (getContainer() instanceof Context);
     }
@@ -99,11 +98,7 @@ public class HealthCheckValve extends ValveBase {
                 return false;
             }
         }
-        if (container instanceof LifecycleBase) {
-            return ((LifecycleBase) container).getState().isAvailable();
-        } else {
-            return true;
-        }
+        return container.getState().isAvailable();
     }
 
 }

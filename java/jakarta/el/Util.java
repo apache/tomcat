@@ -16,7 +16,6 @@
  */
 package jakarta.el;
 
-import java.lang.ref.WeakReference;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
@@ -31,10 +30,6 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 class Util {
 
@@ -47,9 +42,6 @@ class Util {
      * @param t the Throwable to check
      */
     static void handleThrowable(Throwable t) {
-        if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        }
         if (t instanceof VirtualMachineError) {
             throw (VirtualMachineError) t;
         }
@@ -80,9 +72,7 @@ class Util {
         }
     }
 
-
-    private static final CacheValue nullTcclFactory = new CacheValue();
-    private static final Map<CacheKey, CacheValue> factoryCache = new ConcurrentHashMap<>();
+    private static final ExpressionFactoryCache factoryCache = new ExpressionFactoryCache();
 
     /**
      * Provides a per class loader cache of ExpressionFactory instances without pinning any in memory as that could
@@ -92,101 +82,7 @@ class Util {
 
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
 
-        CacheValue cacheValue = null;
-        ExpressionFactory factory = null;
-
-        if (tccl == null) {
-            cacheValue = nullTcclFactory;
-        } else {
-            CacheKey key = new CacheKey(tccl);
-            cacheValue = factoryCache.get(key);
-            if (cacheValue == null) {
-                CacheValue newCacheValue = new CacheValue();
-                cacheValue = factoryCache.putIfAbsent(key, newCacheValue);
-                if (cacheValue == null) {
-                    cacheValue = newCacheValue;
-                }
-            }
-        }
-
-        final Lock readLock = cacheValue.getLock().readLock();
-        readLock.lock();
-        try {
-            factory = cacheValue.getExpressionFactory();
-        } finally {
-            readLock.unlock();
-        }
-
-        if (factory == null) {
-            final Lock writeLock = cacheValue.getLock().writeLock();
-            writeLock.lock();
-            try {
-                factory = cacheValue.getExpressionFactory();
-                if (factory == null) {
-                    factory = ExpressionFactory.newInstance();
-                    cacheValue.setExpressionFactory(factory);
-                }
-            } finally {
-                writeLock.unlock();
-            }
-        }
-
-        return factory;
-    }
-
-
-    /**
-     * Key used to cache default ExpressionFactory information per class loader. The class loader reference is never
-     * {@code null}, because {@code null} tccl is handled separately.
-     */
-    private static class CacheKey {
-        private final int hash;
-        private final WeakReference<ClassLoader> ref;
-
-        CacheKey(ClassLoader key) {
-            hash = key.hashCode();
-            ref = new WeakReference<>(key);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (obj == this) {
-                return true;
-            }
-            if (!(obj instanceof CacheKey)) {
-                return false;
-            }
-            ClassLoader thisKey = ref.get();
-            if (thisKey == null) {
-                return false;
-            }
-            return thisKey == ((CacheKey) obj).ref.get();
-        }
-    }
-
-    private static class CacheValue {
-        private final ReadWriteLock lock = new ReentrantReadWriteLock();
-        private WeakReference<ExpressionFactory> ref;
-
-        CacheValue() {
-        }
-
-        public ReadWriteLock getLock() {
-            return lock;
-        }
-
-        public ExpressionFactory getExpressionFactory() {
-            return ref != null ? ref.get() : null;
-        }
-
-        public void setExpressionFactory(ExpressionFactory factory) {
-            ref = new WeakReference<>(factory);
-        }
+        return factoryCache.getOrCreateExpressionFactory(tccl);
     }
 
 
@@ -205,6 +101,16 @@ class Util {
             paramTypes = getTypesFromValues(paramValues);
         }
 
+        // Fast path: when no arguments exist, there can only be one matching method and no need for coercion.
+        if (paramTypes.length == 0) {
+            try {
+                Method method = clazz.getMethod(methodName, paramTypes);
+                return getMethod(clazz, base, method);
+            } catch (NoSuchMethodException | SecurityException ignore) {
+                // Fall through to broader, slower logic
+            }
+        }
+
         Method[] methods = clazz.getMethods();
 
         List<Wrapper<Method>> wrappers = Wrapper.wrap(methods, methodName);
@@ -221,7 +127,7 @@ class Util {
     private static <T> Wrapper<T> findWrapper(ELContext context, Class<?> clazz, List<Wrapper<T>> wrappers, String name,
             Class<?>[] paramTypes, Object[] paramValues) {
 
-        Map<Wrapper<T>, MatchResult> candidates = new HashMap<>();
+        Map<Wrapper<T>,MatchResult> candidates = new HashMap<>();
 
         int paramCount = paramTypes.length;
 
@@ -335,7 +241,7 @@ class Util {
         MatchResult bestMatch = new MatchResult(true, 0, 0, 0, 0, true);
         Wrapper<T> match = null;
         boolean multiple = false;
-        for (Map.Entry<Wrapper<T>, MatchResult> entry : candidates.entrySet()) {
+        for (Map.Entry<Wrapper<T>,MatchResult> entry : candidates.entrySet()) {
             int cmp = entry.getValue().compareTo(bestMatch);
             if (cmp > 0 || match == null) {
                 bestMatch = entry.getValue();
@@ -496,8 +402,10 @@ class Util {
      * This method duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
     private static boolean isCoercibleFrom(ELContext context, Object src, Class<?> target) {
-        // TODO: This isn't pretty but it works. Significant refactoring would
-        // be required to avoid the exception.
+        /*
+         * TODO: This isn't pretty but it works. Significant refactoring would be required to avoid the exception. See
+         * also OptionalELResolver.convertToType().
+         */
         try {
             context.convertToType(src, target);
         } catch (ELException e) {
@@ -512,7 +420,7 @@ class Util {
             return EMPTY_CLASS_ARRAY;
         }
 
-        Class<?> result[] = new Class<?>[values.length];
+        Class<?>[] result = new Class<?>[values.length];
         for (int i = 0; i < values.length; i++) {
             if (values[i] == null) {
                 result[i] = null;
@@ -533,7 +441,7 @@ class Util {
             return m;
         }
         Class<?>[] interfaces = type.getInterfaces();
-        Method mp = null;
+        Method mp;
         for (Class<?> iface : interfaces) {
             try {
                 mp = iface.getMethod(m.getName(), m.getParameterTypes());
@@ -723,24 +631,8 @@ class Util {
     /*
      * This class duplicates code in org.apache.el.util.ReflectionUtil. When making changes keep the code in sync.
      */
-    private static class MatchResult implements Comparable<MatchResult> {
-
-        private final boolean varArgs;
-        private final int exactCount;
-        private final int assignableCount;
-        private final int coercibleCount;
-        private final int varArgsCount;
-        private final boolean bridge;
-
-        MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount, int varArgsCount,
-                boolean bridge) {
-            this.varArgs = varArgs;
-            this.exactCount = exactCount;
-            this.assignableCount = assignableCount;
-            this.coercibleCount = coercibleCount;
-            this.varArgsCount = varArgsCount;
-            this.bridge = bridge;
-        }
+    private record MatchResult(boolean varArgs, int exactCount, int assignableCount, int coercibleCount,
+            int varArgsCount, boolean bridge) implements Comparable<MatchResult> {
 
         public boolean isVarArgs() {
             return varArgs;
@@ -808,12 +700,12 @@ class Util {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = prime * result + assignableCount;
-            result = prime * result + (bridge ? 1231 : 1237);
-            result = prime * result + coercibleCount;
-            result = prime * result + exactCount;
-            result = prime * result + (varArgs ? 1231 : 1237);
-            result = prime * result + varArgsCount;
+            result = prime * result + getAssignableCount();
+            result = prime * result + (isBridge() ? 1231 : 1237);
+            result = prime * result + getCoercibleCount();
+            result = prime * result + getExactCount();
+            result = prime * result + (isVarArgs() ? 1231 : 1237);
+            result = prime * result + getVarArgsCount();
             return result;
         }
     }

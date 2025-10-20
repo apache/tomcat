@@ -42,13 +42,14 @@ final class ConnectionFactoryFactory {
         final Properties connectionProperties = basicDataSource.getConnectionProperties();
         final String url = basicDataSource.getUrl();
         // Set up the driver connection factory we will use
-        final String user = basicDataSource.getUsername();
+        final String user = basicDataSource.getUserName();
         if (user != null) {
             connectionProperties.put(Constants.KEY_USER, user);
         } else {
             basicDataSource.log(String.format("DBCP DataSource configured without a '%s'", Constants.KEY_USER));
         }
 
+        @SuppressWarnings("deprecation")
         final String pwd = basicDataSource.getPassword();
         if (pwd != null) {
             connectionProperties.put(Constants.KEY_PASSWORD, pwd);

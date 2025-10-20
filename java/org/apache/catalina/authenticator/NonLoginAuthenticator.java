@@ -25,8 +25,6 @@ import org.apache.catalina.connector.Request;
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation that checks only security constraints not involving user
  * authentication.
- *
- * @author Craig R. McClanahan
  */
 public final class NonLoginAuthenticator extends AuthenticatorBase {
 
@@ -86,20 +84,17 @@ public final class NonLoginAuthenticator extends AuthenticatorBase {
         }
 
         // No Principal means the user is not already authenticated
-        // and so will not be assigned any roles. It is safe to
+        // and so will not be assigned any roles. It is safe
         // to say the user is now authenticated because access to
         // protected resources will only be allowed with a matching role.
         // i.e. SC_FORBIDDEN (403 status) will be generated later.
-        if (containerLog.isDebugEnabled()) {
-            containerLog.debug("User authenticated without any roles");
+        if (containerLog.isTraceEnabled()) {
+            containerLog.trace("User authenticated without any roles");
         }
         return true;
     }
 
 
-    /**
-     * Return the authentication method, which is vendor-specific and not defined by HttpServletRequest.
-     */
     @Override
     protected String getAuthMethod() {
         return "NONE";

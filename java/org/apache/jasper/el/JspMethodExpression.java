@@ -29,8 +29,7 @@ import jakarta.el.MethodNotFoundException;
 import jakarta.el.MethodReference;
 import jakarta.el.PropertyNotFoundException;
 
-public final class JspMethodExpression extends MethodExpression implements
-        Externalizable {
+public final class JspMethodExpression extends MethodExpression implements Externalizable {
 
     private String mark;
 
@@ -47,8 +46,7 @@ public final class JspMethodExpression extends MethodExpression implements
 
     @Override
     public MethodInfo getMethodInfo(ELContext context)
-            throws NullPointerException, PropertyNotFoundException,
-            MethodNotFoundException, ELException {
+            throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException {
         context.notifyBeforeEvaluation(getExpressionString());
         try {
             MethodInfo result = this.target.getMethodInfo(context);
@@ -74,8 +72,7 @@ public final class JspMethodExpression extends MethodExpression implements
 
     @Override
     public Object invoke(ELContext context, Object[] params)
-            throws NullPointerException, PropertyNotFoundException,
-            MethodNotFoundException, ELException {
+            throws NullPointerException, PropertyNotFoundException, MethodNotFoundException, ELException {
         context.notifyBeforeEvaluation(getExpressionString());
         try {
             Object result = this.target.invoke(context, params);
@@ -156,8 +153,7 @@ public final class JspMethodExpression extends MethodExpression implements
     }
 
     @Override
-    public void readExternal(ObjectInput in) throws IOException,
-            ClassNotFoundException {
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         this.mark = in.readUTF();
         this.target = (MethodExpression) in.readObject();
     }

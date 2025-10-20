@@ -20,6 +20,8 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
+ * The key type for entries in a {@link PerUserPoolDataSource}.
+ *
  * @since 2.0
  */
 final class PoolKey implements Serializable {

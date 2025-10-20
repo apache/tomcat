@@ -123,7 +123,6 @@ public class AbandonedConfig {
      *
      * @return boolean true if stack trace logging is turned on for abandoned
      * objects
-     *
      */
     public boolean getLogAbandoned() {
         return this.logAbandoned;
@@ -166,7 +165,7 @@ public class AbandonedConfig {
      * <p>If set to true, abandoned objects are removed by the pool
      * maintenance thread when it runs.  This setting has no effect
      * unless maintenance is enabled by setting
-     * {@link GenericObjectPool#getDurationBetweenEvictionRuns() durationBetweenEvictionRuns}
+     * {@link GenericObjectPool#getDurationBetweenEvictionRuns()}
      * to a positive number.</p>
      *
      * @return true if abandoned objects are to be removed by the evictor
@@ -240,7 +239,6 @@ public class AbandonedConfig {
      *
      * @param logAbandoned true turns on abandoned stack trace logging
      * @see #getLogAbandoned()
-     *
      */
     public void setLogAbandoned(final boolean logAbandoned) {
         this.logAbandoned = logAbandoned;

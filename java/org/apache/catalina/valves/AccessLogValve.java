@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 import org.apache.catalina.LifecycleException;
@@ -317,11 +318,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
      */
     public void setFileDateFormat(String fileDateFormat) {
         String newFormat;
-        if (fileDateFormat == null) {
-            newFormat = "";
-        } else {
-            newFormat = fileDateFormat;
-        }
+        newFormat = Objects.requireNonNullElse(fileDateFormat, "");
         this.fileDateFormat = newFormat;
 
         synchronized (this) {
@@ -345,7 +342,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
      * @param encoding The name of the character set.
      */
     public void setEncoding(String encoding) {
-        if (encoding != null && encoding.length() > 0) {
+        if (encoding != null && !encoding.isEmpty()) {
             this.encoding = encoding;
         } else {
             this.encoding = null;
@@ -355,8 +352,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Execute a periodic task, such as reloading, etc. This method will be invoked inside the classloading context of
-     * this container. Unexpected throwables will be caught and logged.
+     * Provides support for access log rotation.
      */
     @Override
     public synchronized void backgroundProcess() {
@@ -378,14 +374,14 @@ public class AccessLogValve extends AbstractAccessLogValve {
                     for (String oldAccessLog : oldAccessLogs) {
                         boolean match = false;
 
-                        if (prefix != null && prefix.length() > 0) {
+                        if (prefix != null && !prefix.isEmpty()) {
                             if (!oldAccessLog.startsWith(prefix)) {
                                 continue;
                             }
                             match = true;
                         }
 
-                        if (suffix != null && suffix.length() > 0) {
+                        if (suffix != null && !suffix.isEmpty()) {
                             if (!oldAccessLog.endsWith(suffix)) {
                                 continue;
                             }
@@ -450,9 +446,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
             close(false);
             try {
                 holder.renameTo(new File(newFileName));
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                log.error(sm.getString("accessLogValve.rotateFail"), e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("accessLogValve.rotateFail"), t);
             }
 
             /* Make sure date is correct */
@@ -519,9 +515,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
                 if (!rotatedLogFile.renameTo(newLogFile)) {
                     log.error(sm.getString("accessLogValve.renameFail", rotatedLogFile, newLogFile));
                 }
-            } catch (Throwable e) {
-                ExceptionUtils.handleThrowable(e);
-                log.error(sm.getString("accessLogValve.renameFail", rotatedLogFile, newLogFile), e);
+            } catch (Throwable t) {
+                ExceptionUtils.handleThrowable(t);
+                log.error(sm.getString("accessLogValve.renameFail", rotatedLogFile, newLogFile), t);
             }
         }
     }
@@ -545,9 +541,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
                     if (!currentLogFile.renameTo(newLogFile)) {
                         log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile));
                     }
-                } catch (Throwable e) {
-                    ExceptionUtils.handleThrowable(e);
-                    log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile), e);
+                } catch (Throwable t) {
+                    ExceptionUtils.handleThrowable(t);
+                    log.error(sm.getString("accessLogValve.renameFail", currentLogFile, newLogFile), t);
                 }
             } else {
                 log.error(sm.getString("accessLogValve.alreadyExists", currentLogFile, newLogFile));
@@ -559,11 +555,6 @@ public class AccessLogValve extends AbstractAccessLogValve {
     }
 
 
-    /**
-     * Log the specified message to the log file, switching files if the date has changed since the previous log call.
-     *
-     * @param message Message to be logged
-     */
     @Override
     public void log(CharArrayWriter message) {
 
@@ -575,9 +566,9 @@ public class AccessLogValve extends AbstractAccessLogValve {
                 if (currentLogFile != null && !currentLogFile.exists()) {
                     try {
                         close(false);
-                    } catch (Throwable e) {
-                        ExceptionUtils.handleThrowable(e);
-                        log.info(sm.getString("accessLogValve.closeFail"), e);
+                    } catch (Throwable t) {
+                        ExceptionUtils.handleThrowable(t);
+                        log.info(sm.getString("accessLogValve.closeFail"), t);
                     }
 
                     /* Make sure date is correct */
@@ -631,10 +622,10 @@ public class AccessLogValve extends AbstractAccessLogValve {
                     false);
 
             currentLogFile = pathname;
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             writer = null;
             currentLogFile = null;
-            log.error(sm.getString("accessLogValve.openFail", pathname, System.getProperty("user.name")), e);
+            log.error(sm.getString("accessLogValve.openFail", pathname, System.getProperty("user.name")), ioe);
         }
         // Rotating a log file will always trigger a new file to be opened so
         // when a new file is opened, check to see if any old files need to be
@@ -650,7 +641,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
      *                                   used
      */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
 
         // Initialize the Date formatters
         String format = getFileDateFormat();
@@ -674,7 +665,7 @@ public class AccessLogValve extends AbstractAccessLogValve {
      *                                   used
      */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
+    protected void stopInternal() throws LifecycleException {
 
         super.stopInternal();
         close(false);

@@ -16,11 +16,13 @@
  */
 package org.apache.jasper.el;
 
+import java.io.Serial;
+
 import jakarta.el.PropertyNotWritableException;
 
-public class JspPropertyNotWritableException extends
-        PropertyNotWritableException {
+public class JspPropertyNotWritableException extends PropertyNotWritableException {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public JspPropertyNotWritableException(String mark, PropertyNotWritableException e) {

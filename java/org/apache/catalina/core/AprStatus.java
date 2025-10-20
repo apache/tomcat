@@ -24,7 +24,7 @@ public class AprStatus {
     private static volatile boolean aprAvailable = false;
     private static volatile boolean useOpenSSL = true;
     private static volatile boolean instanceCreated = false;
-
+    private static volatile int openSSLVersion = 0;
 
     public static boolean isAprInitialized() {
         return aprInitialized;
@@ -57,4 +57,19 @@ public class AprStatus {
     public static void setInstanceCreated(boolean instanceCreated) {
         AprStatus.instanceCreated = instanceCreated;
     }
+
+    /**
+     * @return the openSSLVersion
+     */
+    public static int getOpenSSLVersion() {
+        return openSSLVersion;
+    }
+
+    /**
+     * @param openSSLVersion the openSSLVersion to set
+     */
+    public static void setOpenSSLVersion(int openSSLVersion) {
+        AprStatus.openSSLVersion = openSSLVersion;
+    }
+
 }

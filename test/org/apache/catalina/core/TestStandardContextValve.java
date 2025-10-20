@@ -47,12 +47,12 @@ public class TestStandardContextValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Traces order of events across multiple components
         StringBuilder trace = new StringBuilder();
 
-        //Add the error page
+        // Add the error page
         Tomcat.addServlet(ctx, "errorPage", new Bug51653ErrorPage(trace));
         ctx.addServletMappingDecoded("/error", "errorPage");
         // And the handling for 404 responses
@@ -62,15 +62,13 @@ public class TestStandardContextValve extends TomcatBaseTest {
         ctx.addErrorPage(errorPage);
 
         // Add the request listener
-        Bug51653RequestListener reqListener =
-            new Bug51653RequestListener(trace);
+        Bug51653RequestListener reqListener = new Bug51653RequestListener(trace);
         ((StandardContext) ctx).addApplicationEventListener(reqListener);
 
         tomcat.start();
 
         // Request a page that does not exist
-        int rc = getUrl("http://localhost:" + getPort() + "/invalid",
-                new ByteChunk(), null);
+        int rc = getUrl("http://localhost:" + getPort() + "/invalid", new ByteChunk(), null);
 
         // Need to allow time (but not too long in case the test fails) for
         // ServletRequestListener to complete
@@ -94,7 +92,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Traces order of events across multiple components
         StringBuilder trace = new StringBuilder();
@@ -113,15 +111,13 @@ public class TestStandardContextValve extends TomcatBaseTest {
         ctx.addErrorPage(errorPage);
 
         // Add the request listener
-        Bug51653RequestListener reqListener =
-            new Bug51653RequestListener(trace);
+        Bug51653RequestListener reqListener = new Bug51653RequestListener(trace);
         ((StandardContext) ctx).addApplicationEventListener(reqListener);
 
         tomcat.start();
 
         // Request a page that does not exist
-        int rc = getUrl("http://localhost:" + getPort() + "/test",
-                new ByteChunk(), null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test", new ByteChunk(), null);
 
         // Need to allow time (but not too long in case the test fails) for
         // ServletRequestListener to complete
@@ -143,8 +139,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             resp.sendError(Response.SC_NOT_FOUND);
         }
     }
@@ -160,8 +155,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         }
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
             sb.append("Error");
 
             resp.setContentType("text/plain");
@@ -170,8 +164,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
     }
 
 
-    private static class Bug51653RequestListener
-            implements ServletRequestListener {
+    private static class Bug51653RequestListener implements ServletRequestListener {
 
         private StringBuilder sb;
 
@@ -234,7 +227,7 @@ public class TestStandardContextValve extends TomcatBaseTest {
         final Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        final Context ctx = tomcat.addContext("", null);
+        final Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "echo", new EchoBodyServlet());
         ctx.addServletMappingDecoded("/echo", "echo");

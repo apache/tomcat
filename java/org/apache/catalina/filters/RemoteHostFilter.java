@@ -28,8 +28,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Concrete implementation of <code>RequestFilter</code> that filters based on the remote client's host name.
- *
- * @author Craig R. McClanahan
  */
 public final class RemoteHostFilter extends RequestFilter {
 

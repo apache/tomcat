@@ -1,4 +1,4 @@
-/**
+/*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -33,14 +33,13 @@ import jakarta.security.auth.message.module.ServerAuthModule;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Basic implementation primarily intended for use when using third-party
- * {@link ServerAuthModule} implementations that only provide the module. This
- * implementation supports configuring the {@link ServerAuthContext} with
- * multiple modules.
+ * Basic implementation primarily intended for use when using third-party {@link ServerAuthModule} implementations that
+ * only provide the module. This implementation supports configuring the {@link ServerAuthContext} with multiple
+ * modules.
  */
 public class SimpleServerAuthConfig implements ServerAuthConfig {
 
-    private static StringManager sm = StringManager.getManager(SimpleServerAuthConfig.class);
+    private static final StringManager sm = StringManager.getManager(SimpleServerAuthConfig.class);
 
     private static final String SERVER_AUTH_MODULE_KEY_PREFIX =
             "org.apache.catalina.authenticator.jaspic.ServerAuthModule.";
@@ -92,8 +91,8 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
 
 
     @Override
-    public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject,
-            Map<String,Object> properties) throws AuthException {
+    public ServerAuthContext getAuthContext(String authContextID, Subject serviceSubject, Map<String,Object> properties)
+            throws AuthException {
         ServerAuthContext serverAuthContext = this.serverAuthContext;
         if (serverAuthContext == null) {
             synchronized (this) {
@@ -113,15 +112,11 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                     while (moduleClassName instanceof String) {
                         try {
                             Class<?> clazz = Class.forName((String) moduleClassName);
-                            ServerAuthModule module =
-                                    (ServerAuthModule) clazz.getConstructor().newInstance();
+                            ServerAuthModule module = (ServerAuthModule) clazz.getConstructor().newInstance();
                             module.initialize(null, null, handler, mergedProperties);
                             modules.add(module);
-                        } catch (ReflectiveOperationException | IllegalArgumentException |
-                                SecurityException e) {
-                            AuthException ae = new AuthException();
-                            ae.initCause(e);
-                            throw ae;
+                        } catch (ReflectiveOperationException | IllegalArgumentException | SecurityException e) {
+                            throw new AuthException(e);
                         }
 
                         // Look for the next module
@@ -130,7 +125,7 @@ public class SimpleServerAuthConfig implements ServerAuthConfig {
                         moduleClassName = mergedProperties.get(key);
                     }
 
-                    if (modules.size() == 0) {
+                    if (modules.isEmpty()) {
                         throw new AuthException(sm.getString("simpleServerAuthConfig.noModules"));
                     }
 

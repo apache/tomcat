@@ -25,13 +25,11 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 /**
- * Provides an output stream for sending binary data to the client. A
- * <code>ServletOutputStream</code> object is normally retrieved via the
- * {@link ServletResponse#getOutputStream} method.
+ * Provides an output stream for sending binary data to the client. A <code>ServletOutputStream</code> object is
+ * normally retrieved via the {@link ServletResponse#getOutputStream} method.
  * <p>
- * This is an abstract class that the servlet container implements. Subclasses
- * of this class must implement the <code>java.io.OutputStream.write(int)</code>
- * method.
+ * This is an abstract class that the servlet container implements. Subclasses of this class must implement the
+ * <code>java.io.OutputStream.write(int)</code> method.
  *
  * @see ServletResponse
  */
@@ -50,45 +48,33 @@ public abstract class ServletOutputStream extends OutputStream {
     /**
      * Writes from the given buffer to the output stream.
      * <p>
-     * If the output steam is in non-blocking mode, before each invocation of
-     * this method {@link #isReady()} must be called and must return
-     * {@code true} or the {@link WriteListener#onWritePossible()} call back
-     * must indicate that data may be written else an
-     * {@link IllegalStateException} must be thrown.
+     * If the output steam is in non-blocking mode, before each invocation of this method {@link #isReady()} must be
+     * called and must return {@code true} or the {@link WriteListener#onWritePossible()} call back must indicate that
+     * data may be written else an {@link IllegalStateException} must be thrown.
      * <p>
-     * Otherwise, if this method is called when {@code buffer} has no data
-     * remaining, the method returns immediately and {@code buffer} is
-     * unchanged.
+     * Otherwise, if this method is called when {@code buffer} has no data remaining, the method returns immediately and
+     * {@code buffer} is unchanged.
      * <p>
-     * If the output stream is in non-blocking mode, neither the position, limit
-     * nor content of the buffer passed to this method may be modified until a
-     * subsequent call to {@link #isReady()} returns true or the
-     * {@link WriteListener#onWritePossible()} call back indicates data may be
-     * written again. At this point the buffer's limit will be unchanged from
-     * the value when passed to this method and the position will be the same as
+     * If the output stream is in non-blocking mode, neither the position, limit nor content of the buffer passed to
+     * this method may be modified until a subsequent call to {@link #isReady()} returns true or the
+     * {@link WriteListener#onWritePossible()} call back indicates data may be written again. At this point the buffer's
+     * limit will be unchanged from the value when passed to this method and the position will be the same as the limit.
+     * <p>
+     * If the output stream is in blocking mode and {@code buffer} has space remaining, this method blocks until all the
+     * remaining data in the buffer has been written. When the method returns, and if data has been written, the
+     * buffer's limit will be unchanged from the value when passed to this method and the position will be the same as
      * the limit.
      * <p>
-     * If the output stream is in blocking mode and {@code buffer} has space
-     * remaining, this method blocks until all the remaining data in the buffer
-     * has been written. When the method returns, and if data has been written,
-     * the buffer's limit will be unchanged from the value when passed to this
-     * method and the position will be the same as the limit.
-     * <p>
-     * Subclasses are strongly encouraged to override this method and provide a
-     * more efficient implementation.
+     * Subclasses are strongly encouraged to override this method and provide a more efficient implementation.
      *
      * @param buffer The buffer from which the data is written.
      *
-     * @exception IllegalStateException If the output stream is in non-blocking
-     * mode and this method is called without first calling {@link #isReady()}
-     * and that method has returned {@code true} or
-     * {@link WriteListener#onWritePossible()} has not signalled that data may
-     * be written.
-     *
-     * @exception IOException If the output stream has been closed or if some
-     * other I/O error occurs.
-     *
-     * @exception NullPointerException If buffer is null.
+     * @exception IllegalStateException If the output stream is in non-blocking mode and this method is called without
+     *                                      first calling {@link #isReady()} and that method has returned {@code true}
+     *                                      or {@link WriteListener#onWritePossible()} has not signalled that data may
+     *                                      be written.
+     * @exception IOException           If the output stream has been closed or if some other I/O error occurs.
+     * @exception NullPointerException  If buffer is null.
      *
      * @since Servlet 6.1
      */
@@ -111,13 +97,11 @@ public abstract class ServletOutputStream extends OutputStream {
     }
 
     /**
-     * Writes a <code>String</code> to the client, without a carriage
-     * return-line feed (CRLF) character at the end.
+     * Writes a <code>String</code> to the client, without a carriage return-line feed (CRLF) character at the end.
      *
-     * @param s
-     *            the <code>String</code> to send to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param s the <code>String</code> to send to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void print(String s) throws IOException {
         if (s == null) {
@@ -148,13 +132,11 @@ public abstract class ServletOutputStream extends OutputStream {
     }
 
     /**
-     * Writes a <code>boolean</code> value to the client, with no carriage
-     * return-line feed (CRLF) character at the end.
+     * Writes a <code>boolean</code> value to the client, with no carriage return-line feed (CRLF) character at the end.
      *
-     * @param b
-     *            the <code>boolean</code> value to send to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param b the <code>boolean</code> value to send to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void print(boolean b) throws IOException {
         String msg;
@@ -167,65 +149,55 @@ public abstract class ServletOutputStream extends OutputStream {
     }
 
     /**
-     * Writes a character to the client, with no carriage return-line feed
-     * (CRLF) at the end.
+     * Writes a character to the client, with no carriage return-line feed (CRLF) at the end.
      *
-     * @param c
-     *            the character to send to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param c the character to send to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void print(char c) throws IOException {
         print(String.valueOf(c));
     }
 
     /**
-     * Writes an int to the client, with no carriage return-line feed (CRLF) at
-     * the end.
+     * Writes an int to the client, with no carriage return-line feed (CRLF) at the end.
      *
-     * @param i
-     *            the int to send to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param i the int to send to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void print(int i) throws IOException {
         print(String.valueOf(i));
     }
 
     /**
-     * Writes a <code>long</code> value to the client, with no carriage
-     * return-line feed (CRLF) at the end.
+     * Writes a <code>long</code> value to the client, with no carriage return-line feed (CRLF) at the end.
      *
-     * @param l
-     *            the <code>long</code> value to send to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param l the <code>long</code> value to send to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void print(long l) throws IOException {
         print(String.valueOf(l));
     }
 
     /**
-     * Writes a <code>float</code> value to the client, with no carriage
-     * return-line feed (CRLF) at the end.
+     * Writes a <code>float</code> value to the client, with no carriage return-line feed (CRLF) at the end.
      *
-     * @param f
-     *            the <code>float</code> value to send to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param f the <code>float</code> value to send to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void print(float f) throws IOException {
         print(String.valueOf(f));
     }
 
     /**
-     * Writes a <code>double</code> value to the client, with no carriage
-     * return-line feed (CRLF) at the end.
+     * Writes a <code>double</code> value to the client, with no carriage return-line feed (CRLF) at the end.
      *
-     * @param d
-     *            the <code>double</code> value to send to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param d the <code>double</code> value to send to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void print(double d) throws IOException {
         print(String.valueOf(d));
@@ -234,21 +206,18 @@ public abstract class ServletOutputStream extends OutputStream {
     /**
      * Writes a carriage return-line feed (CRLF) to the client.
      *
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @exception IOException if an input or output exception occurred
      */
     public void println() throws IOException {
         print("\r\n");
     }
 
     /**
-     * Writes a <code>String</code> to the client, followed by a carriage
-     * return-line feed (CRLF).
+     * Writes a <code>String</code> to the client, followed by a carriage return-line feed (CRLF).
      *
-     * @param s
-     *            the <code>String</code> to write to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param s the <code>String</code> to write to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void println(String s) throws IOException {
         StringBuilder sb = new StringBuilder();
@@ -258,13 +227,11 @@ public abstract class ServletOutputStream extends OutputStream {
     }
 
     /**
-     * Writes a <code>boolean</code> value to the client, followed by a carriage
-     * return-line feed (CRLF).
+     * Writes a <code>boolean</code> value to the client, followed by a carriage return-line feed (CRLF).
      *
-     * @param b
-     *            the <code>boolean</code> value to write to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param b the <code>boolean</code> value to write to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void println(boolean b) throws IOException {
         StringBuilder sb = new StringBuilder();
@@ -278,118 +245,101 @@ public abstract class ServletOutputStream extends OutputStream {
     }
 
     /**
-     * Writes a character to the client, followed by a carriage return-line feed
-     * (CRLF).
+     * Writes a character to the client, followed by a carriage return-line feed (CRLF).
      *
-     * @param c
-     *            the character to write to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param c the character to write to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void println(char c) throws IOException {
         println(String.valueOf(c));
     }
 
     /**
-     * Writes an int to the client, followed by a carriage return-line feed
-     * (CRLF) character.
+     * Writes an int to the client, followed by a carriage return-line feed (CRLF) character.
      *
-     * @param i
-     *            the int to write to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param i the int to write to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void println(int i) throws IOException {
         println(String.valueOf(i));
     }
 
     /**
-     * Writes a <code>long</code> value to the client, followed by a carriage
-     * return-line feed (CRLF).
+     * Writes a <code>long</code> value to the client, followed by a carriage return-line feed (CRLF).
      *
-     * @param l
-     *            the <code>long</code> value to write to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param l the <code>long</code> value to write to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void println(long l) throws IOException {
         println(String.valueOf(l));
     }
 
     /**
-     * Writes a <code>float</code> value to the client, followed by a carriage
-     * return-line feed (CRLF).
+     * Writes a <code>float</code> value to the client, followed by a carriage return-line feed (CRLF).
      *
-     * @param f
-     *            the <code>float</code> value to write to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param f the <code>float</code> value to write to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void println(float f) throws IOException {
         println(String.valueOf(f));
     }
 
     /**
-     * Writes a <code>double</code> value to the client, followed by a carriage
-     * return-line feed (CRLF).
+     * Writes a <code>double</code> value to the client, followed by a carriage return-line feed (CRLF).
      *
-     * @param d
-     *            the <code>double</code> value to write to the client
-     * @exception IOException
-     *                if an input or output exception occurred
+     * @param d the <code>double</code> value to write to the client
+     *
+     * @exception IOException if an input or output exception occurred
      */
     public void println(double d) throws IOException {
         println(String.valueOf(d));
     }
 
     /**
-     * Returns {@code true} if it is allowable to call any method that may write
-     * data (e.g. {@code write()}, {@code print()} or {@code flush}). In
-     * blocking mode, this method will always return {@code true}, but a
-     * subsequent call to a method that writes data may block. In non-blocking
-     * mode this method may return {@code false}, in which case it is illegal to
-     * call a method that writes data and an {@link IllegalStateException} MUST
-     * be thrown. When {@link WriteListener#onWritePossible()} is called, a call
-     * to this method that returned {@code true} is implicit.
+     * Returns {@code true} if it is allowable to call any method that may write data (e.g. {@code write()},
+     * {@code print()} or {@code flush}). In blocking mode, this method will always return {@code true}, but a
+     * subsequent call to a method that writes data may block. In non-blocking mode this method may return
+     * {@code false}, in which case it is illegal to call a method that writes data and an {@link IllegalStateException}
+     * MUST be thrown. When {@link WriteListener#onWritePossible()} is called, a call to this method that returned
+     * {@code true} is implicit.
      * <p>
-     * If this method returns {@code false} and a {@link WriteListener} has been
-     * set via {@link #setWriteListener(WriteListener)}, then container will
-     * subsequently invoke {@link WriteListener#onWritePossible()} once a write
-     * operation becomes possible without blocking. Other than the initial call,
-     * {@link WriteListener#onWritePossible()} will only be called if and only
-     * if this method is called and returns false.
+     * If this method returns {@code false} and a {@link WriteListener} has been set via
+     * {@link #setWriteListener(WriteListener)}, then container will subsequently invoke
+     * {@link WriteListener#onWritePossible()} once a write operation becomes possible without blocking. Other than the
+     * initial call, {@link WriteListener#onWritePossible()} will only be called if and only if this method is called
+     * and returns false.
      *
-     * @return {@code true} if data can be written without blocking, otherwise
-     *         returns {@code false}.
+     * @return {@code true} if data can be written without blocking, otherwise returns {@code false}.
      *
      * @since Servlet 3.1
      */
     public abstract boolean isReady();
 
     /**
-     * Sets the {@link WriteListener} for this {@link ServletOutputStream} and
-     * thereby switches to non-blocking IO. It is only valid to switch to
-     * non-blocking IO within async processing or HTTP upgrade processing.
+     * Sets the {@link WriteListener} for this {@link ServletOutputStream} and thereby switches to non-blocking IO. It
+     * is only valid to switch to non-blocking IO within async processing or HTTP upgrade processing.
      *
-     * @param listener  The non-blocking IO write listener
+     * @param listener The non-blocking IO write listener
      *
-     * @throws IllegalStateException    If this method is called if neither
-     *                                  async nor HTTP upgrade is in progress or
-     *                                  if the {@link WriteListener} has already
-     *                                  been set
-     * @throws NullPointerException     If listener is null
+     * @throws IllegalStateException If this method is called if neither async nor HTTP upgrade is in progress or if the
+     *                                   {@link WriteListener} has already been set
+     * @throws NullPointerException  If listener is null
      *
      * @since Servlet 3.1
      */
-    public abstract void setWriteListener(jakarta.servlet.WriteListener listener);
+    public abstract void setWriteListener(WriteListener listener);
 
     /**
      * {@inheritDoc}
      * <p>
-     * If this method is called when the output stream is in non-blocking mode, it will immediately return with the stream
-     * effectively closed, even if the stream contains buffered data that is yet to be written to client. The container will
-     * write this data out in the background. If this process fails the {@link WriteListener#onError(Throwable)} method will
-     * be invoked as normal.
+     * If this method is called when the output stream is in non-blocking mode, it will immediately return with the
+     * stream effectively closed, even if the stream contains buffered data that is yet to be written to client. The
+     * container will write this data out in the background. If this process fails the
+     * {@link WriteListener#onError(Throwable)} method will be invoked as normal.
      */
     @Override
     public void close() throws IOException {

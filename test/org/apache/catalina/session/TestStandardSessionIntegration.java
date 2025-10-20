@@ -56,7 +56,7 @@ public class TestStandardSessionIntegration extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         Tomcat.addServlet(ctx, "bug56578", new Bug56578Servlet());
         ctx.addServletMappingDecoded("/bug56578", "bug56578");

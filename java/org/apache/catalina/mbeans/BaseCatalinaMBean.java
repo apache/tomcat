@@ -30,8 +30,7 @@ public abstract class BaseCatalinaMBean<T> extends BaseModelMBean {
             @SuppressWarnings("unchecked")
             T resource = (T) getManagedResource();
             return resource;
-        } catch (InstanceNotFoundException | RuntimeOperationsException |
-                InvalidTargetObjectTypeException e) {
+        } catch (InstanceNotFoundException | RuntimeOperationsException | InvalidTargetObjectTypeException e) {
             throw new MBeanException(e);
         }
     }

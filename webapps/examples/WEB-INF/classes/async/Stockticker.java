@@ -23,99 +23,99 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Stockticker implements Runnable {
-        public volatile boolean run = true;
-        protected final AtomicInteger counter = new AtomicInteger(0);
-        final List<TickListener> listeners = new CopyOnWriteArrayList<>();
-        protected volatile Thread ticker = null;
-        protected volatile int ticknr = 0;
+    public volatile boolean run = true;
+    protected final AtomicInteger counter = new AtomicInteger(0);
+    final List<TickListener> listeners = new CopyOnWriteArrayList<>();
+    protected volatile Thread ticker = null;
+    protected volatile int ticknr = 0;
 
-        public synchronized void start() {
-            run = true;
-            ticker = new Thread(this);
-            ticker.setName("Ticker Thread");
-            ticker.start();
+    public synchronized void start() {
+        run = true;
+        ticker = new Thread(this);
+        ticker.setName("Ticker Thread");
+        ticker.start();
+    }
+
+    public synchronized void stop() {
+        // On context stop this can be called multiple times.
+        // NO-OP if the ticker thread is not set
+        // (i.e. stop() has already completed)
+        if (ticker == null) {
+            return;
+        }
+        run = false;
+        try {
+            ticker.join();
+        }catch (InterruptedException x) {
+            Thread.interrupted();
         }
 
-        public synchronized void stop() {
-            // On context stop this can be called multiple times.
-            // NO-OP is the ticker thread is not set
-            // (i.e. stop() has already completed)
-            if (ticker == null) {
-                return;
-            }
-            run = false;
-            try {
-                ticker.join();
-            }catch (InterruptedException x) {
-                Thread.interrupted();
-            }
+        ticker = null;
+    }
 
-            ticker = null;
+    public void shutdown() {
+        // Notify each listener of the shutdown. This enables them to
+        // trigger any necessary clean-up.
+        for (TickListener l : listeners) {
+            l.shutdown();
         }
+        // Wait for the thread to stop. This prevents warnings in the logs
+        // that the thread is still active when the context stops.
+        stop();
+    }
 
-        public void shutdown() {
-            // Notify each listener of the shutdown. This enables them to
-            // trigger any necessary clean-up.
-            for (TickListener l : listeners) {
-                l.shutdown();
-            }
-            // Wait for the thread to stop. This prevents warnings in the logs
-            // that the thread is still active when the context stops.
-            stop();
-        }
-
-        public void addTickListener(TickListener listener) {
-            if (listeners.add(listener)) {
-                if (counter.incrementAndGet()==1) {
-                    start();
-                }
-            }
-
-        }
-
-        public void removeTickListener(TickListener listener) {
-            if (listeners.remove(listener)) {
-                if (counter.decrementAndGet()==0) {
-                    stop();
-                }
+    public void addTickListener(TickListener listener) {
+        if (listeners.add(listener)) {
+            if (counter.incrementAndGet()==1) {
+                start();
             }
         }
 
-        @Override
-        public void run() {
-            try {
+    }
 
-                Stock[] stocks = new Stock[] { new Stock("GOOG", 435.43),
-                        new Stock("YHOO", 27.88), new Stock("ASF", 1015.55), };
-                Random r = new Random(System.currentTimeMillis());
-                while (run) {
-                    for (int j = 0; j < 1; j++) {
-                        int i = r.nextInt() % 3;
-                        if (i < 0) {
-                            i = i * (-1);
-                        }
-                        Stock stock = stocks[i];
-                        double change = r.nextDouble();
-                        boolean plus = r.nextBoolean();
-                        if (plus) {
-                            stock.setValue(stock.getValue() + change);
-                        } else {
-                            stock.setValue(stock.getValue() - change);
-                        }
-                        stock.setCnt(++ticknr);
-                        for (TickListener l : listeners) {
-                            l.tick(stock);
-                        }
+    public void removeTickListener(TickListener listener) {
+        if (listeners.remove(listener)) {
+            if (counter.decrementAndGet()==0) {
+                stop();
+            }
+        }
+    }
 
+    @Override
+    public void run() {
+        try {
+
+            Stock[] stocks = new Stock[] { new Stock("GOOG", 435.43),
+                new Stock("YHOO", 27.88), new Stock("ASF", 1015.55), };
+            Random r = new Random(System.currentTimeMillis());
+            while (run) {
+                for (int j = 0; j < 1; j++) {
+                    int i = r.nextInt() % 3;
+                    if (i < 0) {
+                        i = i * (-1);
                     }
-                    Thread.sleep(850);
+                    Stock stock = stocks[i];
+                    double change = r.nextDouble();
+                    boolean plus = r.nextBoolean();
+                    if (plus) {
+                        stock.setValue(stock.getValue() + change);
+                    } else {
+                        stock.setValue(stock.getValue() - change);
+                    }
+                    stock.setCnt(++ticknr);
+                    for (TickListener l : listeners) {
+                        l.tick(stock);
+                    }
+
                 }
-            } catch (InterruptedException ix) {
-                // Ignore
-            } catch (Exception x) {
-                x.printStackTrace();
+                Thread.sleep(850);
             }
+        } catch (InterruptedException ix) {
+        // Ignore
+        } catch (Exception x) {
+            x.printStackTrace();
         }
+    }
 
 
     public interface TickListener {

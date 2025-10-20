@@ -76,17 +76,17 @@
             writeable="false"/>
 
     <attribute   name="maxSize"
-          description="The maximum permitted size of the cache in kB"
+          description="The maximum permitted size of the cache in KiB"
                  type="long"
             writeable="true"/>
 
     <attribute   name="objectMaxSize"
-          description="The maximum permitted size for a single object in the cache in kB"
+          description="The maximum permitted size for a single object in the cache in KiB"
                  type="int"
             writeable="true"/>
 
     <attribute   name="size"
-          description="The current estimate of the cache size in kB"
+          description="The current estimate of the cache size in KiB"
                  type="long"
             writeable="false"/>
 

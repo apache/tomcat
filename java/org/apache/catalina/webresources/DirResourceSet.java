@@ -22,23 +22,33 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
 import java.util.jar.Manifest;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
+import org.apache.catalina.WebResourceLockSet;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.WebResourceRoot.ResourceSetType;
 import org.apache.catalina.util.ResourceSet;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.concurrent.KeyedReentrantReadWriteLock;
+import org.apache.tomcat.util.http.RequestUtil;
 
 /**
  * Represents a {@link org.apache.catalina.WebResourceSet} based on a directory.
  */
-public class DirResourceSet extends AbstractFileResourceSet {
+public class DirResourceSet extends AbstractFileResourceSet implements WebResourceLockSet {
 
     private static final Log log = LogFactory.getLog(DirResourceSet.class);
+
+    private KeyedReentrantReadWriteLock resourceLocksByPath = new KeyedReentrantReadWriteLock();
+
 
     /**
      * A no argument constructor is required for this to work with the digester.
@@ -90,38 +100,52 @@ public class DirResourceSet extends AbstractFileResourceSet {
         checkPath(path);
         String webAppMount = getWebAppMount();
         WebResourceRoot root = getRoot();
-        if (path.startsWith(webAppMount)) {
-            File f = file(path.substring(webAppMount.length()), false);
-            if (f == null) {
-                return new EmptyResource(root, path);
+        boolean readOnly = isReadOnly();
+        if (isPathMounted(path, webAppMount)) {
+            /*
+             * Lock the path for reading until the WebResource has been constructed. The lock prevents concurrent reads
+             * and writes (e.g. HTTP GET and PUT / DELETE) for the same path causing corruption of the FileResource
+             * where some of the fields are set as if the file exists and some as set as if it does not.
+             */
+            Lock readLock = null;
+            if (!readOnly) {
+                readLock = getLock(path).readLock();
+                readLock.lock();
             }
-            if (!f.exists()) {
-                return new EmptyResource(root, path, f);
+            try {
+                File f = file(path.substring(webAppMount.length()), false);
+                if (f == null) {
+                    return new EmptyResource(root, path);
+                }
+                if (!f.exists()) {
+                    return new EmptyResource(root, path, f);
+                }
+                if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
+                    path = path + '/';
+                }
+                return new FileResource(root, path, f, readOnly, getManifest(), this, readOnly ? null : path);
+            } finally {
+                if (readLock != null) {
+                    readLock.unlock();
+                }
             }
-            if (f.isDirectory() && path.charAt(path.length() - 1) != '/') {
-                path = path + '/';
-            }
-            return new FileResource(root, path, f, isReadOnly(), getManifest());
         } else {
             return new EmptyResource(root, path);
         }
     }
 
+
     @Override
     public String[] list(String path) {
         checkPath(path);
         String webAppMount = getWebAppMount();
-        if (path.startsWith(webAppMount)) {
+        if (isPathMounted(path, webAppMount)) {
             File f = file(path.substring(webAppMount.length()), true);
             if (f == null) {
                 return EMPTY_STRING_ARRAY;
             }
             String[] result = f.list();
-            if (result == null) {
-                return EMPTY_STRING_ARRAY;
-            } else {
-                return result;
-            }
+            return Objects.requireNonNullElse(result, EMPTY_STRING_ARRAY);
         } else {
             if (!path.endsWith("/")) {
                 path = path + "/";
@@ -143,15 +167,16 @@ public class DirResourceSet extends AbstractFileResourceSet {
         checkPath(path);
         String webAppMount = getWebAppMount();
         ResourceSet<String> result = new ResourceSet<>();
-        if (path.startsWith(webAppMount)) {
+        if (isPathMounted(path, webAppMount)) {
             File f = file(path.substring(webAppMount.length()), true);
             if (f != null) {
                 File[] list = f.listFiles();
                 if (list != null) {
+                    String fCanPath = null;
                     for (File entry : list) {
                         // f has already been validated so the following checks
                         // can be much simpler than those in file()
-                        if (!getRoot().getAllowLinking()) {
+                        if (!getAllowLinking()) {
                             // allow linking is disabled so need to check for
                             // symlinks
                             boolean symlink = true;
@@ -164,8 +189,12 @@ public class DirResourceSet extends AbstractFileResourceSet {
                                 // path that was contributed by 'f' and check
                                 // that what is left does not contain a symlink.
                                 absPath = entry.getAbsolutePath().substring(f.getAbsolutePath().length());
-                                if (entry.getCanonicalPath().length() >= f.getCanonicalPath().length()) {
-                                    canPath = entry.getCanonicalPath().substring(f.getCanonicalPath().length());
+                                String entryCanPath = entry.getCanonicalPath();
+                                if (fCanPath == null) {
+                                    fCanPath = f.getCanonicalPath();
+                                }
+                                if (entryCanPath.length() >= fCanPath.length()) {
+                                    canPath = entryCanPath.substring(fCanPath.length());
                                     if (absPath.equals(canPath)) {
                                         symlink = false;
                                     }
@@ -215,7 +244,7 @@ public class DirResourceSet extends AbstractFileResourceSet {
             return false;
         }
         String webAppMount = getWebAppMount();
-        if (path.startsWith(webAppMount)) {
+        if (isPathMounted(path, webAppMount)) {
             File f = file(path.substring(webAppMount.length()), false);
             if (f == null) {
                 return false;
@@ -244,37 +273,48 @@ public class DirResourceSet extends AbstractFileResourceSet {
             return false;
         }
 
-        File dest = null;
         String webAppMount = getWebAppMount();
-        if (path.startsWith(webAppMount)) {
+        if (!isPathMounted(path, webAppMount)) {
+            return false;
+        }
+
+        File dest;
+        /*
+         * Lock the path for writing until the write is complete. The lock prevents concurrent reads and writes (e.g.
+         * HTTP GET and PUT / DELETE) for the same path causing corruption of the FileResource where some of the fields
+         * are set as if the file exists and some as set as if it does not.
+         */
+        Lock writeLock = getLock(path).writeLock();
+        writeLock.lock();
+        try {
             dest = file(path.substring(webAppMount.length()), false);
             if (dest == null) {
                 return false;
             }
-        } else {
-            return false;
-        }
 
-        if (dest.exists() && !overwrite) {
-            return false;
-        }
-
-        try {
-            if (overwrite) {
-                Files.copy(is, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            } else {
-                Files.copy(is, dest.toPath());
+            if (dest.exists() && !overwrite) {
+                return false;
             }
-        } catch (IOException ioe) {
-            return false;
-        }
 
-        return true;
+            try {
+                if (overwrite) {
+                    Files.copy(is, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                } else {
+                    Files.copy(is, dest.toPath());
+                }
+            } catch (IOException ioe) {
+                return false;
+            }
+
+            return true;
+        } finally {
+            writeLock.unlock();
+        }
     }
 
     @Override
     protected void checkType(File file) {
-        if (file.isDirectory() == false) {
+        if (!file.isDirectory()) {
             throw new IllegalArgumentException(
                     sm.getString("dirResourceSet.notDirectory", getBase(), File.separator, getInternalPath()));
         }
@@ -285,16 +325,36 @@ public class DirResourceSet extends AbstractFileResourceSet {
     protected void initInternal() throws LifecycleException {
         super.initInternal();
         // Is this an exploded web application?
-        if (getWebAppMount().equals("")) {
+        if (getWebAppMount().isEmpty()) {
             // Look for a manifest
             File mf = file("META-INF/MANIFEST.MF", true);
             if (mf != null && mf.isFile()) {
                 try (FileInputStream fis = new FileInputStream(mf)) {
                     setManifest(new Manifest(fis));
-                } catch (IOException e) {
-                    log.warn(sm.getString("dirResourceSet.manifestFail", mf.getAbsolutePath()), e);
+                } catch (IOException ioe) {
+                    log.warn(sm.getString("dirResourceSet.manifestFail", mf.getAbsolutePath()), ioe);
                 }
             }
         }
+    }
+
+
+    private String getLockKey(String path) {
+        /*
+         * Normalize path to ensure that the same key is used for the same path. Always convert path to lower case as
+         * the file system may be case insensitive. A minor performance improvement is possible by removing the
+         * conversion to lower case for case sensitive file systems but confirming that all the directories within a
+         * DirResourceSet are case sensitive is much harder than it might first appear due to various edge cases. In
+         * particular, Windows can make individual directories case sensitive and File.getCanonicalPath() doesn't return
+         * the canonical file name on Linux for some case insensitive file systems (such as mounted Windows shares).
+         */
+        return RequestUtil.normalize(path).toLowerCase(Locale.ENGLISH);
+    }
+
+
+    @Override
+    public ReadWriteLock getLock(String path) {
+        String key = getLockKey(path);
+        return resourceLocksByPath.getLock(key);
     }
 }

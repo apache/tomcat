@@ -32,7 +32,10 @@ import java.util.Set;
  * </ul>
  *
  * @since Servlet 4.0
+ *
+ * @deprecated In favor of 103 early hints
  */
+@Deprecated
 public interface PushBuilder {
 
     /**

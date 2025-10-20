@@ -18,8 +18,7 @@ package org.apache.catalina.tribes.transport;
 
 import org.apache.catalina.tribes.io.ListenCallback;
 
-public abstract class AbstractRxTask implements Runnable
-{
+public abstract class AbstractRxTask implements Runnable {
 
     public static final int OPTION_DIRECT_BUFFER = ReceiverBase.OPTION_DIRECT_BUFFER;
 

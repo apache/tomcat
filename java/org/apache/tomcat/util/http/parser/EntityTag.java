@@ -22,31 +22,32 @@ import java.io.StringReader;
 public class EntityTag {
 
     /**
-     * Parse the given input as (per RFC 7232) 1#entity-tag.
-     * Compare an ETag header with a resource ETag as described in RFC 7232
-     * section 2.3.2.
+     * Parse the given input as (per RFC 7232) 1#entity-tag. Compare an ETag header with a resource ETag as described in
+     * RFC 7232 section 2.3.2.
      *
      * @param input        The input to parse
      * @param compareWeak  Use weak comparison e.g. match "etag" with W/"etag"
      * @param resourceETag Resource's ETag
      *
-     * @return {@code true} if ETag matches, {@code false} if ETag doesn't match
-     *         or {@code null} if the input is invalid
+     * @return {@code true} if ETag matches, {@code false} if ETag doesn't match or {@code null} if the input is invalid
      *
      * @throws IOException If an I/O occurs during the parsing
      */
     public static Boolean compareEntityTag(StringReader input, boolean compareWeak, String resourceETag)
             throws IOException {
+
+        Boolean result = Boolean.FALSE;
+
         // The resourceETag may be weak so to do weak comparison remove /W
         // before comparison
         String comparisonETag;
-        if (compareWeak && resourceETag.startsWith("W/")) {
+        if (resourceETag == null) {
+            comparisonETag = null;
+        } else if (compareWeak && resourceETag.startsWith("W/")) {
             comparisonETag = resourceETag.substring(2);
         } else {
             comparisonETag = resourceETag;
         }
-
-        Boolean result = Boolean.FALSE;
 
         while (true) {
             boolean strong = false;
@@ -60,12 +61,12 @@ public class EntityTag {
                     strong = true;
                     break;
                 case FOUND:
-                    strong = false;
+                    // Already set as strong = false;
                     break;
             }
 
             // Note: RFC 2616 allowed quoted string
-            //       RFC 7232 does not allow " in the entity-tag
+            // RFC 7232 does not allow " in the entity-tag
             String value = HttpParser.readQuotedString(input, true);
             if (value == null) {
                 // Not a quoted string so the header is invalid
@@ -73,7 +74,7 @@ public class EntityTag {
             }
 
             if (strong || compareWeak) {
-                if (comparisonETag.equals(value)) {
+                if (value.equals(comparisonETag)) {
                     result = Boolean.TRUE;
                 }
             }

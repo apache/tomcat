@@ -130,14 +130,14 @@ public class ConnectionState extends JdbcInterceptor  {
         for (int i=0; (!read) && i<readState.length; i++) {
             read = compare(name,readState[i]);
             if (read) {
-              index = i;
+                index = i;
             }
         }
         boolean write = false;
         for (int i=0; (!write) && (!read) && i<writeState.length; i++) {
             write = compare(name,writeState[i]);
             if (write) {
-              index = i;
+                index = i;
             }
         }
         Object result = null;
@@ -151,18 +151,31 @@ public class ConnectionState extends JdbcInterceptor  {
             }
             //return cached result, if we have it
             if (result!=null) {
-              return result;
+                return result;
             }
         }
 
-        result = super.invoke(proxy, method, args);
-        if (read || write) {
-            switch (index) {
-                case 0:{autoCommit = (Boolean) (read?result:args[0]); break;}
-                case 1:{transactionIsolation = (Integer)(read?result:args[0]); break;}
-                case 2:{readOnly = (Boolean)(read?result:args[0]); break;}
-                case 3:{catalog = (String)(read?result:args[0]); break;}
+        try {
+            result = super.invoke(proxy, method, args);
+            if (read || write) {
+                switch (index) {
+                    case 0:{autoCommit = (Boolean) (read?result:args[0]); break;}
+                    case 1:{transactionIsolation = (Integer)(read?result:args[0]); break;}
+                    case 2:{readOnly = (Boolean)(read?result:args[0]); break;}
+                    case 3:{catalog = (String)(read?result:args[0]); break;}
+                }
             }
+        } catch (Throwable e) {
+            if (write) {
+                log.warn("Reset state to null as an exception occurred while calling method[" + name + "].", e);
+                switch (index) {
+                    case 0:{autoCommit = null; break;}
+                    case 1:{transactionIsolation = null; break;}
+                    case 2:{readOnly = null; break;}
+                    case 3:{catalog = null; break;}
+                }
+            }
+            throw e;
         }
         return result;
     }

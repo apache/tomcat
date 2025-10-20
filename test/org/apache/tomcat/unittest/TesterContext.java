@@ -416,6 +416,16 @@ public class TesterContext implements Context {
     }
 
     @Override
+    public boolean getUsePartitioned() {
+        return false;
+    }
+
+    @Override
+    public void setUsePartitioned(boolean usePartitioned) {
+        // NO-OP
+    }
+
+    @Override
     public String getSessionCookieDomain() {
         return null;
     }
@@ -1206,18 +1216,8 @@ public class TesterContext implements Context {
     public void setThreadBindingListener(ThreadBindingListener threadBindingListener) { /* NO-OP */ }
 
     @Override
-    public ClassLoader bind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
-        return null;
-    }
-
-    @Override
     public ClassLoader bind(ClassLoader originalClassLoader) {
         return null;
-    }
-
-    @Override
-    public void unbind(boolean usePrivilegedAction, ClassLoader originalClassLoader) {
-        // NO-OP
     }
 
     @Override
@@ -1320,5 +1320,10 @@ public class TesterContext implements Context {
     public boolean getMetadataComplete() { return false; }
     @Override
     public void setMetadataComplete(boolean metadataComplete) { /* NO-OP */ }
+
+    @Override
+    public boolean getSuspendWrappedResponseAfterForward() { return true; }
+    @Override
+    public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {}
 
 }

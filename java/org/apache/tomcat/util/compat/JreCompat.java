@@ -16,18 +16,16 @@
  */
 package org.apache.tomcat.util.compat;
 
-import java.lang.reflect.Field;
-
 /**
- * This is the base implementation class for JRE compatibility and provides an
- * implementation based on Java 11. Sub-classes may extend this class and provide
- * alternative implementations for later JRE versions
+ * This is the base implementation class for JRE compatibility and provides an implementation based on Java 21.
+ * Subclasses may extend this class and provide alternative implementations for later JRE versions
  */
 public class JreCompat {
 
     private static final JreCompat instance;
     private static final boolean graalAvailable;
-    private static final boolean jre19Available;
+    private static final boolean jre24Available;
+    private static final boolean jre22Available;
 
     static {
         boolean result = false;
@@ -41,14 +39,20 @@ public class JreCompat {
         }
         graalAvailable = result || System.getProperty("org.graalvm.nativeimage.imagecode") != null;
 
-        // This is Tomcat 11.0.x with a minimum Java version of Java 17.
+        // This is Tomcat 12.0.x with a minimum Java version of Java 21.
         // Look for the highest supported JVM first
-        if (Jre19Compat.isSupported()) {
-            instance = new Jre19Compat();
-            jre19Available = true;
+        if (Jre24Compat.isSupported()) {
+            instance = new Jre24Compat();
+            jre24Available = true;
+            jre22Available = true;
+        } else if (Jre22Compat.isSupported()) {
+            instance = new Jre22Compat();
+            jre24Available = false;
+            jre22Available = true;
         } else {
             instance = new JreCompat();
-            jre19Available = false;
+            jre24Available = false;
+            jre22Available = false;
         }
     }
 
@@ -63,66 +67,12 @@ public class JreCompat {
     }
 
 
-    public static boolean isJre19Available() {
-        return jre19Available;
+    public static boolean isJre22Available() {
+        return jre22Available;
     }
 
 
-    // Java 17 implementations of Java 19 methods
-
-    /**
-     * Obtains the executor, if any, used to create the provided thread.
-     *
-     * @param thread    The thread to examine
-     *
-     * @return  The executor, if any, that created the provided thread
-     *
-     * @throws NoSuchFieldException
-     *              If a field used via reflection to obtain the executor cannot
-     *              be found
-     * @throws SecurityException
-     *              If a security exception occurs while trying to identify the
-     *              executor
-     * @throws IllegalArgumentException
-     *              If the instance object does not match the class of the field
-     *              when obtaining a field value via reflection
-     * @throws IllegalAccessException
-     *              If a field is not accessible due to access restrictions
-     */
-    public Object getExecutor(Thread thread)
-            throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-
-        Object result = null;
-
-        // Runnable wrapped by Thread
-        // "target" in Sun/Oracle JDK
-        // "runnable" in IBM JDK
-        // "action" in Apache Harmony
-        Object target = null;
-        for (String fieldName : new String[] { "target", "runnable", "action" }) {
-            try {
-                Field targetField = thread.getClass().getDeclaredField(fieldName);
-                targetField.setAccessible(true);
-                target = targetField.get(thread);
-                break;
-            } catch (NoSuchFieldException nfe) {
-                continue;
-            }
-        }
-
-        // "java.util.concurrent" code is in public domain,
-        // so all implementations are similar including our
-        // internal fork.
-        if (target != null && target.getClass().getCanonicalName() != null &&
-                (target.getClass().getCanonicalName().equals(
-                        "org.apache.tomcat.util.threads.ThreadPoolExecutor.Worker") ||
-                        target.getClass().getCanonicalName().equals(
-                                "java.util.concurrent.ThreadPoolExecutor.Worker"))) {
-            Field executorField = target.getClass().getDeclaredField("this$0");
-            executorField.setAccessible(true);
-            result = executorField.get(target);
-        }
-
-        return result;
+    public static boolean isJre24Available() {
+        return jre24Available;
     }
 }

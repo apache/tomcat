@@ -201,7 +201,9 @@ public final class Room {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         try {
             ImageIO.write(roomImage, "PNG", bout);
-        } catch (IOException e) { /* Should never happen */ }
+        } catch (IOException ignore) {
+            // Should never happen
+        }
 
 
         // Send the image as binary message.

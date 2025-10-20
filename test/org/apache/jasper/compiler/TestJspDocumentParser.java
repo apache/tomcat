@@ -39,8 +39,7 @@ public class TestJspDocumentParser extends TomcatBaseTest {
     public void testBug47977() throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug47977.jspx", new ByteChunk(), null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug47977.jspx", new ByteChunk(), null);
 
         Assert.assertEquals(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, rc);
     }
@@ -65,13 +64,11 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug54801a.jspx", bc, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug54801a.jspx", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         bc.recycle();
-        rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug54801b.jspx", bc, null);
+        rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug54801b.jspx", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
@@ -80,13 +77,11 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         getTomcatInstanceTestWebapp(false, true);
 
         ByteChunk bc = new ByteChunk();
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug54821a.jspx", bc, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug54821a.jspx", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
 
         bc.recycle();
-        rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug5nnnn/bug54821b.jspx", bc, null);
+        rc = getUrl("http://localhost:" + getPort() + "/test/bug5nnnn/bug54821b.jspx", bc, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
@@ -206,7 +201,7 @@ public class TestJspDocumentParser extends TomcatBaseTest {
         doTestDocument(false, "5.4");
     }
 
-    private void doTestDocument(boolean valid, String version) throws Exception{
+    private void doTestDocument(boolean valid, String version) throws Exception {
         getTomcatInstanceTestWebapp(false, true);
 
         StringBuilder url = new StringBuilder("http://localhost:");

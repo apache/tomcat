@@ -36,14 +36,7 @@ import org.apache.tomcat.util.net.openssl.ciphers.Cipher;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * JSSESupport.
- *
- * Concrete implementation class for JSSE Support classes.
- *
- * @author EKR
- * @author Craig R. McClanahan
- * Parts cribbed from JSSECertCompat
- * Parts cribbed from CertificatesValve
+ * JSSESupport. Concrete implementation class for JSSE Support classes.
  */
 public class JSSESupport implements SSLSupport, SSLSessionManager {
 
@@ -62,16 +55,15 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
     /*
-     * NO-OP method provided to make it easy for other classes in this package
-     * to trigger the loading of this class and the population of the
-     * keySizeCache.
+     * NO-OP method provided to make it easy for other classes in this package to trigger the loading of this class and
+     * the population of the keySizeCache.
      */
     static void init() {
         // NO-OP
     }
 
     private SSLSession session;
-    private Map<String,List<String>> additionalAttributes;
+    private final Map<String,List<String>> additionalAttributes;
 
     public JSSESupport(SSLSession session, Map<String,List<String>> additionalAttributes) {
         this.session = session;
@@ -96,17 +88,19 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
     @Override
-    public java.security.cert.X509Certificate[] getPeerCertificateChain() throws IOException {
+    public X509Certificate[] getPeerCertificateChain() throws IOException {
         // Look up the current SSLSession
         if (session == null) {
             return null;
         }
 
-        Certificate [] certs=null;
+        Certificate[] certs;
         try {
             certs = session.getPeerCertificates();
-        } catch( Throwable t ) {
-            log.debug(sm.getString("jsseSupport.clientCertError"), t);
+        } catch (Throwable t) {
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("jsseSupport.clientCertError"), t);
+            }
             return null;
         }
 
@@ -114,37 +108,32 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
 
-    private static java.security.cert.X509Certificate[] convertCertificates(Certificate[] certs) {
-        if( certs==null ) {
+    private static X509Certificate[] convertCertificates(Certificate[] certs) {
+        if (certs == null) {
             return null;
         }
 
-        java.security.cert.X509Certificate [] x509Certs =
-            new java.security.cert.X509Certificate[certs.length];
-        for(int i=0; i < certs.length; i++) {
-            if (certs[i] instanceof java.security.cert.X509Certificate ) {
+        X509Certificate[] x509Certs = new X509Certificate[certs.length];
+        for (int i = 0; i < certs.length; i++) {
+            if (certs[i] instanceof X509Certificate) {
                 // always currently true with the JSSE 1.1.x
-                x509Certs[i] = (java.security.cert.X509Certificate) certs[i];
+                x509Certs[i] = (X509Certificate) certs[i];
             } else {
                 try {
-                    byte [] buffer = certs[i].getEncoded();
-                    CertificateFactory cf =
-                        CertificateFactory.getInstance("X.509");
-                    ByteArrayInputStream stream =
-                        new ByteArrayInputStream(buffer);
-                    x509Certs[i] = (java.security.cert.X509Certificate)
-                            cf.generateCertificate(stream);
-                } catch(Exception ex) {
-                    log.info(sm.getString(
-                            "jsseSupport.certTranslationError", certs[i]), ex);
+                    byte[] buffer = certs[i].getEncoded();
+                    CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                    ByteArrayInputStream stream = new ByteArrayInputStream(buffer);
+                    x509Certs[i] = (X509Certificate) cf.generateCertificate(stream);
+                } catch (Exception e) {
+                    log.info(sm.getString("jsseSupport.certTranslationError", certs[i]), e);
                     return null;
                 }
             }
-            if(log.isTraceEnabled()) {
+            if (log.isTraceEnabled()) {
                 log.trace("Cert #" + i + " = " + x509Certs[i]);
             }
         }
-        if(x509Certs.length < 1) {
+        if (x509Certs.length < 1) {
             return null;
         }
         return x509Certs;
@@ -167,18 +156,17 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     }
 
     @Override
-    public String getSessionId()
-        throws IOException {
+    public String getSessionId() throws IOException {
         // Look up the current SSLSession
         if (session == null) {
             return null;
         }
         // Expose ssl_session (getId)
-        byte [] ssl_session = session.getId();
-        if ( ssl_session == null) {
+        byte[] ssl_session = session.getId();
+        if (ssl_session == null || ssl_session.length == 0) {
             return null;
         }
-        StringBuilder buf=new StringBuilder();
+        StringBuilder buf = new StringBuilder();
         for (byte b : ssl_session) {
             String digit = Integer.toHexString(b);
             if (digit.length() < 2) {
@@ -209,9 +197,9 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
     @Override
     public String getProtocol() throws IOException {
         if (session == null) {
-           return null;
+            return null;
         }
-       return session.getProtocol();
+        return session.getProtocol();
     }
 
     @Override
@@ -219,7 +207,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         if (additionalAttributes == null) {
             return null;
         }
-        return StringUtils.join(additionalAttributes.get(SSLSupport.REQUESTED_PROTOCOL_VERSIONS_KEY));
+        return StringUtils.join(additionalAttributes.get(REQUESTED_PROTOCOL_VERSIONS_KEY));
     }
 
     @Override
@@ -227,7 +215,7 @@ public class JSSESupport implements SSLSupport, SSLSessionManager {
         if (additionalAttributes == null) {
             return null;
         }
-        return StringUtils.join(additionalAttributes.get(SSLSupport.REQUESTED_CIPHERS_KEY));
+        return StringUtils.join(additionalAttributes.get(REQUESTED_CIPHERS_KEY));
     }
 }
 

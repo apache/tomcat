@@ -31,7 +31,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -42,6 +41,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.http.Method;
 
 
 @RunWith(Parameterized.class)
@@ -62,7 +62,6 @@ public class TestDefaultServletRedirect extends TomcatBaseTest {
     @Parameter(0)
     public int redirectStatus;
 
-    @Ignore // See PR #524
     @Test
     public void testRedirect() throws Exception {
         Tomcat tomcat = getTomcatInstance();
@@ -74,7 +73,7 @@ public class TestDefaultServletRedirect extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctx, "default", new DefaultServlet());
         defaultServlet.addMapping("/");
 
-        defaultServlet.addInitParameter("redirectStatusCode", Integer.toString(redirectStatus));
+        defaultServlet.addInitParameter("directoryRedirectStatusCode", Integer.toString(redirectStatus));
 
         tomcat.start();
 
@@ -82,7 +81,7 @@ public class TestDefaultServletRedirect extends TomcatBaseTest {
         Map<String, List<String>> headers = new HashMap<>();
         // Should be redirected
         int rc = methodUrl("http://localhost:" + getPort() + "/test/jsp", out, DEFAULT_CLIENT_TIMEOUT_MS,
-                null, headers, "GET", false);
+                null, headers, Method.GET, false);
 
         Assert.assertEquals("Unexpected status code", redirectStatus, rc);
     }
@@ -99,7 +98,7 @@ public class TestDefaultServletRedirect extends TomcatBaseTest {
         Wrapper defaultServlet = Tomcat.addServlet(ctx, "default", new DefaultServlet());
         defaultServlet.addMapping("/");
 
-        defaultServlet.addInitParameter("redirectStatusCode", Integer.toString(redirectStatus));
+        defaultServlet.addInitParameter("directoryRedirectStatusCode", Integer.toString(redirectStatus));
 
         Wrapper includeServlet = Tomcat.addServlet(ctx, "include", new IncludeServlet());
         includeServlet.addMapping("/include");

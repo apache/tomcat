@@ -35,8 +35,7 @@ public class TestTagLibraryInfoImpl extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
 
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/jsp/test.jsp", res, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/jsp/test.jsp", res, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
@@ -50,8 +49,7 @@ public class TestTagLibraryInfoImpl extends TomcatBaseTest {
 
         ByteChunk res = new ByteChunk();
 
-        int rc = getUrl("http://localhost:" + getPort() +
-                "/test/bug6nnnn/bug64373.jsp", res, null);
+        int rc = getUrl("http://localhost:" + getPort() + "/test/bug6nnnn/bug64373.jsp", res, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 

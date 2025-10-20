@@ -17,16 +17,13 @@
 package org.apache.el.lang;
 
 /**
- * Stores the state required for correct evaluation of lambda expressions.
- * Lambda expressions may be nested. Correct evaluation requires knowledge not
- * just of the current lambda expression, but also of any nested and nesting
+ * Stores the state required for correct evaluation of lambda expressions. Lambda expressions may be nested. Correct
+ * evaluation requires knowledge not just of the current lambda expression, but also of any nested and nesting
  * expressions.
  * <p>
- * The sets of nodes for parsed expressions are cached and, as a result, a set
- * of nodes may be being used by multiple concurrent threads. This means any
- * state relating to evaluation cannot be stored in the nodes. State is
- * therefore stored in the {@link EvaluationContext} which is created, used for
- * a single evaluation and then discarded.
+ * The sets of nodes for parsed expressions are cached and, as a result, a set of nodes may be being used by multiple
+ * concurrent threads. This means any state relating to evaluation cannot be stored in the nodes. State is therefore
+ * stored in the {@link EvaluationContext} which is created, used for a single evaluation and then discarded.
  */
 public final class LambdaExpressionNestedState {
 

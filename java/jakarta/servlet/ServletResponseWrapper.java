@@ -23,12 +23,12 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Provides a convenient implementation of the ServletResponse interface that
- * can be subclassed by developers wishing to adapt the response from a Servlet.
- * This class implements the Wrapper or Decorator pattern. Methods default to
- * calling through to the wrapped response object.
+ * Provides a convenient implementation of the ServletResponse interface that can be subclassed by developers wishing to
+ * adapt the response from a Servlet. This class implements the Wrapper or Decorator pattern. Methods default to calling
+ * through to the wrapped response object.
  *
  * @since Servlet 2.3
+ *
  * @see jakarta.servlet.ServletResponse
  */
 public class ServletResponseWrapper implements ServletResponse {
@@ -42,8 +42,7 @@ public class ServletResponseWrapper implements ServletResponse {
      *
      * @param response The response to wrap
      *
-     * @throws java.lang.IllegalArgumentException
-     *             if the response is null.
+     * @throws java.lang.IllegalArgumentException if the response is null.
      */
     public ServletResponseWrapper(ServletResponse response) {
         if (response == null) {
@@ -66,8 +65,7 @@ public class ServletResponseWrapper implements ServletResponse {
      *
      * @param response The new response to wrap
      *
-     * @throws java.lang.IllegalArgumentException
-     *             if the response is null.
+     * @throws java.lang.IllegalArgumentException if the response is null.
      */
     public void setResponse(ServletResponse response) {
         if (response == null) {
@@ -77,8 +75,8 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to call
-     * setCharacterEncoding(String charset) on the wrapped response object.
+     * The default behavior of this method is to call setCharacterEncoding(String charset) on the wrapped response
+     * object.
      *
      * @since Servlet 2.4
      */
@@ -88,8 +86,8 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to call
-     * {@code setCharacterEncoding(Charset)} on the wrapped response object.
+     * The default behavior of this method is to call {@code setCharacterEncoding(Charset)} on the wrapped response
+     * object.
      *
      * @since Servlet 6.1
      */
@@ -99,8 +97,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to return getCharacterEncoding()
-     * on the wrapped response object.
+     * The default behavior of this method is to return getCharacterEncoding() on the wrapped response object.
      */
     @Override
     public String getCharacterEncoding() {
@@ -108,8 +105,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to return getOutputStream() on the
-     * wrapped response object.
+     * The default behavior of this method is to return getOutputStream() on the wrapped response object.
      */
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
@@ -117,8 +113,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to return getWriter() on the
-     * wrapped response object.
+     * The default behavior of this method is to return getWriter() on the wrapped response object.
      */
     @Override
     public PrintWriter getWriter() throws IOException {
@@ -126,8 +121,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to call setContentLength(int len)
-     * on the wrapped response object.
+     * The default behavior of this method is to call setContentLength(int len) on the wrapped response object.
      */
     @Override
     public void setContentLength(int len) {
@@ -135,8 +129,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to call setContentLengthLong(long len)
-     * on the wrapped response object.
+     * The default behavior of this method is to call setContentLengthLong(long len) on the wrapped response object.
      *
      * @since Servlet 3.1
      */
@@ -146,8 +139,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to call setContentType(String
-     * type) on the wrapped response object.
+     * The default behavior of this method is to call setContentType(String type) on the wrapped response object.
      */
     @Override
     public void setContentType(String type) {
@@ -155,8 +147,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to return getContentType() on the
-     * wrapped response object.
+     * The default behavior of this method is to return getContentType() on the wrapped response object.
      *
      * @since Servlet 2.4
      */
@@ -166,8 +157,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to call setBufferSize(int size) on
-     * the wrapped response object.
+     * The default behavior of this method is to call setBufferSize(int size) on the wrapped response object.
      */
     @Override
     public void setBufferSize(int size) {
@@ -175,8 +165,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to return getBufferSize() on the
-     * wrapped response object.
+     * The default behavior of this method is to return getBufferSize() on the wrapped response object.
      */
     @Override
     public int getBufferSize() {
@@ -184,8 +173,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to call flushBuffer() on the
-     * wrapped response object.
+     * The default behavior of this method is to call flushBuffer() on the wrapped response object.
      */
     @Override
     public void flushBuffer() throws IOException {
@@ -193,8 +181,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to return isCommitted() on the
-     * wrapped response object.
+     * The default behavior of this method is to return isCommitted() on the wrapped response object.
      */
     @Override
     public boolean isCommitted() {
@@ -202,8 +189,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to call reset() on the wrapped
-     * response object.
+     * The default behavior of this method is to call reset() on the wrapped response object.
      */
     @Override
     public void reset() {
@@ -211,8 +197,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to call resetBuffer() on the
-     * wrapped response object.
+     * The default behavior of this method is to call resetBuffer() on the wrapped response object.
      */
     @Override
     public void resetBuffer() {
@@ -220,8 +205,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to call setLocale(Locale loc) on
-     * the wrapped response object.
+     * The default behavior of this method is to call setLocale(Locale loc) on the wrapped response object.
      */
     @Override
     public void setLocale(Locale loc) {
@@ -229,8 +213,7 @@ public class ServletResponseWrapper implements ServletResponse {
     }
 
     /**
-     * The default behavior of this method is to return getLocale() on the
-     * wrapped response object.
+     * The default behavior of this method is to return getLocale() on the wrapped response object.
      */
     @Override
     public Locale getLocale() {
@@ -239,10 +222,12 @@ public class ServletResponseWrapper implements ServletResponse {
 
     /**
      * TODO SERVLET3 - Add comments
+     *
      * @param wrapped The response to compare to the wrapped response
-     * @return <code>true</code> if the response wrapped by this wrapper (or
-     *         series of wrappers) is the same as the supplied response,
-     *         otherwise <code>false</code>
+     *
+     * @return <code>true</code> if the response wrapped by this wrapper (or series of wrappers) is the same as the
+     *             supplied response, otherwise <code>false</code>
+     *
      * @since Servlet 3.0
      */
     public boolean isWrapperFor(ServletResponse wrapped) {
@@ -257,11 +242,12 @@ public class ServletResponseWrapper implements ServletResponse {
 
     /**
      * TODO SERVLET3 - Add comments
-     * @param wrappedType The class to compare to the class of the wrapped
-     *                    response
-     * @return <code>true</code> if the response wrapped by this wrapper (or
-     *         series of wrappers) is the same type as the supplied type,
-     *         otherwise <code>false</code>
+     *
+     * @param wrappedType The class to compare to the class of the wrapped response
+     *
+     * @return <code>true</code> if the response wrapped by this wrapper (or series of wrappers) is the same type as the
+     *             supplied type, otherwise <code>false</code>
+     *
      * @since Servlet 3.0
      */
     public boolean isWrapperFor(Class<?> wrappedType) {

@@ -57,7 +57,7 @@ public class SocketNioReceive {
             try {
                 Thread.sleep(5000);
                 if ( start != 0 ) {
-                    System.out.println("Throughput " + df.format(mb / seconds) + " MB/seconds, messages "+count+" accepts "+accept+", total "+mb+" MB.");
+                    System.out.println("Throughput " + df.format(mb / seconds) + " MiB/s, messages "+count+" accepts "+accept+", total "+mb+" MiB");
                 }
             }catch (Throwable x) {
                 x.printStackTrace();
@@ -82,7 +82,7 @@ public class SocketNioReceive {
             if ( ( (count) % 10000) == 0) {
                 long time = System.currentTimeMillis();
                 seconds = ( (double) (time - start)) / 1000;
-                System.out.println("Throughput " + df.format(mb / seconds) + " MB/seconds, messages "+count+", total "+mb+" MB.");
+                System.out.println("Throughput " + df.format(mb / seconds) + " MiB/s, messages "+count+", total "+mb+" MiB");
             }
         }
 

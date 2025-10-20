@@ -30,7 +30,7 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.json.JSONParser;
 
 /*
- * Not run automatically (due to name) as if requires a local git clone of
+ * Not run automatically (due to name) as it requires a local git clone of
  * https://github.com/httpwg/structured-field-tests
  */
 public class TesterHttpWgStructuredField {
@@ -106,20 +106,20 @@ public class TesterHttpWgStructuredField {
 
         try {
             switch (headerType) {
-            case "item": {
-                StructuredField.parseSfItem(input);
-                break;
-            }
-            case "list": {
-                StructuredField.parseSfList(input);
-                break;
-            }
-            case "dictionary": {
-                StructuredField.parseSfDictionary(input);
-                break;
-            }
-            default:
-                System.out.println("Type unsupported " + headerType);
+                case "item": {
+                    StructuredField.parseSfItem(input);
+                    break;
+                }
+                case "list": {
+                    StructuredField.parseSfList(input);
+                    break;
+                }
+                case "dictionary": {
+                    StructuredField.parseSfDictionary(input);
+                    break;
+                }
+                default:
+                    System.out.println("Type unsupported " + headerType);
             }
         } catch (Exception e) {
             Assert.assertTrue(name + ": raw [" + unescaped + "]", mustFail.booleanValue() || canFail.booleanValue());

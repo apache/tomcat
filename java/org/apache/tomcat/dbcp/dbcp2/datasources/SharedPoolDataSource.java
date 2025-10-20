@@ -51,10 +51,19 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
 
     private static final long serialVersionUID = -1458539734480586454L;
 
-    // Pool properties
+    /**
+     * Max total defaults to {@link GenericKeyedObjectPoolConfig#DEFAULT_MAX_TOTAL}.
+     */
     private int maxTotal = GenericKeyedObjectPoolConfig.DEFAULT_MAX_TOTAL;
 
+    /**
+     * Maps user credentials to pooled connection with credentials.
+     */
     private transient KeyedObjectPool<UserPassKey, PooledConnectionAndInfo> pool;
+
+    /**
+     * A {@link KeyedPooledObjectFactory} that creates {@link PoolableConnection}s.
+     */
     private transient KeyedCPDSConnectionFactory factory;
 
     /**
@@ -88,9 +97,6 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
     public int getMaxTotal() {
         return this.maxTotal;
     }
-
-    // ----------------------------------------------------------------------
-    // Instrumentation Methods
 
     /**
      * Gets the number of active connections in the pool.
@@ -142,20 +148,20 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
     }
 
     /**
-     * Supports Serialization interface.
+     * Deserializes an instance from an ObjectInputStream.
      *
-     * @param in
-     *            a {@code java.io.ObjectInputStream} value
-     * @throws IOException
-     *             if an error occurs
-     * @throws ClassNotFoundException
-     *             if an error occurs
+     * @param in The source ObjectInputStream.
+     * @throws IOException            Any of the usual Input/Output related exceptions.
+     * @throws ClassNotFoundException A class of a serialized object cannot be found.
      */
     private void readObject(final ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        this.pool = readObjectImpl();
+    }
+
+    private KeyedObjectPool<UserPassKey, PooledConnectionAndInfo> readObjectImpl() throws IOException, ClassNotFoundException {
         try {
-            in.defaultReadObject();
-            final SharedPoolDataSource oldDS = (SharedPoolDataSource) new SharedPoolDataSourceFactory().getObjectInstance(getReference(), null, null, null);
-            this.pool = oldDS.pool;
+            return ((SharedPoolDataSource) new SharedPoolDataSourceFactory().getObjectInstance(getReference(), null, null, null)).pool;
         } catch (final NamingException e) {
             throw new IOException("NamingException: " + e);
         }
@@ -177,10 +183,10 @@ public class SharedPoolDataSource extends InstanceKeyDataSource {
         config.setMaxTotal(getMaxTotal());
         config.setMaxTotalPerKey(getDefaultMaxTotal());
         config.setMaxWait(getDefaultMaxWait());
-        config.setMinEvictableIdleTime(getDefaultMinEvictableIdleDuration());
+        config.setMinEvictableIdleDuration(getDefaultMinEvictableIdleDuration());
         config.setMinIdlePerKey(getDefaultMinIdle());
         config.setNumTestsPerEvictionRun(getDefaultNumTestsPerEvictionRun());
-        config.setSoftMinEvictableIdleTime(getDefaultSoftMinEvictableIdleDuration());
+        config.setSoftMinEvictableIdleDuration(getDefaultSoftMinEvictableIdleDuration());
         config.setTestOnCreate(getDefaultTestOnCreate());
         config.setTestOnBorrow(getDefaultTestOnBorrow());
         config.setTestOnReturn(getDefaultTestOnReturn());

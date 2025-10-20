@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,11 +34,9 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * A {@link org.apache.catalina.tribes.MembershipProvider} that uses DNS to retrieve the members of a cluster.<br>
- *
  * <p>
  * <strong>Configuration example for Kubernetes</strong>
  * </p>
- *
  * {@code server.xml }
  *
  * <pre>
@@ -60,6 +59,7 @@ import org.apache.juli.logging.LogFactory;
  *  }
  *  </pre>
  *
+ * minimal example for the Service my-tomcat-app-membership, note the <strong>selector</strong><br>
  * {@code dns-membership-service.yml }
  *
  * <pre>
@@ -73,16 +73,33 @@ import org.apache.juli.logging.LogFactory;
  *   name: my-tomcat-app-membership
  * spec:
  *   clusterIP: None
- *   ports:
- *   - name: membership
- *     port: 8888
  *   selector:
  *     app: my-tomcat-app
  * }
  * </pre>
  *
- * Environment variable configuration<br>
+ * First Tomcat pod minimal example, note the <strong>labels</strong> that must correspond to the
+ * <strong>selector</strong> in the service.<br>
+ * {@code tomcat1.yml }
  *
+ * <pre>
+ * {@code
+ * apiVersion: v1
+ * kind: Pod
+ * metadata:
+ *   name: tomcat1
+ *   labels:
+ *     app: my-tomcat-app
+ * spec:
+ *   containers:
+ *   - name: tomcat
+ *     image: tomcat
+ *     ports:
+ *     - containerPort: 8080
+ * }
+ * </pre>
+ *
+ * Environment variable configuration<br>
  * {@code DNS_MEMBERSHIP_SERVICE_NAME=my-tomcat-app-membership }
  */
 
@@ -106,9 +123,9 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         }
 
         if (log.isDebugEnabled()) {
-            log.debug(String.format("Namespace [%s] set; clustering enabled", dnsServiceName));
+            log.debug(sm.getString("cloudMembershipProvider.start", dnsServiceName));
         }
-        dnsServiceName = URLEncoder.encode(dnsServiceName, "UTF-8");
+        dnsServiceName = URLEncoder.encode(dnsServiceName, StandardCharsets.UTF_8);
 
         // Fetch initial members
         heartbeat();
@@ -138,17 +155,18 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
                 if (ip.equals(localIp)) {
                     // Update the UID on initial lookup
                     Member localMember = service.getLocalMember(false);
-                    if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID && localMember instanceof MemberImpl) {
+                    if (localMember.getUniqueId() == CloudMembershipService.INITIAL_ID &&
+                            localMember instanceof MemberImpl) {
                         ((MemberImpl) localMember).setUniqueId(id);
                     }
                     continue;
                 }
                 long aliveTime = -1;
-                MemberImpl member = null;
+                MemberImpl member;
                 try {
                     member = new MemberImpl(ip, port, aliveTime);
-                } catch (IOException e) {
-                    log.error(sm.getString("kubernetesMembershipProvider.memberError"), e);
+                } catch (IOException ioe) {
+                    log.error(sm.getString("kubernetesMembershipProvider.memberError"), ioe);
                     continue;
                 }
                 member.setUniqueId(id);
@@ -166,8 +184,7 @@ public class DNSMembershipProvider extends CloudMembershipProvider {
         Member[] members = membership.getMembers();
         if (members != null) {
             for (Member member : members) {
-                if (Arrays.equals(sender.getHost(), member.getHost())
-                        && sender.getPort() == member.getPort()) {
+                if (Arrays.equals(sender.getHost(), member.getHost()) && sender.getPort() == member.getPort()) {
                     found = true;
                     break;
                 }

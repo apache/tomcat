@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.net.HttpURLConnection;
 import java.net.Socket;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -55,6 +56,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.apache.catalina.startup.SimpleHttpClient.CRLF;
 import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.AsyncContextImpl;
@@ -73,8 +75,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     private static final Log log = LogFactory.getLog(TestNonBlockingAPI.class);
 
+    private static String TRAILER_HEADER_NAME = "x-test";
+    private static String TRAILER_HEADER_VALUE = "abcde";
+
     private static final int CHUNK_SIZE = 1024 * 1024;
-    private static final int WRITE_SIZE  = CHUNK_SIZE * 10;
+    private static final int WRITE_SIZE = CHUNK_SIZE * 10;
     private static final byte[] DATA = new byte[WRITE_SIZE];
     private static final int WRITE_PAUSE_MS = 500;
 
@@ -82,8 +87,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     static {
         // Use this sequence for padding to make it easier to spot errors
-        byte[] padding = new byte[] {'z', 'y', 'x', 'w', 'v', 'u', 't', 's',
-                'r', 'q', 'p', 'o', 'n', 'm', 'l', 'k'};
+        byte[] padding = new byte[] { 'z', 'y', 'x', 'w', 'v', 'u', 't', 's', 'r', 'q', 'p', 'o', 'n', 'm', 'l', 'k' };
         int blockSize = padding.length;
 
         for (int i = 0; i < WRITE_SIZE / blockSize; i++) {
@@ -92,8 +96,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             int padSize = blockSize - hexSize;
 
             System.arraycopy(padding, 0, DATA, i * blockSize, padSize);
-            System.arraycopy(
-                    hex.getBytes(), 0, DATA, i * blockSize + padSize, hexSize);
+            System.arraycopy(hex.getBytes(), 0, DATA, i * blockSize + padSize, hexSize);
         }
 
         Field f = null;
@@ -119,7 +122,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
 
-    @Test(expected=IOException.class)
+    @Test(expected = IOException.class)
     public void testNonBlockingReadIgnoreIsReady() throws Exception {
         doTestNonBlockingRead(true, false);
     }
@@ -129,16 +132,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
-        NBReadServlet servlet = new NBReadServlet(ignoreIsReady, async);
+        NBReadServlet servlet = new NBReadServlet(ignoreIsReady, async, null);
         String servletName = NBReadServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
 
         tomcat.start();
 
-        Map<String, List<String>> reqHeaders = new HashMap<>();
+        Map<String,List<String>> reqHeaders = new HashMap<>();
         int rc = postUrl(true, new DataWriter(async ? 0 : 500, async ? 2000000 : 5),
                 "http://localhost:" + getPort() + "/", new ByteChunk(), reqHeaders, null);
 
@@ -146,10 +149,525 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         if (async) {
             Assert.assertEquals(2000000 * 8, servlet.listener.body.length());
             TestAsyncReadListener listener = (TestAsyncReadListener) servlet.listener;
-            Assert.assertTrue(Math.abs(listener.containerThreadCount.get() - listener.notReadyCount.get())  <= 1);
+            Assert.assertTrue(Math.abs(listener.containerThreadCount.get() - listener.notReadyCount.get()) <= 1);
             Assert.assertEquals(listener.isReadyCount.get(), listener.nonContainerThreadCount.get());
         } else {
             Assert.assertEquals(5 * 8, servlet.listener.body.length());
+        }
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedNoSplits() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeChunkHeader() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "",
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInChunkHeader() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "1",
+                "4" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterChunkHeader() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14",
+                CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInHeaderCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14\r",
+                "\n" +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterHeaderCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF,
+                "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeExtensionDelimiter() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14",
+                ";a=b" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterExtensionDelimiter() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14;",
+                "a=b" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInExtension() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14;a",
+                "=b" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterExtension() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14;a=b",
+                CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInChunkBody() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345",
+                "678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeChunkBodyCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED",
+                CRLF +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInChunkBodyCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED\r",
+                "\n" +
+                    "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterChunkBodyCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF,
+                "0" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeEndChunkCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0",
+                CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInEndChunkCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" +
+                    "\r",
+                "\n" +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterEndChunkCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" +
+                    CRLF,
+                CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeTrailer() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF,
+                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInTrailerName() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    "x-te",
+                "st" + ": " + TRAILER_HEADER_VALUE + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterTrailerName() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME,
+                ": " + TRAILER_HEADER_VALUE + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterTrailerDelimiter() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ":",
+                " " + TRAILER_HEADER_VALUE + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitBeforeTrailerValue() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ": ",
+                TRAILER_HEADER_VALUE + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInTrailerValue() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ": abc",
+                "de" + CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterTrailerValue() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE,
+                CRLF +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInTrailerCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + "\r",
+                "\n" +
+                    CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitAfterTrailerCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" + CRLF +
+                    TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + CRLF,
+                CRLF
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody, TRAILER_HEADER_VALUE);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitInFinalCrlf() throws Exception {
+        // @formatter:off
+        String[] requestBody = new String[] {
+                "14" + CRLF +
+                    "012345678901FINISHED" + CRLF +
+                    "0" +
+                    CRLF +
+                    "\r",
+                "\n"
+                };
+        // @formatter:on
+
+        doTestNonBlockingReadChunked(requestBody);
+    }
+
+
+    @Test
+    public void testNonBlockingReadChunkedSplitMaximum() throws Exception {
+        // @formatter:off
+        String requestBody = new String(
+                "14" + CRLF +
+                "012345678901FINISHED" + CRLF +
+                "0" + CRLF +
+                TRAILER_HEADER_NAME + ": " + TRAILER_HEADER_VALUE + CRLF +
+                CRLF);
+        // @formatter:on
+
+        String[] requestBodySplit = new String[requestBody.length()];
+        for (int i = 0; i < requestBody.length(); i++) {
+            requestBodySplit[i] = Character.toString(requestBody.charAt(i));
+        }
+
+        doTestNonBlockingReadChunked(requestBodySplit, TRAILER_HEADER_VALUE);
+    }
+
+
+    private void doTestNonBlockingReadChunked(String[] requestBody) throws Exception {
+        doTestNonBlockingReadChunked(requestBody, null);
+    }
+
+
+    private void doTestNonBlockingReadChunked(String[] requestBody, String expectedTrailerFieldValue) throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+
+        // No file system docBase required
+        Context ctx = getProgrammaticRootContext();
+
+        NBReadServlet servlet = new NBReadServlet(false, true, expectedTrailerFieldValue);
+        String servletName = NBReadServlet.class.getName();
+        Tomcat.addServlet(ctx, servletName, servlet);
+        ctx.addServletMappingDecoded("/", servletName);
+
+        tomcat.getConnector().setProperty("allowedTrailerHeaders", TRAILER_HEADER_NAME);
+
+        tomcat.start();
+
+        // Add the headers to the first part of the chunked body
+        // @formatter:off
+        requestBody[0] =
+                "GET / HTTP/1.1" + CRLF +
+                "Host: localhost" + getPort() + CRLF +
+                "Transfer-Encoding: chunked" + CRLF +
+                CRLF +
+                requestBody[0];
+        // @formatter:on
+
+        Client client = new Client();
+        client.setPort(getPort());
+        client.setRequest(requestBody);
+        /*
+         * Reduce default pause to speed up test execution. Pause only needs to be long enough that each part of the
+         * request is read separately.
+         */
+        client.setRequestPause(200);
+        client.connect();
+        client.sendRequest();
+
+        client.setUseContentLength(true);
+        client.readResponse(true);
+
+        Assert.assertTrue(client.isResponse200());
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    private static class Client extends SimpleHttpClient {
+        @Override
+        public boolean isResponseBodyOK() {
+            return "OK".equals(getResponseBody());
         }
     }
 
@@ -169,15 +687,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NBWriteServlet servlet = new NBWriteServlet(asyncContextIsComplete);
         String servletName = NBWriteServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
         // Note: Low values of socket.txBufSize can trigger very poor
-        //       performance. Set it just low enough to ensure that the
-        //       non-blocking write servlet will see isReady() == false
+        // performance. Set it just low enough to ensure that the
+        // non-blocking write servlet will see isReady() == false
         Assert.assertTrue(tomcat.getConnector().setProperty("socket.txBufSize", "1048576"));
         tomcat.start();
 
@@ -191,9 +709,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         OutputStream os = s.getOutputStream();
         if (keepAlive) {
-            os.write(("OPTIONS * HTTP/1.1\r\n" +
-                    "Host: localhost:" + getPort() + "\r\n" +
-                    "\r\n").getBytes(StandardCharsets.ISO_8859_1));
+            os.write(("OPTIONS * HTTP/1.1\r\n" + "Host: localhost:" + getPort() + "\r\n" + "\r\n")
+                    .getBytes(StandardCharsets.ISO_8859_1));
             os.flush();
             // Make sure the entire response has been read.
             int read = is.read(buffer);
@@ -203,10 +720,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             Assert.assertEquals(buffer[read - 2], '\r');
             Assert.assertEquals(buffer[read - 1], '\n');
         }
-        os.write(("GET / HTTP/1.1\r\n" +
-                "Host: localhost:" + getPort() + "\r\n" +
-                "Connection: close\r\n" +
-                "\r\n").getBytes(StandardCharsets.ISO_8859_1));
+        os.write(("GET / HTTP/1.1\r\n" + "Host: localhost:" + getPort() + "\r\n" + "Connection: close\r\n" + "\r\n")
+                .getBytes(StandardCharsets.ISO_8859_1));
         os.flush();
 
         int read = 0;
@@ -270,7 +785,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             // Read the chunk
             lineStart = lineEnd + 1;
             lineEnd = resultString.indexOf('\n', lineStart);
-            log.info("Start : "  + lineStart + ", End: " + lineEnd);
+            log.info("Start : " + lineStart + ", End: " + lineEnd);
             if (lineEnd > lineStart) {
                 line = resultString.substring(lineStart, lineEnd + 1);
             } else {
@@ -282,8 +797,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 log.info(line);
             }
             if (chunkSize + 2 != line.length()) {
-                log.error("Chunk wrong length. Was " + line.length() +
-                        " Expected " + (chunkSize + 2));
+                log.error("Chunk wrong length. Was " + line.length() + " Expected " + (chunkSize + 2));
 
                 byte[] resultBytes = resultString.getBytes();
 
@@ -307,10 +821,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         if (resultEnd > resultString.length()) {
                             resultEnd = resultString.length();
                         }
-                        log.error("Mismatch tx: " + new String(
-                                DATA, dataStart, dataEnd - dataStart));
-                        log.error("Mismatch rx: " +
-                                resultString.substring(resultStart, resultEnd));
+                        log.error("Mismatch tx: " + new String(DATA, dataStart, dataEnd - dataStart));
+                        log.error("Mismatch rx: " + resultString.substring(resultStart, resultEnd));
                         found = true;
                         break;
                     }
@@ -349,7 +861,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);
@@ -362,8 +874,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
         // Note: Low values of socket.txBufSize can trigger very poor
-        //       performance. Set it just low enough to ensure that the
-        //       non-blocking write servlet will see isReady() == false
+        // performance. Set it just low enough to ensure that the
+        // non-blocking write servlet will see isReady() == false
         Assert.assertTrue(tomcat.getConnector().setProperty("socket.txBufSize", "524228"));
         tomcat.start();
 
@@ -372,10 +884,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         ByteChunk result = new ByteChunk();
         OutputStream os = s.getOutputStream();
-        os.write(("GET / HTTP/1.1\r\n" +
-                "Host: localhost:" + getPort() + "\r\n" +
-                "Connection: close\r\n" +
-                "\r\n").getBytes(StandardCharsets.ISO_8859_1));
+        os.write(("GET / HTTP/1.1\r\n" + "Host: localhost:" + getPort() + "\r\n" + "Connection: close\r\n" + "\r\n")
+                .getBytes(StandardCharsets.ISO_8859_1));
         os.flush();
 
         InputStream is = s.getInputStream();
@@ -388,8 +898,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             long start = System.currentTimeMillis();
             read = is.read(buffer);
             long end = System.currentTimeMillis();
-            log.info("Client read [" + read + "] bytes in [" + (end - start) +
-                    "] ms");
+            log.info("Client read [" + read + "] bytes in [" + (end - start) + "] ms");
             if (read > 0) {
                 result.append(buffer, 0, read);
             }
@@ -417,17 +926,17 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         int count = 0;
         while (count < 100 && !servlet.wlistener.onErrorInvoked) {
             Thread.sleep(100);
-            count ++;
+            count++;
         }
 
         while (count < 100 && !asyncContextIsComplete.get()) {
             Thread.sleep(100);
-            count ++;
+            count++;
         }
 
         while (count < 100 && alv.getEntryCount() < 1) {
             Thread.sleep(100);
-            count ++;
+            count++;
         }
 
         Assert.assertTrue("Error listener should have been invoked.", servlet.wlistener.onErrorInvoked);
@@ -435,8 +944,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         // TODO Figure out why non-blocking writes with the NIO connector appear
         // to be slower on Linux
-        alv.validateAccessLog(1, 500, WRITE_PAUSE_MS,
-                WRITE_PAUSE_MS + 30 * 1000);
+        alv.validateAccessLog(1, 500, WRITE_PAUSE_MS, WRITE_PAUSE_MS + 30 * 1000);
     }
 
 
@@ -445,7 +953,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NBReadWriteServlet servlet = new NBReadWriteServlet();
         String servletName = NBReadWriteServlet.class.getName();
@@ -454,7 +962,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String, List<String>> resHeaders = new HashMap<>();
+        Map<String,List<String>> resHeaders = new HashMap<>();
         int rc = postUrl(false, new BytesStreamer() {
             @Override
             public byte[] next() {
@@ -470,8 +978,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             public int available() {
                 return 0;
             }
-        }, "http://localhost:" +
-                getPort() + "/", new ByteChunk(), resHeaders, null);
+        }, "http://localhost:" + getPort() + "/", new ByteChunk(), resHeaders, null);
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
 
@@ -506,18 +1013,18 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         public byte[] next() {
             if (count < max) {
                 if (count > 0) {
-                  try {
-                      if (delay > 0) {
-                        Thread.sleep(delay);
-                      }
-                  } catch (Exception x) {
-                  }
+                    try {
+                        if (delay > 0) {
+                            Thread.sleep(delay);
+                        }
+                    } catch (Exception x) {
+                    }
                 }
                 count++;
                 if (count < max) {
-                  return b;
+                    return b;
                 } else {
-                  return f;
+                    return f;
                 }
             } else {
                 return null;
@@ -531,11 +1038,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
         private final boolean async;
         private final boolean ignoreIsReady;
+        private final String expectedTrailerFieldValue;
         transient TestReadListener listener;
 
-        public NBReadServlet(boolean ignoreIsReady, boolean async) {
+        public NBReadServlet(boolean ignoreIsReady, boolean async, String expectedTrailerFieldValue) {
             this.async = async;
             this.ignoreIsReady = ignoreIsReady;
+            this.expectedTrailerFieldValue = expectedTrailerFieldValue;
         }
 
         @Override
@@ -572,9 +1081,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             // step 2 - notify on read
             ServletInputStream in = req.getInputStream();
             if (async) {
-                listener = new TestAsyncReadListener(actx, false, ignoreIsReady);
+                listener = new TestAsyncReadListener(actx, false, ignoreIsReady, expectedTrailerFieldValue);
             } else {
-                listener = new TestReadListener(actx, false, ignoreIsReady);
+                listener = new TestReadListener(actx, false, ignoreIsReady, expectedTrailerFieldValue);
             }
             in.setReadListener(listener);
         }
@@ -593,7 +1102,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
 
 
-        public NBWriteServlet(AtomicBoolean asyncContextIsComplete, boolean unlimited, boolean listenerCompletesOnError) {
+        public NBWriteServlet(AtomicBoolean asyncContextIsComplete, boolean unlimited,
+                boolean listenerCompletesOnError) {
             this.asyncContextIsComplete = asyncContextIsComplete;
             this.unlimited = unlimited;
             this.listenerCompletesOnError = listenerCompletesOnError;
@@ -663,15 +1173,16 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         protected final AsyncContext ctx;
         protected final boolean usingNonBlockingWrite;
         protected final boolean ignoreIsReady;
+        protected final String expectedTrailerFieldValue;
         protected final StringBuilder body = new StringBuilder();
 
 
-        TestReadListener(AsyncContext ctx,
-                boolean usingNonBlockingWrite,
-                boolean ignoreIsReady) {
+        TestReadListener(AsyncContext ctx, boolean usingNonBlockingWrite, boolean ignoreIsReady,
+                String expectedTrailerFieldValue) {
             this.ctx = ctx;
             this.usingNonBlockingWrite = usingNonBlockingWrite;
             this.ignoreIsReady = ignoreIsReady;
+            this.expectedTrailerFieldValue = expectedTrailerFieldValue;
         }
 
         @Override
@@ -699,7 +1210,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
             if (!usingNonBlockingWrite) {
                 String msg;
                 if (body.toString().endsWith("FINISHED")) {
-                    msg = "OK";
+                    String trailerFieldValue = ((HttpServletRequest) ctx.getRequest()).getTrailerFields().get("x-test");
+                    if (trailerFieldValue == null && expectedTrailerFieldValue == null ||
+                            trailerFieldValue != null && trailerFieldValue.equals(expectedTrailerFieldValue)) {
+                        msg = "OK";
+                    } else {
+                        System.out.println("Trailer value was [" + trailerFieldValue + "]");
+                        msg = "FAILED";
+                    }
                 } else {
                     msg = "FAILED";
                 }
@@ -726,9 +1244,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         AtomicInteger containerThreadCount = new AtomicInteger(0);
         AtomicInteger nonContainerThreadCount = new AtomicInteger(0);
 
-        TestAsyncReadListener(AsyncContext ctx,
-                boolean usingNonBlockingWrite, boolean ignoreIsReady) {
-            super(ctx, usingNonBlockingWrite, ignoreIsReady);
+        TestAsyncReadListener(AsyncContext ctx, boolean usingNonBlockingWrite, boolean ignoreIsReady,
+                String expectedTrailerFieldValue) {
+            super(ctx, usingNonBlockingWrite, ignoreIsReady, expectedTrailerFieldValue);
         }
 
         @Override
@@ -765,8 +1283,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         if (isReady) {
                             onDataAvailable();
                         }
-                    } catch (IOException e) {
-                        onError(e);
+                    } catch (IOException ioe) {
+                        onError(ioe);
                     }
                 }
             }.start();
@@ -775,17 +1293,15 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         @Override
         public void onAllDataRead() {
             super.onAllDataRead();
-            log.info("isReadyCount=" + isReadyCount + " notReadyCount=" + notReadyCount
-                    + " containerThreadCount=" + containerThreadCount
-                    + " nonContainerThreadCount=" + nonContainerThreadCount);
+            log.info("isReadyCount=" + isReadyCount + " notReadyCount=" + notReadyCount + " containerThreadCount=" +
+                    containerThreadCount + " nonContainerThreadCount=" + nonContainerThreadCount);
         }
 
         @Override
         public void onError(Throwable throwable) {
             super.onError(throwable);
-            log.info("isReadyCount=" + isReadyCount + " notReadyCount=" + notReadyCount
-                    + " containerThreadCount=" + containerThreadCount
-                    + " nonContainerThreadCount=" + nonContainerThreadCount);
+            log.info("isReadyCount=" + isReadyCount + " notReadyCount=" + notReadyCount + " containerThreadCount=" +
+                    containerThreadCount + " nonContainerThreadCount=" + nonContainerThreadCount);
         }
     }
 
@@ -804,10 +1320,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         public void onWritePossible() throws IOException {
             long start = System.currentTimeMillis();
             int before = written;
-            while ((written < WRITE_SIZE || unlimited) &&
-                    ctx.getResponse().getOutputStream().isReady()) {
-                ctx.getResponse().getOutputStream().write(
-                        DATA, written, CHUNK_SIZE);
+            while ((written < WRITE_SIZE || unlimited) && ctx.getResponse().getOutputStream().isReady()) {
+                ctx.getResponse().getOutputStream().write(DATA, written, CHUNK_SIZE);
                 written += CHUNK_SIZE;
             }
             if (written == WRITE_SIZE) {
@@ -815,11 +1329,10 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 // calling complete
                 ctx.getResponse().flushBuffer();
             }
-            log.info("Write took: " + (System.currentTimeMillis() - start) +
-                    " ms. Bytes before=" + before + " after=" + written);
+            log.info("Write took: " + (System.currentTimeMillis() - start) + " ms. Bytes before=" + before + " after=" +
+                    written);
             // only call complete if we have emptied the buffer
-            if (ctx.getResponse().getOutputStream().isReady() &&
-                    written == WRITE_SIZE) {
+            if (ctx.getResponse().getOutputStream().isReady() && written == WRITE_SIZE) {
                 // it is illegal to call complete
                 // if there is a write in progress
                 ctx.complete();
@@ -892,14 +1405,14 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     }
 
     public static int postUrlWithDisconnect(boolean stream, BytesStreamer streamer, String path,
-            Map<String, List<String>> reqHead, Map<String, List<String>> resHead) throws IOException {
+            Map<String,List<String>> reqHead, Map<String,List<String>> resHead) throws IOException {
 
-        URL url = new URL(path);
+        URL url = URI.create(path).toURL();
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setDoOutput(true);
         connection.setReadTimeout(1000000);
         if (reqHead != null) {
-            for (Map.Entry<String, List<String>> entry : reqHead.entrySet()) {
+            for (Map.Entry<String,List<String>> entry : reqHead.entrySet()) {
                 StringBuilder valueList = new StringBuilder();
                 for (String value : entry.getValue()) {
                     if (valueList.length() > 0) {
@@ -931,7 +1444,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         int rc = connection.getResponseCode();
         if (resHead != null) {
-            Map<String, List<String>> head = connection.getHeaderFields();
+            Map<String,List<String>> head = connection.getHeaderFields();
             resHead.putAll(head);
         }
         try {
@@ -951,7 +1464,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testDelayedNBWrite() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         CountDownLatch latch1 = new CountDownLatch(1);
         DelayedNBWriteServlet servlet = new DelayedNBWriteServlet(latch1);
         String servletName = DelayedNBWriteServlet.class.getName();
@@ -963,14 +1476,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         CountDownLatch latch2 = new CountDownLatch(2);
         List<Throwable> exceptions = new ArrayList<>();
 
-        Thread t = new Thread(
-                new RequestExecutor("http://localhost:" + getPort() + "/", latch2, exceptions));
+        Thread t = new Thread(new RequestExecutor("http://localhost:" + getPort() + "/", latch2, exceptions));
         t.start();
 
         latch1.await(3000, TimeUnit.MILLISECONDS);
 
-        Thread t1 = new Thread(new RequestExecutor(
-                "http://localhost:" + getPort() + "/?notify=true", latch2, exceptions));
+        Thread t1 =
+                new Thread(new RequestExecutor("http://localhost:" + getPort() + "/?notify=true", latch2, exceptions));
         t1.start();
 
         latch2.await(3000, TimeUnit.MILLISECONDS);
@@ -984,7 +1496,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
     public void testDelayedNBReadWrite() throws Exception {
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         CountDownLatch latch1 = new CountDownLatch(2);
         DelayedNBReadWriteServlet servlet = new DelayedNBReadWriteServlet(latch1);
         String servletName = DelayedNBReadWriteServlet.class.getName();
@@ -996,8 +1508,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         CountDownLatch latch2 = new CountDownLatch(1);
         List<Throwable> exceptions = new ArrayList<>();
 
-        Thread t = new Thread(
-            new RequestPostExecutor("http://localhost:" + getPort() + "/", latch2, exceptions));
+        Thread t = new Thread(new RequestPostExecutor("http://localhost:" + getPort() + "/", latch2, exceptions));
         t.start();
 
         latch1.await(3000, TimeUnit.MILLISECONDS);
@@ -1106,11 +1617,11 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         @Override
         protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+                throws ServletException, IOException {
             final AsyncContext ctx = request.startAsync();
             ctx.setTimeout(1000);
 
-            Thread readWriteListener =  new Thread(new ReadWriteListener(latch, ctx));
+            Thread readWriteListener = new Thread(new ReadWriteListener(latch, ctx));
             readWriteListener.start();
         }
     }
@@ -1119,7 +1630,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final transient CountDownLatch latch;
         private final transient AsyncContext ctx;
 
-        ReadWriteListener(CountDownLatch latch, AsyncContext ctx){
+        ReadWriteListener(CountDownLatch latch, AsyncContext ctx) {
             this.latch = latch;
             this.ctx = ctx;
         }
@@ -1128,8 +1639,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         public void run() {
             try {
                 setListeners();
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
             }
         }
 
@@ -1150,8 +1661,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                         String body = new String(buffer, StandardCharsets.UTF_8);
                         Assert.assertTrue(body.equals("body"));
 
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
                     }
                 }
 
@@ -1242,7 +1753,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NBReadWithDispatchServlet servlet = new NBReadWithDispatchServlet();
         String servletName = NBReadWithDispatchServlet.class.getName();
@@ -1251,9 +1762,9 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String, List<String>> resHeaders = new HashMap<>();
-        int rc = postUrl(true, new DataWriter(500, 5), "http://localhost:" +
-                getPort() + "/", new ByteChunk(), resHeaders, null);
+        Map<String,List<String>> resHeaders = new HashMap<>();
+        int rc = postUrl(true, new DataWriter(500, 5), "http://localhost:" + getPort() + "/", new ByteChunk(),
+                resHeaders, null);
 
         Assert.assertEquals(HttpServletResponse.SC_OK, rc);
     }
@@ -1265,8 +1776,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             final CountDownLatch latch = new CountDownLatch(1);
 
@@ -1290,8 +1800,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                             is.read(buffer);
                         }
 
-                    } catch (IOException ex) {
-                        ex.printStackTrace();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
                     }
                 }
 
@@ -1319,45 +1829,42 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
     @Test
     public void testCanceledPostChunked() throws Exception {
+        // @formatter:off
         doTestCanceledPost(new String[] {
-                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + SimpleHttpClient.CRLF +
-                "Transfer-Encoding: Chunked" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF +
-                "10" + SimpleHttpClient.CRLF +
-                "This is 16 bytes" + SimpleHttpClient.CRLF
+                "POST / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + CRLF +
+                    "Transfer-Encoding: Chunked" + CRLF +
+                    CRLF +
+                    "10" + CRLF +
+                    "This is 16 bytes" + CRLF
                 });
+        // @formatter:on
     }
 
 
     @Test
     public void testCanceledPostNoChunking() throws Exception {
+        // @formatter:off
         doTestCanceledPost(new String[] {
-                "POST / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + SimpleHttpClient.CRLF +
-                "Content-Length: 100" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF +
-                "This is 16 bytes"
+                "POST / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + CRLF +
+                    "Content-Length: 100" + CRLF +
+                    CRLF +
+                    "This is 16 bytes"
                 });
+        // @formatter:on
     }
 
 
     /*
-     * Tests an error on an non-blocking read when the client closes the
-     * connection before fully writing the request body.
+     * Tests an error on an non-blocking read when the client closes the connection before fully writing the request
+     * body.
      *
-     * Required sequence is:
-     * - enter Servlet's service() method
-     * - startAsync()
-     * - configure non-blocking read
-     * - read partial body
-     * - close client connection
-     * - error is triggered
-     * - exit Servlet's service() method
+     * Required sequence is: - enter Servlet's service() method - startAsync() - configure non-blocking read - read
+     * partial body - close client connection - error is triggered - exit Servlet's service() method
      *
-     * This test makes extensive use of instance fields in the Servlet that
-     * would normally be considered very poor practice. It is only safe in this
-     * test as the Servlet only processes a single request.
+     * This test makes extensive use of instance fields in the Servlet that would normally be considered very poor
+     * practice. It is only safe in this test as the Servlet only processes a single request.
      */
     private void doTestCanceledPost(String[] request) throws Exception {
 
@@ -1370,7 +1877,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         PostServlet postServlet = new PostServlet(partialReadLatch, completeLatch, testFailed);
         Wrapper wrapper = Tomcat.addServlet(ctx, "postServlet", postServlet);
@@ -1420,8 +1927,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         }
 
         @Override
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             AsyncContext ac = req.startAsync();
             ac.setTimeout(-1);
@@ -1494,9 +2000,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
                 }
                 totalRead += bytesRead;
                 isReady = sis.isReady();
-                System.out.println("Read [" + bytesRead +
-                        "], buffer [" + new String(buffer, 0, bytesRead, StandardCharsets.UTF_8) +
-                        "], total read [" + totalRead +
+                System.out.println("Read [" + bytesRead + "], buffer [" +
+                        new String(buffer, 0, bytesRead, StandardCharsets.UTF_8) + "], total read [" + totalRead +
                         "], isReady [" + isReady + "]");
             } while (isReady);
             if (totalRead == 16) {
@@ -1532,12 +2037,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
 
     /*
-     * Tests client disconnect in the following scenario:
-     * - async with non-blocking IO
-     * - response has been committed
-     * - no data in buffers
-     * - client disconnects
-     * - server attempts a write
+     * Tests client disconnect in the following scenario: - async with non-blocking IO - response has been committed -
+     * no data in buffers - client disconnects - server attempts a write
      */
     private void doTestNonBlockingWriteError02(boolean swallowIoException) throws Exception {
         CountDownLatch responseCommitLatch = new CountDownLatch(1);
@@ -1548,7 +2049,7 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         NBWriteServlet02 writeServlet =
                 new NBWriteServlet02(responseCommitLatch, clientCloseLatch, asyncCompleteLatch, swallowIoException);
@@ -1560,11 +2061,13 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         ResponseOKClient client = new ResponseOKClient();
         client.setPort(getPort());
+        // @formatter:off
         client.setRequest(new String[] {
-                "GET / HTTP/1.1" + SimpleHttpClient.CRLF +
-                "Host: localhost:" + SimpleHttpClient.CRLF +
-                SimpleHttpClient.CRLF
+                "GET / HTTP/1.1" + CRLF +
+                    "Host: localhost:" + CRLF +
+                    CRLF
                 });
+        // @formatter:on
         client.connect();
         client.sendRequest();
 
@@ -1648,8 +2151,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         private final boolean swallowIoException;
         private volatile AtomicInteger stage = new AtomicInteger(0);
 
-        TestWriteListener02(AsyncContext ac, CountDownLatch responseCommitLatch,
-                CountDownLatch clientCloseLatch, boolean swallowIoException) {
+        TestWriteListener02(AsyncContext ac, CountDownLatch responseCommitLatch, CountDownLatch clientCloseLatch,
+                boolean swallowIoException) {
             this.ac = ac;
             this.responseCommitLatch = responseCommitLatch;
             this.clientCloseLatch = clientCloseLatch;
@@ -1711,17 +2214,17 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
         // Note: Low values of socket.txBufSize can trigger very poor
-        //       performance.
+        // performance.
         Assert.assertTrue(tomcat.getConnector().setProperty("socket.txBufSize", "524228"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         TesterAccessLogValve alv = new TesterAccessLogValve();
         ctx.getPipeline().addValve(alv);
 
-        NBWriteWithCloseServlet servlet = new NBWriteWithCloseServlet(
-                asyncContextIsComplete, asyncContextIsError, beforeCloseLatch, afterCloseLatch, written);
+        NBWriteWithCloseServlet servlet = new NBWriteWithCloseServlet(asyncContextIsComplete, asyncContextIsError,
+                beforeCloseLatch, afterCloseLatch, written);
         String servletName = NBWriteWithCloseServlet.class.getName();
         Tomcat.addServlet(ctx, servletName, servlet);
         ctx.addServletMappingDecoded("/", servletName);
@@ -1732,10 +2235,8 @@ public class TestNonBlockingAPI extends TomcatBaseTest {
         Socket s = factory.createSocket("localhost", getPort());
 
         OutputStream os = s.getOutputStream();
-        os.write(("GET / HTTP/1.1\r\n" +
-                "Host: localhost:" + getPort() + "\r\n" +
-                "Connection: close\r\n" +
-                "\r\n").getBytes(StandardCharsets.ISO_8859_1));
+        os.write(("GET / HTTP/1.1\r\n" + "Host: localhost:" + getPort() + "\r\n" + "Connection: close\r\n" + "\r\n")
+                .getBytes(StandardCharsets.ISO_8859_1));
         os.flush();
 
         // Wait for Servlet to fill write buffer

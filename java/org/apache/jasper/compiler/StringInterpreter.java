@@ -17,33 +17,24 @@
 package org.apache.jasper.compiler;
 
 /**
- * Defines the interface for the String interpreter. This allows users to
- * provide custom String interpreter implementations that can optimise
- * String processing for an application by performing code generation for
- * a sub-set of Strings.
+ * Defines the interface for the String interpreter. This allows users to provide custom String interpreter
+ * implementations that can optimise String processing for an application by performing code generation for a sub-set of
+ * Strings.
  */
 public interface StringInterpreter {
 
     /**
-     * Generates the source code that represents the conversion of the string
-     * value to the appropriate type.
+     * Generates the source code that represents the conversion of the string value to the appropriate type.
      *
-     * @param c
-     *              The target class to which to coerce the given string
-     * @param s
-     *              The string value
-     * @param attrName
-     *              The name of the attribute whose value is being supplied
-     * @param propEditorClass
-     *              The property editor for the given attribute
-     * @param isNamedAttribute
-     *              true if the given attribute is a named attribute (that
-     *              is, specified using the jsp:attribute standard action),
-     *              and false otherwise
+     * @param c                The target class to which to coerce the given string
+     * @param s                The string value
+     * @param attrName         The name of the attribute whose value is being supplied
+     * @param propEditorClass  The property editor for the given attribute
+     * @param isNamedAttribute true if the given attribute is a named attribute (that is, specified using the
+     *                             jsp:attribute standard action), and false otherwise
      *
-     * @return the string representing the code that will be inserted into the
-     *         source code for the Servlet generated for the JSP.
+     * @return the string representing the code that will be inserted into the source code for the Servlet generated for
+     *             the JSP.
      */
-    String convertString(Class<?> c, String s, String attrName,
-            Class<?> propEditorClass, boolean isNamedAttribute);
+    String convertString(Class<?> c, String s, String attrName, Class<?> propEditorClass, boolean isNamedAttribute);
 }

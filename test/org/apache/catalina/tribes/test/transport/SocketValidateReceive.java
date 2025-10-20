@@ -38,7 +38,7 @@ public class SocketValidateReceive {
     public static void main(String[] args) throws Exception {
         int size = Constants.DEFAULT_CLUSTER_MSG_BUFFER_SIZE;
         if (args.length > 0 ) {
-          try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
+            try {size=Integer.parseInt(args[0]);}catch(Exception x){ /* Ignore */ }
         }
 
         try(ServerSocket srvSocket = new ServerSocket(9999)) {
@@ -52,7 +52,7 @@ public class SocketValidateReceive {
                 public void run() {
                     while ( true ) {
                         try {
-                            Thread.sleep(1000);
+                            sleep(1000);
                             printStats(start, mb, count, df, total);
                         }catch ( Exception x ) { /* Ignore */ }
                     }
@@ -89,8 +89,8 @@ public class SocketValidateReceive {
         long time = System.currentTimeMillis();
         double seconds = ((double)(time-start))/1000;
         System.out.println("Throughput " + df.format(mb/seconds) +
-                " MB/seconds messages " + count + ", total " + mb +
-                " MB, total " + total + " bytes.");
+                " MiB/s messages " + count + ", total " + mb +
+                " MiB total " + total + " bytes.");
     }
 
     public static class MyDataReader {
@@ -110,7 +110,7 @@ public class SocketValidateReceive {
                     packages++;
                 }
                 if ( b[i] != seq ) {
-                  throw new Exception("mismatch on seq:"+seq+" and byte nr:"+cur+" count:"+count+" packages:"+packages);
+                    throw new Exception("mismatch on seq:"+seq+" and byte nr:"+cur+" count:"+count+" packages:"+packages);
                 }
                 cur++;
             }

@@ -52,18 +52,16 @@ public class AstLambdaExpression extends SimpleNode {
         // nested expressions.
         int methodParameterSetCount = jjtGetNumChildren() - 2;
         if (methodParameterSetCount > state.getNestingCount()) {
-            throw new ELException(MessageFactory.get(
-                    "error.lambda.tooManyMethodParameterSets"));
+            throw new ELException(MessageFactory.get("error.lambda.tooManyMethodParameterSets"));
         }
 
         // First child is always parameters even if there aren't any
-        AstLambdaParameters formalParametersNode =
-                (AstLambdaParameters) children[0];
+        AstLambdaParameters formalParametersNode = (AstLambdaParameters) children[0];
         Node[] formalParamNodes = formalParametersNode.children;
 
         // Second child is a value expression
-        ValueExpressionImpl ve = new ValueExpressionImpl("", children[1],
-                ctx.getFunctionMapper(), ctx.getVariableMapper(), null);
+        ValueExpressionImpl ve =
+                new ValueExpressionImpl("", children[1], ctx.getFunctionMapper(), ctx.getVariableMapper(), null);
 
         // Build a LambdaExpression
         List<String> formalParameters = new ArrayList<>();
@@ -87,27 +85,22 @@ public class AstLambdaExpression extends SimpleNode {
         }
 
         /*
-         * This is a (possibly nested) lambda expression with one or more sets
-         * of parameters provided.
+         * This is a (possibly nested) lambda expression with one or more sets of parameters provided.
          *
-         * If there are more nested expressions than sets of parameters this may
-         * return a LambdaExpression.
+         * If there are more nested expressions than sets of parameters this may return a LambdaExpression.
          *
-         * If there are more sets of parameters than nested expressions an
-         * ELException will have been thrown by the check at the start of this
-         * method.
+         * If there are more sets of parameters than nested expressions an ELException will have been thrown by the
+         * check at the start of this method.
          */
 
         // Always have to invoke the outer-most expression
         int methodParameterIndex = 2;
-        Object result = le.invoke(((AstMethodParameters)
-                children[methodParameterIndex]).getParameters(ctx));
+        Object result = le.invoke(((AstMethodParameters) children[methodParameterIndex]).getParameters(ctx));
         methodParameterIndex++;
 
-        while (result instanceof LambdaExpression &&
-                methodParameterIndex < jjtGetNumChildren()) {
-            result = ((LambdaExpression) result).invoke(((AstMethodParameters)
-                    children[methodParameterIndex]).getParameters(ctx));
+        while (result instanceof LambdaExpression && methodParameterIndex < jjtGetNumChildren()) {
+            result = ((LambdaExpression) result)
+                    .invoke(((AstMethodParameters) children[methodParameterIndex]).getParameters(ctx));
             methodParameterIndex++;
         }
 

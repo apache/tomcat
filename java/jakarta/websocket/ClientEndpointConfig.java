@@ -34,8 +34,8 @@ public interface ClientEndpointConfig extends EndpointConfig {
 
     final class Builder {
 
-        private static final Configurator DEFAULT_CONFIGURATOR =
-                new Configurator() {};
+        private static final Configurator DEFAULT_CONFIGURATOR = new Configurator() {
+        };
 
 
         public static Builder create() {
@@ -55,8 +55,8 @@ public interface ClientEndpointConfig extends EndpointConfig {
         private SSLContext sslContext = null;
 
         public ClientEndpointConfig build() {
-            return new DefaultClientEndpointConfig(preferredSubprotocols,
-                    extensions, encoders, decoders, sslContext, configurator);
+            return new DefaultClientEndpointConfig(preferredSubprotocols, extensions, encoders, decoders, sslContext,
+                    configurator);
         }
 
 
@@ -70,22 +70,18 @@ public interface ClientEndpointConfig extends EndpointConfig {
         }
 
 
-        public Builder preferredSubprotocols(
-                List<String> preferredSubprotocols) {
-            if (preferredSubprotocols == null ||
-                    preferredSubprotocols.size() == 0) {
+        public Builder preferredSubprotocols(List<String> preferredSubprotocols) {
+            if (preferredSubprotocols == null || preferredSubprotocols.isEmpty()) {
                 this.preferredSubprotocols = Collections.emptyList();
             } else {
-                this.preferredSubprotocols =
-                        Collections.unmodifiableList(preferredSubprotocols);
+                this.preferredSubprotocols = Collections.unmodifiableList(preferredSubprotocols);
             }
             return this;
         }
 
 
-        public Builder extensions(
-                List<Extension> extensions) {
-            if (extensions == null || extensions.size() == 0) {
+        public Builder extensions(List<Extension> extensions) {
+            if (extensions == null || extensions.isEmpty()) {
                 this.extensions = Collections.emptyList();
             } else {
                 this.extensions = Collections.unmodifiableList(extensions);
@@ -95,7 +91,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
 
 
         public Builder encoders(List<Class<? extends Encoder>> encoders) {
-            if (encoders == null || encoders.size() == 0) {
+            if (encoders == null || encoders.isEmpty()) {
                 this.encoders = Collections.emptyList();
             } else {
                 this.encoders = Collections.unmodifiableList(encoders);
@@ -105,7 +101,7 @@ public interface ClientEndpointConfig extends EndpointConfig {
 
 
         public Builder decoders(List<Class<? extends Decoder>> decoders) {
-            if (decoders == null || decoders.size() == 0) {
+            if (decoders == null || decoders.isEmpty()) {
                 this.decoders = Collections.emptyList();
             } else {
                 this.decoders = Collections.unmodifiableList(decoders);
@@ -124,18 +120,17 @@ public interface ClientEndpointConfig extends EndpointConfig {
     class Configurator {
 
         /**
-         * Provides the client with a mechanism to inspect and/or modify the headers
-         * that are sent to the server to start the WebSocket handshake.
+         * Provides the client with a mechanism to inspect and/or modify the headers that are sent to the server to
+         * start the WebSocket handshake.
          *
-         * @param headers   The HTTP headers
+         * @param headers The HTTP headers
          */
-        public void beforeRequest(Map<String, List<String>> headers) {
+        public void beforeRequest(Map<String,List<String>> headers) {
             // NO-OP
         }
 
         /**
-         * Provides the client with a mechanism to inspect the handshake response
-         * that is returned from the server.
+         * Provides the client with a mechanism to inspect the handshake response that is returned from the server.
          *
          * @param handshakeResponse The response
          */

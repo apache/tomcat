@@ -93,7 +93,7 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         // Add the Servlet
         CharsetServlet servlet = new CharsetServlet(mode, useSetContentType);
@@ -115,7 +115,7 @@ public class TestAddCharSetFilter extends TomcatBaseTest {
 
         tomcat.start();
 
-        Map<String, List<String>> headers = new HashMap<>();
+        Map<String,List<String>> headers = new HashMap<>();
         getUrl("http://localhost:" + getPort() + "/", new ByteChunk(), headers);
 
         String ct = getSingleHeader("Content-Type", headers).toLowerCase(Locale.ENGLISH);

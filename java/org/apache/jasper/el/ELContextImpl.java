@@ -29,15 +29,14 @@ import jakarta.el.ELResolver;
 import jakarta.el.FunctionMapper;
 import jakarta.el.ListELResolver;
 import jakarta.el.MapELResolver;
+import jakarta.el.RecordELResolver;
 import jakarta.el.ResourceBundleELResolver;
 import jakarta.el.StaticFieldELResolver;
 import jakarta.el.ValueExpression;
 import jakarta.el.VariableMapper;
 
 /**
- * Implementation of ELContext
- *
- * @author Jacob Hookom
+ * Implementation of ELContext.
  */
 public class ELContextImpl extends ELContext {
 
@@ -50,7 +49,7 @@ public class ELContextImpl extends ELContext {
 
     private static final class VariableMapperImpl extends VariableMapper {
 
-        private Map<String, ValueExpression> vars;
+        private Map<String,ValueExpression> vars;
 
         @Override
         public ValueExpression resolveVariable(String variable) {
@@ -61,8 +60,7 @@ public class ELContextImpl extends ELContext {
         }
 
         @Override
-        public ValueExpression setVariable(String variable,
-                ValueExpression expression) {
+        public ValueExpression setVariable(String variable, ValueExpression expression) {
             if (vars == null) {
                 vars = new HashMap<>();
             }
@@ -78,13 +76,13 @@ public class ELContextImpl extends ELContext {
 
     static {
         DefaultResolver = new CompositeELResolver();
-        ((CompositeELResolver) DefaultResolver).add(
-                ELManager.getExpressionFactory().getStreamELResolver());
+        ((CompositeELResolver) DefaultResolver).add(ELManager.getExpressionFactory().getStreamELResolver());
         ((CompositeELResolver) DefaultResolver).add(new StaticFieldELResolver());
         ((CompositeELResolver) DefaultResolver).add(new MapELResolver());
         ((CompositeELResolver) DefaultResolver).add(new ResourceBundleELResolver());
         ((CompositeELResolver) DefaultResolver).add(new ListELResolver());
         ((CompositeELResolver) DefaultResolver).add(new ArrayELResolver());
+        ((CompositeELResolver) DefaultResolver).add(new RecordELResolver());
         ((CompositeELResolver) DefaultResolver).add(new BeanELResolver());
     }
 

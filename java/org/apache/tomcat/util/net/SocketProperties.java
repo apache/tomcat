@@ -26,83 +26,85 @@ import java.nio.channels.AsynchronousSocketChannel;
 
 import javax.management.ObjectName;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.res.StringManager;
+
 /**
- * Properties that can be set in the &lt;Connector&gt; element
- * in server.xml. All properties are prefixed with &quot;socket.&quot;
- * and are currently only working for the Nio connector
+ * Properties that can be set in the &lt;Connector&gt; element in server.xml. All properties are prefixed with
+ * &quot;socket.&quot; and are currently only working for the Nio connector
  */
 public class SocketProperties {
 
+    private static final Log log = LogFactory.getLog(SocketProperties.class);
+    private static final StringManager sm = StringManager.getManager(SocketProperties.class);
+
     /**
-     * Enable/disable socket processor cache, this bounded cache stores
-     * SocketProcessor objects to reduce GC
-     * Default is 500
-     * -1 is unlimited
+     * Enable/disable socket processor cache, this bounded cache stores SocketProcessor objects to reduce GC.
+     * <p>
+     * Default is 0<br>
+     * -1 is unlimited<br>
      * 0 is disabled
      */
     protected int processorCache = 0;
 
     /**
-     * Enable/disable poller event cache, this bounded cache stores
-     * PollerEvent objects to reduce GC for the poller
-     * Default is 500
-     * -1 is unlimited
-     * 0 is disabled
+     * Enable/disable poller event cache, this bounded cache stores PollerEvent objects to reduce GC for the poller
+     * <p>
+     * Default is 0<br>
+     * -1 is unlimited<br>
+     * 0 is disabled<br>
      * &gt;0 the max number of objects to keep in cache.
      */
     protected int eventCache = 0;
 
     /**
-     * Enable/disable direct buffers for the network buffers
-     * Default value is disabled
+     * Enable/disable direct buffers for the network buffers. Default value is disabled.
      */
     protected boolean directBuffer = false;
 
     /**
-     * Enable/disable direct buffers for the network buffers for SSL
-     * Default value is disabled
+     * Enable/disable direct buffers for the network buffers for SSL. Default value is disabled.
      */
     protected boolean directSslBuffer = false;
 
     /**
-     * Socket receive buffer size in bytes (SO_RCVBUF).
-     * JVM default used if not set.
+     * Socket receive buffer size in bytes (SO_RCVBUF). JVM default used if not set.
      */
     protected Integer rxBufSize = null;
 
     /**
-     * Socket send buffer size in bytes (SO_SNDBUF).
-     * JVM default used if not set.
+     * Socket send buffer size in bytes (SO_SNDBUF). JVM default used if not set.
      */
     protected Integer txBufSize = null;
 
     /**
-     * The application read buffer size in bytes.
-     * Default value is rxBufSize
+     * The application read buffer size in bytes. Default value is 8192.
      */
     protected int appReadBufSize = 8192;
 
     /**
-     * The application write buffer size in bytes
-     * Default value is txBufSize
+     * The application write buffer size in bytes. Default value is 8192.
      */
     protected int appWriteBufSize = 8192;
 
     /**
-     * NioChannel pool size for the endpoint,
-     * this value is how many channels
-     * -1 means unlimited cached, 0 means no cache,
-     * -2 means bufferPoolSize will be used
+     * NioChannel pool size for the endpoint, this value is how many channels.
+     * <p>
+     * 0 means no cache<br>
+     * -1 means unlimited cached<br>
+     * -2 means bufferPoolSize will be used<br>
      * Default value is -2
      */
     protected int bufferPool = -2;
 
     /**
-     * Buffer pool size in bytes to be cached
-     * -1 means unlimited, 0 means no cache
-     * Default value is based on the max memory reported by the JVM,
-     * if less than 1GB, then 0, else the value divided by 32. This value
-     * will then be used to compute bufferPool if its value is -2
+     * Buffer pool size in bytes to be cached.
+     * <p>
+     * -1 means unlimited<br>
+     * 0 means no cache<br>
+     * Default value is based on the max memory reported by the JVM, if less than 1GB, then 0, else the value divided by
+     * 32. This value will then be used to compute bufferPool if its value is -2
      */
     protected int bufferPoolSize = -2;
 
@@ -127,14 +129,14 @@ public class SocketProperties {
     protected Boolean soReuseAddress = null;
 
     /**
-     * SO_LINGER option, paired with the <code>soLingerTime</code> value.
-     * JVM defaults used unless both attributes are set.
+     * SO_LINGER option, paired with the <code>soLingerTime</code> value. JVM defaults used unless both attributes are
+     * set.
      */
     protected Boolean soLingerOn = null;
 
     /**
-     * SO_LINGER option, paired with the <code>soLingerOn</code> value.
-     * JVM defaults used unless both attributes are set.
+     * SO_LINGER option, paired with the <code>soLingerOn</code> value. JVM defaults used unless both attributes are
+     * set.
      */
     protected Integer soLingerTime = null;
 
@@ -144,32 +146,28 @@ public class SocketProperties {
     protected Integer soTimeout = Integer.valueOf(20000);
 
     /**
-     * Performance preferences according to
-     * http://docs.oracle.com/javase/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)
-     * All three performance attributes must be set or the JVM defaults will be
-     * used.
+     * Performance preferences according to <a href=
+     * "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">setPerformancePreferences</a>
+     * All three performance attributes must be set or the JVM defaults will be used.
      */
     protected Integer performanceConnectionTime = null;
 
     /**
-     * Performance preferences according to
-     * http://docs.oracle.com/javase/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)
-     * All three performance attributes must be set or the JVM defaults will be
-     * used.
+     * Performance preferences according to <a href=
+     * "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">setPerformancePreferences</a>
+     * All three performance attributes must be set or the JVM defaults will be used.
      */
     protected Integer performanceLatency = null;
 
     /**
-     * Performance preferences according to
-     * http://docs.oracle.com/javase/1.5.0/docs/api/java/net/Socket.html#setPerformancePreferences(int,%20int,%20int)
-     * All three performance attributes must be set or the JVM defaults will be
-     * used.
+     * Performance preferences according to <a href=
+     * "https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/net/Socket.html#setPerformancePreferences(int,int,int)">setPerformancePreferences</a>
+     * All three performance attributes must be set or the JVM defaults will be used.
      */
     protected Integer performanceBandwidth = null;
 
     /**
-     * The minimum frequency of the timeout interval to avoid excess load from
-     * the poller during high traffic
+     * The minimum frequency of the timeout interval to avoid excess load from the poller during high traffic
      */
     protected long timeoutInterval = 1000;
 
@@ -181,32 +179,28 @@ public class SocketProperties {
     private ObjectName oname = null;
 
 
-    public void setProperties(Socket socket) throws SocketException{
+    public void setProperties(Socket socket) throws SocketException {
         if (rxBufSize != null) {
             socket.setReceiveBufferSize(rxBufSize.intValue());
         }
         if (txBufSize != null) {
             socket.setSendBufferSize(txBufSize.intValue());
         }
-        if (ooBInline !=null) {
+        if (ooBInline != null) {
             socket.setOOBInline(ooBInline.booleanValue());
         }
         if (soKeepAlive != null) {
             socket.setKeepAlive(soKeepAlive.booleanValue());
         }
-        if (performanceConnectionTime != null && performanceLatency != null &&
-                performanceBandwidth != null) {
-            socket.setPerformancePreferences(
-                    performanceConnectionTime.intValue(),
-                    performanceLatency.intValue(),
+        if (performanceConnectionTime != null && performanceLatency != null && performanceBandwidth != null) {
+            socket.setPerformancePreferences(performanceConnectionTime.intValue(), performanceLatency.intValue(),
                     performanceBandwidth.intValue());
         }
         if (soReuseAddress != null) {
             socket.setReuseAddress(soReuseAddress.booleanValue());
         }
         if (soLingerOn != null && soLingerTime != null) {
-            socket.setSoLinger(soLingerOn.booleanValue(),
-                    soLingerTime.intValue());
+            socket.setSoLinger(soLingerOn.booleanValue(), soLingerTime.intValue());
         }
         if (soTimeout != null && soTimeout.intValue() >= 0) {
             socket.setSoTimeout(soTimeout.intValue());
@@ -220,15 +214,12 @@ public class SocketProperties {
         }
     }
 
-    public void setProperties(ServerSocket socket) throws SocketException{
+    public void setProperties(ServerSocket socket) throws SocketException {
         if (rxBufSize != null) {
             socket.setReceiveBufferSize(rxBufSize.intValue());
         }
-        if (performanceConnectionTime != null && performanceLatency != null &&
-                performanceBandwidth != null) {
-            socket.setPerformancePreferences(
-                    performanceConnectionTime.intValue(),
-                    performanceLatency.intValue(),
+        if (performanceConnectionTime != null && performanceLatency != null && performanceBandwidth != null) {
+            socket.setPerformancePreferences(performanceConnectionTime.intValue(), performanceLatency.intValue(),
                     performanceBandwidth.intValue());
         }
         if (soReuseAddress != null) {
@@ -358,8 +349,7 @@ public class SocketProperties {
     }
 
     public void setPerformanceConnectionTime(int performanceConnectionTime) {
-        this.performanceConnectionTime =
-            Integer.valueOf(performanceConnectionTime);
+        this.performanceConnectionTime = Integer.valueOf(performanceConnectionTime);
     }
 
     public void setTxBufSize(int txBufSize) {
@@ -451,13 +441,19 @@ public class SocketProperties {
     }
 
     public void setUnlockTimeout(int unlockTimeout) {
-        this.unlockTimeout = unlockTimeout;
+        if (unlockTimeout > 0) {
+            this.unlockTimeout = unlockTimeout;
+        } else {
+            log.warn(sm.getString("socketProperties.negativeUnlockTimeout"));
+        }
     }
 
     /**
      * Get the actual buffer pool size to use.
-     * @param bufferOverhead When TLS is enabled, additional network buffers
-     *   are needed and will be added to the application buffer size
+     *
+     * @param bufferOverhead When TLS is enabled, additional network buffers are needed and will be added to the
+     *                           application buffer size
+     *
      * @return the actual buffer pool size that will be used
      */
     public int getActualBufferPool(int bufferOverhead) {
@@ -470,7 +466,7 @@ public class SocketProperties {
                 return 0;
             } else {
                 long actualBufferPoolSize = bufferPoolSize;
-                long poolSize = 0;
+                long poolSize;
                 if (actualBufferPoolSize == -2) {
                     long maxMemory = Runtime.getRuntime().maxMemory();
                     if (maxMemory > Integer.MAX_VALUE) {

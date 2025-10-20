@@ -16,8 +16,11 @@
  */
 package jakarta.el;
 
+import java.io.Serial;
+
 public abstract class ValueExpression extends Expression {
 
+    @Serial
     private static final long serialVersionUID = 8577809572381654673L;
 
     /**

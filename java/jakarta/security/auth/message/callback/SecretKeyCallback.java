@@ -1,4 +1,4 @@
-/**
+/*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -20,8 +20,8 @@ import javax.crypto.SecretKey;
 import javax.security.auth.callback.Callback;
 
 /**
- * A callback enabling an authentication module to request a secret key from the
- * runtime, by supplying an alias. Other request types may also be supported.
+ * A callback enabling an authentication module to request a secret key from the runtime, by supplying an alias. Other
+ * request types may also be supported.
  */
 public class SecretKeyCallback implements Callback {
 

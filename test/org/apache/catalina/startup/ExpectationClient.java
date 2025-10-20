@@ -28,7 +28,7 @@ public class ExpectationClient extends SimpleHttpClient {
         requestHeaders.append("POST /echo HTTP/1.1").append(CRLF);
         requestHeaders.append("Host: localhost").append(CRLF);
         requestHeaders.append("Expect: 100-continue").append(CRLF);
-        requestHeaders.append("Content-Type: application/x-www-form-urlencoded").append(CRLF);
+        requestHeaders.append(SimpleHttpClient.HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING);
         String len = Integer.toString(BODY.length());
         requestHeaders.append("Content-length: ").append(len).append(CRLF);
         requestHeaders.append(CRLF);

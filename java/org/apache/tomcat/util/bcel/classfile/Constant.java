@@ -39,37 +39,37 @@ public abstract class Constant {
         final byte b = dataInput.readByte(); // Read tag byte
         int skipSize;
         switch (b) {
-        case Const.CONSTANT_Class:
-            return new ConstantClass(dataInput);
-        case Const.CONSTANT_Integer:
-            return new ConstantInteger(dataInput);
-        case Const.CONSTANT_Float:
-            return new ConstantFloat(dataInput);
-        case Const.CONSTANT_Long:
-            return new ConstantLong(dataInput);
-        case Const.CONSTANT_Double:
-            return new ConstantDouble(dataInput);
-        case Const.CONSTANT_Utf8:
-            return ConstantUtf8.getInstance(dataInput);
-        case Const.CONSTANT_String:
-        case Const.CONSTANT_MethodType:
-        case Const.CONSTANT_Module:
-        case Const.CONSTANT_Package:
-            skipSize = 2; // unsigned short
-            break;
-        case Const.CONSTANT_MethodHandle:
-            skipSize = 3; // unsigned byte, unsigned short
-            break;
-        case Const.CONSTANT_Fieldref:
-        case Const.CONSTANT_Methodref:
-        case Const.CONSTANT_InterfaceMethodref:
-        case Const.CONSTANT_NameAndType:
-        case Const.CONSTANT_Dynamic:
-        case Const.CONSTANT_InvokeDynamic:
-            skipSize = 4; // unsigned short, unsigned short
-            break;
-        default:
-            throw new ClassFormatException("Invalid byte tag in constant pool: " + b);
+            case Const.CONSTANT_Class:
+                return new ConstantClass(dataInput);
+            case Const.CONSTANT_Integer:
+                return new ConstantInteger(dataInput);
+            case Const.CONSTANT_Float:
+                return new ConstantFloat(dataInput);
+            case Const.CONSTANT_Long:
+                return new ConstantLong(dataInput);
+            case Const.CONSTANT_Double:
+                return new ConstantDouble(dataInput);
+            case Const.CONSTANT_Utf8:
+                return ConstantUtf8.getInstance(dataInput);
+            case Const.CONSTANT_String:
+            case Const.CONSTANT_MethodType:
+            case Const.CONSTANT_Module:
+            case Const.CONSTANT_Package:
+                skipSize = 2; // unsigned short
+                break;
+            case Const.CONSTANT_MethodHandle:
+                skipSize = 3; // unsigned byte, unsigned short
+                break;
+            case Const.CONSTANT_Fieldref:
+            case Const.CONSTANT_Methodref:
+            case Const.CONSTANT_InterfaceMethodref:
+            case Const.CONSTANT_NameAndType:
+            case Const.CONSTANT_Dynamic:
+            case Const.CONSTANT_InvokeDynamic:
+                skipSize = 4; // unsigned short, unsigned short
+                break;
+            default:
+                throw new ClassFormatException("Invalid byte tag in constant pool: " + b);
         }
         Utility.skipFully(dataInput, skipSize);
         return null;

@@ -29,8 +29,8 @@ import jakarta.servlet.jsp.tagext.SimpleTagSupport;
  * SimpleTag handler that echoes all its attributes
  */
 public class EchoAttributesTag
-    extends SimpleTagSupport
-    implements DynamicAttributes
+        extends SimpleTagSupport
+        implements DynamicAttributes
 {
     private final List<String> keys = new ArrayList<>();
     private final List<Object> values = new ArrayList<>();
@@ -47,7 +47,7 @@ public class EchoAttributesTag
 
     @Override
     public void setDynamicAttribute( String uri, String localName,
-        Object value )
+            Object value )
         throws JspException
     {
         keys.add( localName );

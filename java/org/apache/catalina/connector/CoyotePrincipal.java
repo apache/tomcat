@@ -16,17 +16,17 @@
  */
 package org.apache.catalina.connector;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Principal;
 
 /**
  * Generic implementation of <strong>java.security.Principal</strong> that is used to represent principals authenticated
  * at the protocol handler level.
- *
- * @author Remy Maucherat
  */
 public class CoyotePrincipal implements Principal, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 

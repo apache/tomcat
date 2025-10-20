@@ -32,6 +32,7 @@ import org.junit.Test;
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http2.HpackEncoder.State;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -165,7 +166,7 @@ public class TestHttp2Limits extends Http2TestBase {
         // 500ms per frame write delay to give server a chance to process the
         // stream reset and the connection reset before the request is fully
         // sent.
-        doTestHeaderLimits(1, 32 * 1024, 1024, 500, FailureMode.CONNECTION_RESET);
+        doTestHeaderLimits(1, 32 * 1024, 1024, 500, FailureMode.STREAM_RESET_THEN_CONNECTION_RESET);
     }
 
 
@@ -279,6 +280,21 @@ public class TestHttp2Limits extends Http2TestBase {
                 Assert.assertNull(e);
                 break;
             }
+            case STREAM_RESET_THEN_CONNECTION_RESET: {
+                // Expect a stream reset
+                // On some platform / Connector combinations the TCP connection close
+                // will be processed before the client gets a chance to read the
+                // connection close frame which will trigger an
+                // IOException when we try to read the frame.
+                try {
+                    parser.readFrame();
+                    Assert.assertEquals("3-RST-[11]\n", output.getTrace());
+                    output.clearTrace();
+                } catch (IOException ioe) {
+                    // Expected on some platforms
+                }
+            }
+                //$FALL-THROUGH$
             case CONNECTION_RESET: {
                 // This message uses i18n and needs to be used in a regular
                 // expression (since we don't know the connection ID). Generate the
@@ -297,7 +313,7 @@ public class TestHttp2Limits extends Http2TestBase {
                     parser.readFrame();
                     MatcherAssert.assertThat(output.getTrace(),
                             RegexMatcher.matchesRegex("0-Goaway-\\[1\\]-\\[11\\]-\\[" + limitMessage + "\\]"));
-                } catch (IOException se) {
+                } catch (IOException ignore) {
                     // Expected on some platforms
                 }
                 break;
@@ -309,7 +325,7 @@ public class TestHttp2Limits extends Http2TestBase {
     private void populateHeadersPayload(ByteBuffer headersPayload, List<String[]> customHeaders, String path)
             throws Exception {
         MimeHeaders headers = new MimeHeaders();
-        headers.addValue(":method").setString("GET");
+        headers.addValue(":method").setString(Method.GET);
         headers.addValue(":scheme").setString("http");
         headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());
@@ -484,8 +500,8 @@ public class TestHttp2Limits extends Http2TestBase {
         byte[] trailerFrameHeader = new byte[9];
         ByteBuffer trailerPayload = ByteBuffer.allocate(256);
 
-        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null,
-                trailerFrameHeader, trailerPayload, 3);
+        buildPostRequest(headersFrameHeader, headersPayload, false, dataFrameHeader, dataPayload, null, true, 3);
+        buildTrailerHeaders(trailerFrameHeader, trailerPayload, 3);
 
         // Write the headers
         writeFrame(headersFrameHeader, headersPayload);
@@ -523,6 +539,10 @@ public class TestHttp2Limits extends Http2TestBase {
                 Assert.assertEquals("3-RST-[11]\n", output.getTrace());
                 break;
             }
+            case STREAM_RESET_THEN_CONNECTION_RESET: {
+                Assert.fail("Not used");
+                break;
+            }
             case CONNECTION_RESET: {
                 // NIO2 can sometimes send window updates depending timing
                 skipWindowSizeFrames();
@@ -545,7 +565,7 @@ public class TestHttp2Limits extends Http2TestBase {
         NONE,
         STREAM_RESET,
         CONNECTION_RESET,
-
+        STREAM_RESET_THEN_CONNECTION_RESET,
     }
 
 

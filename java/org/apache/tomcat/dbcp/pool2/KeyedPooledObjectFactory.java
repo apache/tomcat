@@ -57,7 +57,7 @@ package org.apache.tomcat.dbcp.pool2;
  * {@link KeyedPooledObjectFactory} must be thread-safe. The only promise
  * an {@link KeyedObjectPool} makes is that the same instance of an object will
  * not be passed to more than one method of a
- * {@code KeyedPoolableObjectFactory} at a time.
+ * {@code KeyedPooledObjectFactory} at a time.
  * <p>
  * While clients of a {@link KeyedObjectPool} borrow and return instances of
  * the underlying value type V, the factory methods act on instances of
@@ -67,10 +67,8 @@ package org.apache.tomcat.dbcp.pool2;
  * </p>
  *
  * @see KeyedObjectPool
- *
  * @param <K> The type of keys managed by this factory.
  * @param <V> Type of element managed by this factory.
- *
  * @since 2.0
  */
 public interface KeyedPooledObjectFactory<K, V> {
@@ -80,7 +78,6 @@ public interface KeyedPooledObjectFactory<K, V> {
      *
      * @param key the key used when selecting the object
      * @param p a {@code PooledObject} wrapping the instance to be activated
-     *
      * @throws Exception if there is a problem activating {@code obj},
      *    this exception may be swallowed by the pool.
      *
@@ -102,7 +99,6 @@ public interface KeyedPooledObjectFactory<K, V> {
      *
      * @param key the key used when selecting the instance
      * @param p a {@code PooledObject} wrapping the instance to be destroyed
-     *
      * @throws Exception should be avoided as it may be swallowed by
      *    the pool implementation.
      *
@@ -117,7 +113,6 @@ public interface KeyedPooledObjectFactory<K, V> {
      * @param key the key used when selecting the instance
      * @param p a {@code PooledObject} wrapping the instance to be destroyed
      * @param destroyMode DestroyMode providing context to the factory
-     *
      * @throws Exception should be avoided as it may be swallowed by
      *    the pool implementation.
      *
@@ -136,7 +131,6 @@ public interface KeyedPooledObjectFactory<K, V> {
      * wrap it in a {@link PooledObject} to be managed by the pool.
      *
      * @param key the key used when constructing the object
-     *
      * @return a {@code PooledObject} wrapping an instance that can
      * be served by the pool.
      *
@@ -150,7 +144,6 @@ public interface KeyedPooledObjectFactory<K, V> {
      *
      * @param key the key used when selecting the object
      * @param p a {@code PooledObject} wrapping the instance to be passivated
-     *
      * @throws Exception if there is a problem passivating {@code obj},
      *    this exception may be swallowed by the pool.
      *
@@ -163,7 +156,6 @@ public interface KeyedPooledObjectFactory<K, V> {
      *
      * @param key the key used when selecting the object
      * @param p a {@code PooledObject} wrapping the instance to be validated
-     *
      * @return {@code false} if {@code obj} is not valid and should
      *         be dropped from the pool, {@code true} otherwise.
      */

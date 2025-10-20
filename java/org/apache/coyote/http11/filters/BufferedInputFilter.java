@@ -26,12 +26,15 @@ import org.apache.coyote.Request;
 import org.apache.coyote.http11.InputFilter;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
+import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Input filter responsible for reading and buffering the request body, so that
- * it does not interfere with client SSL handshake messages.
+ * Input filter responsible for reading and buffering the request body, so that it does not interfere with client SSL
+ * handshake messages.
  */
 public class BufferedInputFilter implements InputFilter, ApplicationBufferHandler {
+
+    private static final StringManager sm = StringManager.getManager(BufferedInputFilter.class);
 
     private static final String ENCODING_NAME = "buffered";
     private static final ByteChunk ENCODING = new ByteChunk();
@@ -60,8 +63,7 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
 
 
     /**
-     * Set the buffering limit. This should be reset every time the buffer is
-     * used.
+     * Set the buffering limit. This should be reset every time the buffer is used.
      *
      * @param limit The maximum number of bytes that will be buffered
      */
@@ -86,12 +88,12 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
             if (buffered.getLimit() == 0) {
                 // Special case - ignore (swallow) body. Do so within a limit.
                 long swallowed = 0;
-                int read = 0;
+                int read;
                 while ((read = buffer.doRead(this)) >= 0) {
                     swallowed += read;
                     if (maxSwallowSize > -1 && swallowed > maxSwallowSize) {
                         // No need for i18n - this isn't going to get logged
-                        throw new IOException("Ignored body exceeded maxSwallowSize");
+                        throw new IOException(sm.getString("bufferedInputFilter.maxSwallowSize"));
                     }
                 }
             } else {
@@ -100,10 +102,9 @@ public class BufferedInputFilter implements InputFilter, ApplicationBufferHandle
                     tempRead = null;
                 }
             }
-        } catch(IOException | BufferOverflowException ioe) {
+        } catch (IOException | BufferOverflowException ioe) {
             // No need for i18n - this isn't going to get logged anywhere
-            throw new IllegalStateException(
-                    "Request body too large for buffer");
+            throw new IllegalStateException(sm.getString("bufferedInputFilter.bodySize", ioe.getMessage()));
         }
     }
 

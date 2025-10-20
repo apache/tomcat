@@ -38,8 +38,8 @@ public class EchoTag extends TagSupport {
     public int doStartTag() throws JspException {
         try {
             pageContext.getOut().print("<p>" + echo + "</p>");
-        } catch (IOException e) {
-            throw new JspException(e);
+        } catch (IOException ioe) {
+            throw new JspException(ioe);
         }
         return super.doStartTag();
     }

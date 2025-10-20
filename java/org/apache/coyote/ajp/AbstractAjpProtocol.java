@@ -29,7 +29,7 @@ import org.apache.tomcat.util.net.SocketWrapperBase;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * The is the base implementation for the AJP protocol handlers. Implementations typically extend this base class rather
+ * This the base implementation for the AJP protocol handlers. Implementations typically extend this base class rather
  * than implement {@link org.apache.coyote.ProtocolHandler}. All of the implementations that ship with Tomcat are
  * implemented this way.
  *
@@ -43,7 +43,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     protected static final StringManager sm = StringManager.getManager(AbstractAjpProtocol.class);
 
 
-    public AbstractAjpProtocol(AbstractEndpoint<S, ?> endpoint) {
+    public AbstractAjpProtocol(AbstractEndpoint<S,?> endpoint) {
         super(endpoint);
         setConnectionTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
         // AJP does not use Send File
@@ -63,7 +63,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
      * {@inheritDoc} Overridden to make getter accessible to other classes in this package.
      */
     @Override
-    protected AbstractEndpoint<S, ?> getEndpoint() {
+    protected AbstractEndpoint<S,?> getEndpoint() {
         return super.getEndpoint();
     }
 
@@ -97,7 +97,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     /**
      * Configure whether to aend an AJP flush packet when flushing. A flush packet is a zero byte AJP13 SEND_BODY_CHUNK
      * packet. mod_jk and mod_proxy_ajp interpret this as a request to flush data to the client. AJP always does flush
-     * at the and of the response, so if it is not important, that the packets get streamed up to the client, do not use
+     * at the end of the response, so if it is not important, that the packets get streamed up to the client, do not use
      * extra flush packets. For compatibility and to stay on the safe side, flush packets are enabled by default.
      *
      * @param ajpFlush The new flush setting
@@ -210,6 +210,12 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
 
     @Override
+    public void addSslHostConfig(SSLHostConfig sslHostConfig, boolean replace) {
+        getLog().warn(sm.getString("ajpprotocol.noSSL", sslHostConfig.getHostName()));
+    }
+
+
+    @Override
     public SSLHostConfig[] findSslHostConfigs() {
         return new SSLHostConfig[0];
     }
@@ -229,15 +235,14 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
 
     @Override
     protected Processor createProcessor() {
-        AjpProcessor processor = new AjpProcessor(this, getAdapter());
-        return processor;
+        return new AjpProcessor(this, getAdapter());
     }
 
 
     @Override
     protected Processor createUpgradeProcessor(SocketWrapperBase<?> socket, UpgradeToken upgradeToken) {
-        throw new IllegalStateException(sm.getString("ajpprotocol.noUpgradeHandler",
-                upgradeToken.getHttpUpgradeHandler().getClass().getName()));
+        throw new IllegalStateException(
+                sm.getString("ajpprotocol.noUpgradeHandler", upgradeToken.httpUpgradeHandler().getClass().getName()));
     }
 
 
@@ -245,7 +250,7 @@ public abstract class AbstractAjpProtocol<S> extends AbstractProtocol<S> {
     public void start() throws Exception {
         if (getSecretRequired()) {
             String secret = getSecret();
-            if (secret == null || secret.length() == 0) {
+            if (secret == null || secret.isEmpty()) {
                 throw new IllegalArgumentException(sm.getString("ajpprotocol.noSecret"));
             }
         }

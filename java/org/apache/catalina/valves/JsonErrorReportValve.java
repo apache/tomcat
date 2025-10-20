@@ -28,12 +28,8 @@ import org.apache.tomcat.util.json.JSONFilter;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>
- * Implementation of a Valve that outputs error jsons.
- * </p>
- * <p>
- * This Valve should be attached at the Host level, although it will work if attached to a Context.
- * </p>
+ * Implementation of a Valve that outputs error JSON. This Valve should be attached at the Host level, although it will
+ * work if attached to a Context.
  */
 public class JsonErrorReportValve extends ErrorReportValve {
 
@@ -64,7 +60,7 @@ public class JsonErrorReportValve extends ErrorReportValve {
 
         StringManager smClient = StringManager.getManager(Constants.Package, request.getLocales());
         response.setLocale(smClient.getLocale());
-        String type = null;
+        String type;
         if (throwable != null) {
             type = smClient.getString("errorReportValve.exceptionReport");
         } else {
@@ -74,18 +70,61 @@ public class JsonErrorReportValve extends ErrorReportValve {
         if (message == null && throwable != null) {
             message = throwable.getMessage();
         }
-        String description = null;
-        description = smClient.getString("http." + statusCode + ".desc");
+        if (message == null) {
+            message = "";
+        }
+        String description = smClient.getString("http." + statusCode + ".desc");
         if (description == null) {
-            if (message == null || message.isEmpty()) {
+            if (message.isEmpty()) {
                 return;
             } else {
                 description = smClient.getString("errorReportValve.noDescription");
             }
         }
-        String jsonReport = "{\n" + "  \"type\": \"" + JSONFilter.escape(type) + "\",\n" + "  \"message\": \"" +
-                JSONFilter.escape(message) + "\",\n" + "  \"description\": \"" + JSONFilter.escape(description) +
-                "\"\n" + "}";
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n  \"type\": \"").append(JSONFilter.escape(type)).append("\",\n");
+        sb.append("  \"status\": ").append(statusCode).append(",\n");
+        sb.append("  \"message\": \"").append(JSONFilter.escape(message)).append("\",\n");
+        sb.append("  \"description\": \"").append(JSONFilter.escape(description));
+
+        if (throwable != null) {
+            sb.append("\",\n");
+
+            // Stack trace
+            sb.append("  \"throwable\": [");
+            boolean first = true;
+            do {
+                if (!first) {
+                    sb.append(',');
+                } else {
+                    first = false;
+                }
+                sb.append('\"').append(JSONFilter.escape(throwable.toString())).append('\"');
+
+                StackTraceElement[] elements = throwable.getStackTrace();
+                int pos = elements.length;
+                for (int i = elements.length - 1; i >= 0; i--) {
+                    if ((elements[i].getClassName().startsWith("org.apache.catalina.core.ApplicationFilterChain")) &&
+                            (elements[i].getMethodName().equals("doFilter"))) {
+                        pos = i;
+                        break;
+                    }
+                }
+                for (int i = 0; i < pos; i++) {
+                    if (!(elements[i].getClassName().startsWith("org.apache.catalina.core."))) {
+                        sb.append(',').append('\"').append(' ').append(JSONFilter.escape(elements[i].toString()))
+                                .append('\"');
+                    }
+                }
+
+                throwable = throwable.getCause();
+            } while (throwable != null);
+            sb.append("]\n}");
+
+        } else {
+            sb.append("\"\n}");
+        }
+
         try {
             try {
                 response.setContentType("application/json");
@@ -93,17 +132,17 @@ public class JsonErrorReportValve extends ErrorReportValve {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (container.getLogger().isDebugEnabled()) {
-                    container.getLogger().debug("Failure to set the content-type of response", t);
+                    container.getLogger().debug(sm.getString("errorReportValve.contentTypeFail"), t);
                 }
             }
             Writer writer = response.getReporter();
             if (writer != null) {
-                writer.write(jsonReport);
+                writer.write(sb.toString());
                 response.finishResponse();
-                return;
             }
         } catch (IOException | IllegalStateException e) {
             // Ignore
         }
     }
+
 }

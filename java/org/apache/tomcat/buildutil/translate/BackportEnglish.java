@@ -21,15 +21,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Generates a set of English property files to back-port updates to a previous
- * version. Where a key exists in the source and target versions the value is
- * copied from the source to the target, overwriting the value in the target.
- * The expectation is that the changes will be manually reviewed before
- * committing them.
+ * Generates a set of English property files to back-port updates to a previous version. Where a key exists in the
+ * source and target versions the value is copied from the source to the target, overwriting the value in the target.
+ * The expectation is that the changes will be manually reviewed before committing them.
  */
 public class BackportEnglish extends BackportBase {
 
-    private static Set<String> keysToExclude = new HashSet<>();
+    private static final Set<String> keysToExclude = new HashSet<>();
 
 
     public static void main(String... args) throws IOException {
@@ -37,10 +35,6 @@ public class BackportEnglish extends BackportBase {
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jsp.error.jsproot.version.invalid");
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.webfrg.header");
         keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.webxml.header");
-
-        // Exclude keys known to be different between 11.0.x and 10.1.x
-        keysToExclude.add("java.org.apache.jasper.resources.zzz.jsp.error.param.invalidUse");
-        keysToExclude.add("java.org.apache.jasper.resources.zzz.jspc.usage");
 
         BackportEnglish backport = new BackportEnglish(args);
         backport.execute();

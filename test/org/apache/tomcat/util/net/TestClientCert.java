@@ -29,11 +29,10 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
 import org.apache.catalina.Context;
-import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
 /**
  * The keys and certificates used in this file are all available in svn and were
@@ -51,7 +50,7 @@ public class TestClientCert extends TomcatBaseTest {
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
         parameterSets.add(new Object[] {
-                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
         return parameterSets;
     }
@@ -60,7 +59,7 @@ public class TestClientCert extends TomcatBaseTest {
     public String connectorName;
 
     @Parameter(1)
-    public boolean needApr;
+    public boolean useOpenSSL;
 
     @Parameter(2)
     public String sslImplementationName;
@@ -86,6 +85,11 @@ public class TestClientCert extends TomcatBaseTest {
         }
 
         getTomcatInstance().start();
+
+        Assume.assumeFalse("LibreSSL does not allow renegotiation",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
+        Assume.assumeFalse("BoringSSL does not allow TLS renegotiation",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
 
         // Unprotected resource
         ByteChunk res = getUrl("https://localhost:" + getPort() + "/unprotected");
@@ -159,6 +163,11 @@ public class TestClientCert extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
         tomcat.start();
 
+        Assume.assumeFalse("LibreSSL does not allow renegotiation",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.LIBRESSL));
+        Assume.assumeFalse("BoringSSL does not allow TLS renegotiation",
+                TesterSupport.isOpenSSLVariant(sslImplementationName, OpenSSLStatus.Name.BORINGSSL));
+
         byte[] body = new byte[bodySize];
         Arrays.fill(body, TesterSupport.DATA);
 
@@ -219,13 +228,6 @@ public class TestClientCert extends TomcatBaseTest {
 
         TesterSupport.configureClientSsl();
 
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
-
-        if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
-        }
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
     }
 }

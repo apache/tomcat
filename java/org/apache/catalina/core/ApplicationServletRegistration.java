@@ -62,8 +62,8 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
     }
 
     @Override
-    public Map<String, String> getInitParameters() {
-        ParameterMap<String, String> result = new ParameterMap<>();
+    public Map<String,String> getInitParameters() {
+        ParameterMap<String,String> result = new ParameterMap<>();
 
         String[] parameterNames = wrapper.findInitParameters();
 
@@ -96,11 +96,11 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
     }
 
     @Override
-    public Set<String> setInitParameters(Map<String, String> initParameters) {
+    public Set<String> setInitParameters(Map<String,String> initParameters) {
 
         Set<String> conflicts = new HashSet<>();
 
-        for (Map.Entry<String, String> entry : initParameters.entrySet()) {
+        for (Map.Entry<String,String> entry : initParameters.entrySet()) {
             if (entry.getKey() == null || entry.getValue() == null) {
                 throw new IllegalArgumentException(
                         sm.getString("applicationFilterRegistration.nullInitParams", entry.getKey(), entry.getValue()));
@@ -113,7 +113,7 @@ public class ApplicationServletRegistration implements ServletRegistration.Dynam
         // Have to add in a separate loop since spec requires no updates at all
         // if there is an issue
         if (conflicts.isEmpty()) {
-            for (Map.Entry<String, String> entry : initParameters.entrySet()) {
+            for (Map.Entry<String,String> entry : initParameters.entrySet()) {
                 setInitParameter(entry.getKey(), entry.getValue());
             }
         }

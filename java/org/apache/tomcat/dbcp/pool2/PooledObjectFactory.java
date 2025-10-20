@@ -65,9 +65,7 @@ package org.apache.tomcat.dbcp.pool2;
  * </p>
  *
  * @param <T> Type of element managed in this factory.
- *
  * @see ObjectPool
- *
  * @since 2.0
  */
 public interface PooledObjectFactory<T> {
@@ -76,13 +74,12 @@ public interface PooledObjectFactory<T> {
    * Reinitializes an instance to be returned by the pool.
    *
    * @param p a {@code PooledObject} wrapping the instance to be activated
-   *
    * @throws Exception if there is a problem activating {@code obj},
    *    this exception may be swallowed by the pool.
    *
    * @see #destroyObject
    */
-  void activateObject(PooledObject<T> p) throws Exception;
+    void activateObject(PooledObject<T> p) throws Exception;
 
   /**
    * Destroys an instance no longer needed by the pool, using the default (NORMAL)
@@ -98,14 +95,13 @@ public interface PooledObjectFactory<T> {
    * </p>
    *
    * @param p a {@code PooledObject} wrapping the instance to be destroyed
-   *
    * @throws Exception should be avoided as it may be swallowed by
    *    the pool implementation.
    *
    * @see #validateObject
    * @see ObjectPool#invalidateObject
    */
-  void destroyObject(PooledObject<T> p) throws Exception;
+    void destroyObject(PooledObject<T> p) throws Exception;
 
   /**
    * Destroys an instance no longer needed by the pool, using the provided
@@ -113,7 +109,6 @@ public interface PooledObjectFactory<T> {
    *
    * @param p a {@code PooledObject} wrapping the instance to be destroyed
    * @param destroyMode DestroyMode providing context to the factory
-   *
    * @throws Exception should be avoided as it may be swallowed by
    *    the pool implementation.
    *
@@ -123,40 +118,37 @@ public interface PooledObjectFactory<T> {
    * @see DestroyMode
    * @since 2.9.0
    */
-  default void destroyObject(final PooledObject<T> p, final DestroyMode destroyMode) throws Exception {
-      destroyObject(p);
-  }
+    default void destroyObject(final PooledObject<T> p, final DestroyMode destroyMode) throws Exception {
+        destroyObject(p);
+    }
 
   /**
    * Creates an instance that can be served by the pool and wrap it in a
    * {@link PooledObject} to be managed by the pool.
    *
-   * @return a {@code PooledObject} wrapping an instance that can be served by the pool
-   *
+   * @return a {@code PooledObject} wrapping an instance that can be served by the pool, not null.
    * @throws Exception if there is a problem creating a new instance,
    *    this will be propagated to the code requesting an object.
    */
-  PooledObject<T> makeObject() throws Exception;
+    PooledObject<T> makeObject() throws Exception;
 
   /**
    * Uninitializes an instance to be returned to the idle object pool.
    *
    * @param p a {@code PooledObject} wrapping the instance to be passivated
-   *
    * @throws Exception if there is a problem passivating {@code obj},
    *    this exception may be swallowed by the pool.
    *
    * @see #destroyObject
    */
-  void passivateObject(PooledObject<T> p) throws Exception;
+    void passivateObject(PooledObject<T> p) throws Exception;
 
   /**
    * Ensures that the instance is safe to be returned by the pool.
    *
    * @param p a {@code PooledObject} wrapping the instance to be validated
-   *
    * @return {@code false} if {@code obj} is not valid and should
    *         be dropped from the pool, {@code true} otherwise.
    */
-  boolean validateObject(PooledObject<T> p);
+    boolean validateObject(PooledObject<T> p);
 }

@@ -17,6 +17,7 @@
 package org.apache.catalina.startup;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
@@ -82,7 +83,7 @@ public class TestWebappServiceLoader {
     @Test
     @SuppressWarnings("unchecked")
     public void testInitializerFromClasspath() throws IOException {
-        URL url = new URL("file://test");
+        URL url = URI.create("file://test").toURL();
         loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
                 .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
                 .withConstructor(context).createMock(control);
@@ -101,10 +102,10 @@ public class TestWebappServiceLoader {
     @Test
     @SuppressWarnings("unchecked")
     public void testWithOrdering() throws IOException {
-        URL url1 = new URL("file://jar1.jar");
-        URL sci1 = new URL("jar:file://jar1.jar!/" + CONFIG_FILE);
-        URL url2 = new URL("file://dir/");
-        URL sci2 = new URL("file://dir/" + CONFIG_FILE);
+        URL url1 = URI.create("file://jar1.jar").toURL();
+        URL sci1 = URI.create("jar:file://jar1.jar!/" + CONFIG_FILE).toURL();
+        URL url2 = URI.create("file://dir/").toURL();
+        URL sci2 = URI.create("file://dir/" + CONFIG_FILE).toURL();
         loader = EasyMock.createMockBuilder(WebappServiceLoader.class)
                 .addMockedMethod("parseConfigFile", LinkedHashSet.class, URL.class)
                 .withConstructor(context).createMock(control);
@@ -164,8 +165,8 @@ public class TestWebappServiceLoader {
         control.replay();
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
-        } catch (IOException e) {
-            assertThat(e.getCause(), instanceOf(ClassCastException.class));
+        } catch (IOException ioe) {
+            assertThat(ioe.getCause(), instanceOf(ClassCastException.class));
         } finally {
             control.verify();
         }
@@ -183,8 +184,8 @@ public class TestWebappServiceLoader {
         control.replay();
         try {
             loader.loadServices(ServletContainerInitializer.class, names);
-        } catch (IOException e) {
-            assertThat(e.getCause(), instanceOf(ReflectiveOperationException.class));
+        } catch (IOException ioe) {
+            assertThat(ioe.getCause(), instanceOf(ReflectiveOperationException.class));
         } finally {
             control.verify();
         }

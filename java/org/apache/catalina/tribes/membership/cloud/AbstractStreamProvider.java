@@ -46,18 +46,20 @@ public abstract class AbstractStreamProvider implements StreamProvider {
     private static final Log log = LogFactory.getLog(AbstractStreamProvider.class);
     protected static final StringManager sm = StringManager.getManager(AbstractStreamProvider.class);
 
-    protected static final TrustManager[] INSECURE_TRUST_MANAGERS = new TrustManager[] {
-            new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
-                @Override
-                public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-            }
-        };
+    protected static final TrustManager[] INSECURE_TRUST_MANAGERS = new TrustManager[] { new X509TrustManager() {
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        }
+
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return new X509Certificate[0];
+        }
+    } };
 
     /**
      * @return the socket factory, or null if not needed
@@ -66,34 +68,37 @@ public abstract class AbstractStreamProvider implements StreamProvider {
 
     /**
      * Open URL connection to the specified URL.
-     * @param url the url
-     * @param headers the headers map
+     *
+     * @param url            the url
+     * @param headers        the headers map
      * @param connectTimeout connection timeout in ms
-     * @param readTimeout read timeout in ms
+     * @param readTimeout    read timeout in ms
+     *
      * @return the URL connection
+     *
      * @throws IOException when an error occurs
      */
-    public URLConnection openConnection(String url, Map<String, String> headers, int connectTimeout, int readTimeout) throws IOException {
+    public URLConnection openConnection(String url, Map<String,String> headers, int connectTimeout, int readTimeout)
+            throws IOException {
         if (log.isDebugEnabled()) {
-            log.debug(String.format("%s opening connection: url [%s], headers [%s], connectTimeout [%s], readTimeout [%s]",
-                    getClass().getSimpleName(), url, headers, Integer.toString(connectTimeout), Integer.toString(readTimeout)));
+            log.debug(sm.getString("abstractStream.connection", getClass().getSimpleName(), url, headers,
+                    Integer.toString(connectTimeout), Integer.toString(readTimeout)));
         }
         URLConnection connection;
         try {
             connection = new URI(url).toURL().openConnection();
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException | IllegalArgumentException e) {
             // Not ideal but consistent with API
             throw new IOException(e);
         }
         if (headers != null) {
-            for (Map.Entry<String, String> entry : headers.entrySet()) {
+            for (Map.Entry<String,String> entry : headers.entrySet()) {
                 connection.addRequestProperty(entry.getKey(), entry.getValue());
             }
         }
         if (connectTimeout < 0 || readTimeout < 0) {
-            throw new IllegalArgumentException(
-                String.format("Neither connectTimeout [%s] nor readTimeout [%s] can be less than 0 for URLConnection.",
-                        Integer.toString(connectTimeout), Integer.toString(readTimeout)));
+            throw new IllegalArgumentException(sm.getString("abstractStream.invalidTimeout",
+                    Integer.toString(connectTimeout), Integer.toString(readTimeout)));
         }
         connection.setConnectTimeout(connectTimeout);
         connection.setReadTimeout(readTimeout);
@@ -101,17 +106,18 @@ public abstract class AbstractStreamProvider implements StreamProvider {
     }
 
     @Override
-    public InputStream openStream(String url, Map<String, String> headers,
-            int connectTimeout, int readTimeout) throws IOException {
+    public InputStream openStream(String url, Map<String,String> headers, int connectTimeout, int readTimeout)
+            throws IOException {
         URLConnection connection = openConnection(url, headers, connectTimeout, readTimeout);
         if (connection instanceof HttpsURLConnection) {
             ((HttpsURLConnection) connection).setSSLSocketFactory(getSocketFactory());
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Using HttpsURLConnection with SSLSocketFactory [%s] for url [%s].", getSocketFactory(), url));
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("Using HttpsURLConnection with SSLSocketFactory [%s] for url [%s].",
+                        getSocketFactory(), url));
             }
         } else {
-            if (log.isDebugEnabled()) {
-                log.debug(String.format("Using URLConnection for url [%s].", url));
+            if (log.isTraceEnabled()) {
+                log.trace(String.format("Using URLConnection for url [%s].", url));
             }
         }
         return connection.getInputStream();
@@ -132,7 +138,8 @@ public abstract class AbstractStreamProvider implements StreamProvider {
                     trustStore.setCertificateEntry(alias, cert);
                 }
 
-                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                TrustManagerFactory trustManagerFactory =
+                        TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
                 trustManagerFactory.init(trustStore);
 
                 return trustManagerFactory.getTrustManagers();
@@ -145,7 +152,7 @@ public abstract class AbstractStreamProvider implements StreamProvider {
             }
         } else {
             log.warn(sm.getString("abstractStream.CACertUndefined"));
-            return InsecureStreamProvider.INSECURE_TRUST_MANAGERS;
+            return INSECURE_TRUST_MANAGERS;
         }
     }
 }

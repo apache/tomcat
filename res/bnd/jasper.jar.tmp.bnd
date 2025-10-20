@@ -29,6 +29,8 @@ Export-Package: \
     org.apache.jasper.tagplugins.jstl,\
     org.apache.jasper.tagplugins.jstl.core,\
     org.apache.jasper.util
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
     org.apache.jasper.resources

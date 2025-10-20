@@ -27,9 +27,11 @@ import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 
 public class ContextMBean extends BaseCatalinaMBean<Context> {
 
-     /**
+    /**
      * Return the set of application parameters for this application.
+     *
      * @return a string array with a representation of each parameter
+     *
      * @throws MBeanException propagated from the managed resource access
      */
     public String[] findApplicationParameters() throws MBeanException {
@@ -39,7 +41,7 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
         ApplicationParameter[] params = context.findApplicationParameters();
         String[] stringParams = new String[params.length];
         for (int counter = 0; counter < params.length; counter++) {
-           stringParams[counter] = params[counter].toString();
+            stringParams[counter] = params[counter].toString();
         }
 
         return stringParams;
@@ -47,10 +49,10 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
 
 
     /**
-     * Return the security constraints for this web application.
-     * If there are none, a zero-length array is returned.
-     * @return a string array with a representation of each
-     *  security constraint
+     * Return the security constraints for this web application. If there are none, a zero-length array is returned.
+     *
+     * @return a string array with a representation of each security constraint
+     *
      * @throws MBeanException propagated from the managed resource access
      */
     public String[] findConstraints() throws MBeanException {
@@ -68,37 +70,50 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
 
 
     /**
-     * Return the error page entry for the specified HTTP error code,
-     * if any; otherwise return <code>null</code>.
+     * Return the error page entry for the specified HTTP error code, if any; otherwise return <code>null</code>.
      *
      * @param errorCode Error code to look up
+     *
      * @return a string representation of the error page
+     *
      * @throws MBeanException propagated from the managed resource access
      */
     public String findErrorPage(int errorCode) throws MBeanException {
         Context context = doGetManagedResource();
-        return context.findErrorPage(errorCode).toString();
+        ErrorPage errorPage = context.findErrorPage(errorCode);
+        if (errorPage != null) {
+            return errorPage.toString();
+        } else {
+            return null;
+        }
     }
 
 
     /**
-     * Return the error page entry for the specified Java exception type,
-     * if any; otherwise return <code>null</code>.
+     * Return the error page entry for the specified Java exception type, if any; otherwise return <code>null</code>.
      *
      * @param exceptionType Exception type to look up
+     *
      * @return a string representation of the error page
+     *
      * @throws MBeanException propagated from the managed resource access
      */
     public String findErrorPage(Throwable exceptionType) throws MBeanException {
         Context context = doGetManagedResource();
-        return context.findErrorPage(exceptionType).toString();
+        ErrorPage errorPage = context.findErrorPage(exceptionType);
+        if (errorPage != null) {
+            return errorPage.toString();
+        } else {
+            return null;
+        }
     }
 
 
     /**
-     * Return the set of defined error pages for all specified error codes
-     * and exception types.
+     * Return the set of defined error pages for all specified error codes and exception types.
+     *
      * @return a string array with a representation of each error page
+     *
      * @throws MBeanException propagated from the managed resource access
      */
     public String[] findErrorPages() throws MBeanException {
@@ -116,11 +131,12 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
 
 
     /**
-     * Return the filter definition for the specified filter name, if any;
-     * otherwise return <code>null</code>.
+     * Return the filter definition for the specified filter name, if any; otherwise return <code>null</code>.
      *
      * @param name Filter name to look up
+     *
      * @return a string representation of the filter definition
+     *
      * @throws MBeanException propagated from the managed resource access
      */
     public String findFilterDef(String name) throws MBeanException {
@@ -128,14 +144,19 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
         Context context = doGetManagedResource();
 
         FilterDef filterDef = context.findFilterDef(name);
-        return filterDef.toString();
+        if (filterDef != null) {
+            return filterDef.toString();
+        } else {
+            return null;
+        }
     }
 
 
     /**
      * Return the set of defined filters for this Context.
-     * @return a string array with a representation of all
-     *  the filter definitions
+     *
+     * @return a string array with a representation of all the filter definitions
+     *
      * @throws MBeanException propagated from the managed resource access
      */
     public String[] findFilterDefs() throws MBeanException {
@@ -154,7 +175,9 @@ public class ContextMBean extends BaseCatalinaMBean<Context> {
 
     /**
      * Return the set of filter mappings for this Context.
+     *
      * @return a string array with a representation of all the filter mappings
+     *
      * @throws MBeanException propagated from the managed resource access
      */
     public String[] findFilterMaps() throws MBeanException {

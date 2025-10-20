@@ -38,8 +38,7 @@ import org.apache.tomcat.dbcp.pool2.PooledObject;
 import org.apache.tomcat.dbcp.pool2.impl.DefaultPooledObject;
 
 /**
- * A {@link KeyedPooledObjectFactory} that creates {@link org.apache.tomcat.dbcp.dbcp2.PoolableConnection
- * PoolableConnection}s.
+ * A {@link KeyedPooledObjectFactory} that creates {@link PoolableConnection}s.
  *
  * @since 2.0
  */
@@ -205,7 +204,7 @@ final class KeyedCPDSConnectionFactory implements KeyedPooledObjectFactory<UserP
     /**
      * Invalidates the PooledConnection in the pool. The KeyedCPDSConnectionFactory closes the connection and pool
      * counters are updated appropriately. Also clears any idle instances associated with the user name that was used to
-     * create the PooledConnection. Connections associated with this user are not affected and they will not be
+     * create the PooledConnection. Connections associated with this user are not affected, and they will not be
      * automatically closed on return to the pool.
      */
     @Override

@@ -17,6 +17,7 @@
 package org.apache.jasper.runtime;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -30,20 +31,17 @@ import org.apache.jasper.compiler.Localizer;
 
 /**
  * This is the super class of all JSP-generated servlets.
- *
- * @author Anil K. Vijendran
  */
 public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected HttpJspBase() {
     }
 
     @Override
-    public final void init(ServletConfig config)
-        throws ServletException
-    {
+    public final void init(ServletConfig config) throws ServletException {
         super.init(config);
         jspInit();
         _jspInit();
@@ -60,13 +58,9 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
         _jspDestroy();
     }
 
-    /**
-     * Entry point into service.
-     */
     @Override
     public final void service(HttpServletRequest request, HttpServletResponse response)
-        throws ServletException, IOException
-    {
+            throws ServletException, IOException {
         _jspService(request, response);
     }
 
@@ -85,7 +79,6 @@ public abstract class HttpJspBase extends HttpServlet implements HttpJspPage {
     }
 
     @Override
-    public abstract void _jspService(HttpServletRequest request,
-                                     HttpServletResponse response)
-        throws ServletException, IOException;
+    public abstract void _jspService(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException;
 }

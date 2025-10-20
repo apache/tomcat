@@ -29,8 +29,8 @@ import jakarta.websocket.DeploymentException;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Extracts path parameters from URIs used to create web socket connections
- * using the URI template defined for the associated Endpoint.
+ * Extracts path parameters from URIs used to create web socket connections using the URI template defined for the
+ * associated Endpoint.
  */
 public class UriTemplate {
 
@@ -43,10 +43,9 @@ public class UriTemplate {
 
     public UriTemplate(String path) throws DeploymentException {
 
-        if (path == null || path.length() == 0 || !path.startsWith("/") || path.contains("/../") ||
-                path.contains("/./") || path.contains("//")) {
-            throw new DeploymentException(
-                    sm.getString("uriTemplate.invalidPath", path));
+        if (path == null || !path.startsWith("/") || path.contains("/../") || path.contains("/./") ||
+                path.contains("//")) {
+            throw new DeploymentException(sm.getString("uriTemplate.invalidPath", path));
         }
 
         StringBuilder normalized = new StringBuilder(path.length());
@@ -59,7 +58,7 @@ public class UriTemplate {
 
         for (int i = 0; i < segments.length; i++) {
             String segment = segments[i];
-            if (segment.length() == 0) {
+            if (segment.isEmpty()) {
                 if (i == 0 || (i == segments.length - 1 && paramCount == 0)) {
                     // Ignore the first empty segment as the path must always
                     // start with '/'
@@ -69,8 +68,7 @@ public class UriTemplate {
                 } else {
                     // As per EG discussion, all other empty segments are
                     // invalid
-                    throw new DeploymentException(sm.getString(
-                            "uriTemplate.emptySegment", path));
+                    throw new DeploymentException(sm.getString("uriTemplate.emptySegment", path));
                 }
             }
             normalized.append('/');
@@ -82,13 +80,11 @@ public class UriTemplate {
                 normalized.append(paramCount++);
                 normalized.append('}');
                 if (!paramNames.add(segment)) {
-                    throw new DeploymentException(sm.getString(
-                            "uriTemplate.duplicateParameter", segment));
+                    throw new DeploymentException(sm.getString("uriTemplate.duplicateParameter", segment));
                 }
             } else {
                 if (segment.contains("{") || segment.contains("}")) {
-                    throw new DeploymentException(sm.getString(
-                            "uriTemplate.invalidSegment", segment, path));
+                    throw new DeploymentException(sm.getString("uriTemplate.invalidSegment", segment, path));
                 }
                 normalized.append(segment);
             }
@@ -115,17 +111,15 @@ public class UriTemplate {
         for (Segment candidateSegment : candidate.getSegments()) {
             Segment targetSegment = targetSegments.next();
 
-            if (targetSegment.getParameterIndex() == -1) {
+            if (targetSegment.parameterIndex() == -1) {
                 // Not a parameter - values must match
-                if (!targetSegment.getValue().equals(
-                        candidateSegment.getValue())) {
+                if (!targetSegment.value().equals(candidateSegment.value())) {
                     // Not a match. Stop here
                     return null;
                 }
             } else {
                 // Parameter
-                result.put(targetSegment.getValue(),
-                        candidateSegment.getValue());
+                result.put(targetSegment.value(), candidateSegment.value());
             }
         }
 
@@ -153,23 +147,6 @@ public class UriTemplate {
     }
 
 
-    private static class Segment {
-        private final int parameterIndex;
-        private final String value;
-
-        Segment(int parameterIndex, String value) {
-            this.parameterIndex = parameterIndex;
-            this.value = value;
-        }
-
-
-        public int getParameterIndex() {
-            return parameterIndex;
-        }
-
-
-        public String getValue() {
-            return value;
-        }
+    private record Segment(int parameterIndex, String value) {
     }
 }

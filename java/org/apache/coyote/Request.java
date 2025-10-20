@@ -17,10 +17,11 @@
 package org.apache.coyote;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
+import java.io.StringReader;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -32,9 +33,11 @@ import jakarta.servlet.ServletConnection;
 import org.apache.tomcat.util.buf.CharsetHolder;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.apache.tomcat.util.buf.UDecoder;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.Parameters;
 import org.apache.tomcat.util.http.ServerCookies;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -47,15 +50,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <ul>
  * <li>"org.apache.tomcat.request" - allows access to the low-level request object in trusted applications
  * </ul>
- *
- * @author James Duncan Davidson [duncan@eng.sun.com]
- * @author James Todd [gonzo@eng.sun.com]
- * @author Jason Hunter [jch@eng.sun.com]
- * @author Harish Prabandham
- * @author Alex Cruikshank [alex@epitonic.com]
- * @author Hans Bergsten [hans@gefionsoftware.com]
- * @author Costin Manolache
- * @author Remy Maucherat
  */
 public final class Request {
 
@@ -69,8 +63,8 @@ public final class Request {
      * another 3,000,000 years before it gets back to zero).
      *
      * Local testing shows that 5, 10, 50, 500 or 1000 threads can obtain 60,000,000+ IDs a second from a single
-     * AtomicLong. That is about about 17ns per request. It does not appear that the introduction of this counter will
-     * cause a bottleneck for request processing.
+     * AtomicLong. That is about 17ns per request. It does not appear that the introduction of this counter will cause a
+     * bottleneck for request processing.
      */
     private static final AtomicLong requestIdGenerator = new AtomicLong(0);
 
@@ -92,7 +86,7 @@ public final class Request {
 
     private final MessageBytes schemeMB = MessageBytes.newInstance();
 
-    private final MessageBytes methodMB = MessageBytes.newInstance();
+    private String method;
     private final MessageBytes uriMB = MessageBytes.newInstance();
     private final MessageBytes decodedUriMB = MessageBytes.newInstance();
     private final MessageBytes queryMB = MessageBytes.newInstance();
@@ -108,17 +102,17 @@ public final class Request {
     private final MessageBytes localAddrMB = MessageBytes.newInstance();
 
     private final MimeHeaders headers = new MimeHeaders();
-    private final Map<String, String> trailerFields = new HashMap<>();
+    private final MimeHeaders trailerFields = new MimeHeaders();
 
     /**
      * Path parameters
      */
-    private final Map<String, String> pathParameters = new HashMap<>();
+    private final Map<String,String> pathParameters = new HashMap<>();
 
     /**
      * Notes.
      */
-    private final Object notes[] = new Object[Constants.MAX_NOTES];
+    private final Object[] notes = new Object[Constants.MAX_NOTES];
 
 
     /**
@@ -138,7 +132,7 @@ public final class Request {
      */
     private long contentLength = -1;
     private MessageBytes contentTypeMB = null;
-    private CharsetHolder charsetHolder = CharsetHolder.EMPTY;
+    private CharsetHolder charsetHolder = null;
 
     /**
      * Is there an expectation ?
@@ -151,7 +145,7 @@ public final class Request {
     private final MessageBytes remoteUser = MessageBytes.newInstance();
     private boolean remoteUserNeedsAuthorization = false;
     private final MessageBytes authType = MessageBytes.newInstance();
-    private final HashMap<String, Object> attributes = new HashMap<>();
+    private final HashMap<String,Object> attributes = new HashMap<>();
 
     private Response response;
     private volatile ActionHook hook;
@@ -159,6 +153,7 @@ public final class Request {
     private long bytesRead = 0;
     // Time of the request - useful to avoid repeated calls to System.currentTime
     private long startTimeNanos = -1;
+    private Instant startInstant = null;
     private long threadId = 0;
     private int available = 0;
 
@@ -231,7 +226,7 @@ public final class Request {
 
     public boolean isReady() {
         // Assume read is not possible
-        boolean ready = false;
+        boolean ready;
         synchronized (nonBlockingStateLock) {
             if (registeredForRead) {
                 fireListener = true;
@@ -290,7 +285,12 @@ public final class Request {
     }
 
 
-    public Map<String, String> getTrailerFields() {
+    public Map<String,String> getTrailerFields() {
+        return trailerFields.toMap();
+    }
+
+
+    public MimeHeaders getMimeTrailerFields() {
         return trailerFields;
     }
 
@@ -306,8 +306,16 @@ public final class Request {
         return schemeMB;
     }
 
-    public MessageBytes method() {
-        return methodMB;
+    public void setMethod(String method) {
+        this.method = method;
+    }
+
+    public void setMethod(byte[] buf, int start, int len) {
+        this.method = Method.bytesToString(buf, start, len);
+    }
+
+    public String getMethod() {
+        return method;
     }
 
     public MessageBytes requestURI() {
@@ -382,60 +390,8 @@ public final class Request {
 
     // -------------------- encoding/type --------------------
 
-    /**
-     * Get the character encoding used for this request.
-     *
-     * @return The value set via {@link #setCharset(Charset)} or if no call has been made to that method try to obtain
-     *             if from the content type.
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 11.
-     */
-    @Deprecated
-    public String getCharacterEncoding() {
-        if (charsetHolder.getName() == null) {
-            charsetHolder = CharsetHolder.getInstance(getCharsetFromContentType(getContentType()));
-        }
-
-        return charsetHolder.getName();
-    }
-
-
-    /**
-     * Get the character encoding used for this request.
-     *
-     * @return The value set via {@link #setCharset(Charset)} or if no call has been made to that method try to obtain
-     *             if from the content type.
-     *
-     * @throws UnsupportedEncodingException If the user agent has specified an invalid character encoding
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 11.
-     */
-    @Deprecated
-    public Charset getCharset() throws UnsupportedEncodingException {
-        if (charsetHolder.getName() == null) {
-            // Populates charsetHolder
-            getCharacterEncoding();
-        }
-
-        return charsetHolder.getValidatedCharset();
-    }
-
-
-    /**
-     * Unused.
-     *
-     * @param charset The Charset to use for the request
-     *
-     * @deprecated Unused. This method will be removed in Tomcat 11.
-     */
-    @Deprecated
-    public void setCharset(Charset charset) {
-        charsetHolder = CharsetHolder.getInstance(charset);
-    }
-
-
     public CharsetHolder getCharsetHolder() {
-        if (charsetHolder.getName() == null) {
+        if (charsetHolder == null) {
             charsetHolder = CharsetHolder.getInstance(getCharsetFromContentType(getContentType()));
         }
         return charsetHolder;
@@ -443,7 +399,11 @@ public final class Request {
 
 
     public void setCharsetHolder(CharsetHolder charsetHolder) {
-        this.charsetHolder = charsetHolder;
+        if (charsetHolder == null || charsetHolder.getName() == null) {
+            this.charsetHolder = null;
+        } else {
+            this.charsetHolder = charsetHolder;
+        }
     }
 
 
@@ -474,10 +434,10 @@ public final class Request {
 
     public String getContentType() {
         contentType();
-        if ((contentTypeMB == null) || contentTypeMB.isNull()) {
+        if (contentTypeMB == null || contentTypeMB.isNull()) {
             return null;
         }
-        return contentTypeMB.toString();
+        return contentTypeMB.toStringType();
     }
 
 
@@ -525,17 +485,13 @@ public final class Request {
         response.setRequest(this);
     }
 
-    protected void setHook(ActionHook hook) {
+    void setHook(ActionHook hook) {
         this.hook = hook;
     }
 
     public void action(ActionCode actionCode, Object param) {
         if (hook != null) {
-            if (param == null) {
-                hook.action(actionCode, this);
-            } else {
-                hook.action(actionCode, param);
-            }
+            hook.action(actionCode, Objects.requireNonNullElse(param, this));
         }
     }
 
@@ -570,7 +526,7 @@ public final class Request {
         attributes.put(name, o);
     }
 
-    public HashMap<String, Object> getAttributes() {
+    public HashMap<String,Object> getAttributes() {
         return attributes;
     }
 
@@ -617,10 +573,7 @@ public final class Request {
     }
 
     public boolean getSupportsRelativeRedirects() {
-        if (protocol().equals("") || protocol().equals("HTTP/1.0")) {
-            return false;
-        }
-        return true;
+        return !protocol().equals("") && !protocol().equals("HTTP/1.0");
     }
 
 
@@ -722,8 +675,13 @@ public final class Request {
         return startTimeNanos;
     }
 
-    public void setStartTimeNanos(long startTimeNanos) {
-        this.startTimeNanos = startTimeNanos;
+    public void markStartTime() {
+        startTimeNanos = System.nanoTime();
+        startInstant = Instant.now();
+    }
+
+    public Instant getStartInstant() {
+        return startInstant;
     }
 
     public long getThreadId() {
@@ -734,12 +692,14 @@ public final class Request {
         threadId = 0;
     }
 
+    @SuppressWarnings("deprecation")
     public void setRequestThread() {
         Thread t = Thread.currentThread();
         threadId = t.getId();
         getRequestProcessor().setWorkerThreadName(t.getName());
     }
 
+    @SuppressWarnings("deprecation")
     public boolean isRequestThread() {
         return Thread.currentThread().getId() == threadId;
     }
@@ -775,10 +735,16 @@ public final class Request {
 
         contentLength = -1;
         contentTypeMB = null;
-        charsetHolder = CharsetHolder.EMPTY;
+        charsetHolder = null;
         expectation = false;
         headers.recycle();
-        trailerFields.clear();
+        trailerFields.recycle();
+        /*
+         * Trailer fields are limited in size by bytes. The following call ensures that any request with a large number
+         * of small trailer fields doesn't result in a long lasting, large array of headers inside the MimeHeader
+         * instance.
+         */
+        trailerFields.setLimit(MimeHeaders.DEFAULT_HEADER_SIZE);
         serverNameMB.recycle();
         serverPort = -1;
         localAddrMB.recycle();
@@ -806,7 +772,7 @@ public final class Request {
         uriMB.recycle();
         decodedUriMB.recycle();
         queryMB.recycle();
-        methodMB.recycle();
+        method = null;
         protoMB.recycle();
 
         schemeMB.recycle();
@@ -826,7 +792,17 @@ public final class Request {
         allDataReadEventSent.set(false);
 
         startTimeNanos = -1;
+        startInstant = null;
         threadId = 0;
+
+        if (hook instanceof NonPipeliningProcessor) {
+            /*
+             * No requirement to maintain state between requests so clear the hook (a.k.a. Processor) and the input
+             * buffer to aid GC.
+             */
+            setHook(null);
+            setInputBuffer(null);
+        }
     }
 
     // -------------------- Info --------------------
@@ -843,7 +819,7 @@ public final class Request {
     }
 
     public boolean isProcessing() {
-        return reqProcessorMX.getStage() == org.apache.coyote.Constants.STAGE_SERVICE;
+        return reqProcessorMX.getStage() == Constants.STAGE_SERVICE;
     }
 
     /**
@@ -857,20 +833,17 @@ public final class Request {
         if (contentType == null) {
             return null;
         }
-        int start = contentType.indexOf("charset=");
-        if (start < 0) {
-            return null;
+
+        MediaType mediaType = null;
+        try {
+            mediaType = MediaType.parseMediaType(new StringReader(contentType));
+        } catch (IOException ioe) {
+            // Ignore - null test below handles this
         }
-        String encoding = contentType.substring(start + 8);
-        int end = encoding.indexOf(';');
-        if (end >= 0) {
-            encoding = encoding.substring(0, end);
-        }
-        encoding = encoding.trim();
-        if ((encoding.length() > 2) && (encoding.startsWith("\"")) && (encoding.endsWith("\""))) {
-            encoding = encoding.substring(1, encoding.length() - 1);
+        if (mediaType != null) {
+            return mediaType.getCharset();
         }
 
-        return encoding.trim();
+        return null;
     }
 }

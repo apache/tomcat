@@ -27,6 +27,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.JarInputStream;
 import java.util.jar.Manifest;
+import java.util.zip.ZipFile;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResource;
@@ -85,7 +86,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
      * JarWar can't optimise for a single resource so the Map is always returned.
      */
     @Override
-    protected Map<String, JarEntry> getArchiveEntries(boolean single) {
+    protected Map<String,JarEntry> getArchiveEntries(boolean single) {
         synchronized (archiveLock) {
             if (archiveEntries == null) {
                 JarFile warFile = null;
@@ -140,13 +141,36 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                     if (jarFileIs != null) {
                         try {
                             jarFileIs.close();
-                        } catch (IOException e) {
+                        } catch (IOException ignore) {
                             // Ignore
                         }
                     }
                 }
             }
+            WebResourceRoot root = getRoot();
+            if (root.getArchiveIndexStrategyEnum().getUsesBloom()) {
+                jarContents = new JarContents(archiveEntries.values());
+                retainBloomFilterForArchives = root.getArchiveIndexStrategyEnum().getRetain();
+            }
             return archiveEntries;
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * JarWar needs to generate the index (jarContents) for the inner JAR, not the outer WAR.
+     */
+    @Override
+    protected JarFile openJarFile() throws IOException {
+        synchronized (archiveLock) {
+            if (archive == null) {
+                archive = new JarFile(new File(getBase()), true, ZipFile.OPEN_READ, Runtime.version());
+                // Don't populate JarContents here. Populate at the end of getArchiveEntries()
+            }
+            archiveUseCount++;
+            return archive;
         }
     }
 
@@ -155,10 +179,10 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
 
         int targetVersion = Runtime.version().feature();
 
-        Map<String, VersionedJarEntry> versionedEntries = new HashMap<>();
-        Iterator<Entry<String, JarEntry>> iter = archiveEntries.entrySet().iterator();
+        Map<String,VersionedJarEntry> versionedEntries = new HashMap<>();
+        Iterator<Entry<String,JarEntry>> iter = archiveEntries.entrySet().iterator();
         while (iter.hasNext()) {
-            Entry<String, JarEntry> entry = iter.next();
+            Entry<String,JarEntry> entry = iter.next();
             String name = entry.getKey();
             if (name.startsWith("META-INF/versions/")) {
                 // Remove the multi-release version
@@ -181,7 +205,7 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
                         } else {
                             // Ignore any entry for which we have already found
                             // a later version
-                            if (version > versionedJarEntry.getVersion()) {
+                            if (version > versionedJarEntry.version()) {
                                 // Replace the entry targeted at an earlier
                                 // version
                                 versionedEntries.put(baseName, new VersionedJarEntry(version, entry.getValue()));
@@ -192,8 +216,8 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
             }
         }
 
-        for (Entry<String, VersionedJarEntry> versionedJarEntry : versionedEntries.entrySet()) {
-            archiveEntries.put(versionedJarEntry.getKey(), versionedJarEntry.getValue().getJarEntry());
+        for (Entry<String,VersionedJarEntry> versionedJarEntry : versionedEntries.entrySet()) {
+            archiveEntries.put(versionedJarEntry.getKey(), versionedJarEntry.getValue().jarEntry());
         }
     }
 
@@ -234,29 +258,12 @@ public class JarWarResourceSet extends AbstractArchiveResourceSet {
 
         try {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(ioe);
         }
     }
 
 
-    private static final class VersionedJarEntry {
-        private final int version;
-        private final JarEntry jarEntry;
-
-        VersionedJarEntry(int version, JarEntry jarEntry) {
-            this.version = version;
-            this.jarEntry = jarEntry;
-        }
-
-
-        public int getVersion() {
-            return version;
-        }
-
-
-        public JarEntry getJarEntry() {
-            return jarEntry;
-        }
+    private record VersionedJarEntry(int version, JarEntry jarEntry) {
     }
 }

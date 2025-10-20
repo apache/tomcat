@@ -23,13 +23,16 @@ import org.junit.Test;
 
 import org.apache.tomcat.unittest.TesterThreadedPerformance;
 
+/*
+ * This is an absolute performance test. There is no benefit in running it as part of a standard test run so it is
+ * excluded due to the name starting Tester...
+ */
 public class TesterContainerProviderPerformance {
 
     @Test
     public void testGetWebSocketContainer() throws Exception {
         for (int i = 1; i < 9; i++) {
-            TesterThreadedPerformance test =
-                    new TesterThreadedPerformance(i, 250000, new TestInstanceSupplier());
+            TesterThreadedPerformance test = new TesterThreadedPerformance(i, 250000, new TestInstanceSupplier());
             long duration = test.doTest();
             System.out.println(i + " threads completed in " + duration + "ns");
         }

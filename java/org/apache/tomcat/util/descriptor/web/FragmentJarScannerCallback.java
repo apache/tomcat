@@ -33,16 +33,14 @@ import org.xml.sax.InputSource;
  */
 public class FragmentJarScannerCallback implements JarScannerCallback {
 
-    private static final String FRAGMENT_LOCATION =
-        "META-INF/web-fragment.xml";
+    private static final String FRAGMENT_LOCATION = "META-INF/web-fragment.xml";
     private final WebXmlParser webXmlParser;
     private final boolean delegate;
     private final boolean parseRequired;
     private final Map<String,WebXml> fragments = new HashMap<>();
-    private boolean ok  = true;
+    private boolean ok = true;
 
-    public FragmentJarScannerCallback(WebXmlParser webXmlParser, boolean delegate,
-            boolean parseRequired) {
+    public FragmentJarScannerCallback(WebXmlParser webXmlParser, boolean delegate, boolean parseRequired) {
         this.webXmlParser = webXmlParser;
         this.delegate = delegate;
         this.parseRequired = parseRequired;
@@ -107,8 +105,7 @@ public class FragmentJarScannerCallback implements JarScannerCallback {
         try {
             if (fragmentFile.isFile()) {
                 try (InputStream stream = new FileInputStream(fragmentFile)) {
-                    InputSource source =
-                        new InputSource(fragmentFile.toURI().toURL().toString());
+                    InputSource source = new InputSource(fragmentFile.toURI().toURL().toString());
                     source.setByteStream(stream);
                     if (!webXmlParser.parseWebXml(source, fragment, true)) {
                         ok = false;

@@ -106,12 +106,14 @@
     <allow pkg="org.apache.el"/>
   </subpackage>
   <subpackage name="jasper">
+    <allow pkg="javax.tools"/>
     <allow pkg="jakarta.el"/>
     <allow pkg="jakarta.servlet"/>
     <allow pkg="org.apache.el"/>
     <allow pkg="org.apache.jasper"/>
     <allow pkg="org.apache.juli"/>
     <allow pkg="org.apache.tomcat" exact-match="true"/>
+    <allow pkg="org.apache.tomcat.util.buf"/>
     <allow pkg="org.apache.tomcat.util.descriptor"/>
     <allow pkg="org.apache.tomcat.util.scan"/>
     <allow pkg="org.apache.tomcat.util.security"/>

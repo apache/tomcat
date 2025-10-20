@@ -16,8 +16,11 @@
  */
 package jakarta.transaction;
 
+import java.io.Serial;
+
 public class TransactionRequiredException extends java.rmi.RemoteException {
 
+    @Serial
     private static final long serialVersionUID = -1898806419937446439L;
 
     public TransactionRequiredException() {

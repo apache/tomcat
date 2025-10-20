@@ -17,8 +17,7 @@
 package jakarta.servlet.jsp.tagext;
 
 /**
- * Serves as a base class for Tag and SimpleTag.
- * This is mostly for organizational and type-safety purposes.
+ * Serves as a base class for Tag and SimpleTag. This is mostly for organizational and type-safety purposes.
  *
  * @since JSP 2.0
  */

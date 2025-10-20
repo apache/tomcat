@@ -48,7 +48,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
      * we will be keeping track of query stats on a per pool basis
      */
     protected static final ConcurrentHashMap<String,ConcurrentHashMap<String,QueryStats>> perPoolStats =
-        new ConcurrentHashMap<>();
+            new ConcurrentHashMap<>();
     /**
      * the queries that are used for this interceptor.
      */
@@ -117,7 +117,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
         if (this.maxQueries > 0 ) {
             QueryStats qs = this.getQueryStats(sql);
             if (qs != null) {
-              qs.add(delta, start);
+                qs.add(delta, start);
             }
         }
         return sql;
@@ -152,7 +152,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
         if (this.maxQueries > 0 ) {
             QueryStats qs = getQueryStats(sql);
             if (qs != null) {
-              qs.prepare(time);
+                qs.prepare(time);
             }
         }
     }
@@ -162,19 +162,16 @@ public class SlowQueryReport extends AbstractQueryReport  {
         if (this.maxQueries > 0 ) {
             QueryStats qs = getQueryStats(sql);
             if (qs != null) {
-              qs.prepare(time);
+                qs.prepare(time);
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void poolStarted(ConnectionPool pool) {
         super.poolStarted(pool);
         //see if we already created a map for this pool
-        queries = SlowQueryReport.perPoolStats.get(pool.getName());
+        queries = perPoolStats.get(pool.getName());
         if (queries==null) {
             //create the map to hold our stats
             //however TODO we need to improve the eviction
@@ -182,14 +179,11 @@ public class SlowQueryReport extends AbstractQueryReport  {
             queries = new ConcurrentHashMap<>();
             if (perPoolStats.putIfAbsent(pool.getName(), queries)!=null) {
                 //there already was one
-                queries = SlowQueryReport.perPoolStats.get(pool.getName());
+                queries = perPoolStats.get(pool.getName());
             }
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void poolClosed(ConnectionPool pool) {
         perPoolStats.remove(pool.getName());
@@ -198,12 +192,12 @@ public class SlowQueryReport extends AbstractQueryReport  {
 
     protected QueryStats getQueryStats(String sql) {
         if (sql==null) {
-          sql = "";
+            sql = "";
         }
         ConcurrentHashMap<String,QueryStats> queries = SlowQueryReport.this.queries;
         if (queries==null) {
             if (log.isWarnEnabled()) {
-              log.warn("Connection has already been closed or abandoned");
+                log.warn("Connection has already been closed or abandoned");
             }
             return null;
         }
@@ -294,9 +288,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
     public void reset(ConnectionPool parent, PooledConnection con) {
         super.reset(parent, con);
         if (parent!=null) {
-          queries = SlowQueryReport.perPoolStats.get(parent.getName());
+            queries = perPoolStats.get(parent.getName());
         } else {
-          queries = null;
+            queries = null;
         }
     }
 
@@ -462,14 +456,13 @@ public class SlowQueryReport extends AbstractQueryReport  {
             this.query = query;
         }
 
-        public void prepare(long invocationTime) {
+        public synchronized void prepare(long invocationTime) {
             prepareCount++;
             prepareTime+=invocationTime;
 
         }
 
-        public void add(long invocationTime, long now) {
-            //not thread safe, but don't sacrifice performance for this kind of stuff
+        public synchronized void add(long invocationTime, long now) {
             maxInvocationTime = Math.max(invocationTime, maxInvocationTime);
             if (maxInvocationTime == invocationTime) {
                 maxInvocationDate = now;
@@ -483,7 +476,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
             lastInvocation = now;
         }
 
-        public void failure(long invocationTime, long now) {
+        public synchronized void failure(long invocationTime, long now) {
             add(invocationTime,now);
             failures++;
 

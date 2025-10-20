@@ -23,21 +23,20 @@ import java.util.TreeMap;
 import jakarta.servlet.SessionTrackingMode;
 
 /**
- * Representation of a session configuration element for a web application,
- * as represented in a <code>&lt;session-config&gt;</code> element in the
- * deployment descriptor.
+ * Representation of a session configuration element for a web application, as represented in a
+ * <code>&lt;session-config&gt;</code> element in the deployment descriptor.
  */
 public class SessionConfig {
 
     private Integer sessionTimeout;
     private String cookieName;
     private final Map<String,String> cookieAttributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-    private final EnumSet<SessionTrackingMode> sessionTrackingModes =
-        EnumSet.noneOf(SessionTrackingMode.class);
+    private final EnumSet<SessionTrackingMode> sessionTrackingModes = EnumSet.noneOf(SessionTrackingMode.class);
 
     public Integer getSessionTimeout() {
         return sessionTimeout;
     }
+
     public void setSessionTimeout(String sessionTimeout) {
         this.sessionTimeout = Integer.valueOf(sessionTimeout);
     }
@@ -45,6 +44,7 @@ public class SessionConfig {
     public String getCookieName() {
         return cookieName;
     }
+
     public void setCookieName(String cookieName) {
         this.cookieName = cookieName;
     }
@@ -52,6 +52,7 @@ public class SessionConfig {
     public String getCookieDomain() {
         return getCookieAttribute(Constants.COOKIE_DOMAIN_ATTR);
     }
+
     public void setCookieDomain(String cookieDomain) {
         setCookieAttribute(Constants.COOKIE_DOMAIN_ATTR, cookieDomain);
     }
@@ -59,6 +60,7 @@ public class SessionConfig {
     public String getCookiePath() {
         return getCookieAttribute(Constants.COOKIE_PATH_ATTR);
     }
+
     public void setCookiePath(String cookiePath) {
         setCookieAttribute(Constants.COOKIE_PATH_ATTR, cookiePath);
     }
@@ -66,6 +68,7 @@ public class SessionConfig {
     public String getCookieComment() {
         return getCookieAttribute(Constants.COOKIE_COMMENT_ATTR);
     }
+
     public void setCookieComment(String cookieComment) {
         setCookieAttribute(Constants.COOKIE_COMMENT_ATTR, cookieComment);
     }
@@ -77,6 +80,7 @@ public class SessionConfig {
         }
         return Boolean.valueOf(httpOnly);
     }
+
     public void setCookieHttpOnly(String cookieHttpOnly) {
         setCookieAttribute(Constants.COOKIE_HTTP_ONLY_ATTR, cookieHttpOnly);
     }
@@ -88,6 +92,7 @@ public class SessionConfig {
         }
         return Boolean.valueOf(secure);
     }
+
     public void setCookieSecure(String cookieSecure) {
         setCookieAttribute(Constants.COOKIE_SECURE_ATTR, cookieSecure);
     }
@@ -99,6 +104,7 @@ public class SessionConfig {
         }
         return Integer.valueOf(maxAge);
     }
+
     public void setCookieMaxAge(String cookieMaxAge) {
         setCookieAttribute(Constants.COOKIE_MAX_AGE_ATTR, cookieMaxAge);
     }
@@ -106,9 +112,11 @@ public class SessionConfig {
     public Map<String,String> getCookieAttributes() {
         return cookieAttributes;
     }
+
     public void setCookieAttribute(String name, String value) {
         cookieAttributes.put(name, value);
     }
+
     public String getCookieAttribute(String name) {
         return cookieAttributes.get(name);
     }
@@ -116,8 +124,8 @@ public class SessionConfig {
     public EnumSet<SessionTrackingMode> getSessionTrackingModes() {
         return sessionTrackingModes;
     }
+
     public void addSessionTrackingMode(String sessionTrackingMode) {
-        sessionTrackingModes.add(
-                SessionTrackingMode.valueOf(sessionTrackingMode));
+        sessionTrackingModes.add(SessionTrackingMode.valueOf(sessionTrackingMode));
     }
 }

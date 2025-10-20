@@ -26,6 +26,7 @@ import org.apache.catalina.tribes.Member;
 public class Response {
     private Member source;
     private Serializable message;
+
     public Response() {
     }
 

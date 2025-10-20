@@ -16,12 +16,14 @@
  */
 package org.apache.tomcat.util.net.openssl;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OpenSSLConf implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private final List<OpenSSLConfCmd> commands = new ArrayList<>();

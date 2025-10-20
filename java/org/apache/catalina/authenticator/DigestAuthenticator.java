@@ -17,10 +17,17 @@
 package org.apache.catalina.authenticator;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,15 +40,14 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.http.parser.Authorization;
 import org.apache.tomcat.util.security.ConcurrentMessageDigest;
 
 
 /**
- * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP DIGEST Authentication (see RFC 2069).
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
+ * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP DIGEST Authentication, as outlined in RFC 7616: "HTTP
+ * Digest Authentication"
  */
 public class DigestAuthenticator extends AuthenticatorBase {
 
@@ -54,6 +60,20 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * Tomcat's DIGEST implementation only supports auth quality of protection.
      */
     protected static final String QOP = "auth";
+
+    private static final AuthDigest FALLBACK_DIGEST = AuthDigest.MD5;
+
+    private static final String NONCE_DIGEST = "SHA-256";
+
+    // List permitted algorithms and maps them to Java standard names
+    private static final Map<String,AuthDigest> PERMITTED_ALGORITHMS = new HashMap<>();
+    static {
+        // Allows the digester to be configured with either the Standard Java name or the name used the RFC.
+        for (AuthDigest authDigest : AuthDigest.values()) {
+            PERMITTED_ALGORITHMS.put(authDigest.getJavaName(), authDigest);
+            PERMITTED_ALGORITHMS.put(authDigest.getRfcName(), authDigest);
+        }
+    }
 
 
     // ----------------------------------------------------------- Constructors
@@ -69,7 +89,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     /**
      * List of server nonce values currently being tracked
      */
-    protected Map<String, NonceInfo> nonces;
+    protected Map<String,NonceInfo> nonces;
 
 
     /**
@@ -114,6 +134,13 @@ public class DigestAuthenticator extends AuthenticatorBase {
      * modified the URI.
      */
     protected boolean validateUri = true;
+
+
+    /**
+     * Algorithms to use for WWW-Authenticate challenges.
+     */
+    private List<AuthDigest> algorithms = Arrays.asList(AuthDigest.SHA_256, AuthDigest.MD5);
+
 
     // ------------------------------------------------------------- Properties
 
@@ -177,6 +204,51 @@ public class DigestAuthenticator extends AuthenticatorBase {
     }
 
 
+    public String getAlgorithms() {
+        StringBuilder result = new StringBuilder();
+        StringUtils.join(algorithms, ',', AuthDigest::getRfcName, result);
+        return result.toString();
+    }
+
+
+    public void setAlgorithms(String algorithmsString) {
+        String[] algorithmsArray = algorithmsString.split(",");
+        List<AuthDigest> algorithms = new ArrayList<>();
+
+        // Ignore the new setting if any of the algorithms are invalid
+        for (String algorithm : algorithmsArray) {
+            AuthDigest authDigest = PERMITTED_ALGORITHMS.get(algorithm);
+            if (authDigest == null) {
+                log.warn(sm.getString("digestAuthenticator.invalidAlgorithm", algorithmsString, algorithm));
+                return;
+            }
+            algorithms.add(authDigest);
+        }
+
+        initAlgorithms(algorithms);
+        this.algorithms = algorithms;
+    }
+
+
+    /*
+     * Initialise algorithms, removing ones that the JRE does not support
+     */
+    private void initAlgorithms(List<AuthDigest> algorithms) {
+        Iterator<AuthDigest> algorithmIterator = algorithms.iterator();
+        while (algorithmIterator.hasNext()) {
+            AuthDigest algorithm = algorithmIterator.next();
+            try {
+                ConcurrentMessageDigest.init(algorithm.getJavaName());
+            } catch (NoSuchAlgorithmException e) {
+                // In theory, a JRE can choose not to implement SHA-512/256
+                log.warn(sm.getString("digestAuthenticator.unsupportedAlgorithm", algorithms, algorithm.getJavaName()),
+                        e);
+                algorithmIterator.remove();
+            }
+        }
+    }
+
+
     // --------------------------------------------------------- Public Methods
 
     /**
@@ -210,7 +282,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
         DigestInfo digestInfo = new DigestInfo(getOpaque(), getNonceValidity(), getKey(), nonces, isValidateUri());
         if (authorization != null) {
             if (digestInfo.parse(request, authorization)) {
-                if (digestInfo.validate(request)) {
+                if (digestInfo.validate(request, algorithms)) {
                     principal = digestInfo.authenticate(context.getRealm());
                 }
 
@@ -244,38 +316,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Removes the quotes on a string. RFC2617 states quotes are optional for all parameters except realm.
-     *
-     * @param quotedString   The quoted string
-     * @param quotesRequired <code>true</code> if quotes were required
-     *
-     * @return The unquoted string
-     */
-    protected static String removeQuotes(String quotedString, boolean quotesRequired) {
-        // support both quoted and non-quoted
-        if (quotedString.length() > 0 && quotedString.charAt(0) != '"' && !quotesRequired) {
-            return quotedString;
-        } else if (quotedString.length() > 2) {
-            return quotedString.substring(1, quotedString.length() - 1);
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Removes the quotes on a string.
-     *
-     * @param quotedString The quoted string
-     *
-     * @return The unquoted string
-     */
-    protected static String removeQuotes(String quotedString) {
-        return removeQuotes(quotedString, false);
-    }
-
-    /**
-     * Generate a unique token. The token is generated according to the following pattern. NOnceToken = Base64 ( MD5 (
-     * client-IP ":" time-stamp ":" private-key ) ).
+     * Generate a unique token. The token is generated according to the following pattern. NOnceToken = Base64 (
+     * NONCE_DIGEST ( client-IP ":" time-stamp ":" private-key ) ).
      *
      * @param request HTTP Servlet request
      *
@@ -295,7 +337,8 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         String ipTimeKey = request.getRemoteAddr() + ":" + currentTime + ":" + getKey();
 
-        byte[] buffer = ConcurrentMessageDigest.digestMD5(ipTimeKey.getBytes(StandardCharsets.ISO_8859_1));
+        // Note: The digest used to generate the nonce is independent of the digest used for authentication.
+        byte[] buffer = ConcurrentMessageDigest.digest(NONCE_DIGEST, ipTimeKey.getBytes(StandardCharsets.ISO_8859_1));
         String nonce = currentTime + ":" + HexUtils.toHexString(buffer);
 
         NonceInfo info = new NonceInfo(currentTime, getNonceCountWindowSize());
@@ -308,26 +351,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
 
     /**
-     * Generates the WWW-Authenticate header.
-     * <p>
-     * The header MUST follow this template :
-     *
-     * <pre>
-     *      WWW-Authenticate    = "WWW-Authenticate" ":" "Digest"
-     *                            digest-challenge
-     *
-     *      digest-challenge    = 1#( realm | [ domain ] | nonce |
-     *                  [ digest-opaque ] |[ stale ] | [ algorithm ] )
-     *
-     *      realm               = "realm" "=" realm-value
-     *      realm-value         = quoted-string
-     *      domain              = "domain" "=" &lt;"&gt; 1#URI &lt;"&gt;
-     *      nonce               = "nonce" "=" nonce-value
-     *      nonce-value         = quoted-string
-     *      opaque              = "opaque" "=" quoted-string
-     *      stale               = "stale" "=" ( "true" | "false" )
-     *      algorithm           = "algorithm" "=" ( "MD5" | token )
-     * </pre>
+     * Generates the WWW-Authenticate header(s) as per RFC 7616.
      *
      * @param request      HTTP Servlet request
      * @param response     HTTP Servlet response
@@ -339,17 +363,35 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         String realmName = getRealmName(context);
 
-        String authenticateHeader;
-        if (isNonceStale) {
-            authenticateHeader = "Digest realm=\"" + realmName + "\", " + "qop=\"" + QOP + "\", nonce=\"" + nonce +
-                    "\", " + "opaque=\"" + getOpaque() + "\", stale=true";
-        } else {
-            authenticateHeader = "Digest realm=\"" + realmName + "\", " + "qop=\"" + QOP + "\", nonce=\"" + nonce +
-                    "\", " + "opaque=\"" + getOpaque() + "\"";
+        boolean first = true;
+        for (AuthDigest algorithm : algorithms) {
+            StringBuilder authenticateHeader = new StringBuilder(200);
+            authenticateHeader.append("Digest realm=\"");
+            authenticateHeader.append(realmName);
+            authenticateHeader.append("\", qop=\"");
+            authenticateHeader.append(QOP);
+            authenticateHeader.append("\", nonce=\"");
+            authenticateHeader.append(nonce);
+            authenticateHeader.append("\", opaque=\"");
+            authenticateHeader.append(getOpaque());
+            authenticateHeader.append("\"");
+            if (isNonceStale) {
+                authenticateHeader.append(", stale=true");
+            }
+            authenticateHeader.append(", algorithm=");
+            authenticateHeader.append(algorithm.getRfcName());
+
+            if (first) {
+                response.setHeader(AUTH_HEADER_NAME, authenticateHeader.toString());
+                first = false;
+            } else {
+                response.addHeader(AUTH_HEADER_NAME, authenticateHeader.toString());
+            }
+            /*
+             * Note: userhash is not supported by this implementation so don't include it. The clients will use the
+             * default of false.
+             */
         }
-
-        response.setHeader(AUTH_HEADER_NAME, authenticateHeader);
-
     }
 
 
@@ -363,7 +405,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
     // ------------------------------------------------------- Lifecycle Methods
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         super.startInternal();
 
         // Generate a random secret key
@@ -382,13 +424,14 @@ public class DigestAuthenticator extends AuthenticatorBase {
          */
         nonces = new LinkedHashMap<>() {
 
+            @Serial
             private static final long serialVersionUID = 1L;
             private static final long LOG_SUPPRESS_TIME = 5 * 60 * 1000;
 
             private long lastLog = 0;
 
             @Override
-            protected boolean removeEldestEntry(Map.Entry<String, NonceInfo> eldest) {
+            protected boolean removeEldestEntry(Map.Entry<String,NonceInfo> eldest) {
                 // This is called from a sync so keep it simple
                 long currentTime = System.currentTimeMillis();
                 if (size() > getNonceCacheSize()) {
@@ -402,15 +445,23 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 return false;
             }
         };
+
+        initAlgorithms(algorithms);
+        try {
+            ConcurrentMessageDigest.init(NONCE_DIGEST);
+        } catch (NoSuchAlgorithmException e) {
+            // Not possible. NONCE_DIGEST uses an algorithm that JREs must support.
+        }
     }
+
 
     public static class DigestInfo {
 
         private final String opaque;
         private final long nonceValidity;
         private final String key;
-        private final Map<String, NonceInfo> nonces;
-        private boolean validateUri = true;
+        private final Map<String,NonceInfo> nonces;
+        private final boolean validateUri;
 
         private String userName = null;
         private String method = null;
@@ -424,9 +475,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
         private String opaqueReceived = null;
 
         private boolean nonceStale = false;
+        private AuthDigest algorithm = null;
 
 
-        public DigestInfo(String opaque, long nonceValidity, String key, Map<String, NonceInfo> nonces,
+        public DigestInfo(String opaque, long nonceValidity, String key, Map<String,NonceInfo> nonces,
                 boolean validateUri) {
             this.opaque = opaque;
             this.nonceValidity = nonceValidity;
@@ -447,10 +499,10 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 return false;
             }
 
-            Map<String, String> directives;
+            Map<String,String> directives;
             try {
                 directives = Authorization.parseAuthorizationDigest(new StringReader(authorization));
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 return false;
             }
 
@@ -468,11 +520,15 @@ public class DigestAuthenticator extends AuthenticatorBase {
             uri = directives.get("uri");
             response = directives.get("response");
             opaqueReceived = directives.get("opaque");
+            algorithm = PERMITTED_ALGORITHMS.get(directives.get("algorithm"));
+            if (algorithm == null) {
+                algorithm = FALLBACK_DIGEST;
+            }
 
             return true;
         }
 
-        public boolean validate(Request request) {
+        public boolean validate(Request request, List<AuthDigest> algorithms) {
             if ((userName == null) || (realmName == null) || (nonce == null) || (uri == null) || (response == null)) {
                 return false;
             }
@@ -498,7 +554,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
                         absolute.append("://");
                         absolute.append(host);
                         absolute.append(uriQuery);
-                        if (!uri.equals(absolute.toString())) {
+                        if (!uri.contentEquals(absolute)) {
                             return false;
                         }
                     } else {
@@ -529,7 +585,7 @@ public class DigestAuthenticator extends AuthenticatorBase {
             } catch (NumberFormatException nfe) {
                 return false;
             }
-            String md5clientIpTimeKey = nonce.substring(i + 1);
+            String digestclientIpTimeKey = nonce.substring(i + 1);
             long currentTime = System.currentTimeMillis();
             if ((currentTime - nonceTime) > nonceValidity) {
                 nonceStale = true;
@@ -538,9 +594,11 @@ public class DigestAuthenticator extends AuthenticatorBase {
                 }
             }
             String serverIpTimeKey = request.getRemoteAddr() + ":" + nonceTime + ":" + key;
-            byte[] buffer = ConcurrentMessageDigest.digestMD5(serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
-            String md5ServerIpTimeKey = HexUtils.toHexString(buffer);
-            if (!md5ServerIpTimeKey.equals(md5clientIpTimeKey)) {
+            // Note: The digest used to generate the nonce is independent of the digest used for authentication/
+            byte[] buffer =
+                    ConcurrentMessageDigest.digest(NONCE_DIGEST, serverIpTimeKey.getBytes(StandardCharsets.ISO_8859_1));
+            String digestServerIpTimeKey = HexUtils.toHexString(buffer);
+            if (!digestServerIpTimeKey.equals(digestclientIpTimeKey)) {
                 return false;
             }
 
@@ -584,7 +642,9 @@ public class DigestAuthenticator extends AuthenticatorBase {
                     }
                 }
             }
-            return true;
+
+            // Validate algorithm is one of the algorithms configured for the authenticator
+            return algorithms.contains(algorithm);
         }
 
         public boolean isNonceStale() {
@@ -592,21 +652,21 @@ public class DigestAuthenticator extends AuthenticatorBase {
         }
 
         public Principal authenticate(Realm realm) {
-            // Second MD5 digest used to calculate the digest :
-            // MD5(Method + ":" + uri)
             String a2 = method + ":" + uri;
 
-            byte[] buffer = ConcurrentMessageDigest.digestMD5(a2.getBytes(StandardCharsets.ISO_8859_1));
-            String md5a2 = HexUtils.toHexString(buffer);
+            byte[] buffer =
+                    ConcurrentMessageDigest.digest(algorithm.getJavaName(), a2.getBytes(StandardCharsets.ISO_8859_1));
+            String digestA2 = HexUtils.toHexString(buffer);
 
-            return realm.authenticate(userName, response, nonce, nc, cnonce, qop, realmName, md5a2);
+            return realm.authenticate(userName, response, nonce, nc, cnonce, qop, realmName, digestA2,
+                    algorithm.getJavaName());
         }
 
     }
 
     public static class NonceInfo {
         private final long timestamp;
-        private final boolean seen[];
+        private final boolean[] seen;
         private final int offset;
         private int count = 0;
 
@@ -633,6 +693,33 @@ public class DigestAuthenticator extends AuthenticatorBase {
 
         public long getTimestamp() {
             return timestamp;
+        }
+    }
+
+
+    /**
+     * This enum exists because RFC 7616 and Java use different names for some digests.
+     */
+    public enum AuthDigest {
+
+        MD5("MD5", "MD5"),
+        SHA_256("SHA-256", "SHA-256"),
+        SHA_512_256("SHA-512/256", "SHA-512-256");
+
+        private final String javaName;
+        private final String rfcName;
+
+        AuthDigest(String javaName, String rfcName) {
+            this.javaName = javaName;
+            this.rfcName = rfcName;
+        }
+
+        public String getJavaName() {
+            return javaName;
+        }
+
+        public String getRfcName() {
+            return rfcName;
         }
     }
 }

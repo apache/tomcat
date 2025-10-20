@@ -33,8 +33,6 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
  * <strong>WARNING</strong>: Due to Java's lack of support for multiple inheritance, all of the logic in
  * <code>ApplicationResponse</code> is duplicated in <code>ApplicationHttpResponse</code>. Make sure that you keep these
  * two classes in synchronization when making changes!
- *
- * @author Craig R. McClanahan
  */
 class ApplicationHttpResponse extends HttpServletResponseWrapper {
 
@@ -257,19 +255,54 @@ class ApplicationHttpResponse extends HttpServletResponseWrapper {
 
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Disallow <code>sendRedirect()</code> calls on an included response.
-     *
-     * @param location The new location
-     *
-     * @exception IOException if an input/output error occurs
      */
     @Override
     public void sendRedirect(String location) throws IOException {
-
         if (!included) {
             ((HttpServletResponse) getResponse()).sendRedirect(location);
         }
+    }
 
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Disallow <code>sendRedirect()</code> calls on an included response.
+     */
+    @Override
+    public void sendRedirect(String location, int sc) throws IOException {
+        if (!included) {
+            ((HttpServletResponse) getResponse()).sendRedirect(location, sc);
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Disallow <code>sendRedirect()</code> calls on an included response.
+     */
+    @Override
+    public void sendRedirect(String location, boolean clearBuffer) throws IOException {
+        if (!included) {
+            ((HttpServletResponse) getResponse()).sendRedirect(location, clearBuffer);
+        }
+    }
+
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Disallow <code>sendRedirect()</code> calls on an included response.
+     */
+    @Override
+    public void sendRedirect(String location, int sc, boolean clearBuffer) throws IOException {
+        if (!included) {
+            ((HttpServletResponse) getResponse()).sendRedirect(location, sc, clearBuffer);
+        }
     }
 
 

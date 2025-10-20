@@ -1,4 +1,4 @@
-/**
+/*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -22,11 +22,9 @@ import jakarta.security.auth.message.AuthException;
 
 public interface AuthConfigProvider {
 
-    ClientAuthConfig getClientAuthConfig(String layer, String appContext, CallbackHandler handler)
-            throws AuthException;
+    ClientAuthConfig getClientAuthConfig(String layer, String appContext, CallbackHandler handler) throws AuthException;
 
-    ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler)
-            throws AuthException;
+    ServerAuthConfig getServerAuthConfig(String layer, String appContext, CallbackHandler handler) throws AuthException;
 
     void refresh();
 }

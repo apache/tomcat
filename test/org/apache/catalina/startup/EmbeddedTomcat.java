@@ -42,10 +42,10 @@ public class EmbeddedTomcat {
 
     private static void resetLogging() {
         final String loggingConfig = "handlers = java.util.logging.ConsoleHandler\n" +
-            ".handlers = java.util.logging.ConsoleHandler\n" +
-            "java.util.logging.ConsoleHandler.level = FINE\n" +
-            "java.util.logging.ConsoleHandler.formatter = org.apache.juli.OneLineFormatter\n" +
-            "java.util.logging.ConsoleHandler.encoding = UTF-8\n";
+                ".handlers = java.util.logging.ConsoleHandler\n" +
+                "java.util.logging.ConsoleHandler.level = FINE\n" +
+                "java.util.logging.ConsoleHandler.formatter = org.apache.juli.OneLineFormatter\n" +
+                "java.util.logging.ConsoleHandler.encoding = UTF-8\n";
         try {
             InputStream is = new ByteArrayInputStream(loggingConfig.getBytes(StandardCharsets.UTF_8));
             LogManager.getLogManager().readConfiguration(is);

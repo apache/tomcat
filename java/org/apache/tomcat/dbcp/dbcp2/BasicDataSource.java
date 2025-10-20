@@ -27,12 +27,14 @@ import java.sql.SQLFeatureNotSupportedException;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.logging.Logger;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -55,7 +57,6 @@ import org.apache.tomcat.dbcp.pool2.impl.GenericObjectPoolConfig;
 
 /**
  * Basic implementation of {@code javax.sql.DataSource} that is configured via JavaBeans properties.
- *
  * <p>
  * This is not the only way to combine the <em>commons-dbcp2</em> and <em>commons-pool2</em> packages, but provides a
  * one-stop solution for basic requirements.
@@ -229,7 +230,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * The number of milliseconds to sleep between runs of the idle object evictor thread. When non-positive, no idle
      * object evictor thread will be run.
      */
-    private Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_TIME_BETWEEN_EVICTION_RUNS;
+    private Duration durationBetweenEvictionRuns = BaseObjectPoolConfig.DEFAULT_DURATION_BETWEEN_EVICTION_RUNS;
 
     /**
      * The number of objects to examine during each run of the idle object evictor thread (if any).
@@ -317,6 +318,13 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     private boolean rollbackOnReturn = true;
 
     private volatile Set<String> disconnectionSqlCodes;
+
+    /**
+     * A collection of SQL State codes that are not considered fatal disconnection codes.
+     *
+     * @since 2.13.0
+     */
+    private volatile Set<String> disconnectionIgnoreSqlCodes;
 
     private boolean fastFailValidation;
 
@@ -430,14 +438,12 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * </p>
      *
      * @return A new connection factory.
-     *
      * @throws SQLException If the connection factory cannot be created
      */
     protected ConnectionFactory createConnectionFactory() throws SQLException {
         // Load the JDBC driver class
         return ConnectionFactoryFactory.createConnectionFactory(this, DriverFactory.createDriver(this));
     }
-
 
     /**
      * Creates a connection pool for this datasource. This method only exists so subclasses can replace the
@@ -456,6 +462,10 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
         updateJmxName(config);
         // Disable JMX on the underlying pool if the DS is not registered:
         config.setJmxEnabled(registeredJmxObjectName != null);
+        // Set up usage tracking if enabled
+        if (getAbandonedUsageTracking() && abandonedConfig != null) {
+            abandonedConfig.setUseUsageTracking(true);
+        }
         final GenericObjectPool<PoolableConnection> gop = createObjectPool(factory, config, abandonedConfig);
         gop.setMaxTotal(maxTotal);
         gop.setMaxIdle(maxIdle);
@@ -465,8 +475,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
         gop.setTestOnBorrow(testOnBorrow);
         gop.setTestOnReturn(testOnReturn);
         gop.setNumTestsPerEvictionRun(numTestsPerEvictionRun);
-        gop.setMinEvictableIdle(minEvictableIdleDuration);
-        gop.setSoftMinEvictableIdle(softMinEvictableIdleDuration);
+        gop.setMinEvictableIdleDuration(minEvictableIdleDuration);
+        gop.setSoftMinEvictableIdleDuration(softMinEvictableIdleDuration);
         gop.setTestWhileIdle(testWhileIdle);
         gop.setLifo(lifo);
         gop.setSwallowedExceptionListener(new SwallowedExceptionLogger(log, logExpiredConnections));
@@ -533,7 +543,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * implementation class.
      *
      * @throws SQLException if unable to create a datasource instance
-     *
      * @return A new DataSource instance
      */
     protected DataSource createDataSourceInstance() throws SQLException {
@@ -568,7 +577,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      *
      * @param driverConnectionFactory JDBC connection factory
      * @throws SQLException if an error occurs creating the PoolableConnectionFactory
-     *
      * @return A new PoolableConnectionFactory configured with the current configuration of this BasicDataSource
      */
     protected PoolableConnectionFactory createPoolableConnectionFactory(final ConnectionFactory driverConnectionFactory)
@@ -598,6 +606,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
             connectionFactory.setDefaultQueryTimeout(getDefaultQueryTimeoutDuration());
             connectionFactory.setFastFailValidation(fastFailValidation);
             connectionFactory.setDisconnectionSqlCodes(disconnectionSqlCodes);
+            connectionFactory.setDisconnectionIgnoreSqlCodes(disconnectionIgnoreSqlCodes);
             validateConnectionFactory(connectionFactory);
         } catch (final RuntimeException e) {
             throw e;
@@ -676,7 +685,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      *
      * @param user Database user on whose behalf the Connection is being made
      * @param pass The database user's password
-     *
      * @throws UnsupportedOperationException always thrown.
      * @throws SQLException                  if a database access error occurs
      * @return nothing - always throws UnsupportedOperationException
@@ -724,8 +732,9 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Gets the underlying connection pool.
      *
      * @return the underlying connection pool.
+     * @since DBCP 2.10.0
      */
-    protected GenericObjectPool<PoolableConnection> getConnectionPool() {
+    public GenericObjectPool<PoolableConnection> getConnectionPool() {
         return connectionPool;
     }
 
@@ -809,7 +818,33 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Gets the set of SQL_STATE codes considered to signal fatal conditions.
+     * Gets the set of SQL State codes that are not considered fatal disconnection codes.
+     * <p>
+     * This method returns the set of SQL State codes that have been specified to be ignored
+     * when determining if a {@link SQLException} signals a disconnection. These codes will not
+     * trigger a disconnection even if they match other disconnection criteria.
+     * </p>
+     *
+     * @return a set of SQL State codes that should be ignored for disconnection checks, or an empty set if none have been specified.
+     * @since 2.13.0
+     */
+    public Set<String> getDisconnectionIgnoreSqlCodes() {
+        final Set<String> result = disconnectionIgnoreSqlCodes;
+        return result == null ? Collections.emptySet() : result;
+    }
+
+    /**
+     * Provides the same data as {@link #getDisconnectionIgnoreSqlCodes()} but in an array, so it is accessible via JMX.
+     *
+     * @since 2.13.0
+     */
+    @Override
+    public String[] getDisconnectionIgnoreSqlCodesAsArray() {
+        return getDisconnectionIgnoreSqlCodes().toArray(Utils.EMPTY_STRING_ARRAY);
+    }
+
+    /**
+     * Gets the set of SQL State codes considered to signal fatal conditions.
      *
      * @return fatal disconnection state codes
      * @see #setDisconnectionSqlCodes(Collection)
@@ -872,6 +907,17 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
+     * Gets the value of the {code durationBetweenEvictionRuns} property.
+     *
+     * @return the time (in milliseconds) between evictor runs
+     * @see #setDurationBetweenEvictionRuns(Duration)
+     * @since 2.10.0
+     */
+    public synchronized Duration getDurationBetweenEvictionRuns() {
+        return this.durationBetweenEvictionRuns;
+    }
+
+    /**
      * Gets the value of the flag that controls whether or not connections being returned to the pool will be checked
      * and configured with {@link Connection#setAutoCommit(boolean) Connection.setAutoCommit(true)} if the auto commit
      * setting is {@code false} when the connection is returned. It is {@code true} by default.
@@ -895,10 +941,11 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
 
     /**
      * True means that validation will fail immediately for connections that have previously thrown SQLExceptions with
-     * SQL_STATE indicating fatal disconnection errors.
+     * SQL State indicating fatal disconnection errors.
      *
      * @return true if connections created by this datasource will fast fail validation.
      * @see #setDisconnectionSqlCodes(Collection)
+     * @see #setDisconnectionIgnoreSqlCodes(Collection)
      * @since 2.1
      */
     @Override
@@ -1160,7 +1207,9 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Gets the password passed to the JDBC driver to establish connections.
      *
      * @return the connection password
+     * @deprecated Exposing passwords via JMX is an Information Exposure issue.
      */
+    @Deprecated
     @Override
     public String getPassword() {
         return this.password;
@@ -1321,7 +1370,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Gets the {code testOnBorrow} property.
      *
      * @return true if objects are validated before being borrowed from the pool
-     *
      * @see #setTestOnBorrow(boolean)
      */
     @Override
@@ -1366,17 +1414,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      *
      * @return the time (in milliseconds) between evictor runs
      * @see #setDurationBetweenEvictionRuns(Duration)
-     * @since 2.10.0
-     */
-    public synchronized Duration getDurationBetweenEvictionRuns() {
-        return this.durationBetweenEvictionRuns;
-    }
-
-    /**
-     * Gets the value of the {code durationBetweenEvictionRuns} property.
-     *
-     * @return the time (in milliseconds) between evictor runs
-     * @see #setDurationBetweenEvictionRuns(Duration)
      * @deprecated Use {@link #getDurationBetweenEvictionRuns()}.
      */
     @Deprecated
@@ -1399,7 +1436,9 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Gets the JDBC connection {code userName} property.
      *
      * @return the {code userName} passed to the JDBC driver to establish connections
+     * @deprecated Use {@link #getUserName()}.
      */
+    @Deprecated
     @Override
     public String getUsername() {
         return this.userName;
@@ -1420,15 +1459,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Gets the validation query timeout.
      *
      * @return the timeout in seconds before connection validation queries fail.
-     */
-    public Duration getValidationQueryTimeoutDuration() {
-        return validationQueryTimeoutDuration;
-    }
-
-    /**
-     * Gets the validation query timeout.
-     *
-     * @return the timeout in seconds before connection validation queries fail.
      * @deprecated Use {@link #getValidationQueryTimeoutDuration()}.
      */
     @Deprecated
@@ -1438,11 +1468,19 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
+     * Gets the validation query timeout.
+     *
+     * @return the timeout in seconds before connection validation queries fail.
+     */
+    public Duration getValidationQueryTimeoutDuration() {
+        return validationQueryTimeoutDuration;
+    }
+
+    /**
      * Manually invalidates a connection, effectively requesting the pool to try to close it, remove it from the pool
      * and reclaim pool capacity.
      *
      * @param connection The Connection to invalidate.
-     *
      * @throws IllegalStateException if invalidating the connection failed.
      * @since 2.1
      */
@@ -1559,10 +1597,10 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Logs the given throwable.
-     * @param message TODO
-     * @param throwable the throwable.
+     * Logs the given message and throwable.
      *
+     * @param message value to be log.
+     * @param throwable the throwable.
      * @since 2.7.0
      */
     protected void log(final String message, final Throwable throwable) {
@@ -1654,12 +1692,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
         }
     }
 
-    private <T> void setConnectionPool(final BiConsumer<GenericObjectPool<PoolableConnection>, T> consumer, final T object) {
-        if (connectionPool != null) {
-            consumer.accept(connectionPool, object);
-        }
-    }
-
     /**
      * Sets the print writer to be used by this configuration to log information on abandoned objects.
      *
@@ -1686,8 +1718,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * the underlying connection. (Default: false)
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param allow Access to the underlying connection is granted when true.
@@ -1740,33 +1772,40 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Sets the list of SQL statements to be executed when a physical connection is first created.
+     * Sets the collection of SQL statements to be executed when a physical connection is first created.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param connectionInitSqls Collection of SQL statements to execute on connection creation
      */
     public void setConnectionInitSqls(final Collection<String> connectionInitSqls) {
-//        if (connectionInitSqls != null && !connectionInitSqls.isEmpty()) {
-//            ArrayList<String> newVal = null;
-//            for (final String s : connectionInitSqls) {
-//                if (!isEmpty(s)) {
-//                    if (newVal == null) {
-//                        newVal = new ArrayList<>();
-//                    }
-//                    newVal.add(s);
-//                }
-//            }
-//            this.connectionInitSqls = newVal;
-//        } else {
-//            this.connectionInitSqls = null;
-//        }
         final List<String> collect = Utils.isEmpty(connectionInitSqls) ? null
                 : connectionInitSqls.stream().filter(s -> !isEmpty(s)).collect(Collectors.toList());
         this.connectionInitSqls = Utils.isEmpty(collect) ? null : collect;
+    }
+
+    /**
+     * Sets the list of SQL statements to be executed when a physical connection is first created.
+     * <p>
+     * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
+     * </p>
+     *
+     * @param connectionInitSqls List of SQL statements to execute on connection creation
+     * @since 2.12.0
+     */
+    public void setConnectionInitSqls(final List<String> connectionInitSqls) {
+        setConnectionInitSqls((Collection<String>) connectionInitSqls);
+    }
+
+    private <T> void setConnectionPool(final BiConsumer<GenericObjectPool<PoolableConnection>, T> consumer, final T object) {
+        if (connectionPool != null) {
+            consumer.accept(connectionPool, object);
+        }
     }
 
     /**
@@ -1803,8 +1842,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets default auto-commit state of connections returned by this datasource.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param defaultAutoCommit default auto-commit value
@@ -1817,8 +1856,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the default catalog.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param defaultCatalog the default catalog
@@ -1854,8 +1893,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets defaultReadonly property.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param defaultReadOnly default read-only value
@@ -1868,8 +1907,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the default schema.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param defaultSchema the default catalog
@@ -1883,8 +1922,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the default transaction isolation state for returned connections.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param defaultTransactionIsolation the default transaction isolation state
@@ -1895,11 +1934,41 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
     }
 
     /**
-     * Sets the SQL_STATE codes considered to signal fatal conditions.
+     * Sets the SQL State codes that should be ignored when determining fatal disconnection conditions.
+     * <p>
+     * This method allows you to specify a collection of SQL State codes that will be excluded from
+     * disconnection checks. These codes will not trigger the "fatally disconnected" status even if they
+     * match the typical disconnection criteria. This can be useful in scenarios where certain SQL State
+     * codes (e.g., specific codes starting with "08") are known to be non-fatal in your environment.
+     * </p>
+     * <p>
+     * The effect of this method is similar to the one described in {@link #setDisconnectionSqlCodes(Collection)},
+     * but instead of setting codes that signal fatal disconnections, it defines codes that should be ignored
+     * during such checks.
+     * </p>
+     * <p>
+     * Note: This method currently has no effect once the pool has been initialized. The pool is initialized the first
+     * time one of the following methods is invoked: {@code getConnection, setLogwriter, setLoginTimeout,
+     * getLoginTimeout, getLogWriter}.
+     * </p>
+     *
+     * @param disconnectionIgnoreSqlCodes SQL State codes that should be ignored in disconnection checks
+     * @throws IllegalArgumentException if any SQL state codes overlap with those in {@link #disconnectionSqlCodes}.
+     * @since 2.13.0
+     */
+    public void setDisconnectionIgnoreSqlCodes(final Collection<String> disconnectionIgnoreSqlCodes) {
+        Utils.checkSqlCodes(disconnectionIgnoreSqlCodes, this.disconnectionSqlCodes);
+        final Set<String> collect = Utils.isEmpty(disconnectionIgnoreSqlCodes) ? null
+                : disconnectionIgnoreSqlCodes.stream().filter(s -> !isEmpty(s)).collect(toLinkedHashSet());
+        this.disconnectionIgnoreSqlCodes = Utils.isEmpty(collect) ? null : collect;
+    }
+
+    /**
+     * Sets the SQL State codes considered to signal fatal conditions.
      * <p>
      * Overrides the defaults in {@link Utils#getDisconnectionSqlCodes()} (plus anything starting with
      * {@link Utils#DISCONNECTION_SQL_CODE_PREFIX}). If this property is non-null and {@link #getFastFailValidation()}
-     * is {@code true}, whenever connections created by this datasource generate exceptions with SQL_STATE codes in this
+     * is {@code true}, whenever connections created by this datasource generate exceptions with SQL State codes in this
      * list, they will be marked as "fatally disconnected" and subsequent validations will fail fast (no attempt at
      * isValid or validation query).
      * </p>
@@ -1912,26 +1981,14 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * setLoginTimeout, getLoginTimeout, getLogWriter}.
      * </p>
      *
-     * @param disconnectionSqlCodes SQL_STATE codes considered to signal fatal conditions
+     * @param disconnectionSqlCodes SQL State codes considered to signal fatal conditions
      * @since 2.1
+     * @throws IllegalArgumentException if any SQL state codes overlap with those in {@link #disconnectionIgnoreSqlCodes}.
      */
     public void setDisconnectionSqlCodes(final Collection<String> disconnectionSqlCodes) {
-//        if (disconnectionSqlCodes != null && !disconnectionSqlCodes.isEmpty()) {
-//            HashSet<String> newVal = null;
-//            for (final String s : disconnectionSqlCodes) {
-//                if (!isEmpty(s)) {
-//                    if (newVal == null) {
-//                        newVal = new HashSet<>();
-//                    }
-//                    newVal.add(s);
-//                }
-//            }
-//            this.disconnectionSqlCodes = newVal;
-//        } else {
-//            this.disconnectionSqlCodes = null;
-//        }
+        Utils.checkSqlCodes(disconnectionSqlCodes, this.disconnectionIgnoreSqlCodes);
         final Set<String> collect = Utils.isEmpty(disconnectionSqlCodes) ? null
-                : disconnectionSqlCodes.stream().filter(s -> !isEmpty(s)).collect(Collectors.toSet());
+                : disconnectionSqlCodes.stream().filter(s -> !isEmpty(s)).collect(toLinkedHashSet());
         this.disconnectionSqlCodes = Utils.isEmpty(collect) ? null : collect;
     }
 
@@ -1939,8 +1996,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the JDBC Driver instance to use for this pool.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param driver The JDBC Driver instance to use for this pool.
@@ -1953,8 +2010,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the class loader to be used to load the JDBC driver.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param driverClassLoader the class loader with which to load the JDBC driver
@@ -1967,14 +2024,26 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the JDBC driver class name.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param driverClassName the class name of the JDBC driver
      */
     public synchronized void setDriverClassName(final String driverClassName) {
         this.driverClassName = isEmpty(driverClassName) ? null : driverClassName;
+    }
+
+    /**
+     * Sets the {code durationBetweenEvictionRuns} property.
+     *
+     * @param timeBetweenEvictionRunsMillis the new time between evictor runs
+     * @see #setDurationBetweenEvictionRuns(Duration)
+     * @since 2.10.0
+     */
+    public synchronized void setDurationBetweenEvictionRuns(final Duration timeBetweenEvictionRunsMillis) {
+        this.durationBetweenEvictionRuns = timeBetweenEvictionRunsMillis;
+        setConnectionPool(GenericObjectPool::setDurationBetweenEvictionRuns, timeBetweenEvictionRunsMillis);
     }
 
     /**
@@ -2014,8 +2083,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the initial size of the connection pool.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param initialSize the number of connections created when the pool is initialized
@@ -2034,16 +2103,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     public void setJmxName(final String jmxName) {
         this.jmxName = jmxName;
-    }
-
-    /**
-     * Sets if connection level JMX tracking is requested for this DataSource. If true, each connection will be
-     * registered for tracking with JMX.
-     *
-     * @param registerConnectionMBean connection tracking requested for this DataSource.
-     */
-    public void setRegisterConnectionMBean(final boolean registerConnectionMBean) {
-        this.registerConnectionMBean = registerConnectionMBean;
     }
 
     /**
@@ -2079,7 +2138,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * <strong>BasicDataSource does NOT support this method. </strong>
      *
      * <p>
-     * Set the login timeout (in seconds) for connecting to the database.
+     * Sets the login timeout (in seconds) for connecting to the database.
      * </p>
      * <p>
      * Calls {@link #createDataSource()}, so has the side effect of initializing the connection pool.
@@ -2117,8 +2176,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * infinite lifetime.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param maxConnDuration The maximum permitted lifetime of a connection.
@@ -2133,8 +2192,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * infinite lifetime.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param maxConnLifetimeMillis The maximum permitted lifetime of a connection in milliseconds.
@@ -2161,8 +2220,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the value of the {@code maxOpenPreparedStatements} property.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param maxOpenStatements the new maximum number of prepared statements
@@ -2216,7 +2275,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     public synchronized void setMinEvictableIdle(final Duration minEvictableIdleDuration) {
         this.minEvictableIdleDuration = minEvictableIdleDuration;
-        setConnectionPool(GenericObjectPool::setMinEvictableIdle, minEvictableIdleDuration);
+        setConnectionPool(GenericObjectPool::setMinEvictableIdleDuration, minEvictableIdleDuration);
     }
 
     /**
@@ -2259,8 +2318,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the {code password}.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param password new value for the password
@@ -2273,14 +2332,24 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets whether to pool statements or not.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param poolingStatements pooling on or off
      */
     public synchronized void setPoolPreparedStatements(final boolean poolingStatements) {
         this.poolPreparedStatements = poolingStatements;
+    }
+
+    /**
+     * Sets if connection level JMX tracking is requested for this DataSource. If true, each connection will be
+     * registered for tracking with JMX.
+     *
+     * @param registerConnectionMBean connection tracking requested for this DataSource.
+     */
+    public void setRegisterConnectionMBean(final boolean registerConnectionMBean) {
+        this.registerConnectionMBean = registerConnectionMBean;
     }
 
     /**
@@ -2357,7 +2426,7 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     public synchronized void setSoftMinEvictableIdle(final Duration softMinEvictableIdleTimeMillis) {
         this.softMinEvictableIdleDuration = softMinEvictableIdleTimeMillis;
-        setConnectionPool(GenericObjectPool::setSoftMinEvictableIdle, softMinEvictableIdleTimeMillis);
+        setConnectionPool(GenericObjectPool::setSoftMinEvictableIdleDuration, softMinEvictableIdleTimeMillis);
     }
 
     /**
@@ -2424,18 +2493,6 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      *
      * @param timeBetweenEvictionRunsMillis the new time between evictor runs
      * @see #setDurationBetweenEvictionRuns(Duration)
-     * @since 2.10.0
-     */
-    public synchronized void setDurationBetweenEvictionRuns(final Duration timeBetweenEvictionRunsMillis) {
-        this.durationBetweenEvictionRuns = timeBetweenEvictionRunsMillis;
-        setConnectionPool(GenericObjectPool::setTimeBetweenEvictionRuns, timeBetweenEvictionRunsMillis);
-    }
-
-    /**
-     * Sets the {code durationBetweenEvictionRuns} property.
-     *
-     * @param timeBetweenEvictionRunsMillis the new time between evictor runs
-     * @see #setDurationBetweenEvictionRuns(Duration)
      * @deprecated Use {@link #setDurationBetweenEvictionRuns(Duration)}.
      */
     @Deprecated
@@ -2447,8 +2504,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the {code connection string}.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param connectionString the new value for the JDBC connection connectionString
@@ -2461,8 +2518,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the {code userName}.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param userName the new value for the JDBC connection user name
@@ -2475,8 +2532,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * Sets the {code validationQuery}.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param validationQuery the new value for the validation query
@@ -2490,8 +2547,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * response from the database when executing a validation query. Use a value less than or equal to 0 for no timeout.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param validationQueryTimeoutDuration new validation query timeout value in seconds
@@ -2506,8 +2563,8 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      * response from the database when executing a validation query. Use a value less than or equal to 0 for no timeout.
      * <p>
      * Note: this method currently has no effect once the pool has been initialized. The pool is initialized the first
-     * time one of the following methods is invoked: <code>getConnection, setLogwriter,
-     * setLoginTimeout, getLoginTimeout, getLogWriter.</code>
+     * time one of the following methods is invoked: {@link #getConnection()}, {@link #setLogWriter(PrintWriter)},
+     * {@link #setLoginTimeout(int)}, {@link #getLoginTimeout()}, {@link #getLogWriter()}.
      * </p>
      *
      * @param validationQueryTimeoutSeconds new validation query timeout value in seconds
@@ -2546,8 +2603,12 @@ public class BasicDataSource implements DataSource, BasicDataSourceMXBean, MBean
      */
     protected void startPoolMaintenance() {
         if (connectionPool != null && durationBetweenEvictionRuns.compareTo(Duration.ZERO) > 0) {
-            connectionPool.setTimeBetweenEvictionRuns(durationBetweenEvictionRuns);
+            connectionPool.setDurationBetweenEvictionRuns(durationBetweenEvictionRuns);
         }
+    }
+
+    private Collector<String, ?, LinkedHashSet<String>> toLinkedHashSet() {
+        return Collectors.toCollection(LinkedHashSet::new);
     }
 
     @Override

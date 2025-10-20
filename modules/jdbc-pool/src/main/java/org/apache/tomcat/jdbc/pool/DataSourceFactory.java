@@ -51,8 +51,6 @@ import org.apache.juli.logging.LogFactory;
  *  <li>jmxEnabled - true of false, whether to register the pool with JMX.</li>
  *  <li>fairQueue - true of false, whether the pool should sacrifice a little bit of performance for true fairness.</li>
  * </ol>
- * @author Craig R. McClanahan
- * @author Dirk Verbeeck
  */
 public class DataSourceFactory implements ObjectFactory {
     private static final Log log = LogFactory.getLog(DataSourceFactory.class);
@@ -549,12 +547,12 @@ public class DataSourceFactory implements ObjectFactory {
         return createDataSource(properties,null,false);
     }
     public DataSource createDataSource(Properties properties,Context context, boolean XA) throws Exception {
-        PoolConfiguration poolProperties = DataSourceFactory.parsePoolProperties(properties);
+        PoolConfiguration poolProperties = parsePoolProperties(properties);
         if (poolProperties.getDataSourceJNDI()!=null && poolProperties.getDataSource()==null) {
             performJNDILookup(context, poolProperties);
         }
-        org.apache.tomcat.jdbc.pool.DataSource dataSource = XA?
-                new org.apache.tomcat.jdbc.pool.XADataSource(poolProperties) :
+        org.apache.tomcat.jdbc.pool.DataSource dataSource = XA ?
+                new XADataSource(poolProperties) :
                 new org.apache.tomcat.jdbc.pool.DataSource(poolProperties);
         //initialise the pool itself
         dataSource.createPool();
@@ -571,14 +569,16 @@ public class DataSourceFactory implements ObjectFactory {
                 log.warn("dataSourceJNDI property is configured, but local JNDI context is null.");
             }
         } catch (NamingException e) {
-            log.debug("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the local context.");
+            if (log.isDebugEnabled()) {
+                log.debug("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the local context.", e);
+            }
         }
         if (jndiDS==null) {
             try {
                 context = new InitialContext();
                 jndiDS = context.lookup(poolProperties.getDataSourceJNDI());
             } catch (NamingException e) {
-                log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the InitialContext.");
+                log.warn("The name \""+poolProperties.getDataSourceJNDI()+"\" cannot be found in the InitialContext.", e);
             }
         }
         if (jndiDS!=null) {

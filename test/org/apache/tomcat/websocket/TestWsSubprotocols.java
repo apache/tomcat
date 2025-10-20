@@ -45,7 +45,7 @@ public class TestWsSubprotocols extends WebSocketBaseTest {
     public void testWsSubprotocols() throws Exception {
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(Config.class.getName());
 
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
@@ -53,16 +53,13 @@ public class TestWsSubprotocols extends WebSocketBaseTest {
 
         tomcat.start();
 
-        WebSocketContainer wsContainer = ContainerProvider
-                .getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
         tomcat.start();
 
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class, ClientEndpointConfig.Builder
-                        .create().preferredSubprotocols(Arrays.asList("sp3"))
-                        .build(), new URI("ws://localhost:" + getPort()
-                        + SubProtocolsEndpoint.PATH_BASIC));
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
+                ClientEndpointConfig.Builder.create().preferredSubprotocols(Arrays.asList("sp3")).build(),
+                new URI("ws://localhost:" + getPort() + SubProtocolsEndpoint.PATH_BASIC));
 
         Assert.assertTrue(wsSession.isOpen());
         if (wsSession.getNegotiatedSubprotocol() != null) {
@@ -71,11 +68,9 @@ public class TestWsSubprotocols extends WebSocketBaseTest {
         wsSession.close();
         SubProtocolsEndpoint.recycle();
 
-        wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class, ClientEndpointConfig.Builder
-                        .create().preferredSubprotocols(Arrays.asList("sp2"))
-                        .build(), new URI("ws://localhost:" + getPort()
-                        + SubProtocolsEndpoint.PATH_BASIC));
+        wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
+                ClientEndpointConfig.Builder.create().preferredSubprotocols(Arrays.asList("sp2")).build(),
+                new URI("ws://localhost:" + getPort() + SubProtocolsEndpoint.PATH_BASIC));
 
         Assert.assertTrue(wsSession.isOpen());
         Assert.assertEquals("sp2", wsSession.getNegotiatedSubprotocol());
@@ -87,21 +82,20 @@ public class TestWsSubprotocols extends WebSocketBaseTest {
             Thread.sleep(100);
         }
         Assert.assertNotNull(SubProtocolsEndpoint.subprotocols);
-        Assert.assertArrayEquals(new String[]{"sp1","sp2"},
+        Assert.assertArrayEquals(new String[] { "sp1", "sp2" },
                 SubProtocolsEndpoint.subprotocols.toArray(new String[0]));
         wsSession.close();
         SubProtocolsEndpoint.recycle();
     }
 
-    @ServerEndpoint(value = "/echo", subprotocols = {"sp1","sp2"})
+    @ServerEndpoint(value = "/echo", subprotocols = { "sp1", "sp2" })
     public static class SubProtocolsEndpoint {
         public static final String PATH_BASIC = "/echo";
         public static volatile List<String> subprotocols;
 
         @OnOpen
-        public void processOpen(@SuppressWarnings("unused") Session session,
-                EndpointConfig  epc) {
-            subprotocols = ((ServerEndpointConfig)epc).getSubprotocols();
+        public void processOpen(@SuppressWarnings("unused") Session session, EndpointConfig epc) {
+            subprotocols = ((ServerEndpointConfig) epc).getSubprotocols();
         }
 
         public static void recycle() {

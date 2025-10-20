@@ -34,9 +34,8 @@ import java.util.zip.ZipFile;
 import org.apache.tomcat.Jar;
 
 /**
- * Implementation of {@link Jar} that is optimised for file based JAR URLs that
- * refer directly to a JAR file (e.g URLs of the form jar:file: ... .jar!/ or
- * file:... .jar).
+ * Implementation of {@link Jar} that is optimised for file based JAR URLs that refer directly to a JAR file (e.g. URLs
+ * of the form jar:file: ... .jar!/ or file:... .jar).
  */
 public class JarFileUrlJar implements Jar {
 
@@ -68,11 +67,14 @@ public class JarFileUrlJar implements Jar {
         boolean multiReleaseValue = false;
         try {
             multiReleaseValue = jarFile.isMultiRelease();
-        } catch (IllegalStateException e) {
-            // ISE can be thrown if the JAR URL is bad, for example:
-            // https://github.com/spring-projects/spring-boot/issues/33633
-            // The Javadoc does not document that ISE and given what it does for a vanilla IOE,
-            // this looks like a Java bug, it should return false instead.
+        } catch (IllegalStateException ignore) {
+            /*
+             * ISE can be thrown if the JAR URL is bad, for example:
+             * https://github.com/spring-projects/spring-boot/issues/33633
+             *
+             * The Javadoc does not document that ISE and given what it does for a vanilla IOE, this looks like a Java
+             * bug, it should return false instead.
+             */
         }
         multiRelease = multiReleaseValue;
     }
@@ -115,12 +117,7 @@ public class JarFileUrlJar implements Jar {
 
     @Override
     public String getURL(String entry) {
-        StringBuilder result = new StringBuilder("jar:");
-        result.append(getJarFileURL().toExternalForm());
-        result.append("!/");
-        result.append(entry);
-
-        return result.toString();
+        return "jar:" + getJarFileURL().toExternalForm() + "!/" + entry;
     }
 
     @Override
@@ -128,7 +125,7 @@ public class JarFileUrlJar implements Jar {
         if (jarFile != null) {
             try {
                 jarFile.close();
-            } catch (IOException e) {
+            } catch (IOException ignore) {
                 // Ignore
             }
         }
@@ -147,15 +144,15 @@ public class JarFileUrlJar implements Jar {
         if (multiRelease) {
             // Need to ensure that:
             // - the one, correct entry is returned where multiple versions
-            //   are available
+            // are available
             // - that the order of entries in the JAR doesn't prevent the
-            //   correct entries being returned
+            // correct entries being returned
             // - the case where an entry appears in the versions location
-            //   but not in the the base location is handled correctly
+            // but not in the base location is handled correctly
 
             // Enumerate the entries until one is reached that represents an
             // entry that has not been seen before.
-            String name = null;
+            String name;
             while (true) {
                 if (entries.hasMoreElements()) {
                     entry = entries.nextElement();
@@ -168,7 +165,7 @@ public class JarFileUrlJar implements Jar {
                         }
                         name = name.substring(i + 1);
                     }
-                    if (name.length() == 0 || entryNamesSeen.contains(name)) {
+                    if (name.isEmpty() || entryNamesSeen.contains(name)) {
                         continue;
                     }
 
@@ -176,11 +173,10 @@ public class JarFileUrlJar implements Jar {
 
                     // JarFile.getJarEntry is version aware so use it
                     entry = jarFile.getJarEntry(entry.getName());
-                    break;
                 } else {
                     entry = null;
-                    break;
                 }
+                break;
             }
         } else {
             if (entries.hasMoreElements()) {

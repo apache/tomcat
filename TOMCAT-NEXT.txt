@@ -15,18 +15,6 @@
   limitations under the License.
 ================================================================================
 
-Notes of things to consider for the next major Tomcat release (11.x)
+Notes of things to consider for the next major Tomcat release (12.x)
 
- 1. Implement OCSP checks for client certs with NIO/NIO2.
-    Useful reference:
-    https://stackoverflow.com/questions/5161504/ocsp-revocation-on-client-certificate
-
- 2. Integrate Panama OpenSSL module once Java 21 is available. Building Tomcat
-    releases would then require at least Java 21.
-
- 3. Add QUIC support using OpenSSL and Panama.
-
- 4. Update minimum Java version to 21.
-
- 5. Implement an optional Loom module that provides
-    o.a.c.http11.Http11BioLoomProtocol
+ 1. Add QUIC support using OpenSSL and FFM.

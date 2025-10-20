@@ -114,6 +114,11 @@
     <body-content>JSP</body-content>
   </tag>
   <tag>
+    <name>TesterTagRelease</name>
+    <tag-class>org.apache.jasper.compiler.TestGenerator$TesterTagRelease</tag-class>
+    <body-content>JSP</body-content>
+  </tag>
+  <tag>
     <name>TesterScriptingTag</name>
     <tag-class>org.apache.jasper.compiler.TestGenerator$TesterScriptingTag</tag-class>
     <body-content>JSP</body-content>

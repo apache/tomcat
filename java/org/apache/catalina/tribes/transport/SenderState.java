@@ -27,7 +27,7 @@ public class SenderState {
     public static final int SUSPECT = 1;
     public static final int FAILING = 2;
 
-    protected static final ConcurrentMap<Member, SenderState> memberStates = new ConcurrentHashMap<>();
+    protected static final ConcurrentMap<Member,SenderState> memberStates = new ConcurrentHashMap<>();
 
     public static SenderState getSenderState(Member member) {
         return getSenderState(member, true);
@@ -52,9 +52,9 @@ public class SenderState {
 
     // ----------------------------------------------------- Instance Variables
 
-    private volatile int state = READY;
+    private volatile int state;
 
-    //  ----------------------------------------------------- Constructor
+    // ----------------------------------------------------- Constructor
 
 
     private SenderState() {
@@ -90,6 +90,6 @@ public class SenderState {
     }
 
 
-    //  ----------------------------------------------------- Public Properties
+    // ----------------------------------------------------- Public Properties
 
 }

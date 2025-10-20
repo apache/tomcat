@@ -17,7 +17,7 @@
 package org.apache.tomcat.dbcp.pool2.impl;
 
 /**
- * A simple "struct" encapsulating the configuration for a
+ * A simple structure encapsulating the configuration for a
  * {@link GenericObjectPool}.
  *
  * <p>
@@ -31,23 +31,25 @@ package org.apache.tomcat.dbcp.pool2.impl;
 public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
 
     /**
-     * The default value for the {@code maxTotal} configuration attribute.
+     * The default value for the {@code maxTotal} configuration attribute: {@value}.
+     *
      * @see GenericObjectPool#getMaxTotal()
      */
     public static final int DEFAULT_MAX_TOTAL = 8;
 
     /**
-     * The default value for the {@code maxIdle} configuration attribute.
+     * The default value for the {@code maxIdle} configuration attribute: {@value}.
+     *
      * @see GenericObjectPool#getMaxIdle()
      */
     public static final int DEFAULT_MAX_IDLE = 8;
 
     /**
-     * The default value for the {@code minIdle} configuration attribute.
+     * The default value for the {@code minIdle} configuration attribute: {@value}.
+     *
      * @see GenericObjectPool#getMinIdle()
      */
     public static final int DEFAULT_MIN_IDLE = 0;
-
 
     private int maxTotal = DEFAULT_MAX_TOTAL;
 
@@ -66,7 +68,7 @@ public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
     }
 
     /**
-     * Get the value for the {@code maxIdle} configuration attribute
+     * Gets the value for the {@code maxIdle} configuration attribute
      * for pools created with this configuration instance.
      *
      * @return  The current setting of {@code maxIdle} for this
@@ -78,9 +80,8 @@ public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
         return maxIdle;
     }
 
-
     /**
-     * Get the value for the {@code maxTotal} configuration attribute
+     * Gets the value for the {@code maxTotal} configuration attribute
      * for pools created with this configuration instance.
      *
      * @return  The current setting of {@code maxTotal} for this
@@ -93,7 +94,7 @@ public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
     }
 
     /**
-     * Get the value for the {@code minIdle} configuration attribute
+     * Gets the value for the {@code minIdle} configuration attribute
      * for pools created with this configuration instance.
      *
      * @return  The current setting of {@code minIdle} for this
@@ -105,9 +106,8 @@ public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
         return minIdle;
     }
 
-
     /**
-     * Set the value for the {@code maxIdle} configuration attribute for
+     * Sets the value for the {@code maxIdle} configuration attribute for
      * pools created with this configuration instance.
      *
      * @param maxIdle The new setting of {@code maxIdle}
@@ -120,7 +120,7 @@ public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
     }
 
     /**
-     * Set the value for the {@code maxTotal} configuration attribute for
+     * Sets the value for the {@code maxTotal} configuration attribute for
      * pools created with this configuration instance.
      *
      * @param maxTotal The new setting of {@code maxTotal}
@@ -133,7 +133,7 @@ public class GenericObjectPoolConfig<T> extends BaseObjectPoolConfig<T> {
     }
 
     /**
-     * Set the value for the {@code minIdle} configuration attribute for
+     * Sets the value for the {@code minIdle} configuration attribute for
      * pools created with this configuration instance.
      *
      * @param minIdle The new setting of {@code minIdle}

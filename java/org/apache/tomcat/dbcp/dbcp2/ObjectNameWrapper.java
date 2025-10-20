@@ -42,7 +42,9 @@ final class ObjectNameWrapper {
             return ManagementFactory.getPlatformMBeanServer();
         } catch (final LinkageError | Exception e) {
             // ignore - JMX not available
-            log.debug("Failed to get platform MBeanServer", e);
+            if (log.isDebugEnabled()) {
+                log.debug("Failed to get platform MBeanServer", e);
+            }
             return null;
         }
     }

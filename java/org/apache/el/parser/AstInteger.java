@@ -23,10 +23,6 @@ import jakarta.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstInteger extends SimpleNode {
     public AstInteger(int id) {
         super(id);
@@ -34,7 +30,7 @@ public final class AstInteger extends SimpleNode {
 
     private volatile Number number;
 
-    protected Number getInteger() {
+    private Number getInteger() {
         // The parser should ensure the format of the string to be parsed
         if (this.number == null) {
             try {
@@ -55,14 +51,12 @@ public final class AstInteger extends SimpleNode {
     }
 
     @Override
-    public Class<?> getType(EvaluationContext ctx)
-            throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         return this.getInteger().getClass();
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         return this.getInteger();
     }
 }

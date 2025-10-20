@@ -24,11 +24,9 @@ import jakarta.servlet.jsp.tagext.FunctionInfo;
 /**
  * Common representation of a Tag Library Descriptor (TLD) XML file.
  * <p>
- * This stores the raw result of parsing an TLD XML file, flattening different
- * version of the descriptors to a common format. This is different to a
- * TagLibraryInfo instance that would be passed to a tag validator in that it
- * does not contain the uri and prefix values used by a JSP to reference this
- * tag library.
+ * This stores the raw result of parsing an TLD XML file, flattening different version of the descriptors to a common
+ * format. This is different to a TagLibraryInfo instance that would be passed to a tag validator in that it does not
+ * contain the uri and prefix values used by a JSP to reference this tag library.
  */
 public class TaglibXml {
     private String tlibVersion;

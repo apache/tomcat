@@ -50,8 +50,6 @@ import java.util.List;
  *     &lt;TransientAttribute&gt;startupTime&lt;/TransientAttribute&gt;
  *     &lt;TransientAttribute&gt;tldScanTime&lt;/TransientAttribute&gt;
  *  &lt;/Description&gt;
- *
- *
  * </pre>
  */
 public class StoreDescription {
@@ -96,8 +94,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param external
-     *            The external to set.
+     * @param external The external to set.
      */
     public void setExternalAllowed(boolean external) {
         this.externalAllowed = external;
@@ -119,8 +116,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param standard
-     *            The standard to set.
+     * @param standard The standard to set.
      */
     public void setStandard(boolean standard) {
         this.standard = standard;
@@ -134,8 +130,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param backup
-     *            The backup to set.
+     * @param backup The backup to set.
      */
     public void setBackup(boolean backup) {
         this.backup = backup;
@@ -149,8 +144,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param aDefault
-     *            The myDefault to set.
+     * @param aDefault The myDefault to set.
      */
     public void setDefault(boolean aDefault) {
         this.myDefault = aDefault;
@@ -164,8 +158,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param storeFactoryClass
-     *            The storeFactory to set.
+     * @param storeFactoryClass The storeFactory to set.
      */
     public void setStoreFactoryClass(String storeFactoryClass) {
         this.storeFactoryClass = storeFactoryClass;
@@ -179,8 +172,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param storeFactory
-     *            The storeFactory to set.
+     * @param storeFactory The storeFactory to set.
      */
     public void setStoreFactory(IStoreFactory storeFactory) {
         this.storeFactory = storeFactory;
@@ -194,8 +186,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param storeWriterClass
-     *            The storeWriterClass to set.
+     * @param storeWriterClass The storeWriterClass to set.
      */
     public void setStoreWriterClass(String storeWriterClass) {
         this.storeWriterClass = storeWriterClass;
@@ -209,8 +200,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param tag
-     *            The tag to set.
+     * @param tag The tag to set.
      */
     public void setTag(String tag) {
         this.tag = tag;
@@ -224,8 +214,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param tagClass
-     *            The tagClass to set.
+     * @param tagClass The tagClass to set.
      */
     public void setTagClass(String tagClass) {
         this.tagClass = tagClass;
@@ -239,8 +228,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param transientAttributes
-     *            The transientAttributes to set.
+     * @param transientAttributes The transientAttributes to set.
      */
     public void setTransientAttributes(List<String> transientAttributes) {
         this.transientAttributes = transientAttributes;
@@ -267,8 +255,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param transientChildren
-     *            The transientChildren to set.
+     * @param transientChildren The transientChildren to set.
      */
     public void setTransientChildren(List<String> transientChildren) {
         this.transientChildren = transientChildren;
@@ -291,6 +278,7 @@ public class StoreDescription {
      * Is child transient, please don't save this.
      *
      * @param classname The class name to check
+     *
      * @return is classname attribute?
      */
     public boolean isTransientChild(String classname) {
@@ -304,6 +292,7 @@ public class StoreDescription {
      * Is attribute transient, please don't save this.
      *
      * @param attribute The attribute name to check
+     *
      * @return is transient attribute?
      */
     public boolean isTransientAttribute(String attribute) {
@@ -327,8 +316,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param id
-     *            The id to set.
+     * @param id The id to set.
      */
     public void setId(String id) {
         this.id = id;
@@ -342,8 +330,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param attributes
-     *            The attributes to set.
+     * @param attributes The attributes to set.
      */
     public void setAttributes(boolean attributes) {
         this.attributes = attributes;
@@ -368,8 +355,7 @@ public class StoreDescription {
     }
 
     /**
-     * @param children
-     *            The children to set.
+     * @param children The children to set.
      */
     public void setChildren(boolean children) {
         this.children = children;

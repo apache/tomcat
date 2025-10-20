@@ -73,8 +73,7 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
                 stopIdleThreads((Context) lifecycle);
             }
         } catch (Exception e) {
-            String msg = sm.getString("threadLocalLeakPreventionListener.lifecycleEvent.error", event);
-            log.error(msg, e);
+            log.error(sm.getString("threadLocalLeakPreventionListener.lifecycleEvent.error", event), e);
         }
     }
 
@@ -83,8 +82,7 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
         try {
             super.containerEvent(event);
         } catch (Exception e) {
-            String msg = sm.getString("threadLocalLeakPreventionListener.containerEvent.error", event);
-            log.error(msg, e);
+            log.error(sm.getString("threadLocalLeakPreventionListener.containerEvent.error", event), e);
         }
 
     }
@@ -101,7 +99,9 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
 
         if (!(context instanceof StandardContext) ||
                 !((StandardContext) context).getRenewThreadsWhenStoppingContext()) {
-            log.debug("Not renewing threads when the context is stopping. " + "It is not configured to do it.");
+            if (log.isTraceEnabled()) {
+                log.trace("Not renewing threads when the context is stopping. It is not configured to do it.");
+            }
             return;
         }
 
@@ -116,11 +116,9 @@ public class ThreadLocalLeakPreventionListener extends FrameworkListener {
                     executor = handler.getExecutor();
                 }
 
-                if (executor instanceof ThreadPoolExecutor) {
-                    ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
+                if (executor instanceof ThreadPoolExecutor threadPoolExecutor) {
                     threadPoolExecutor.contextStopping();
-                } else if (executor instanceof StandardThreadExecutor) {
-                    StandardThreadExecutor stdThreadExecutor = (StandardThreadExecutor) executor;
+                } else if (executor instanceof StandardThreadExecutor stdThreadExecutor) {
                     stdThreadExecutor.contextStopping();
                 }
 

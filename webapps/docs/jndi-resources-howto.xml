@@ -23,8 +23,6 @@
     &project;
 
     <properties>
-      <author email="craigmcc@apache.org">Craig R. McClanahan</author>
-      <author email="yoavs@apache.org">Yoav Shapira</author>
       <title>JNDI Resources How-To</title>
     </properties>
 
@@ -66,7 +64,7 @@ resources:</p>
     will operate.</li>
 <li><code><strong>&lt;resource-ref&gt;</strong></code> - Resource reference,
     which is typically to an object factory for resources such as a JDBC
-    <code>DataSource</code>, a JavaMail <code>Session</code>, or custom
+    <code>DataSource</code>, a Jakarta Mail <code>Session</code>, or custom
     object factories configured into Tomcat.</li>
 <li><code><strong>&lt;resource-env-ref&gt;</strong></code> - Resource
     environment reference, a new variation of <code>resource-ref</code>
@@ -329,7 +327,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <p>If the bean property is of type <code>String</code>, the BeanFactory
     will call the property setter using the provided property value. If the
-    bean property type is a primitive or a primitive wrapper, the the
+    bean property type is a primitive or a primitive wrapper, the
     BeanFactory will convert the value to the appropriate primitive or
     primitive wrapper and then use that value when calling the setter. Some
     beans have properties with types that cannot automatically be converted
@@ -427,7 +425,7 @@ writer.println("foo = " + bean.getFoo() + ", bar = " +
 
     <h5>1. Database schema</h5>
 
-    <p>The database shema for the user database is flexible. It can be the same
+    <p>The database schema for the user database is flexible. It can be the same
     as the schema used for the <code>DataSourceRealm</code>, with only a table
     for users (user name, password), and another one listing the roles
     associated with each user. To support the full <code>UserDatabase</code>
@@ -619,13 +617,13 @@ create table user_roles (
 
   </subsection>
 
-  <subsection name="JavaMail Sessions">
+  <subsection name="Jakarta Mail Sessions">
 
     <h5>0.  Introduction</h5>
 
     <p>In many web applications, sending electronic mail messages is a
     required part of the system's functionality.  The
-    <a href="http://www.oracle.com/technetwork/java/javamail/index.html">Java Mail</a> API
+    <a href="https://jakartaee.github.io/mail-api/">Jakarta Mail</a> API
     makes this process relatively straightforward, but requires many
     configuration details that the client application must be aware of
     (including the name of the SMTP host to be used for message sending).</p>
@@ -717,7 +715,7 @@ Transport.send(message);]]></source>
     and values and passed to
     <code>jakarta.mail.Session.getInstance(java.util.Properties)</code> as part of
     the <code>java.util.Properties</code> collection. In addition to the
-    properties defined in Annex A of the JavaMail specification, individual
+    properties defined in Appendix A of the Jakarta Mail specification, individual
     providers may also support additional properties.
     </p>
 
@@ -726,39 +724,33 @@ Transport.send(message);]]></source>
     then Tomcat&apos;s resource factory will configure and add a
     <code>jakarta.mail.Authenticator</code> to the mail session.</p>
 
-    <h5>4.  Install the JavaMail libraries</h5>
+    <h5>4.  Install the Jakarta Mail API</h5>
 
-    <p><a href="http://javamail.java.net/">
-    Download the JavaMail API</a>.</p>
+    <p><a href="https://search.maven.org/artifact/jakarta.mail/jakarta.mail-api/2.1.0/jar">
+    Download the Jakarta Mail API</a>.</p>
 
-    <p>Unpackage the distribution and place mail.jar  into $CATALINA_HOME/lib so
-    that it is available to Tomcat during the initialization of the mail Session
-    Resource. <strong>Note:</strong> placing this jar in both $CATALINA_HOME/lib
-    and a  web application's lib folder will cause an error, so ensure you have
-    it in the $CATALINA_HOME/lib location only.
+    <p>Unpackage the distribution and place jakarta.mail-api-2.1.0.jar into
+    $CATALINA_HOME/lib so that it is available to Tomcat during the
+    initialization of the mail Session Resource.
+    <strong>Note:</strong> placing this jar in both $CATALINA_HOME/lib and a web
+    application's lib folder will cause an error, so ensure you have it in the
+    $CATALINA_HOME/lib location only.
     </p>
 
-    <h5>5.  Restart Tomcat</h5>
+    <h5>5.  Install a compatible implementation</h5>
+
+    <p>Select and <a href="https://jakarta.ee/specifications/mail/2.1/">
+    download a compatible implementation</a>.</p>
+
+    <p>Unpackage the implementation and place the jar file(s) into
+    $CATALINA_HOME/lib.</p>
+
+    <p>Note: Other implementations may be available</p>
+
+    <h5>6.  Restart Tomcat</h5>
 
     <p>For the additional JAR to be visible to Tomcat, it is necessary for the
     Tomcat instance to be restarted.</p>
-
-
-    <h5>Example Application</h5>
-
-    <p>The <code>/examples</code> application included with Tomcat contains
-    an example of utilizing this resource factory.  It is accessed via the
-    "JSP Examples" link.  The source code for the servlet that actually
-    sends the mail message is in
-    <code>/WEB-INF/classes/SendMailServlet.java</code>.</p>
-
-    <p><strong>WARNING</strong> - The default configuration assumes that there
-    is an SMTP server listing on port 25 on <code>localhost</code>. If this is
-    not the case, edit the
-    <a href="config/context.html"><code>&lt;Context&gt;</code></a> element for
-    this web application and modify the parameter value for the
-    <code>mail.smtp.host</code> parameter to be the host name of an SMTP server
-    on your network.</p>
 
   </subsection>
 
@@ -1097,8 +1089,8 @@ public class MyBeanFactory implements ObjectFactory {
 
   <p>In this example, we are unconditionally creating a new instance of
   the <code>com.mycompany.MyBean</code> class, and populating its properties
-  based on the parameters included in the <code>&lt;ResourceParams&gt;</code>
-  element that configures this factory (see below).  You should note that any
+  based on the parameters included in the <code>&lt;Resource&gt;</code>
+  element that configures this resource (see below).  You should note that any
   parameter named <code>factory</code> should be skipped - that parameter is
   used to specify the name of the factory class itself (in this case,
   <code>com.mycompany.MyBeanFactory</code>) rather than a property of the

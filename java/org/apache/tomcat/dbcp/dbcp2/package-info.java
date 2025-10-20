@@ -19,8 +19,7 @@
  * <p>
  * Database Connection Pool API.
  * </p>
- *
- * <b>Overview in Dialog Form</b>
+ * <strong>Overview in Dialog Form</strong>
  * <p>
  * Q: How do I use the DBCP package?
  * </p>
@@ -94,13 +93,12 @@
  * <p>
  * In code, that might look like this:
  * </p>
- *
  * <pre>
  * GenericObjectPool connectionPool = new GenericObjectPool(null);
  * ConnectionFactory connectionFactory = new DriverManagerConnectionFactory("jdbc:some:connect:string", "userName",
  *         "password");
- * PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,
- *         connectionPool, null, null, false, true);
+ * ObjectName oName = new ObjectName("MyTests:DataSource=test"); // or null to not use JMX
+ * PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, oName);
  * PoolingDataSource dataSource = new PoolingDataSource(connectionPool);
  * </pre>
  * <p>
@@ -108,13 +106,12 @@
  * {@link javax.sql.DataSource} on the last line, we create a {@link org.apache.tomcat.dbcp.dbcp2.PoolingDriver}, and
  * register the {@code connectionPool} with it. E.g.,:
  * </p>
- *
  * <pre>
  * GenericObjectPool connectionPool = new GenericObjectPool(null);
  * ConnectionFactory connectionFactory = new DriverManagerConnectionFactory("jdbc:some:connect:string", "userName",
  *         "password");
- * PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory,
- *         connectionPool, null, null, false, true);
+ * ObjectName oName = new ObjectName("MyTests:DataSource=test"); // or null to not use JMX
+ * PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(connectionFactory, oName);
  * PoolingDriver driver = new PoolingDriver();
  * driver.registerPool("example", connectionPool);
  * </pre>
@@ -123,7 +120,6 @@
  * when it is created, now you can just go to the {@link java.sql.DriverManager} to create your
  * {@link java.sql.Connection}s, like you normally would:
  * </p>
- *
  * <pre>
  * Connection conn = DriverManager.getConnection("jdbc:apache:commons:dbcp:example");
  * </pre>

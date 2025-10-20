@@ -38,7 +38,6 @@ Export-Package: \
     org.apache.catalina.security,\
     org.apache.catalina.servlets,\
     org.apache.catalina.session,\
-    org.apache.catalina.ssi,\
     org.apache.catalina.startup,\
     org.apache.catalina.users,\
     org.apache.catalina.util,\
@@ -62,9 +61,9 @@ Export-Package: \
     org.apache.tomcat.util,\
     org.apache.tomcat.util.bcel.classfile,\
     org.apache.tomcat.util.buf,\
-    org.apache.tomcat.util.codec.binary,\
     org.apache.tomcat.util.collections,\
     org.apache.tomcat.util.compat,\
+    org.apache.tomcat.util.concurrent,\
     org.apache.tomcat.util.descriptor,\
     org.apache.tomcat.util.descriptor.tagplugin,\
     org.apache.tomcat.util.descriptor.web,\
@@ -87,6 +86,8 @@ Export-Package: \
     org.apache.tomcat.util.scan,\
     org.apache.tomcat.util.security,\
     org.apache.tomcat.util.threads
+X-Compile-Source-JDK: ${compile.release}
+X-Compile-Target-JDK: ${compile.release}
 
 -includepackage: \
     org.apache.tomcat.util.bcel,\
@@ -99,11 +100,11 @@ Export-Package: \
 
 Provide-Capability: \
     osgi.contract;\
-        osgi.contract=JavaJASPIC;\
+        osgi.contract=JakartaAuthentication;\
         version:Version=${jaspic.spec.version};\
         uses:='${packages;NAMED;jakarta.security.auth.message.*}',\
     osgi.contract;\
-        osgi.contract=JavaServlet;\
+        osgi.contract=JakartaServlet;\
         version:Version=${servlet.spec.version};\
         uses:='${packages;NAMED;jakarta.servlet.*;NAMED;!jakarta.servlet.jsp.*}'
 

@@ -59,9 +59,16 @@
     <module name="IllegalInstantiation"/>
 
     <!-- Imports -->
-    <module name="AvoidStarImport"/>
+    <module name="AvoidStarImport">
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Compatibility.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Macros.*"/>
+    </module>
     <module name="AvoidStaticImport">
         <property name="excludes" value="org.apache.catalina.startup.SimpleHttpClient.CRLF"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Compatibility.*"/>
+        <property name="excludes" value="org.apache.tomcat.util.openssl.openssl_h_Macros.*"/>
         <property name="excludes" value="org.hamcrest.MatcherAssert.*"/>
         <property name="excludes" value="org.hamcrest.core.IsInstanceOf.*"/>
     </module>
@@ -87,31 +94,29 @@
     <module name="JavadocMissingLeadingAsterisk"/>
     <module name="JavadocMissingWhitespaceAfterAsterisk"/>
     <module name="JavadocStyle">
-        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1500 errors -->
-        <property name="checkFirstSentence" value="false"/>
         <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1400 errors -->
+        <property name="checkFirstSentence" value="false"/>
+        <!-- Disabled. Large number of errors with minimal benefit to be gained by fixing at this time. ~1300 errors -->
         <property name="checkEmptyJavadoc" value="false"/>
         <!-- Does not handle HTML tags in {@code ...} correctly -->
         <property name="checkHtml" value="false"/>
     </module>
-    <!-- ~9000 errors
+    <!-- ~10000 errors
     <module name="MissingJavadocMethod"/>
     -->
-    <!-- ~1400 errors
+    <!-- ~1600 errors
     <module name="MissingJavadocType"/>
     -->
     <module name="NonEmptyAtclauseDescription"/>
-    <!-- ~1500 errors
+    <!-- ~500 errors
     <module name="RequireEmptyLineBeforeBlockTagGroup"/>
     -->
     <module name="SingleLineJavadoc"/>
 
     <!-- Miscellaneous -->
-    <!-- ~4100 errors
     <module name="Indentation">
         <property name="lineWrappingIndentation" value="8"/>
     </module>
-    -->
 
     <!-- Modifiers -->
     <module name="ModifierOrder"/>
@@ -121,7 +126,7 @@
     <module name="GenericWhitespace"/>
     <module name="EmptyForInitializerPad"/>
     <module name="EmptyForIteratorPad"/>
-    <!--  ~ 1100 errors
+    <!--  ~ 600 errors
     <module name="OperatorWrap">
       <property name="option" value="eol"/>
     </module>

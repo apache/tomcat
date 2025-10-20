@@ -99,6 +99,22 @@
 
     <attributes>
 
+      <attribute name="cookiesWithoutEquals" required="false">
+        <p>Determines how a cookie received from a user agent should be
+        interpreted when the name value pair does not contain an equals sign.
+        The default value is <code>ignore</code> which means the cookie will be
+        ignored. The other option is <code>name</code> which means that the
+        cookie will be treated as a cookie with a name but no value. In Tomcat
+        11 and earlier the default was <code>name</code>.</p>
+      </attribute>
+
+      <attribute name="partitioned" required="false">
+       <p>Should the Partitioned flag be set on cookies? Defaults to <code>false</code>.</p>
+       <p>Note: The name of the attribute used to indicate a partitioned cookie as part of
+       <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+       may change in a non-backwards compatible way once equivalent functionality is included in an RFC.</p>
+      </attribute>
+
       <attribute name="sameSiteCookies" required="false">
         <p>Enables setting same-site cookie attribute.</p>
 

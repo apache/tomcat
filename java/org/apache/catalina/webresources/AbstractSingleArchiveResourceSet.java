@@ -61,7 +61,7 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
 
 
     @Override
-    protected Map<String, JarEntry> getArchiveEntries(boolean single) {
+    protected Map<String,JarEntry> getArchiveEntries(boolean single) {
         synchronized (archiveLock) {
             if (archiveEntries == null && !single) {
                 JarFile jarFile = null;
@@ -142,8 +142,8 @@ public abstract class AbstractSingleArchiveResourceSet extends AbstractArchiveRe
 
         try {
             setBaseUrl(UriUtil.buildJarSafeUrl(new File(getBase())));
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+        } catch (IOException ioe) {
+            throw new IllegalArgumentException(ioe);
         }
     }
 }

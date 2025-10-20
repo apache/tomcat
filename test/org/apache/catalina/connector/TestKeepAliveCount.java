@@ -53,7 +53,7 @@ public class TestKeepAliveCount extends TomcatBaseTest {
 
         private synchronized void init() {
             if (init) {
-              return;
+                return;
             }
 
             Tomcat tomcat = getTomcatInstance();
@@ -77,11 +77,14 @@ public class TestKeepAliveCount extends TomcatBaseTest {
 
             // Send request in two parts
             String[] request = new String[1];
+            // @formatter:off
             request[0] =
-                "GET /test HTTP/1.0" + CRLF + CRLF;
+                    "GET /test HTTP/1.0" + CRLF +
+                    CRLF;
+            // @formatter:on
             setRequest(request);
             processRequest(false); // blocks until response has been read
-            boolean passed = (this.readLine()==null);
+            boolean passed = (this.readLine() == null);
             // Close the connection
             disconnect();
             reset();
@@ -100,19 +103,22 @@ public class TestKeepAliveCount extends TomcatBaseTest {
 
             // Send request in two parts
             String[] request = new String[1];
+            // @formatter:off
             request[0] =
-                "GET /test HTTP/1.1" + CRLF +
-                "Host: localhost" + CRLF +
-                "Connection: Keep-Alive" + CRLF+
-                "Keep-Alive: 300"+ CRLF+ CRLF;
+                    "GET /test HTTP/1.1" + CRLF +
+                    "Host: localhost" + CRLF +
+                    "Connection: Keep-Alive" + CRLF +
+                    "Keep-Alive: 300"+ CRLF +
+                    CRLF;
+            // @formatter:on
 
             setRequest(request);
 
-            for (int i=0; i<5; i++) {
+            for (int i = 0; i < 5; i++) {
                 processRequest(false); // blocks until response has been read
-                Assert.assertTrue(getResponseLine()!=null && getResponseLine().startsWith("HTTP/1.1 200 "));
+                Assert.assertTrue(getResponseLine() != null && getResponseLine().startsWith("HTTP/1.1 200 "));
             }
-            boolean passed = (this.readLine()==null);
+            boolean passed = (this.readLine() == null);
             // Close the connection
             disconnect();
             reset();

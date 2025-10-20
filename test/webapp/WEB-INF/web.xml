@@ -18,8 +18,8 @@
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
-                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
-  version="6.0"
+                      https://jakarta.ee/xml/ns/jakartaee/web-app_6_2.xsd"
+  version="6.2"
   metadata-complete="true">
 
   <display-name>Tomcat Test Application</display-name>
@@ -27,6 +27,11 @@
      Used as part of the Tomcat unit tests when a full web application is
      required.
   </description>
+
+  <servlet-mapping>
+    <servlet-name>JSP-nonstandard</servlet-name>
+    <url-pattern>/jsp/generator/nonstandard/*</url-pattern>
+  </servlet-mapping>
 
   <servlet>
     <servlet-name>jsp</servlet-name>
@@ -38,6 +43,29 @@
       <init-param>
         <param-name>xpoweredBy</param-name>
         <param-value>false</param-value>
+      </init-param>
+      <!-- Required by /jsp/tagFileInJar.jsp / TestJspCompilationContext  -->
+      <init-param>
+        <param-name>modificationTestInterval</param-name>
+        <param-value>0</param-value>
+      </init-param>
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>JSP-nonstandard</servlet-name>
+      <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
+      <init-param>
+        <param-name>fork</param-name>
+        <param-value>false</param-value>
+      </init-param>
+      <init-param>
+        <param-name>xpoweredBy</param-name>
+        <param-value>false</param-value>
+      </init-param>
+      <init-param>
+        <param-name>useNonstandardTagOptimizations</param-name>
+        <param-value>c:set,c:remove</param-value>
       </init-param>
       <!-- Required by /jsp/tagFileInJar.jsp / TestJspCompilationContext  -->
       <init-param>

@@ -18,27 +18,29 @@ package org.apache.tomcat.util.security;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import org.apache.juli.logging.Log;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * A thread safe wrapper around {@link MessageDigest} that does not make use
- * of ThreadLocal and - broadly - only creates enough MessageDigest objects
- * to satisfy the concurrency requirements.
+ * A thread safe wrapper around {@link MessageDigest} that does not make use of ThreadLocal and - broadly - only creates
+ * enough MessageDigest objects to satisfy the concurrency requirements.
  */
 public class ConcurrentMessageDigest {
 
     private static final StringManager sm = StringManager.getManager(ConcurrentMessageDigest.class);
+    private static final Log log = LogFactory.getLog(ConcurrentMessageDigest.class);
 
     private static final String MD5 = "MD5";
     private static final String SHA1 = "SHA-1";
+    private static final String SHA256 = "SHA-256";
 
-    private static final Map<String,Queue<MessageDigest>> queues =
-            new HashMap<>();
+    private static final Map<String,Queue<MessageDigest>> queues = new ConcurrentHashMap<>();
 
 
     private ConcurrentMessageDigest() {
@@ -46,10 +48,19 @@ public class ConcurrentMessageDigest {
     }
 
     static {
+        // Init commonly used algorithms
         try {
-            // Init commonly used algorithms
             init(MD5);
+        } catch (NoSuchAlgorithmException e) {
+            log.warn(sm.getString("concurrentMessageDigest.noDigest"), e);
+        }
+        try {
             init(SHA1);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalArgumentException(sm.getString("concurrentMessageDigest.noDigest"), e);
+        }
+        try {
+            init(SHA256);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalArgumentException(sm.getString("concurrentMessageDigest.noDigest"), e);
         }
@@ -61,6 +72,10 @@ public class ConcurrentMessageDigest {
 
     public static byte[] digestSHA1(byte[]... input) {
         return digest(SHA1, input);
+    }
+
+    public static byte[] digestSHA256(byte[]... input) {
+        return digest(SHA256, input);
     }
 
     public static byte[] digest(String algorithm, byte[]... input) {
@@ -107,23 +122,19 @@ public class ConcurrentMessageDigest {
 
 
     /**
-     * Ensures that {@link #digest(String, byte[][])} will support the specified
-     * algorithm. This method <b>must</b> be called and return successfully
-     * before using {@link #digest(String, byte[][])}.
+     * Ensures that {@link #digest(String, byte[][])} will support the specified algorithm. This method <b>must</b> be
+     * called and return successfully before using {@link #digest(String, byte[][])}.
      *
      * @param algorithm The message digest algorithm to be supported
      *
-     * @throws NoSuchAlgorithmException If the algorithm is not supported by the
-     *                                  JVM
+     * @throws NoSuchAlgorithmException If the algorithm is not supported by the JVM
      */
     public static void init(String algorithm) throws NoSuchAlgorithmException {
-        synchronized (queues) {
-            if (!queues.containsKey(algorithm)) {
-                MessageDigest md = MessageDigest.getInstance(algorithm);
-                Queue<MessageDigest> queue = new ConcurrentLinkedQueue<>();
-                queue.add(md);
-                queues.put(algorithm, queue);
-            }
+        if (!queues.containsKey(algorithm)) {
+            MessageDigest md = MessageDigest.getInstance(algorithm);
+            Queue<MessageDigest> queue = new ConcurrentLinkedQueue<>();
+            queue.add(md);
+            queues.putIfAbsent(algorithm, queue);
         }
     }
 }

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -31,10 +32,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class ImportHandler {
 
-    private static final Map<String, Set<String>> standardPackages = new HashMap<>();
+    private static final Map<String,Set<String>> standardPackages = new HashMap<>();
 
     static {
-        // Servlet 6.0
+        // Servlet 6.2
         Set<String> servletClassNames = new HashSet<>();
         // Interfaces
         servletClassNames.add("AsyncContext");
@@ -87,13 +88,14 @@ public class ImportHandler {
         servletClassNames.add("UnavailableException");
         standardPackages.put("jakarta.servlet", servletClassNames);
 
-        // Servlet 6.0
+        // Servlet 6.2
         Set<String> servletHttpClassNames = new HashSet<>();
         // Interfaces
         servletHttpClassNames.add("HttpServletMapping");
         servletHttpClassNames.add("HttpServletRequest");
         servletHttpClassNames.add("HttpServletResponse");
         servletHttpClassNames.add("HttpSession");
+        servletHttpClassNames.add("HttpSession.Accessor");
         servletHttpClassNames.add("HttpSessionActivationListener");
         servletHttpClassNames.add("HttpSessionAttributeListener");
         servletHttpClassNames.add("HttpSessionBindingListener");
@@ -116,7 +118,7 @@ public class ImportHandler {
         servletHttpClassNames.add("MappingMatch");
         standardPackages.put("jakarta.servlet.http", servletHttpClassNames);
 
-        // JSP 3.0
+        // JSP 4.1
         Set<String> servletJspClassNames = new HashSet<>();
         // Interfaces
         servletJspClassNames.add("HttpJspPage");
@@ -136,7 +138,7 @@ public class ImportHandler {
         standardPackages.put("jakarta.servlet.jsp", servletJspClassNames);
 
         Set<String> javaLangClassNames = new HashSet<>();
-        // Based on Java 19 EA26
+        // Based on Java 25 EA16
         // Interfaces
         javaLangClassNames.add("Appendable");
         javaLangClassNames.add("AutoCloseable");
@@ -168,6 +170,7 @@ public class ImportHandler {
         javaLangClassNames.add("Enum");
         javaLangClassNames.add("Enum.EnumDesc");
         javaLangClassNames.add("Float");
+        javaLangClassNames.add("IO");
         javaLangClassNames.add("InheritableThreadLocal");
         javaLangClassNames.add("Integer");
         javaLangClassNames.add("Long");
@@ -185,14 +188,21 @@ public class ImportHandler {
         javaLangClassNames.add("Runtime");
         javaLangClassNames.add("Runtime.Version");
         javaLangClassNames.add("RuntimePermission");
+        javaLangClassNames.add("ScopedValue");
+        javaLangClassNames.add("ScopedValue.CallableOp");
+        javaLangClassNames.add("ScopedValue.Carrier");
         javaLangClassNames.add("SecurityManager");
         javaLangClassNames.add("Short");
+        javaLangClassNames.add("StableValue");
         javaLangClassNames.add("StackTraceElement");
         javaLangClassNames.add("StackWalker");
         javaLangClassNames.add("StrictMath");
         javaLangClassNames.add("String");
         javaLangClassNames.add("StringBuffer");
         javaLangClassNames.add("StringBuilder");
+        javaLangClassNames.add("StringTemplate");
+        javaLangClassNames.add("StringTemplate.Processor");
+        javaLangClassNames.add("StringTemplate.Processor.Linkage");
         javaLangClassNames.add("System");
         javaLangClassNames.add("System.LoggerFinder");
         javaLangClassNames.add("Thread");
@@ -272,10 +282,10 @@ public class ImportHandler {
 
     }
 
-    private Map<String, Set<String>> packageNames = new ConcurrentHashMap<>();
-    private Map<String, String> classNames = new ConcurrentHashMap<>();
-    private Map<String, Class<?>> clazzes = new ConcurrentHashMap<>();
-    private Map<String, Class<?>> statics = new ConcurrentHashMap<>();
+    private final Map<String,Set<String>> packageNames = new ConcurrentHashMap<>();
+    private final Map<String,String> classNames = new ConcurrentHashMap<>();
+    private final Map<String,Class<?>> clazzes = new ConcurrentHashMap<>();
+    private final Map<String,Class<?>> statics = new ConcurrentHashMap<>();
 
 
     public ImportHandler() {
@@ -283,7 +293,7 @@ public class ImportHandler {
     }
 
 
-    public void importStatic(String name) throws jakarta.el.ELException {
+    public void importStatic(String name) throws ELException {
         int lastPeriod = name.lastIndexOf('.');
 
         if (lastPeriod < 0) {
@@ -338,7 +348,7 @@ public class ImportHandler {
     }
 
 
-    public void importClass(String name) throws jakarta.el.ELException {
+    public void importClass(String name) throws ELException {
         int lastPeriodIndex = name.lastIndexOf('.');
 
         if (lastPeriodIndex < 0) {
@@ -362,15 +372,11 @@ public class ImportHandler {
         // b) java.lang.Package.getPackage(name) is not reliable (BZ 57574),
         // c) such check is not required by specification.
         Set<String> preloaded = standardPackages.get(name);
-        if (preloaded == null) {
-            packageNames.put(name, Collections.emptySet());
-        } else {
-            packageNames.put(name, preloaded);
-        }
+        packageNames.put(name, Objects.requireNonNullElse(preloaded, Collections.emptySet()));
     }
 
 
-    public java.lang.Class<?> resolveClass(String name) {
+    public Class<?> resolveClass(String name) {
         if (name == null || name.contains(".")) {
             return null;
         }
@@ -394,11 +400,23 @@ public class ImportHandler {
                 clazzes.put(name, clazz);
                 return clazz;
             }
+            // Might be an inner class
+            StringBuilder sb = new StringBuilder(className);
+            int replacementPosition = sb.lastIndexOf(".");
+            while (replacementPosition > -1) {
+                sb.setCharAt(replacementPosition, '$');
+                clazz = findClass(sb.toString(), true);
+                if (clazz != null) {
+                    clazzes.put(name, clazz);
+                    return clazz;
+                }
+                replacementPosition = sb.lastIndexOf(".", replacementPosition);
+            }
         }
 
         // Search the package imports - note there may be multiple matches
         // (which correctly triggers an error)
-        for (Map.Entry<String, Set<String>> entry : packageNames.entrySet()) {
+        for (Map.Entry<String,Set<String>> entry : packageNames.entrySet()) {
             if (!entry.getValue().isEmpty()) {
                 // Standard package where we know all the class names
                 if (!entry.getValue().contains(name)) {
@@ -418,19 +436,15 @@ public class ImportHandler {
                 result = clazz;
             }
         }
-        if (result == null) {
-            // Cache NotFound results to save repeated calls to findClass()
-            // which is relatively slow
-            clazzes.put(name, NotFound.class);
-        } else {
-            clazzes.put(name, result);
-        }
+        // Cache NotFound results to save repeated calls to findClass()
+        // which is relatively slow
+        clazzes.put(name, Objects.requireNonNullElse(result, NotFound.class));
 
         return result;
     }
 
 
-    public java.lang.Class<?> resolveStatic(String name) {
+    public Class<?> resolveStatic(String name) {
         return statics.get(name);
     }
 

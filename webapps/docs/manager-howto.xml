@@ -23,7 +23,6 @@
     &project;
 
     <properties>
-        <author email="craigmcc@apache.org">Craig R. McClanahan</author>
         <title>Manager App How-To</title>
     </properties>
 
@@ -77,8 +76,8 @@ example:</p>
          docBase="${catalina.home}/webapps/manager">
   <CookieProcessor className="org.apache.tomcat.util.http.Rfc6265CookieProcessor"
                    sameSiteCookies="strict" />
-  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         allow="127\.\d+\.\d+\.\d+|::1|0:0:0:0:0:0:0:1" />
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         allow="127.0.0.0/8,::1/128" />
   <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
 </Context>]]></source>
 
@@ -205,13 +204,13 @@ the role <strong>manager-script</strong>.</p>
 
 <p>In addition to the password restrictions, access to the Manager web
 application can be restricted by the <strong>remote IP address</strong> or host
-by adding a <code>RemoteAddrValve</code> or <code>RemoteHostValve</code>.
+by adding a <code>RemoteCIDRValve</code> or <code>RemoteHostValve</code>.
 See <a href="config/valve.html#Remote_Address_Filter">valves documentation</a>
 for details. Here is
 an example of restricting access to the localhost by IP address:</p>
 <source><![CDATA[<Context privileged="true">
-         <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-                allow="127\.0\.0\.1"/>
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         allow="127.0.0.0/8,::1/128" />
 </Context>]]></source>
 
 </section>
@@ -236,6 +235,25 @@ stored in your session and is included in all links on the page. If your next
 action does not have correct value of the token, the action will be denied.
 If the token has expired you can start again from the main page or
 <em>List Applications</em> page of Manager.</p>
+
+<p>To customize the subtitle of the HTML interface of the Manager web application,
+you can add any valid xml escaped html code to the <code>htmlSubTitle</code>
+initialisation parameter of the <code>HTMLManagerServlet</code>
+</p>
+
+<source><![CDATA[<servlet>
+  <servlet-name>HTMLManager</servlet-name>
+  <servlet-class>org.apache.catalina.manager.HTMLManagerServlet</servlet-class>
+  <init-param>
+    <param-name>htmlSubTitle</param-name>
+    <param-value>Company Inc.&lt;br&gt;&lt;i style=&apos;color:red&apos;&gt;Staging&lt;/i&gt;</param-value>
+  </init-param>
+  ...
+</servlet>]]></source>
+
+<p>The above string value would unescape and be appended to the title</p>
+
+<source><![CDATA[Company Inc.<br><i style='color:red'>Staging</i>]]></source>
 
 </section>
 
@@ -1024,17 +1042,27 @@ href="config/listeners.html#StoreConfig_Lifecycle_Listener_-_org.apache.catalina
 <section name="Server Status">
 
 <p>From the following links you can view Status information about the server.
-Any one of <strong>manager-xxx</strong> roles allows access to this page.</p>
+The <code>manager-status</code> role or any one of the other
+<strong>manager-xxx</strong> roles allow access to this page.</p>
 
 <source>http://localhost:8080/manager/status
 http://localhost:8080/manager/status/all</source>
 
 <p>Displays server status information in HTML format.</p>
 
-<source>http://localhost:8080/manager/status?XML=true
-http://localhost:8080/manager/status/all?XML=true</source>
+<source>http://localhost:8080/manager/status?XML=true</source>
 
-<p>Displays server status information in XML format.</p>
+<p>Displays server status information in XML format. The XML format does
+not include the detailed per web application statistics.</p>
+
+<source>http://localhost:8080/manager/status?JSON=true
+http://localhost:8080/manager/status/all?JSON=true</source>
+
+<p>Displays server status information in JSON format. The JSON format does
+not include the per thread state information. If using a client visualization
+tool for active monitoring and server status alerts (such as Grafana), the JSON
+output provided by the Manager will likely provide the easiest and most secure
+solution.</p>
 
 <p>First, you have the server and JVM version number, JVM provider, OS name
 and number followed by the architecture type.</p>
@@ -1049,8 +1077,9 @@ The same information is available for both of them :
     current thread count and current thread busy.</p></li>
     <li><p>Request information : Max processing time and processing time,
     request and error count, bytes received and sent.</p></li>
-    <li><p>A table showing Stage, Time, Bytes Sent, Bytes Receive, Client,
-    VHost and Request. All existing threads are listed in the table.
+    <li><p>If not using the JSON format, the state of threads with Stage,
+    Time, Bytes Sent, Bytes Receive, Client, VHost and Request.
+    All existing threads are listed in the table.
     Here is the list of the possible thread stages :</p>
     <ul>
         <li><p><em>"Parse and Prepare Request"</em> : The request headers are
@@ -1077,7 +1106,8 @@ The same information is available for both of them :
 </ul>
 
 <p>If you are using <code>/status/all</code> command, additional information
-on each of deployed web applications will be available.</p>
+on each of deployed web applications will be available, except for the XML
+format.</p>
 
 </section>
 

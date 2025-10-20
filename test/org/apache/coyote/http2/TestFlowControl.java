@@ -19,11 +19,12 @@ package org.apache.coyote.http2;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -37,7 +38,7 @@ public class TestFlowControl extends Http2TestBase {
     @Test
     public void testNotFound() throws Exception {
 
-        LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.ALL);
+        Logger.getLogger("org.apache.coyote.http2").setLevel(Level.ALL);
         try {
             http2Connect();
 
@@ -49,7 +50,7 @@ public class TestFlowControl extends Http2TestBase {
             ByteBuffer headersPayload = ByteBuffer.allocate(128);
 
             MimeHeaders headers = new MimeHeaders();
-            headers.addValue(":method").setString("POST");
+            headers.addValue(":method").setString(Method.POST);
             headers.addValue(":scheme").setString("http");
             headers.addValue(":path").setString("/path-does-not-exist");
             headers.addValue(":authority").setString("localhost:" + getPort());
@@ -120,7 +121,7 @@ public class TestFlowControl extends Http2TestBase {
             writeFrame(dataFrameHeader, dataPayload);
             waitForWindowSize(0);
         } finally {
-            LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.INFO);
+            Logger.getLogger("org.apache.coyote.http2").setLevel(Level.INFO);
         }
     }
 

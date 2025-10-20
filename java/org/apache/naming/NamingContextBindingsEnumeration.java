@@ -26,18 +26,14 @@ import javax.naming.NamingException;
 
 /**
  * Naming enumeration implementation.
- *
- * @author Remy Maucherat
  */
-public class NamingContextBindingsEnumeration
-    implements NamingEnumeration<Binding> {
+public class NamingContextBindingsEnumeration implements NamingEnumeration<Binding> {
 
 
     // ----------------------------------------------------------- Constructors
 
 
-    public NamingContextBindingsEnumeration(Iterator<NamingEntry> entries,
-            Context ctx) {
+    public NamingContextBindingsEnumeration(Iterator<NamingEntry> entries, Context ctx) {
         iterator = entries;
         this.ctx = ctx;
     }
@@ -60,32 +56,20 @@ public class NamingContextBindingsEnumeration
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Retrieves the next element in the enumeration.
-     */
     @Override
-    public Binding next()
-        throws NamingException {
+    public Binding next() throws NamingException {
         return nextElementInternal();
     }
 
 
-    /**
-     * Determines whether there are any more elements in the enumeration.
-     */
     @Override
-    public boolean hasMore()
-        throws NamingException {
+    public boolean hasMore() throws NamingException {
         return iterator.hasNext();
     }
 
 
-    /**
-     * Closes this enumeration.
-     */
     @Override
-    public void close()
-        throws NamingException {
+    public void close() throws NamingException {
     }
 
 
@@ -109,8 +93,7 @@ public class NamingContextBindingsEnumeration
         Object value;
 
         // If the entry is a reference, resolve it
-        if (entry.type == NamingEntry.REFERENCE
-                || entry.type == NamingEntry.LINK_REF) {
+        if (entry.type == NamingEntry.REFERENCE || entry.type == NamingEntry.LINK_REF) {
             try {
                 value = ctx.lookup(new CompositeName(entry.name));
             } catch (NamingException e) {

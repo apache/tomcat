@@ -17,6 +17,7 @@
 package org.apache.tomcat.websocket.server;
 
 import java.io.IOException;
+import java.io.Serial;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.GenericFilter;
@@ -31,6 +32,7 @@ import jakarta.servlet.http.HttpServletResponse;
  */
 public class WsFilter extends GenericFilter {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private transient WsServerContainer sc;
@@ -38,18 +40,16 @@ public class WsFilter extends GenericFilter {
 
     @Override
     public void init() throws ServletException {
-        sc = (WsServerContainer) getServletContext().getAttribute(
-                Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
+        sc = (WsServerContainer) getServletContext().getAttribute(Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
     }
 
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response,
-            FilterChain chain) throws IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
 
         // This filter only needs to handle WebSocket upgrade requests
-        if (!sc.areEndpointsRegistered() ||
-                !UpgradeUtil.isWebSocketUpgradeRequest(request, response)) {
+        if (!sc.areEndpointsRegistered() || !UpgradeUtil.isWebSocketUpgradeRequest(request, response)) {
             chain.doFilter(request, response);
             return;
         }
@@ -75,7 +75,6 @@ public class WsFilter extends GenericFilter {
             return;
         }
 
-        UpgradeUtil.doUpgrade(sc, req, resp, mappingResult.getConfig(),
-                mappingResult.getPathParams());
+        UpgradeUtil.doUpgrade(sc, req, resp, mappingResult.config(), mappingResult.pathParams());
     }
 }

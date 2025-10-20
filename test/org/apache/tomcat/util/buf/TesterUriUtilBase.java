@@ -18,6 +18,7 @@ package org.apache.tomcat.util.buf;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 
 import org.junit.Assert;
@@ -86,8 +87,20 @@ public abstract class TesterUriUtilBase {
 
 
     @Test
-    public void testWarToJar01() throws IOException {
-        doTestWarToJar("^");
+    public void testBuildJarUrl05() throws IOException {
+        File jarFile = new File("/patha/pathb/pathc/war##001.war");
+        String result = UriUtil.buildJarUrl(jarFile).toString();
+
+        int index = result.indexOf("!/");
+        Assert.assertEquals(result, result.length() - 2, index);
+
+        index = result.indexOf(separator + "/");
+        Assert.assertEquals(result, -1, index);
+
+        // Ensure there is no double decoding
+        // https://bz.apache.org/bugzilla/show_bug.cgi?id=69234
+        index = result.indexOf("%25");
+        Assert.assertEquals(result, -1, index);
     }
 
 
@@ -104,7 +117,7 @@ public abstract class TesterUriUtilBase {
 
 
     private void doTestWarToJar(String separator) throws IOException {
-        URL warUrl = new URL("war:file:/external/path" + separator + "/internal/path");
+        URL warUrl = URI.create("war:file:/external/path" + separator + "/internal/path").toURL();
         URL jarUrl = UriUtil.warToJar(warUrl);
         Assert.assertEquals("jar:file:/external/path!/internal/path", jarUrl.toString());
     }

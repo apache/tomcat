@@ -62,31 +62,34 @@ public class Asn1Writer {
         int dataSize = data.length;
         // How many bytes to write the length?
         int lengthSize = 1;
-        if (dataSize >127) {
+        if (dataSize > 127) {
             // 1 byte we have is now used to record how many bytes we need to
             // record a length > 127
             // Result is lengthSize = 1 + number of bytes to record length
             do {
                 lengthSize++;
-            }
-            while ((dataSize >> (lengthSize * 8)) > 0);
+            } while ((dataSize >> (lengthSize * 8)) > 0);
         }
 
-        // 1 for tag + lengthSize + dataSize
-        byte[] result = new byte[1 + lengthSize + dataSize];
-        result[0] = tagId;
+        byte[] result;
         if (dataSize < 128) {
+            // 1 for tag + lengthSize + dataSize
+            result = new byte[1 + lengthSize + dataSize];
             result[1] = (byte) dataSize;
         } else {
             // lengthSize is 1 + number of bytes for length
-            result[1] = (byte) (127 + lengthSize);
+            // 1 for tag + one for the lengthSize + lengthSize + dataSize
+            result = new byte[2 + lengthSize + dataSize];
+            result[1] = (byte) (128 + lengthSize);
             int i = lengthSize;
             while (dataSize > 0) {
-                result[i] = (byte) (dataSize & 0xFF);
+                result[i+1] = (byte) (dataSize & 0xFF);
                 dataSize = dataSize >> 8;
                 i--;
             }
+            lengthSize++; // we added the size.
         }
+        result[0] = tagId;
 
         System.arraycopy(data, 0, result, 1 + lengthSize, data.length);
 

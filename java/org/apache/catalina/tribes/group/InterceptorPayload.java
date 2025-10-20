@@ -18,7 +18,7 @@ package org.apache.catalina.tribes.group;
 
 import org.apache.catalina.tribes.ErrorHandler;
 
-public class InterceptorPayload  {
+public class InterceptorPayload {
     private ErrorHandler errorHandler;
 
     public ErrorHandler getErrorHandler() {

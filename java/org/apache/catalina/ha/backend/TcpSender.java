@@ -33,8 +33,7 @@ import org.apache.tomcat.util.res.StringManager;
 /*
  * Sender to proxies using multicast socket.
  */
-public class TcpSender
-    implements Sender {
+public class TcpSender implements Sender {
 
     private static final Log log = LogFactory.getLog(HeartbeatListener.class);
     private static final StringManager sm = StringManager.getManager(TcpSender.class);
@@ -71,7 +70,7 @@ public class TcpSender
             proxies[i] = new Proxy();
             proxies[i].port = Integer.parseInt(token.substring(pos + 1));
             try {
-                 proxies[i].address = InetAddress.getByName(token.substring(0, pos));
+                proxies[i].address = InetAddress.getByName(token.substring(0, pos));
             } catch (Exception e) {
                 throw new Exception(sm.getString("tcpSender.invalidProxyList"));
             }
@@ -96,7 +95,7 @@ public class TcpSender
                 try {
                     if (config.getHost() != null) {
                         connections[i] = new Socket();
-                        InetAddress addr =  InetAddress.getByName(config.getHost());
+                        InetAddress addr = InetAddress.getByName(config.getHost());
                         InetSocketAddress addrs = new InetSocketAddress(addr, 0);
                         connections[i].setReuseAddress(true);
                         connections[i].bind(addrs);
@@ -107,13 +106,12 @@ public class TcpSender
                     }
                     connectionReaders[i] = new BufferedReader(new InputStreamReader(connections[i].getInputStream()));
                     connectionWriters[i] = new BufferedWriter(new OutputStreamWriter(connections[i].getOutputStream()));
-                } catch (Exception ex) {
-                    log.error(sm.getString("tcpSender.connectionFailed"), ex);
+                } catch (Exception e) {
+                    log.error(sm.getString("tcpSender.connectionFailed"), e);
                     close(i);
                 }
             }
-            if (connections[i] == null)
-             {
+            if (connections[i] == null) {
                 continue; // try next proxy in the list
             }
             BufferedWriter writer = connectionWriters[i];
@@ -127,12 +125,11 @@ public class TcpSender
                 writer.write(mess);
                 writer.write("\r\n");
                 writer.flush();
-            } catch (Exception ex) {
-                log.error(sm.getString("tcpSender.sendFailed"), ex);
+            } catch (Exception e) {
+                log.error(sm.getString("tcpSender.sendFailed"), e);
                 close(i);
             }
-            if (connections[i] == null)
-             {
+            if (connections[i] == null) {
                 continue; // try next proxy in the list
             }
 
@@ -143,7 +140,8 @@ public class TcpSender
                 close(i);
                 continue;
             } else {
-                responseStatus = responseStatus.substring(responseStatus.indexOf(' ') + 1, responseStatus.indexOf(' ', responseStatus.indexOf(' ') + 1));
+                responseStatus = responseStatus.substring(responseStatus.indexOf(' ') + 1,
+                        responseStatus.indexOf(' ', responseStatus.indexOf(' ') + 1));
                 int status = Integer.parseInt(responseStatus);
                 if (status != 200) {
                     log.error(sm.getString("tcpSender.responseErrorCode", Integer.valueOf(status)));
@@ -166,7 +164,7 @@ public class TcpSender
                 if (contentLength > 0) {
                     char[] buf = new char[512];
                     while (contentLength > 0) {
-                        int thisTime = (contentLength > buf.length) ? buf.length : contentLength;
+                        int thisTime = Math.min(contentLength, buf.length);
                         int n = connectionReaders[i].read(buf, 0, thisTime);
                         if (n <= 0) {
                             log.error(sm.getString("tcpSender.readError"));
@@ -175,7 +173,7 @@ public class TcpSender
                         } else {
                             contentLength -= n;
                         }
-                   }
+                    }
                 }
             }
 
@@ -186,6 +184,7 @@ public class TcpSender
 
     /**
      * Close connection.
+     *
      * @param i The index of the connection that will be closed
      */
     protected void close(int i) {
@@ -193,21 +192,24 @@ public class TcpSender
             if (connectionReaders[i] != null) {
                 connectionReaders[i].close();
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
+            // Ignore
         }
         connectionReaders[i] = null;
         try {
             if (connectionWriters[i] != null) {
                 connectionWriters[i].close();
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
+            // Ignore
         }
         connectionWriters[i] = null;
         try {
             if (connections[i] != null) {
                 connections[i].close();
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
+            // Ignore
         }
         connections[i] = null;
     }

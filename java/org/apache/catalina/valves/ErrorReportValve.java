@@ -42,21 +42,11 @@ import org.apache.tomcat.util.res.StringManager;
 import org.apache.tomcat.util.security.Escape;
 
 /**
- * <p>
  * Implementation of a Valve that outputs HTML error pages.
- * </p>
  * <p>
  * This Valve should be attached at the Host level, although it will work if attached to a Context.
- * </p>
  * <p>
  * HTML code from the Cocoon 2 project.
- * </p>
- *
- * @author Remy Maucherat
- * @author Craig R. McClanahan
- * @author <a href="mailto:nicolaken@supereva.it">Nicola Ken Barozzi</a> Aisa
- * @author <a href="mailto:stefano@apache.org">Stefano Mazzocchi</a>
- * @author Yoav Shapira
  */
 public class ErrorReportValve extends ValveBase {
 
@@ -77,14 +67,10 @@ public class ErrorReportValve extends ValveBase {
     // --------------------------------------------------------- Public Methods
 
     /**
+     * {@inheritDoc}
+     * <p>
      * Invoke the next Valve in the sequence. When the invoke returns, check the response state. If the status code is
      * greater than or equal to 400 or an uncaught exception was thrown then the error handling will be triggered.
-     *
-     * @param request  The servlet request to be processed
-     * @param response The servlet response to be created
-     *
-     * @exception IOException      if an input/output error occurs
-     * @exception ServletException if a servlet error occurs
      */
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
@@ -94,7 +80,7 @@ public class ErrorReportValve extends ValveBase {
 
         if (response.isCommitted()) {
             if (response.setErrorReported()) {
-                // Error wasn't previously reported but we can't write an error
+                // Error wasn't previously reported, but we can't write an error
                 // page because the response has already been committed.
 
                 // See if IO is allowed
@@ -217,7 +203,7 @@ public class ErrorReportValve extends ValveBase {
         if (message == null) {
             if (throwable != null) {
                 String exceptionMessage = throwable.getMessage();
-                if (exceptionMessage != null && exceptionMessage.length() > 0) {
+                if (exceptionMessage != null && !exceptionMessage.isEmpty()) {
                     try (Scanner scanner = new Scanner(exceptionMessage)) {
                         message = Escape.htmlElementContent(scanner.nextLine());
                     }
@@ -329,7 +315,7 @@ public class ErrorReportValve extends ValveBase {
             } catch (Throwable t) {
                 ExceptionUtils.handleThrowable(t);
                 if (container.getLogger().isDebugEnabled()) {
-                    container.getLogger().debug("Failure to set the content-type of response", t);
+                    container.getLogger().debug(sm.getString("errorReportValve.contentTypeFail"), t);
                 }
             }
             Writer writer = response.getReporter();
@@ -360,7 +346,7 @@ public class ErrorReportValve extends ValveBase {
         int pos = elements.length;
         for (int i = elements.length - 1; i >= 0; i--) {
             if ((elements[i].getClassName().startsWith("org.apache.catalina.core.ApplicationFilterChain")) &&
-                    (elements[i].getMethodName().equals("internalDoFilter"))) {
+                    (elements[i].getMethodName().equals("doFilter"))) {
                 pos = i;
                 break;
             }
@@ -389,10 +375,10 @@ public class ErrorReportValve extends ValveBase {
         response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
 
-        try (OutputStream os = response.getOutputStream(); InputStream is = new FileInputStream(file);) {
+        try (OutputStream os = response.getOutputStream(); InputStream is = new FileInputStream(file)) {
             IOTools.flow(is, os);
-        } catch (IOException e) {
-            getContainer().getLogger().warn(sm.getString("errorReportValve.errorPageIOException", location), e);
+        } catch (IOException ioe) {
+            getContainer().getLogger().warn(sm.getString("errorReportValve.errorPageIOException", location), ioe);
             return false;
         }
 

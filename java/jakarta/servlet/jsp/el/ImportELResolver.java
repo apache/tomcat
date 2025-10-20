@@ -24,26 +24,11 @@ import jakarta.el.ELResolver;
 import jakarta.el.ImportHandler;
 
 /**
- * Providers resolution of imports and static imports in the Jakarta Server
- * Pages ELResolver chain.
+ * Providers resolution of imports and static imports in the Jakarta Pages ELResolver chain.
  *
  * @since JSP 3.1
  */
 public class ImportELResolver extends ELResolver {
-
-    // Indicates if a performance short-cut is available
-    private static final Class<?> AST_IDENTIFIER_KEY;
-
-    static {
-        Class<?> key = null;
-        try {
-            key = Class.forName("org.apache.el.parser.AstIdentifier");
-        } catch (Exception e) {
-            // Ignore: Expected if not running on Tomcat. Not a problem since
-            //         this just allows a short-cut.
-        }
-        AST_IDENTIFIER_KEY = key;
-    }
 
     /**
      * Default constructor.
@@ -61,23 +46,20 @@ public class ImportELResolver extends ELResolver {
         if (base == null) {
             if (property != null) {
                 boolean resolveClass = true;
-                // Performance short-cut available when running on Tomcat
-                if (AST_IDENTIFIER_KEY != null) {
-                    // Tomcat will set this key to Boolean.TRUE if the
-                    // identifier is a stand-alone identifier (i.e.
-                    // identifier) rather than part of an AstValue (i.e.
-                    // identifier.something). Imports do not need to be
-                    // checked if this is a stand-alone identifier
-                    Boolean value = (Boolean) context.getContext(AST_IDENTIFIER_KEY);
-                    if (value != null && value.booleanValue()) {
-                        resolveClass = false;
-                    }
+                /*
+                 * The EL implementation will set this key to Boolean.TRUE if the identifier is a stand-alone identifier
+                 * (i.e. identifier) rather than part of an AstValue (i.e. identifier.something). Imports do not need to
+                 * be checked if this is a stand-alone identifier.
+                 */
+                Boolean value = (Boolean) context.getContext(ELResolver.StandaloneIdentifierMarker.class);
+                if (value != null && value.booleanValue()) {
+                    resolveClass = false;
                 }
 
                 ImportHandler importHandler = context.getImportHandler();
                 if (importHandler != null) {
                     String key = property.toString();
-                    Class<?> clazz = null;
+                    Class<?> clazz;
                     if (resolveClass) {
                         clazz = importHandler.resolveClass(key);
                         if (clazz != null) {
@@ -90,8 +72,8 @@ public class ImportELResolver extends ELResolver {
                         if (clazz != null) {
                             try {
                                 result = clazz.getField(key).get(null);
-                            } catch (IllegalArgumentException | IllegalAccessException |
-                                    NoSuchFieldException | SecurityException e) {
+                            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException |
+                                    SecurityException e) {
                                 // Most (all?) of these should have been
                                 // prevented by the checks when the import
                                 // was defined.

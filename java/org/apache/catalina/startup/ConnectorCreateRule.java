@@ -34,7 +34,6 @@ import org.xml.sax.Attributes;
 /**
  * Rule implementation that creates a connector.
  */
-
 public class ConnectorCreateRule extends Rule {
 
     private static final Log log = LogFactory.getLog(ConnectorCreateRule.class);
@@ -42,23 +41,12 @@ public class ConnectorCreateRule extends Rule {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Process the beginning of this element.
-     *
-     * @param namespace the namespace URI of the matching element, or an
-     *   empty string if the parser is not namespace aware or the element has
-     *   no namespace
-     * @param name the local name if the parser is namespace aware, or just
-     *   the element name otherwise
-     * @param attributes The attribute list for this element
-     */
     @Override
-    public void begin(String namespace, String name, Attributes attributes)
-            throws Exception {
+    public void begin(String namespace, String name, Attributes attributes) throws Exception {
         Service svc = (Service) digester.peek();
         Executor ex = null;
         String executorName = attributes.getValue("executor");
-        if (executorName != null ) {
+        if (executorName != null) {
             ex = svc.getExecutor(executorName);
         }
         String protocolName = attributes.getValue("protocol");
@@ -81,8 +69,8 @@ public class ConnectorCreateRule extends Rule {
             code.append(System.lineSeparator());
             if (ex != null) {
                 code.append(digester.toVariableName(con)).append(".getProtocolHandler().setExecutor(");
-                code.append(digester.toVariableName(svc)).append(".getExecutor(").append(executorName);
-                code.append("));");
+                code.append(digester.toVariableName(svc)).append(".getExecutor(\"").append(executorName);
+                code.append("\"));");
                 code.append(System.lineSeparator());
             }
             if (sslImplementationName != null) {
@@ -95,32 +83,25 @@ public class ConnectorCreateRule extends Rule {
     }
 
     private static void setExecutor(Connector con, Executor ex) throws Exception {
-        Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(),"setExecutor",new Class[] {java.util.concurrent.Executor.class});
-        if (m!=null) {
-            m.invoke(con.getProtocolHandler(), new Object[] {ex});
-        }else {
+        Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(), "setExecutor",
+                new Class[] { java.util.concurrent.Executor.class });
+        if (m != null) {
+            m.invoke(con.getProtocolHandler(), ex);
+        } else {
             log.warn(sm.getString("connector.noSetExecutor", con));
         }
     }
 
     private static void setSSLImplementationName(Connector con, String sslImplementationName) throws Exception {
-        Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(),"setSslImplementationName",new Class[] {String.class});
+        Method m = IntrospectionUtils.findMethod(con.getProtocolHandler().getClass(), "setSslImplementationName",
+                new Class[] { String.class });
         if (m != null) {
-            m.invoke(con.getProtocolHandler(), new Object[] {sslImplementationName});
+            m.invoke(con.getProtocolHandler(), sslImplementationName);
         } else {
             log.warn(sm.getString("connector.noSetSSLImplementationName", con));
         }
     }
 
-    /**
-     * Process the end of this element.
-     *
-     * @param namespace the namespace URI of the matching element, or an
-     *   empty string if the parser is not namespace aware or the element has
-     *   no namespace
-     * @param name the local name if the parser is namespace aware, or just
-     *   the element name otherwise
-     */
     @Override
     public void end(String namespace, String name) throws Exception {
         digester.pop();

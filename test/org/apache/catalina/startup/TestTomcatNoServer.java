@@ -19,8 +19,11 @@ package org.apache.catalina.startup;
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -64,26 +67,46 @@ public class TestTomcatNoServer {
 
         Set<String> embeddedExtensions = new HashSet<>(Arrays.asList(ctx.findMimeMappings()));
 
-        // Find entries present in conf/web.xml that are missing in embedded
-        Set<String> missingInEmbedded = new HashSet<>(webXmlMimeMappings.keySet());
-        missingInEmbedded.removeAll(embeddedExtensions);
-        if (missingInEmbedded.size() > 0) {
-            for (String missingExtension : missingInEmbedded) {
-                System.out.println("Missing in embedded: [" + missingExtension +
-                        "]-[" + webXmlMimeMappings.get(missingExtension) + "]");
+        boolean pass = true;
+
+        /*
+         *  Check that each entry for embedded is present in web.xml with the same media type.
+         *  Also finds entries that are missing in conf/web.xml
+         */
+        Iterator<String> embeddedExtensionIterator = embeddedExtensions.iterator();
+        while (embeddedExtensionIterator.hasNext()) {
+            String embeddedExtension = embeddedExtensionIterator.next();
+            String embeddedMediaType = ctx.findMimeMapping(embeddedExtension);
+
+            if (!embeddedMediaType.equals(webXmlMimeMappings.get(embeddedExtension))) {
+                pass = false;
+                System.out.println("Extension [" + embeddedExtension + "] is mapped to [" + embeddedMediaType +
+                        "] in embedded but [" + webXmlMimeMappings.get(embeddedExtension) + "] in conf/web.xml");
             }
-            Assert.fail("Embedded is missing [" + missingInEmbedded.size() + "] entries compared to conf/web.xml");
+            // Remove from both whether they matched or not
+            embeddedExtensionIterator.remove();
+            webXmlMimeMappings.remove(embeddedExtension);
         }
 
-        // Find entries present in embedded that are missing in conf/web.xml
-        Set<String> missingInWebXml = new HashSet<>(embeddedExtensions);
-        missingInWebXml.removeAll(webXmlMimeMappings.keySet());
-        if (missingInWebXml.size() > 0) {
-            for (String missingExtension : missingInWebXml) {
-                System.out.println("Missing in embedded: [" + missingExtension +
-                        "]-[" + ctx.findMimeMapping(missingExtension) + "]");
+        // Check for entries missing in embedded
+        if (webXmlMimeMappings.size() > 0) {
+            pass = false;
+            for (Map.Entry<String,String> mapping : webXmlMimeMappings.entrySet()) {
+                System.out.println("Extension [" + mapping.getKey() + "] is mapped to [" + mapping.getValue() +
+                        "] in conf/web.xml but [null] in embedded");
             }
-            Assert.fail("Embedded is missing [" + missingInWebXml.size() + "] entries compared to conf/web.xml");
+        }
+
+        Assert.assertTrue(pass);
+    }
+
+    @Test
+    public void testJarsDecoration() throws Exception {
+        File libDir = new File(LoggingBaseTest.getBuildDirectory(), "lib");
+        try (JarFile catalinaJar = new JarFile(new File(libDir, "tomcat-util.jar"))) {
+            Manifest manifest = catalinaJar.getManifest();
+            Assert.assertFalse(manifest.getMainAttributes().getValue("Export-Package").isEmpty());
+            Assert.assertNotNull(catalinaJar.getJarEntry("module-info.class"));
         }
     }
 }

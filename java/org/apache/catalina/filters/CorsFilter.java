@@ -18,10 +18,9 @@ package org.apache.catalina.filters;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.Serial;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -35,10 +34,13 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Globals;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.http.ResponseUtil;
+import org.apache.tomcat.util.http.parser.MediaType;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
@@ -75,6 +77,7 @@ import org.apache.tomcat.util.res.StringManager;
  */
 public class CorsFilter extends GenericFilter {
 
+    @Serial
     private static final long serialVersionUID = 1L;
     private static final StringManager sm = StringManager.getManager(CorsFilter.class);
 
@@ -127,20 +130,17 @@ public class CorsFilter extends GenericFilter {
     @Override
     public void doFilter(final ServletRequest servletRequest, final ServletResponse servletResponse,
             final FilterChain filterChain) throws IOException, ServletException {
-        if (!(servletRequest instanceof HttpServletRequest) || !(servletResponse instanceof HttpServletResponse)) {
+        if (!(servletRequest instanceof HttpServletRequest request) ||
+                !(servletResponse instanceof HttpServletResponse response)) {
             throw new ServletException(sm.getString("corsFilter.onlyHttp"));
         }
-
-        // Safe to downcast at this point.
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HttpServletResponse response = (HttpServletResponse) servletResponse;
 
         // Determines the CORS request type.
         CorsFilter.CORSRequestType requestType = checkRequestType(request);
 
         // Adds CORS specific attributes to request.
         if (isDecorateRequest()) {
-            CorsFilter.decorateCORSProperties(request, requestType);
+            decorateCORSProperties(request, requestType);
         }
         switch (requestType) {
             case SIMPLE:
@@ -218,7 +218,7 @@ public class CorsFilter extends GenericFilter {
                     CorsFilter.CORSRequestType.ACTUAL));
         }
 
-        final String origin = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
+        final String origin = request.getHeader(REQUEST_HEADER_ORIGIN);
         final String method = request.getMethod();
 
         // Section 6.1.2
@@ -258,7 +258,7 @@ public class CorsFilter extends GenericFilter {
                     CORSRequestType.PRE_FLIGHT.name().toLowerCase(Locale.ENGLISH)));
         }
 
-        final String origin = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
+        final String origin = request.getHeader(REQUEST_HEADER_ORIGIN);
 
         // Section 6.2.2
         if (!isOriginAllowed(origin)) {
@@ -267,7 +267,7 @@ public class CorsFilter extends GenericFilter {
         }
 
         // Section 6.2.3
-        String accessControlRequestMethod = request.getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+        String accessControlRequestMethod = request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
         if (accessControlRequestMethod == null) {
             handleInvalidCORS(request, response, filterChain);
             return;
@@ -276,8 +276,7 @@ public class CorsFilter extends GenericFilter {
         }
 
         // Section 6.2.4
-        String accessControlRequestHeadersHeader = request
-                .getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
+        String accessControlRequestHeadersHeader = request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
         List<String> accessControlRequestHeaders = new ArrayList<>();
         if (accessControlRequestHeadersHeader != null && !accessControlRequestHeadersHeader.trim().isEmpty()) {
             String[] headers = accessControlRequestHeadersHeader.trim().split(",");
@@ -322,7 +321,11 @@ public class CorsFilter extends GenericFilter {
     private void handleNonCORS(final HttpServletRequest request, final HttpServletResponse response,
             final FilterChain filterChain) throws IOException, ServletException {
 
-        addStandardHeaders(request, response);
+        if (!isAnyOriginAllowed()) {
+            // If only specific origins are allowed, the response will vary by
+            // origin
+            ResponseUtil.addVaryFieldName(response, REQUEST_HEADER_ORIGIN);
+        }
 
         // Let request pass.
         filterChain.doFilter(request, response);
@@ -338,7 +341,7 @@ public class CorsFilter extends GenericFilter {
      */
     private void handleInvalidCORS(final HttpServletRequest request, final HttpServletResponse response,
             final FilterChain filterChain) {
-        String origin = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
+        String origin = request.getHeader(REQUEST_HEADER_ORIGIN);
         String method = request.getMethod();
         String accessControlRequestHeaders = request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
 
@@ -347,16 +350,7 @@ public class CorsFilter extends GenericFilter {
         response.resetBuffer();
 
         if (log.isDebugEnabled()) {
-            // Debug so no need for i18n
-            StringBuilder message = new StringBuilder("Invalid CORS request; Origin=");
-            message.append(origin);
-            message.append(";Method=");
-            message.append(method);
-            if (accessControlRequestHeaders != null) {
-                message.append(";Access-Control-Request-Headers=");
-                message.append(accessControlRequestHeaders);
-            }
-            log.debug(message.toString());
+            log.debug(sm.getString("corsFilter.invalidRequest", origin, method, accessControlRequestHeaders));
         }
     }
 
@@ -367,7 +361,7 @@ public class CorsFilter extends GenericFilter {
     private void addStandardHeaders(final HttpServletRequest request, final HttpServletResponse response) {
 
         final String method = request.getMethod();
-        final String origin = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
+        final String origin = request.getHeader(REQUEST_HEADER_ORIGIN);
 
         // Local copy to avoid concurrency issues if isAnyOriginAllowed()
         // is overridden.
@@ -375,7 +369,7 @@ public class CorsFilter extends GenericFilter {
         if (!anyOriginAllowed) {
             // If only specific origins are allowed, the response will vary by
             // origin
-            ResponseUtil.addVaryFieldName(response, CorsFilter.REQUEST_HEADER_ORIGIN);
+            ResponseUtil.addVaryFieldName(response, REQUEST_HEADER_ORIGIN);
         }
 
         // CORS requests (SIMPLE, ACTUAL, PRE_FLIGHT) set the following headers
@@ -386,18 +380,18 @@ public class CorsFilter extends GenericFilter {
         // Add a single Access-Control-Allow-Origin header.
         if (anyOriginAllowed) {
             // If any origin is allowed, return header with '*'.
-            response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
+            response.addHeader(RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, "*");
         } else {
             // Add a single Access-Control-Allow-Origin header, with the value
             // of the Origin header as value.
-            response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+            response.addHeader(RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN, origin);
         }
 
         // If the resource supports credentials, add a single
         // Access-Control-Allow-Credentials header with the case-sensitive
         // string "true" as value.
         if (isSupportsCredentials()) {
-            response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
+            response.addHeader(RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_CREDENTIALS, "true");
         }
 
         // If the list of exposed headers is not empty add one or more
@@ -406,17 +400,17 @@ public class CorsFilter extends GenericFilter {
         // Local copy to avoid concurrency issues if getExposedHeaders()
         // is overridden.
         Collection<String> exposedHeaders = getExposedHeaders();
-        if ((exposedHeaders != null) && (exposedHeaders.size() > 0)) {
+        if (exposedHeaders != null && !exposedHeaders.isEmpty()) {
             String exposedHeadersString = join(exposedHeaders, ",");
-            response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS, exposedHeadersString);
+            response.addHeader(RESPONSE_HEADER_ACCESS_CONTROL_EXPOSE_HEADERS, exposedHeadersString);
         }
 
-        if ("OPTIONS".equals(method)) {
+        if (Method.OPTIONS.equals(method)) {
             // For an OPTIONS request, the response will vary based on the
-            // value or absence of the following headers. Hence they need be be
+            // value or absence of the following headers. Hence, they need to be
             // included in the Vary header.
-            ResponseUtil.addVaryFieldName(response, CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
-            ResponseUtil.addVaryFieldName(response, CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
+            ResponseUtil.addVaryFieldName(response, REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+            ResponseUtil.addVaryFieldName(response, REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
 
             // CORS PRE_FLIGHT (OPTIONS) requests set the following headers although
             // non-CORS OPTIONS requests do not need to. The headers are always set
@@ -426,23 +420,21 @@ public class CorsFilter extends GenericFilter {
             // is overridden.
             long preflightMaxAge = getPreflightMaxAge();
             if (preflightMaxAge > 0) {
-                response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_MAX_AGE, String.valueOf(preflightMaxAge));
+                response.addHeader(RESPONSE_HEADER_ACCESS_CONTROL_MAX_AGE, String.valueOf(preflightMaxAge));
             }
 
             // Local copy to avoid concurrency issues if getAllowedHttpMethods()
             // is overridden.
             Collection<String> allowedHttpMethods = getAllowedHttpMethods();
-            if ((allowedHttpMethods != null) && (!allowedHttpMethods.isEmpty())) {
-                response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_METHODS,
-                        join(allowedHttpMethods, ","));
+            if (allowedHttpMethods != null && !allowedHttpMethods.isEmpty()) {
+                response.addHeader(RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_METHODS, join(allowedHttpMethods, ","));
             }
 
             // Local copy to avoid concurrency issues if getAllowedHttpHeaders()
             // is overridden.
             Collection<String> allowedHttpHeaders = getAllowedHttpHeaders();
-            if ((allowedHttpHeaders != null) && (!allowedHttpHeaders.isEmpty())) {
-                response.addHeader(CorsFilter.RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_HEADERS,
-                        join(allowedHttpHeaders, ","));
+            if (allowedHttpHeaders != null && !allowedHttpHeaders.isEmpty()) {
+                response.addHeader(RESPONSE_HEADER_ACCESS_CONTROL_ALLOW_HEADERS, join(allowedHttpHeaders, ","));
             }
         }
     }
@@ -476,26 +468,24 @@ public class CorsFilter extends GenericFilter {
         switch (corsRequestType) {
             case SIMPLE:
             case ACTUAL:
-                request.setAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST, Boolean.TRUE);
-                request.setAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_ORIGIN,
-                        request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN));
-                request.setAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_REQUEST_TYPE,
+                request.setAttribute(HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST, Boolean.TRUE);
+                request.setAttribute(HTTP_REQUEST_ATTRIBUTE_ORIGIN, request.getHeader(REQUEST_HEADER_ORIGIN));
+                request.setAttribute(HTTP_REQUEST_ATTRIBUTE_REQUEST_TYPE,
                         corsRequestType.name().toLowerCase(Locale.ENGLISH));
                 break;
             case PRE_FLIGHT:
-                request.setAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST, Boolean.TRUE);
-                request.setAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_ORIGIN,
-                        request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN));
-                request.setAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_REQUEST_TYPE,
+                request.setAttribute(HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST, Boolean.TRUE);
+                request.setAttribute(HTTP_REQUEST_ATTRIBUTE_ORIGIN, request.getHeader(REQUEST_HEADER_ORIGIN));
+                request.setAttribute(HTTP_REQUEST_ATTRIBUTE_REQUEST_TYPE,
                         corsRequestType.name().toLowerCase(Locale.ENGLISH));
                 String headers = request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_HEADERS);
                 if (headers == null) {
                     headers = "";
                 }
-                request.setAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_REQUEST_HEADERS, headers);
+                request.setAttribute(HTTP_REQUEST_ATTRIBUTE_REQUEST_HEADERS, headers);
                 break;
             case NOT_CORS:
-                request.setAttribute(CorsFilter.HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST, Boolean.FALSE);
+                request.setAttribute(HTTP_REQUEST_ATTRIBUTE_IS_CORS_REQUEST, Boolean.FALSE);
                 break;
             default:
                 // Don't set any attributes
@@ -546,71 +536,45 @@ public class CorsFilter extends GenericFilter {
      * @return the CORS type
      */
     protected CORSRequestType checkRequestType(final HttpServletRequest request) {
-        CORSRequestType requestType = CORSRequestType.INVALID_CORS;
         if (request == null) {
             throw new IllegalArgumentException(sm.getString("corsFilter.nullRequest"));
         }
         String originHeader = request.getHeader(REQUEST_HEADER_ORIGIN);
-        // Section 6.1.1 and Section 6.2.1
-        if (originHeader != null) {
-            if (originHeader.isEmpty()) {
-                requestType = CORSRequestType.INVALID_CORS;
-            } else if (!RequestUtil.isValidOrigin(originHeader)) {
-                requestType = CORSRequestType.INVALID_CORS;
-            } else if (RequestUtil.isSameOrigin(request, originHeader)) {
-                return CORSRequestType.NOT_CORS;
-            } else {
-                String method = request.getMethod();
-                if (method != null) {
-                    if ("OPTIONS".equals(method)) {
-                        String accessControlRequestMethodHeader = request
-                                .getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
-                        if (accessControlRequestMethodHeader != null && !accessControlRequestMethodHeader.isEmpty()) {
-                            requestType = CORSRequestType.PRE_FLIGHT;
-                        } else if (accessControlRequestMethodHeader != null &&
-                                accessControlRequestMethodHeader.isEmpty()) {
-                            requestType = CORSRequestType.INVALID_CORS;
-                        } else {
-                            requestType = CORSRequestType.ACTUAL;
-                        }
-                    } else if ("GET".equals(method) || "HEAD".equals(method)) {
-                        requestType = CORSRequestType.SIMPLE;
-                    } else if ("POST".equals(method)) {
-                        String mediaType = getMediaType(request.getContentType());
-                        if (mediaType != null) {
-                            if (SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES.contains(mediaType)) {
-                                requestType = CORSRequestType.SIMPLE;
-                            } else {
-                                requestType = CORSRequestType.ACTUAL;
-                            }
-                        }
-                    } else {
-                        requestType = CORSRequestType.ACTUAL;
+        if (originHeader == null) {
+            return CORSRequestType.NOT_CORS;
+        }
+        if (originHeader.isEmpty() || !RequestUtil.isValidOrigin(originHeader)) {
+            return CORSRequestType.INVALID_CORS;
+        }
+        if (RequestUtil.isSameOrigin(request, originHeader)) {
+            return CORSRequestType.NOT_CORS;
+        }
+        String method = request.getMethod();
+        if (method == null) {
+            return CORSRequestType.INVALID_CORS;
+        }
+        switch (method) {
+            case Method.OPTIONS:
+                String accessControlRequestMethodHeader =
+                        request.getHeader(REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+                if (accessControlRequestMethodHeader != null) {
+                    if (accessControlRequestMethodHeader.isEmpty()) {
+                        return CORSRequestType.INVALID_CORS;
                     }
+                    return CORSRequestType.PRE_FLIGHT;
                 }
-            }
-        } else {
-            requestType = CORSRequestType.NOT_CORS;
+                return CORSRequestType.ACTUAL;
+            case Method.GET:
+            case Method.HEAD:
+                return CORSRequestType.SIMPLE;
+            case Method.POST:
+                String mediaType = MediaType.parseMediaTypeOnly(request.getContentType());
+                if (mediaType == null || SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES.contains(mediaType)) {
+                    return CORSRequestType.SIMPLE;
+                }
+                break;
         }
-
-        return requestType;
-    }
-
-
-    /**
-     * Return the lower case, trimmed value of the media type from the content type.
-     */
-    private String getMediaType(String contentType) {
-        if (contentType == null) {
-            return null;
-        }
-        String result = contentType.toLowerCase(Locale.ENGLISH);
-        int firstSemiColonIndex = result.indexOf(';');
-        if (firstSemiColonIndex > -1) {
-            result = result.substring(0, firstSemiColonIndex);
-        }
-        result = result.trim();
-        return result;
+        return CORSRequestType.ACTUAL;
     }
 
     /**
@@ -705,17 +669,15 @@ public class CorsFilter extends GenericFilter {
     private Set<String> parseStringToSet(final String data) {
         String[] splits;
 
-        if (data != null && data.length() > 0) {
+        if (data != null && !data.isEmpty()) {
             splits = data.split(",");
         } else {
             splits = new String[] {};
         }
 
         Set<String> set = new HashSet<>();
-        if (splits.length > 0) {
-            for (String split : splits) {
-                set.add(split.trim());
-            }
+        for (String split : splits) {
+            set.add(split.trim());
         }
 
         return set;
@@ -806,6 +768,7 @@ public class CorsFilter extends GenericFilter {
      * Log objects are not Serializable but this Filter is because it extends GenericFilter. Tomcat won't serialize a
      * Filter but in case something else does...
      */
+    @Serial
     private void readObject(ObjectInputStream ois) throws ClassNotFoundException, IOException {
         ois.defaultReadObject();
         log = LogFactory.getLog(CorsFilter.class);
@@ -894,8 +857,8 @@ public class CorsFilter extends GenericFilter {
     /**
      * Request headers sent as 'Access-Control-Request-Headers' header, for pre-flight request.
      */
-    public static final String HTTP_REQUEST_ATTRIBUTE_REQUEST_HEADERS = HTTP_REQUEST_ATTRIBUTE_PREFIX +
-            "request.headers";
+    public static final String HTTP_REQUEST_ATTRIBUTE_REQUEST_HEADERS =
+            HTTP_REQUEST_ATTRIBUTE_PREFIX + "request.headers";
 
     // -------------------------------------------------------------- Constants
     /**
@@ -930,8 +893,8 @@ public class CorsFilter extends GenericFilter {
      *
      * @see <a href="http://www.w3.org/TR/cors/#terminology" >http://www.w3.org/TR/cors/#terminology</a>
      */
-    public static final Collection<String> SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList("application/x-www-form-urlencoded", "multipart/form-data", "text/plain")));
+    public static final Collection<String> SIMPLE_HTTP_REQUEST_CONTENT_TYPE_VALUES =
+            Set.of(Globals.CONTENT_TYPE_FORM_URL_ENCODING, "multipart/form-data", "text/plain");
 
     // ------------------------------------------------ Configuration Defaults
     /**

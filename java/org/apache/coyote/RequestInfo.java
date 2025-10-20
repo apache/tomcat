@@ -25,9 +25,7 @@ import javax.management.ObjectName;
  * Structure holding the Request and Response objects. It also holds statistical information about request processing
  * and provide management information about the requests being processed. Each thread uses a Request/Response pair that
  * is recycled on each request. This object provides a place to collect global low-level statistics - without having to
- * deal with synchronization ( since each thread will have it's own RequestProcessorMX ).
- *
- * @author Costin Manolache
+ * deal with synchronization (since each thread will have its own RequestProcessorMX).
  */
 public class RequestInfo {
     private RequestGroupInfo global = null;
@@ -65,7 +63,7 @@ public class RequestInfo {
     // This is useful for long-running requests only
 
     public String getMethod() {
-        return req.method().toString();
+        return req.getMethod();
     }
 
     public String getCurrentUri() {
@@ -101,7 +99,7 @@ public class RequestInfo {
     /**
      * Obtain the remote address for this connection as reported by an intermediate proxy (if any).
      *
-     * @return The remote address for the this connection
+     * @return The remote address for this connection
      */
     public String getRemoteAddrForwarded() {
         String remoteAddrProxy = (String) req.getAttribute(Constants.REMOTE_ADDR_ATTRIBUTE);
@@ -127,7 +125,7 @@ public class RequestInfo {
         // Not perfect, but good enough to avoid returning strange values due to
         // concurrent updates.
         long startTime = req.getStartTimeNanos();
-        if (getStage() == org.apache.coyote.Constants.STAGE_ENDED || startTime < 0) {
+        if (getStage() == Constants.STAGE_ENDED || startTime < 0) {
             return 0;
         } else {
             return TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime);
@@ -260,5 +258,19 @@ public class RequestInfo {
 
     public void setLastRequestProcessingTime(long lastRequestProcessingTime) {
         this.lastRequestProcessingTime = lastRequestProcessingTime;
+    }
+
+    public void recycleStatistcs() {
+        this.bytesSent = 0;
+        this.bytesReceived = 0;
+
+        this.processingTime = 0;
+        this.maxTime = 0;
+        this.maxRequestUri = null;
+
+        this.requestCount = 0;
+        this.errorCount = 0;
+
+        this.lastRequestProcessingTime = 0;
     }
 }

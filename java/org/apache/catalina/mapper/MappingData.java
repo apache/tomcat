@@ -25,8 +25,6 @@ import org.apache.tomcat.util.buf.MessageBytes;
 
 /**
  * Mapping data.
- *
- * @author Remy Maucherat
  */
 public class MappingData {
 

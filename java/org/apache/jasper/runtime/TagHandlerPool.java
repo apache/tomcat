@@ -21,12 +21,12 @@ import jakarta.servlet.jsp.JspException;
 import jakarta.servlet.jsp.tagext.Tag;
 
 import org.apache.jasper.Constants;
+import org.apache.jasper.compiler.Localizer;
+import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.InstanceManager;
 
 /**
  * Pool of tag handlers that can be reused.
- *
- * @author Jan Luehe
  */
 public class TagHandlerPool {
 
@@ -50,8 +50,7 @@ public class TagHandlerPool {
                 Class<?> c = Class.forName(tpClassName);
                 result = (TagHandlerPool) c.getConstructor().newInstance();
             } catch (Exception e) {
-                e.printStackTrace();
-                result = null;
+                LogFactory.getLog(TagHandlerPool.class).info(Localizer.getMessage("jsp.error.tagHandlerPool"), e);
             }
         }
         if (result == null) {
@@ -68,8 +67,8 @@ public class TagHandlerPool {
         if (maxSizeS != null) {
             try {
                 maxSize = Integer.parseInt(maxSizeS);
-            } catch (Exception ex) {
-                maxSize = -1;
+            } catch (Exception e) {
+                // Ignore
             }
         }
         if (maxSize < 0) {
@@ -91,14 +90,14 @@ public class TagHandlerPool {
     }
 
     /**
-     * Gets the next available tag handler from this tag handler pool,
-     * instantiating one if this tag handler pool is empty.
+     * Gets the next available tag handler from this tag handler pool, instantiating one if this tag handler pool is
+     * empty.
      *
-     * @param handlerClass
-     *            Tag handler class
+     * @param handlerClass Tag handler class
+     *
      * @return Reused or newly instantiated tag handler
-     * @throws JspException
-     *             if a tag handler cannot be instantiated
+     *
+     * @throws JspException if a tag handler cannot be instantiated
      */
     public Tag get(Class<? extends Tag> handlerClass) throws JspException {
         Tag handler;
@@ -113,8 +112,7 @@ public class TagHandlerPool {
         // wait for us to construct a tag for this thread.
         try {
             if (useInstanceManagerForTags) {
-                return (Tag) instanceManager.newInstance(
-                        handlerClass.getName(), handlerClass.getClassLoader());
+                return (Tag) instanceManager.newInstance(handlerClass.getName(), handlerClass.getClassLoader());
             } else {
                 Tag instance = handlerClass.getConstructor().newInstance();
                 instanceManager.newInstance(instance);
@@ -128,12 +126,10 @@ public class TagHandlerPool {
     }
 
     /**
-     * Adds the given tag handler to this tag handler pool, unless this tag
-     * handler pool has already reached its capacity, in which case the tag
-     * handler's release() method is called.
+     * Adds the given tag handler to this tag handler pool, unless this tag handler pool has already reached its
+     * capacity, in which case the tag handler's release() method is called.
      *
-     * @param handler
-     *            Tag handler to add to this tag handler pool
+     * @param handler Tag handler to add to this tag handler pool
      */
     public void reuse(Tag handler) {
         synchronized (this) {
@@ -147,8 +143,7 @@ public class TagHandlerPool {
     }
 
     /**
-     * Calls the release() method of all available tag handlers in this tag
-     * handler pool.
+     * Calls the release() method of all available tag handlers in this tag handler pool.
      */
     public synchronized void release() {
         for (int i = current; i >= 0; i--) {
@@ -157,8 +152,7 @@ public class TagHandlerPool {
     }
 
 
-    protected static String getOption(ServletConfig config, String name,
-            String defaultV) {
+    protected static String getOption(ServletConfig config, String name, String defaultV) {
         if (config == null) {
             return defaultV;
         }

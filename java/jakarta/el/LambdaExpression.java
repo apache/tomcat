@@ -25,7 +25,7 @@ public class LambdaExpression {
 
     private final List<String> formalParameters;
     private final ValueExpression expression;
-    private final Map<String, Object> nestedArguments = new HashMap<>();
+    private final Map<String,Object> nestedArguments = new HashMap<>();
     private ELContext context = null;
 
     public LambdaExpression(List<String> formalParameters, ValueExpression expression) {
@@ -61,7 +61,7 @@ public class LambdaExpression {
         // Build the argument map
         // Start with the arguments from any outer expressions so if there is
         // any overlap the local arguments have priority
-        Map<String, Object> lambdaArguments = new HashMap<>(nestedArguments);
+        Map<String,Object> lambdaArguments = new HashMap<>(nestedArguments);
         for (int i = 0; i < formalParamCount; i++) {
             lambdaArguments.put(formalParameters.get(i), args[i]);
         }
@@ -81,7 +81,7 @@ public class LambdaExpression {
         }
     }
 
-    public java.lang.Object invoke(Object... args) {
+    public Object invoke(Object... args) {
         return invoke(context, args);
     }
 }

@@ -57,6 +57,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.filters.CorsFilter;
 import org.apache.catalina.filters.RemoteIpFilter;
 import org.apache.catalina.realm.GenericPrincipal;
+import org.apache.catalina.util.FilterUtil;
 import org.apache.catalina.util.SessionIdGeneratorBase;
 import org.apache.catalina.util.StandardSessionIdGenerator;
 import org.apache.catalina.valves.RemoteIpValve;
@@ -69,6 +70,7 @@ import org.apache.tomcat.util.descriptor.web.FilterMap;
 import org.apache.tomcat.util.descriptor.web.LoginConfig;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.RequestUtil;
 import org.apache.tomcat.util.res.StringManager;
 
@@ -84,8 +86,6 @@ import org.apache.tomcat.util.res.StringManager;
  * <p>
  * <b>USAGE CONSTRAINT</b>: This Valve is only useful when processing HTTP requests. Requests of any other type will
  * simply be passed through.
- *
- * @author Craig R. McClanahan
  */
 public abstract class AuthenticatorBase extends ValveBase implements Authenticator, RegistrationListener {
 
@@ -142,7 +142,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
      * Should a session always be used once a user is authenticated? This may offer some performance benefits since the
      * session can then be used to cache the authenticated Principal, hence removing the need to authenticate the user
      * via the Realm on every request. This may be of help for combinations such as BASIC authentication used with the
-     * JNDIRealm or DataSourceRealms. However there will also be the performance cost of creating and GC'ing the
+     * JNDIRealm or DataSourceRealms. However, there will also be the performance cost of creating and GC'ing the
      * session. By default, a session will not be created.
      */
     protected boolean alwaysUseSession = false;
@@ -263,29 +263,18 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         this.cache = cache;
     }
 
-    /**
-     * Return the Container to which this Valve is attached.
-     */
     @Override
     public Container getContainer() {
         return this.context;
     }
 
-    /**
-     * Set the Container to which this Valve is attached.
-     *
-     * @param container The container to which we are attached
-     */
     @Override
     public void setContainer(Container container) {
-
         if (container != null && !(container instanceof Context)) {
             throw new IllegalArgumentException(sm.getString("authenticator.notContext"));
         }
-
         super.setContainer(container);
         this.context = (Context) container;
-
     }
 
     /**
@@ -430,7 +419,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
     /**
-     * Sets the flag whether authentication information will be send to a reverse proxy on a forwarded request.
+     * Sets the flag whether authentication information will be sent to a reverse proxy on a forwarded request.
      *
      * @param sendAuthInfoResponseHeaders {@code true} if response headers shall be sent, {@code false} otherwise
      */
@@ -452,8 +441,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     @Override
     public void invoke(Request request, Response response) throws IOException, ServletException {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Security checking request " + request.getMethod() + " " + request.getRequestURI());
+        if (log.isTraceEnabled()) {
+            log.trace("Security checking request " + request.getMethod() + " " + request.getRequestURI());
         }
 
         // Have we got a cached authenticated Principal to record?
@@ -464,8 +453,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 if (session != null) {
                     principal = session.getPrincipal();
                     if (principal != null) {
-                        if (log.isDebugEnabled()) {
-                            log.debug("We have cached auth type " + session.getAuthType() + " for principal " +
+                        if (log.isTraceEnabled()) {
+                            log.trace("We have cached auth type " + session.getAuthType() + " for principal " +
                                     principal);
                         }
                         request.setAuthType(session.getAuthType());
@@ -487,8 +476,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
 
         if (constraints == null && !context.getPreemptiveAuthentication() && !authRequired) {
-            if (log.isDebugEnabled()) {
-                log.debug("Not subject to any constraint");
+            if (log.isTraceEnabled()) {
+                log.trace("Not subject to any constraint");
             }
             getNext().invoke(request, response);
             return;
@@ -496,7 +485,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         // Make sure that constrained resources are not cached by web proxies
         // or browsers as caching can provide a security hole
-        if (constraints != null && disableProxyCaching && !"POST".equalsIgnoreCase(request.getMethod())) {
+        if (constraints != null && disableProxyCaching && !Method.POST.equals(request.getMethod())) {
             if (securePagesWithPragma) {
                 // Note: These can cause problems with downloading files with IE
                 response.setHeader("Pragma", "No-cache");
@@ -509,12 +498,12 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         if (constraints != null) {
             // Enforce any user data constraint for this security constraint
-            if (log.isDebugEnabled()) {
-                log.debug("Calling hasUserDataPermission()");
+            if (log.isTraceEnabled()) {
+                log.trace("Calling hasUserDataPermission()");
             }
             if (!realm.hasUserDataPermission(request, response, constraints)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Failed hasUserDataPermission() test");
+                    log.debug(sm.getString("authenticator.userDataPermissionFail"));
                 }
                 /*
                  * ASSERT: Authenticator already set the appropriate HTTP status code, so we do not have to do anything
@@ -553,15 +542,15 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         if ((authRequired || constraints != null) && allowCorsPreflightBypass(request)) {
             if (log.isDebugEnabled()) {
-                log.debug("CORS Preflight request bypassing authentication");
+                log.debug(sm.getString("authenticator.corsBypass"));
             }
             getNext().invoke(request, response);
             return;
         }
 
         if (authRequired) {
-            if (log.isDebugEnabled()) {
-                log.debug("Calling authenticate()");
+            if (log.isTraceEnabled()) {
+                log.trace("Calling authenticate()");
             }
 
             if (jaspicProvider != null) {
@@ -574,7 +563,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             if (jaspicProvider == null && !doAuthenticate(request, response) ||
                     jaspicProvider != null && !authenticateJaspic(request, response, jaspicState, false)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Failed authenticate() test");
+                    log.debug(sm.getString("authenticator.authenticationFail"));
                 }
                 /*
                  * ASSERT: Authenticator already set the appropriate HTTP status code, so we do not have to do anything
@@ -586,12 +575,12 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
 
         if (constraints != null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Calling accessControl()");
+            if (log.isTraceEnabled()) {
+                log.trace("Calling accessControl()");
             }
             if (!realm.hasResourcePermission(request, response, constraints, this.context)) {
                 if (log.isDebugEnabled()) {
-                    log.debug("Failed accessControl() test");
+                    log.debug(sm.getString("authenticator.userPermissionFail", request.getUserPrincipal().getName()));
                 }
                 /*
                  * ASSERT: AccessControl method has already set the appropriate HTTP status code, so we do not have to
@@ -602,8 +591,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
 
         // Any and all specified constraints have been satisfied
-        if (log.isDebugEnabled()) {
-            log.debug("Successfully passed all security constraints");
+        if (log.isTraceEnabled()) {
+            log.trace("Successfully passed all security constraints");
         }
         getNext().invoke(request, response);
 
@@ -619,12 +608,12 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         if (allowCorsPreflight != AllowCorsPreflight.NEVER) {
             // First check to see if this is a CORS Preflight request
             // This is a subset of the tests in CorsFilter.checkRequestType
-            if ("OPTIONS".equals(request.getMethod())) {
+            if (Method.OPTIONS.equals(request.getMethod())) {
                 String originHeader = request.getHeader(CorsFilter.REQUEST_HEADER_ORIGIN);
                 if (originHeader != null && !originHeader.isEmpty() && RequestUtil.isValidOrigin(originHeader) &&
                         !RequestUtil.isSameOrigin(request, originHeader)) {
-                    String accessControlRequestMethodHeader = request
-                            .getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
+                    String accessControlRequestMethodHeader =
+                            request.getHeader(CorsFilter.REQUEST_HEADER_ACCESS_CONTROL_REQUEST_METHOD);
                     if (accessControlRequestMethodHeader != null && !accessControlRequestMethodHeader.isEmpty()) {
                         // This appears to be a CORS Preflight request
                         if (allowCorsPreflight == AllowCorsPreflight.ALWAYS) {
@@ -639,12 +628,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                                         for (FilterMap filterMap : context.findFilterMaps()) {
                                             if (filterMap.getFilterName().equals(filterDef.getFilterName())) {
                                                 if ((filterMap.getDispatcherMapping() & FilterMap.REQUEST) > 0) {
-                                                    for (String urlPattern : filterMap.getURLPatterns()) {
-                                                        if ("/*".equals(urlPattern)) {
-                                                            allowBypass = true;
-                                                            // No need to check other patterns
-                                                            break;
-                                                        }
+                                                    String requestPath = FilterUtil.getRequestPath(request);
+                                                    if (FilterUtil.matchFiltersURL(filterMap, requestPath)) {
+                                                        allowBypass = true;
                                                     }
                                                 }
                                                 // Found mappings for CORS filter.
@@ -710,8 +696,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         try {
             CallbackHandler callbackHandler = getCallbackHandler();
-            ServerAuthConfig serverAuthConfig = jaspicProvider.getServerAuthConfig("HttpServlet", jaspicAppContextID,
-                    callbackHandler);
+            ServerAuthConfig serverAuthConfig =
+                    jaspicProvider.getServerAuthConfig("HttpServlet", jaspicAppContextID, callbackHandler);
             String authContextID = serverAuthConfig.getAuthContextID(jaspicState.messageInfo);
             jaspicState.serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
         } catch (AuthException e) {
@@ -734,17 +720,18 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
 
     private CallbackHandler createCallbackHandler() {
-        CallbackHandler callbackHandler = null;
+        CallbackHandler callbackHandler;
 
         Class<?> clazz = null;
         try {
             clazz = Class.forName(jaspicCallbackHandlerClass, true, Thread.currentThread().getContextClassLoader());
-        } catch (ClassNotFoundException e) {
-            // Proceed with the retry below
+        } catch (ClassNotFoundException ignore) {
+            // Not found in the context class loader (web application class loader). Re-try below.
         }
 
         try {
             if (clazz == null) {
+                // Look in the same class loader that loaded this class - usually Tomcat's common loader.
                 clazz = Class.forName(jaspicCallbackHandlerClass);
             }
             callbackHandler = (CallbackHandler) clazz.getConstructor().newInstance();
@@ -764,12 +751,12 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     // ------------------------------------------------------ Protected Methods
 
     /**
-     * Provided for sub-classes to implement their specific authentication mechanism.
+     * Provided for subclasses to implement their specific authentication mechanism.
      *
      * @param request  The request that triggered the authentication
      * @param response The response associated with the request
      *
-     * @return {@code true} if the the user was authenticated, otherwise {@code
+     * @return {@code true} if the user was authenticated, otherwise {@code
      *         false}, in which case an authentication challenge will have been written to the response
      *
      * @throws IOException If an I/O problem occurred during the authentication process
@@ -816,6 +803,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             authStatus = state.serverAuthContext.validateRequest(state.messageInfo, client, null);
         } catch (AuthException e) {
             log.debug(sm.getString("authenticator.loginFail"), e);
+            // Need to explicitly set the return code as the ServerAuthContext may not have done.
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return false;
         }
 
@@ -824,8 +813,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         if (authStatus == AuthStatus.SUCCESS) {
             GenericPrincipal principal = getPrincipal(client);
-            if (log.isDebugEnabled()) {
-                log.debug("Authenticated user: " + principal);
+            if (log.isTraceEnabled()) {
+                log.trace("Authenticated user: " + principal);
             }
             if (principal == null) {
                 request.setUserPrincipal(null);
@@ -833,7 +822,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 if (requirePrincipal) {
                     return false;
                 }
-            } else if (cachedAuth == false || !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
+            } else if (!cachedAuth || !principal.getUserPrincipal().equals(request.getUserPrincipal())) {
                 // Skip registration if authentication credentials were
                 // cached and the Principal did not change.
 
@@ -940,14 +929,14 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 Principal authorized = context.getRealm().authenticate(username);
                 if (authorized == null) {
                     // Realm doesn't recognise user. Create a user with no roles
-                    // from the authenticated user name
+                    // from the authenticated username
                     if (log.isDebugEnabled()) {
                         log.debug(sm.getString("authenticator.check.authorizeFail", username));
                     }
                     authorized = new GenericPrincipal(username);
                 }
                 String authType = request.getAuthType();
-                if (authType == null || authType.length() == 0) {
+                if (authType == null || authType.isEmpty()) {
                     authType = getAuthMethod();
                 }
                 register(request, response, authorized, authType, username, null);
@@ -986,8 +975,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             associate(ssoId, request.getSessionInternal(true));
 
             if (log.isDebugEnabled()) {
-                log.debug("Reauthenticated cached principal '" + request.getUserPrincipal().getName() +
-                        "' with auth type '" + request.getAuthType() + "'");
+                log.debug(sm.getString("authenticator.reauthentication", request.getUserPrincipal().getName(),
+                        request.getAuthType()));
             }
         }
 
@@ -1029,7 +1018,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
 
         if (log.isDebugEnabled()) {
             String name = (principal == null) ? "none" : principal.getName();
-            log.debug("Authenticated '" + name + "' with type '" + authType + "'");
+            log.debug(sm.getString("authenticator.authentication", name, authType));
         }
 
         // Cache the authentication information in our request
@@ -1089,12 +1078,15 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
                 cookie.setDomain(ssoDomain);
             }
 
-            // Configure httpOnly on SSO cookie using same rules as session
-            // cookies
+            // Configure httpOnly on SSO cookie using same rules as session cookies
             if (request.getServletContext().getSessionCookieConfig().isHttpOnly() ||
                     request.getContext().getUseHttpOnly()) {
                 cookie.setHttpOnly(true);
             }
+
+            // Configure Partitioned on SSO cookie using same rules as session cookies
+            cookie.setAttribute(Constants.COOKIE_PARTITIONED_ATTR,
+                    Boolean.toString(request.getContext().getUsePartitioned()));
 
             response.addCookie(cookie);
 
@@ -1147,6 +1139,11 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         register(request, request.getResponse(), principal, getAuthMethod(), username, password);
     }
 
+    /**
+     * Return the authentication method, which is vendor-specific and not defined by HttpServletRequest.
+     *
+     * @return the authentication method, which is vendor-specific and not defined by HttpServletRequest.
+     */
     protected abstract String getAuthMethod();
 
     /**
@@ -1177,8 +1174,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
             if (client != null) {
                 ServerAuthContext serverAuthContext;
                 try {
-                    ServerAuthConfig serverAuthConfig = provider.getServerAuthConfig("HttpServlet", jaspicAppContextID,
-                            getCallbackHandler());
+                    ServerAuthConfig serverAuthConfig =
+                            provider.getServerAuthConfig("HttpServlet", jaspicAppContextID, getCallbackHandler());
                     String authContextID = serverAuthConfig.getAuthContextID(messageInfo);
                     serverAuthContext = serverAuthConfig.getAuthContext(authContextID, null, null);
                     serverAuthContext.cleanSubject(messageInfo, client);
@@ -1202,15 +1199,8 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
 
-    /**
-     * Start this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#startInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         ServletContext servletContext = context.getServletContext();
         jaspicAppContextID = servletContext.getVirtualServerName() + " " + servletContext.getContextPath();
 
@@ -1218,7 +1208,7 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         // path, if there is one
         Container parent = context.getParent();
         while ((sso == null) && (parent != null)) {
-            Valve valves[] = parent.getPipeline().getValves();
+            Valve[] valves = parent.getPipeline().getValves();
             for (Valve valve : valves) {
                 if (valve instanceof SingleSignOn) {
                     sso = (SingleSignOn) valve;
@@ -1231,9 +1221,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
         }
         if (log.isDebugEnabled()) {
             if (sso != null) {
-                log.debug("Found SingleSignOn Valve at " + sso);
+                log.debug(sm.getString("authenticator.sso", sso));
             } else {
-                log.debug("No SingleSignOn Valve is present");
+                log.trace("No SingleSignOn Valve is present");
             }
         }
 
@@ -1246,18 +1236,9 @@ public abstract class AuthenticatorBase extends ValveBase implements Authenticat
     }
 
 
-    /**
-     * Stop this component and implement the requirements of
-     * {@link org.apache.catalina.util.LifecycleBase#stopInternal()}.
-     *
-     * @exception LifecycleException if this component detects a fatal error that prevents this component from being
-     *                                   used
-     */
     @Override
-    protected synchronized void stopInternal() throws LifecycleException {
-
+    protected void stopInternal() throws LifecycleException {
         super.stopInternal();
-
         sso = null;
     }
 

@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
     <title>The Realm Component</title>
   </properties>
 
@@ -278,9 +277,14 @@
       </attribute>
 
       <attribute name="authentication" required="false">
-        <p>A string specifying the type of authentication to use.
-        "none", "simple", "strong" or a provider specific definition
-        can be used. If no value is given the providers default is used.</p>
+        <p>A string specifying the type of authentication to use. "none",
+        "simple", "strong" or a provider specific definition can be used. If the
+        provider specific mechanism "GSSAPI" is specified and supported by the
+        provider, there are some circumstances, such as handling calls to
+        <code>HttpServletRequest.login(String username, String password)</code>,
+        where "GSSAPI" will not be used and the user will be
+        authenticated as described in <code>userPassword</code>. If no value is
+        given, the providers default is used.</p>
       </attribute>
 
       <attribute name="cipherSuites" required="false">
@@ -470,7 +474,7 @@
         connection. This attribute should be a comma-separated list of values
         selected from <code>auth-conf</code>, <code>auth-int</code> and
         <code>auth</code>. See <a
-        href="http://docs.oracle.com/javase/7/docs/api/javax/security/sasl/Sasl.html#QOP"
+        href="https://docs.oracle.com/en/java/javase/21/docs/api/java.security.sasl/javax/security/sasl/Sasl.html#QOP"
         rel="nofollow">Java documentation</a> for more details.</p>
         <p>The default value is <code>auth-conf</code>.</p>
       </attribute>
@@ -519,8 +523,12 @@
         <p>When the JNDIRealm is used with the SPNEGO authenticator, delegated
         credentials for the user may be available. If such credentials are
         present, this attribute controls whether or not they are used to
-        connect to the directory. If not specified, the default value of
-        <code>true</code> is used.</p>
+        connect to the directory. If delegated credentials are present but not
+        used because this attribute is <code>false</code>, the behaviour will be
+        as described in <code>roleSearchAsUser</code>, <code>userPattern</code>
+        and <code>userSearchAsUser</code> when delegated credentials are not
+        used. If not specified, the default value of <code>true</code> is
+        used.</p>
       </attribute>
 
       <attribute name="userBase" required="false">
@@ -669,7 +677,7 @@
       <attribute name="useStaticPrincipal" required="false">
         <p>This allows using a static <code>Principal</code> instance
         disconnected from the database if needed. This makes the behavior of
-        authenticated prinicipals equivalent to that of the other realms.
+        authenticated principals equivalent to that of the other realms.
         If there is a plan to use serialization, it is best to set this to
         <code>true</code> as the principal will always be replaced by this
         equivalent static principal when serializing.

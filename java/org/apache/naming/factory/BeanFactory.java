@@ -37,54 +37,26 @@ import org.apache.naming.StringManager;
 
 /**
  * Object factory for any Resource conforming to the JavaBean spec.
+ * <p>
+ * This factory can be configured in a <code>&lt;Context&gt;</code> element in your <code>conf/server.xml</code>
+ * configuration file. An example of factory configuration is:
+ * </p>
  *
- * <p>This factory can be configured in a <code>&lt;Context&gt;</code> element
- * in your <code>conf/server.xml</code>
- * configuration file.  An example of factory configuration is:</p>
  * <pre>
- * &lt;Resource name="jdbc/myDataSource" auth="SERVLET"
- *   type="oracle.jdbc.pool.OracleConnectionCacheImpl"/&gt;
- * &lt;ResourceParams name="jdbc/myDataSource"&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;factory&lt;/name&gt;
- *     &lt;value&gt;org.apache.naming.factory.BeanFactory&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;driverType&lt;/name&gt;
- *     &lt;value&gt;thin&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;serverName&lt;/name&gt;
- *     &lt;value&gt;hue&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;networkProtocol&lt;/name&gt;
- *     &lt;value&gt;tcp&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;databaseName&lt;/name&gt;
- *     &lt;value&gt;XXXX&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;portNumber&lt;/name&gt;
- *     &lt;value&gt;NNNN&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;user&lt;/name&gt;
- *     &lt;value&gt;XXXX&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;password&lt;/name&gt;
- *     &lt;value&gt;XXXX&lt;/value&gt;
- *   &lt;/parameter&gt;
- *   &lt;parameter&gt;
- *     &lt;name&gt;maxLimit&lt;/name&gt;
- *     &lt;value&gt;5&lt;/value&gt;
- *   &lt;/parameter&gt;
- * &lt;/ResourceParams&gt;
+ * &lt;Resource name="jdbc/myDataSource"
+ *           auth="SERVLET"
+ *           type="oracle.jdbc.pool.OracleConnectionCacheImpl"
+ *           factory="org.apache.naming.factory.BeanFactory"
+ *           driverType="thin"
+ *           serverName="hue"
+ *           networkProtocol="tcp"
+ *           databaseName="XXXX"
+ *           portNumber="NNNN"
+ *           user="XXXX"
+ *           password="XXXX"
+ *           maxLimit="5"
+ *           /&gt;
  * </pre>
- *
- * @author Aner Perez [aner at ncstech.com]
  */
 public class BeanFactory implements ObjectFactory {
 
@@ -95,7 +67,14 @@ public class BeanFactory implements ObjectFactory {
     /**
      * Create a new Bean instance.
      *
-     * @param obj The reference object describing the Bean
+     * @param obj         The reference object describing the Bean
+     * @param name        the bound name
+     * @param nameCtx     unused
+     * @param environment unused
+     *
+     * @return the object instance
+     *
+     * @throws NamingException if an error occur creating the instance
      */
     @Override
     public Object getObjectInstance(Object obj, Name name, Context nameCtx, Hashtable<?,?> environment)
@@ -106,7 +85,7 @@ public class BeanFactory implements ObjectFactory {
             try {
                 Reference ref = (Reference) obj;
                 String beanClassName = ref.getClassName();
-                Class<?> beanClass = null;
+                Class<?> beanClass;
                 ClassLoader tcl = Thread.currentThread().getContextClassLoader();
                 try {
                     if (tcl != null) {
@@ -114,7 +93,7 @@ public class BeanFactory implements ObjectFactory {
                     } else {
                         beanClass = Class.forName(beanClassName);
                     }
-                } catch(ClassNotFoundException cnfe) {
+                } catch (ClassNotFoundException cnfe) {
                     NamingException ne = new NamingException(sm.getString("beanFactory.classNotFound", beanClassName));
                     ne.initCause(cnfe);
                     throw ne;
@@ -139,18 +118,16 @@ public class BeanFactory implements ObjectFactory {
                     ra = e.nextElement();
                     String propName = ra.getType();
 
-                    if (propName.equals(Constants.FACTORY) ||
-                        propName.equals("scope") || propName.equals("auth") ||
-                        propName.equals("forceString") ||
-                        propName.equals("singleton")) {
+                    if (propName.equals(Constants.FACTORY) || propName.equals("scope") || propName.equals("auth") ||
+                            propName.equals("forceString") || propName.equals("singleton")) {
                         continue;
                     }
 
-                    value = (String)ra.getContent();
+                    value = (String) ra.getContent();
 
                     Object[] valueArray = new Object[1];
 
-                    int i = 0;
+                    int i;
                     for (i = 0; i < pda.length; i++) {
 
                         if (pda[i].getName().equals(propName)) {
@@ -184,12 +161,12 @@ public class BeanFactory implements ObjectFactory {
                                     setProp = bean.getClass().getMethod(setterName, String.class);
                                     valueArray[0] = value;
                                 } catch (NoSuchMethodException nsme) {
-                                    throw new NamingException(sm.getString(
-                                            "beanFactory.noStringConversion", propName, propType.getName()));
+                                    throw new NamingException(sm.getString("beanFactory.noStringConversion", propName,
+                                            propType.getName()));
                                 }
                             } else {
-                                throw new NamingException(sm.getString(
-                                        "beanFactory.noStringConversion", propName, propType.getName()));
+                                throw new NamingException(
+                                        sm.getString("beanFactory.noStringConversion", propName, propType.getName()));
                             }
 
                             if (setProp != null) {
@@ -213,11 +190,8 @@ public class BeanFactory implements ObjectFactory {
                 NamingException ne = new NamingException(ie.getMessage());
                 ne.setRootCause(ie);
                 throw ne;
-            } catch (java.lang.ReflectiveOperationException e) {
+            } catch (ReflectiveOperationException e) {
                 Throwable cause = e.getCause();
-                if (cause instanceof ThreadDeath) {
-                    throw (ThreadDeath) cause;
-                }
                 if (cause instanceof VirtualMachineError) {
                     throw (VirtualMachineError) cause;
                 }

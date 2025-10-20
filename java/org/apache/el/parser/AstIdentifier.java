@@ -19,6 +19,7 @@ package org.apache.el.parser;
 
 import jakarta.el.ELClass;
 import jakarta.el.ELException;
+import jakarta.el.ELResolver;
 import jakarta.el.MethodExpression;
 import jakarta.el.MethodInfo;
 import jakarta.el.MethodNotFoundException;
@@ -32,10 +33,6 @@ import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 import org.apache.el.util.Validation;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstIdentifier extends SimpleNode {
     public AstIdentifier(int id) {
         super(id);
@@ -53,8 +50,7 @@ public final class AstIdentifier extends SimpleNode {
         ctx.setPropertyResolved(false);
         Class<?> result = ctx.getELResolver().getType(ctx, null, this.image);
         if (!ctx.isPropertyResolved()) {
-            throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.resolver.unhandled.null", this.image));
+            throw new PropertyNotFoundException(MessageFactory.get("error.resolver.unhandled.null", this.image));
         }
         return result;
     }
@@ -78,17 +74,14 @@ public final class AstIdentifier extends SimpleNode {
         // EL Resolvers
         ctx.setPropertyResolved(false);
         Object result;
-        /* Putting the Boolean into the ELContext is part of a performance
-         * optimisation for ScopedAttributeELResolver. When looking up "foo",
-         * the resolver can't differentiate between ${ foo } and ${ foo.bar }.
-         * This is important because the expensive class lookup only needs to
-         * be performed in the later case. This flag tells the resolver if the
-         * lookup can be skipped.
+        /*
+         * Putting the Boolean into the ELContext is part of a performance optimisation for ImportELResolver. When
+         * looking up "foo", the resolver can't differentiate between ${ foo } and ${ foo.bar }. This is important
+         * because the expensive class lookup only needs to be performed in the later case. This flag tells the resolver
+         * if the lookup can be skipped.
          */
-        if (parent instanceof AstValue) {
-            ctx.putContext(this.getClass(), Boolean.FALSE);
-        } else {
-            ctx.putContext(this.getClass(), Boolean.TRUE);
+        if (!(parent instanceof AstValue)) {
+            ctx.putContext(ELResolver.StandaloneIdentifierMarker.class, Boolean.TRUE);
         }
         try {
             result = ctx.getELResolver().getValue(ctx, null, this.image);
@@ -111,14 +104,12 @@ public final class AstIdentifier extends SimpleNode {
         if (result != null) {
             try {
                 return ((Class<?>) result).getField(this.image).get(null);
-            } catch (IllegalArgumentException | IllegalAccessException
-                    | NoSuchFieldException | SecurityException e) {
+            } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
                 throw new ELException(e);
             }
         }
 
-        throw new PropertyNotFoundException(MessageFactory.get(
-                "error.resolver.unhandled.null", this.image));
+        throw new PropertyNotFoundException(MessageFactory.get("error.resolver.unhandled.null", this.image));
     }
 
     @Override
@@ -133,15 +124,13 @@ public final class AstIdentifier extends SimpleNode {
         ctx.setPropertyResolved(false);
         boolean result = ctx.getELResolver().isReadOnly(ctx, null, this.image);
         if (!ctx.isPropertyResolved()) {
-            throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.resolver.unhandled.null", this.image));
+            throw new PropertyNotFoundException(MessageFactory.get("error.resolver.unhandled.null", this.image));
         }
         return result;
     }
 
     @Override
-    public void setValue(EvaluationContext ctx, Object value)
-            throws ELException {
+    public void setValue(EvaluationContext ctx, Object value) throws ELException {
         VariableMapper varMapper = ctx.getVariableMapper();
         if (varMapper != null) {
             ValueExpression expr = varMapper.resolveVariable(this.image);
@@ -153,21 +142,18 @@ public final class AstIdentifier extends SimpleNode {
         ctx.setPropertyResolved(false);
         ctx.getELResolver().setValue(ctx, null, this.image, value);
         if (!ctx.isPropertyResolved()) {
-            throw new PropertyNotFoundException(MessageFactory.get(
-                    "error.resolver.unhandled.null", this.image));
+            throw new PropertyNotFoundException(MessageFactory.get("error.resolver.unhandled.null", this.image));
         }
     }
 
     @Override
-    public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
-            Object[] paramValues) throws ELException {
+    public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes, Object[] paramValues) throws ELException {
         return this.getMethodExpression(ctx).invoke(ctx.getELContext(), paramValues);
     }
 
 
     @Override
-    public MethodInfo getMethodInfo(EvaluationContext ctx,
-            Class<?>[] paramTypes) throws ELException {
+    public MethodInfo getMethodInfo(EvaluationContext ctx, Class<?>[] paramTypes) throws ELException {
         return this.getMethodExpression(ctx).getMethodInfo(ctx.getELContext());
     }
 
@@ -179,8 +165,7 @@ public final class AstIdentifier extends SimpleNode {
     @Override
     public void setImage(String image) {
         if (!Validation.isIdentifier(image)) {
-            throw new ELException(MessageFactory.get("error.identifier.notjava",
-                    image));
+            throw new ELException(MessageFactory.get("error.identifier.notjava", image));
         }
         this.image = image;
     }
@@ -204,8 +189,7 @@ public final class AstIdentifier extends SimpleNode {
     }
 
 
-    private MethodExpression getMethodExpression(EvaluationContext ctx)
-            throws ELException {
+    private MethodExpression getMethodExpression(EvaluationContext ctx) throws ELException {
         Object obj = null;
 
         // case A: ValueExpression exists, getValue which must
@@ -232,7 +216,8 @@ public final class AstIdentifier extends SimpleNode {
         } else if (obj == null) {
             throw new MethodNotFoundException(MessageFactory.get("error.identifier.noMethod", this.image));
         } else {
-            throw new ELException(MessageFactory.get("error.identifier.notMethodExpression", this.image, obj.getClass().getName()));
+            throw new ELException(
+                    MessageFactory.get("error.identifier.notMethodExpression", this.image, obj.getClass().getName()));
         }
     }
 }

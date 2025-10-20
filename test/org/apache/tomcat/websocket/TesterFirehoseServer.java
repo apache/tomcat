@@ -32,8 +32,8 @@ import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.websocket.server.TesterEndpointConfig;
 
 /**
- * Sends {@link #MESSAGE_COUNT} messages of size {@link #MESSAGE_SIZE} bytes as
- * quickly as possible after the client sends its first message.
+ * Sends {@link #MESSAGE_COUNT} messages of size {@link #MESSAGE_SIZE} bytes as quickly as possible after the client
+ * sends its first message.
  */
 public class TesterFirehoseServer {
 
@@ -41,7 +41,7 @@ public class TesterFirehoseServer {
     public static final String MESSAGE;
     public static final int MESSAGE_SIZE = 1024;
     public static final int WAIT_TIME_MILLIS = 300000;
-    public static final int SEND_TIME_OUT_MILLIS = 5000;
+    public static final int SEND_TIME_OUT_MILLIS = 2000;
 
     public static final String PATH = "/firehose";
 
@@ -156,8 +156,7 @@ public class TesterFirehoseServer {
         }
 
         public void doRun() throws IOException {
-            session.getUserProperties().put(
-                    org.apache.tomcat.websocket.Constants.BLOCKING_SEND_TIMEOUT_PROPERTY,
+            session.getUserProperties().put(Constants.BLOCKING_SEND_TIMEOUT_PROPERTY,
                     Long.valueOf(SEND_TIME_OUT_MILLIS));
 
             Basic remote = session.getBasicRemote();

@@ -14,10 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM openjdk:11-jre
-# FROM openjdk:17-jdk
-# Tomcat 10.1+ no longer supports Java 8 
-# FROM openjdk:8-jre
+FROM eclipse-temurin:22-jre
 VOLUME /tmp
 
 USER root
@@ -41,21 +38,21 @@ ENV JAVA_OPTS="-Dcatalina.base=. -Djava.security.egd=file:/dev/urandom"
 
 # Add JULI logging configuration
 ENV JAVA_OPTS="${JAVA_OPTS} -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager -Djava.util.logging.config.file=conf/logging.properties"
-# OpenSSL integration for Java 17
-#ENV JAVA_OPTS="${JAVA_OPTS} --enable-native-access=ALL-UNNAMED --add-modules jdk.incubator.foreign"
+# OpenSSL FFM
+ENV JAVA_OPTS="${JAVA_OPTS} --enable-native-access=ALL-UNNAMED"
 
 RUN sh -c 'touch app.jar'
 
 RUN mkdir -p /opt
 
 # Optional: Add Jolokia agent for JMX monitoring and management
-# RUN mkdir /opt/jolokia && wget https://repo.maven.apache.org/maven2/org/jolokia/jolokia-jvm/1.7.1/jolokia-jvm-1.7.1.jar -O /opt/jolokia/jolokia.jar
+# RUN mkdir /opt/jolokia && wget https://repo.maven.apache.org/maven2/org/jolokia/jolokia-jvm/1.7.2/jolokia-jvm-1.7.2.jar -O /opt/jolokia/jolokia.jar
 # ARG jolokiaport=8778
 # ENV JAVA_OPTS="-javaagent:/opt/jolokia/jolokia.jar=host=*,port=$jolokiaport,protocol=https,authIgnoreCerts=true ${JAVA_OPTS}"
 # EXPOSE $jolokiaport
 
 # Optional: Add Prometheus agent for JMX monitoring
-# RUN mkdir /opt/prometheus && wget https://repo.maven.apache.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.16.1/jmx_prometheus_javaagent-0.16.1.jar -O /opt/prometheus/prometheus.jar && wget https://raw.githubusercontent.com/prometheus/jmx_exporter/master/example_configs/tomcat.yml -O conf/prometheus.yaml
+# RUN mkdir /opt/prometheus && wget https://repo.maven.apache.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/1.0.1/jmx_prometheus_javaagent-1.0.1.jar -O /opt/prometheus/prometheus.jar && wget https://raw.githubusercontent.com/prometheus/jmx_exporter/master/example_configs/tomcat.yml -O conf/prometheus.yaml
 # ARG prometheusport=9404
 # ENV JAVA_OPTS="-javaagent:/opt/prometheus/prometheus.jar=$prometheusport:conf/prometheus.yaml ${JAVA_OPTS}"
 # EXPOSE $prometheusport

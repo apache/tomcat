@@ -31,7 +31,6 @@ import java.sql.Timestamp;
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -85,8 +84,8 @@ public class FileHandler extends Handler {
     public static final int DEFAULT_BUFFER_SIZE = -1;
 
 
-    private static final ExecutorService DELETE_FILES_SERVICE = Executors
-            .newSingleThreadExecutor(new ThreadFactory("FileHandlerLogFilesCleaner-"));
+    private static final ExecutorService DELETE_FILES_SERVICE =
+            Executors.newSingleThreadExecutor(new ThreadFactory("FileHandlerLogFilesCleaner-"));
 
     // ------------------------------------------------------------ Constructor
 
@@ -229,7 +228,7 @@ public class FileHandler extends Handler {
                 }
             }
 
-            String result = null;
+            String result;
             try {
                 result = getFormatter().format(record);
             } catch (Exception e) {
@@ -362,10 +361,10 @@ public class FileHandler extends Handler {
 
         // Get encoding for the logging file
         String encoding = getProperty(className + ".encoding", null);
-        if (encoding != null && encoding.length() > 0) {
+        if (encoding != null && !encoding.isEmpty()) {
             try {
                 setEncoding(encoding);
-            } catch (UnsupportedEncodingException ex) {
+            } catch (UnsupportedEncodingException ignore) {
                 // Ignore
             }
         }
@@ -378,7 +377,7 @@ public class FileHandler extends Handler {
         if (filterName != null) {
             try {
                 setFilter((Filter) cl.loadClass(filterName).getConstructor().newInstance());
-            } catch (Exception e) {
+            } catch (Exception ignore) {
                 // Ignore
             }
         }
@@ -388,7 +387,7 @@ public class FileHandler extends Handler {
         if (formatterName != null) {
             try {
                 setFormatter((Formatter) cl.loadClass(formatterName).getConstructor().newInstance());
-            } catch (Exception e) {
+            } catch (Exception ignore) {
                 // Ignore and fallback to defaults
                 setFormatter(new OneLineFormatter());
             }
@@ -453,14 +452,14 @@ public class FileHandler extends Handler {
             if (fos != null) {
                 try {
                     fos.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
             if (os != null) {
                 try {
                     os.close();
-                } catch (IOException e1) {
+                } catch (IOException ignore) {
                     // Ignore
                 }
             }
@@ -478,7 +477,7 @@ public class FileHandler extends Handler {
                 for (Path file : files) {
                     Files.delete(file);
                 }
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 reportError("Unable to delete log files older than [" + maxDays + "] days", null,
                         ErrorManager.GENERIC_FAILURE);
             }
@@ -486,7 +485,7 @@ public class FileHandler extends Handler {
     }
 
     private DirectoryStream<Path> streamFilesForDelete() throws IOException {
-        LocalDate maxDaysOffset = LocalDate.now().minus(maxDays.intValue(), ChronoUnit.DAYS);
+        LocalDate maxDaysOffset = LocalDate.now().minusDays(maxDays.intValue());
         return Files.newDirectoryStream(getDirectoryAsPath(), path -> {
             boolean result = false;
             String date = obtainDateFromPath(path);
@@ -494,8 +493,8 @@ public class FileHandler extends Handler {
                 try {
                     LocalDate dateFromFile = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(date));
                     result = dateFromFile.isBefore(maxDaysOffset);
-                } catch (DateTimeException e) {
-                    // no-op
+                } catch (DateTimeException ignore) {
+                    // Unable to determine date from path. File will not be included.
                 }
             }
             return result;

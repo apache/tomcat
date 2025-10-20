@@ -16,33 +16,20 @@
  */
 package org.apache.jasper;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Some constants and other global data that are used by the compiler and the runtime.
- *
- * @author Anil K. Vijendran
- * @author Harish Prabandham
- * @author Shawn Bayern
- * @author Mark Roth
  */
 public class Constants {
 
     public static final String SPEC_VERSION = "4.0";
 
     /**
-     * These classes/packages are automatically imported by the
-     * generated code.
+     * These classes/packages are automatically imported by the generated code.
      */
-    private static final String[] PRIVATE_STANDARD_IMPORTS = {
-        "jakarta.servlet.*",
-        "jakarta.servlet.http.*",
-        "jakarta.servlet.jsp.*"
-    };
     public static final List<String> STANDARD_IMPORTS =
-        Collections.unmodifiableList(Arrays.asList(PRIVATE_STANDARD_IMPORTS));
+            List.of("jakarta.servlet.*", "jakarta.servlet.http.*", "jakarta.servlet.jsp.*");
 
     /**
      * Default size of the JSP buffer.
@@ -60,36 +47,31 @@ public class Constants {
     public static final int MAX_POOL_SIZE = 5;
 
     /**
-     * Name of the system property containing
-     * the tomcat product installation path
+     * Name of the system property containing the tomcat product installation path
      */
     public static final String CATALINA_HOME_PROP = "catalina.home";
 
 
     /**
-     * Name of the ServletContext init-param that determines if the XML parsers
-     * used for *.tld files will be validating or not.
+     * Name of the ServletContext init-param that determines if the XML parsers used for *.tld files will be validating
+     * or not.
      * <p>
      * This must be kept in sync with org.apache.catalina.Globals
      */
-    public static final String XML_VALIDATION_TLD_INIT_PARAM =
-            "org.apache.jasper.XML_VALIDATE_TLD";
+    public static final String XML_VALIDATION_TLD_INIT_PARAM = "org.apache.jasper.XML_VALIDATE_TLD";
 
     /**
-     * Name of the ServletContext init-param that determines if the XML parsers
-     * will block the resolution of external entities.
+     * Name of the ServletContext init-param that determines if the XML parsers will block the resolution of external
+     * entities.
      * <p>
      * This must be kept in sync with org.apache.catalina.Globals
      */
-    public static final String XML_BLOCK_EXTERNAL_INIT_PARAM =
-            "org.apache.jasper.XML_BLOCK_EXTERNAL";
+    public static final String XML_BLOCK_EXTERNAL_INIT_PARAM = "org.apache.jasper.XML_BLOCK_EXTERNAL";
 
     /**
-     * Name of the ServletContext init-param that determines the JSP
-     * factory pool size. Set the value to a positive integer to enable it.
-     * The default value is <code>8</code> per thread.
+     * Name of the ServletContext init-param that determines the JSP factory pool size. Set the value to a positive
+     * integer to enable it. The default value is <code>8</code> per thread.
      */
-    public static final String JSP_FACTORY_POOL_SIZE_INIT_PARAM =
-            "org.apache.jasper.runtime.JspFactoryImpl.POOL_SIZE";
+    public static final String JSP_FACTORY_POOL_SIZE_INIT_PARAM = "org.apache.jasper.runtime.JspFactoryImpl.POOL_SIZE";
 
 }

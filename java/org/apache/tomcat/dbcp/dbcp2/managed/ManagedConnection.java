@@ -30,7 +30,7 @@ import org.apache.tomcat.dbcp.pool2.ObjectPool;
  * transaction or JTA Transaction) is in progress. When a global transaction is active a single physical connection to
  * the database is used by all ManagedConnections accessed in the scope of the transaction. Connection sharing means
  * that all data access during a transaction has a consistent view of the database. When the global transaction is
- * committed or rolled back the enlisted connections are committed or rolled back. Typically upon transaction
+ * committed or rolled back the enlisted connections are committed or rolled back. Typically, upon transaction
  * completion, a connection returns to the auto commit setting in effect before being enlisted in the transaction, but
  * some vendors do not properly implement this.
  * <p>
@@ -122,7 +122,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     @Override
     public void commit() throws SQLException {
         if (transactionContext != null) {
-            throw new SQLException("Commit can not be set while enrolled in a transaction");
+            throw new SQLException("Commit cannot be set while enrolled in a transaction");
         }
         super.commit();
     }
@@ -148,6 +148,8 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     }
 
     /**
+     * Gets the transaction context.
+     *
      * @return The transaction context.
      * @since 2.6.0
      */
@@ -156,6 +158,8 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     }
 
     /**
+     * Gets the transaction registry.
+     *
      * @return The transaction registry.
      * @since 2.6.0
      */
@@ -175,7 +179,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     @Override
     public void rollback() throws SQLException {
         if (transactionContext != null) {
-            throw new SQLException("Commit can not be set while enrolled in a transaction");
+            throw new SQLException("Commit cannot be set while enrolled in a transaction");
         }
         super.rollback();
     }
@@ -183,7 +187,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     @Override
     public void setAutoCommit(final boolean autoCommit) throws SQLException {
         if (transactionContext != null) {
-            throw new SQLException("Auto-commit can not be set while enrolled in a transaction");
+            throw new SQLException("Auto-commit cannot be set while enrolled in a transaction");
         }
         super.setAutoCommit(autoCommit);
     }
@@ -191,7 +195,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     @Override
     public void setReadOnly(final boolean readOnly) throws SQLException {
         if (transactionContext != null) {
-            throw new SQLException("Read-only can not be set while enrolled in a transaction");
+            throw new SQLException("Read-only cannot be set while enrolled in a transaction");
         }
         super.setReadOnly(readOnly);
     }
@@ -236,11 +240,11 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
     }
 
     private void updateTransactionStatus() throws SQLException {
-        // if there is a is an active transaction context, assure the transaction context hasn't changed
+        // if there is an active transaction context, assure the transaction context hasn't changed
         if (transactionContext != null && !transactionContext.isTransactionComplete()) {
             if (transactionContext.isActive()) {
                 if (transactionContext != transactionRegistry.getActiveTransactionContext()) {
-                    throw new SQLException("Connection can not be used while enlisted in another transaction");
+                    throw new SQLException("Connection cannot be used while enlisted in another transaction");
                 }
                 return;
             }
@@ -253,7 +257,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
         // the existing transaction context ended (or we didn't have one), get the active transaction context
         transactionContext = transactionRegistry.getActiveTransactionContext();
 
-        // if there is an active transaction context and it already has a shared connection, use it
+        // if there is an active transaction context, and it already has a shared connection, use it
         if (transactionContext != null && transactionContext.getSharedConnection() != null) {
             // A connection for the connection factory has already been enrolled
             // in the transaction, replace our delegate with the enrolled connection
@@ -284,7 +288,7 @@ public class ManagedConnection<C extends Connection> extends DelegatingConnectio
             final C shared = (C) transactionContext.getSharedConnection();
             setDelegate(shared);
 
-            // remember that we are using a shared connection so it can be cleared after the
+            // remember that we are using a shared connection, so it can be cleared after the
             // transaction completes
             isSharedConnection = true;
         } else {

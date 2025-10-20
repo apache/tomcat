@@ -52,7 +52,7 @@ public class CreateTestTable extends DefaultTestCase {
             ResultSet rs = st.executeQuery(check);
 
             if (rs.next()) {
-              count = rs.getInt(1);
+                count = rs.getInt(1);
             }
             rs.close();
             st.close();

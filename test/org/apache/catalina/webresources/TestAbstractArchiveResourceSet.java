@@ -78,6 +78,23 @@ public class TestAbstractArchiveResourceSet {
         Assert.assertNull(getJarContents(jarResourceSet));
     }
 
+    @Test
+    public void testBloomFilterWithJarResource() throws Exception {
+        WebResourceRoot root = new TesterWebResourceRoot();
+
+        root.setArchiveIndexStrategy(WebResourceRoot.ArchiveIndexStrategy.BLOOM.name());
+
+        File file = new File("test/webresources/static-resources.jar");
+
+        JarResourceSet jarResourceSet = new JarResourceSet(root, "/", file.getAbsolutePath(), "/META-INF/resources");
+        jarResourceSet.getArchiveEntries(false);
+        Assert.assertNotNull(getJarContents(jarResourceSet));
+
+        WebResource r1 = jarResourceSet.getResource("/index.html");
+        Assert.assertTrue(r1.isFile());
+
+    }
+
     private JarContents getJarContents(Object target)
         throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException, SecurityException {
         Field field = AbstractArchiveResourceSet.class.getDeclaredField("jarContents");

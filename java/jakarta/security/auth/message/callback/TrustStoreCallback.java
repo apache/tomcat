@@ -1,4 +1,4 @@
-/**
+/*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -21,8 +21,7 @@ import java.security.KeyStore;
 import javax.security.auth.callback.Callback;
 
 /**
- * A Callback enabling an authentication module to request a truststore from the
- * runtime.
+ * A Callback enabling an authentication module to request a truststore from the runtime.
  */
 public class TrustStoreCallback implements Callback {
 

@@ -17,16 +17,17 @@
 package org.apache.tomcat.util.modeler;
 
 
+import java.io.Serial;
+
 import javax.management.MBeanParameterInfo;
 
-
 /**
- * <p>Internal configuration information for a <code>Parameter</code>
- * descriptor.</p>
- *
- * @author Craig R. McClanahan
+ * <p>
+ * Internal configuration information for a <code>Parameter</code> descriptor.
+ * </p>
  */
 public class ParameterInfo extends FeatureInfo {
+    @Serial
     private static final long serialVersionUID = 2222796006787664020L;
     // ----------------------------------------------------------- Constructors
 
@@ -39,17 +40,17 @@ public class ParameterInfo extends FeatureInfo {
     }
 
     /**
-     * Create and return a <code>MBeanParameterInfo</code> object that
-     * corresponds to the parameter described by this instance.
+     * Create and return a <code>MBeanParameterInfo</code> object that corresponds to the parameter described by this
+     * instance.
+     *
      * @return a parameter info
      */
     public MBeanParameterInfo createParameterInfo() {
 
         // Return our cached information (if any)
         if (info == null) {
-            info = new MBeanParameterInfo
-                (getName(), getType(), getDescription());
+            info = new MBeanParameterInfo(getName(), getType(), getDescription());
         }
-        return (MBeanParameterInfo)info;
+        return (MBeanParameterInfo) info;
     }
 }

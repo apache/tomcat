@@ -47,7 +47,7 @@ public class TestHttp2Section_3_5 extends Http2TestBase {
         // body will fail.
         try {
             sendPing();
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore
         }
 

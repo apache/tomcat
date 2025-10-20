@@ -99,6 +99,11 @@ public class DummyProxySession implements Session {
     }
 
     @Override
+    public boolean isNew() {
+        return false;
+    }
+
+    @Override
     public Manager getManager() {
         return null;
     }
@@ -210,8 +215,8 @@ public class DummyProxySession implements Session {
     }
 
     @Override
-    public void tellChangedSessionId(String newId, String oldId,
-            boolean notifySessionListeners, boolean notifyContainerListeners) {
+    public void tellChangedSessionId(String newId, String oldId, boolean notifySessionListeners,
+            boolean notifyContainerListeners) {
         // NOOP
     }
 

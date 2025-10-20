@@ -16,9 +16,9 @@
  */
 package tomcat.cxf;
 
-import javax.enterprise.context.Dependent;
-import javax.ws.rs.Produces;
-import javax.ws.rs.ext.Provider;
+import jakarta.enterprise.context.Dependent;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.ext.Provider;
 
 import org.apache.johnzon.jaxrs.jsonb.jaxrs.JsonbJaxrsProvider;
 

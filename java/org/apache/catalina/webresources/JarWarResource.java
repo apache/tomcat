@@ -39,7 +39,7 @@ public class JarWarResource extends AbstractArchiveResource {
             JarEntry jarEntry, String archivePath) {
 
         super(archiveResourceSet, webAppPath, "jar:war:" + baseUrl + UriUtil.getWarSeparator() + archivePath + "!/",
-                jarEntry);
+                jarEntry, "war:" + baseUrl + UriUtil.getWarSeparator() + archivePath);
         this.archivePath = archivePath;
     }
 
@@ -54,19 +54,18 @@ public class JarWarResource extends AbstractArchiveResource {
             InputStream isInWar = warFile.getInputStream(jarFileInWar);
 
             jarIs = new JarInputStream(isInWar);
-            entry = jarIs.getNextJarEntry();
-            while (entry != null && !entry.getName().equals(getResource().getName())) {
+            do {
                 entry = jarIs.getNextJarEntry();
-            }
+            } while (entry != null && !entry.getName().equals(getResource().getName()));
 
             if (entry == null) {
                 return null;
             }
 
             return new JarInputStreamWrapper(entry, jarIs);
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             if (log.isDebugEnabled()) {
-                log.debug(sm.getString("jarResource.getInputStreamFail", getResource().getName(), getBaseUrl()), e);
+                log.debug(sm.getString("jarResource.getInputStreamFail", getResource().getName(), getBaseUrl()), ioe);
             }
             // Ensure jarIs is closed if there is an exception
             entry = null;

@@ -32,7 +32,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Implementation of <b>JdbcInterceptor</b> that proxies resultSets and statements.
- * @author Guillermo Fernandes
  */
 public class StatementDecoratorInterceptor extends AbstractCreateStatementInterceptor {
 
@@ -99,9 +98,6 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
         } catch (Exception x) {
             if (x instanceof InvocationTargetException) {
                 Throwable cause = x.getCause();
-                if (cause instanceof ThreadDeath) {
-                    throw (ThreadDeath) cause;
-                }
                 if (cause instanceof VirtualMachineError) {
                     throw (VirtualMachineError) cause;
                 }
@@ -130,7 +126,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
      */
     protected Object createDecorator(Object proxy, Method method, Object[] args,
                                      Object statement, Constructor<?> constructor, String sql)
-    throws InstantiationException, IllegalAccessException, InvocationTargetException {
+        throws InstantiationException, IllegalAccessException, InvocationTargetException {
         Object result = null;
         StatementProxy<Statement> statementProxy =
                 new StatementProxy<>((Statement)statement,sql);
@@ -156,7 +152,7 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
     /**
      * Class to measure query execute time.
      */
-    protected class StatementProxy<T extends java.sql.Statement> implements InvocationHandler {
+    protected class StatementProxy<T extends Statement> implements InvocationHandler {
 
         protected boolean closed = false;
         protected T delegate;
@@ -218,15 +214,15 @@ public class StatementDecoratorInterceptor extends AbstractCreateStatementInterc
             boolean close = compare(CLOSE_VAL, method);
             // allow close to be called multiple times
             if (close && closed) {
-              return null;
+                return null;
             }
             // are we calling isClosed?
             if (compare(ISCLOSED_VAL, method)) {
-              return Boolean.valueOf(closed);
+                return Boolean.valueOf(closed);
             }
             // if we are calling anything else, bail out
             if (closed) {
-              throw new SQLException("Statement closed.");
+                throw new SQLException("Statement closed.");
             }
             if (compare(GETCONNECTION_VAL,method)){
                 return connection;

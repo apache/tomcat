@@ -31,15 +31,11 @@ import org.apache.el.lang.ELSupport;
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstFunction extends SimpleNode {
 
-    protected String localName = "";
+    private String localName = "";
 
-    protected String prefix = "";
+    private String prefix = "";
 
     public AstFunction(int id) {
         super(id);
@@ -88,7 +84,7 @@ public final class AstFunction extends SimpleNode {
         }
         Method m = fnMapper.resolveFunction(this.prefix, this.localName);
 
-        if (m == null && this.prefix.length() == 0) {
+        if (m == null && this.prefix.isEmpty()) {
             // TODO: Do we need to think about precedence of the various ways
             // a lambda expression may be obtained from something that
             // the parser thinks is a function?
@@ -100,7 +96,7 @@ public final class AstFunction extends SimpleNode {
                 VariableMapper varMapper = ctx.getVariableMapper();
                 if (varMapper != null) {
                     obj = varMapper.resolveVariable(this.localName);
-                    if (obj instanceof ValueExpression) {
+                    if (obj != null) {
                         // See if this returns a LambdaExpression
                         obj = ((ValueExpression) obj).getValue(ctx);
                     }
@@ -151,7 +147,6 @@ public final class AstFunction extends SimpleNode {
         Node parameters = jjtGetChild(0);
         Class<?>[] paramTypes = m.getParameterTypes();
         Object[] params = null;
-        Object result = null;
         int inputParameterCount = parameters.jjtGetNumChildren();
         int methodParameterCount = paramTypes.length;
         if (inputParameterCount == 0 && methodParameterCount == 1 && m.isVarArgs()) {
@@ -163,7 +158,8 @@ public final class AstFunction extends SimpleNode {
                     if (m.isVarArgs() && i == methodParameterCount - 1) {
                         if (inputParameterCount < methodParameterCount) {
                             params[i] = new Object[] { null };
-                        } else if (inputParameterCount == methodParameterCount && isArray(parameters.jjtGetChild(i).getValue(ctx))) {
+                        } else if (inputParameterCount == methodParameterCount &&
+                                isArray(parameters.jjtGetChild(i).getValue(ctx))) {
                             params[i] = parameters.jjtGetChild(i).getValue(ctx);
                         } else {
                             Object[] varargs = new Object[inputParameterCount - methodParameterCount + 1];
@@ -183,15 +179,13 @@ public final class AstFunction extends SimpleNode {
                 throw new ELException(MessageFactory.get("error.function", this.getOutputName()), ele);
             }
         }
+        Object result;
         try {
             result = m.invoke(null, params);
         } catch (IllegalAccessException iae) {
             throw new ELException(MessageFactory.get("error.function", this.getOutputName()), iae);
         } catch (InvocationTargetException ite) {
             Throwable cause = ite.getCause();
-            if (cause instanceof ThreadDeath) {
-                throw (ThreadDeath) cause;
-            }
             if (cause instanceof VirtualMachineError) {
                 throw (VirtualMachineError) cause;
             }

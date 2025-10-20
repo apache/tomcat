@@ -41,7 +41,7 @@ import org.apache.juli.logging.Log;
  * <li>The subclass extracts the request property to be filtered, and calls the common <code>process()</code> method.
  * <li>If there is a deny expression configured, the property will be compared to the expression. If a match is found,
  * this request will be rejected with a "Forbidden" HTTP response.</li>
- * <li>If there is a allow expression configured, the property will be compared to each such expression. If a match is
+ * <li>If there is an allow expression configured, the property will be compared to each such expression. If a match is
  * found, this request will be allowed to pass through to the next Valve in the current pipeline.</li>
  * <li>If a deny expression was specified but no allow expression, allow this request to pass through (because none of
  * the deny expressions matched it).
@@ -53,8 +53,6 @@ import org.apache.juli.logging.Log;
  * authentication instead of denial.
  * <p>
  * This Valve may be attached to any Container, depending on the granularity of the filtering you wish to perform.
- *
- * @author Craig R. McClanahan
  */
 public abstract class RequestFilterValve extends ValveBase {
 
@@ -111,9 +109,8 @@ public abstract class RequestFilterValve extends ValveBase {
     protected int denyStatus = HttpServletResponse.SC_FORBIDDEN;
 
     /**
-     * <p>
      * If <code>invalidAuthenticationWhenDeny</code> is true and the context has <code>preemptiveAuthentication</code>
-     * set, set an invalid authorization header to trigger basic auth instead of denying the request..
+     * set, set an invalid authorization header to trigger basic auth instead of denying the request.
      */
     private boolean invalidAuthenticationWhenDeny = false;
 
@@ -149,7 +146,7 @@ public abstract class RequestFilterValve extends ValveBase {
      * @param allow The new allow expression
      */
     public void setAllow(String allow) {
-        if (allow == null || allow.length() == 0) {
+        if (allow == null || allow.isEmpty()) {
             this.allow = null;
             allowValue = null;
             allowValid = true;
@@ -183,7 +180,7 @@ public abstract class RequestFilterValve extends ValveBase {
      * @param deny The new deny expression
      */
     public void setDeny(String deny) {
-        if (deny == null || deny.length() == 0) {
+        if (deny == null || deny.isEmpty()) {
             this.deny = null;
             denyValue = null;
             denyValid = true;
@@ -331,7 +328,7 @@ public abstract class RequestFilterValve extends ValveBase {
 
 
     @Override
-    protected synchronized void startInternal() throws LifecycleException {
+    protected void startInternal() throws LifecycleException {
         if (!allowValid || !denyValid) {
             throw new LifecycleException(sm.getString("requestFilterValve.configInvalid"));
         }
@@ -420,11 +417,7 @@ public abstract class RequestFilterValve extends ValveBase {
         }
 
         // Allow if denies specified but not allows
-        if (deny != null && allow == null) {
-            return true;
-        }
-
-        // Deny this request
-        return false;
+        // Otherwise deny this request
+        return deny != null && allow == null;
     }
 }

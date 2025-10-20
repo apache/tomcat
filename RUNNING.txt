@@ -248,7 +248,8 @@ In CATALINA_BASE:
           The setenv scripts were described above. The tomcat-juli library
           is documented in the Logging chapter in the User Guide.
 
- * conf - Server configuration files (including server.xml)
+ * conf - Server configuration files (typically all of them, including
+          server.xml)
 
  * lib  - Libraries and classes, as explained below
 
@@ -304,8 +305,8 @@ The file will look like the following:
   <?xml version="1.0" encoding="UTF-8"?>
   <Context docBase="${catalina.home}/webapps/manager"
     antiResourceLocking="false" privileged="true" >
-    <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         allow="127\.0\.0\.1" />
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         allow="127.0.0.0/8,::1/128" />
     <Manager sessionAttributeValueClassNameFilter="java\.lang\.(?:Boolean|Integer|Long|Number|String)|org\.apache\.catalina\.filters\.CsrfPreventionFilter\$LruCache(?:\$1)?|java\.util\.(?:Linked)?HashMap"/>
   </Context>
 
@@ -422,8 +423,8 @@ To deactivate Apache Tomcat Native library:
 
 The binary file of Apache Tomcat Native library is usually named
 
-  - "tcnative-1.dll" on Windows
-  - "libtcnative-1.so" on *nix systems
+  - "tcnative-2.dll" on Windows
+  - "libtcnative-2.so" on *nix systems
 
 
 Apache Commons Daemon

@@ -16,15 +16,18 @@
  */
 package org.apache.catalina.tribes;
 
+import java.io.Serial;
+
 /**
  * Message thrown by a sender when USE_SYNC_ACK receives a FAIL_ACK_COMMAND.
- * <br>
- * This means that the message was received on the remote node but the processing of the message failed.
- * This message will be embedded in a ChannelException.FaultyMember
+ * <p>
+ * This means that the message was received on the remote node but the processing of the message failed. This message
+ * will be embedded in a ChannelException.FaultyMember
  *
  * @see ChannelException
  */
 public class RemoteProcessException extends RuntimeException {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public RemoteProcessException() {

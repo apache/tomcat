@@ -60,6 +60,7 @@ public abstract class ElementValue {
     public static final byte PRIMITIVE_LONG = 'J';
     public static final byte PRIMITIVE_SHORT = 'S';
     public static final byte PRIMITIVE_BOOLEAN = 'Z';
+    static final ElementValue[] EMPTY_ARRAY = {};
 
     /**
      * Reads an {@code element_value} as an {@code ElementValue}.
@@ -87,44 +88,39 @@ public abstract class ElementValue {
             throws IOException {
         final byte tag = input.readByte();
         switch (tag) {
-        case PRIMITIVE_BYTE:
-        case PRIMITIVE_CHAR:
-        case PRIMITIVE_DOUBLE:
-        case PRIMITIVE_FLOAT:
-        case PRIMITIVE_INT:
-        case PRIMITIVE_LONG:
-        case PRIMITIVE_SHORT:
-        case PRIMITIVE_BOOLEAN:
-        case STRING:
-            return new SimpleElementValue(tag, input.readUnsignedShort(), cpool);
-
-        case ENUM_CONSTANT:
-            input.readUnsignedShort();    // Unused type_index
-            return new EnumElementValue(ENUM_CONSTANT, input.readUnsignedShort(), cpool);
-
-        case CLASS:
-            return new ClassElementValue(CLASS, input.readUnsignedShort(), cpool);
-
-        case ANNOTATION:
-            // TODO isRuntimeVisible
-            return new AnnotationElementValue(ANNOTATION, new AnnotationEntry(input, cpool), cpool);
-
-        case ARRAY:
-            arrayNesting++;
-            if (arrayNesting > Const.MAX_ARRAY_DIMENSIONS) {
-                // JVM spec 4.4.1
-                throw new ClassFormatException(String.format("Arrays are only valid if they represent %,d or fewer dimensions.",
-                        Integer.valueOf(Const.MAX_ARRAY_DIMENSIONS)));
-            }
-            final int numArrayVals = input.readUnsignedShort();
-            final ElementValue[] evalues = new ElementValue[numArrayVals];
-            for (int j = 0; j < numArrayVals; j++) {
-                evalues[j] = ElementValue.readElementValue(input, cpool, arrayNesting);
-            }
-            return new ArrayElementValue(ARRAY, evalues, cpool);
-
-        default:
-            throw new ClassFormatException("Unexpected element value kind in annotation: " + tag);
+            case PRIMITIVE_BYTE:
+            case PRIMITIVE_CHAR:
+            case PRIMITIVE_DOUBLE:
+            case PRIMITIVE_FLOAT:
+            case PRIMITIVE_INT:
+            case PRIMITIVE_LONG:
+            case PRIMITIVE_SHORT:
+            case PRIMITIVE_BOOLEAN:
+            case STRING:
+                return new SimpleElementValue(tag, input.readUnsignedShort(), cpool);
+            case ENUM_CONSTANT:
+                input.readUnsignedShort();    // Unused type_index
+                return new EnumElementValue(ENUM_CONSTANT, input.readUnsignedShort(), cpool);
+            case CLASS:
+                return new ClassElementValue(CLASS, input.readUnsignedShort(), cpool);
+            case ANNOTATION:
+                // TODO isRuntimeVisible
+                return new AnnotationElementValue(ANNOTATION, new AnnotationEntry(input, cpool), cpool);
+            case ARRAY:
+                arrayNesting++;
+                if (arrayNesting > Const.MAX_ARRAY_DIMENSIONS) {
+                    // JVM spec 4.4.1
+                    throw new ClassFormatException(String.format("Arrays are only valid if they represent %,d or fewer dimensions.",
+                            Integer.valueOf(Const.MAX_ARRAY_DIMENSIONS)));
+                }
+                final int numArrayVals = input.readUnsignedShort();
+                final ElementValue[] evalues = new ElementValue[numArrayVals];
+                for (int j = 0; j < numArrayVals; j++) {
+                    evalues[j] = readElementValue(input, cpool, arrayNesting);
+                }
+                return new ArrayElementValue(ARRAY, evalues, cpool);
+            default:
+                throw new ClassFormatException("Unexpected element value kind in annotation: " + tag);
         }
     }
 

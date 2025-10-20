@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="yoavs@apache.org">Yoav Shapira</author>
     <title>Table of Contents</title>
   </properties>
 
@@ -37,12 +36,8 @@ the architecture and design of the Tomcat server.  It includes significant
 contributions from several tomcat developers:
 </p>
 <ul>
-<li>Yoav Shapira
-    (<a href="mailto:yoavs@apache.org">yoavs@apache.org</a>)</li>
 <li>Jeanfrancois Arcand
     (<a href="mailto:jfarcand@apache.org">jfarcand@apache.org</a>)</li>
-<li>Filip Hanik
-    (<a href="mailto:fhanik@apache.org">fhanik@apache.org</a>)</li>
 </ul>
 
 </section>

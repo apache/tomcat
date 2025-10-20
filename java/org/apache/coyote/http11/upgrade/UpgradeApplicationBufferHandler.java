@@ -21,8 +21,8 @@ import java.nio.ByteBuffer;
 import org.apache.tomcat.util.net.ApplicationBufferHandler;
 
 /**
- * Trivial implementation of {@link ApplicationBufferHandler} to support saving
- * of HTTP request bodies during an HTTP/1.1 upgrade.
+ * Trivial implementation of {@link ApplicationBufferHandler} to support saving of HTTP request bodies during an
+ * HTTP/1.1 upgrade.
  */
 public class UpgradeApplicationBufferHandler implements ApplicationBufferHandler {
 

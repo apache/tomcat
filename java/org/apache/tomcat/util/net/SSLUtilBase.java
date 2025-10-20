@@ -16,9 +16,12 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.security.DomainLoadStoreParameter;
 import java.security.Key;
 import java.security.KeyStore;
@@ -56,11 +59,11 @@ import javax.net.ssl.X509KeyManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
+import org.apache.tomcat.util.compat.JreCompat;
 import org.apache.tomcat.util.file.ConfigFileLoader;
 import org.apache.tomcat.util.net.jsse.JSSEKeyManager;
 import org.apache.tomcat.util.net.jsse.PEMFile;
 import org.apache.tomcat.util.res.StringManager;
-import org.apache.tomcat.util.security.KeyStoreUtil;
 
 /**
  * Common base class for {@link SSLUtil} implementations.
@@ -113,8 +116,7 @@ public abstract class SSLUtilBase implements SSLUtil {
         this.enabledProtocols = enabledProtocols.toArray(new String[0]);
 
         if (enabledProtocols.contains(Constants.SSL_PROTO_TLSv1_3) &&
-                sslHostConfig.getCertificateVerification().isOptional() &&
-                !isTls13RenegAuthAvailable() && warnTls13) {
+                sslHostConfig.getCertificateVerification().isOptional() && !isTls13RenegAuthAvailable() && warnTls13) {
             log.warn(sm.getString("sslUtilBase.tls13.auth"));
         }
 
@@ -122,11 +124,17 @@ public abstract class SSLUtilBase implements SSLUtil {
         sslHostConfig.setTls13RenegotiationAvailable(isTls13RenegAuthAvailable());
 
         // Calculate the enabled ciphers
-        List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
-        Set<String> implementedCiphers = getImplementedCiphers();
-        List<String> enabledCiphers =
-                getEnabled("ciphers", getLog(), false, configuredCiphers, implementedCiphers);
-        this.enabledCiphers = enabledCiphers.toArray(new String[0]);
+        if (!JreCompat.isJre22Available() && sslHostConfig.getCiphers().startsWith("PROFILE=")) {
+            // OpenSSL profiles cannot be resolved without Java 22
+            this.enabledCiphers = new String[0];
+        } else {
+            boolean warnOnSkip = !sslHostConfig.getCiphers().equals(SSLHostConfig.DEFAULT_TLS_CIPHERS);
+            List<String> configuredCiphers = sslHostConfig.getJsseCipherNames();
+            Set<String> implementedCiphers = getImplementedCiphers();
+            List<String> enabledCiphers =
+                    getEnabled("ciphers", getLog(), warnOnSkip, configuredCiphers, implementedCiphers);
+            this.enabledCiphers = enabledCiphers.toArray(new String[0]);
+        }
     }
 
 
@@ -135,7 +143,7 @@ public abstract class SSLUtilBase implements SSLUtil {
 
         List<T> enabled = new ArrayList<>();
 
-        if (implemented.size() == 0) {
+        if (implemented.isEmpty()) {
             // Unable to determine the list of available protocols. This will
             // have been logged previously.
             // Use the configuredProtocols and hope they work. If not, an error
@@ -150,8 +158,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                 // Don't use the defaults in this case. They may be less secure
                 // than the configuration the user intended.
                 // Force the failure of the connector
-                throw new IllegalArgumentException(
-                        sm.getString("sslUtilBase.noneSupported", name, configured));
+                throw new IllegalArgumentException(sm.getString("sslUtilBase.noneSupported", name, configured));
             }
             if (log.isDebugEnabled()) {
                 log.debug(sm.getString("sslUtilBase.active", name, enabled));
@@ -175,12 +182,12 @@ public abstract class SSLUtilBase implements SSLUtil {
 
 
     /*
-     * Gets the key- or truststore with the specified type, path, and password.
+     * Gets the key- or truststore with the specified type, path, password and password file.
      */
-    static KeyStore getStore(String type, String provider, String path,
-            String pass) throws IOException {
+    static KeyStore getStore(String type, String provider, String path, String pass, String passFile)
+            throws IOException {
 
-        KeyStore ks = null;
+        KeyStore ks;
         InputStream istream = null;
         try {
             if (provider == null) {
@@ -194,9 +201,7 @@ public abstract class SSLUtilBase implements SSLUtil {
             } else {
                 // Some key store types (e.g. hardware) expect the InputStream
                 // to be null
-                if(!("PKCS11".equalsIgnoreCase(type) ||
-                        path.isEmpty() ||
-                        "NONE".equalsIgnoreCase(path))) {
+                if (!("PKCS11".equalsIgnoreCase(type) || path.isEmpty() || "NONE".equalsIgnoreCase(path))) {
                     istream = ConfigFileLoader.getSource().getResource(path).getInputStream();
                 }
 
@@ -209,22 +214,32 @@ public abstract class SSLUtilBase implements SSLUtil {
                 // Therefore:
                 // - generally use null if pass is null or ""
                 // - for JKS or PKCS12 only use null if pass is null
-                //   (because JKS will auto-switch to PKCS12)
+                // (because JKS will auto-switch to PKCS12)
                 char[] storePass = null;
-                if (pass != null && (!"".equals(pass) ||
-                        "JKS".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type))) {
-                    storePass = pass.toCharArray();
+                String passToUse;
+                if (passFile != null) {
+                    try (BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(ConfigFileLoader.getSource().getResource(passFile).getInputStream(),
+                                    StandardCharsets.UTF_8))) {
+                        passToUse = reader.readLine();
+                    }
+                } else {
+                    passToUse = pass;
                 }
-                KeyStoreUtil.load(ks, istream, storePass);
+
+                if (passToUse != null &&
+                        (!passToUse.isEmpty() || "JKS".equalsIgnoreCase(type) || "PKCS12".equalsIgnoreCase(type))) {
+                    storePass = passToUse.toCharArray();
+                }
+                ks.load(istream, storePass);
             }
         } catch (IOException ioe) {
             // May be expected when working with a trust store
             // Re-throw. Caller will catch and log as required
             throw ioe;
-        } catch(Exception ex) {
-            String msg = sm.getString("sslUtilBase.keystore_load_failed", type, path,
-                    ex.getMessage());
-            log.error(msg, ex);
+        } catch (Exception e) {
+            String msg = sm.getString("sslUtilBase.keystore_load_failed", type, path, e.getMessage());
+            log.error(msg, e);
             throw new IOException(msg);
         } finally {
             if (istream != null) {
@@ -272,9 +287,13 @@ public abstract class SSLUtilBase implements SSLUtil {
     public KeyManager[] getKeyManagers() throws Exception {
         String keyAlias = certificate.getCertificateKeyAlias();
         String algorithm = sslHostConfig.getKeyManagerAlgorithm();
+        String keyPassFile = certificate.getCertificateKeyPasswordFile();
         String keyPass = certificate.getCertificateKeyPassword();
         // This has to be here as it can't be moved to SSLHostConfig since the
         // defaults vary between JSSE and OpenSSL.
+        if (keyPassFile == null) {
+            keyPassFile = certificate.getCertificateKeystorePasswordFile();
+        }
         if (keyPass == null) {
             keyPass = certificate.getCertificateKeystorePassword();
         }
@@ -283,18 +302,26 @@ public abstract class SSLUtilBase implements SSLUtil {
         KeyStore ksUsed = ks;
 
         /*
-         * Use an in memory key store where possible.
-         * For PEM format keys and certificates, it allows them to be imported
-         * into the expected format.
-         * For Java key stores with PKCS8 encoded keys (e.g. JKS files), it
-         * enables Tomcat to handle the case where multiple keys exist in the
-         * key store, each with a different password. The KeyManagerFactory
-         * can't handle that so using an in memory key store with just the
-         * required key works around that.
-         * Other keys stores (hardware, MS, etc.) will be used as is.
+         * Use an in memory key store where possible. For PEM format keys and certificates, it allows them to be
+         * imported into the expected format. For Java key stores with PKCS8 encoded keys (e.g. JKS files), it enables
+         * Tomcat to handle the case where multiple keys exist in the key store, each with a different password. The
+         * KeyManagerFactory can't handle that so using an in memory key store with just the required key works around
+         * that. Other keys stores (hardware, MS, etc.) will be used as is.
          */
+        char[] keyPassArray = new char[0];
+        String keyPassToUse;
+        if (keyPassFile != null) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    ConfigFileLoader.getSource().getResource(keyPassFile).getInputStream(), StandardCharsets.UTF_8))) {
+                keyPassToUse = reader.readLine();
+            }
+        } else {
+            keyPassToUse = keyPass;
+        }
 
-        char[] keyPassArray = keyPass.toCharArray();
+        if (keyPassToUse != null) {
+            keyPassArray = keyPassToUse.toCharArray();
+        }
 
         KeyManagerFactory kmf = KeyManagerFactory.getInstance(algorithm);
         if (kmf.getProvider().getInfo().contains("FIPS")) {
@@ -311,9 +338,9 @@ public abstract class SSLUtilBase implements SSLUtil {
                 throw new IOException(sm.getString("sslUtilBase.noCertFile"));
             }
 
-            PEMFile privateKeyFile = new PEMFile(
-                    certificate.getCertificateKeyFile() != null ? certificate.getCertificateKeyFile() : certificate.getCertificateFile(),
-                    keyPass);
+            PEMFile privateKeyFile =
+                    new PEMFile(certificate.getCertificateKeyFile() != null ? certificate.getCertificateKeyFile() :
+                            certificate.getCertificateFile(), keyPass, keyPassFile, null);
             PEMFile certificateFile = new PEMFile(certificate.getCertificateFile());
 
             Collection<Certificate> chain = new ArrayList<>(certificateFile.getCertificates());
@@ -328,8 +355,8 @@ public abstract class SSLUtilBase implements SSLUtil {
 
             // Switch to in-memory key store
             ksUsed = KeyStore.getInstance("JKS");
-            ksUsed.load(null,  null);
-            ksUsed.setKeyEntry(keyAlias, privateKeyFile.getPrivateKey(), keyPass.toCharArray(),
+            ksUsed.load(null, null);
+            ksUsed.setKeyEntry(keyAlias, privateKeyFile.getPrivateKey(), keyPassArray,
                     chain.toArray(new Certificate[0]));
         } else {
             if (keyAlias != null && !ks.isKeyEntry(keyAlias)) {
@@ -358,10 +385,9 @@ public abstract class SSLUtilBase implements SSLUtil {
                 if (provider == null) {
                     ksUsed = KeyStore.getInstance(certificate.getCertificateKeystoreType());
                 } else {
-                    ksUsed = KeyStore.getInstance(certificate.getCertificateKeystoreType(),
-                            provider);
+                    ksUsed = KeyStore.getInstance(certificate.getCertificateKeystoreType(), provider);
                 }
-                ksUsed.load(null,  null);
+                ksUsed.load(null, null);
                 ksUsed.setKeyEntry(keyAlias, k, keyPassArray, ks.getCertificateChain(keyAlias));
             }
             // Non-PKCS#8 key stores will use the original key store
@@ -381,8 +407,8 @@ public abstract class SSLUtilBase implements SSLUtil {
             if ("JKS".equals(certificate.getCertificateKeystoreType())) {
                 alias = alias.toLowerCase(Locale.ENGLISH);
             }
-            for(int i = 0; i < kms.length; i++) {
-                kms[i] = new JSSEKeyManager((X509KeyManager)kms[i], alias);
+            for (int i = 0; i < kms.length; i++) {
+                kms[i] = new JSSEKeyManager((X509KeyManager) kms[i], alias);
             }
         }
 
@@ -406,16 +432,15 @@ public abstract class SSLUtilBase implements SSLUtil {
     public TrustManager[] getTrustManagers() throws Exception {
 
         String className = sslHostConfig.getTrustManagerClassName();
-        if(className != null && className.length() > 0) {
-             ClassLoader classLoader = getClass().getClassLoader();
-             Class<?> clazz = classLoader.loadClass(className);
-             if(!(TrustManager.class.isAssignableFrom(clazz))){
-                throw new InstantiationException(sm.getString(
-                        "sslUtilBase.invalidTrustManagerClassName", className));
-             }
-             Object trustManagerObject = clazz.getConstructor().newInstance();
-             TrustManager trustManager = (TrustManager) trustManagerObject;
-             return new TrustManager[]{ trustManager };
+        if (className != null && !className.isEmpty()) {
+            ClassLoader classLoader = getClass().getClassLoader();
+            Class<?> clazz = classLoader.loadClass(className);
+            if (!(TrustManager.class.isAssignableFrom(clazz))) {
+                throw new InstantiationException(sm.getString("sslUtilBase.invalidTrustManagerClassName", className));
+            }
+            Object trustManagerObject = clazz.getConstructor().newInstance();
+            TrustManager trustManager = (TrustManager) trustManagerObject;
+            return new TrustManager[] { trustManager };
         }
 
         TrustManager[] tms = null;
@@ -427,17 +452,16 @@ public abstract class SSLUtilBase implements SSLUtil {
             String crlf = sslHostConfig.getCertificateRevocationListFile();
             boolean revocationEnabled = sslHostConfig.getRevocationEnabled();
 
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
             if ("PKIX".equalsIgnoreCase(algorithm)) {
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
                 CertPathParameters params = getParameters(crlf, trustStore, revocationEnabled);
                 ManagerFactoryParameters mfp = new CertPathTrustManagerParameters(params);
                 tmf.init(mfp);
                 tms = tmf.getTrustManagers();
             } else {
-                TrustManagerFactory tmf = TrustManagerFactory.getInstance(algorithm);
                 tmf.init(trustStore);
                 tms = tmf.getTrustManagers();
-                if (crlf != null && crlf.length() > 0) {
+                if (crlf != null && !crlf.isEmpty()) {
                     throw new CRLException(sm.getString("sslUtilBase.noCrlSupport", algorithm));
                 }
                 // Only warn if the attribute has been explicitly configured
@@ -466,7 +490,7 @@ public abstract class SSLUtilBase implements SSLUtil {
                             String msg = sm.getString("sslUtilBase.trustedCertNotValid", alias,
                                     ((X509Certificate) cert).getSubjectX500Principal(), e.getMessage());
                             if (log.isDebugEnabled()) {
-                                log.debug(msg, e);
+                                log.warn(msg, e);
                             } else {
                                 log.warn(msg);
                             }
@@ -483,24 +507,24 @@ public abstract class SSLUtilBase implements SSLUtil {
 
 
     /**
-     * Return the initialization parameters for the TrustManager.
-     * Currently, only the default <code>PKIX</code> is supported.
+     * Return the initialization parameters for the TrustManager. Currently, only the default <code>PKIX</code> is
+     * supported.
      *
-     * @param crlf The path to the CRL file.
-     * @param trustStore The configured TrustStore.
-     * @param revocationEnabled Should the JSSE provider perform revocation
-     *                          checks? Ignored if {@code crlf} is non-null.
-     *                          Configuration of revocation checks are expected
-     *                          to be via proprietary JSSE provider methods.
+     * @param crlf              The path to the CRL file.
+     * @param trustStore        The configured TrustStore.
+     * @param revocationEnabled Should the JSSE provider perform revocation checks? Ignored if {@code crlf} is non-null.
+     *                              Configuration of revocation checks are expected to be via proprietary JSSE provider
+     *                              methods.
+     *
      * @return The parameters including the CRLs and TrustStore.
+     *
      * @throws Exception An error occurred
      */
-    protected CertPathParameters getParameters(String crlf, KeyStore trustStore,
-            boolean revocationEnabled) throws Exception {
+    protected CertPathParameters getParameters(String crlf, KeyStore trustStore, boolean revocationEnabled)
+            throws Exception {
 
-        PKIXBuilderParameters xparams =
-                new PKIXBuilderParameters(trustStore, new X509CertSelector());
-        if (crlf != null && crlf.length() > 0) {
+        PKIXBuilderParameters xparams = new PKIXBuilderParameters(trustStore, new X509CertSelector());
+        if (crlf != null && !crlf.isEmpty()) {
             Collection<? extends CRL> crls = getCRLs(crlf);
             CertStoreParameters csp = new CollectionCertStoreParameters(crls);
             CertStore store = CertStore.getInstance("Collection", csp);
@@ -516,31 +540,33 @@ public abstract class SSLUtilBase implements SSLUtil {
 
     /**
      * Load the collection of CRLs.
+     *
      * @param crlf The path to the CRL file.
+     *
      * @return the CRLs collection
-     * @throws IOException Error reading CRL file
-     * @throws CRLException CRL error
+     *
+     * @throws IOException          Error reading CRL file
+     * @throws CRLException         CRL error
      * @throws CertificateException Error processing certificate
      */
-    protected Collection<? extends CRL> getCRLs(String crlf)
-        throws IOException, CRLException, CertificateException {
+    protected Collection<? extends CRL> getCRLs(String crlf) throws IOException, CRLException, CertificateException {
 
-        Collection<? extends CRL> crls = null;
-        try {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
-            try (InputStream is = ConfigFileLoader.getSource().getResource(crlf).getInputStream()) {
-                crls = cf.generateCRLs(is);
-            }
-        } catch(IOException | CRLException | CertificateException e) {
-            throw e;
+        Collection<? extends CRL> crls;
+        CertificateFactory cf = CertificateFactory.getInstance("X.509");
+        try (InputStream is = ConfigFileLoader.getSource().getResource(crlf).getInputStream()) {
+            crls = cf.generateCRLs(is);
         }
         return crls;
     }
 
 
     protected abstract Set<String> getImplementedProtocols();
+
     protected abstract Set<String> getImplementedCiphers();
+
     protected abstract Log getLog();
+
     protected abstract boolean isTls13RenegAuthAvailable();
+
     protected abstract SSLContext createSSLContextInternal(List<String> negotiableProtocols) throws Exception;
 }

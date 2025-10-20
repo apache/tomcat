@@ -44,12 +44,11 @@ public class TestStandardContextAliases extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         File lib = new File("webapps/examples/WEB-INF/lib");
         ctx.setResources(new StandardRoot(ctx));
-        ctx.getResources().createWebResourceSet(
-                WebResourceRoot.ResourceSetType.POST, "/WEB-INF/lib",
+        ctx.getResources().createWebResourceSet(WebResourceRoot.ResourceSetType.POST, "/WEB-INF/lib",
                 lib.getAbsolutePath(), null, "/");
 
 
@@ -79,8 +78,7 @@ public class TestStandardContextAliases extends TomcatBaseTest {
         private static final long serialVersionUID = 1L;
 
         @Override
-        protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
+        protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
             resp.setContentType("text/plain");
 

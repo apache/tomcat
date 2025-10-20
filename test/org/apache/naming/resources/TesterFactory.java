@@ -40,7 +40,7 @@ public class TesterFactory implements ObjectFactory {
             if (className.equals("org.apache.naming.resources.TesterObject")) {
                 ClassLoader cl = Thread.currentThread().getContextClassLoader();
                 Class<?> clazz =
-                    cl.loadClass("org.apache.naming.resources.TesterObject");
+                        cl.loadClass("org.apache.naming.resources.TesterObject");
                 return clazz.getConstructor().newInstance();
             }
         }

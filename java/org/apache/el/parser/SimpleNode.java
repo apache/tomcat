@@ -28,14 +28,16 @@ import jakarta.el.ValueReference;
 import org.apache.el.lang.EvaluationContext;
 import org.apache.el.util.MessageFactory;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public abstract class SimpleNode implements Node {
-    protected Node parent;
 
-    protected Node[] children;
+    /*
+     * Uses SimpleNode rather than Node for performance.
+     *
+     * See https://bz.apache.org/bugzilla/show_bug.cgi?id=68068
+     */
+    protected SimpleNode parent;
+
+    protected SimpleNode[] children;
 
     protected final int id;
 
@@ -57,7 +59,7 @@ public abstract class SimpleNode implements Node {
 
     @Override
     public void jjtSetParent(Node n) {
-        parent = n;
+        parent = (SimpleNode) n;
     }
 
     @Override
@@ -68,13 +70,13 @@ public abstract class SimpleNode implements Node {
     @Override
     public void jjtAddChild(Node n, int i) {
         if (children == null) {
-            children = new Node[i + 1];
+            children = new SimpleNode[i + 1];
         } else if (i >= children.length) {
-            Node c[] = new Node[i + 1];
+            SimpleNode[] c = new SimpleNode[i + 1];
             System.arraycopy(children, 0, c, 0, children.length);
             children = c;
         }
-        children[i] = n;
+        children[i] = (SimpleNode) n;
     }
 
     @Override
@@ -88,17 +90,15 @@ public abstract class SimpleNode implements Node {
     }
 
     /*
-     * You can override these two methods in subclasses of SimpleNode to
-     * customize the way the node appears when the tree is dumped. If your
-     * output uses more than one line you should override toString(String),
-     * otherwise overriding toString() is probably all you need to do.
+     * You can override these two methods in subclasses of SimpleNode to customize the way the node appears when the
+     * tree is dumped. If your output uses more than one line you should override toString(String), otherwise overriding
+     * toString() is probably all you need to do.
      */
 
     @Override
     public String toString() {
         if (this.image != null) {
-            return ELParserTreeConstants.jjtNodeName[id] + "[" + this.image
-                    + "]";
+            return ELParserTreeConstants.jjtNodeName[id] + "[" + this.image + "]";
         }
         return ELParserTreeConstants.jjtNodeName[id];
     }
@@ -113,33 +113,29 @@ public abstract class SimpleNode implements Node {
     }
 
     @Override
-    public Class<?> getType(EvaluationContext ctx)
-            throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean isReadOnly(EvaluationContext ctx)
-            throws ELException {
+    public boolean isReadOnly(EvaluationContext ctx) throws ELException {
         return true;
     }
 
     @Override
-    public void setValue(EvaluationContext ctx, Object value)
-            throws ELException {
+    public void setValue(EvaluationContext ctx, Object value) throws ELException {
         throw new PropertyNotWritableException(MessageFactory.get("error.syntax.set"));
     }
 
     @Override
     public void accept(NodeVisitor visitor) throws Exception {
         visitor.visit(this);
-        if (this.children != null && this.children.length > 0) {
+        if (this.children != null) {
             for (Node child : this.children) {
                 child.accept(visitor);
             }
@@ -147,14 +143,12 @@ public abstract class SimpleNode implements Node {
     }
 
     @Override
-    public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes,
-            Object[] paramValues) throws ELException {
+    public Object invoke(EvaluationContext ctx, Class<?>[] paramTypes, Object[] paramValues) throws ELException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public MethodInfo getMethodInfo(EvaluationContext ctx,
-            Class<?>[] paramTypes) throws ELException {
+    public MethodInfo getMethodInfo(EvaluationContext ctx, Class<?>[] paramTypes) throws ELException {
         throw new UnsupportedOperationException();
     }
 
@@ -178,10 +172,9 @@ public abstract class SimpleNode implements Node {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof SimpleNode)) {
+        if (!(obj instanceof SimpleNode other)) {
             return false;
         }
-        SimpleNode other = (SimpleNode) obj;
         if (id != other.id) {
             return false;
         }
@@ -192,10 +185,7 @@ public abstract class SimpleNode implements Node {
         } else if (!image.equals(other.image)) {
             return false;
         }
-        if (!Arrays.equals(children, other.children)) {
-            return false;
-        }
-        return true;
+        return Arrays.equals(children, other.children);
     }
 
     /**

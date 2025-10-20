@@ -37,6 +37,8 @@ import java.util.Locale;
 
 import org.junit.Assert;
 
+import org.apache.catalina.Globals;
+
 /**
  * Simple client for unit testing. It isn't robust, it isn't secure and
  * should not be used as the basis for production code. Its only purpose
@@ -49,6 +51,9 @@ public abstract class SimpleHttpClient {
     public static final String CR = "\r";
     public static final String LF = "\n";
     public static final String CRLF = CR + LF;
+
+    public static final String HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODING =
+            "Content-Type: " + Globals.CONTENT_TYPE_FORM_URL_ENCODING + CRLF;
 
     public static final String INFO_100 = "HTTP/1.1 100 ";
     public static final String OK_200 = "HTTP/1.1 200 ";
@@ -148,6 +153,13 @@ public abstract class SimpleHttpClient {
 
     public String getResponseLine() {
         return responseLine;
+    }
+
+    public int getStatusCode() {
+        if (responseLine.length() < 13) {
+            throw new IllegalStateException();
+        }
+        return Integer.parseInt(responseLine.substring(9, 12));
     }
 
     public List<String> getResponseHeaders() {
@@ -326,11 +338,12 @@ public abstract class SimpleHttpClient {
                 builder.append(body, 0 , read);
                 Assert.assertEquals(contentLength, builder.toString().getBytes(responseBodyEncoding).length);
             } else {
-                // not using content length, so just read it line by line
-                String line = null;
+                // Not using content length, so just read until EOF
+                char[] buf = new char[1024];
+                int read;
                 try {
-                    while ((line = readLine()) != null) {
-                        builder.append(line);
+                    while ((read = reader.read(buf)) != -1) {
+                        builder.append(buf, 0, read);
                     }
                 } catch (SocketException e) {
                     // Ignore

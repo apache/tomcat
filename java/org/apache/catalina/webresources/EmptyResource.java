@@ -99,7 +99,7 @@ public class EmptyResource implements WebResource {
         } else {
             try {
                 return file.getCanonicalPath();
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 return null;
             }
         }
@@ -147,6 +147,11 @@ public class EmptyResource implements WebResource {
 
     @Override
     public URL getURL() {
+        return null;
+    }
+
+    @Override
+    public URL getCodeBase() {
         return null;
     }
 

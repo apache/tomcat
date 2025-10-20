@@ -101,7 +101,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
                 //give the object to the thread instead of adding it to the pool
                 c.setItem(e);
                 if (isLinux) {
-                  c.countDown();
+                    c.countDown();
                 }
             } else {
                 //we always add first, so that the most recently used object will be given out
@@ -112,7 +112,7 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         }
         //if we exchanged an object with another thread, wake it up.
         if (!isLinux && c!=null) {
-          c.countDown();
+            c.countDown();
         }
         //we have an unbounded queue, so always return true
         return true;
@@ -219,9 +219,6 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         return result;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean remove(Object e) {
         final ReentrantLock lock = this.lock;
@@ -233,25 +230,22 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int size() {
-        return items.size();
+        final ReentrantLock lock = this.lock;
+        lock.lock();
+        try {
+            return items.size();
+        } finally {
+            lock.unlock();
+        }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Iterator<E> iterator() {
         return new FairIterator();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E poll() {
         final ReentrantLock lock = this.lock;
@@ -263,9 +257,6 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean contains(Object e) {
         final ReentrantLock lock = this.lock;
@@ -281,9 +272,6 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
     //------------------------------------------------------------------
     // NOT USED BY CONPOOL IMPLEMENTATION
     //------------------------------------------------------------------
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean add(E e) {
         return offer(e);
@@ -308,33 +296,21 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         return drainTo(c,Integer.MAX_VALUE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void put(E e) throws InterruptedException {
         offer(e);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int remainingCapacity() {
         return Integer.MAX_VALUE - size();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public E take() throws InterruptedException {
         return this.poll(Long.MAX_VALUE, TimeUnit.MILLISECONDS);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean addAll(Collection<? extends E> c) {
         Iterator<? extends E> i = c.iterator();
@@ -364,9 +340,6 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
         throw new UnsupportedOperationException("boolean containsAll(Collection<?> c)");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isEmpty() {
         return size() == 0;
@@ -477,9 +450,9 @@ public class FairBlockingQueue<E> implements BlockingQueue<E> {
             } else if (latch!=null) {
                 boolean timedout = !latch.await(timeout, unit);
                 if (timedout) {
-                  throw new TimeoutException();
+                    throw new TimeoutException();
                 } else {
-                  return latch.getItem();
+                    return latch.getItem();
                 }
             } else {
                 throw new ExecutionException("ItemFuture incorrectly instantiated. Bug in the code?", new Exception());

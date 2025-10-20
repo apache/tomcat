@@ -219,6 +219,48 @@ public class TestUDecoder {
     }
 
 
+    @Test
+    public void testURLDecodeStringSolidus10a() throws IOException {
+        String result = doTestSolidus("xx%25xx", EncodedSolidusHandling.REJECT);
+        Assert.assertEquals("xx%xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringSolidus10b() throws IOException {
+        String result = doTestSolidus("xx%25xx", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("xx%25xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringSolidus10c() throws IOException {
+        String result = doTestSolidus("xx%25xx", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("xx%xx", result);
+    }
+
+
+    @Test(expected = CharConversionException.class)
+    public void testURLDecodeStringSolidus11a() throws IOException {
+        String result = doTestSolidus("xx%2f%25xx", EncodedSolidusHandling.REJECT);
+        Assert.assertEquals("xx%xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringSolidus11b() throws IOException {
+        String result = doTestSolidus("xx%2f%25xx", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("xx%2f%25xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringSolidus11c() throws IOException {
+        String result = doTestSolidus("xx%2f%25xx", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("xx/%xx", result);
+    }
+
+
     private void doTestSolidus(String input, String expected) throws IOException {
         for (EncodedSolidusHandling solidusHandling : EncodedSolidusHandling.values()) {
             String result = doTestSolidus(input, solidusHandling);
@@ -234,7 +276,194 @@ public class TestUDecoder {
         bc.setCharset(StandardCharsets.UTF_8);
 
         UDecoder udecoder = new UDecoder();
-        udecoder.convert(bc, solidusHandling);
+        udecoder.convert(bc, solidusHandling, EncodedSolidusHandling.DECODE);
+
+        return bc.toString();
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus01() throws IOException {
+        doTestReverseSolidus("xxxxxx", "xxxxxx");
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus02() throws IOException {
+        doTestReverseSolidus("%20xxxx", " xxxx");
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus03() throws IOException {
+        doTestReverseSolidus("xx%20xx", "xx xx");
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus04() throws IOException {
+        doTestReverseSolidus("xxxx%20", "xxxx ");
+    }
+
+
+    @Test(expected = CharConversionException.class)
+    public void testURLDecodeStringReverseSolidus05a() throws IOException {
+        doTestReverseSolidus("%5cxxxx", EncodedSolidusHandling.REJECT);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus05b() throws IOException {
+        String result = doTestReverseSolidus("%5cxxxx", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("%5cxxxx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus05c() throws IOException {
+        String result = doTestReverseSolidus("%5cxxxx", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("\\xxxx", result);
+    }
+
+
+    @Test(expected = CharConversionException.class)
+    public void testURLDecodeStringReverseSolidus06a() throws IOException {
+        doTestReverseSolidus("%5cxx%20xx", EncodedSolidusHandling.REJECT);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus06b() throws IOException {
+        String result = doTestReverseSolidus("%5cxx%20xx", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("%5cxx xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus06c() throws IOException {
+        String result = doTestReverseSolidus("%5cxx%20xx", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("\\xx xx", result);
+    }
+
+
+    @Test(expected = CharConversionException.class)
+    public void testURLDecodeStringReverseSolidus07a() throws IOException {
+        doTestReverseSolidus("xx%5c%20xx", EncodedSolidusHandling.REJECT);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus07b() throws IOException {
+        String result = doTestReverseSolidus("xx%5c%20xx", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("xx%5c xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus07c() throws IOException {
+        String result = doTestReverseSolidus("xx%5c%20xx", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("xx\\ xx", result);
+    }
+
+
+    @Test(expected = CharConversionException.class)
+    public void testURLDecodeStringReverseSolidus08a() throws IOException {
+        doTestReverseSolidus("xx%20%5cxx", EncodedSolidusHandling.REJECT);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus08b() throws IOException {
+        String result = doTestReverseSolidus("xx%20%5cxx", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("xx %5cxx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus08c() throws IOException {
+        String result = doTestReverseSolidus("xx%20%5cxx", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("xx \\xx", result);
+    }
+
+
+    @Test(expected = CharConversionException.class)
+    public void testURLDecodeStringReverseSolidus09a() throws IOException {
+        doTestReverseSolidus("xx%20xx%5c", EncodedSolidusHandling.REJECT);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus09b() throws IOException {
+        String result = doTestReverseSolidus("xx%20xx%5c", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("xx xx%5c", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus09c() throws IOException {
+        String result = doTestReverseSolidus("xx%20xx%5c", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("xx xx\\", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus10a() throws IOException {
+        String result = doTestReverseSolidus("xx%25xx", EncodedSolidusHandling.REJECT);
+        Assert.assertEquals("xx%xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus10b() throws IOException {
+        String result = doTestReverseSolidus("xx%25xx", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("xx%25xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus10c() throws IOException {
+        String result = doTestReverseSolidus("xx%25xx", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("xx%xx", result);
+    }
+
+
+    @Test(expected = CharConversionException.class)
+    public void testURLDecodeStringReverseSolidus11a() throws IOException {
+        String result = doTestReverseSolidus("xx%5c%25xx", EncodedSolidusHandling.REJECT);
+        Assert.assertEquals("xx%xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus11b() throws IOException {
+        String result = doTestReverseSolidus("xx%5c%25xx", EncodedSolidusHandling.PASS_THROUGH);
+        Assert.assertEquals("xx%5c%25xx", result);
+    }
+
+
+    @Test
+    public void testURLDecodeStringReverseSolidus11c() throws IOException {
+        String result = doTestReverseSolidus("xx%5c%25xx", EncodedSolidusHandling.DECODE);
+        Assert.assertEquals("xx\\%xx", result);
+    }
+
+
+    private void doTestReverseSolidus(String input, String expected) throws IOException {
+        for (EncodedSolidusHandling solidusHandling : EncodedSolidusHandling.values()) {
+            String result = doTestReverseSolidus(input, solidusHandling);
+            Assert.assertEquals(expected, result);
+        }
+    }
+
+
+    private String doTestReverseSolidus(String input, EncodedSolidusHandling reverseSolidusHandling) throws IOException {
+        byte[] b = input.getBytes(StandardCharsets.UTF_8);
+        ByteChunk bc = new ByteChunk(16);
+        bc.setBytes(b, 0,  b.length);
+        bc.setCharset(StandardCharsets.UTF_8);
+
+        UDecoder udecoder = new UDecoder();
+        udecoder.convert(bc, EncodedSolidusHandling.REJECT, reverseSolidusHandling);
 
         return bc.toString();
     }

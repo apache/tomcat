@@ -86,7 +86,7 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         Assert.assertTrue(tomcat.getConnector().setProperty("useAsyncIO", "true"));
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         UpgradeServlet servlet = new UpgradeServlet(upgradeHandlerClass);
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -250,17 +250,17 @@ public class TestUpgradeInternalHandler extends TomcatBaseTest {
         public SocketState upgradeDispatch(SocketEvent status) {
             System.out.println("Processing: " + status);
             switch (status) {
-            case OPEN_READ:
-                // Note: there's always an initial read event at the moment (reading should be skipped since it ends up in the internal buffer)
-                break;
-            case OPEN_WRITE:
-                break;
-            case STOP:
-            case DISCONNECT:
-            case ERROR:
-            case TIMEOUT:
-            case CONNECT_FAIL:
-                return SocketState.CLOSED;
+                case OPEN_READ:
+                    // Note: there's always an initial read event at the moment (reading should be skipped since it ends up in the internal buffer)
+                    break;
+                case OPEN_WRITE:
+                    break;
+                case STOP:
+                case DISCONNECT:
+                case ERROR:
+                case TIMEOUT:
+                case CONNECT_FAIL:
+                    return SocketState.CLOSED;
             }
             return SocketState.UPGRADED;
         }

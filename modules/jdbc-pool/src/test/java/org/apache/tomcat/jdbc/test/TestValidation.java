@@ -617,10 +617,10 @@ public class TestValidation extends DefaultTestCase {
         public boolean isValid(int timeout) throws SQLException {
             statementExecuted();
             switch (validationOutcome) {
-            case SUCCESS: { return true; }
-            case FAILURE: { return false; }
-            case EXCEPTION: { throw new SQLException("Unexpected error generated in test"); }
-            default: { return true; }
+                case SUCCESS: { return true; }
+                case FAILURE: { return false; }
+                case EXCEPTION: { throw new SQLException("Unexpected error generated in test"); }
+                default: { return true; }
             }
         }
     }

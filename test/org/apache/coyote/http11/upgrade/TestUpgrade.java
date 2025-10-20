@@ -166,7 +166,7 @@ public class TestUpgrade extends TomcatBaseTest {
         Tomcat tomcat = getTomcatInstance();
 
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
 
         UpgradeServlet servlet = new UpgradeServlet(upgradeHandlerClass);
         Tomcat.addServlet(ctx, "servlet", servlet);
@@ -273,7 +273,7 @@ public class TestUpgrade extends TomcatBaseTest {
         public void init(WebConnection connection) {
 
             try (ServletInputStream sis = connection.getInputStream();
-                 ServletOutputStream sos = connection.getOutputStream()){
+                    ServletOutputStream sos = connection.getOutputStream()){
                 byte[] buffer = new byte[8192];
                 int read;
                 while ((read = sis.read(buffer)) >= 0) {

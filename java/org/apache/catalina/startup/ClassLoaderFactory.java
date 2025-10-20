@@ -32,21 +32,17 @@ import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 
 /**
- * <p>Utility class for building class loaders for Catalina.  The factory
- * method requires the following parameters in order to build a new class
- * loader (with suitable defaults in all cases):</p>
+ * <p>
+ * Utility class for building class loaders for Catalina. The factory method requires the following parameters in order
+ * to build a new class loader (with suitable defaults in all cases):
+ * </p>
  * <ul>
- * <li>A set of directories containing unpacked classes (and resources)
- *     that should be included in the class loader's
- *     repositories.</li>
- * <li>A set of directories containing classes and resources in JAR files.
- *     Each readable JAR file discovered in these directories will be
- *     added to the class loader's repositories.</li>
- * <li><code>ClassLoader</code> instance that should become the parent of
- *     the new class loader.</li>
+ * <li>A set of directories containing unpacked classes (and resources) that should be included in the class loader's
+ * repositories.</li>
+ * <li>A set of directories containing classes and resources in JAR files. Each readable JAR file discovered in these
+ * directories will be added to the class loader's repositories.</li>
+ * <li><code>ClassLoader</code> instance that should become the parent of the new class loader.</li>
  * </ul>
- *
- * @author Craig R. McClanahan
  */
 public final class ClassLoaderFactory {
 
@@ -57,25 +53,20 @@ public final class ClassLoaderFactory {
 
 
     /**
-     * Create and return a new class loader, based on the configuration
-     * defaults and the specified directory paths:
+     * Create and return a new class loader, based on the configuration defaults and the specified directory paths:
      *
-     * @param unpacked Array of pathnames to unpacked directories that should
-     *  be added to the repositories of the class loader, or <code>null</code>
-     * for no unpacked directories to be considered
-     * @param packed Array of pathnames to directories containing JAR files
-     *  that should be added to the repositories of the class loader,
-     * or <code>null</code> for no directories of JAR files to be considered
-     * @param parent Parent class loader for the new class loader, or
-     *  <code>null</code> for the system class loader.
+     * @param unpacked Array of pathnames to unpacked directories that should be added to the repositories of the class
+     *                     loader, or <code>null</code> for no unpacked directories to be considered
+     * @param packed   Array of pathnames to directories containing JAR files that should be added to the repositories
+     *                     of the class loader, or <code>null</code> for no directories of JAR files to be considered
+     * @param parent   Parent class loader for the new class loader, or <code>null</code> for the system class loader.
+     *
      * @return the new class loader
      *
      * @exception Exception if an error occurs constructing the class loader
      */
-    public static ClassLoader createClassLoader(File unpacked[],
-                                                File packed[],
-                                                final ClassLoader parent)
-        throws Exception {
+    public static ClassLoader createClassLoader(File[] unpacked, File[] packed, final ClassLoader parent)
+            throws Exception {
 
         if (log.isDebugEnabled()) {
             log.debug("Creating new class loader");
@@ -105,7 +96,7 @@ public final class ClassLoaderFactory {
                 if (!directory.isDirectory() || !directory.canRead()) {
                     continue;
                 }
-                String filenames[] = directory.list();
+                String[] filenames = directory.list();
                 if (filenames == null) {
                     continue;
                 }
@@ -135,21 +126,19 @@ public final class ClassLoaderFactory {
 
 
     /**
-     * Create and return a new class loader, based on the configuration
-     * defaults and the specified directory paths:
+     * Create and return a new class loader, based on the configuration defaults and the specified directory paths:
      *
-     * @param repositories List of class directories, jar files, jar directories
-     *                     or URLS that should be added to the repositories of
-     *                     the class loader.
-     * @param parent Parent class loader for the new class loader, or
-     *  <code>null</code> for the system class loader.
+     * @param repositories List of class directories, jar files, jar directories or URLS that should be added to the
+     *                         repositories of the class loader.
+     * @param parent       Parent class loader for the new class loader, or <code>null</code> for the system class
+     *                         loader.
+     *
      * @return the new class loader
      *
      * @exception Exception if an error occurs constructing the class loader
      */
-    public static ClassLoader createClassLoader(List<Repository> repositories,
-                                                final ClassLoader parent)
-        throws Exception {
+    public static ClassLoader createClassLoader(List<Repository> repositories, final ClassLoader parent)
+            throws Exception {
 
         if (log.isDebugEnabled()) {
             log.debug("Creating new class loader");
@@ -159,15 +148,15 @@ public final class ClassLoaderFactory {
         Set<URL> set = new LinkedHashSet<>();
 
         if (repositories != null) {
-            for (Repository repository : repositories)  {
-                if (repository.getType() == RepositoryType.URL) {
-                    URL url = buildClassLoaderUrl(repository.getLocation());
+            for (Repository repository : repositories) {
+                if (repository.type() == RepositoryType.URL) {
+                    URL url = buildClassLoaderUrl(repository.location());
                     if (log.isDebugEnabled()) {
                         log.debug("  Including URL " + url);
                     }
                     set.add(url);
-                } else if (repository.getType() == RepositoryType.DIR) {
-                    File directory = new File(repository.getLocation());
+                } else if (repository.type() == RepositoryType.DIR) {
+                    File directory = new File(repository.location());
                     directory = directory.getCanonicalFile();
                     if (!validateFile(directory, RepositoryType.DIR)) {
                         continue;
@@ -177,8 +166,8 @@ public final class ClassLoaderFactory {
                         log.debug("  Including directory " + url);
                     }
                     set.add(url);
-                } else if (repository.getType() == RepositoryType.JAR) {
-                    File file=new File(repository.getLocation());
+                } else if (repository.type() == RepositoryType.JAR) {
+                    File file = new File(repository.location());
                     file = file.getCanonicalFile();
                     if (!validateFile(file, RepositoryType.JAR)) {
                         continue;
@@ -188,17 +177,16 @@ public final class ClassLoaderFactory {
                         log.debug("  Including jar file " + url);
                     }
                     set.add(url);
-                } else if (repository.getType() == RepositoryType.GLOB) {
-                    File directory=new File(repository.getLocation());
+                } else if (repository.type() == RepositoryType.GLOB) {
+                    File directory = new File(repository.location());
                     directory = directory.getCanonicalFile();
                     if (!validateFile(directory, RepositoryType.GLOB)) {
                         continue;
                     }
                     if (log.isDebugEnabled()) {
-                        log.debug("  Including directory glob "
-                            + directory.getAbsolutePath());
+                        log.debug("  Including directory glob " + directory.getAbsolutePath());
                     }
-                    String filenames[] = directory.list();
+                    String[] filenames = directory.list();
                     if (filenames == null) {
                         continue;
                     }
@@ -213,8 +201,7 @@ public final class ClassLoaderFactory {
                             continue;
                         }
                         if (log.isDebugEnabled()) {
-                            log.debug("    Including glob jar file "
-                                    + file.getAbsolutePath());
+                            log.debug("    Including glob jar file " + file.getAbsolutePath());
                         }
                         URL url = buildClassLoaderUrl(file);
                         set.add(url);
@@ -225,9 +212,9 @@ public final class ClassLoaderFactory {
 
         // Construct the class loader itself
         final URL[] array = set.toArray(new URL[0]);
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             for (int i = 0; i < array.length; i++) {
-                log.debug("  location " + i + " is " + array[i]);
+                log.trace("  location " + i + " is " + array[i]);
             }
         }
 
@@ -238,27 +225,23 @@ public final class ClassLoaderFactory {
         }
     }
 
-    private static boolean validateFile(File file,
-            RepositoryType type) throws IOException {
+    private static boolean validateFile(File file, RepositoryType type) throws IOException {
         if (RepositoryType.DIR == type || RepositoryType.GLOB == type) {
             if (!file.isDirectory() || !file.canRead()) {
-                String msg = "Problem with directory [" + file +
-                        "], exists: [" + file.exists() +
-                        "], isDirectory: [" + file.isDirectory() +
-                        "], canRead: [" + file.canRead() + "]";
+                String msg = "Problem with directory [" + file + "], exists: [" + file.exists() + "], isDirectory: [" +
+                        file.isDirectory() + "], canRead: [" + file.canRead() + "]";
 
-                File home = new File (Bootstrap.getCatalinaHome());
+                File home = new File(Bootstrap.getCatalinaHome());
                 home = home.getCanonicalFile();
-                File base = new File (Bootstrap.getCatalinaBase());
+                File base = new File(Bootstrap.getCatalinaBase());
                 base = base.getCanonicalFile();
                 File defaultValue = new File(base, "lib");
 
                 // Existence of ${catalina.base}/lib directory is optional.
                 // Hide the warning if Tomcat runs with separate catalina.home
                 // and catalina.base and that directory is absent.
-                if (!home.getPath().equals(base.getPath())
-                        && file.getPath().equals(defaultValue.getPath())
-                        && !file.exists()) {
+                if (!home.getPath().equals(base.getPath()) && file.getPath().equals(defaultValue.getPath()) &&
+                        !file.exists()) {
                     log.debug(msg);
                 } else {
                     log.warn(msg);
@@ -267,9 +250,8 @@ public final class ClassLoaderFactory {
             }
         } else if (RepositoryType.JAR == type) {
             if (!file.canRead()) {
-                log.warn("Problem with JAR file [" + file +
-                        "], exists: [" + file.exists() +
-                        "], canRead: [" + file.canRead() + "]");
+                log.warn("Problem with JAR file [" + file + "], exists: [" + file.exists() + "], canRead: [" +
+                        file.canRead() + "]");
                 return false;
             }
         }
@@ -278,9 +260,8 @@ public final class ClassLoaderFactory {
 
 
     /*
-     * These two methods would ideally be in the utility class
-     * org.apache.tomcat.util.buf.UriUtil but that class is not visible until
-     * after the class loaders have been constructed.
+     * These two methods would ideally be in the utility class org.apache.tomcat.util.buf.UriUtil but that class is not
+     * visible until after the class loaders have been constructed.
      */
     private static URL buildClassLoaderUrl(String urlString) throws MalformedURLException, URISyntaxException {
         // URLs passed to class loaders may point to directories that contain
@@ -307,21 +288,6 @@ public final class ClassLoaderFactory {
         URL
     }
 
-    public static class Repository {
-        private final String location;
-        private final RepositoryType type;
-
-        public Repository(String location, RepositoryType type) {
-            this.location = location;
-            this.type = type;
-        }
-
-        public String getLocation() {
-            return location;
-        }
-
-        public RepositoryType getType() {
-            return type;
-        }
+    public record Repository(String location, RepositoryType type) {
     }
 }

@@ -20,11 +20,9 @@
  * This package contains two DataSources: {@code PerUserPoolDataSource} and
  * {@code SharedPoolDataSource} which provide a database connection pool.
  * Below are a couple of usage examples.  One shows deployment into a JNDI system.
- * The other is a simple example initializing the pool using standard java code.
+ * The other is a simple example initializing the pool using standard Java code.
  * </p>
- *
  * <h2>JNDI</h2>
- *
  * <p>
  * Most
  * J2EE containers will provide some way of deploying resources into JNDI.  The
@@ -35,8 +33,7 @@
  * <p>In server.xml, the following would be added to the &lt;Context&gt; for your
  * webapp:
  * </p>
- *
- * <code>
+ * <pre>
  *  &lt;Resource name="jdbc/bookstore" auth="Container"
  *             type="org.apache.tomcat.dbcp.dbcp2.datasources.PerUserPoolPoolDataSource"/&gt;
  *   &lt;ResourceParams name="jdbc/bookstore"&gt;
@@ -51,14 +48,12 @@
  *       &lt;name&gt;defaultMaxTotal&lt;/name&gt;&lt;value&gt;30&lt;/value&gt;
  *     &lt;/parameter&gt;
  *   &lt;/ResourceParams&gt;
- * </code>
- *
+ * </pre>
  * <p>
  * In web.xml.  Note that elements must be given in the order of the dtd
  * described in the servlet specification:
  * </p>
- *
- * <code>
+ * <pre>
  * &lt;resource-ref&gt;
  *   &lt;description&gt;
  *     Resource reference to a factory for java.sql.Connection
@@ -75,8 +70,7 @@
  *     Container
  *   &lt;/res-auth&gt;
  * &lt;/resource-ref&gt;
- * </code>
- *
+ * </pre>
  * <p>
  * Apache Tomcat deploys all objects configured similarly to above within the
  * <strong>java:comp/env</strong> namespace.  So the JNDI path given for
@@ -84,14 +78,11 @@
  * {@code ConnectionPoolDataSource} that is deployed as given in the
  * <a href="../cpdsadapter/package-summary.html">cpdsadapter example</a>
  * </p>
- *
  * <p>
  * The {@code DataSource} is now available to the application as shown
  * below:
  * </p>
- *
- * <code>
- *
+ * <pre>
  *     Context ctx = new InitialContext();
  *     DataSource ds = (DataSource)
  *         ctx.lookup("java:comp/env/jdbc/bookstore");
@@ -108,9 +99,7 @@
  *         if (con != null)
  *             con.close();
  *     }
- *
- * </code>
- *
+ * </pre>
  * <p>
  * The reference to the {@code DataSource} could be maintained, for
  * multiple getConnection() requests.  Or the {@code DataSource} can be
@@ -120,24 +109,19 @@
  * between different lookups.  This behavior may be different in other
  * implementations.
  * </p>
- *
  * <h2>Without JNDI</h2>
- *
  * <p>
  * Connection pooling is useful in applications regardless of whether they run
  * in a J2EE environment and a {@code DataSource} can be used within a
  * simpler environment.  The example below shows SharedPoolDataSource using
  * DriverAdapterCPDS as the back end source, though any CPDS is applicable.
  * </p>
+ * <pre>
+ * public class Pool {
  *
- * <code>
- *
- * public class Pool
- * {
  *     private static DataSource ds;
  *
- *     static
- *     {
+ *     static {
  *         DriverAdapterCPDS cpds = new DriverAdapterCPDS();
  *         cpds.setDriver("org.gjt.mm.mysql.Driver");
  *         cpds.setUrl("jdbc:mysql://localhost:3306/bookstore");
@@ -152,32 +136,26 @@
  *         ds = tds;
  *     }
  *
- *     public static getConnection()
- *     {
+ *     public static getConnection() {
  *         return ds.getConnection();
  *     }
  * }
- *
- * </code>
- *
+ * </pre>
  * <p>
  * This class can then be used wherever a connection is needed:
  * </p>
- *
- * <code>
+ * <pre>
  *     Connection con = null;
- *     try
- *     {
+ *     try {
  *         con = Pool.getConnection();
  *         ...
  *         use the connection
  *         ...
- *     }
- *     finally
- *     {
- *         if (con != null)
+ *     } finally {
+ *         if (con != null) {
  *             con.close();
+ *         }
  *     }
- * </code>
+ * </pre>
  */
 package org.apache.tomcat.dbcp.dbcp2.datasources;

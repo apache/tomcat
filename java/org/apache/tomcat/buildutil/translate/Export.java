@@ -23,8 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- * Generates a single properties file per language for import into a translation
- * tool.
+ * Generates a single properties file per language for import into a translation tool.
  */
 public class Export {
 
@@ -49,7 +48,7 @@ public class Export {
         }
 
         for (Map.Entry<String,Properties> translationEntry : translations.entrySet()) {
-             Utils.export(translationEntry.getKey(), translationEntry.getValue(), storageDir);
+            Utils.export(translationEntry.getKey(), translationEntry.getValue(), storageDir);
         }
     }
 }

@@ -23,14 +23,12 @@ import java.io.IOException;
  *
  * @since Servlet 3.1
  */
-public interface ReadListener extends java.util.EventListener{
+public interface ReadListener extends java.util.EventListener {
 
     /**
-     * Invoked when data is available to read. The container will invoke this
-     * method the first time for a request as soon as there is data to read.
-     * Subsequent invocations will only occur if a call to
-     * {@link ServletInputStream#isReady()} has returned false and data has
-     * subsequently become available to read.
+     * Invoked when data is available to read. The container will invoke this method the first time for a request as
+     * soon as there is data to read. Subsequent invocations will only occur if a call to
+     * {@link ServletInputStream#isReady()} has returned false and data has subsequently become available to read.
      *
      * @throws IOException id an I/O error occurs while processing the event
      */
@@ -48,5 +46,5 @@ public interface ReadListener extends java.util.EventListener{
      *
      * @param throwable The exception that occurred
      */
-    void onError(java.lang.Throwable throwable);
+    void onError(Throwable throwable);
 }

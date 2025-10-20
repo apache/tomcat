@@ -16,20 +16,19 @@
  */
 package org.apache.tomcat.util.descriptor.web;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 import org.apache.tomcat.util.buf.UDecoder;
 
 /**
- * Representation of a login configuration element for a web application,
- * as represented in a <code>&lt;login-config&gt;</code> element in the
- * deployment descriptor.
- *
- * @author Craig R. McClanahan
+ * Representation of a login configuration element for a web application, as represented in a
+ * <code>&lt;login-config&gt;</code> element in the deployment descriptor.
  */
 public class LoginConfig extends XmlEncodingBase implements Serializable {
 
 
+    @Serial
     private static final long serialVersionUID = 2L;
 
 
@@ -49,12 +48,11 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
      * Construct a new LoginConfig with the specified properties.
      *
      * @param authMethod The authentication method
-     * @param realmName The realm name
-     * @param loginPage The login page URI
-     * @param errorPage The error page URI
+     * @param realmName  The realm name
+     * @param loginPage  The login page URI
+     * @param errorPage  The error page URI
      */
-    public LoginConfig(String authMethod, String realmName,
-                       String loginPage, String errorPage) {
+    public LoginConfig(String authMethod, String realmName, String loginPage, String errorPage) {
 
         super();
         setAuthMethod(authMethod);
@@ -69,8 +67,7 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
 
 
     /**
-     * The authentication method to use for application login.  Must be
-     * BASIC, DIGEST, FORM, or CLIENT-CERT.
+     * The authentication method to use for application login. Must be BASIC, DIGEST, FORM, or CLIENT-CERT.
      */
     private String authMethod = null;
 
@@ -93,9 +90,6 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
     }
 
     public void setErrorPage(String errorPage) {
-        //        if ((errorPage == null) || !errorPage.startsWith("/"))
-        //            throw new IllegalArgumentException
-        //                ("Error Page resource path must start with a '/'");
         this.errorPage = UDecoder.URLDecode(errorPage, getCharset());
     }
 
@@ -110,16 +104,12 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
     }
 
     public void setLoginPage(String loginPage) {
-        //        if ((loginPage == null) || !loginPage.startsWith("/"))
-        //            throw new IllegalArgumentException
-        //                ("Login Page resource path must start with a '/'");
         this.loginPage = UDecoder.URLDecode(loginPage, getCharset());
     }
 
 
     /**
-     * The realm name used when challenging the user for authentication
-     * credentials.
+     * The realm name used when challenging the user for authentication credentials.
      */
     private String realmName = null;
 
@@ -160,26 +150,26 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
     }
 
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result
-                + ((authMethod == null) ? 0 : authMethod.hashCode());
-        result = prime * result
-                + ((errorPage == null) ? 0 : errorPage.hashCode());
-        result = prime * result
-                + ((loginPage == null) ? 0 : loginPage.hashCode());
-        result = prime * result
-                + ((realmName == null) ? 0 : realmName.hashCode());
+        result = prime * result + ((authMethod == null) ? 0 : authMethod.hashCode());
+        result = prime * result + ((errorPage == null) ? 0 : errorPage.hashCode());
+        result = prime * result + ((loginPage == null) ? 0 : loginPage.hashCode());
+        result = prime * result + ((realmName == null) ? 0 : realmName.hashCode());
         return result;
     }
 
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -187,10 +177,9 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof LoginConfig)) {
+        if (!(obj instanceof LoginConfig other)) {
             return false;
         }
-        LoginConfig other = (LoginConfig) obj;
         if (authMethod == null) {
             if (other.authMethod != null) {
                 return false;
@@ -213,13 +202,10 @@ public class LoginConfig extends XmlEncodingBase implements Serializable {
             return false;
         }
         if (realmName == null) {
-            if (other.realmName != null) {
-                return false;
-            }
-        } else if (!realmName.equals(other.realmName)) {
-            return false;
+            return other.realmName == null;
+        } else {
+            return realmName.equals(other.realmName);
         }
-        return true;
     }
 
 

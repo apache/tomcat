@@ -23,7 +23,7 @@ import java.util.Iterator;
  * item that was received within a {@code multipart/form-data} POST
  * request.</p>
  *
- * @since 1.2.1
+ * @since FileUpload 1.2.1
  */
 public interface FileItemHeaders {
 
@@ -44,6 +44,17 @@ public interface FileItemHeaders {
 
     /**
      * <p>
+     * Returns an {@code Iterator} of all the header names.
+     * </p>
+     *
+     * @return an {@code Iterator} containing all of the names of
+     *         headers provided with this file item. If the item does not have
+     *         any headers return an empty {@code Iterator}
+     */
+    Iterator<String> getHeaderNames();
+
+    /**
+     * <p>
      * Returns all the values of the specified item header as an
      * {@code Iterator} of {@code String} objects.
      * </p>
@@ -59,16 +70,5 @@ public interface FileItemHeaders {
      *         that name, return an empty {@code Iterator}
      */
     Iterator<String> getHeaders(String name);
-
-    /**
-     * <p>
-     * Returns an {@code Iterator} of all the header names.
-     * </p>
-     *
-     * @return an {@code Iterator} containing all of the names of
-     *         headers provided with this file item. If the item does not have
-     *         any headers return an empty {@code Iterator}
-     */
-    Iterator<String> getHeaderNames();
 
 }

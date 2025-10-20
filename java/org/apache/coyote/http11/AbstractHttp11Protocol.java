@@ -45,6 +45,7 @@ import org.apache.coyote.http11.upgrade.UpgradeGroupInfo;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorInternal;
 import org.apache.tomcat.util.buf.StringUtils;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.modeler.Util;
 import org.apache.tomcat.util.net.AbstractEndpoint;
@@ -59,8 +60,9 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     private final CompressionConfig compressionConfig = new CompressionConfig();
 
+    private HttpParser httpParser = null;
 
-    public AbstractHttp11Protocol(AbstractEndpoint<S, ?> endpoint) {
+    public AbstractHttp11Protocol(AbstractEndpoint<S,?> endpoint) {
         super(endpoint);
         setConnectionTimeout(Constants.DEFAULT_CONNECTION_TIMEOUT);
     }
@@ -68,6 +70,8 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     @Override
     public void init() throws Exception {
+        httpParser = new HttpParser(relaxedPathChars, relaxedQueryChars);
+
         // Upgrade protocols have to be configured first since the endpoint
         // init (triggered via super.init() below) uses this list to configure
         // the list of ALPN protocols to advertise
@@ -75,13 +79,15 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
             configureUpgradeProtocol(upgradeProtocol);
         }
 
-        super.init();
-
-        // Set the Http11Protocol (i.e. this) for any upgrade protocols once
-        // this has completed initialisation as the upgrade protocols may expect this
-        // to be initialised when the call is made
-        for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
-            upgradeProtocol.setHttp11Protocol(this);
+        try {
+            super.init();
+        } finally {
+            // Set the Http11Protocol (i.e. this) for any upgrade protocols once
+            // this has completed initialisation as the upgrade protocols may expect this
+            // to be initialised when the call is made
+            for (UpgradeProtocol upgradeProtocol : upgradeProtocols) {
+                upgradeProtocol.setHttp11Protocol(this);
+            }
         }
     }
 
@@ -92,7 +98,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         // be de-registered.
         ObjectName rgOname = getGlobalRequestProcessorMBeanName();
         if (rgOname != null) {
-            Registry registry = Registry.getRegistry(null, null);
+            Registry registry = Registry.getRegistry(null);
             ObjectName query = new ObjectName(rgOname.getCanonicalName() + ",Upgrade=*");
             Set<ObjectInstance> upgrades = registry.getMBeanServer().queryMBeans(query, null);
             for (ObjectInstance upgrade : upgrades) {
@@ -116,8 +122,13 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * Over-ridden here to make the method visible to nested classes.
      */
     @Override
-    protected AbstractEndpoint<S, ?> getEndpoint() {
+    protected AbstractEndpoint<S,?> getEndpoint() {
         return super.getEndpoint();
+    }
+
+
+    public HttpParser getHttpParser() {
+        return httpParser;
     }
 
 
@@ -169,53 +180,6 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
     public void setRelaxedQueryChars(String relaxedQueryChars) {
         this.relaxedQueryChars = relaxedQueryChars;
-    }
-
-
-    private boolean allowHostHeaderMismatch = false;
-
-    /**
-     * Will Tomcat accept an HTTP 1.1 request where the host header does not agree with the host specified (if any) in
-     * the request line?
-     *
-     * @return {@code true} if Tomcat will allow such requests, otherwise {@code false}
-     */
-    public boolean getAllowHostHeaderMismatch() {
-        return allowHostHeaderMismatch;
-    }
-
-    /**
-     * Will Tomcat accept an HTTP 1.1 request where the host header does not agree with the host specified (if any) in
-     * the request line?
-     *
-     * @param allowHostHeaderMismatch {@code true} to allow such requests, {@code false} to reject them with a 400
-     */
-    public void setAllowHostHeaderMismatch(boolean allowHostHeaderMismatch) {
-        this.allowHostHeaderMismatch = allowHostHeaderMismatch;
-    }
-
-
-    private boolean rejectIllegalHeader = true;
-
-    /**
-     * If an HTTP request is received that contains an illegal header name or value (e.g. the header name is not a
-     * token) will the request be rejected (with a 400 response) or will the illegal header be ignored?
-     *
-     * @return {@code true} if the request will be rejected or {@code false} if the header will be ignored
-     */
-    public boolean getRejectIllegalHeader() {
-        return rejectIllegalHeader;
-    }
-
-    /**
-     * If an HTTP request is received that contains an illegal header name or value (e.g. the header name is not a
-     * token) should the request be rejected (with a 400 response) or should the illegal header be ignored?
-     *
-     * @param rejectIllegalHeader {@code true} to reject requests with illegal header names or values, {@code false} to
-     *                                ignore the header
-     */
-    public void setRejectIllegalHeader(boolean rejectIllegalHeader) {
-        this.rejectIllegalHeader = rejectIllegalHeader;
     }
 
 
@@ -409,7 +373,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      *                                 "gorilla|desesplorer|tigrus"
      */
     public void setRestrictedUserAgents(String restrictedUserAgents) {
-        if (restrictedUserAgents == null || restrictedUserAgents.length() == 0) {
+        if (restrictedUserAgents == null || restrictedUserAgents.isEmpty()) {
             this.restrictedUserAgents = null;
         } else {
             this.restrictedUserAgents = Pattern.compile(restrictedUserAgents);
@@ -511,7 +475,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * The names of headers that are allowed to be sent via a trailer when using chunked encoding. They are stored in
      * lower case.
      */
-    private Set<String> allowedTrailerHeaders = ConcurrentHashMap.newKeySet();
+    private final Set<String> allowedTrailerHeaders = ConcurrentHashMap.newKeySet();
 
     public void setAllowedTrailerHeaders(String commaSeparatedHeaders) {
         // Jump through some hoops so we don't end up with an empty set while
@@ -536,7 +500,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     }
 
     public boolean isTrailerHeaderAllowed(String headerName) {
-        return allowedTrailerHeaders.contains(headerName);
+        return allowedTrailerHeaders.contains(headerName.trim().toLowerCase(Locale.ENGLISH));
     }
 
     public String getAllowedTrailerHeaders() {
@@ -578,17 +542,17 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     /**
      * The protocols that are available via internal Tomcat support for access via HTTP upgrade.
      */
-    private final Map<String, UpgradeProtocol> httpUpgradeProtocols = new HashMap<>();
+    private final Map<String,UpgradeProtocol> httpUpgradeProtocols = new HashMap<>();
     /**
      * The protocols that are available via internal Tomcat support for access via ALPN negotiation.
      */
-    private final Map<String, UpgradeProtocol> negotiatedProtocols = new HashMap<>();
+    private final Map<String,UpgradeProtocol> negotiatedProtocols = new HashMap<>();
 
     private void configureUpgradeProtocol(UpgradeProtocol upgradeProtocol) {
         // HTTP Upgrade
         String httpUpgradeName = upgradeProtocol.getHttpUpgradeName(getEndpoint().isSSLEnabled());
         boolean httpUpgradeConfigured = false;
-        if (httpUpgradeName != null && httpUpgradeName.length() > 0) {
+        if (httpUpgradeName != null && !httpUpgradeName.isEmpty()) {
             httpUpgradeProtocols.put(httpUpgradeName, upgradeProtocol);
             httpUpgradeConfigured = true;
             getLog().info(sm.getString("abstractHttp11Protocol.httpUpgradeConfigured", getName(), httpUpgradeName));
@@ -597,7 +561,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
         // ALPN
         String alpnName = upgradeProtocol.getAlpnName();
-        if (alpnName != null && alpnName.length() > 0) {
+        if (alpnName != null && !alpnName.isEmpty()) {
             // ALPN is only available with TLS
             if (getEndpoint().isSSLEnabled()) {
                 negotiatedProtocols.put(alpnName, upgradeProtocol);
@@ -634,7 +598,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
      * To enable basic statistics to be made available for these protocols, a map of protocol name to
      * {@link UpgradeGroupInfo} instances is maintained here.
      */
-    private final Map<String, UpgradeGroupInfo> upgradeProtocolGroupInfos = new ConcurrentHashMap<>();
+    private final Map<String,UpgradeGroupInfo> upgradeProtocolGroupInfos = new ConcurrentHashMap<>();
 
     public UpgradeGroupInfo getUpgradeGroupInfo(String upgradeProtocol) {
         if (upgradeProtocol == null) {
@@ -652,7 +616,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                     ObjectName oname = getONameForUpgrade(upgradeProtocol);
                     if (oname != null) {
                         try {
-                            Registry.getRegistry(null, null).registerComponent(result, oname, null);
+                            Registry.getRegistry(null).registerComponent(result, oname, null);
                         } catch (Exception e) {
                             getLog().warn(sm.getString("abstractHttp11Protocol.upgradeJmxRegistrationFail"), e);
                             result = null;
@@ -745,6 +709,12 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
 
 
     @Override
+    public void addSslHostConfig(SSLHostConfig sslHostConfig, boolean replace) {
+        getEndpoint().addSslHostConfig(sslHostConfig, replace);
+    }
+
+
+    @Override
     public SSLHostConfig[] findSslHostConfigs() {
         return getEndpoint().findSslHostConfigs();
     }
@@ -766,7 +736,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         }
         if (getSslImplementationName() != null &&
                 getSslImplementationName().endsWith(".panama.OpenSSLImplementation")) {
-            return "opensslforeign";
+            return "opensslffm";
         }
         return "jsse";
     }
@@ -792,16 +762,18 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     // ------------------------------------------------------------- Common code
 
     @Override
-    protected abstract Processor createProcessor();
+    protected Processor createProcessor() {
+        return new Http11Processor(this, adapter);
+    }
 
 
     @Override
     protected Processor createUpgradeProcessor(SocketWrapperBase<?> socket, UpgradeToken upgradeToken) {
-        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.getHttpUpgradeHandler();
+        HttpUpgradeHandler httpUpgradeHandler = upgradeToken.httpUpgradeHandler();
         if (httpUpgradeHandler instanceof InternalHttpUpgradeHandler) {
-            return new UpgradeProcessorInternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.getProtocol()));
+            return new UpgradeProcessorInternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.protocol()));
         } else {
-            return new UpgradeProcessorExternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.getProtocol()));
+            return new UpgradeProcessorExternal(socket, upgradeToken, getUpgradeGroupInfo(upgradeToken.protocol()));
         }
     }
 }

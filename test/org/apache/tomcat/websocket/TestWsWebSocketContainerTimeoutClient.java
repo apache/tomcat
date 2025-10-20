@@ -41,7 +41,7 @@ import org.apache.tomcat.websocket.TesterMessageCountClient.TesterProgrammaticEn
  * significantly extends the length of a test run when using multiple test
  * threads.
  */
-public class TestWsWebSocketContainerTimeoutClient  extends WsWebSocketContainerBaseTest {
+public class TestWsWebSocketContainerTimeoutClient extends WsWebSocketContainerBaseTest {
 
     @Test
     public void testWriteTimeoutClientContainer() throws Exception {
@@ -55,18 +55,16 @@ public class TestWsWebSocketContainerTimeoutClient  extends WsWebSocketContainer
     }
 
 
-    private void doTestWriteTimeoutClient(boolean setTimeoutOnContainer)
-            throws Exception {
+    private void doTestWriteTimeoutClient(boolean setTimeoutOnContainer) throws Exception {
 
         Tomcat tomcat = getTomcatInstance();
         // No file system docBase required
-        Context ctx = tomcat.addContext("", null);
+        Context ctx = getProgrammaticRootContext();
         ctx.addApplicationListener(BlockingConfig.class.getName());
         Tomcat.addServlet(ctx, "default", new DefaultServlet());
         ctx.addServletMappingDecoded("/", "default");
 
-        WebSocketContainer wsContainer =
-                ContainerProvider.getWebSocketContainer();
+        WebSocketContainer wsContainer = ContainerProvider.getWebSocketContainer();
 
         // Set the async timeout
         if (setTimeoutOnContainer) {
@@ -75,8 +73,7 @@ public class TestWsWebSocketContainerTimeoutClient  extends WsWebSocketContainer
 
         tomcat.start();
 
-        Session wsSession = wsContainer.connectToServer(
-                TesterProgrammaticEndpoint.class,
+        Session wsSession = wsContainer.connectToServer(TesterProgrammaticEndpoint.class,
                 ClientEndpointConfig.Builder.create().build(),
                 new URI("ws://" + getHostName() + ":" + getPort() + BlockingConfig.PATH));
 
@@ -92,8 +89,7 @@ public class TestWsWebSocketContainerTimeoutClient  extends WsWebSocketContainer
         try {
             while (true) {
                 lastSend = System.currentTimeMillis();
-                Future<Void> f = wsSession.getAsyncRemote().sendBinary(
-                        ByteBuffer.wrap(MESSAGE_BINARY_4K));
+                Future<Void> f = wsSession.getAsyncRemote().sendBinary(ByteBuffer.wrap(MESSAGE_BINARY_4K));
                 f.get();
             }
         } catch (Exception e) {
@@ -113,7 +109,7 @@ public class TestWsWebSocketContainerTimeoutClient  extends WsWebSocketContainer
         String msg = "Time out was [" + timeout + "] ms";
 
         // Check correct time passed
-        Assert.assertTrue(msg, timeout >= TIMEOUT_MS - MARGIN );
+        Assert.assertTrue(msg, timeout >= TIMEOUT_MS - MARGIN);
 
         // Check the timeout wasn't too long
         Assert.assertTrue(msg, timeout < TIMEOUT_MS * 2);

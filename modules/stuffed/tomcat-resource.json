@@ -53,7 +53,6 @@
     {"name":"org.apache.tomcat.dbcp.dbcp2.LocalStrings"},
     {"name":"org.apache.tomcat.util.LocalStrings"},
     {"name":"org.apache.tomcat.util.buf.LocalStrings"},
-    {"name":"org.apache.tomcat.util.codec.binary.LocalStrings"},
     {"name":"org.apache.tomcat.util.compat.LocalStrings"},
     {"name":"org.apache.tomcat.util.descriptor.LocalStrings"},
     {"name":"org.apache.tomcat.util.descriptor.tld.LocalStrings"},

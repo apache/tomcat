@@ -38,7 +38,6 @@ import org.apache.tomcat.dbcp.pool2.PooledObject;
  * </p>
  *
  * @param <T> the type of objects in the pool.
- *
  * @since 2.0
  */
 public class DefaultEvictionPolicy<T> implements EvictionPolicy<T> {
@@ -46,8 +45,8 @@ public class DefaultEvictionPolicy<T> implements EvictionPolicy<T> {
     @Override
     public boolean evict(final EvictionConfig config, final PooledObject<T> underTest, final int idleCount) {
         // @formatter:off
-        return (config.getIdleSoftEvictDuration().compareTo(underTest.getIdleDuration()) < 0 &&
-                config.getMinIdle() < idleCount) ||
+        return config.getIdleSoftEvictDuration().compareTo(underTest.getIdleDuration()) < 0 &&
+                config.getMinIdle() < idleCount ||
                 config.getIdleEvictDuration().compareTo(underTest.getIdleDuration()) < 0;
         // @formatter:on
     }

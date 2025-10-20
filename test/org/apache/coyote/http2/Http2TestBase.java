@@ -16,6 +16,7 @@
  */
 package org.apache.coyote.http2;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,6 +29,7 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -49,6 +51,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.Globals;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
@@ -58,9 +61,9 @@ import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http2.HpackDecoder.HeaderEmitter;
 import org.apache.coyote.http2.Http2Parser.Input;
 import org.apache.coyote.http2.Http2Parser.Output;
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.compat.JrePlatform;
 import org.apache.tomcat.util.http.FastHttpDateFormat;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.MimeHeaders;
 import org.apache.tomcat.util.http.parser.Priority;
 import org.apache.tomcat.util.net.TesterSupport;
@@ -77,7 +80,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         List<Object[]> parameterSets = new ArrayList<>();
 
         for (int loop = 0; loop < loopCount; loop++) {
-            for (Boolean useAsyncIO : TomcatBaseTest.booleans) {
+            for (Boolean useAsyncIO : booleans) {
                 parameterSets.add(new Object[] { Integer.valueOf(loop), useAsyncIO });
             }
         }
@@ -105,14 +108,14 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     static {
         byte[] empty = new byte[0];
-        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.encodeBase64URLSafeString(empty) + "\r\n";
+        EMPTY_HTTP2_SETTINGS_HEADER = "HTTP2-Settings: " + Base64.getUrlEncoder().encodeToString(empty) + "\r\n";
     }
 
     protected static final String TRAILER_HEADER_NAME = "x-trailertest";
     protected static final String TRAILER_HEADER_VALUE = "test";
 
     // Client
-    private Socket s;
+    protected Socket s;
     protected HpackEncoder hpackEncoder;
     protected Input input;
     protected TestOutput output;
@@ -222,7 +225,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void buildGetRequest(byte[] frameHeader, ByteBuffer headersPayload, byte[] padding, int streamId,
             String url) {
         List<Header> headers = new ArrayList<>(4);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", url));
         headers.add(new Header(":authority", "localhost:" + getPort()));
@@ -260,7 +263,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void buildSimpleGetRequestPart1(byte[] frameHeader, ByteBuffer headersPayload, int streamId) {
         List<Header> headers = new ArrayList<>(3);
-        headers.add(new Header(":method", "GET"));
+        headers.add(new Header(":method", Method.GET));
         headers.add(new Header(":scheme", "http"));
         headers.add(new Header(":path", "/simple"));
 
@@ -346,8 +349,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         byte[] dataFrameHeader = new byte[9];
         ByteBuffer dataPayload = ByteBuffer.allocate(128);
 
-        buildPostRequest(headersFrameHeader, headersPayload, useExpectation, "application/x-www-form-urlencoded",
-                contentLength, "/parameter", dataFrameHeader, dataPayload, padding, null, null, streamId);
+        buildPostRequest(headersFrameHeader, headersPayload, useExpectation, Globals.CONTENT_TYPE_FORM_URL_ENCODING,
+                contentLength, "/parameter", dataFrameHeader, dataPayload, padding, false, streamId);
         writeFrame(headersFrameHeader, headersPayload);
         if (body != null) {
             dataPayload.put(body.getBytes(StandardCharsets.ISO_8859_1));
@@ -359,22 +362,21 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, boolean useExpectation,
             byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding, int streamId) {
         buildPostRequest(headersFrameHeader, headersPayload, useExpectation, dataFrameHeader, dataPayload, padding,
-                null, null, streamId);
+                false, streamId);
     }
 
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, boolean useExpectation,
-            byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding, byte[] trailersFrameHeader,
-            ByteBuffer trailersPayload, int streamId) {
+            byte[] dataFrameHeader, ByteBuffer dataPayload, byte[] padding, boolean withTrailers, int streamId) {
         buildPostRequest(headersFrameHeader, headersPayload, useExpectation, null, -1, "/simple", dataFrameHeader,
-                dataPayload, padding, trailersFrameHeader, trailersPayload, streamId);
+                dataPayload, padding, withTrailers, streamId);
     }
 
     protected void buildPostRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, boolean useExpectation,
             String contentType, long contentLength, String path, byte[] dataFrameHeader, ByteBuffer dataPayload,
-            byte[] padding, byte[] trailersFrameHeader, ByteBuffer trailersPayload, int streamId) {
+            byte[] padding, boolean withTrailers, int streamId) {
 
         MimeHeaders headers = new MimeHeaders();
-        headers.addValue(":method").setString("POST");
+        headers.addValue(":method").setString(Method.POST);
         headers.addValue(":scheme").setString("http");
         headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());
@@ -418,17 +420,19 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         ByteUtil.setThreeBytes(dataFrameHeader, 0, dataPayload.limit());
         // Data is type 0
         // Flags: End of stream 1, Padding 8
-        if (trailersPayload == null) {
-            dataFrameHeader[4] = 0x01;
-        } else {
+        if (withTrailers) {
             dataFrameHeader[4] = 0x00;
+        } else {
+            dataFrameHeader[4] = 0x01;
         }
         if (padding != null) {
             dataFrameHeader[4] += 0x08;
         }
         ByteUtil.set31Bits(dataFrameHeader, 5, streamId);
+    }
 
-        // Trailers
+
+    protected void buildTrailerHeaders(byte[] trailersFrameHeader, ByteBuffer trailersPayload, int streamId) {
         if (trailersPayload != null) {
             MimeHeaders trailerHeaders = new MimeHeaders();
             trailerHeaders.addValue(TRAILER_HEADER_NAME).setString(TRAILER_HEADER_VALUE);
@@ -448,7 +452,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     protected void buildHeadRequest(byte[] headersFrameHeader, ByteBuffer headersPayload, int streamId, String path) {
         MimeHeaders headers = new MimeHeaders();
-        headers.addValue(":method").setString("HEAD");
+        headers.addValue(":method").setString(Method.HEAD);
         headers.addValue(":scheme").setString("http");
         headers.addValue(":path").setString(path);
         headers.addValue(":authority").setString("localhost:" + getPort());
@@ -647,7 +651,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     protected void configureAndStartWebApplication() throws LifecycleException {
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "empty", new EmptyServlet());
         ctxt.addServletMappingDecoded("/empty", "empty");
         Tomcat.addServlet(ctxt, "simple", new SimpleServlet());
@@ -668,16 +672,21 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
     protected void openClientConnection(boolean tls) throws IOException {
+        openClientConnection(tls, true);
+    }
+
+    protected void openClientConnection(boolean tls, boolean autoAckSettings) throws IOException {
+
         SocketFactory socketFactory = tls ? TesterSupport.configureClientSsl() : SocketFactory.getDefault();
         // Open a connection
         s = socketFactory.createSocket("localhost", getPort());
         s.setSoTimeout(30000);
 
-        os = s.getOutputStream();
+        os = new BufferedOutputStream(s.getOutputStream());
         InputStream is = s.getInputStream();
 
         input = new TestInput(is);
-        output = new TestOutput();
+        output = new TestOutput(autoAckSettings);
         parser = new TesterHttp2Parser("-1", input, output);
         hpackEncoder = new HpackEncoder();
     }
@@ -799,7 +808,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
     }
 
 
-    void sendClientPreface() throws IOException {
+    protected void sendClientPreface() throws IOException {
         os.write(Http2Parser.CLIENT_PREFACE_START);
         os.write(EMPTY_SETTINGS_FRAME);
         os.flush();
@@ -1043,7 +1052,7 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             while (len > 0) {
                 int read = is.read(data, off, len);
                 if (read == -1) {
-                    throw new IOException("End of input stream");
+                    throw new IOException("End of input stream with [" + len + "] bytes left to read");
                 }
                 off += read;
                 len -= read;
@@ -1062,6 +1071,8 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
     public class TestOutput implements Output, HeaderEmitter {
 
+        private final boolean autoAckSettings;
+
         private StringBuffer trace = new StringBuffer();
         private String lastStreamId = "0";
         private ConnectionSettingsRemote remoteSettings = new ConnectionSettingsRemote("-1");
@@ -1069,6 +1080,10 @@ public abstract class Http2TestBase extends TomcatBaseTest {
         private ByteBuffer bodyBuffer = null;
         private long bytesRead;
         private volatile HpackDecoder hpackDecoder = null;
+
+        public TestOutput(boolean autoAckSettings) {
+            this.autoAckSettings = autoAckSettings;
+        }
 
         public void setTraceBody(boolean traceBody) {
             this.traceBody = traceBody;
@@ -1089,14 +1104,14 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public ByteBuffer startRequestBodyFrame(int streamId, int payloadSize, boolean endOfStream) {
+        public ByteBuffer startRequestBodyFrame(int streamId, int dataLength, boolean endOfStream) {
             lastStreamId = Integer.toString(streamId);
-            bytesRead += payloadSize;
+            bytesRead += dataLength;
             if (traceBody) {
-                bodyBuffer = ByteBuffer.allocate(payloadSize);
+                bodyBuffer = ByteBuffer.allocate(dataLength);
                 return bodyBuffer;
             } else {
-                trace.append(lastStreamId + "-Body-" + payloadSize + "\n");
+                trace.append(lastStreamId + "-Body-" + dataLength + "\n");
                 return null;
             }
         }
@@ -1115,13 +1130,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                     bodyBuffer = null;
                 }
             }
-        }
-
-
-        @Override
-        public void receivedEndOfStream(int streamId) {
-            lastStreamId = Integer.toString(streamId);
-            trace.append(lastStreamId + "-EndOfStream\n");
         }
 
 
@@ -1173,8 +1181,18 @@ public abstract class Http2TestBase extends TomcatBaseTest {
 
 
         @Override
-        public void headersEnd(int streamId) {
+        public void headersEnd(int streamId, boolean endOfStream) {
             trace.append(streamId + "-HeadersEnd\n");
+            if (endOfStream) {
+                receivedEndOfStream(streamId) ;
+            }
+        }
+
+
+        @Override
+        public void receivedEndOfStream(int streamId) {
+            lastStreamId = Integer.toString(streamId);
+            trace.append(lastStreamId + "-EndOfStream\n");
         }
 
 
@@ -1197,7 +1215,9 @@ public abstract class Http2TestBase extends TomcatBaseTest {
                 trace.append("0-Settings-Ack\n");
             } else {
                 trace.append("0-Settings-End\n");
-                sendSettings(0, true);
+                if (autoAckSettings) {
+                    sendSettings(0, true);
+                }
             }
         }
 
@@ -1261,14 +1281,6 @@ public abstract class Http2TestBase extends TomcatBaseTest {
             // NO-OP
             // Many tests swallow request bodies which triggers this
             // notification. It is added to the trace to reduce noise.
-        }
-
-
-        public void pushPromise(int streamId, int pushedStreamId) {
-            trace.append(streamId);
-            trace.append("-PushPromise-");
-            trace.append(pushedStreamId);
-            trace.append("\n");
         }
 
 

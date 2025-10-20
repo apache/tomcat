@@ -24,6 +24,7 @@ import java.net.URLClassLoader;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
@@ -41,8 +42,7 @@ public class TestWebappClassLoader extends TomcatBaseTest {
 
         Tomcat tomcat = getTomcatInstance();
 
-        StandardContext ctx =
-                (StandardContext)tomcat.addContext("",  f.getAbsolutePath());
+        StandardContext ctx = (StandardContext) tomcat.addContext("", f.getAbsolutePath());
 
         tomcat.start();
 
@@ -62,49 +62,18 @@ public class TestWebappClassLoader extends TomcatBaseTest {
     @Test
     public void testFilter() throws IOException {
 
-        String[] classSuffixes = new String[]{
-            "",
-            "some.package.Example"
-        };
+        String[] classSuffixes = new String[] { "", "some.package.Example" };
 
-        String[] resourceSuffixes = new String[]{
-            "",
-            "some/path/test.properties",
-            "some/path/test"
-        };
+        String[] resourceSuffixes = new String[] { "", "some/path/test.properties", "some/path/test" };
 
-        String[] prefixes = new String[]{
-            "",
-            "resources",
-            "WEB-INF",
-            "WEB-INF.classes",
-            "WEB-INF.lib",
-            "org",
-            "org.apache",
-            "jakarta",
-            "javax",
-            "com.mycorp"
-        };
+        String[] prefixes = new String[] { "", "resources", "WEB-INF", "WEB-INF.classes", "WEB-INF.lib", "org",
+                "org.apache", "jakarta", "javax", "com.mycorp" };
 
-        String[] prefixesPermit = new String[]{
-            "org.apache.tomcat.jdbc",
-            "jakarta.servlet.jsp.jstl",
-        };
+        String[] prefixesPermit = new String[] { "org.apache.tomcat.jdbc", "jakarta.servlet.jsp.jstl", };
 
-        String[] prefixesDeny = new String[]{
-            "org.apache.catalina",
-            "org.apache.coyote",
-            "org.apache.el",
-            "org.apache.jasper",
-            "org.apache.juli",
-            "org.apache.naming",
-            "org.apache.tomcat",
-            "jakarta.annotation",
-            "jakarta.el",
-            "jakarta.servlet",
-            "jakarta.websocket",
-            "jakarta.security.auth.message"
-        };
+        String[] prefixesDeny = new String[] { "org.apache.catalina", "org.apache.coyote", "org.apache.el",
+                "org.apache.jasper", "org.apache.juli", "org.apache.naming", "org.apache.tomcat", "jakarta.annotation",
+                "jakarta.el", "jakarta.servlet", "jakarta.websocket", "jakarta.security.auth.message" };
 
         try (WebappClassLoader loader = new WebappClassLoader()) {
             String name;
@@ -112,33 +81,27 @@ public class TestWebappClassLoader extends TomcatBaseTest {
             for (String prefix : prefixes) {
                 for (String suffix : classSuffixes) {
                     name = prefix + "." + suffix;
-                    Assert.assertTrue("Class '" + name + "' failed permit filter",
-                               !loader.filter(name, true));
+                    Assert.assertTrue("Class '" + name + "' failed permit filter", !loader.filter(name, true));
                     if (prefix.equals("")) {
                         name = suffix;
-                        Assert.assertTrue("Class '" + name + "' failed permit filter",
-                                   !loader.filter(name, true));
+                        Assert.assertTrue("Class '" + name + "' failed permit filter", !loader.filter(name, true));
                     }
                     if (suffix.equals("")) {
                         name = prefix;
-                        Assert.assertTrue("Class '" + name + "' failed permit filter",
-                                   !loader.filter(name, true));
+                        Assert.assertTrue("Class '" + name + "' failed permit filter", !loader.filter(name, true));
                     }
                 }
                 prefix = prefix.replace('.', '/');
                 for (String suffix : resourceSuffixes) {
                     name = prefix + "/" + suffix;
-                    Assert.assertTrue("Resource '" + name + "' failed permit filter",
-                               !loader.filter(name, false));
+                    Assert.assertTrue("Resource '" + name + "' failed permit filter", !loader.filter(name, false));
                     if (prefix.equals("")) {
                         name = suffix;
-                        Assert.assertTrue("Resource '" + name + "' failed permit filter",
-                                   !loader.filter(name, false));
+                        Assert.assertTrue("Resource '" + name + "' failed permit filter", !loader.filter(name, false));
                     }
                     if (suffix.equals("")) {
                         name = prefix;
-                        Assert.assertTrue("Resource '" + name + "' failed permit filter",
-                                   !loader.filter(name, false));
+                        Assert.assertTrue("Resource '" + name + "' failed permit filter", !loader.filter(name, false));
                     }
                 }
             }
@@ -146,30 +109,79 @@ public class TestWebappClassLoader extends TomcatBaseTest {
             for (String prefix : prefixesPermit) {
                 for (String suffix : classSuffixes) {
                     name = prefix + "." + suffix;
-                    Assert.assertTrue("Class '" + name + "' failed permit filter",
-                               !loader.filter(name, true));
+                    Assert.assertTrue("Class '" + name + "' failed permit filter", !loader.filter(name, true));
                 }
                 prefix = prefix.replace('.', '/');
                 for (String suffix : resourceSuffixes) {
                     name = prefix + "/" + suffix;
-                    Assert.assertTrue("Resource '" + name + "' failed permit filter",
-                               !loader.filter(name, false));
+                    Assert.assertTrue("Resource '" + name + "' failed permit filter", !loader.filter(name, false));
                 }
             }
 
             for (String prefix : prefixesDeny) {
                 for (String suffix : classSuffixes) {
                     name = prefix + "." + suffix;
-                    Assert.assertTrue("Class '" + name + "' failed deny filter",
-                               loader.filter(name, true));
+                    Assert.assertTrue("Class '" + name + "' failed deny filter", loader.filter(name, true));
                 }
                 prefix = prefix.replace('.', '/');
                 for (String suffix : resourceSuffixes) {
                     name = prefix + "/" + suffix;
-                    Assert.assertTrue("Resource '" + name + "' failed deny filter",
-                               loader.filter(name, false));
+                    Assert.assertTrue("Resource '" + name + "' failed deny filter", loader.filter(name, false));
                 }
             }
         }
+    }
+
+
+    @Test
+    public void testResourceName() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        ClassLoader cl = ((Context) tomcat.getHost().findChildren()[0]).getLoader().getClassLoader();
+
+        URL u1 = cl.getResource("org/apache/tomcat/Bug58096.java");
+        Assert.assertNotNull(u1);
+
+        URL u2 = cl.getResource("/org/apache/tomcat/Bug58096.java");
+        Assert.assertNull(u2);
+    }
+
+
+    @Test
+    public void testResourceNameEmptyString() throws Exception {
+        Tomcat tomcat = getTomcatInstance();
+        getProgrammaticRootContext();
+        tomcat.start();
+
+        // Add an external resource to the web application
+        WebappClassLoaderBase cl =
+                (WebappClassLoaderBase) ((Context) tomcat.getHost().findChildren()[0]).getLoader().getClassLoader();
+
+        URL u1 = cl.getResource("");
+        Assert.assertNotNull(u1);
+    }
+
+
+    @Test
+    public void testFindResourceNull() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        WebappClassLoaderBase cl =
+                (WebappClassLoaderBase) ((Context) tomcat.getHost().findChildren()[0]).getLoader().getClassLoader();
+
+        URL u1 = cl.findResource(null);
+        Assert.assertNull(u1);
+    }
+
+
+    @Test
+    public void testFindResourceEmptyString() throws Exception {
+        Tomcat tomcat = getTomcatInstanceTestWebapp(false, true);
+
+        Context c = (Context) tomcat.getHost().findChildren()[0];
+        WebappClassLoaderBase cl = (WebappClassLoaderBase) c.getLoader().getClassLoader();
+
+        URL u1 = cl.findResource("");
+        Assert.assertNotNull(u1);
     }
 }

@@ -31,7 +31,7 @@ public interface BasicDataSourceMXBean extends DataSourceMXBean {
      * See {@link BasicDataSource#getPassword()}
      *
      * @return {@link BasicDataSource#getPassword()}
-     * @deprecated exposing password via JMX is an Information Exposure issue.
+     * @deprecated Exposing passwords via JMX is an Information Exposure issue.
      */
     @Deprecated
     String getPassword();

@@ -36,13 +36,12 @@ public abstract class Authenticator {
     /**
      * Generate the authorization header value that will be sent to the server.
      *
-     * @param requestUri            The request URI
-     * @param authenticateHeader    The server authentication header received
-     * @param userName              The user name
-     * @param userPassword          The user password
-     * @param userRealm             The realm for which the provided user name
-     *                                  and password are valid. {@code null} to
-     *                                  indicate all realms.
+     * @param requestUri         The request URI
+     * @param authenticateHeader The server authentication header received
+     * @param userName           The username
+     * @param userPassword       The user password
+     * @param userRealm          The realm for which the provided username and password are valid. {@code null} to
+     *                               indicate all realms.
      *
      * @return The generated authorization header value
      *
@@ -67,10 +66,10 @@ public abstract class Authenticator {
      *
      * @return a map of authentication parameter names and values
      */
-    public Map<String, String> parseAuthenticateHeader(String authenticateHeader) {
+    public Map<String,String> parseAuthenticateHeader(String authenticateHeader) {
 
         Matcher m = pattern.matcher(authenticateHeader);
-        Map<String, String> parameterMap = new HashMap<>();
+        Map<String,String> parameterMap = new HashMap<>();
 
         while (m.find()) {
             String key = m.group(1);
@@ -105,14 +104,13 @@ public abstract class Authenticator {
         }
 
         userRealm = userRealm.trim();
-        if (userRealm.length() == 0) {
+        if (userRealm.isEmpty()) {
             return;
         }
 
         /*
-         * User has configured a realm. Only allow authentication to proceed if
-         * the realm in the authentication challenge matches (both BASIC and
-         * DIGEST are required to include a realm).
+         * User has configured a realm. Only allow authentication to proceed if the realm in the authentication
+         * challenge matches (both BASIC and DIGEST are required to include a realm).
          */
         if (serverRealm != null) {
             serverRealm = serverRealm.trim();

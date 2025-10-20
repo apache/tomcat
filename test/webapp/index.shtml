@@ -1,0 +1,44 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<html>
+  <head>
+    <title>Simple SSI test web application</title>
+  </head>
+  <body>
+  <!--#if expr="true" -->
+  <!--#set var="testvar" value="set" -->
+
+  <p><!--#exec cmd="echo exec-cmd works!" --></p>
+  <!--#config errmsg="[errmsg works!]" timefmt="%A %B %d, %Y"-->
+  <p>todayDT<!--#echo var="DATE_LOCAL" --> </p>
+  <p><!--#include virtual="subpage.html" -->path is interpreted as a virtual path</p>
+  <P><!--#include file="subpage.html" -->path is relative to the document</P>
+  <p>fsize file works!<!--#fsize file="subpage.html" --></p>
+  <p>fsize virtual works!<!--#fsize virtual="subpage.html" --></p>
+  <p>flastmod works!<!--#flastmod virtual="index.shtml" --> </p>
+  <p>should fail<!--#fsize shouldFail="subpage.html" --></p>
+  <!--#else -->
+  <strong>DOES NOT WORK.</strong>
+  <!--#endif -->
+
+   <ul>
+     <li>Document name: <!--#echo var="DOCUMENT_NAME" --></li>
+     <li>Testvar content: <!--#echo var="testvar" --></li>
+     <li>Env variables: <!--#printenv --></li>
+   </ul>
+  </body>
+</html>

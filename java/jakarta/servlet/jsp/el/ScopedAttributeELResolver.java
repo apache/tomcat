@@ -24,8 +24,7 @@ import jakarta.servlet.jsp.JspContext;
 import jakarta.servlet.jsp.PageContext;
 
 /**
- * An ELResolver for working with JSP scoped attributes which may have page,
- * request, session or application scope.
+ * An ELResolver for working with JSP scoped attributes which may have page, request, session or application scope.
  *
  * @since JSP 2.1
  */
@@ -51,7 +50,7 @@ public class ScopedAttributeELResolver extends ELResolver {
                 result = page.findAttribute(key);
 
                 if (result != null) {
-                    context.setPropertyResolved(base, property);
+                    context.setPropertyResolved(null, property);
                 }
             }
         }
@@ -64,7 +63,7 @@ public class ScopedAttributeELResolver extends ELResolver {
         Objects.requireNonNull(context);
 
         if (base == null) {
-            context.setPropertyResolved(base, property);
+            context.setPropertyResolved(null, property);
             return Object.class;
         }
 
@@ -76,7 +75,7 @@ public class ScopedAttributeELResolver extends ELResolver {
         Objects.requireNonNull(context);
 
         if (base == null) {
-            context.setPropertyResolved(base, property);
+            context.setPropertyResolved(null, property);
             if (property != null) {
                 String key = property.toString();
                 PageContext page = (PageContext) context.getContext(JspContext.class);
@@ -95,7 +94,7 @@ public class ScopedAttributeELResolver extends ELResolver {
         Objects.requireNonNull(context);
 
         if (base == null) {
-            context.setPropertyResolved(base, property);
+            context.setPropertyResolved(null, property);
         }
 
         return false;

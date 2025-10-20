@@ -32,16 +32,14 @@ public class BeanNameELResolver extends ELResolver {
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
-        if (base != null || !(property instanceof String)) {
+        if (base != null || !(property instanceof String beanName)) {
             return null;
         }
-
-        String beanName = (String) property;
 
         if (beanNameResolver.isNameResolved(beanName)) {
             try {
                 Object result = beanNameResolver.getBean(beanName);
-                context.setPropertyResolved(base, property);
+                context.setPropertyResolved(null, property);
                 return result;
             } catch (Throwable t) {
                 Util.handleThrowable(t);
@@ -55,17 +53,15 @@ public class BeanNameELResolver extends ELResolver {
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
         Objects.requireNonNull(context);
-        if (base != null || !(property instanceof String)) {
+        if (base != null || !(property instanceof String beanName)) {
             return;
         }
-
-        String beanName = (String) property;
 
         boolean isResolved = context.isPropertyResolved();
 
         boolean isReadOnly;
         try {
-            isReadOnly = isReadOnly(context, base, property);
+            isReadOnly = isReadOnly(context, null, property);
         } catch (Throwable t) {
             Util.handleThrowable(t);
             throw new ELException(t);
@@ -80,7 +76,7 @@ public class BeanNameELResolver extends ELResolver {
         if (beanNameResolver.isNameResolved(beanName) || beanNameResolver.canCreateBean(beanName)) {
             try {
                 beanNameResolver.setBeanValue(beanName, value);
-                context.setPropertyResolved(base, property);
+                context.setPropertyResolved(null, property);
             } catch (Throwable t) {
                 Util.handleThrowable(t);
                 throw new ELException(t);
@@ -91,16 +87,14 @@ public class BeanNameELResolver extends ELResolver {
     @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
-        if (base != null || !(property instanceof String)) {
+        if (base != null || !(property instanceof String beanName)) {
             return null;
         }
-
-        String beanName = (String) property;
 
         try {
             if (beanNameResolver.isNameResolved(beanName)) {
                 Class<?> result = beanNameResolver.getBean(beanName).getClass();
-                context.setPropertyResolved(base, property);
+                context.setPropertyResolved(null, property);
 
                 /*
                  * No resolver level isReadOnly property for this resolver
@@ -122,12 +116,10 @@ public class BeanNameELResolver extends ELResolver {
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         Objects.requireNonNull(context);
-        if (base != null || !(property instanceof String)) {
+        if (base != null || !(property instanceof String beanName)) {
             // Return value undefined
             return false;
         }
-
-        String beanName = (String) property;
 
         if (beanNameResolver.isNameResolved(beanName)) {
             boolean result;
@@ -137,7 +129,7 @@ public class BeanNameELResolver extends ELResolver {
                 Util.handleThrowable(t);
                 throw new ELException(t);
             }
-            context.setPropertyResolved(base, property);
+            context.setPropertyResolved(null, property);
             return result;
         }
 

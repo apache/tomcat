@@ -21,18 +21,13 @@ import jakarta.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstBracketSuffix extends SimpleNode {
     public AstBracketSuffix(int id) {
         super(id);
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         return this.children[0].getValue(ctx);
     }
 }

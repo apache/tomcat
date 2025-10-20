@@ -27,8 +27,8 @@ public abstract class TesterEndpointConfig extends WsContextListener {
     public void contextInitialized(ServletContextEvent sce) {
         super.contextInitialized(sce);
 
-        ServerContainer sc = (ServerContainer) sce.getServletContext().getAttribute(
-                Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
+        ServerContainer sc = (ServerContainer) sce.getServletContext()
+                .getAttribute(Constants.SERVER_CONTAINER_SERVLET_CONTEXT_ATTRIBUTE);
 
         try {
             ServerEndpointConfig sec = getServerEndpointConfig();

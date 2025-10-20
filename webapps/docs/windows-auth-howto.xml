@@ -122,8 +122,8 @@ policy had to be relaxed. This is not recommended for production environments.
   </subsection>
 
   <subsection name="Tomcat instance (Windows server)">
-  <p>These steps assume that Tomcat and a Java 11 JDK/JRE have already been
-  installed and configured and that Tomcat is running as the tc01@dev.local
+  <p>These steps assume that Tomcat and an appropriate Java JDK/JRE have already
+  been installed and configured and that Tomcat is running as the tc01@dev.local
   user. The steps to configure the Tomcat instance for Windows authentication
   are as follows:
   </p>

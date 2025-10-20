@@ -32,10 +32,9 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>A <strong>ModelMBean</strong> implementation for the
- * <code>org.apache.catalina.User</code> component.</p>
- *
- * @author Craig R. McClanahan
+ * <p>
+ * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.User</code> component.
+ * </p>
  */
 public class UserMBean extends BaseModelMBean {
 
@@ -70,8 +69,7 @@ public class UserMBean extends BaseModelMBean {
             Group group = null;
             try {
                 group = groups.next();
-                ObjectName oname =
-                    MBeanUtils.createObjectName(managed.getDomain(), group);
+                ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), group);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
                 throw new IllegalArgumentException(sm.getString("userMBean.createError.group", group), e);
@@ -93,8 +91,7 @@ public class UserMBean extends BaseModelMBean {
             Role role = null;
             try {
                 role = roles.next();
-                ObjectName oname =
-                    MBeanUtils.createObjectName(managed.getDomain(), role);
+                ObjectName oname = MBeanUtils.createObjectName(managed.getDomain(), role);
                 results.add(oname.toString());
             } catch (MalformedObjectNameException e) {
                 throw new IllegalArgumentException(sm.getString("userMBean.createError.role", role), e);

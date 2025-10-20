@@ -31,19 +31,14 @@ import org.apache.juli.logging.Log;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Custom subclass of <code>ObjectInputStream</code> that loads from the
- * class loader for this web application.  This allows classes defined only
- * with the web application to be found correctly.
- *
- * @author Craig R. McClanahan
- * @author Bip Thelin
+ * Custom subclass of <code>ObjectInputStream</code> that loads from the class loader for this web application. This
+ * allows classes defined only with the web application to be found correctly.
  */
 public final class CustomObjectInputStream extends ObjectInputStream {
 
     private static final StringManager sm = StringManager.getManager(CustomObjectInputStream.class);
 
-    private static final WeakHashMap<ClassLoader, Set<String>> reportedClassCache =
-            new WeakHashMap<>();
+    private static final WeakHashMap<ClassLoader,Set<String>> reportedClassCache = new WeakHashMap<>();
 
     /**
      * The class loader we will use to resolve classes.
@@ -58,10 +53,9 @@ public final class CustomObjectInputStream extends ObjectInputStream {
 
 
     /**
-     * Construct a new instance of CustomObjectInputStream without any filtering
-     * of deserialized classes.
+     * Construct a new instance of CustomObjectInputStream without any filtering of deserialized classes.
      *
-     * @param stream The input stream we will read from
+     * @param stream      The input stream we will read from
      * @param classLoader The class loader used to instantiate objects
      *
      * @exception IOException if an input/output error occurs
@@ -72,29 +66,24 @@ public final class CustomObjectInputStream extends ObjectInputStream {
 
 
     /**
-     * Construct a new instance of CustomObjectInputStream with filtering of
-     * deserialized classes.
+     * Construct a new instance of CustomObjectInputStream with filtering of deserialized classes.
      *
-     * @param stream The input stream we will read from
-     * @param classLoader The class loader used to instantiate objects
-     * @param log The logger to use to report any issues. It may only be null if
-     *            the filterMode does not require logging
-     * @param allowedClassNamePattern The regular expression to use to filter
-     *                                deserialized classes. The fully qualified
-     *                                class name must match this pattern for
-     *                                deserialization to be allowed if filtering
-     *                                is enabled.
-     * @param warnOnFailure Should any failures be logged?
+     * @param stream                  The input stream we will read from
+     * @param classLoader             The class loader used to instantiate objects
+     * @param log                     The logger to use to report any issues. It may only be null if the filterMode does
+     *                                    not require logging
+     * @param allowedClassNamePattern The regular expression to use to filter deserialized classes. The fully qualified
+     *                                    class name must match this pattern for deserialization to be allowed if
+     *                                    filtering is enabled.
+     * @param warnOnFailure           Should any failures be logged?
      *
      * @exception IOException if an input/output error occurs
      */
-    public CustomObjectInputStream(InputStream stream, ClassLoader classLoader,
-            Log log, Pattern allowedClassNamePattern, boolean warnOnFailure)
-            throws IOException {
+    public CustomObjectInputStream(InputStream stream, ClassLoader classLoader, Log log,
+            Pattern allowedClassNamePattern, boolean warnOnFailure) throws IOException {
         super(stream);
         if (log == null && allowedClassNamePattern != null && warnOnFailure) {
-            throw new IllegalArgumentException(
-                    sm.getString("customObjectInputStream.logRequired"));
+            throw new IllegalArgumentException(sm.getString("customObjectInputStream.logRequired"));
         }
         this.classLoader = classLoader;
         this.log = log;
@@ -127,17 +116,16 @@ public final class CustomObjectInputStream extends ObjectInputStream {
 
 
     /**
-     * Load the local class equivalent of the specified stream class
-     * description, by using the class loader assigned to this Context.
+     * Load the local class equivalent of the specified stream class description, by using the class loader assigned to
+     * this Context.
      *
      * @param classDesc Class description from the input stream
      *
      * @exception ClassNotFoundException if this class cannot be found
-     * @exception IOException if an input/output error occurs
+     * @exception IOException            if an input/output error occurs
      */
     @Override
-    public Class<?> resolveClass(ObjectStreamClass classDesc)
-        throws ClassNotFoundException, IOException {
+    public Class<?> resolveClass(ObjectStreamClass classDesc) throws ClassNotFoundException, IOException {
 
         String name = classDesc.getName();
         if (allowedClassNamePattern != null) {
@@ -170,13 +158,11 @@ public final class CustomObjectInputStream extends ObjectInputStream {
 
 
     /**
-     * Return a proxy class that implements the interfaces named in a proxy
-     * class descriptor. Do this using the class loader assigned to this
-     * Context.
+     * Return a proxy class that implements the interfaces named in a proxy class descriptor. Do this using the class
+     * loader assigned to this Context.
      */
     @Override
-    protected Class<?> resolveProxyClass(String[] interfaces)
-            throws IOException, ClassNotFoundException {
+    protected Class<?> resolveProxyClass(String[] interfaces) throws IOException, ClassNotFoundException {
 
         Class<?>[] cinterfaces = new Class[interfaces.length];
         for (int i = 0; i < interfaces.length; i++) {

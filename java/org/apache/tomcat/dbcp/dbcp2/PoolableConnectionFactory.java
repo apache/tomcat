@@ -64,6 +64,8 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
 
     private Collection<String> disconnectionSqlCodes;
 
+    private Collection<String> disconnectionIgnoreSqlCodes;
+
     private boolean fastFailValidation = true;
 
     private volatile ObjectPool<PoolableConnection> pool;
@@ -147,14 +149,14 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     @Override
     public void destroyObject(final PooledObject<PoolableConnection> p, final DestroyMode mode) throws SQLException {
         if (mode == DestroyMode.ABANDONED) {
-            p.getObject().getInnermostDelegate().abort(Runnable::run);
+            Jdbc41Bridge.abort(p.getObject().getInnermostDelegate(), Runnable::run);
         } else {
             p.getObject().reallyClose();
         }
     }
 
     /**
-     * Gets the cache state.
+     * Gets the cache state to propagate in {@link #makeObject()}.
      *
      * @return The cache state.
      * @since 2.6.0.
@@ -173,11 +175,18 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
         return connectionFactory;
     }
 
+    /**
+     * Gets how many connections were created in {@link #makeObject()}.
+     *
+     * @return the connection count.
+     */
     protected AtomicLong getConnectionIndex() {
         return connectionIndex;
     }
 
     /**
+     * Gets the collection of initialization SQL statements.
+     *
      * @return The collection of initialization SQL statements.
      * @since 2.6.0
      */
@@ -186,7 +195,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return The data source JMX ObjectName
+     * Gets data source JMX ObjectName.
+     *
+     * @return The data source JMX ObjectName.
      * @since 2.6.0.
      */
     public ObjectName getDataSourceJmxName() {
@@ -194,7 +205,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return The data source JMS ObjectName.
+     * Gets the data source JMX ObjectName.
+     *
+     * @return The data source JMX ObjectName.
      * @since 2.6.0
      */
     public ObjectName getDataSourceJmxObjectName() {
@@ -202,7 +215,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return Default auto-commit value.
+     * Gets the Default auto-commit value.
+     *
+     * @return The default auto-commit value.
      * @since 2.6.0
      */
     public Boolean getDefaultAutoCommit() {
@@ -210,7 +225,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return Default catalog.
+     * Gets the default catalog.
+     *
+     * @return The default catalog.
      * @since 2.6.0
      */
     public String getDefaultCatalog() {
@@ -218,7 +235,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return Default query timeout in seconds.
+     * Gets the default query timeout in seconds.
+     *
+     * @return The default query timeout in seconds.
      * @deprecated Use {@link #getDefaultQueryTimeoutDuration()}.
      */
     @Deprecated
@@ -229,7 +248,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     /**
      * Gets the default query timeout Duration.
      *
-     * @return Default query timeout Duration.
+     * @return The default query timeout Duration.
      * @since 2.10.0
      */
     public Duration getDefaultQueryTimeoutDuration() {
@@ -237,7 +256,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return Default query timeout in seconds.
+     * Gets the default query timeout in seconds.
+     *
+     * @return The default query timeout in seconds.
      * @since 2.6.0
      * @deprecated Use {@link #getDefaultQueryTimeoutDuration()}.
      */
@@ -247,7 +268,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return Default read-only-value.
+     * Gets the default read-only-value.
+     *
+     * @return The default read-only-value.
      * @since 2.6.0
      */
     public Boolean getDefaultReadOnly() {
@@ -255,7 +278,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return Default schema.
+     * Gets the default schema.
+     *
+     * @return The default schema.
      * @since 2.6.0
      */
     public String getDefaultSchema() {
@@ -263,7 +288,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return Default transaction isolation.
+     * Gets the default transaction isolation.
+     *
+     * @return The default transaction isolation.
      * @since 2.6.0
      */
     public int getDefaultTransactionIsolation() {
@@ -271,11 +298,26 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * SQL_STATE codes considered to signal fatal conditions.
+     * Gets the collection of SQL State codes that are not considered fatal disconnection codes.
+     * <p>
+     * This method returns the collection of SQL State codes that have been set to be ignored when
+     * determining if a {@link SQLException} signals a disconnection. These codes are excluded from
+     * being treated as fatal even if they match the typical disconnection criteria.
+     * </p>
+     *
+     * @return a {@link Collection} of SQL State codes that should be ignored for disconnection checks.
+     * @since 2.13.0
+     */
+    public Collection<String> getDisconnectionIgnoreSqlCodes() {
+        return disconnectionIgnoreSqlCodes;
+    }
+
+    /**
+     * Gets SQL State codes considered to signal fatal conditions.
      * <p>
      * Overrides the defaults in {@link Utils#getDisconnectionSqlCodes()} (plus anything starting with
      * {@link Utils#DISCONNECTION_SQL_CODE_PREFIX}). If this property is non-null and {@link #isFastFailValidation()} is
-     * {@code true}, whenever connections created by this factory generate exceptions with SQL_STATE codes in this list,
+     * {@code true}, whenever connections created by this factory generate exceptions with SQL State codes in this list,
      * they will be marked as "fatally disconnected" and subsequent validations will fail fast (no attempt at isValid or
      * validation query).
      * </p>
@@ -283,7 +325,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
      * If {@link #isFastFailValidation()} is {@code false} setting this property has no effect.
      * </p>
      *
-     * @return SQL_STATE codes overriding defaults
+     * @return SQL State codes overriding defaults
      * @since 2.1
      */
     public Collection<String> getDisconnectionSqlCodes() {
@@ -310,9 +352,15 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
         return maxConnDuration.toMillis();
     }
 
+    /**
+     * Gets the maximum number of open prepared statements.
+     *
+     * @return The maximum number of open prepared statements.
+     */
     protected int getMaxOpenPreparedStatements() {
         return maxOpenPreparedStatements;
     }
+
     /**
      * Returns the {@link ObjectPool} in which {@link Connection}s are pooled.
      *
@@ -321,14 +369,20 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     public synchronized ObjectPool<PoolableConnection> getPool() {
         return pool;
     }
+
     /**
+     * Tests whether to pool statements.
+     *
      * @return Whether to pool statements.
      * @since 2.6.0.
      */
     public boolean getPoolStatements() {
         return poolStatements;
     }
+
     /**
+     * Gets the validation query.
+     *
      * @return Validation query.
      * @since 2.6.0
      */
@@ -358,6 +412,13 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
         return (int) validationQueryTimeoutDuration.getSeconds();
     }
 
+    /**
+     * Initializes the given connection with the collection of SQL statements set in {@link #setConnectionInitSql(Collection)}.
+     *
+     * @param conn the connection to initialize.
+     * @throws SQLException if a database access error occurs or this method is called on a closed connection.
+     * @see #setConnectionInitSql(Collection)
+     */
     protected void initializeConnection(final Connection conn) throws SQLException {
         final Collection<String> sqls = connectionInitSqls;
         if (conn.isClosed()) {
@@ -373,7 +434,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return Whether to auto-commit on return.
+     * Tests whether to set auto-commit on {@link #passivateObject(PooledObject)}.
+     *
+     * @return Whether to set auto-commit on {@link #passivateObject(PooledObject)}.
      * @since 2.6.0
      */
     public boolean isAutoCommitOnReturn() {
@@ -381,7 +444,9 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
-     * @return Whether to auto-commit on return.
+     * Tests whether to set auto-commit on {@link #passivateObject(PooledObject)}.
+     *
+     * @return Whether to set auto-commit on {@link #passivateObject(PooledObject)}.
      * @deprecated Use {@link #isAutoCommitOnReturn()}.
      */
     @Deprecated
@@ -391,7 +456,7 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
 
     /**
      * True means that validation will fail immediately for connections that have previously thrown SQLExceptions with
-     * SQL_STATE indicating fatal disconnection errors.
+     * SQL State indicating fatal disconnection errors.
      *
      * @return true if connections created by this factory will fast fail validation.
      * @see #setDisconnectionSqlCodes(Collection)
@@ -403,6 +468,8 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
+     * Tests whether to rollback on return.
+     *
      * @return Whether to rollback on return.
      */
     public boolean isRollbackOnReturn() {
@@ -458,13 +525,14 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
             final String name = dataSourceJmxObjectName.toString() + Constants.JMX_CONNECTION_BASE_EXT + connIndex;
             try {
                 connJmxName = new ObjectName(name);
-            } catch (MalformedObjectNameException e) {
+            } catch (final MalformedObjectNameException e) {
                 Utils.closeQuietly((AutoCloseable) conn);
                 throw new SQLException(name, e);
             }
         }
 
-        final PoolableConnection pc = new PoolableConnection(conn, pool, connJmxName, disconnectionSqlCodes, fastFailValidation);
+        final PoolableConnection pc = new PoolableConnection(conn, pool, connJmxName,
+                disconnectionSqlCodes, disconnectionIgnoreSqlCodes, fastFailValidation);
         pc.setCacheState(cacheState);
 
         return new DefaultPooledObject<>(pc);
@@ -500,10 +568,20 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
         conn.passivate();
     }
 
+    /**
+     * Sets whether to set auto-commit on {@link #passivateObject(PooledObject)}.
+     *
+     * @param autoCommitOnReturn whether to set auto-commit.
+     */
     public void setAutoCommitOnReturn(final boolean autoCommitOnReturn) {
         this.autoCommitOnReturn = autoCommitOnReturn;
     }
 
+    /**
+     * Sets the cache state to propagate in {@link #makeObject()}.
+     *
+     * @param cacheState the cache state to propagate.
+     */
     public void setCacheState(final boolean cacheState) {
         this.cacheState = cacheState;
     }
@@ -602,18 +680,37 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
     }
 
     /**
+     * Sets the disconnection SQL codes to ignore.
+     *
+     * @param disconnectionIgnoreSqlCodes
+     *            The collection of SQL State codes to be ignored.
+     * @see #getDisconnectionIgnoreSqlCodes()
+     * @throws IllegalArgumentException if any SQL state codes overlap with those in {@link #disconnectionSqlCodes}.
+     * @since 2.13.0
+     */
+    public void setDisconnectionIgnoreSqlCodes(final Collection<String> disconnectionIgnoreSqlCodes) {
+        Utils.checkSqlCodes(disconnectionIgnoreSqlCodes, this.disconnectionSqlCodes);
+        this.disconnectionIgnoreSqlCodes = disconnectionIgnoreSqlCodes;
+    }
+
+    /**
+     * Sets the disconnection SQL codes.
+     *
      * @param disconnectionSqlCodes
      *            The disconnection SQL codes.
      * @see #getDisconnectionSqlCodes()
      * @since 2.1
+     * @throws IllegalArgumentException if any SQL state codes overlap with those in {@link #disconnectionIgnoreSqlCodes}.
      */
     public void setDisconnectionSqlCodes(final Collection<String> disconnectionSqlCodes) {
+        Utils.checkSqlCodes(disconnectionSqlCodes, this.disconnectionIgnoreSqlCodes);
         this.disconnectionSqlCodes = disconnectionSqlCodes;
     }
 
     /**
-     * @param autoCommitOnReturn Whether to auto-commit on return.
-     * @deprecated Use {@link #setAutoCommitOnReturn(boolean)}.
+     * Sets whether to set auto-commit on {@link #passivateObject(PooledObject)}.
+     *
+     * @param autoCommitOnReturn whether to set auto-commit.
      */
     @Deprecated
     public void setEnableAutoCommitOnReturn(final boolean autoCommitOnReturn) {
@@ -690,10 +787,20 @@ public class PoolableConnectionFactory implements PooledObjectFactory<PoolableCo
         this.pool = pool;
     }
 
+    /**
+     * Sets whether to pool statements.
+     *
+     * @param poolStatements whether to pool statements.
+     */
     public void setPoolStatements(final boolean poolStatements) {
         this.poolStatements = poolStatements;
     }
 
+    /**
+     * Sets whether to rollback on return.
+     *
+     * @param rollbackOnReturn whether to rollback on return.
+     */
     public void setRollbackOnReturn(final boolean rollbackOnReturn) {
         this.rollbackOnReturn = rollbackOnReturn;
     }

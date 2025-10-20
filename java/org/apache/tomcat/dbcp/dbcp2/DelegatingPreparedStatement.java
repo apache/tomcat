@@ -32,12 +32,12 @@ import java.sql.RowId;
 import java.sql.SQLException;
 import java.sql.SQLType;
 import java.sql.SQLXML;
-import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A base delegating implementation of {@link PreparedStatement}.
@@ -165,6 +165,27 @@ public class DelegatingPreparedStatement extends DelegatingStatement implements 
             handleException(e);
             throw new AssertionError();
         }
+    }
+
+    protected void prepareToReturn() throws SQLException {
+        setClosedInternal(true);
+        removeThisTrace(getConnectionInternal());
+
+        // The JDBC spec requires that a statement close any open
+        // ResultSet's when it is closed.
+        // FIXME The PreparedStatement we're wrapping should handle this for us.
+        // See DBCP-10 for what could happen when ResultSets are closed twice.
+        final List<AbandonedTrace> traceList = getTrace();
+        if (traceList != null) {
+            final List<Exception> thrownList = new ArrayList<>();
+            traceList.forEach(trace -> trace.close(thrownList::add));
+            clearTrace();
+            if (!thrownList.isEmpty()) {
+                throw new SQLExceptionList(thrownList);
+            }
+        }
+
+        super.passivate();
     }
 
     @Override
@@ -691,28 +712,6 @@ public class DelegatingPreparedStatement extends DelegatingStatement implements 
      */
     @Override
     public synchronized String toString() {
-        final Statement statement = getDelegate();
-        return statement == null ? "NULL" : statement.toString();
-    }
-
-    protected void prepareToReturn() throws SQLException {
-        setClosedInternal(true);
-        removeThisTrace(getConnectionInternal());
-
-        // The JDBC spec requires that a statement close any open
-        // ResultSet's when it is closed.
-        // FIXME The PreparedStatement we're wrapping should handle this for us.
-        // See DBCP-10 for what could happen when ResultSets are closed twice.
-        final List<AbandonedTrace> traceList = getTrace();
-        if (traceList != null) {
-            final List<Exception> thrownList = new ArrayList<>();
-            traceList.forEach(trace -> trace.close(thrownList::add));
-            clearTrace();
-            if (!thrownList.isEmpty()) {
-                throw new SQLExceptionList(thrownList);
-            }
-        }
-
-        super.passivate();
+        return Objects.toString(getDelegate(), "NULL");
     }
 }

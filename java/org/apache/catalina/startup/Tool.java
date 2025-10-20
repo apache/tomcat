@@ -27,45 +27,39 @@ import org.apache.juli.logging.LogFactory;
 
 
 /**
- * <p>General purpose wrapper for command line tools that should execute in an
- * environment with the common class loader environment set up by Catalina.
- * This should be executed from a command line script that conforms to
- * the following requirements:</p>
+ * General purpose wrapper for command line tools that should execute in an environment with the common class loader
+ * environment set up by Catalina. This should be executed from a command line script that conforms to the following
+ * requirements:
  * <ul>
- * <li>Passes the <code>catalina.home</code> system property configured with
- *     the pathname of the Tomcat installation directory.</li>
- * <li>Sets the system classpath to include <code>bootstrap.jar</code> and
- *     <code>$JAVA_HOME/lib/tools.jar</code>.</li>
+ * <li>Passes the <code>catalina.home</code> system property configured with the pathname of the Tomcat installation
+ * directory.</li>
+ * <li>Sets the system classpath to include <code>bootstrap.jar</code> and <code>$JAVA_HOME/lib/tools.jar</code>.</li>
  * </ul>
+ * <p>
+ * The command line to execute the tool looks like:
  *
- * <p>The command line to execute the tool looks like:</p>
  * <pre>
  *   java -classpath $CLASSPATH org.apache.catalina.startup.Tool \
  *     ${options} ${classname} ${arguments}
  * </pre>
- *
- * <p>with the following replacement contents:
+ * <p>
+ * with the following replacement contents:
  * <ul>
- * <li><strong>${options}</strong> - Command line options for this Tool wrapper.
- *     The following options are supported:
- *     <ul>
- *     <li><em>-ant</em> : Set the <code>ant.home</code> system property
- *         to corresponding to the value of <code>catalina.home</code>
- *         (useful when your command line tool runs Ant).</li>
- *     <li><em>-common</em> : Add <code>common/classes</code> and
- *         <code>common/lib</code> to the class loader repositories.</li>
- *     <li><em>-server</em> : Add <code>server/classes</code> and
- *         <code>server/lib</code> to the class loader repositories.</li>
- *     <li><em>-shared</em> : Add <code>shared/classes</code> and
- *         <code>shared/lib</code> to the class loader repositories.</li>
- *     </ul>
- * <li><strong>${classname}</strong> - Fully qualified Java class name of the
- *     application's main class.</li>
- * <li><strong>${arguments}</strong> - Command line arguments to be passed to
- *     the application's <code>main()</code> method.</li>
+ * <li><strong>${options}</strong> - Command line options for this Tool wrapper. The following options are supported:
+ * <ul>
+ * <li><em>-ant</em> : Set the <code>ant.home</code> system property to corresponding to the value of
+ * <code>catalina.home</code> (useful when your command line tool runs Ant).</li>
+ * <li><em>-common</em> : Add <code>common/classes</code> and <code>common/lib</code> to the class loader
+ * repositories.</li>
+ * <li><em>-server</em> : Add <code>server/classes</code> and <code>server/lib</code> to the class loader
+ * repositories.</li>
+ * <li><em>-shared</em> : Add <code>shared/classes</code> and <code>shared/lib</code> to the class loader
+ * repositories.</li>
  * </ul>
- *
- * @author Craig R. McClanahan
+ * <li><strong>${classname}</strong> - Fully qualified Java class name of the application's main class.</li>
+ * <li><strong>${arguments}</strong> - Command line arguments to be passed to the application's <code>main()</code>
+ * method.</li>
+ * </ul>
  */
 public final class Tool {
 
@@ -84,8 +78,7 @@ public final class Tool {
     /**
      * The pathname of our installation base directory.
      */
-    private static final String catalinaHome =
-            System.getProperty(Constants.CATALINA_HOME_PROP);
+    private static final String catalinaHome = System.getProperty(Constants.CATALINA_HOME_PROP);
 
 
     /**
@@ -115,7 +108,7 @@ public final class Tool {
      * @param args Command line arguments to be processed
      */
     @SuppressWarnings("null")
-    public static void main(String args[]) {
+    public static void main(String[] args) {
 
         // Verify that "catalina.home" was passed.
         if (catalinaHome == null) {
@@ -125,27 +118,29 @@ public final class Tool {
 
         // Process command line options
         int index = 0;
+        label:
         while (true) {
             if (index == args.length) {
                 usage();
                 System.exit(1);
             }
-            if ("-ant".equals(args[index])) {
-                ant = true;
-            } else if ("-common".equals(args[index])) {
-                common = true;
-            } else if ("-server".equals(args[index])) {
-                server = true;
-            } else if ("-shared".equals(args[index])) {
-                shared = true;
-            } else {
-                break;
+            switch (args[index]) {
+                case "-ant":
+                    ant = true;
+                    break;
+                case "-common":
+                    common = true;
+                    break;
+                case "-server":
+                    server = true;
+                    break;
+                case "-shared":
+                    shared = true;
+                    break;
+                default:
+                    break label;
             }
             index++;
-        }
-        if (index > args.length) {
-            usage();
-            System.exit(1);
         }
 
         // Set "ant.home" if requested
@@ -161,28 +156,19 @@ public final class Tool {
             unpacked.add(new File(catalinaHome, "classes"));
             packed.add(new File(catalinaHome, "lib"));
             if (common) {
-                unpacked.add(new File(catalinaHome,
-                                      "common" + File.separator + "classes"));
-                packed.add(new File(catalinaHome,
-                                    "common" + File.separator + "lib"));
+                unpacked.add(new File(catalinaHome, "common" + File.separator + "classes"));
+                packed.add(new File(catalinaHome, "common" + File.separator + "lib"));
             }
             if (server) {
-                unpacked.add(new File(catalinaHome,
-                                      "server" + File.separator + "classes"));
-                packed.add(new File(catalinaHome,
-                                    "server" + File.separator + "lib"));
+                unpacked.add(new File(catalinaHome, "server" + File.separator + "classes"));
+                packed.add(new File(catalinaHome, "server" + File.separator + "lib"));
             }
             if (shared) {
-                unpacked.add(new File(catalinaHome,
-                                      "shared" + File.separator + "classes"));
-                packed.add(new File(catalinaHome,
-                                    "shared" + File.separator + "lib"));
+                unpacked.add(new File(catalinaHome, "shared" + File.separator + "classes"));
+                packed.add(new File(catalinaHome, "shared" + File.separator + "lib"));
             }
-            classLoader =
-                ClassLoaderFactory.createClassLoader
-                (unpacked.toArray(new File[0]),
-                 packed.toArray(new File[0]),
-                 null);
+            classLoader = ClassLoaderFactory.createClassLoader(unpacked.toArray(new File[0]),
+                    packed.toArray(new File[0]), null);
         } catch (Throwable t) {
             Bootstrap.handleThrowable(t);
             log.error("Class loader creation threw exception", t);
@@ -205,14 +191,14 @@ public final class Tool {
         }
 
         Method method = null;
-        String params[] = new String[args.length - index];
+        String[] params = new String[args.length - index];
         System.arraycopy(args, index, params, 0, params.length);
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Identifying main() method");
+            if (log.isTraceEnabled()) {
+                log.trace("Identifying main() method");
             }
             String methodName = "main";
-            Class<?> paramTypes[] = new Class[1];
+            Class<?>[] paramTypes = new Class[1];
             paramTypes[0] = params.getClass();
             method = clazz.getMethod(methodName, paramTypes);
         } catch (Throwable t) {
@@ -223,16 +209,16 @@ public final class Tool {
 
         // Invoke the main method of the application class
         try {
-            if (log.isDebugEnabled()) {
-                log.debug("Calling main() method");
+            if (log.isTraceEnabled()) {
+                log.trace("Calling main() method");
             }
-            Object paramValues[] = new Object[1];
+            Object[] paramValues = new Object[1];
             paramValues[0] = params;
             method.invoke(null, paramValues);
         } catch (Throwable t) {
-            t = Bootstrap.unwrapInvocationTargetException(t);
-            Bootstrap.handleThrowable(t);
-            log.error("Exception calling main() method", t);
+            Throwable throwable = Bootstrap.unwrapInvocationTargetException(t);
+            Bootstrap.handleThrowable(throwable);
+            log.error("Exception calling main() method", throwable);
             System.exit(1);
         }
 

@@ -17,6 +17,7 @@
 package org.apache.catalina.connector;
 
 import java.io.IOException;
+import java.io.Serial;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
@@ -48,6 +49,7 @@ import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.HexUtils;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.apache.tomcat.util.http.Method;
 import org.apache.tomcat.util.http.ServerCookie;
 import org.apache.tomcat.util.http.ServerCookies;
 import org.apache.tomcat.util.net.SSLSupport;
@@ -57,9 +59,6 @@ import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Implementation of a request processor which delegates the processing to a Coyote processor.
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
 public class CoyoteAdapter implements Adapter {
 
@@ -67,7 +66,7 @@ public class CoyoteAdapter implements Adapter {
 
     // -------------------------------------------------------------- Constants
 
-    private static final String POWERED_BY = "Servlet/6.1 JSP/4.0 " + "(" + ServerInfo.getServerInfo() + " Java/" +
+    private static final String POWERED_BY = "Servlet/6.2 JSP/4.1 " + "(" + ServerInfo.getServerInfo() + " Java/" +
             System.getProperty("java.vm.vendor") + "/" + System.getProperty("java.runtime.version") + ")";
 
     private static final EnumSet<SessionTrackingMode> SSL_ONLY = EnumSet.of(SessionTrackingMode.SSL);
@@ -137,7 +136,7 @@ public class CoyoteAdapter implements Adapter {
                 }
             } else if (status == SocketEvent.ERROR) {
                 // An I/O error occurred on a non-container thread which means
-                // that the socket needs to be closed so set success to false to
+                // that the socket needs to be closed so set success as false to
                 // trigger a close
                 success = false;
                 Throwable t = (Throwable) req.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
@@ -177,6 +176,8 @@ public class CoyoteAdapter implements Adapter {
                         }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
+                        // Allow the error handling to write to the response
+                        response.setSuspended(false);
                         // Need to trigger the call to AbstractProcessor.setErrorState()
                         // before the listener is called so the listener can call complete
                         // Therefore no need to set success=false as that would trigger a
@@ -210,6 +211,8 @@ public class CoyoteAdapter implements Adapter {
                         }
                     } catch (Throwable t) {
                         ExceptionUtils.handleThrowable(t);
+                        // Allow the error handling to write to the response
+                        response.setSuspended(false);
                         // Need to trigger the call to AbstractProcessor.setErrorState()
                         // before the listener is called so the listener can call complete
                         // Therefore no need to set success=false as that would trigger a
@@ -233,8 +236,8 @@ public class CoyoteAdapter implements Adapter {
 
             if (request.isAsyncDispatching()) {
                 connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
-                Throwable t = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
-                if (t != null) {
+                if (response.isError()) {
+                    Throwable t = (Throwable) request.getAttribute(RequestDispatcher.ERROR_EXCEPTION);
                     asyncConImpl.setErrorState(t, true);
                 }
             }
@@ -249,17 +252,16 @@ public class CoyoteAdapter implements Adapter {
             AtomicBoolean error = new AtomicBoolean(false);
             res.action(ActionCode.IS_ERROR, error);
             if (error.get()) {
-                if (request.isAsyncCompleting()) {
-                    // Connection will be forcibly closed which will prevent
-                    // completion happening at the usual point. Need to trigger
-                    // call to onComplete() here.
+                if (request.isAsyncCompleting() || request.isAsyncDispatching()) {
+                    // Connection will be forcibly closed which will prevent completion/dispatch happening at the usual
+                    // point. Trigger post-processing here.
                     res.action(ActionCode.ASYNC_POST_PROCESS, null);
                 }
                 success = false;
             }
-        } catch (IOException e) {
+        } catch (IOException ioe) {
+            // Issues that should be logged will have already been logged
             success = false;
-            // Ignore
         } catch (Throwable t) {
             ExceptionUtils.handleThrowable(t);
             success = false;
@@ -304,10 +306,8 @@ public class CoyoteAdapter implements Adapter {
 
         if (request == null) {
             // Create objects
-            request = connector.createRequest();
-            request.setCoyoteRequest(req);
-            response = connector.createResponse();
-            response.setCoyoteResponse(res);
+            request = connector.createRequest(req);
+            response = connector.createResponse(res);
 
             // Link objects
             request.setResponse(response);
@@ -370,8 +370,8 @@ public class CoyoteAdapter implements Adapter {
                 response.finishResponse();
             }
 
-        } catch (IOException e) {
-            // Ignore
+        } catch (IOException ignore) {
+            // Issues that should be logged will have already been logged
         } finally {
             AtomicBoolean error = new AtomicBoolean(false);
             res.action(ActionCode.IS_ERROR, error);
@@ -451,10 +451,8 @@ public class CoyoteAdapter implements Adapter {
 
         if (request == null) {
             // Create objects
-            request = connector.createRequest();
-            request.setCoyoteRequest(req);
-            response = connector.createResponse();
-            response.setCoyoteResponse(res);
+            request = connector.createRequest(req);
+            response = connector.createResponse(res);
 
             // Link objects
             request.setResponse(response);
@@ -496,6 +494,7 @@ public class CoyoteAdapter implements Adapter {
 
 
     private static class RecycleRequiredException extends Exception {
+        @Serial
         private static final long serialVersionUID = 1L;
     }
 
@@ -591,7 +590,7 @@ public class CoyoteAdapter implements Adapter {
 
         // Check for ping OPTIONS * request
         if (undecodedURI.equals("*")) {
-            if (req.method().equalsIgnoreCase("OPTIONS")) {
+            if (Method.OPTIONS.equals(req.getMethod())) {
                 StringBuilder allow = new StringBuilder();
                 allow.append("GET, HEAD, POST, PUT, DELETE, OPTIONS");
                 // Trace if allowed
@@ -610,7 +609,7 @@ public class CoyoteAdapter implements Adapter {
         MessageBytes decodedURI = req.decodedURI();
 
         // Filter CONNECT method
-        if (req.method().equalsIgnoreCase("CONNECT")) {
+        if (Method.CONNECT.equals(req.getMethod())) {
             response.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, sm.getString("coyoteAdapter.connect"));
         } else {
             // No URI for CONNECT requests
@@ -631,7 +630,8 @@ public class CoyoteAdapter implements Adapter {
                 // %xx decoding of the URL
                 try {
                     req.getURLDecoder().convert(decodedURI.getByteChunk(),
-                            connector.getEncodedSolidusHandlingInternal());
+                            connector.getEncodedSolidusHandlingInternal(),
+                            connector.getEncodedReverseSolidusHandlingInternal());
                 } catch (IOException ioe) {
                     response.sendError(400, sm.getString("coyoteAdapter.invalidURIWithMessage", ioe.getMessage()));
                 }
@@ -640,7 +640,7 @@ public class CoyoteAdapter implements Adapter {
                     // Character decoding
                     convertURI(decodedURI, request);
                     // URIEncoding values are limited to US-ASCII supersets.
-                    // Therefore it is not necessary to check that the URI remains
+                    // Therefore, it is not necessary to check that the URI remains
                     // normalized after character decoding
                 } else {
                     response.sendError(400, sm.getString("coyoteAdapter.invalidURI"));
@@ -648,18 +648,17 @@ public class CoyoteAdapter implements Adapter {
             } else {
                 /*
                  * The URI is chars or String, and has been sent using an in-memory protocol handler. The following
-                 * assumptions are made: - req.requestURI() has been set to the 'original' non-decoded, non-normalized
-                 * URI - req.decodedURI() has been set to the decoded, normalized form of req.requestURI() -
-                 * 'suspicious' URI filtering - if required - has already been performed
+                 * assumptions are made:
+                 *
+                 * - req.requestURI() has been set to the 'original' non-decoded, non-normalized URI that includes path
+                 * parameters (if any)
+                 *
+                 * - req.decodedURI() has been set to the decoded, normalized form of req.requestURI() with any path
+                 * parameters removed
+                 *
+                 * - 'suspicious' URI filtering, if required, has already been performed
                  */
                 decodedURI.toChars();
-                // Remove all path parameters; any needed path parameter should be set
-                // using the request object rather than passing it in the URL
-                CharChunk uriCC = decodedURI.getCharChunk();
-                int semicolon = uriCC.indexOf(';');
-                if (semicolon > 0) {
-                    decodedURI.setChars(uriCC.getBuffer(), uriCC.getStart(), semicolon);
-                }
             }
         }
 
@@ -689,7 +688,7 @@ public class CoyoteAdapter implements Adapter {
         }
 
         while (mapRequired) {
-            // This will map the the latest version by default
+            // This will map the latest version by default
             connector.getService().getMapper().map(serverName, decodedURI, version, request.getMappingData());
 
             // If there is no context at this point, either this is a 404
@@ -778,8 +777,8 @@ public class CoyoteAdapter implements Adapter {
                 // point.
                 try {
                     Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    // Should never happen
+                } catch (InterruptedException ignore) {
+                    // Should never happen but, if it does, just continue looping
                 }
                 // Reset mapping
                 request.getMappingData().recycle();
@@ -809,26 +808,26 @@ public class CoyoteAdapter implements Adapter {
         }
 
         // Filter TRACE method
-        if (!connector.getAllowTrace() && req.method().equalsIgnoreCase("TRACE")) {
+        if (!connector.getAllowTrace() && Method.TRACE.equals(req.getMethod())) {
             Wrapper wrapper = request.getWrapper();
-            String header = null;
+            StringBuilder header = null;
             if (wrapper != null) {
                 String[] methods = wrapper.getServletMethods();
                 if (methods != null) {
                     for (String method : methods) {
-                        if ("TRACE".equals(method)) {
+                        if (Method.TRACE.equals(method)) {
                             continue;
                         }
                         if (header == null) {
-                            header = method;
+                            header = new StringBuilder(method);
                         } else {
-                            header += ", " + method;
+                            header.append(", ").append(method);
                         }
                     }
                 }
             }
             if (header != null) {
-                res.addHeader("Allow", header);
+                res.addHeader("Allow", header.toString());
             }
             response.sendError(405, sm.getString("coyoteAdapter.trace"));
             // Safe to skip the remainder of this method.
@@ -864,7 +863,7 @@ public class CoyoteAdapter implements Adapter {
                 // result preventing excessive calls to the Realm.
             } else {
                 // The connector isn't configured for authorization. Create a
-                // user without any roles using the supplied user name.
+                // user without any roles using the supplied username.
                 request.setUserPrincipal(new CoyotePrincipal(username));
             }
         }
@@ -905,10 +904,10 @@ public class CoyoteAdapter implements Adapter {
         // encoding that doesn't give the expected result so be explicit
         Charset charset = connector.getURICharset();
 
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("coyoteAdapter.debug", "uriBC", uriBC.toString()));
-            log.debug(sm.getString("coyoteAdapter.debug", "semicolon", String.valueOf(semicolon)));
-            log.debug(sm.getString("coyoteAdapter.debug", "enc", charset.name()));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("coyoteAdapter.debug", "uriBC", uriBC.toString()));
+            log.trace(sm.getString("coyoteAdapter.debug", "semicolon", String.valueOf(semicolon)));
+            log.trace(sm.getString("coyoteAdapter.debug", "enc", charset.name()));
         }
 
         while (semicolon > -1) {
@@ -917,8 +916,8 @@ public class CoyoteAdapter implements Adapter {
             int end = uriBC.getEnd();
 
             int pathParamStart = semicolon + 1;
-            int pathParamEnd = ByteChunk.findBytes(uriBC.getBuffer(), start + pathParamStart, end,
-                    new byte[] { ';', '/' });
+            int pathParamEnd =
+                    ByteChunk.findBytes(uriBC.getBuffer(), start + pathParamStart, end, new byte[] { ';', '/' });
 
             String pv = null;
 
@@ -939,10 +938,10 @@ public class CoyoteAdapter implements Adapter {
                 uriBC.setEnd(start + semicolon);
             }
 
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("coyoteAdapter.debug", "pathParamStart", String.valueOf(pathParamStart)));
-                log.debug(sm.getString("coyoteAdapter.debug", "pathParamEnd", String.valueOf(pathParamEnd)));
-                log.debug(sm.getString("coyoteAdapter.debug", "pv", pv));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("coyoteAdapter.debug", "pathParamStart", String.valueOf(pathParamStart)));
+                log.trace(sm.getString("coyoteAdapter.debug", "pathParamEnd", String.valueOf(pathParamEnd)));
+                log.trace(sm.getString("coyoteAdapter.debug", "pv", pv));
             }
 
             if (pv != null) {
@@ -951,10 +950,10 @@ public class CoyoteAdapter implements Adapter {
                     String name = pv.substring(0, equals);
                     String value = pv.substring(equals + 1);
                     request.addPathParameter(name, value);
-                    if (log.isDebugEnabled()) {
-                        log.debug(sm.getString("coyoteAdapter.debug", "equals", String.valueOf(equals)));
-                        log.debug(sm.getString("coyoteAdapter.debug", "name", name));
-                        log.debug(sm.getString("coyoteAdapter.debug", "value", value));
+                    if (log.isTraceEnabled()) {
+                        log.trace(sm.getString("coyoteAdapter.debug", "equals", String.valueOf(equals)));
+                        log.trace(sm.getString("coyoteAdapter.debug", "name", name));
+                        log.trace(sm.getString("coyoteAdapter.debug", "value", value));
                     }
                 }
             }
@@ -1018,8 +1017,8 @@ public class CoyoteAdapter implements Adapter {
                     request.setRequestedSessionId(scookie.getValue().toString());
                     request.setRequestedSessionCookie(true);
                     request.setRequestedSessionURL(false);
-                    if (log.isDebugEnabled()) {
-                        log.debug(" Requested cookie session id is " + request.getRequestedSessionId());
+                    if (log.isTraceEnabled()) {
+                        log.trace(" Requested cookie session id is " + request.getRequestedSessionId());
                     }
                 } else {
                     if (!request.isRequestedSessionIdValid()) {
@@ -1071,7 +1070,7 @@ public class CoyoteAdapter implements Adapter {
 
 
     /**
-     * Character conversion of the a US-ASCII MessageBytes.
+     * Character conversion of the US-ASCII MessageBytes.
      *
      * @param mb The MessageBytes instance containing the bytes that should be converted to chars
      */
@@ -1121,14 +1120,12 @@ public class CoyoteAdapter implements Adapter {
             return false;
         }
 
-        int pos = 0;
-        int index = 0;
-
-
         // The URL must start with '/' (or '\' that will be replaced soon)
         if (b[start] != (byte) '/' && b[start] != (byte) '\\') {
             return false;
         }
+
+        int pos;
 
         // Replace '\' with '/'
         // Check for null byte
@@ -1167,7 +1164,7 @@ public class CoyoteAdapter implements Adapter {
 
         uriBC.setEnd(end);
 
-        index = 0;
+        int index = 0;
 
         // Resolve occurrences of "/./" in the normalized path
         while (true) {
@@ -1234,11 +1231,10 @@ public class CoyoteAdapter implements Adapter {
         byte[] bytes = undecodedURI.getBytes();
         int start = undecodedURI.getStart();
         int end = undecodedURI.getEnd();
-        int segmentStart = -1;
-        int segmentEnd = -1;
 
         // Find first segment
-        segmentStart = undecodedURI.indexOf('/', 0);
+        int segmentStart = undecodedURI.indexOf('/', 0);
+        int segmentEnd = -1;
         if (segmentStart > -1) {
             segmentEnd = undecodedURI.indexOf('/', segmentStart + 1);
         }

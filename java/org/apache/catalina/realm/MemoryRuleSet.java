@@ -25,8 +25,6 @@ import org.xml.sax.Attributes;
  * <p>
  * <strong>RuleSet</strong> for recognizing the users defined in the XML file processed by <code>MemoryRealm</code>.
  * </p>
- *
- * @author Craig R. McClanahan
  */
 public class MemoryRuleSet implements RuleSet {
 
@@ -62,14 +60,6 @@ public class MemoryRuleSet implements RuleSet {
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * <p>
-     * Add the set of Rule instances defined in this RuleSet to the specified <code>Digester</code> instance,
-     * associating them with our namespace URI (if any). This method should only be called by a Digester instance.
-     * </p>
-     *
-     * @param digester Digester instance to which the new Rule instances should be added.
-     */
     @Override
     public void addRuleInstances(Digester digester) {
 

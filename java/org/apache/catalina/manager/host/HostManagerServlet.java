@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,49 +50,37 @@ import org.apache.tomcat.util.buf.StringUtils;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * Servlet that enables remote management of the virtual hosts installed
- * on the server.  Normally, this functionality will be protected by
- * a security constraint in the web application deployment descriptor.
- * However, this requirement can be relaxed during testing.
+ * Servlet that enables remote management of the virtual hosts installed on the server. Normally, this functionality
+ * will be protected by a security constraint in the web application deployment descriptor. However, this requirement
+ * can be relaxed during testing.
  * <p>
- * This servlet examines the value returned by <code>getPathInfo()</code>
- * and related query parameters to determine what action is being requested.
- * The following actions and parameters (starting after the servlet path)
- * are supported:
+ * This servlet examines the value returned by <code>getPathInfo()</code> and related query parameters to determine what
+ * action is being requested. The following actions and parameters (starting after the servlet path) are supported:
  * <ul>
- * <li><b>/add?name={host-name}&amp;aliases={host-aliases}&amp;manager={manager}</b> -
- *     Create and add a new virtual host. The <code>host-name</code> attribute
- *     indicates the name of the new host. The <code>host-aliases</code>
- *     attribute is a comma separated list of the host alias names.
- *     The <code>manager</code> attribute is a boolean value indicating if the
- *     webapp manager will be installed in the newly created host (optional,
- *     false by default).</li>
- * <li><b>/remove?name={host-name}</b> - Remove a virtual host.
- *     The <code>host-name</code> attribute indicates the name of the host.
- *     </li>
- * <li><b>/list</b> - List the virtual hosts installed on the server.
- *     Each host will be listed with the following format
- *     <code>host-name#host-aliases</code>.</li>
+ * <li><b>/add?name={host-name}&amp;aliases={host-aliases}&amp;manager={manager}</b> - Create and add a new virtual
+ * host. The <code>host-name</code> attribute indicates the name of the new host. The <code>host-aliases</code>
+ * attribute is a comma separated list of the host alias names. The <code>manager</code> attribute is a boolean value
+ * indicating if the webapp manager will be installed in the newly created host (optional, false by default).</li>
+ * <li><b>/remove?name={host-name}</b> - Remove a virtual host. The <code>host-name</code> attribute indicates the name
+ * of the host.</li>
+ * <li><b>/list</b> - List the virtual hosts installed on the server. Each host will be listed with the following format
+ * <code>host-name#host-aliases</code>.</li>
  * <li><b>/start?name={host-name}</b> - Start the virtual host.</li>
  * <li><b>/stop?name={host-name}</b> - Stop the virtual host.</li>
  * </ul>
  * <p>
- * <b>NOTE</b> - Attempting to stop or remove the host containing
- * this servlet itself will not succeed.  Therefore, this servlet should
- * generally be deployed in a separate virtual host.
+ * <b>NOTE</b> - Attempting to stop or remove the host containing this servlet itself will not succeed. Therefore, this
+ * servlet should generally be deployed in a separate virtual host.
  * <p>
  * The following servlet initialization parameters are recognized:
  * <ul>
- * <li><b>debug</b> - The debugging detail level that controls the amount
- *     of information that is logged by this servlet.  Default is zero.
+ * <li><b>debug</b> - The debugging detail level that controls the amount of information that is logged by this servlet.
+ * Default is zero.
  * </ul>
- *
- * @author Craig R. McClanahan
- * @author Remy Maucherat
  */
-public class HostManagerServlet
-    extends HttpServlet implements ContainerServlet {
+public class HostManagerServlet extends HttpServlet implements ContainerServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // ----------------------------------------------------- Instance Variables
@@ -124,8 +113,7 @@ public class HostManagerServlet
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+    protected static final StringManager sm = StringManager.getManager(Constants.Package);
 
 
     /**
@@ -137,20 +125,12 @@ public class HostManagerServlet
     // ----------------------------------------------- ContainerServlet Methods
 
 
-    /**
-     * Return the Wrapper with which we are associated.
-     */
     @Override
     public Wrapper getWrapper() {
         return this.wrapper;
     }
 
 
-    /**
-     * Set the Wrapper with which we are associated.
-     *
-     * @param wrapper The new wrapper
-     */
     @Override
     public void setWrapper(Wrapper wrapper) {
 
@@ -170,9 +150,6 @@ public class HostManagerServlet
     // --------------------------------------------------------- Public Methods
 
 
-    /**
-     * Finalize this servlet.
-     */
     @Override
     public void destroy() {
 
@@ -181,22 +158,10 @@ public class HostManagerServlet
     }
 
 
-    /**
-     * Process a GET request for the specified resource.
-     *
-     * @param request The servlet request we are processing
-     * @param response The servlet response we are creating
-     *
-     * @exception IOException if an input/output error occurs
-     * @exception ServletException if a servlet-specified error occurs
-     */
     @Override
-    public void doGet(HttpServletRequest request,
-                      HttpServletResponse response)
-        throws IOException, ServletException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        StringManager smClient = StringManager.getManager(
-                Constants.Package, request.getLocales());
+        StringManager smClient = StringManager.getManager(Constants.Package, request.getLocales());
 
         // Identify the request parameters that we need
         String command = request.getPathInfo();
@@ -229,8 +194,7 @@ public class HostManagerServlet
         } else if (command.equals("/persist")) {
             persist(writer, smClient);
         } else {
-            writer.println(smClient.getString("hostManagerServlet.unknownCommand",
-                                        command));
+            writer.println(smClient.getString("hostManagerServlet.unknownCommand", command));
         }
 
         // Finish up the response
@@ -242,14 +206,14 @@ public class HostManagerServlet
     /**
      * Add host with the given parameters.
      *
-     * @param request The request
-     * @param writer The output writer
-     * @param name The host name
+     * @param request  The request
+     * @param writer   The output writer
+     * @param name     The host name
      * @param htmlMode Flag value
      * @param smClient StringManager for the client's locale
-    */
-    protected void add(HttpServletRequest request, PrintWriter writer,
-            String name, boolean htmlMode, StringManager smClient) {
+     */
+    protected void add(HttpServletRequest request, PrintWriter writer, String name, boolean htmlMode,
+            StringManager smClient) {
         String aliases = request.getParameter("aliases");
         String appBase = request.getParameter("appBase");
         boolean manager = booleanParameter(request, "manager", false, htmlMode);
@@ -258,26 +222,23 @@ public class HostManagerServlet
         boolean deployXML = booleanParameter(request, "deployXML", true, htmlMode);
         boolean unpackWARs = booleanParameter(request, "unpackWARs", true, htmlMode);
         boolean copyXML = booleanParameter(request, "copyXML", false, htmlMode);
-        add(writer, name, aliases, appBase, manager,
-            autoDeploy,
-            deployOnStartup,
-            deployXML,
-            unpackWARs,
-            copyXML,
-            smClient);
+        add(writer, name, aliases, appBase, manager, autoDeploy, deployOnStartup, deployXML, unpackWARs, copyXML,
+                smClient);
     }
 
 
     /**
      * Extract boolean value from checkbox with default.
-     * @param request The Servlet request
-     * @param parameter The parameter name
+     *
+     * @param request    The Servlet request
+     * @param parameter  The parameter name
      * @param theDefault Default value
-     * @param htmlMode Flag value
+     * @param htmlMode   Flag value
+     *
      * @return the boolean value for the parameter
      */
-    protected boolean booleanParameter(HttpServletRequest request,
-            String parameter, boolean theDefault, boolean htmlMode) {
+    protected boolean booleanParameter(HttpServletRequest request, String parameter, boolean theDefault,
+            boolean htmlMode) {
         String value = request.getParameter(parameter);
         boolean booleanValue = theDefault;
         if (value != null) {
@@ -303,13 +264,12 @@ public class HostManagerServlet
     public void init() throws ServletException {
 
         // Ensure that our ContainerServlet properties have been set
-        if ((wrapper == null) || (context == null)) {
-            throw new UnavailableException
-                (sm.getString("hostManagerServlet.noWrapper"));
+        if (wrapper == null || context == null) {
+            throw new UnavailableException(sm.getString("hostManagerServlet.noWrapper"));
         }
 
         // Set our properties from the initialization parameters
-        String value = null;
+        String value;
         try {
             value = getServletConfig().getInitParameter("debug");
             debug = Integer.parseInt(value);
@@ -320,57 +280,48 @@ public class HostManagerServlet
     }
 
 
-
     // -------------------------------------------------------- Private Methods
 
 
     /**
      * Add a host using the specified parameters.
      *
-     * @param writer Writer to render results to
-     * @param name host name
-     * @param aliases comma separated alias list
-     * @param appBase application base for the host
-     * @param manager should the manager webapp be deployed to the new host ?
-     * @param autoDeploy Flag value
+     * @param writer          Writer to render results to
+     * @param name            host name
+     * @param aliases         comma separated alias list
+     * @param appBase         application base for the host
+     * @param manager         should the manager webapp be deployed to the new host ?
+     * @param autoDeploy      Flag value
      * @param deployOnStartup Flag value
-     * @param deployXML Flag value
-     * @param unpackWARs Flag value
-     * @param copyXML Flag value
-     * @param smClient StringManager for the client's locale
+     * @param deployXML       Flag value
+     * @param unpackWARs      Flag value
+     * @param copyXML         Flag value
+     * @param smClient        StringManager for the client's locale
      */
-    protected synchronized void add
-        (PrintWriter writer, String name, String aliases, String appBase,
-         boolean manager,
-         boolean autoDeploy,
-         boolean deployOnStartup,
-         boolean deployXML,
-         boolean unpackWARs,
-         boolean copyXML,
-         StringManager smClient) {
+    protected synchronized void add(PrintWriter writer, String name, String aliases, String appBase, boolean manager,
+            boolean autoDeploy, boolean deployOnStartup, boolean deployXML, boolean unpackWARs, boolean copyXML,
+            StringManager smClient) {
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.add", name));
         }
 
         // Validate the requested host name
-        if ((name == null) || name.length() == 0) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.invalidHostName", name));
+        if (name == null || name.isEmpty()) {
+            writer.println(smClient.getString("hostManagerServlet.invalidHostName", name));
             return;
         }
 
         // Check if host already exists
         if (engine.findChild(name) != null) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.alreadyHost", name));
+            writer.println(smClient.getString("hostManagerServlet.alreadyHost", name));
             return;
         }
 
         // Validate and create appBase
-        File appBaseFile = null;
-        File file = null;
+        File appBaseFile;
+        File file;
         String applicationBase = appBase;
-        if (applicationBase == null || applicationBase.length() == 0) {
+        if (applicationBase == null || applicationBase.isEmpty()) {
             applicationBase = name;
         }
         file = new File(applicationBase);
@@ -379,13 +330,11 @@ public class HostManagerServlet
         }
         try {
             appBaseFile = file.getCanonicalFile();
-        } catch (IOException e) {
+        } catch (IOException ioe) {
             appBaseFile = file;
         }
         if (!appBaseFile.mkdirs() && !appBaseFile.isDirectory()) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.appBaseCreateFail",
-                    appBaseFile.toString(), name));
+            writer.println(smClient.getString("hostManagerServlet.appBaseCreateFail", appBaseFile.toString(), name));
             return;
         }
 
@@ -395,14 +344,17 @@ public class HostManagerServlet
         // Copy manager.xml if requested
         if (manager) {
             if (configBaseFile == null) {
-                writer.println(smClient.getString(
-                        "hostManagerServlet.configBaseCreateFail", name));
+                writer.println(smClient.getString("hostManagerServlet.configBaseCreateFail", name));
                 return;
             }
             try (InputStream is = getServletContext().getResourceAsStream("/WEB-INF/manager.xml")) {
-                Path dest = (new File(configBaseFile, "manager.xml")).toPath();
+                if (is == null) {
+                    writer.println(smClient.getString("hostManagerServlet.managerXml"));
+                    return;
+                }
+                Path dest = new File(configBaseFile, "manager.xml").toPath();
                 Files.copy(is, dest);
-            } catch (IOException e) {
+            } catch (IOException ioe) {
                 writer.println(smClient.getString("hostManagerServlet.managerXml"));
                 return;
             }
@@ -415,7 +367,7 @@ public class HostManagerServlet
         host.addLifecycleListener(new HostConfig());
 
         // Add host aliases
-        if ((aliases != null) && !aliases.isEmpty()) {
+        if (aliases != null && !aliases.isEmpty()) {
             StringTokenizer tok = new StringTokenizer(aliases, ", ");
             while (tok.hasMoreTokens()) {
                 host.addAlias(tok.nextToken());
@@ -431,8 +383,7 @@ public class HostManagerServlet
         try {
             engine.addChild(host);
         } catch (Exception e) {
-            writer.println(smClient.getString("hostManagerServlet.exception",
-                    e.toString()));
+            writer.println(smClient.getString("hostManagerServlet.exception", e.toString()));
             return;
         }
 
@@ -441,8 +392,7 @@ public class HostManagerServlet
             writer.println(smClient.getString("hostManagerServlet.addSuccess", name));
         } else {
             // Something failed
-            writer.println(smClient.getString(
-                    "hostManagerServlet.addFailed", name));
+            writer.println(smClient.getString("hostManagerServlet.addFailed", name));
         }
 
     }
@@ -451,35 +401,31 @@ public class HostManagerServlet
     /**
      * Remove the specified host.
      *
-     * @param writer Writer to render results to
-     * @param name host name
+     * @param writer   Writer to render results to
+     * @param name     host name
      * @param smClient StringManager for the client's locale
      */
-    protected synchronized void remove(PrintWriter writer, String name,
-            StringManager smClient) {
+    protected synchronized void remove(PrintWriter writer, String name, StringManager smClient) {
 
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.remove", name));
         }
 
         // Validate the requested host name
-        if ((name == null) || name.length() == 0) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.invalidHostName", name));
+        if (name == null || name.isEmpty()) {
+            writer.println(smClient.getString("hostManagerServlet.invalidHostName", name));
             return;
         }
 
         // Check if host exists
         if (engine.findChild(name) == null) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.noHost", name));
+            writer.println(smClient.getString("hostManagerServlet.noHost", name));
             return;
         }
 
         // Prevent removing our own host
         if (engine.findChild(name) == installedHost) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.cannotRemoveOwnHost", name));
+            writer.println(smClient.getString("hostManagerServlet.cannotRemoveOwnHost", name));
             return;
         }
 
@@ -488,23 +434,20 @@ public class HostManagerServlet
         try {
             Container child = engine.findChild(name);
             engine.removeChild(child);
-            if ( child instanceof ContainerBase ) {
+            if (child instanceof ContainerBase) {
                 child.destroy();
             }
         } catch (Exception e) {
-            writer.println(smClient.getString("hostManagerServlet.exception",
-                    e.toString()));
+            writer.println(smClient.getString("hostManagerServlet.exception", e.toString()));
             return;
         }
 
         Host host = (StandardHost) engine.findChild(name);
         if (host == null) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.removeSuccess", name));
+            writer.println(smClient.getString("hostManagerServlet.removeSuccess", name));
         } else {
             // Something failed
-            writer.println(smClient.getString(
-                    "hostManagerServlet.removeFailed", name));
+            writer.println(smClient.getString("hostManagerServlet.removeFailed", name));
         }
 
     }
@@ -513,7 +456,7 @@ public class HostManagerServlet
     /**
      * Render a list of the currently active Contexts in our virtual host.
      *
-     * @param writer Writer to render to
+     * @param writer   Writer to render to
      * @param smClient StringManager for the client's locale
      */
     protected void list(PrintWriter writer, StringManager smClient) {
@@ -522,8 +465,7 @@ public class HostManagerServlet
             log(sm.getString("hostManagerServlet.list", engine.getName()));
         }
 
-        writer.println(smClient.getString("hostManagerServlet.listed",
-                engine.getName()));
+        writer.println(smClient.getString("hostManagerServlet.listed", engine.getName()));
         Container[] hosts = engine.findChildren();
         for (Container container : hosts) {
             Host host = (Host) container;
@@ -537,21 +479,19 @@ public class HostManagerServlet
     /**
      * Start the host with the specified name.
      *
-     * @param writer Writer to render to
-     * @param name Host name
+     * @param writer   Writer to render to
+     * @param name     Host name
      * @param smClient StringManager for the client's locale
      */
-    protected void start(PrintWriter writer, String name,
-            StringManager smClient) {
+    protected void start(PrintWriter writer, String name, StringManager smClient) {
 
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.start", name));
         }
 
         // Validate the requested host name
-        if ((name == null) || name.length() == 0) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.invalidHostName", name));
+        if (name == null || name.isEmpty()) {
+            writer.println(smClient.getString("hostManagerServlet.invalidHostName", name));
             return;
         }
 
@@ -559,37 +499,30 @@ public class HostManagerServlet
 
         // Check if host exists
         if (host == null) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.noHost", name));
+            writer.println(smClient.getString("hostManagerServlet.noHost", name));
             return;
         }
 
         // Prevent starting our own host
         if (host == installedHost) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.cannotStartOwnHost", name));
+            writer.println(smClient.getString("hostManagerServlet.cannotStartOwnHost", name));
             return;
         }
 
         // Don't start host if already started
         if (host.getState().isAvailable()) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.alreadyStarted", name));
+            writer.println(smClient.getString("hostManagerServlet.alreadyStarted", name));
             return;
         }
 
         // Start host
         try {
             host.start();
-            writer.println(smClient.getString(
-                    "hostManagerServlet.started", name));
+            writer.println(smClient.getString("hostManagerServlet.started", name));
         } catch (Exception e) {
-            getServletContext().log
-                (sm.getString("hostManagerServlet.startFailed", name), e);
-            writer.println(smClient.getString(
-                    "hostManagerServlet.startFailed", name));
-            writer.println(smClient.getString(
-                    "hostManagerServlet.exception", e.toString()));
+            getServletContext().log(sm.getString("hostManagerServlet.startFailed", name), e);
+            writer.println(smClient.getString("hostManagerServlet.startFailed", name));
+            writer.println(smClient.getString("hostManagerServlet.exception", e.toString()));
         }
     }
 
@@ -597,21 +530,19 @@ public class HostManagerServlet
     /**
      * Stop the host with the specified name.
      *
-     * @param writer Writer to render to
-     * @param name Host name
+     * @param writer   Writer to render to
+     * @param name     Host name
      * @param smClient StringManager for the client's locale
      */
-    protected void stop(PrintWriter writer, String name,
-            StringManager smClient) {
+    protected void stop(PrintWriter writer, String name, StringManager smClient) {
 
         if (debug >= 1) {
             log(sm.getString("hostManagerServlet.stop", name));
         }
 
         // Validate the requested host name
-        if ((name == null) || name.length() == 0) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.invalidHostName", name));
+        if (name == null || name.isEmpty()) {
+            writer.println(smClient.getString("hostManagerServlet.invalidHostName", name));
             return;
         }
 
@@ -619,37 +550,30 @@ public class HostManagerServlet
 
         // Check if host exists
         if (host == null) {
-            writer.println(smClient.getString("hostManagerServlet.noHost",
-                    name));
+            writer.println(smClient.getString("hostManagerServlet.noHost", name));
             return;
         }
 
         // Prevent stopping our own host
         if (host == installedHost) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.cannotStopOwnHost", name));
+            writer.println(smClient.getString("hostManagerServlet.cannotStopOwnHost", name));
             return;
         }
 
         // Don't stop host if already stopped
         if (!host.getState().isAvailable()) {
-            writer.println(smClient.getString(
-                    "hostManagerServlet.alreadyStopped", name));
+            writer.println(smClient.getString("hostManagerServlet.alreadyStopped", name));
             return;
         }
 
         // Stop host
         try {
             host.stop();
-            writer.println(smClient.getString("hostManagerServlet.stopped",
-                    name));
+            writer.println(smClient.getString("hostManagerServlet.stopped", name));
         } catch (Exception e) {
-            getServletContext().log(sm.getString(
-                    "hostManagerServlet.stopFailed", name), e);
-            writer.println(smClient.getString("hostManagerServlet.stopFailed",
-                    name));
-            writer.println(smClient.getString("hostManagerServlet.exception",
-                    e.toString()));
+            getServletContext().log(sm.getString("hostManagerServlet.stopFailed", name), e);
+            writer.println(smClient.getString("hostManagerServlet.stopFailed", name));
+            writer.println(smClient.getString("hostManagerServlet.exception", e.toString()));
         }
     }
 
@@ -657,7 +581,7 @@ public class HostManagerServlet
     /**
      * Persist the current configuration to server.xml.
      *
-     * @param writer Writer to render to
+     * @param writer   Writer to render to
      * @param smClient i18n resources localized for the client
      */
     protected void persist(PrintWriter writer, StringManager smClient) {
@@ -668,7 +592,7 @@ public class HostManagerServlet
 
         try {
             MBeanServer platformMBeanServer = ManagementFactory.getPlatformMBeanServer();
-            ObjectName oname = new ObjectName(engine.getDomain() + ":type=StoreConfig");
+            ObjectName oname = new ObjectName("Catalina:type=StoreConfig");
             platformMBeanServer.invoke(oname, "storeConfig", null, null);
             writer.println(smClient.getString("hostManagerServlet.persisted"));
         } catch (Exception e) {
@@ -677,7 +601,7 @@ public class HostManagerServlet
             // catch InstanceNotFoundException when StoreConfig is not enabled instead of printing
             // the failure message
             if (e instanceof InstanceNotFoundException) {
-                writer.println("Please enable StoreConfig to use this feature.");
+                writer.println(smClient.getString("hostManagerServlet.noStoreConfig"));
             } else {
                 writer.println(smClient.getString("hostManagerServlet.exception", e.toString()));
             }
@@ -689,7 +613,9 @@ public class HostManagerServlet
 
     /**
      * Get config base.
+     *
      * @param hostName The host name
+     *
      * @return the config base for the host
      */
     protected File getConfigBase(String hostName) {

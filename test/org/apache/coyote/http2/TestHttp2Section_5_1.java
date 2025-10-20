@@ -18,7 +18,7 @@ package org.apache.coyote.http2;
 
 import java.nio.ByteBuffer;
 import java.util.logging.Level;
-import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -296,8 +296,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
         // Reset stream 3 (client cancel)
         sendRst(3, Http2Error.NO_ERROR.getCode());
-        // Client reset triggers a write error which in turn triggers a server
-        // reset
+        // Client reset triggers both a read error and a write error which in turn trigger two server resets
         parser.readFrame();
         Assert.assertEquals("3-RST-[5]\n", output.getTrace());
         output.clearTrace();
@@ -315,7 +314,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
 
     @Test
     public void testErrorOnWaitingStream01() throws Exception {
-        LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.ALL);
+        Logger.getLogger("org.apache.coyote.http2").setLevel(Level.ALL);
         try {
             // http2Connect() - modified
             enableHttp2(1);
@@ -365,7 +364,7 @@ public class TestHttp2Section_5_1 extends Http2TestBase {
             parser.readFrame();
             Assert.assertEquals("3-RST-[" + Http2Error.FLOW_CONTROL_ERROR.getCode() + "]\n", output.getTrace());
         } finally {
-            LogManager.getLogManager().getLogger("org.apache.coyote.http2").setLevel(Level.INFO);
+            Logger.getLogger("org.apache.coyote.http2").setLevel(Level.INFO);
         }
     }
 

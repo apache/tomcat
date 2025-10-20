@@ -28,19 +28,17 @@
               doctype-system="about:legacy-compat"/>
 
   <!-- Defined parameters (overridable) -->
-  <xsl:param    name="home-name"           select="'The Tomcat Project'"/>
-  <xsl:param    name="home-href"           select="'https://tomcat.apache.org/'"/>
   <xsl:param    name="home-logo"           select="'/images/tomcat.png'"/>
   <xsl:param    name="home-stylesheet"     select="'/images/docs-stylesheet.css'"/>
   <xsl:param    name="apache-logo"         select="'/images/asf-logo.svg'"/>
   <xsl:param    name="subdir"              select="''"/>
   <xsl:param    name="relative-path"       select="'.'"/>
   <!-- Keep versions in sync with build.xml -->
-  <xsl:param    name="version"             select="'11.0.x'"/>
-  <xsl:param    name="majorversion"        select="'11'"/>
-  <xsl:param    name="majorminorversion"   select="'11.0'"/>
-  <xsl:param    name="minjavaversion"      select="'11'"/>
-  <xsl:param    name="buildjavaversion"    select="'11'"/>
+  <xsl:param    name="version"             select="'12.0.x'"/>
+  <xsl:param    name="majorversion"        select="'12'"/>
+  <xsl:param    name="majorminorversion"   select="'12.0'"/>
+  <xsl:param    name="minjavaversion"      select="'21'"/>
+  <xsl:param    name="buildjavaversion"    select="'22'"/>
   <xsl:param    name="antversionrequired"  select="'1.10.2'"/>
   <xsl:param    name="build-date"          select="'MMM d yyyy'"/>
   <xsl:param    name="build-date-iso-8601" select="'yyyy-MM-dd'"/>
@@ -48,13 +46,13 @@
   <xsl:param    name="buglink"             select="'https://bz.apache.org/bugzilla/show_bug.cgi?id='"/>
   <xsl:param    name="prlink"              select="'https://github.com/apache/tomcat/pull/'"/>
   <xsl:param    name="revlink"             select="'https://svn.apache.org/viewvc?view=rev&amp;rev='"/>
-  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-11.0-doc'"/>
-  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-11.html'"/>
-  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-11.cgi'"/>
+  <xsl:param    name="doclink"             select="'https://tomcat.apache.org/tomcat-12.0-doc'"/>
+  <xsl:param    name="sylink"              select="'https://tomcat.apache.org/security-12.html'"/>
+  <xsl:param    name="dllink"              select="'https://tomcat.apache.org/download-12.cgi'"/>
   <xsl:param    name="sitedir"             select="''"/>
   <xsl:param    name="filename"            select="'-'"/>
 
-  <!-- Defined variables (non-overrideable) -->
+  <!-- Defined variables (non-overridable) -->
   <xsl:variable name="project-xml-filename"><xsl:value-of select="$subdir"/>project.xml</xsl:variable>
   <xsl:variable name="project"
                 select="document($project-xml-filename)/project"/>
@@ -88,7 +86,6 @@
         <xsl:value-of select="@email"/>
       </xsl:variable>
     -->
-    <meta name="author" content="{$name}"/>
   </xsl:for-each>
 </head>
 
@@ -151,6 +148,10 @@
   <footer>
     <div id="footer">
     Copyright © 1999-<xsl:value-of select="$year"/>, The Apache Software Foundation
+    <br/>
+    Apache Tomcat, Tomcat, Apache, the Apache Tomcat logo and the Apache logo
+    are either registered trademarks or trademarks of the Apache Software
+    Foundation.
     </div>
   </footer>
   </div>
@@ -296,7 +297,7 @@
         </th>
       </tr>
       <xsl:for-each select="attribute">
-        <tr>
+        <tr id="{concat(../../../@name, '_', ../../@name, '_', @name)}">
           <td>
             <xsl:if test="@required = 'true'">
               <strong><code class="attributeName"><xsl:value-of select="@name"/></code></strong>

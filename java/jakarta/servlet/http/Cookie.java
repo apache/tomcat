@@ -16,6 +16,7 @@
  */
 package jakarta.servlet.http;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.BitSet;
@@ -35,8 +36,8 @@ import java.util.TreeMap;
  * sparingly to improve the interoperability of your servlets.
  * <p>
  * The servlet sends cookies to the browser by using the {@link HttpServletResponse#addCookie} method, which adds fields
- * to HTTP response headers to send cookies to the browser, one at a time. The browser is expected to support 20 cookies
- * for each Web server, 300 cookies total, and may limit cookie size to 4 KB each.
+ * to HTTP response headers to send cookies to the browser, one at a time. The browser is expected to support 50 cookies
+ * for each domain, 3000 cookies total, and may limit cookie size to 4 KiB each.
  * <p>
  * The browser returns cookies to the servlet by adding fields to HTTP request headers. Cookies can be retrieved from a
  * request by using the {@link HttpServletRequest#getCookies} method. Several cookies might have the same name but
@@ -45,7 +46,7 @@ import java.util.TreeMap;
  * Cookies affect the caching of the Web pages that use them. HTTP 1.0 does not cache pages that use cookies created
  * with this class. This class does not support the cache control defined with HTTP 1.1.
  * <p>
- * This class supports both the RFC 6265 specification.
+ * This class supports the RFC 6265 specification.
  */
 public class Cookie implements Cloneable, Serializable {
 
@@ -54,6 +55,9 @@ public class Cookie implements Cloneable, Serializable {
 
     private static final CookieNameValidator validation = new RFC6265Validator();
 
+    private static final String EMPTY_STRING = "";
+
+    @Serial
     private static final long serialVersionUID = 2L;
 
     /**
@@ -69,7 +73,7 @@ public class Cookie implements Cloneable, Serializable {
     /**
      * Attributes encoded in the header's cookie fields.
      */
-    private volatile Map<String, String> attributes;
+    private volatile Map<String,String> attributes;
 
     private static final String DOMAIN = "Domain";
     private static final String MAX_AGE = "Max-Age";
@@ -232,13 +236,17 @@ public class Cookie implements Cloneable, Serializable {
      * <p>
      * The default value is <code>false</code>.
      *
-     * @param flag if <code>true</code>, sends the cookie from the browser to the server only when using a secure
-     *                 protocol; if <code>false</code>, sent on any protocol
+     * @param secure if <code>true</code>, sends the cookie from the browser to the server only when using a secure
+     *                   protocol; if <code>false</code>, sent on any protocol
      *
      * @see #getSecure
      */
-    public void setSecure(boolean flag) {
-        setAttributeInternal(SECURE, Boolean.toString(flag));
+    public void setSecure(boolean secure) {
+        if (secure) {
+            setAttributeInternal(SECURE, EMPTY_STRING);
+        } else {
+            setAttributeInternal(SECURE, null);
+        }
     }
 
 
@@ -251,7 +259,7 @@ public class Cookie implements Cloneable, Serializable {
      * @see #setSecure
      */
     public boolean getSecure() {
-        return Boolean.parseBoolean(getAttribute(SECURE));
+        return EMPTY_STRING.equals(getAttribute(SECURE));
     }
 
 
@@ -347,7 +355,11 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 3.0
      */
     public void setHttpOnly(boolean httpOnly) {
-        setAttributeInternal(HTTP_ONLY, Boolean.toString(httpOnly));
+        if (httpOnly) {
+            setAttributeInternal(HTTP_ONLY, EMPTY_STRING);
+        } else {
+            setAttributeInternal(HTTP_ONLY, null);
+        }
     }
 
 
@@ -359,7 +371,7 @@ public class Cookie implements Cloneable, Serializable {
      * @since Servlet 3.0
      */
     public boolean isHttpOnly() {
-        return Boolean.parseBoolean(getAttribute(HTTP_ONLY));
+        return EMPTY_STRING.equals(getAttribute(HTTP_ONLY));
     }
 
 
@@ -404,12 +416,16 @@ public class Cookie implements Cloneable, Serializable {
             if (value == null) {
                 return;
             } else {
-                // Case insensitive keys but retain case used
+                // Case-insensitive keys but retain case used
                 attributes = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
             }
         }
 
-        attributes.put(name, value);
+        if (value == null) {
+            attributes.remove(name);
+        } else {
+            attributes.put(name, value);
+        }
     }
 
 
@@ -439,7 +455,7 @@ public class Cookie implements Cloneable, Serializable {
      *
      * @since Servlet 6.0
      */
-    public Map<String, String> getAttributes() {
+    public Map<String,String> getAttributes() {
         if (attributes == null) {
             return Collections.emptyMap();
         } else {
@@ -486,13 +502,10 @@ public class Cookie implements Cloneable, Serializable {
             return false;
         }
         if (value == null) {
-            if (other.value != null) {
-                return false;
-            }
-        } else if (!value.equals(other.value)) {
-            return false;
+            return other.value == null;
+        } else {
+            return value.equals(other.value);
         }
-        return true;
     }
 }
 
@@ -513,7 +526,7 @@ class CookieNameValidator {
     }
 
     void validate(String name) {
-        if (name == null || name.length() == 0) {
+        if (name == null || name.isEmpty()) {
             throw new IllegalArgumentException(lStrings.getString("err.cookie_name_blank"));
         }
         if (!isToken(name)) {

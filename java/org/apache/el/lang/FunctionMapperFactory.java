@@ -22,9 +22,6 @@ import jakarta.el.FunctionMapper;
 
 import org.apache.el.util.MessageFactory;
 
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public class FunctionMapperFactory extends FunctionMapper {
 
     protected FunctionMapperImpl memento = null;
@@ -38,9 +35,6 @@ public class FunctionMapperFactory extends FunctionMapper {
     }
 
 
-    /* (non-Javadoc)
-     * @see jakarta.el.FunctionMapper#resolveFunction(java.lang.String, java.lang.String)
-     */
     @Override
     public Method resolveFunction(String prefix, String localName) {
         if (this.memento == null) {

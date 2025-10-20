@@ -23,7 +23,6 @@
   &project;
 
   <properties>
-    <author email="craigmcc@apache.org">Craig R. McClanahan</author>
     <title>The Context Container</title>
   </properties>
 
@@ -175,7 +174,13 @@
   recommended that zero padding is used so that <code>foo##002.war</code> is
   treated as an earlier version than <code>foo##011.war</code>.
   </p>
-
+  <p>To get the current webapp version number in a servlet you should use
+  <code>org.apache.catalina.webappVersion</code>
+  <a href="runtime-attributes.html">attribute</a>, like this:
+  <code>String webappVersion =
+  (String)request.getServletContext().getAttribute("org.apache.catalina.webappVersion");
+  </code>
+  </p>
   <p>If you want to deploy a WAR file or a directory using a context path that
   is not related to the base file name then one of the following options must
   be used to prevent double-deployment:
@@ -383,6 +388,15 @@
         else the default value will be <code>false</code>.</p>
       </attribute>
 
+      <attribute name="dispatchersUseEncodedPaths" required="false">
+        <p>Controls whether paths used in calls to obtain a request dispatcher
+        ares expected to be encoded. This affects both how Tomcat handles calls
+        to obtain a request dispatcher as well as how Tomcat generates paths
+        used to obtain request dispatchers internally. If not specified, the
+        default value of <code>true</code> is used. When encoding/decoding paths
+        for a request dispatcher, UTF-8 is always used.</p>
+      </attribute>
+
       <attribute name="docBase" required="true">
         <p>The <em>Document Base</em> (also known as the <em>Context
         Root</em>) directory for this web application, or the pathname
@@ -400,13 +414,42 @@
         sufficient.</p>
       </attribute>
 
-      <attribute name="dispatchersUseEncodedPaths" required="false">
-        <p>Controls whether paths used in calls to obtain a request dispatcher
-        ares expected to be encoded. This affects both how Tomcat handles calls
-        to obtain a request dispatcher as well as how Tomcat generates paths
-        used to obtain request dispatchers internally. If not specified, the
-        default value of <code>true</code> is used. When encoding/decoding paths
-        for a request dispatcher, UTF-8 is always used.</p>
+      <attribute name="encodedReverseSolidusHandling" required="false">
+        <p>When set to <code>reject</code>, an attempt to obtain a
+        <code>RequestDispatcher</code> for a path containing a <code>%5c</code>
+        sequence will trigger an <code>IllegalArgumentException</code>. When set
+        to <code>decode</code>, any <code>%5c</code> sequence in the path used
+        to obtain a <code>RequestDispatcher</code> will have that sequence
+        decoded to <code>\</code> (and then normalized to <code>/</code>) before
+        the <code>RequestDispatcher</code> is created. When set to
+        <code>passthrough</code>, any <code>%5c</code> sequence in the path used
+        to obtain a <code>RequestDispatcher</code> will remain unchanged.</p>
+        <p>If <code>passthrough</code> is used then it is the application's
+        responsibility to perform any further <code>%nn</code> decoding required.
+        Any <code>%25</code> sequences (encoded <code>%</code>) in the path will
+        also be processed with the <code>%25</code> sequence unchanged
+        to avoid potential corruption and/or decoding failure when the path is
+        subsequently <code>%nn</code> decoded by the application.</p>
+        <p>If not specified, the default value is <code>decode</code>.</p>
+      </attribute>
+
+      <attribute name="encodedSolidusHandling" required="false">
+        <p>When set to <code>reject</code>, an attempt to obtain a
+        <code>RequestDispatcher</code> for a path containing a <code>%2f</code>
+        sequence will trigger an <code>IllegalArgumentException</code>. When set
+        to <code>decode</code>, any <code>%2f</code> sequence in the path used
+        to obtain a <code>RequestDispatcher</code> will have that sequence
+        decoded to <code>/</code> before the <code>RequestDispatcher</code> is
+        created. When set to <code>passthrough</code>, any <code>%2f</code>
+        sequence in the path used to obtain a <code>RequestDispatcher</code>
+        will remain unchanged.</p>
+        <p>If <code>passthrough</code> is used then it is the application's
+        responsibility to perform any further <code>%nn</code> decoding required.
+        Any <code>%25</code> sequences (encoded <code>%</code>) in the path will
+        also be processed with the <code>%25</code> sequence unchanged
+        to avoid potential corruption and/or decoding failure when the path is
+        subsequently <code>%nn</code> decoded by the application.</p>
+        <p>If not specified, the default value is <code>reject</code>.</p>
       </attribute>
 
       <attribute name="failCtxIfServletStartFails" required="false">
@@ -445,17 +488,25 @@
       <attribute name="mapperContextRootRedirectEnabled" required="false">
         <p>If enabled, requests for a web application context root will be
         redirected (adding a trailing slash) if necessary by the Mapper rather
-        than the default Servlet. This is more efficient but has the side effect
-        of confirming that the context path exists. If not specified, the
-        default value of <code>true</code> is used.</p>
+        than the default Servlet. This is more efficient but there are security
+        side effects. First, the existence of a web application or a directory
+        may be confirmed even though the user does not have access to that
+        directory. Secondly, any Valves and/or Filters - including those
+        providing security functionality - will not have an opportunity to
+        process the request. If not specified, the default value of
+        <code>true</code> is used.</p>
       </attribute>
 
       <attribute name="mapperDirectoryRedirectEnabled" required="false">
         <p>If enabled, requests for a web application directory will be
         redirected (adding a trailing slash) if necessary by the Mapper rather
-        than the default Servlet. This is more efficient but has the side effect
-        of confirming that the directory is exists. If not specified, the
-        default value of <code>false</code> is used.</p>
+        than the default Servlet. This is more efficient but there are security
+        side effects. First, the existence of a web application or a directory
+        may be confirmed even though the user does not have access to that
+        directory. Secondly, any Valves and/or Filters - including those
+        providing security functionality - will not have an opportunity to
+        process the request. If not specified, the default value of
+        <code>false</code> is used.</p>
       </attribute>
 
       <attribute name="override" required="false">
@@ -603,15 +654,23 @@
         attribute is <code>false</code>.</p>
       </attribute>
 
+      <attribute name="suspendWrappedResponseAfterForward" required="false">
+        <p>If the value of this flag is <code>true</code>, Catalina will
+        suspend wrapped responses after a forward, instead of closing them.
+        If not specified, the default value of the flag is
+        <code>true</code>.</p>
+      </attribute>
+
       <attribute name="swallowAbortedUploads" required="false">
         <p>Set to <code>false</code> if Tomcat should <b>not</b> read any
         additional request body data for aborted uploads and instead abort the
         client connection. This setting is used in the following situations:
         </p>
         <ul>
-        <li>the size of the request body is larger than the
-            <code>maxPostSize</code> configured in the connector</li>
-        <li>the size limit of a MultiPart upload is reached</li>
+        <li>Tomcat is automatically processing the request body for parameters
+            and size of the request body data converted to parameters is larger
+            than the <code>maxPostSize</code> configured in the connector</li>
+        <li>a size limit of a MultiPart upload is reached</li>
         <li>the servlet sets the response status to 413 (Request Entity Too
             Large) </li>
         </ul>
@@ -649,6 +708,13 @@
        <p>Should the HttpOnly flag be set on session cookies to prevent client
           side script from accessing the session ID? Defaults to
           <code>true</code>.</p>
+      </attribute>
+
+      <attribute name="usePartitioned" required="false">
+       <p>Should the Partitioned flag be set on session cookies? Defaults to <code>false</code>.</p>
+       <p>Note: The name of the attribute used to indicate a partitioned cookie as part of
+       <a href="https://developers.google.com/privacy-sandbox/3pcd#partitioned">CHIPS</a> is not defined by an RFC and
+       may change in a non-backwards compatible way once equivalent functionality is included in an RFC.</p>
       </attribute>
 
       <attribute name="useRelativeRedirects" required="false">
@@ -789,21 +855,6 @@
         not specified, the default value of <code>true</code> will be used.</p>
       </attribute>
 
-      <attribute name="clearReferencesObjectStreamClassCaches" required="false">
-        <p>If <code>true</code>, when the web application is stopped Tomcat
-        looks for <code>SoftReference</code>s to classes loaded by the web
-        application in the <code>ObjectStreamClass</code> class used for
-        serialization and clears any <code>SoftReference</code>s it finds. This
-        feature uses reflection to identify the <code>SoftReference</code>s and
-        therefore requires that the command line option
-        <code>-XaddExports:java.base/java.io=ALL-UNNAMED</code> is set. If not
-        specified, the default value of <code>true</code> will be used.</p>
-        <p>The memory leak associated with <code>ObjectStreamClass</code> has
-        been fixed in Java 19 onwards, Java 17.0.4 onwards and Java 11.0.16
-        onwards. The check will be disabled when running on a version
-        of Java that contains the fix.</p>
-      </attribute>
-
       <attribute name="clearReferencesRmiTargets" required="false">
         <p>If <code>true</code>, Tomcat looks for memory leaks associated with
         RMI Targets and clears any it finds. This feature uses reflection to
@@ -869,6 +920,17 @@
         any changes and methods that return values will return
         <code>null</code>. If not specified, the specification compliant default
         of <code>true</code> will be used.</p>
+      </attribute>
+
+      <attribute name="notFoundClassResourceCacheSize" required="false">
+        <p>Class resources are not cached by the standard resources
+        implementation since they are loaded on first use and then the resource
+        is then no longer required. It does help, however, to cache classes that
+        are not found as in some scenarios the same class will be searched for
+        many times and the greater the number of JARs/classes, the longer that
+        search will take. An LRU cache is used and this attribute controls the
+        size of that cache. A value of less than 1 disables the cache. If not
+        specified, the default value of 1000 will be used.</p>
       </attribute>
 
       <attribute name="renewThreadsWhenStoppingContext" required="false">
@@ -1205,8 +1267,8 @@
   ...
   <Valve className="org.apache.catalina.valves.RemoteHostValve"
          allow=".*\.mycompany\.com|www\.yourcompany\.com"/>
-  <Valve className="org.apache.catalina.valves.RemoteAddrValve"
-         deny="192\.168\.1\.\d+"/>
+  <Valve className="org.apache.catalina.valves.RemoteCIDRValve"
+         deny="192.168.1.0/24"/>
   ...
 </Context>]]></source>
 
@@ -1365,8 +1427,8 @@
        two additional attributes to allow a shared data source to be used with different credentials.
        When these two additional attributes are used in combination with the <code>javax.sql.DataSource</code>
        type, different contexts can share a global data source with different credentials.
-       Under the hood, what happens is that a call to <a href="http://docs.oracle.com/javase/7/docs/api/javax/sql/DataSource.html#getConnection()"><code>getConnection()</code></a>
-       is simply translated to a call <a href="http://docs.oracle.com/javase/7/docs/api/javax/sql/DataSource.html#getConnection(java.lang.String,%20java.lang.String)">
+       Under the hood, what happens is that a call to <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/javax/sql/DataSource.html#getConnection())"><code>getConnection()</code></a>
+       is simply translated to a call <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.sql/javax/sql/DataSource.html#getConnection(java.lang.String,java.lang.String)">
        <code>getConnection(username, password)</code></a> on the global data source. This is an easy way to get code to be transparent to what schemas are being used,
        yet be able to control connections (or pools) in the global configuration.
     </p>

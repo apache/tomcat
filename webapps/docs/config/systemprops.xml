@@ -256,7 +256,7 @@
 
     <property name="org.apache.tomcat. websocket.DEFAULT_BUFFER_SIZE">
       <p>The default size for buffers used in the Websockets container.</p>
-      <p>The default value is <code>8192</code> which corresponds to 8KB.</p>
+      <p>The default value is <code>8192</code> which corresponds to 8 KiB.</p>
     </property>
 
     <property name="org.apache.tomcat. websocket.DEFAULT_ORIGIN_HEADER_VALUE">
@@ -348,6 +348,19 @@
       <p>If not specified, the default value of <code>1000</code> will be used.</p>
     </property>
 
+    <property name="org.apache.tomcat.util.openssl.LIBRARY_NAME">
+      <p>Specify the library name of OpenSSL.</p>
+      <p>If not specified, the default value of <code>ssl</code> will be used,
+      except on MacOS where a dylib versioned name will be used, in the form of
+      <code>ssl.v</code> where v is a version number.</p>
+    </property>
+
+    <property name="org.apache.tomcat.util.openssl.USE_SYSTEM_LOAD_LIBRARY">
+      <p>Use <code>System.loadLibrary</code> to load OpenSSL rather than
+      the FFM library loading code.</p>
+      <p>If not specified, the default value of <code>false</code> will be used.</p>
+    </property>
+
     <property name="org.apache.catalina.startup. EXIT_ON_INIT_FAILURE">
       <p>If <code>true</code>, the server will exit if an exception happens
       during the server initialization phase. To support this feature, this
@@ -372,7 +385,7 @@
     <property name="org.apache.catalina.tribes.io. BufferPool.DEFAULT_POOL_SIZE">
       <p>The size of the buffer pool which is used by Tribes in bytes.</p>
       <p>If not specified, the default value of <code>100*1024*1024</code>
-      (100MB) will be used.</p>
+      (100 MiB) will be used.</p>
     </property>
 
   </properties>

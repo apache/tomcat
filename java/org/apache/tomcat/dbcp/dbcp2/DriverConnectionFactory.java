@@ -53,6 +53,8 @@ public class DriverConnectionFactory implements ConnectionFactory {
     }
 
     /**
+     * Gets the connection String.
+     *
      * @return The connection String.
      * @since 2.6.0
      */
@@ -61,7 +63,9 @@ public class DriverConnectionFactory implements ConnectionFactory {
     }
 
     /**
-     * @return The Driver.
+     * Gets the JDBC Driver.
+     *
+     * @return The JDBC Driver.
      * @since 2.6.0
      */
     public Driver getDriver() {
@@ -69,7 +73,9 @@ public class DriverConnectionFactory implements ConnectionFactory {
     }
 
     /**
-     * @return The Properties.
+     * Gets the properties.
+     *
+     * @return The properties.
      * @since 2.6.0
      */
     public Properties getProperties() {
@@ -79,6 +85,6 @@ public class DriverConnectionFactory implements ConnectionFactory {
     @Override
     public String toString() {
         return this.getClass().getName() + " [" + driver + ";" + connectionString + ";"
-            + Utils.cloneWithoutCredentials(properties) + "]";
+                + Utils.cloneWithoutCredentials(properties) + "]";
     }
 }

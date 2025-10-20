@@ -108,7 +108,8 @@ public class TestPersistentManager {
         context.setParent(host);
 
         Connector connector = EasyMock.createNiceMock(Connector.class);
-        Request req = new Request(connector) {
+        EasyMock.replay(connector);
+        Request req = new Request(connector, null) {
             @Override
             public Context getContext() {
                 return context;
@@ -116,7 +117,6 @@ public class TestPersistentManager {
         };
         req.setRequestedSessionId("invalidSession");
         HttpServletRequest request = new RequestFacade(req);
-        EasyMock.replay(connector);
         requestCachingSessionListener.request = request;
 
         manager.setContext(context);

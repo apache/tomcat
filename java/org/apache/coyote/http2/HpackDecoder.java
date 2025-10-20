@@ -61,7 +61,7 @@ public class HpackDecoder {
     /**
      * The maximum allowed memory size set by the container.
      */
-    private int maxMemorySizeHard;
+    private final int maxMemorySizeHard;
     /**
      * The maximum memory size currently in use. May be less than the hard limit.
      */
@@ -263,8 +263,8 @@ public class HpackDecoder {
             addStaticTableEntry(index);
         } else {
             int adjustedIndex = getRealIndex(index - Hpack.STATIC_TABLE_LENGTH);
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("hpackdecoder.useDynamic", Integer.valueOf(adjustedIndex)));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("hpackdecoder.useDynamic", Integer.valueOf(adjustedIndex)));
             }
             Hpack.HeaderField headerField = headerTable[adjustedIndex];
             emitHeader(headerField.name, headerField.value);
@@ -283,7 +283,7 @@ public class HpackDecoder {
      */
     int getRealIndex(int index) throws HpackException {
         // the index is one based, but our table is zero based, hence -1
-        // also because of our ring buffer setup the indexes are reversed
+        // also because of our ring buffer set up the indexes are reversed
         // index = 1 is at position firstSlotPosition + filledSlots
         int realIndex = (firstSlotPosition + (filledTableSlots - index)) % headerTable.length;
         if (realIndex < 0) {
@@ -295,8 +295,8 @@ public class HpackDecoder {
 
     private void addStaticTableEntry(int index) throws HpackException {
         // adds an entry from the static table.
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("hpackdecoder.useStatic", Integer.valueOf(index)));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("hpackdecoder.useStatic", Integer.valueOf(index)));
         }
         Hpack.HeaderField entry = Hpack.STATIC_TABLE[index];
         emitHeader(entry.name, (entry.value == null) ? "" : entry.value);
@@ -304,10 +304,10 @@ public class HpackDecoder {
 
     private void addEntryToHeaderTable(Hpack.HeaderField entry) {
         if (entry.size > maxMemorySizeSoft) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("hpackdecoder.clearDynamic"));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("hpackdecoder.clearDynamic"));
             }
-            // it is to big to fit, so we just completely clear the table.
+            // it is too big to fit, so we just completely clear the table.
             while (filledTableSlots > 0) {
                 headerTable[firstSlotPosition] = null;
                 firstSlotPosition++;
@@ -323,8 +323,8 @@ public class HpackDecoder {
         int newTableSlots = filledTableSlots + 1;
         int tableLength = headerTable.length;
         int index = (firstSlotPosition + filledTableSlots) % tableLength;
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("hpackdecoder.addDynamic", Integer.valueOf(index), entry.name, entry.value));
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("hpackdecoder.addDynamic", Integer.valueOf(index), entry.name, entry.value));
         }
         headerTable[index] = entry;
         int newSize = currentMemorySize + entry.size;
@@ -380,10 +380,9 @@ public class HpackDecoder {
 
         /**
          * Are the headers pass to the recipient so far valid? The decoder needs to process all the headers to maintain
-         * state even if there is a problem. In addition, it is easy for the the intended recipient to track if the
-         * complete set of headers is valid since to do that state needs to be maintained between the parsing of the
-         * initial headers and the parsing of any trailer headers. The recipient is the best place to maintain that
-         * state.
+         * state even if there is a problem. In addition, it is easy for the intended recipient to track if the complete
+         * set of headers is valid since to do that state needs to be maintained between the parsing of the initial
+         * headers and the parsing of any trailer headers. The recipient is the best place to maintain that state.
          *
          * @throws StreamException If the headers received to date are not valid
          */
@@ -402,6 +401,11 @@ public class HpackDecoder {
         headerCount = 0;
         countedCookie = false;
         headerSize = 0;
+    }
+
+
+    void clearHeaderEmitter() {
+        headerEmitter = null;
     }
 
 
@@ -433,8 +437,8 @@ public class HpackDecoder {
         int inc = 3 + name.length() + value.length();
         headerSize += inc;
         if (!isHeaderCountExceeded() && !isHeaderSizeExceeded(0)) {
-            if (log.isDebugEnabled()) {
-                log.debug(sm.getString("hpackdecoder.emitHeader", name, value));
+            if (log.isTraceEnabled()) {
+                log.trace(sm.getString("hpackdecoder.emitHeader", name, value));
             }
             headerEmitter.emitHeader(name, value);
         }

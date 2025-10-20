@@ -16,6 +16,7 @@
  */
 package org.apache.catalina.realm;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.security.Principal;
 import java.util.Arrays;
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.security.auth.login.LoginContext;
 
@@ -32,11 +34,10 @@ import org.ietf.jgss.GSSCredential;
 /**
  * Generic implementation of <strong>java.security.Principal</strong> that is available for use by <code>Realm</code>
  * implementations.
- *
- * @author Craig R. McClanahan
  */
 public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
 
@@ -102,7 +103,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
      * @param attributes    - If provided, additional attributes associated with this Principal
      */
     public GenericPrincipal(String name, List<String> roles, Principal userPrincipal, LoginContext loginContext,
-            GSSCredential gssCredential, Map<String, Object> attributes) {
+            GSSCredential gssCredential, Map<String,Object> attributes) {
         super();
         this.name = name;
         this.userPrincipal = userPrincipal;
@@ -149,11 +150,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
     @Override
     public Principal getUserPrincipal() {
-        if (userPrincipal != null) {
-            return userPrincipal;
-        } else {
-            return this;
-        }
+        return Objects.requireNonNullElse(userPrincipal, this);
     }
 
 
@@ -166,7 +163,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     /**
      * The user's delegated credentials.
      */
-    protected transient GSSCredential gssCredential = null;
+    protected transient GSSCredential gssCredential;
 
     @Override
     public GSSCredential getGssCredential() {
@@ -180,7 +177,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     /**
      * The additional attributes associated with this Principal.
      */
-    protected final Map<String, Object> attributes;
+    protected final Map<String,Object> attributes;
 
 
     // ---------------------------------------------------------- Public Methods
@@ -203,9 +200,6 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
     }
 
 
-    /**
-     * Return a String representation of this object, which exposes only information that should be public.
-     */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("GenericPrincipal[");
@@ -250,19 +244,17 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
 
     // ----------------------------------------------------------- Serialization
 
+    @Serial
     private Object writeReplace() {
         return new SerializablePrincipal(name, roles, userPrincipal, attributes);
     }
 
-    private static class SerializablePrincipal implements Serializable {
+    private record SerializablePrincipal(String name, String[] roles, Principal principal,
+            Map<String,Object> attributes) implements Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
 
-        private final String name;
-        private final String[] roles;
-        private final Principal principal;
-        private final Map<String, Object> attributes;
-
-        SerializablePrincipal(String name, String[] roles, Principal principal, Map<String, Object> attributes) {
+        private SerializablePrincipal(String name, String[] roles, Principal principal, Map<String,Object> attributes) {
             this.name = name;
             this.roles = roles;
             if (principal instanceof Serializable) {
@@ -273,6 +265,7 @@ public class GenericPrincipal implements TomcatPrincipal, Serializable {
             this.attributes = attributes;
         }
 
+        @Serial
         private Object readResolve() {
             return new GenericPrincipal(name, Arrays.asList(roles), principal, null, null, attributes);
         }

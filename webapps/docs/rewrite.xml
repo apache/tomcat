@@ -24,7 +24,6 @@
   &project;
 
   <properties>
-    <author email="remm@apache.org">Remy Maucherat</author>
     <title>The rewrite Valve</title>
   </properties>
 
@@ -52,6 +51,28 @@
   <p>It can also be in the context.xml of a webapp.
   The valve will then use a <code>rewrite.config</code> file containing the
   rewrite directives, it must be placed in the WEB-INF folder of the web application
+  </p>
+
+</section>
+
+<section name="Using rewrite rules with special characters">
+
+  <p>The URL presented to the rewrite valve is the same URL used for request
+  mapping with any literal <code>'%'</code>, <code>';'</code> and/or
+  <code>'?'</code> characters encoded in <code>%nn</code> form.</p>
+
+  <p>A rewrite rule that wishes to insert a literal <code>'%'</code>,
+  <code>';'</code>, <code>'?'</code>, <code>'&amp;'</code> or <code>'='</code>
+  character should do so in <code>%nn</code> form. Other characters maybe
+  inserted in either literal or <code>%nn</code> form.</p>
+
+  <p>This enables the rewrite rules to:
+  <ul>
+  <li>process URLs containing literal <code>'?'</code> characters;</li>
+  <li>add a query string;</li>
+  <li>insert a literal <code>'%'</code> character without it being confused with
+  <code>%nn</code> encoding.</li>
+  </ul>
   </p>
 
 </section>
@@ -433,7 +454,7 @@ public interface RewriteMap {
     <p>Note: You can use more than one parameter. These have to be separated by spaces. Parameters
     can be quoted with &quot;. This enables space characters inside parameters.</p>
 
-    <p>That map instance will be given the the lookup value that is configured in the corresponding <code>RewriteRule</code> by
+    <p>That map instance will be given the lookup value that is configured in the corresponding <code>RewriteRule</code> by
     calling <code>lookup(String)</code>. Your implementation is free to return <code>null</code> to indicate,
     that the given default should be used, or to return a replacement value.</p>
 
@@ -457,7 +478,7 @@ public class UpperCaseMap implements RewriteMap {
     if (key == null) {
       return null;
     }
-    return key.toUpperCase();
+    return key.toUpperCase(Locale.ENGLISH);
   }
 
 }]]></source>
@@ -802,6 +823,17 @@ cannot use <code>$N</code> in the substitution string!
         the <code>.phps</code> extension:
         <source>RewriteRule ^(.+\.php)s$ $1 [T=application/x-httpd-php-source]</source>
         </li>
+
+        <li>'<strong><code>valveSkip|VS</code></strong>'
+        (skip valve)<br />
+        This flag can be used to setup conditional execution of valves.
+        When the flag is set and the rule matches, the rewrite valve will skip
+        the next valve in the Catalina pipeline. If the rewrite valve is the
+        last of the pipeline, then the flag will be ignored and the container
+        basic valve will be invoked. If rewrite occurred, then the flag will
+        not have any effect.
+        </li>
+
       </ul>
 
   </subsection>

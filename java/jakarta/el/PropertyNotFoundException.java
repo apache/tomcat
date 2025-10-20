@@ -16,8 +16,11 @@
  */
 package jakarta.el;
 
+import java.io.Serial;
+
 public class PropertyNotFoundException extends ELException {
 
+    @Serial
     private static final long serialVersionUID = -3799200961303506745L;
 
     public PropertyNotFoundException() {

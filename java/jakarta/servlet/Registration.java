@@ -45,65 +45,60 @@ public interface Registration {
      *
      * @param name  Name of initialisation parameter
      * @param value Value of initialisation parameter
-     * @return <code>true</code> if the initialisation parameter was set,
-     *         <code>false</code> if the initialisation parameter was not set
-     *         because an initialisation parameter of the same name already
-     *         existed
+     *
+     * @return <code>true</code> if the initialisation parameter was set, <code>false</code> if the initialisation
+     *             parameter was not set because an initialisation parameter of the same name already existed
+     *
      * @throws IllegalArgumentException if name or value is <code>null</code>
-     * @throws IllegalStateException if the ServletContext associated with this
-     *         registration has already been initialised
+     * @throws IllegalStateException    if the ServletContext associated with this registration has already been
+     *                                      initialised
      */
     boolean setInitParameter(String name, String value);
 
     /**
      * Get the value of an initialisation parameter.
      *
-     * @param name  The initialisation parameter whose value is required
+     * @param name The initialisation parameter whose value is required
      *
      * @return The value of the named initialisation parameter
      */
     String getInitParameter(String name);
 
     /**
-     * Add multiple initialisation parameters. If any of the supplied
-     * initialisation parameter conflicts with an existing initialisation
-     * parameter, no updates will be performed.
+     * Add multiple initialisation parameters. If any of the supplied initialisation parameter conflicts with an
+     * existing initialisation parameter, no updates will be performed.
      *
      * @param initParameters The initialisation parameters to add
      *
-     * @return The set of initialisation parameter names that conflicted with
-     *         existing initialisation parameter. If there are no conflicts,
-     *         this Set will be empty.
-     * @throws IllegalArgumentException if any of the supplied initialisation
-     *         parameters have a null name or value
-     * @throws IllegalStateException if the ServletContext associated with this
-     *         registration has already been initialised
+     * @return The set of initialisation parameter names that conflicted with existing initialisation parameter. If
+     *             there are no conflicts, this Set will be empty.
+     *
+     * @throws IllegalArgumentException if any of the supplied initialisation parameters have a null name or value
+     * @throws IllegalStateException    if the ServletContext associated with this registration has already been
+     *                                      initialised
      */
     Set<String> setInitParameters(Map<String,String> initParameters);
 
     /**
      * Get the names and values of all the initialisation parameters.
      *
-     * @return A Map of initialisation parameter names and associated values
-     *         keyed by name
+     * @return A Map of initialisation parameter names and associated values keyed by name
      */
-    Map<String, String> getInitParameters();
+    Map<String,String> getInitParameters();
 
     /**
-     * Interface through which a Servlet or Filter registered via one of the
-     * addServlet or addFilter methods, respectively, on ServletContext may be
-     * further configured.
+     * Interface through which a Servlet or Filter registered via one of the addServlet or addFilter methods,
+     * respectively, on ServletContext may be further configured.
      */
     interface Dynamic extends Registration {
 
         /**
          * Mark this Servlet/Filter as supported asynchronous processing.
          *
-         * @param isAsyncSupported  Should this Servlet/Filter support
-         *                          asynchronous processing
+         * @param isAsyncSupported Should this Servlet/Filter support asynchronous processing
          *
-         * @throws IllegalStateException if the ServletContext associated with
-         *         this registration has already been initialised
+         * @throws IllegalStateException if the ServletContext associated with this registration has already been
+         *                                   initialised
          */
         void setAsyncSupported(boolean isAsyncSupported);
     }

@@ -30,8 +30,6 @@ import org.apache.juli.logging.LogFactory;
 
 /**
  * Utility class to read the bootstrap Catalina configuration.
- *
- * @author Remy Maucherat
  */
 public class CatalinaProperties {
 
@@ -47,6 +45,7 @@ public class CatalinaProperties {
 
     /**
      * @param name The property name
+     *
      * @return specified property value
      */
     public static String getProperty(String name) {
@@ -89,8 +88,7 @@ public class CatalinaProperties {
 
         if (is == null) {
             try {
-                is = CatalinaProperties.class.getResourceAsStream
-                    ("/org/apache/catalina/startup/catalina.properties");
+                is = CatalinaProperties.class.getResourceAsStream("/org/apache/catalina/startup/catalina.properties");
             } catch (Throwable t) {
                 handleThrowable(t);
             }
@@ -102,7 +100,7 @@ public class CatalinaProperties {
                 properties.load(is);
             } catch (Throwable t) {
                 handleThrowable(t);
-                log.warn(t);
+                log.warn(t.getMessage(), t);
             } finally {
                 try {
                     is.close();
@@ -133,9 +131,6 @@ public class CatalinaProperties {
 
     // Copied from ExceptionUtils since that class is not visible during start
     private static void handleThrowable(Throwable t) {
-        if (t instanceof ThreadDeath) {
-            throw (ThreadDeath) t;
-        }
         if (t instanceof VirtualMachineError) {
             throw (VirtualMachineError) t;
         }

@@ -39,7 +39,6 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
     // Defaults (defined by the specification)
     static final int DEFAULT_HEADER_TABLE_SIZE = Hpack.DEFAULT_TABLE_SIZE;
-    static final boolean DEFAULT_ENABLE_PUSH = true;
     static final long DEFAULT_MAX_CONCURRENT_STREAMS = UNLIMITED;
     static final int DEFAULT_INITIAL_WINDOW_SIZE = (1 << 16) - 1;
     static final int DEFAULT_MAX_FRAME_SIZE = MIN_MAX_FRAME_SIZE;
@@ -48,15 +47,15 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
     // Defaults (defined by Tomcat)
     static final long DEFAULT_NO_RFC7540_PRIORITIES = 1;
 
-    Map<Setting, Long> current = new ConcurrentHashMap<>();
-    Map<Setting, Long> pending = new ConcurrentHashMap<>();
+    Map<Setting,Long> current = new ConcurrentHashMap<>();
+    Map<Setting,Long> pending = new ConcurrentHashMap<>();
 
 
     ConnectionSettingsBase(String connectionId) {
         this.connectionId = connectionId;
         // Set up the defaults
         current.put(Setting.HEADER_TABLE_SIZE, Long.valueOf(DEFAULT_HEADER_TABLE_SIZE));
-        current.put(Setting.ENABLE_PUSH, Long.valueOf(DEFAULT_ENABLE_PUSH ? 1 : 0));
+        current.put(Setting.ENABLE_PUSH, Long.valueOf(0));
         current.put(Setting.MAX_CONCURRENT_STREAMS, Long.valueOf(DEFAULT_MAX_CONCURRENT_STREAMS));
         current.put(Setting.INITIAL_WINDOW_SIZE, Long.valueOf(DEFAULT_INITIAL_WINDOW_SIZE));
         current.put(Setting.MAX_FRAME_SIZE, Long.valueOf(DEFAULT_MAX_FRAME_SIZE));
@@ -66,43 +65,51 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
 
     final void set(Setting setting, long value) throws T {
-        if (log.isDebugEnabled()) {
-            log.debug(sm.getString("connectionSettings.debug", connectionId, getEndpointName(), setting,
+        set(setting, value, false);
+    }
+
+
+    final void set(Setting setting, long value, boolean force) throws T {
+        if (log.isTraceEnabled()) {
+            log.trace(sm.getString("connectionSettings.debug", connectionId, getEndpointName(), setting,
                     Long.toString(value)));
         }
 
         switch (setting) {
-            case HEADER_TABLE_SIZE:
-                validateHeaderTableSize(value);
-                break;
-            case ENABLE_PUSH:
-                validateEnablePush(value);
-                break;
-            case MAX_CONCURRENT_STREAMS:
+            case HEADER_TABLE_SIZE -> validateHeaderTableSize(value);
+            case ENABLE_PUSH -> validateEnablePush(value);
+            case MAX_CONCURRENT_STREAMS, MAX_HEADER_LIST_SIZE -> {
                 // No further validation required
-                break;
-            case INITIAL_WINDOW_SIZE:
-                validateInitialWindowSize(value);
-                break;
-            case MAX_FRAME_SIZE:
-                validateMaxFrameSize(value);
-                break;
-            case MAX_HEADER_LIST_SIZE:
-                // No further validation required
-                break;
-            case NO_RFC7540_PRIORITIES:
-                validateNoRfc7540Priorities(value);
-                break;
-            case UNKNOWN:
+            }
+            case INITIAL_WINDOW_SIZE -> validateInitialWindowSize(value);
+            case MAX_FRAME_SIZE -> validateMaxFrameSize(value);
+            case NO_RFC7540_PRIORITIES -> validateNoRfc7540Priorities(value);
+            case ENABLE_CONNECT_PROTOCOL, TLS_RENEG_PERMITTED -> {
+                // Not supported. Ignore it.
+                return;
+                // Not supported. Ignore it.
+            }
+            case UNKNOWN -> {
                 // Unrecognised. Ignore it.
                 return;
+            }
         }
 
-        set(setting, Long.valueOf(value));
+        set(setting, Long.valueOf(value), force);
     }
 
 
-    synchronized void set(Setting setting, Long value) {
+    /**
+     * Specify a new value for setting with the option to force the change to take effect immediately rather than
+     * waiting until an {@code ACK} is received.
+     *
+     * @param setting The setting to update
+     * @param value   The new value for the setting
+     * @param force   {@code false} if an {@code ACK} must be received before the setting takes effect or {@code true}
+     *                    if the setting to take effect immediately. Even if the setting takes effect immediately, it
+     *                    will still be included in the next {@code SETTINGS} frame and an {@code ACK} will be expected.
+     */
+    synchronized void set(Setting setting, Long value, boolean force) {
         current.put(setting, value);
     }
 
@@ -210,9 +217,9 @@ abstract class ConnectionSettingsBase<T extends Throwable> {
 
     private void validateMaxFrameSize(long maxFrameSize) throws T {
         if (maxFrameSize < MIN_MAX_FRAME_SIZE || maxFrameSize > MAX_MAX_FRAME_SIZE) {
-            String msg = sm.getString("connectionSettings.maxFrameSizeInvalid", connectionId,
-                    Long.toString(maxFrameSize), Integer.toString(MIN_MAX_FRAME_SIZE),
-                    Integer.toString(MAX_MAX_FRAME_SIZE));
+            String msg =
+                    sm.getString("connectionSettings.maxFrameSizeInvalid", connectionId, Long.toString(maxFrameSize),
+                            Integer.toString(MIN_MAX_FRAME_SIZE), Integer.toString(MAX_MAX_FRAME_SIZE));
             throwException(msg, Http2Error.PROTOCOL_ERROR);
         }
     }

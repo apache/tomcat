@@ -36,10 +36,6 @@
                  type="java.lang.String"
             writeable="false"/>
 
-    <attribute   name="duplicates"
-          description="Number of duplicated session ids generated"
-                 type="int" />
-
     <attribute   name="expiredSessions"
           description="Number of sessions that expired ( doesn't include explicit invalidations )"
                  type="long" />
@@ -223,10 +219,6 @@
           description="Fully qualified class name of the managed object"
                  type="java.lang.String"
             writeable="false"/>
-
-    <attribute   name="duplicates"
-          description="Number of duplicated session ids generated"
-                 type="int" />
 
     <attribute   name="expiredSessions"
           description="Number of sessions that expired ( doesn't include explicit invalidations )"

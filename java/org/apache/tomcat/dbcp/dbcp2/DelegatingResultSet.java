@@ -97,7 +97,7 @@ public final class DelegatingResultSet extends AbandonedTrace implements ResultS
 
     /**
      * Creates a wrapper for the ResultSet which traces this ResultSet to the Connection which created it (via, for
-     * example DatabaseMetadata, and the code which created it.
+     * example DatabaseMetadata), and the code which created it.
      * <p>
      * Private to ensure all construction is {@link #wrapResultSet(Connection, ResultSet)}
      * </p>

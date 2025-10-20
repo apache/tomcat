@@ -21,10 +21,6 @@ import jakarta.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstLiteralExpression extends SimpleNode {
     public AstLiteralExpression(int id) {
         super(id);
@@ -53,7 +49,7 @@ public final class AstLiteralExpression extends SimpleNode {
             if (c == '\\' && i + 2 < size) {
                 char c1 = image.charAt(i + 1);
                 char c2 = image.charAt(i + 2);
-                if ((c1 == '#' || c1 == '$') && c2 == '{')  {
+                if ((c1 == '#' || c1 == '$') && c2 == '{') {
                     c = c1;
                     i++;
                 }

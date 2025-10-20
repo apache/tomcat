@@ -29,15 +29,8 @@ import org.apache.tomcat.util.res.StringManager;
  * A single packet for communication between the web server and the container. Designed to be reused many times with no
  * creation of garbage. Understands the format of data types for these packets. Can be used (somewhat confusingly) for
  * both incoming and outgoing packets.
- *
- * @author Henri Gomez
- * @author Dan Milstein
- * @author Keith Wannamaker
- * @author Kevin Seguin
- * @author Costin Manolache
  */
 public class AjpMessage {
-
 
     private static final Log log = LogFactory.getLog(AjpMessage.class);
 
@@ -47,21 +40,15 @@ public class AjpMessage {
     protected static final StringManager sm = StringManager.getManager(AjpMessage.class);
 
 
-    // ------------------------------------------------------------ Constructor
-
-
     public AjpMessage(int packetSize) {
         buf = new byte[packetSize];
     }
 
 
-    // ----------------------------------------------------- Instance Variables
-
-
     /**
      * Fixed size buffer.
      */
-    protected final byte buf[];
+    protected final byte[] buf;
 
 
     /**
@@ -76,9 +63,6 @@ public class AjpMessage {
      * Oh, well.
      */
     protected int len;
-
-
-    // --------------------------------------------------------- Public Methods
 
 
     /**
@@ -167,7 +151,7 @@ public class AjpMessage {
             // values will be OK. Strings using other encodings may be
             // corrupted.
             byte[] buffer = bc.getBuffer();
-            for (int i = bc.getOffset(); i < bc.getLength(); i++) {
+            for (int i = bc.getStart(); i < bc.getLength(); i++) {
                 // byte values are signed i.e. -128 to 127
                 // The values are used unsigned. 0 to 31 are CTLs so they are
                 // filtered (apart from TAB which is 9). 127 is a control (DEL).
@@ -289,7 +273,7 @@ public class AjpMessage {
 
     private void doGetBytes(MessageBytes mb, boolean terminated) {
         int length = getInt();
-        if ((length == 0xFFFF) || (length == -1)) {
+        if (length == 0xFFFF || length == -1) {
             mb.recycle();
             return;
         }
@@ -333,21 +317,21 @@ public class AjpMessage {
         // Verify message signature
         if ((toContainer && mark != 0x1234) || (!toContainer && mark != 0x4142)) {
             log.error(sm.getString("ajpmessage.invalid", "" + mark));
-            if (log.isDebugEnabled()) {
+            if (log.isTraceEnabled()) {
                 dump("In");
             }
             return -1;
         }
-        if (log.isDebugEnabled()) {
-            log.debug("Received " + len + " " + buf[0]);
+        if (log.isTraceEnabled()) {
+            log.trace("Received " + len + " " + buf[0]);
         }
         return len;
     }
 
 
     private void dump(String prefix) {
-        if (log.isDebugEnabled()) {
-            log.debug(prefix + ": " + HexUtils.toHexString(buf) + " " + pos + "/" + (len + 4));
+        if (log.isTraceEnabled()) {
+            log.trace(prefix + ": " + HexUtils.toHexString(buf) + " " + pos + "/" + (len + 4));
         }
         int max = pos;
         if (len + 4 > pos) {
@@ -356,9 +340,9 @@ public class AjpMessage {
         if (max > 1000) {
             max = 1000;
         }
-        if (log.isDebugEnabled()) {
+        if (log.isTraceEnabled()) {
             for (int j = 0; j < max; j += 16) {
-                log.debug(hexLine(buf, j, len));
+                log.trace(hexLine(buf, j, len));
             }
         }
     }
@@ -373,7 +357,7 @@ public class AjpMessage {
     // ------------------------------------------------------ Protected Methods
 
 
-    protected static String hexLine(byte buf[], int start, int len) {
+    protected static String hexLine(byte[] buf, int start, int len) {
         StringBuilder sb = new StringBuilder();
         for (int i = start; i < start + 16; i++) {
             if (i < len + 4) {

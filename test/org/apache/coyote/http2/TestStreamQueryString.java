@@ -50,7 +50,7 @@ public class TestStreamQueryString extends Http2TestBase {
     @Parameters
     public static Collection<Object[]> inputs() {
         List<Object[]> result = new ArrayList<>();
-        Collection<Object[]> baseData = Http2TestBase.data();
+        Collection<Object[]> baseData = data();
 
         for (Object[] base : baseData) {
             // Test ASCII characters from 32 to 126 inclusive
@@ -74,7 +74,7 @@ public class TestStreamQueryString extends Http2TestBase {
 
         Tomcat tomcat = getTomcatInstance();
 
-        Context ctxt = tomcat.addContext("", null);
+        Context ctxt = getProgrammaticRootContext();
         Tomcat.addServlet(ctxt, "query", new Query(queryValue));
         ctxt.addServletMappingDecoded("/query", "query");
 

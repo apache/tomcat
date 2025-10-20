@@ -52,8 +52,8 @@ class Http2AsyncParser extends Http2Parser {
         ByteBuffer preface = ByteBuffer.wrap(prefaceData);
         ByteBuffer header = ByteBuffer.allocate(9);
         ByteBuffer framePayload = ByteBuffer.allocate(input.getMaxFrameSize());
-        PrefaceCompletionHandler handler = new PrefaceCompletionHandler(webConnection, stream, prefaceData, preface,
-                header, framePayload);
+        PrefaceCompletionHandler handler =
+                new PrefaceCompletionHandler(webConnection, stream, prefaceData, preface, header, framePayload);
         socketWrapper.read(BlockingMode.NON_BLOCK, socketWrapper.getReadTimeout(), TimeUnit.MILLISECONDS, null, handler,
                 handler, preface, header, framePayload);
     }
@@ -152,19 +152,16 @@ class Http2AsyncParser extends Http2Parser {
         if (error != null) {
             Throwable error = this.error;
             this.error = null;
-            if (error instanceof Http2Exception) {
-                throw (Http2Exception) error;
-            } else if (error instanceof IOException) {
-                throw (IOException) error;
-            } else if (error instanceof RuntimeException) {
-                throw (RuntimeException) error;
-            } else {
-                throw new RuntimeException(error);
+            switch (error) {
+                case Http2Exception http2Exception -> throw http2Exception;
+                case IOException ioException -> throw ioException;
+                case RuntimeException runtimeException -> throw runtimeException;
+                case null, default -> throw new RuntimeException(error);
             }
         }
     }
 
-    private class FrameCompletionHandler implements CompletionCheck, CompletionHandler<Long, Void> {
+    private class FrameCompletionHandler implements CompletionCheck, CompletionHandler<Long,Void> {
 
         private final FrameType expected;
         protected final ByteBuffer[] buffers;
@@ -284,36 +281,39 @@ class Http2AsyncParser extends Http2Parser {
                                     readUnknownFrame(streamId, frameTypeId, flags, payloadSize, payload);
                             }
                         }
-                        // See if there is a new 9 byte header and continue parsing if possible
-                        if (payload.remaining() >= 9) {
-                            int position = payload.position();
-                            payloadSize = ByteUtil.getThreeBytes(payload, position);
-                            frameTypeId = ByteUtil.getOneByte(payload, position + 3);
-                            frameType = FrameType.valueOf(frameTypeId);
-                            flags = ByteUtil.getOneByte(payload, position + 4);
-                            streamId = ByteUtil.get31Bits(payload, position + 5);
-                            streamException = false;
-                            if (payload.remaining() - 9 >= payloadSize) {
-                                continueParsing = true;
-                                // Now go over frame header
-                                payload.position(payload.position() + 9);
-                                try {
-                                    validateFrame(null, frameType, streamId, flags, payloadSize);
-                                } catch (StreamException e) {
-                                    error = e;
-                                    streamException = true;
-                                } catch (Http2Exception e) {
-                                    error = e;
-                                    continueParsing = false;
+                        if (!upgradeHandler.isOverheadLimitExceeded()) {
+                            // See if there is a new 9 byte header and continue parsing if possible
+                            if (payload.remaining() >= 9) {
+                                int position = payload.position();
+                                payloadSize = ByteUtil.getThreeBytes(payload, position);
+                                frameTypeId = ByteUtil.getOneByte(payload, position + 3);
+                                frameType = FrameType.valueOf(frameTypeId);
+                                flags = ByteUtil.getOneByte(payload, position + 4);
+                                streamId = ByteUtil.get31Bits(payload, position + 5);
+                                streamException = false;
+                                if (payload.remaining() - 9 >= payloadSize) {
+                                    continueParsing = true;
+                                    // Now go over frame header
+                                    payload.position(payload.position() + 9);
+                                    try {
+                                        validateFrame(null, frameType, streamId, flags, payloadSize);
+                                    } catch (StreamException e) {
+                                        error = e;
+                                        streamException = true;
+                                    } catch (Http2Exception e) {
+                                        error = e;
+                                        continueParsing = false;
+                                    }
                                 }
                             }
                         }
                     } while (continueParsing);
                 } catch (RuntimeException | IOException | Http2Exception e) {
                     error = e;
-                }
-                if (payload.hasRemaining()) {
-                    socketWrapper.unRead(payload);
+                } finally {
+                    if (payload.hasRemaining()) {
+                        socketWrapper.unRead(payload);
+                    }
                 }
             }
             if (state == CompletionState.DONE) {

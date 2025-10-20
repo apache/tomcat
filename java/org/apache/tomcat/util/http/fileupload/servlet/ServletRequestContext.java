@@ -24,7 +24,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.apache.tomcat.util.http.fileupload.UploadContext;
 
-
 /**
  * <p>Provides access to the request information needed for a request made to
  * an HTTP servlet.</p>
@@ -33,14 +32,10 @@ import org.apache.tomcat.util.http.fileupload.UploadContext;
  */
 public class ServletRequestContext implements UploadContext {
 
-    // ----------------------------------------------------- Instance Variables
-
     /**
      * The request for which the context is being provided.
      */
     private final HttpServletRequest request;
-
-    // ----------------------------------------------------------- Constructors
 
     /**
      * Construct a context for this request.
@@ -51,7 +46,22 @@ public class ServletRequestContext implements UploadContext {
         this.request = request;
     }
 
-    // --------------------------------------------------------- Public Methods
+    /**
+     * Retrieve the content length of the request.
+     *
+     * @return The content length of the request.
+     * @since FileUpload 1.3
+     */
+    @Override
+    public long contentLength() {
+        long size;
+        try {
+            size = Long.parseLong(request.getHeader(FileUploadBase.CONTENT_LENGTH));
+        } catch (final NumberFormatException e) {
+            size = request.getContentLength();
+        }
+        return size;
+    }
 
     /**
      * Retrieve the character encoding for the request.
@@ -74,23 +84,6 @@ public class ServletRequestContext implements UploadContext {
     }
 
     /**
-     * Retrieve the content length of the request.
-     *
-     * @return The content length of the request.
-     * @since 1.3
-     */
-    @Override
-    public long contentLength() {
-        long size;
-        try {
-            size = Long.parseLong(request.getHeader(FileUploadBase.CONTENT_LENGTH));
-        } catch (final NumberFormatException e) {
-            size = request.getContentLength();
-        }
-        return size;
-    }
-
-    /**
      * Retrieve the input stream for the request.
      *
      * @return The input stream for the request.
@@ -110,8 +103,7 @@ public class ServletRequestContext implements UploadContext {
     @Override
     public String toString() {
         return String.format("ContentLength=%s, ContentType=%s",
-                Long.valueOf(this.contentLength()),
-                this.getContentType());
+                Long.valueOf(contentLength()), getContentType());
     }
 
 }

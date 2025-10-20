@@ -16,6 +16,7 @@
  */
 package org.apache.tomcat.util.net;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
@@ -23,17 +24,13 @@ import java.util.Collection;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 
-import org.apache.catalina.core.AprLifecycleListener;
-import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.apache.tomcat.websocket.server.WsContextListener;
 
 @RunWith(Parameterized.class)
@@ -47,7 +44,7 @@ public class TestSSLHostConfigIntegration extends TomcatBaseTest {
         parameterSets.add(new Object[] {
                 "OpenSSL", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.OpenSSLImplementation"});
         parameterSets.add(new Object[] {
-                "OpenSSL-Panama", Boolean.FALSE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
+                "OpenSSL-FFM", Boolean.TRUE, "org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation"});
 
         return parameterSets;
     }
@@ -56,7 +53,7 @@ public class TestSSLHostConfigIntegration extends TomcatBaseTest {
     public String connectorName;
 
     @Parameter(1)
-    public boolean needApr;
+    public boolean useOpenSSL;
 
     @Parameter(2)
     public String sslImplementationName;
@@ -72,14 +69,7 @@ public class TestSSLHostConfigIntegration extends TomcatBaseTest {
         ctxt.addApplicationListener(WsContextListener.class.getName());
 
         TesterSupport.initSsl(tomcat);
-        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName);
-
-        if (needApr) {
-            AprLifecycleListener listener = new AprLifecycleListener();
-            Assume.assumeTrue(AprLifecycleListener.isAprAvailable());
-            StandardServer server = (StandardServer) tomcat.getServer();
-            server.addLifecycleListener(listener);
-        }
+        TesterSupport.configureSSLImplementation(tomcat, sslImplementationName, useOpenSSL);
 
         tomcat.start();
 

@@ -34,14 +34,12 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
- * <p>A <strong>ModelMBean</strong> implementation for the
- * <code>org.apache.catalina.users.SparseUserDatabase</code> component.
- * The main difference is that the MBeans are created on demand (for example,
- * the findUser method would register the corresponding user and make it
- * available for management. All the MBeans created for users, groups and roles
- * are then discarded when save is invoked.</p>
- *
- * @author Craig R. McClanahan
+ * <p>
+ * A <strong>ModelMBean</strong> implementation for the <code>org.apache.catalina.users.SparseUserDatabase</code>
+ * component. The main difference is that the MBeans are created on demand (for example, the findUser method would
+ * register the corresponding user and make it available for management). All the MBeans created for users, groups and
+ * roles are then discarded when save is invoked.
+ * </p>
  */
 public class SparseUserDatabaseMBean extends BaseModelMBean {
 
@@ -137,8 +135,9 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
     /**
      * Create a new Group and return the corresponding MBean Name.
      *
-     * @param groupname Group name of the new group
+     * @param groupname   Group name of the new group
      * @param description Description of the new group
+     *
      * @return the new group object name
      */
     public String createGroup(String groupname, String description) {
@@ -156,8 +155,9 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
     /**
      * Create a new Role and return the corresponding MBean Name.
      *
-     * @param rolename Group name of the new group
+     * @param rolename    Group name of the new group
      * @param description Description of the new group
+     *
      * @return the new role object name
      */
     public String createRole(String rolename, String description) {
@@ -175,9 +175,10 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
     /**
      * Create a new User and return the corresponding MBean Name.
      *
-     * @param username User name of the new user
+     * @param username Username of the new user
      * @param password Password for the new user
      * @param fullName Full name for the new user
+     *
      * @return the new user object name
      */
     public String createUser(String username, String password, String fullName) {
@@ -193,10 +194,10 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Name for the specified group name (if any);
-     * otherwise return <code>null</code>.
+     * Return the MBean Name for the specified group name (if any); otherwise return <code>null</code>.
      *
      * @param groupname Group name to look up
+     *
      * @return the group object name
      */
     public String findGroup(String groupname) {
@@ -218,10 +219,10 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Name for the specified role name (if any);
-     * otherwise return <code>null</code>.
+     * Return the MBean Name for the specified role name (if any); otherwise return <code>null</code>.
      *
      * @param rolename Role name to look up
+     *
      * @return the role object name
      */
     public String findRole(String rolename) {
@@ -244,10 +245,10 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
 
 
     /**
-     * Return the MBean Name for the specified user name (if any);
-     * otherwise return <code>null</code>.
+     * Return the MBean Name for the specified username (if any); otherwise return <code>null</code>.
      *
-     * @param username User name to look up
+     * @param username Username to look up
+     *
      * @return the user object name
      */
     public String findUser(String username) {
@@ -311,7 +312,7 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
     /**
      * Remove an existing user and destroy the corresponding MBean.
      *
-     * @param username User name to remove
+     * @param username Username to remove
      */
     public void removeUser(String username) {
         UserDatabase database = (UserDatabase) this.resource;
@@ -335,28 +336,25 @@ public class SparseUserDatabaseMBean extends BaseModelMBean {
         try {
             UserDatabase database = (UserDatabase) this.resource;
             if (database.isSparse()) {
-                ObjectName query = null;
-                Set<ObjectName> results = null;
+                ObjectName query;
+                Set<ObjectName> results;
 
                 // Groups
-                query = new ObjectName(
-                        "Users:type=Group,database=" + database.getId() + ",*");
+                query = new ObjectName("Users:type=Group,database=" + database.getId() + ",*");
                 results = mserver.queryNames(query, null);
                 for (ObjectName result : results) {
                     mserver.unregisterMBean(result);
                 }
 
                 // Roles
-                query = new ObjectName(
-                        "Users:type=Role,database=" + database.getId() + ",*");
+                query = new ObjectName("Users:type=Role,database=" + database.getId() + ",*");
                 results = mserver.queryNames(query, null);
                 for (ObjectName result : results) {
                     mserver.unregisterMBean(result);
                 }
 
                 // Users
-                query = new ObjectName(
-                        "Users:type=User,database=" + database.getId() + ",*");
+                query = new ObjectName("Users:type=User,database=" + database.getId() + ",*");
                 results = mserver.queryNames(query, null);
                 for (ObjectName result : results) {
                     mserver.unregisterMBean(result);

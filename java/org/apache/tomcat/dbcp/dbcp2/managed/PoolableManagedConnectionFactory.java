@@ -58,6 +58,8 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
     }
 
     /**
+     * Gets the transaction registry.
+     *
      * @return The transaction registry.
      * @since 2.6.0
      */
@@ -103,7 +105,7 @@ public class PoolableManagedConnectionFactory extends PoolableConnectionFactory 
             ((PoolingConnection) conn).setCacheState(getCacheState());
         }
         final PoolableManagedConnection pmc = new PoolableManagedConnection(transactionRegistry, conn, getPool(),
-                getDisconnectionSqlCodes(), isFastFailValidation());
+                getDisconnectionSqlCodes(), getDisconnectionIgnoreSqlCodes(), isFastFailValidation());
         pmc.setCacheState(getCacheState());
         return new DefaultPooledObject<>(pmc);
     }

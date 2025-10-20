@@ -21,7 +21,6 @@ import java.util.Arrays;
 import java.util.logging.Level;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import org.apache.catalina.Globals;
@@ -36,9 +35,21 @@ public class TestSSLValve {
 
     public static class MockRequest extends Request {
 
-        public MockRequest() {
-            super(EasyMock.createMock(Connector.class));
-            setCoyoteRequest(new org.apache.coyote.Request());
+        private static MockRequest single_instance = null;
+
+        public MockRequest(Connector connector) {
+            super(connector, new org.apache.coyote.Request());
+        }
+
+        public static MockRequest getInstance()
+        {
+            if (single_instance == null) {
+                Connector connector = EasyMock.createNiceMock(Connector.class);
+                EasyMock.replay(connector);
+                single_instance = new MockRequest(connector);
+            }
+
+            return single_instance;
         }
 
         @Override
@@ -91,22 +102,30 @@ public class TestSSLValve {
             "yoTBqEpJloWksrypqp3iL4PAL5+KkB2zp66+MVAg8LcEDFJggBBJCtv4SCWV7ZOB",
             "WLu8gep+XCwSn0Wb6D3eFs4DoIiMvQ6g2rS/pk7o5eWj", "-----END CERTIFICATE-----" };
 
-    private SSLValve valve = new SSLValve();
+    private final SSLValve valve = new SSLValve();
 
-    private MockRequest mockRequest = new MockRequest();
-    private Valve mockNext = EasyMock.createMock(Valve.class);
+    private MockRequest mockRequest;
+    private final Valve mockNext = EasyMock.createMock(Valve.class);
 
-
-    @Before
     public void setUp() throws Exception {
+        setUp(null);
+    }
+
+    public void setUp(Connector connector) throws Exception {
         valve.setNext(mockNext);
+        if (connector == null) {
+            mockRequest = MockRequest.getInstance();
+        } else {
+            EasyMock.replay(connector);
+            mockRequest = new MockRequest(connector);
+        }
         mockNext.invoke(mockRequest, null);
         EasyMock.replay(mockNext);
     }
 
-
     @Test
-    public void testSslHeader() {
+    public void testSslHeader() throws Exception {
+        setUp();
         final String headerName = "myheader";
         final String headerValue = "BASE64_HEADER_VALUE";
         mockRequest.setHeader(headerName, headerValue);
@@ -116,7 +135,8 @@ public class TestSSLValve {
 
 
     @Test
-    public void testSslHeaderNull() {
+    public void testSslHeaderNull() throws Exception {
+        setUp();
         final String headerName = "myheader";
         mockRequest.setHeader(headerName, null);
 
@@ -125,7 +145,8 @@ public class TestSSLValve {
 
 
     @Test
-    public void testSslHeaderNullModHeader() {
+    public void testSslHeaderNullModHeader() throws Exception {
+        setUp();
         final String headerName = "myheader";
         final String nullModHeaderValue = "(null)";
         mockRequest.setHeader(headerName, nullModHeaderValue);
@@ -136,12 +157,14 @@ public class TestSSLValve {
 
     @Test
     public void testSslHeaderNullName() throws Exception {
+        setUp();
         Assert.assertNull(valve.mygetHeader(mockRequest, null));
     }
 
 
     @Test
     public void testSslHeaderMultiples() throws Exception {
+        setUp();
         final String headerName = "myheader";
         final String headerValue = "BASE64_HEADER_VALUE";
         mockRequest.addHeader(headerName, headerValue);
@@ -153,6 +176,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslClientCertHeaderSingleSpace() throws Exception {
+        setUp();
         String singleSpaced = certificateSingleLine(" ");
         mockRequest.setHeader(valve.getSslClientCertHeader(), singleSpaced);
 
@@ -164,6 +188,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslClientCertHeaderMultiSpace() throws Exception {
+        setUp();
         String singleSpaced = certificateSingleLine("    ");
         mockRequest.setHeader(valve.getSslClientCertHeader(), singleSpaced);
 
@@ -175,6 +200,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslClientCertHeaderTab() throws Exception {
+        setUp();
         String singleSpaced = certificateSingleLine("\t");
         mockRequest.setHeader(valve.getSslClientCertHeader(), singleSpaced);
 
@@ -186,6 +212,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslClientCertHeaderEscaped() throws Exception {
+        setUp();
         String cert = certificateEscaped();
         mockRequest.setHeader(valve.getSslClientEscapedCertHeader(), cert);
 
@@ -197,6 +224,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslClientCertNull() throws Exception {
+        setUp();
         TesterLogValidationFilter f = TesterLogValidationFilter.add(null, "", null,
                 "org.apache.catalina.valves.SSLValve");
 
@@ -210,6 +238,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslClientCertShorter() throws Exception {
+        setUp();
         mockRequest.setHeader(valve.getSslClientCertHeader(), "shorter than hell");
 
         TesterLogValidationFilter f = TesterLogValidationFilter.add(null, "", null,
@@ -225,6 +254,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslClientCertIgnoredBegin() throws Exception {
+        setUp();
         String[] linesBegin = Arrays.copyOf(CERTIFICATE_LINES, CERTIFICATE_LINES.length);
         linesBegin[0] = "3fisjcme3kdsakasdfsadkafsd3";
         String begin = certificateSingleLine(linesBegin, " ");
@@ -238,6 +268,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslClientCertBadFormat() throws Exception {
+        setUp();
         String[] linesDeleted = Arrays.copyOf(CERTIFICATE_LINES, CERTIFICATE_LINES.length / 2);
         String deleted = certificateSingleLine(linesDeleted, " ");
         mockRequest.setHeader(valve.getSslClientCertHeader(), deleted);
@@ -255,8 +286,10 @@ public class TestSSLValve {
 
     @Test
     public void testClientCertProviderNotFound() throws Exception {
-        EasyMock.expect(mockRequest.getConnector().getProperty("clientCertProvider")).andStubReturn("wontBeFound");
-        EasyMock.replay(mockRequest.getConnector());
+        Connector connector = EasyMock.createNiceMock(Connector.class);
+        EasyMock.expect(connector.getProperty("clientCertProvider")).andStubReturn("wontBeFound");
+        setUp(connector);
+
         mockRequest.setHeader(valve.getSslClientCertHeader(), certificateSingleLine(" "));
 
         TesterLogValidationFilter f = TesterLogValidationFilter.add(Level.SEVERE, null,
@@ -270,7 +303,20 @@ public class TestSSLValve {
 
 
     @Test
+    public void testSslSecureProtocolHeaderPresent() throws Exception {
+        setUp();
+        String protocol = "secured-with";
+        mockRequest.setHeader(valve.getSslSecureProtocolHeader(), protocol);
+
+        valve.invoke(mockRequest, null);
+
+        Assert.assertEquals(protocol, mockRequest.getAttribute(Globals.SECURE_PROTOCOL_ATTR));
+    }
+
+
+    @Test
     public void testSslCipherHeaderPresent() throws Exception {
+        setUp();
         String cipher = "ciphered-with";
         mockRequest.setHeader(valve.getSslCipherHeader(), cipher);
 
@@ -282,6 +328,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslSessionIdHeaderPresent() throws Exception {
+        setUp();
         String session = "ssl-session";
         mockRequest.setHeader(valve.getSslSessionIdHeader(), session);
 
@@ -293,6 +340,7 @@ public class TestSSLValve {
 
     @Test
     public void testSslCipherUserKeySizeHeaderPresent() throws Exception {
+        setUp();
         Integer keySize = Integer.valueOf(452);
         mockRequest.setHeader(valve.getSslCipherUserKeySizeHeader(), String.valueOf(keySize));
 
@@ -304,12 +352,14 @@ public class TestSSLValve {
 
     @Test(expected = NumberFormatException.class)
     public void testSslCipherUserKeySizeHeaderBadFormat() throws Exception {
+        setUp();
         mockRequest.setHeader(valve.getSslCipherUserKeySizeHeader(), "not-an-integer");
 
         try {
             valve.invoke(mockRequest, null);
         } catch (NumberFormatException e) {
             Assert.assertNull(mockRequest.getAttribute(Globals.KEY_SIZE_ATTR));
+            mockRequest.setHeader(valve.getSslCipherUserKeySizeHeader(), null);
             throw e;
         }
     }

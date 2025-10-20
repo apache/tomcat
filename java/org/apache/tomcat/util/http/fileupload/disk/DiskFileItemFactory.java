@@ -34,12 +34,12 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * <p>If not otherwise configured, the default configuration values are as
  * follows:</p>
  * <ul>
- *   <li>Size threshold is 10KB.</li>
+ *   <li>Size threshold is 10 KiB.</li>
  *   <li>Repository is the system default temp directory, as returned by
  *       {@code System.getProperty("java.io.tmpdir")}.</li>
  * </ul>
  * <p>
- * <b>NOTE</b>: Files are created in the system default temp directory with
+ * <strong>NOTE</strong>: Files are created in the system default temp directory with
  * predictable names. This means that a local attacker with write access to that
  * directory can perform a TOUTOC attack to replace any uploaded file with a
  * file of the attackers choice. The implications of this will depend on how the
@@ -51,21 +51,17 @@ import org.apache.tomcat.util.http.fileupload.FileItemFactory;
  * may be used.
  * </p>
  *
- * <p>Temporary files, which are created for file items, should be
- * deleted later on.</p>
+ * <p>Temporary files, which are created for file items, will be deleted when
+ * the associated request is recycled.</p>
  *
- * @since 1.1
+ * @since FileUpload 1.1
  */
 public class DiskFileItemFactory implements FileItemFactory {
-
-    // ----------------------------------------------------- Manifest constants
 
     /**
      * The default threshold above which uploads will be stored on disk.
      */
     public static final int DEFAULT_SIZE_THRESHOLD = 10240;
-
-    // ----------------------------------------------------- Instance Variables
 
     /**
      * The directory in which uploaded files will be stored, if stored on disk.
@@ -82,8 +78,6 @@ public class DiskFileItemFactory implements FileItemFactory {
      * parameter is provided by the sender.
      */
     private String defaultCharset = DiskFileItem.DEFAULT_CHARSET;
-
-    // ----------------------------------------------------------- Constructors
 
     /**
      * Constructs an unconfigured instance of this class. The resulting factory
@@ -108,60 +102,6 @@ public class DiskFileItemFactory implements FileItemFactory {
         this.repository = repository;
     }
 
-    // ------------------------------------------------------------- Properties
-
-    /**
-     * Returns the directory used to temporarily store files that are larger
-     * than the configured size threshold.
-     *
-     * @return The directory in which temporary files will be located.
-     *
-     * @see #setRepository(java.io.File)
-     *
-     */
-    public File getRepository() {
-        return repository;
-    }
-
-    /**
-     * Sets the directory used to temporarily store files that are larger
-     * than the configured size threshold.
-     *
-     * @param repository The directory in which temporary files will be located.
-     *
-     * @see #getRepository()
-     *
-     */
-    public void setRepository(final File repository) {
-        this.repository = repository;
-    }
-
-    /**
-     * Returns the size threshold beyond which files are written directly to
-     * disk. The default value is 10240 bytes.
-     *
-     * @return The size threshold, in bytes.
-     *
-     * @see #setSizeThreshold(int)
-     */
-    public int getSizeThreshold() {
-        return sizeThreshold;
-    }
-
-    /**
-     * Sets the size threshold beyond which files are written directly to disk.
-     *
-     * @param sizeThreshold The size threshold, in bytes.
-     *
-     * @see #getSizeThreshold()
-     *
-     */
-    public void setSizeThreshold(final int sizeThreshold) {
-        this.sizeThreshold = sizeThreshold;
-    }
-
-    // --------------------------------------------------------- Public Methods
-
     /**
      * Create a new {@link DiskFileItem}
      * instance from the supplied parameters and the local factory
@@ -178,7 +118,7 @@ public class DiskFileItemFactory implements FileItemFactory {
      */
     @Override
     public FileItem createItem(final String fieldName, final String contentType,
-                final boolean isFormField, final String fileName) {
+            final boolean isFormField, final String fileName) {
         final DiskFileItem result = new DiskFileItem(fieldName, contentType,
                 isFormField, fileName, sizeThreshold, repository);
         result.setDefaultCharset(defaultCharset);
@@ -186,7 +126,7 @@ public class DiskFileItemFactory implements FileItemFactory {
     }
 
     /**
-     * Returns the default charset for use when no explicit charset
+     * Gets the default charset for use when no explicit charset
      * parameter is provided by the sender.
      * @return the default charset
      */
@@ -195,11 +135,62 @@ public class DiskFileItemFactory implements FileItemFactory {
     }
 
     /**
+     * Gets the directory used to temporarily store files that are larger
+     * than the configured size threshold.
+     *
+     * @return The directory in which temporary files will be located.
+     *
+     * @see #setRepository(java.io.File)
+     *
+     */
+    public File getRepository() {
+        return repository;
+    }
+
+    /**
+     * Gets the size threshold beyond which files are written directly to
+     * disk. The default value is 10240 bytes.
+     *
+     * @return The size threshold, in bytes.
+     *
+     * @see #setSizeThreshold(int)
+     */
+    public int getSizeThreshold() {
+        return sizeThreshold;
+    }
+
+    /**
      * Sets the default charset for use when no explicit charset
      * parameter is provided by the sender.
-     * @param pCharset the default charset
+     *
+     * @param charset the default charset
      */
-    public void setDefaultCharset(final String pCharset) {
-        defaultCharset = pCharset;
+    public void setDefaultCharset(final String charset) {
+        this.defaultCharset = charset;
+    }
+
+    /**
+     * Sets the directory used to temporarily store files that are larger
+     * than the configured size threshold.
+     *
+     * @param repository The directory in which temporary files will be located.
+     *
+     * @see #getRepository()
+     *
+     */
+    public void setRepository(final File repository) {
+        this.repository = repository;
+    }
+
+    /**
+     * Sets the size threshold beyond which files are written directly to disk.
+     *
+     * @param sizeThreshold The size threshold, in bytes.
+     *
+     * @see #getSizeThreshold()
+     *
+     */
+    public void setSizeThreshold(final int sizeThreshold) {
+        this.sizeThreshold = sizeThreshold;
     }
 }

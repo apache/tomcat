@@ -33,9 +33,8 @@ public enum Protocol {
     }
 
     /**
-     * The name returned by OpenSSL in the protocol column when using
-     * <code>openssl ciphers -v</code>. This is currently only used by the unit
-     * tests hence it is package private.
+     * The name returned by OpenSSL in the protocol column when using <code>openssl ciphers -v</code>. This is currently
+     * only used by the unit tests hence it is package private.
      */
     String getOpenSSLName() {
         return openSSLName;

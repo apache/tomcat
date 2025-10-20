@@ -52,7 +52,7 @@ public class Http2OutputBuffer implements HttpOutputBuffer {
     @Override
     public int doWrite(ByteBuffer chunk) throws IOException {
         if (!coyoteResponse.isCommitted()) {
-            coyoteResponse.sendHeaders();
+            coyoteResponse.commit();
         }
         return next.doWrite(chunk);
     }

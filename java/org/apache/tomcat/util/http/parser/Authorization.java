@@ -32,8 +32,8 @@ public class Authorization {
     static {
         // Digest field types.
         // Note: These are more relaxed than RFC2617. This adheres to the
-        //       recommendation of RFC2616 that servers are tolerant of buggy
-        //       clients when they can be so without ambiguity.
+        // recommendation of RFC2616 that servers are tolerant of buggy
+        // clients when they can be so without ambiguity.
         fieldTypes.put("username", FieldType.QUOTED_STRING);
         fieldTypes.put("realm", FieldType.QUOTED_STRING);
         fieldTypes.put("nonce", FieldType.QUOTED_STRING);
@@ -58,21 +58,18 @@ public class Authorization {
 
 
     /**
-     * Parses an HTTP Authorization header for DIGEST authentication as per RFC
-     * 2617 section 3.2.2.
+     * Parses an HTTP Authorization header for DIGEST authentication as per RFC 2617 section 3.2.2.
      *
      * @param input The header value to parse
      *
-     * @return  A map of directives and values as {@link String}s or
-     *          <code>null</code> if a parsing error occurs. Although the
-     *          values returned are {@link String}s they will have been
-     *          validated to ensure that they conform to RFC 2617.
+     * @return A map of directives and values as {@link String}s or <code>null</code> if a parsing error occurs.
+     *             Although the values returned are {@link String}s they will have been validated to ensure that they
+     *             conform to RFC 2617.
      *
-     * @throws IllegalArgumentException If the header does not conform to RFC
-     *                                  2617
-     * @throws java.io.IOException If an error occurs while reading the input
+     * @throws IllegalArgumentException If the header does not conform to RFC 2617
+     * @throws IOException              If an error occurs while reading the input
      */
-    public static Map<String,String> parseAuthorizationDigest (StringReader input)
+    public static Map<String,String> parseAuthorizationDigest(StringReader input)
             throws IllegalArgumentException, IOException {
 
         Map<String,String> result = new HashMap<>();
@@ -85,30 +82,21 @@ public class Authorization {
         if (field == null) {
             return null;
         }
-        while (!field.equals("")) {
+        while (!field.isEmpty()) {
             if (HttpParser.skipConstant(input, "=") != SkipResult.FOUND) {
                 return null;
             }
-            String value = null;
             FieldType type = fieldTypes.get(field.toLowerCase(Locale.ENGLISH));
             if (type == null) {
                 // auth-param = token "=" ( token | quoted-string )
                 type = FieldType.TOKEN_OR_QUOTED_STRING;
             }
-            switch (type) {
-                case QUOTED_STRING:
-                    value = HttpParser.readQuotedString(input, false);
-                    break;
-                case TOKEN_OR_QUOTED_STRING:
-                    value = HttpParser.readTokenOrQuotedString(input, false);
-                    break;
-                case LHEX:
-                    value = HttpParser.readLhex(input);
-                    break;
-                case QUOTED_TOKEN:
-                    value = HttpParser.readQuotedToken(input);
-                    break;
-            }
+            String value = switch (type) {
+                case QUOTED_STRING -> HttpParser.readQuotedString(input, false);
+                case TOKEN_OR_QUOTED_STRING -> HttpParser.readTokenOrQuotedString(input, false);
+                case LHEX -> HttpParser.readLhex(input);
+                case QUOTED_TOKEN -> HttpParser.readQuotedToken(input);
+            };
 
             if (value == null) {
                 return null;
@@ -134,6 +122,6 @@ public class Authorization {
         QUOTED_STRING,
         TOKEN_OR_QUOTED_STRING,
         LHEX,
-        QUOTED_TOKEN;
+        QUOTED_TOKEN
     }
 }

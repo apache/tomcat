@@ -23,10 +23,6 @@ import jakarta.el.ELException;
 
 import org.apache.el.lang.EvaluationContext;
 
-
-/**
- * @author Jacob Hookom [jacob@hookom.net]
- */
 public final class AstFloatingPoint extends SimpleNode {
     public AstFloatingPoint(int id) {
         super(id);
@@ -54,14 +50,12 @@ public final class AstFloatingPoint extends SimpleNode {
     }
 
     @Override
-    public Object getValue(EvaluationContext ctx)
-            throws ELException {
+    public Object getValue(EvaluationContext ctx) throws ELException {
         return this.getFloatingPoint();
     }
 
     @Override
-    public Class<?> getType(EvaluationContext ctx)
-            throws ELException {
+    public Class<?> getType(EvaluationContext ctx) throws ELException {
         return this.getFloatingPoint().getClass();
     }
 }

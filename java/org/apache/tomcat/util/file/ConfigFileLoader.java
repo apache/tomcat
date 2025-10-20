@@ -20,32 +20,32 @@ package org.apache.tomcat.util.file;
 import java.io.InputStream;
 
 /**
- * This class is used to obtain {@link InputStream}s for configuration files
- * from a given location String. This allows greater flexibility than these
- * files having to be loaded directly from a file system.
+ * This class is used to obtain {@link InputStream}s for configuration files from a given location String. This allows
+ * greater flexibility than these files having to be loaded directly from a file system.
  */
 public class ConfigFileLoader {
 
     private static ConfigurationSource source;
 
     /**
-     * Get the configured configuration source. If none has been configured,
-     * a default source based on the calling directory will be used.
+     * Get the configured configuration source. If none has been configured, a default source based on the calling
+     * directory will be used.
+     *
      * @return the configuration source in use
      */
-    public static final ConfigurationSource getSource() {
-        if (ConfigFileLoader.source == null) {
+    public static ConfigurationSource getSource() {
+        if (source == null) {
             return ConfigurationSource.DEFAULT;
         }
         return source;
     }
 
     /**
-     * Set the configuration source used by Tomcat to locate various
-     * configuration resources.
+     * Set the configuration source used by Tomcat to locate various configuration resources.
+     *
      * @param source The source
      */
-    public static final void setSource(ConfigurationSource source) {
+    public static void setSource(ConfigurationSource source) {
         if (ConfigFileLoader.source == null) {
             ConfigFileLoader.source = source;
         }

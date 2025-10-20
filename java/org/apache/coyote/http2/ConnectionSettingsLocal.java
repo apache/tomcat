@@ -40,12 +40,15 @@ class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgumentExce
 
 
     @Override
-    final synchronized void set(Setting setting, Long value) {
+    final synchronized void set(Setting setting, Long value, boolean force) {
         checkSend();
         if (current.get(setting).longValue() == value.longValue()) {
             pending.remove(setting);
         } else {
             pending.put(setting, value);
+            if (force) {
+                current.put(setting, value);
+            }
         }
     }
 
@@ -61,7 +64,7 @@ class ConnectionSettingsLocal extends ConnectionSettingsBase<IllegalArgumentExce
         // Stream is zero
         // Payload
         int pos = 9;
-        for (Map.Entry<Setting, Long> setting : pending.entrySet()) {
+        for (Map.Entry<Setting,Long> setting : pending.entrySet()) {
             ByteUtil.setTwoBytes(result, pos, setting.getKey().getId());
             pos += 2;
             ByteUtil.setFourBytes(result, pos, setting.getValue().longValue());

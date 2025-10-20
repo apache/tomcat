@@ -19,19 +19,18 @@ package org.apache.tomcat.util.http.parser;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.tomcat.util.codec.binary.Base64;
 import org.apache.tomcat.util.res.StringManager;
 
 /**
  * Parsing of structured fields as per RFC 8941.
  * <p>
- * The parsing implementation is complete but not all elements are currently
- * exposed via getters. Additional getters will be added as required as the
- * use of structured fields expands.
+ * The parsing implementation is complete but not all elements are currently exposed via getters. Additional getters
+ * will be added as required as the use of structured fields expands.
  * <p>
  * The serialization of structured fields has not been implemented.
  */
@@ -52,7 +51,7 @@ public class StructuredField {
             if (i == '*' || i >= 'a' && i <= 'z') {
                 IS_KEY_FIRST[i] = true;
                 IS_KEY[i] = true;
-            } else if (i  >= '0' && i <= '9' || i == '_' || i == '-' || i == '.'){
+            } else if (i >= '0' && i <= '9' || i == '_' || i == '-' || i == '.') {
                 IS_KEY[i] = true;
             }
         }
@@ -202,7 +201,7 @@ public class StructuredField {
             item = parseSfBoolean(input);
         } else {
             throw new IllegalArgumentException(
-                    sm.getString("sf.bareitem.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                    sm.getString("sf.bareitem.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
         }
 
         return item;
@@ -210,10 +209,7 @@ public class StructuredField {
 
 
     static void parseSfParameters(Reader input, SfListMember listMember) throws IOException {
-        while (true) {
-            if (peek(input) != ';') {
-                break;
-            }
+        while (peek(input) == ';') {
             requireChar(input, ';');
             skipSP(input);
             String key = parseSfKey(input);
@@ -238,7 +234,7 @@ public class StructuredField {
         int c = input.read();
         if (!isKeyFirst(c)) {
             throw new IllegalArgumentException(
-                    sm.getString("sf.key.invalidFirstCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                    sm.getString("sf.key.invalidFirstCharacter", String.format("\\u%04X", Integer.valueOf(c))));
         }
 
         while (c != -1 && isKey(c)) {
@@ -268,7 +264,7 @@ public class StructuredField {
 
         if (!HttpParser.isNumeric(c)) {
             throw new IllegalArgumentException(
-                    sm.getString("sf.numeric.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                    sm.getString("sf.numeric.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
         }
         result.append((char) c);
         input.mark(1);
@@ -325,7 +321,7 @@ public class StructuredField {
                 c = input.read();
                 if (c != '\\' && c != '\"') {
                     throw new IllegalArgumentException(
-                            sm.getString("sf.string.invalidEscape", String.format("\\u%40X", Integer.valueOf(c))));
+                            sm.getString("sf.string.invalidEscape", String.format("\\u%04X", Integer.valueOf(c))));
                 }
             } else {
                 if (c == '\"') {
@@ -334,7 +330,7 @@ public class StructuredField {
                 // This test also covers unexpected EOF
                 if (c < 32 || c > 126) {
                     throw new IllegalArgumentException(
-                            sm.getString("sf.string.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                            sm.getString("sf.string.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
                 }
             }
             result.append((char) c);
@@ -376,11 +372,11 @@ public class StructuredField {
                 base64.append((char) c);
             } else {
                 throw new IllegalArgumentException(
-                        sm.getString("sf.base64.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                        sm.getString("sf.base64.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
             }
         }
 
-        return new SfByteSequence(Base64.decodeBase64(base64.toString()));
+        return new SfByteSequence(Base64.getDecoder().decode(base64.toString()));
     }
 
 
@@ -394,7 +390,7 @@ public class StructuredField {
             return new SfBoolean(false);
         } else {
             throw new IllegalArgumentException(
-                    sm.getString("sf.boolean.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                    sm.getString("sf.boolean.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
         }
     }
 
@@ -429,7 +425,7 @@ public class StructuredField {
             }
         }
         throw new IllegalArgumentException(
-                sm.getString("sf.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                sm.getString("sf.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
     }
 
 
@@ -438,7 +434,7 @@ public class StructuredField {
         int c = input.read();
         if (c == required) {
             throw new IllegalArgumentException(
-                    sm.getString("sf.invalidCharacter", String.format("\\u%40X", Integer.valueOf(c))));
+                    sm.getString("sf.invalidCharacter", String.format("\\u%04X", Integer.valueOf(c))));
         }
         input.reset();
     }
@@ -503,7 +499,7 @@ public class StructuredField {
 
 
     static class SfDictionary {
-        private Map<String,SfListMember> dictionary = new LinkedHashMap<>();
+        private final Map<String,SfListMember> dictionary = new LinkedHashMap<>();
 
         void addDictionaryMember(String key, SfListMember value) {
             dictionary.put(key, value);
@@ -515,7 +511,7 @@ public class StructuredField {
     }
 
     static class SfList {
-        private List<SfListMember> listMembers = new ArrayList<>();
+        private final List<SfListMember> listMembers = new ArrayList<>();
 
         void addListMember(SfListMember listMember) {
             listMembers.add(listMember);

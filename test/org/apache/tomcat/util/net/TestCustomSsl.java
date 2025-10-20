@@ -62,6 +62,8 @@ public class TestCustomSsl extends TomcatBaseTest {
         File keystoreFile = new File(TesterSupport.LOCALHOST_RSA_JKS);
         certificate.setCertificateKeystoreFile(keystoreFile.getAbsolutePath());
 
+        certificate.setCertificateKeyPassword(TesterSupport.JKS_PASS);
+
         connector.setSecure(true);
         Assert.assertTrue(connector.setProperty("SSLEnabled", "true"));
 
@@ -72,7 +74,7 @@ public class TestCustomSsl extends TomcatBaseTest {
 
         tomcat.start();
         ByteChunk res = getUrl("https://localhost:" + getPort() +
-            "/examples/servlets/servlet/HelloWorldExample");
+                "/examples/servlets/servlet/HelloWorldExample");
         Assert.assertTrue(res.toString().indexOf("<a href=\"../helloworld.html\">") > 0);
     }
 }

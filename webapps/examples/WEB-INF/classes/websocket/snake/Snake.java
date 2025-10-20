@@ -67,8 +67,7 @@ public class Snake {
         try {
             session.getBasicRemote().sendText(msg);
         } catch (IOException ioe) {
-            CloseReason cr =
-                    new CloseReason(CloseCodes.CLOSED_ABNORMALLY, ioe.getMessage());
+            CloseReason cr = new CloseReason(CloseCodes.CLOSED_ABNORMALLY, ioe.getMessage());
             try {
                 session.close(cr);
             } catch (IOException ioe2) {

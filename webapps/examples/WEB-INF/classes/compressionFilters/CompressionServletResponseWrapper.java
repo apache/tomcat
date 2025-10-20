@@ -30,9 +30,6 @@ import jakarta.servlet.http.HttpServletResponseWrapper;
 /**
  * Implementation of <b>HttpServletResponseWrapper</b> that works with
  * the CompressionServletResponseStream implementation..
- *
- * @author Amy Roh
- * @author Dmitri Valdin
  */
 public class CompressionServletResponseWrapper
         extends HttpServletResponseWrapper {
@@ -82,7 +79,7 @@ public class CompressionServletResponseWrapper
     /**
      * The compression buffer size
      */
-    protected int compressionBuffer = 8192;  // 8KB default
+    protected int compressionBuffer = 8192;  // 8 KiB default
 
     /**
      * The mime types to compress
@@ -188,7 +185,7 @@ public class CompressionServletResponseWrapper
                     stream.close();
                 }
             }
-        } catch (IOException e) {
+        } catch (IOException ignore) {
             // Ignore
         }
     }

@@ -19,16 +19,17 @@ package jakarta.servlet.http;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.Serial;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import jakarta.servlet.AsyncEvent;
 import jakarta.servlet.AsyncListener;
@@ -43,7 +44,7 @@ import jakarta.servlet.WriteListener;
 
 
 /**
- * Provides an abstract class to be subclassed to create an HTTP servlet suitable for a Web site. A subclass of
+ * Provides an abstract class to be subclassed to create an HTTP servlet suitable for a website. A subclass of
  * <code>HttpServlet</code> must override at least one method, usually one of these:
  * <ul>
  * <li><code>doGet</code>, if the servlet supports HTTP GET requests
@@ -68,6 +69,7 @@ import jakarta.servlet.WriteListener;
  */
 public abstract class HttpServlet extends GenericServlet {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private static final String METHOD_DELETE = "DELETE";
@@ -85,7 +87,8 @@ public abstract class HttpServlet extends GenericServlet {
     private static final String LSTRING_FILE = "jakarta.servlet.http.LocalStrings";
     private static final ResourceBundle lStrings = ResourceBundle.getBundle(LSTRING_FILE);
 
-    private static final Set<String> SENSITIVE_HTTP_HEADERS = new HashSet<>();
+    private static final List<String> SENSITIVE_HTTP_HEADERS =
+            Arrays.asList("authorization", "cookie", "x-forwarded", "forwarded", "proxy-authorization");
 
     /**
      * @deprecated May be removed in a future release
@@ -106,11 +109,6 @@ public abstract class HttpServlet extends GenericServlet {
      * Cached value read from {@link HttpServlet#LEGACY_DO_HEAD} system property.
      */
     private volatile boolean cachedUseLegacyDoHead;
-
-    static {
-        SENSITIVE_HTTP_HEADERS.add("cookie");
-        SENSITIVE_HTTP_HEADERS.add("authorization");
-    }
 
 
     /**
@@ -134,9 +132,9 @@ public abstract class HttpServlet extends GenericServlet {
      * Overriding this method to support a GET request also automatically supports an HTTP HEAD request. A HEAD request
      * is a GET request that returns no body in the response, only the request header fields.
      * <p>
-     * When overriding this method, read the request data, write the response headers, get the response's Writer
-     * or output stream object, and finally, write the response data. It's best to include content type and encoding.
-     * When using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
+     * When overriding this method, read the request data, write the response headers, get the response's Writer or
+     * output stream object, and finally, write the response data. It's best to include content type and encoding. When
+     * using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
      * <code>PrintWriter</code> object.
      * <p>
      * The servlet container must write the headers before committing the response, because in HTTP the headers must be
@@ -230,9 +228,9 @@ public abstract class HttpServlet extends GenericServlet {
      * Called by the server (via the <code>service</code> method) to allow a servlet to handle a PATCH request. The HTTP
      * PATCH method allows the client to partially modify an existing resource.
      * <p>
-     * When overriding this method, read the request data and write the response headers, get the response's Writer
-     * or output stream object, and finally, write the response data. It's best to include content type and encoding.
-     * When using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
+     * When overriding this method, read the request data and write the response headers, get the response's Writer or
+     * output stream object, and finally, write the response data. It's best to include content type and encoding. When
+     * using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
      * <code>PrintWriter</code> object.
      * <p>
      * The servlet container must write the headers before committing the response, because in HTTP the headers must be
@@ -246,10 +244,10 @@ public abstract class HttpServlet extends GenericServlet {
      * When using HTTP 1.1 chunked encoding (which means that the response has a Transfer-Encoding header), do not set
      * the Content-Length header.
      * <p>
-     * This method does not need to be either safe or idempotent. Operations requested through POST can have side
-     * effects for which the user can be held accountable, for example, updating stored data or buying items online.
+     * This method is neither safe nor idempotent. Operations requested through PATCH have side effects for which the
+     * user can be held accountable.
      * <p>
-     * If the HTTP POST request is incorrectly formatted, <code>doPost</code> returns an HTTP "Bad Request" message.
+     * If the HTTP PATCH request is incorrectly formatted, <code>doPost</code> returns an HTTP "Bad Request" message.
      *
      * @param req  an {@link HttpServletRequest} object that contains the request the client has made of the servlet
      * @param resp an {@link HttpServletResponse} object that contains the response the servlet sends to the client
@@ -259,6 +257,8 @@ public abstract class HttpServlet extends GenericServlet {
      *
      * @see jakarta.servlet.ServletOutputStream
      * @see jakarta.servlet.ServletResponse#setContentType
+     *
+     * @since Servlet 6.1
      */
     protected void doPatch(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String msg = lStrings.getString("http.method_patch_not_supported");
@@ -271,9 +271,9 @@ public abstract class HttpServlet extends GenericServlet {
      * POST method allows the client to send data of unlimited length to the Web server a single time and is useful when
      * posting information such as credit card numbers.
      * <p>
-     * When overriding this method, read the request data, write the response headers, get the response's Writer
-     * or output stream object, and finally, write the response data. It's best to include content type and encoding.
-     * When using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
+     * When overriding this method, read the request data, write the response headers, get the response's Writer or
+     * output stream object, and finally, write the response data. It's best to include content type and encoding. When
+     * using a <code>PrintWriter</code> object to return the response, set the content type before accessing the
      * <code>PrintWriter</code> object.
      * <p>
      * The servlet container must write the headers before committing the response, because in HTTP the headers must be
@@ -364,7 +364,7 @@ public abstract class HttpServlet extends GenericServlet {
         String protocol = req.getProtocol();
         // Note: Tomcat reports "" for HTTP/0.9 although some implementations
         // may report HTTP/0.9
-        if (protocol.length() == 0 || protocol.endsWith("0.9") || protocol.endsWith("1.0")) {
+        if (protocol.isEmpty() || protocol.endsWith("0.9") || protocol.endsWith("1.0")) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
         } else {
             resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, msg);
@@ -467,7 +467,7 @@ public abstract class HttpServlet extends GenericServlet {
 
     private static Method[] getAllDeclaredMethods(Class<?> c) {
 
-        if (c.equals(jakarta.servlet.http.HttpServlet.class)) {
+        if (c.equals(HttpServlet.class)) {
             return null;
         }
 
@@ -507,7 +507,7 @@ public abstract class HttpServlet extends GenericServlet {
 
         // Tomcat specific hack to see if TRACE is allowed
         if (TomcatHack.getAllowTrace(req)) {
-            if (allow.length() == 0) {
+            if (allow.isEmpty()) {
                 allow = METHOD_TRACE;
             } else {
                 allow = allow + ", " + METHOD_TRACE;
@@ -534,15 +534,15 @@ public abstract class HttpServlet extends GenericServlet {
         int responseLength;
 
         String CRLF = "\r\n";
-        StringBuilder buffer = new StringBuilder("TRACE ").append(req.getRequestURI()).append(' ')
-                .append(req.getProtocol());
+        StringBuilder buffer =
+                new StringBuilder("TRACE ").append(req.getRequestURI()).append(' ').append(req.getProtocol());
 
         Enumeration<String> reqHeaderNames = req.getHeaderNames();
 
         while (reqHeaderNames.hasMoreElements()) {
             String headerName = reqHeaderNames.nextElement();
             // RFC 7231, 4.3.8 - skip 'sensitive' headers
-            if (!SENSITIVE_HTTP_HEADERS.contains(headerName.toLowerCase(Locale.ENGLISH))) {
+            if (!isSensitiveHeader(headerName)) {
                 Enumeration<String> headerValues = req.getHeaders(headerName);
                 while (headerValues.hasMoreElements()) {
                     String headerValue = headerValues.nextElement();
@@ -564,6 +564,39 @@ public abstract class HttpServlet extends GenericServlet {
 
 
     /**
+     * Is the provided HTTP request header considered sensitive and therefore should be excluded from the response to a
+     * {@code TRACE} request?
+     * <p>
+     * By default, the headers that start with any of the following are considered sensitive:
+     * <ul>
+     * <li>authorization</li>
+     * <li>cookie</li>
+     * <li>x-forwarded</li>
+     * <li>forwarded</li>
+     * <li>proxy-authorization</li>
+     * </ul>
+     * <p>
+     * Note that HTTP header names are case-insensitive.
+     *
+     * @param headerName the name of the HTTP request header to test
+     *
+     * @return {@code true} if the HTTP request header is considered sensitive and should be excluded from the response
+     *             to a {@code TRACE} request, otherwise {@code false}
+     *
+     * @since Servlet 6.1
+     */
+    protected boolean isSensitiveHeader(String headerName) {
+        String lcHeaderName = headerName.toLowerCase(Locale.ENGLISH);
+        for (String sensitiveHeaderName : SENSITIVE_HTTP_HEADERS) {
+            if (lcHeaderName.startsWith(sensitiveHeaderName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    /**
      * Receives standard HTTP requests from the public <code>service</code> method and dispatches them to the
      * <code>do</code><i>Method</i> methods defined in this class. This method is an HTTP-specific version of the
      * {@link jakarta.servlet.Servlet#service} method. There's no need to override this method.
@@ -580,66 +613,58 @@ public abstract class HttpServlet extends GenericServlet {
 
         String method = req.getMethod();
 
-        if (method.equals(METHOD_GET)) {
-            long lastModified = getLastModified(req);
-            if (lastModified == -1) {
-                // servlet doesn't support if-modified-since, no reason
-                // to go through further expensive logic
-                doGet(req, resp);
-            } else {
-                long ifModifiedSince;
-                try {
-                    ifModifiedSince = req.getDateHeader(HEADER_IFMODSINCE);
-                } catch (IllegalArgumentException iae) {
-                    // Invalid date header - proceed as if none was set
-                    ifModifiedSince = -1;
-                }
-                if (ifModifiedSince < (lastModified / 1000 * 1000)) {
-                    // If the servlet mod time is later, call doGet()
-                    // Round down to the nearest second for a proper compare
-                    // A ifModifiedSince of -1 will always be less
-                    maybeSetLastModified(resp, lastModified);
+        switch (method) {
+            case METHOD_GET -> {
+                long lastModified = getLastModified(req);
+                if (lastModified == -1) {
+                    // servlet doesn't support if-modified-since, no reason
+                    // to go through further expensive logic
                     doGet(req, resp);
                 } else {
-                    resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                    long ifModifiedSince;
+                    try {
+                        ifModifiedSince = req.getDateHeader(HEADER_IFMODSINCE);
+                    } catch (IllegalArgumentException iae) {
+                        // Invalid date header - proceed as if none was set
+                        ifModifiedSince = -1;
+                    }
+                    if (ifModifiedSince < (lastModified / 1000 * 1000)) {
+                        // If the servlet mod time is later, call doGet()
+                        // Round down to the nearest second for a proper compare
+                        // A ifModifiedSince of -1 will always be less
+                        maybeSetLastModified(resp, lastModified);
+                        doGet(req, resp);
+                    } else {
+                        resp.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
+                    }
                 }
+
             }
+            case METHOD_HEAD -> {
+                long lastModified = getLastModified(req);
+                maybeSetLastModified(resp, lastModified);
+                doHead(req, resp);
 
-        } else if (method.equals(METHOD_HEAD)) {
-            long lastModified = getLastModified(req);
-            maybeSetLastModified(resp, lastModified);
-            doHead(req, resp);
+            }
+            case METHOD_POST -> doPost(req, resp);
+            case METHOD_PUT -> doPut(req, resp);
+            case METHOD_DELETE -> doDelete(req, resp);
+            case METHOD_OPTIONS -> doOptions(req, resp);
+            case METHOD_TRACE -> doTrace(req, resp);
+            case METHOD_PATCH -> doPatch(req, resp);
+            default -> {
+                //
+                // Note that this means NO servlet supports whatever
+                // method was requested, anywhere on this server.
+                //
 
-        } else if (method.equals(METHOD_POST)) {
-            doPost(req, resp);
+                String errMsg = lStrings.getString("http.method_not_implemented");
+                Object[] errArgs = new Object[1];
+                errArgs[0] = method;
+                errMsg = MessageFormat.format(errMsg, errArgs);
 
-        } else if (method.equals(METHOD_PUT)) {
-            doPut(req, resp);
-
-        } else if (method.equals(METHOD_DELETE)) {
-            doDelete(req, resp);
-
-        } else if (method.equals(METHOD_OPTIONS)) {
-            doOptions(req, resp);
-
-        } else if (method.equals(METHOD_TRACE)) {
-            doTrace(req, resp);
-
-        } else if (method.equals(METHOD_PATCH)) {
-            doPatch(req, resp);
-
-        } else {
-            //
-            // Note that this means NO servlet supports whatever
-            // method was requested, anywhere on this server.
-            //
-
-            String errMsg = lStrings.getString("http.method_not_implemented");
-            Object[] errArgs = new Object[1];
-            errArgs[0] = method;
-            errMsg = MessageFormat.format(errMsg, errArgs);
-
-            resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, errMsg);
+                resp.sendError(HttpServletResponse.SC_NOT_IMPLEMENTED, errMsg);
+            }
         }
     }
 
@@ -710,9 +735,8 @@ public abstract class HttpServlet extends GenericServlet {
                 if (REQUEST_FACADE_CLAZZ.isAssignableFrom(req.getClass())) {
                     try {
                         return ((Boolean) GET_ALLOW_TRACE.invoke(req, (Object[]) null)).booleanValue();
-                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ignore) {
                         // Should never happen given the checks in place.
-                        // Ignore
                     }
                 }
             }
@@ -847,7 +871,7 @@ public abstract class HttpServlet extends GenericServlet {
         }
 
         @Override
-        public void write(byte buf[], int offset, int len) throws IOException {
+        public void write(byte[] buf, int offset, int len) throws IOException {
             if (buf == null) {
                 throw new NullPointerException(lStrings.getString("err.io.nullArray"));
             }
@@ -919,11 +943,11 @@ public abstract class HttpServlet extends GenericServlet {
             Writer osw = null;
             try {
                 osw = new OutputStreamWriter(out, encoding);
-            } catch (UnsupportedEncodingException e) {
-                // Impossible.
-                // The same values were used in the constructor. If this method
-                // gets called then the constructor must have succeeded so the
-                // above call must also succeed.
+            } catch (UnsupportedEncodingException ignore) {
+                /*
+                 * Impossible. The same values were used in the constructor. If this method gets called then the
+                 * constructor must have succeeded so the above call must also succeed.
+                 */
             }
             pw = new PrintWriter(osw);
         }
@@ -1068,14 +1092,7 @@ public abstract class HttpServlet extends GenericServlet {
     /*
      * Calls NoBodyResponse.setContentLength() once the async request is complete.
      */
-    private static class NoBodyAsyncContextListener implements AsyncListener {
-
-        private final NoBodyResponse noBodyResponse;
-
-        NoBodyAsyncContextListener(NoBodyResponse noBodyResponse) {
-            this.noBodyResponse = noBodyResponse;
-        }
-
+    private record NoBodyAsyncContextListener(NoBodyResponse noBodyResponse) implements AsyncListener {
         @Override
         public void onComplete(AsyncEvent event) throws IOException {
             noBodyResponse.setContentLength();

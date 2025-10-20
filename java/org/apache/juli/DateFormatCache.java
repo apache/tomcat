@@ -35,11 +35,11 @@ import java.util.TimeZone;
  * implemented based on a cyclic buffer. New entries shift the range.
  * </p>
  * <p>
- * The cache is not threadsafe. It can be used without synchronization via thread local instances, or with
+ * The cache is not thread safe. It can be used without synchronization via thread local instances, or with
  * synchronization as a global cache.
  * </p>
  * <p>
- * The cache can be created with a parent cache to build a cache hierarchy. Access to the parent cache is threadsafe.
+ * The cache can be created with a parent cache to build a cache hierarchy. Access to the parent cache is thread safe.
  * </p>
  */
 public class DateFormatCache {
@@ -114,10 +114,10 @@ public class DateFormatCache {
         /* Helper object to be able to call SimpleDateFormat.format(). */
         private final Date currentDate = new Date();
 
-        private String cache[];
-        private SimpleDateFormat formatter;
+        private final String[] cache;
+        private final SimpleDateFormat formatter;
 
-        private Cache parent = null;
+        private final Cache parent;
 
         private Cache(Cache parent) {
             cache = new String[cacheSize];
@@ -166,7 +166,7 @@ public class DateFormatCache {
                 first = seconds - (cacheSize - 1);
                 last = seconds;
                 offset = (index + 1) % cacheSize;
-            } else if (seconds < first) {
+            } else {
                 for (int i = 1; i < first - seconds; i++) {
                     cache[(index + i) % cacheSize] = null;
                 }

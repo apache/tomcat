@@ -48,8 +48,7 @@ public class TesterUtil {
         }
 
         @Override
-        public <T> T getEndpointInstance(Class<T> clazz)
-                throws InstantiationException {
+        public <T> T getEndpointInstance(Class<T> clazz) throws InstantiationException {
             @SuppressWarnings("unchecked")
             T result = (T) instance;
             return result;

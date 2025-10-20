@@ -16,8 +16,11 @@
  */
 package jakarta.transaction;
 
-public class HeuristicRollbackException extends java.lang.Exception {
+import java.io.Serial;
 
+public class HeuristicRollbackException extends Exception {
+
+    @Serial
     private static final long serialVersionUID = -3483618944556408897L;
 
     public HeuristicRollbackException() {

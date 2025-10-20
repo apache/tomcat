@@ -41,11 +41,9 @@ import org.apache.tools.ant.types.FileSet;
 /**
  * Ant task to assist with repeatable builds.
  * <p>
- * While originally written to address an issue with Javadoc output, this task
- * takes a generic approach that could be used with any archive. The task takes
- * a set of zip (or jar, war etc) files as its input and sets the last modified
- * time of every file in the archive to be the same as the last modified time
- * of the archive.
+ * While originally written to address an issue with Javadoc output, this task takes a generic approach that could be
+ * used with any archive. The task takes a set of zip (or jar, war etc) files as its input and sets the last modified
+ * time of every file in the archive to be the same as the last modified time of the archive.
  */
 public class RepeatableArchive extends Task {
 

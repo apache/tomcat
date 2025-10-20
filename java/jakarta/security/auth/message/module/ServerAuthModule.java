@@ -1,4 +1,4 @@
-/**
+/*
  *  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -26,8 +26,8 @@ import jakarta.security.auth.message.ServerAuth;
 
 public interface ServerAuthModule extends ServerAuth {
 
-    void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy,
-            CallbackHandler handler, Map<String,Object> options) throws AuthException;
+    void initialize(MessagePolicy requestPolicy, MessagePolicy responsePolicy, CallbackHandler handler,
+            Map<String,Object> options) throws AuthException;
 
     Class<?>[] getSupportedMessageTypes();
 }

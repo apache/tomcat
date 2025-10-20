@@ -35,15 +35,15 @@
  *       &lt;name&gt;factory&lt;/name&gt;
  *       &lt;value&gt;org.apache.tomcat.dbcp.dbcp2.cpdsadapter.DriverAdapterCPDS&lt;/value&gt;
  *     &lt;/parameter&gt;
- *         &lt;parameter&gt;&lt;name&gt;user&lt;/name&gt;&lt;value&gt;root&lt;/value&gt;&lt;/parameter&gt;
- *         &lt;parameter&gt;&lt;name&gt;password&lt;/name&gt;&lt;value&gt;&lt;/value&gt;&lt;/parameter&gt;
- *         &lt;parameter&gt;
- *             &lt;name&gt;driver&lt;/name&gt;
- *             &lt;value&gt;org.gjt.mm.mysql.Driver&lt;/value&gt;&lt;/parameter&gt;
- *         &lt;parameter&gt;
- *              &lt;name&gt;url&lt;/name&gt;
- *              &lt;value&gt;jdbc:mysql://localhost:3306/bookstore&lt;/value&gt;
- *         &lt;/parameter&gt;
+ *     &lt;parameter&gt;&lt;name&gt;user&lt;/name&gt;&lt;value&gt;root&lt;/value&gt;&lt;/parameter&gt;
+ *     &lt;parameter&gt;&lt;name&gt;password&lt;/name&gt;&lt;value&gt;&lt;/value&gt;&lt;/parameter&gt;
+ *     &lt;parameter&gt;
+ *       &lt;name&gt;driver&lt;/name&gt;
+ *       &lt;value&gt;org.gjt.mm.mysql.Driver&lt;/value&gt;&lt;/parameter&gt;
+ *     &lt;parameter&gt;
+ *       &lt;name&gt;url&lt;/name&gt;
+ *       &lt;value&gt;jdbc:mysql://localhost:3306/bookstore&lt;/value&gt;
+ *     &lt;/parameter&gt;
  *   &lt;/ResourceParams&gt;
  * </pre>
  *
