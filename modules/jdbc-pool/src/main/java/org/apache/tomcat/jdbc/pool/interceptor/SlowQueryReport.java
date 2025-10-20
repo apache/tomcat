@@ -220,7 +220,7 @@ public class SlowQueryReport extends AbstractQueryReport  {
         public final QueryStats queryStats;
         public final long lastInvocation;
 
-        public MiniQueryStats(QueryStats queryStats) {
+        MiniQueryStats(QueryStats queryStats) {
             this.queryStats = queryStats;
             this.lastInvocation = queryStats.lastInvocation;
         }
