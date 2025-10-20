@@ -38,6 +38,7 @@ import org.apache.tomcat.jdbc.pool.PooledConnection;
 
 public class Connection implements java.sql.Connection {
     Properties info;
+    private boolean closed = false;
 
     public Connection(Properties info) {
         this.info = info;
@@ -57,6 +58,7 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public void close() throws SQLException {
+        closed = true;
         Driver.disconnectCount.incrementAndGet();
     }
 
@@ -156,7 +158,7 @@ public class Connection implements java.sql.Connection {
 
     @Override
     public boolean isClosed() throws SQLException {
-        return false;
+        return closed;
     }
 
     @Override

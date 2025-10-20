@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 
 import javax.sql.PooledConnection;
 
+import org.apache.tomcat.jdbc.pool.ConnectionPool;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -139,6 +140,27 @@ public class TestValidation extends DefaultTestCase {
         datasource.getPoolProperties().setValidationQuery("SELECT 1");
         PooledConnection cxn = getPooledConnection();
         Assert.assertFalse("No transaction must be running after connection is obtained", getMock(cxn).isRunningTransaction());
+    }
+
+    @Test
+    public void returnClosedConnection() throws SQLException {
+        ConnectionPool pool = datasource.createPool();
+        pool.resetStats();
+        Assert.assertFalse(datasource.getPoolProperties().isTestOnBorrow());
+        Assert.assertFalse(datasource.getPoolProperties().isTestOnReturn());
+        Assert.assertFalse(datasource.getPoolProperties().isTestWhileIdle());
+        try (Connection connection = datasource.getConnection()) {
+            Assert.assertEquals("size", 1, pool.getSize());
+            Connection realConnection = ((PooledConnection) connection).getConnection();
+            Assert.assertNotSame(connection, realConnection);
+            realConnection.close();
+            Assert.assertTrue(realConnection.isClosed());
+            Assert.assertFalse(connection.isClosed());
+        }
+        Assert.assertEquals("borrowed", 1, pool.getBorrowedCount());
+        Assert.assertEquals("returned", 1, pool.getReturnedCount());
+        Assert.assertEquals("released", 1, pool.getReleasedCount());
+        Assert.assertEquals("size", 0, pool.getSize());
     }
 
     @Test
