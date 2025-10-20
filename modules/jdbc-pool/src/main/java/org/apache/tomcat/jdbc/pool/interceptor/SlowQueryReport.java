@@ -258,10 +258,18 @@ public class SlowQueryReport extends AbstractQueryReport  {
         for(QueryStats stats : queries.values()) {
             list.add(new MiniQueryStats(stats));
         }
+        int queryCount = list.size();
 
         Collections.sort(list, miniQueryStatsComparator);
+
         int removeIndex = 0;
-        while (queries.size() > maxQueries) {
+        // Remove old queries until we have fewer than maxQueries or
+        // run out of queries to remove. If there is high enough turnover
+        // in the queries map, this one-time process may not remove enough
+        // old queries. We will rely on this process running multiple
+        // times to eventually reduce the query count back down to less
+        // than the maxQueries count.
+        while (queries.size() > maxQueries && removeIndex < queryCount) {
             MiniQueryStats mqs = list.get(removeIndex);
             // Check to see if the lastInvocation has been updated since we
             // took our snapshot. If the timestamps disagree, it means
@@ -270,7 +278,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
             if(mqs.lastInvocation == mqs.queryStats.lastInvocation) {
                 String sql = mqs.queryStats.query;
                 queries.remove(sql);
-                if (log.isDebugEnabled()) log.debug("Removing slow query, capacity reached:"+sql);
+                if (log.isDebugEnabled()) {
+                    log.debug("Removing slow query, capacity reached:"+sql);
+                }
             }
             removeIndex++;
         }
