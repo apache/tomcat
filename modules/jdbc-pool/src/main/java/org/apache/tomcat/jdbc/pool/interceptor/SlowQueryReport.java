@@ -284,6 +284,9 @@ public class SlowQueryReport extends AbstractQueryReport  {
             }
             removeIndex++;
         }
+        if (queries.size() > maxQueries) {
+            log.warn("removeOldest: unable to remove enough old queries; will try again next time");
+        }
     }
 
 
