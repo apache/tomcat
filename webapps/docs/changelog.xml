@@ -144,7 +144,7 @@
       </fix>
       <update>
         Deprecate the <code>RemoteAddrFilter</code> and
-        <code>RemoteAddValve</code> in favour of the
+        <code>RemoteAddrValve</code> in favour of the
         <code>RemoteCIDRFilter</code> and <code>RemoteCIDRValve</code>. (markt)
       </update>
       <fix>
