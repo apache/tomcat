@@ -121,6 +121,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>69862</bug>: Avoid NPE unwrapping Servlet exception which would
+        hide some exception details. Patch submitted by Eric Blanquer. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Other">
     <changelog>
       <update>
