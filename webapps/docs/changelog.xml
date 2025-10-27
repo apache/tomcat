@@ -119,6 +119,10 @@
       <fix>
         Graceful failure for OCSP on BoringSSL in the FFM code. (remm)
       </fix>
+      <fix>
+        <bug>69866</bug>: Fix a memory leak when using a trust store with the
+        OpenSSL provider. Pull request <pr>912</pr> by aogburn. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
