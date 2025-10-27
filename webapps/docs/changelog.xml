@@ -123,6 +123,10 @@
         Fix use of <code>deferAccept</code> attribute in JMX, since it is
         normally only removed in Tomcat 11. (remm)
       </fix>
+      <fix>
+        <bug>69866</bug>: Fix a memory leak when using a trust store with the
+        OpenSSL provider. Pull request <pr>912</pr> by aogburn. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
