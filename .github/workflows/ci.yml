@@ -64,7 +64,7 @@ jobs:
 
     - name: Upload logs
       if: ${{ !cancelled() }}
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: JDK${{ matrix.java }}-${{ matrix.os }}-logs
         path: |
