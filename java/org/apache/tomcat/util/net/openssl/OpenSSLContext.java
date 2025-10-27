@@ -45,7 +45,6 @@ import javax.net.ssl.X509TrustManager;
 
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
-import org.apache.tomcat.jni.CertificateVerifier;
 import org.apache.tomcat.jni.Library;
 import org.apache.tomcat.jni.Pool;
 import org.apache.tomcat.jni.SSL;
@@ -360,21 +359,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             if (tms != null) {
                 // Client certificate verification based on custom trust managers
                 x509TrustManager = chooseTrustManager(tms);
-                SSLContext.setCertVerifyCallback(ctx, new CertificateVerifier() {
-                    @Override
-                    public boolean verify(long ssl, byte[][] chain, String auth) {
-                        X509Certificate[] peerCerts = certificates(chain);
-                        try {
-                            x509TrustManager.checkClientTrusted(peerCerts, auth);
-                            return true;
-                        } catch (Exception e) {
-                            if (log.isDebugEnabled()) {
-                                log.debug(sm.getString("openssl.certificateVerificationFailed"), e);
-                            }
-                        }
-                        return false;
-                    }
-                });
+                SSLContext.setCertVerifyCallback(ctx, new OpenSSLCertificateVerifier(x509TrustManager));
                 // Pass along the DER encoded certificates of the accepted client
                 // certificate issuers, so that their subjects can be presented
                 // by the server during the handshake to allow the client choosing
@@ -563,14 +548,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
             }
         }
         throw new IllegalStateException(sm.getString("openssl.trustManagerMissing"));
-    }
-
-    private static X509Certificate[] certificates(byte[][] chain) {
-        X509Certificate[] peerCerts = new X509Certificate[chain.length];
-        for (int i = 0; i < peerCerts.length; i++) {
-            peerCerts[i] = new OpenSSLX509Certificate(chain[i]);
-        }
-        return peerCerts;
     }
 
 
