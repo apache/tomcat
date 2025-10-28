@@ -146,6 +146,12 @@
       <update>
         Update to Jacoco 0.8.14. (markt)
       </update>
+      <update>
+        Update to SpotBugs 4.9.8. (markt)
+      </update>
+      <update>
+        Update to JSign 7.4. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
