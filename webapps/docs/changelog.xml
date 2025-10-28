@@ -140,6 +140,9 @@
       <update>
         Update to Byte Buddy 1.17.8. (markt)
       </update>
+      <update>
+        Update to Checkstyle 12.1.1. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
