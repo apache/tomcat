@@ -18,7 +18,6 @@ package org.apache.tomcat.util.net.openssl;
 
 import java.security.cert.X509Certificate;
 
-import javax.net.ssl.X509KeyManager;
 import javax.net.ssl.X509TrustManager;
 
 import org.apache.juli.logging.Log;
