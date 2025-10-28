@@ -527,14 +527,6 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         throw new IllegalStateException(sm.getString("openssl.trustManagerMissing"));
     }
 
-    private static X509Certificate[] certificates(byte[][] chain) {
-        X509Certificate[] peerCerts = new X509Certificate[chain.length];
-        for (int i = 0; i < peerCerts.length; i++) {
-            peerCerts[i] = new OpenSSLX509Certificate(chain[i]);
-        }
-        return peerCerts;
-    }
-
 
     long getSSLContextID() {
         return state.ctx;
