@@ -30,7 +30,7 @@ public class OpenSSLCertificateVerifier implements CertificateVerifier {
     private static final Log log = LogFactory.getLog(OpenSSLCertificateVerifier.class);
     private static final StringManager sm = StringManager.getManager(OpenSSLContext.class);
 
-    private X509TrustManager x509TrustManager;
+    private final X509TrustManager x509TrustManager;
 
     public OpenSSLCertificateVerifier(X509TrustManager x509TrustManager) {
         this.x509TrustManager = x509TrustManager;
