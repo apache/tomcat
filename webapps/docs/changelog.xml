@@ -137,6 +137,9 @@
       <update>
         Update to the Eclipse JDT compiler 4.37. (markt)
       </update>
+      <update>
+        Update to Byte Buddy 1.17.8. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
