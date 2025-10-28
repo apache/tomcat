@@ -134,6 +134,9 @@
       <update>
         Update the internal fork of Apache Commons BCEL to 6.11.0. (markt)
       </update>
+      <update>
+        Update to Byte Buddy 1.17.8. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
