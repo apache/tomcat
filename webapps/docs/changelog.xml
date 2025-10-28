@@ -4794,6 +4794,9 @@
         Update the internal fork of Apache Commons FileUpload to aa8eff6
         (2022-11-29, 2.0-SNAPSHOT). (markt)
       </update>
+      <update>
+        Update to the Eclipse JDT compiler 4.37. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
