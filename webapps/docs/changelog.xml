@@ -140,6 +140,9 @@
       <update>
         Update to Checkstyle 12.1.1. (markt)
       </update>
+      <update>
+        Update to Jacoco 0.8.14. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
