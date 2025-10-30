@@ -43,6 +43,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.storeconfig.StoreConfigLifecycleListener;
 import org.apache.catalina.util.IOTools;
+import org.apache.catalina.util.ServerInfo;
 import org.apache.catalina.util.URLEncoder;
 
 
@@ -198,7 +199,7 @@ public class TestManagerWebapp extends TomcatBaseTest {
         client.connect();
         client.processRequest(true);
         Assert.assertEquals(HttpServletResponse.SC_OK, client.getStatusCode());
-        Assert.assertTrue(client.getResponseBody().contains("[Apache Tomcat"));
+        Assert.assertTrue(client.getResponseBody().contains("[" + ServerInfo.getServerInfo() + "]"));
 
         // @formatter:off
         client.setRequest(new String[] {
