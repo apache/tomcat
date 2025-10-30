@@ -1018,7 +1018,7 @@ public abstract class AbstractEndpoint<S, U> {
      * @deprecated This code will be removed in Tomcat 11 onwards
      */
     @Deprecated
-    protected boolean getDeferAccept() {
+    public boolean getDeferAccept() {
         return false;
     }
 

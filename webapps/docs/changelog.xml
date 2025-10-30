@@ -119,6 +119,10 @@
       <fix>
         Graceful failure for OCSP on BoringSSL in the FFM code. (remm)
       </fix>
+      <fix>
+        Fix use of <code>deferAccept</code> attribute in JMX, since it is
+        normally only removed in Tomcat 11. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
