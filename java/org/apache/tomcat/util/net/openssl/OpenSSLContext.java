@@ -584,40 +584,22 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
     }
 
 
-    private class OpenSSLState implements Runnable {
-        private volatile long aprPool;
-        private volatile long cctx;
-        private volatile long ctx;
-
-        /**
-         * @param aprPool the APR pool
-         * @param cctx    OpenSSLConfCmd context
-         * @param ctx     SSL context
-         */
-        OpenSSLState(long aprPool, long cctx, long ctx) {
-            this.aprPool = aprPool;
-            this.cctx = cctx;
-            this.ctx = ctx;
-        }
-
-        /*
-         * This runnable can be called by the cleaner thread during GC but also by OpenSSLContext.destroy() so we need
-         * to make sure that the free() methods are only called once. Calling them more than once will trigger a JVM
-         * crash.
-         */
+    /**
+     * @param aprPool the APR pool
+     * @param cctx    OpenSSLConfCmd context
+     * @param ctx     SSL context
+     */
+    private record OpenSSLState(long aprPool, long cctx, long ctx) implements Runnable {
         @Override
-        public synchronized void run() {
+        public void run() {
             if (ctx != 0) {
                 SSLContext.free(ctx);
-                ctx = 0;
             }
             if (cctx != 0) {
                 SSLConf.free(cctx);
-                cctx = 0;
             }
             if (aprPool != 0) {
                 Pool.destroy(aprPool);
-                aprPool = 0;
             }
         }
     }
