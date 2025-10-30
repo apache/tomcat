@@ -28,7 +28,7 @@ import org.apache.tomcat.util.res.StringManager;
 public class OpenSSLCertificateVerifier implements CertificateVerifier {
 
     private static final Log log = LogFactory.getLog(OpenSSLCertificateVerifier.class);
-    private static final StringManager sm = StringManager.getManager(OpenSSLContext.class);
+    private static final StringManager sm = StringManager.getManager(OpenSSLCertificateVerifier.class);
 
     private final X509TrustManager x509TrustManager;
 
@@ -43,7 +43,9 @@ public class OpenSSLCertificateVerifier implements CertificateVerifier {
             x509TrustManager.checkClientTrusted(peerCerts, auth);
             return true;
         } catch (Exception e) {
-            log.debug(sm.getString("openssl.certificateVerificationFailed"), e);
+            if (log.isDebugEnabled()) {
+                log.debug(sm.getString("openssl.certificateVerificationFailed"), e);
+            }
         }
         return false;
     }
