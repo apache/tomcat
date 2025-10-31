@@ -93,7 +93,17 @@ public class Utils {
             result = in;
         }
 
-        return formatValueCommon(result);
+        // Double single quotes for MessageFormat strings (strings containing placeholders like {0})
+        if (result.contains("{")) {
+            result = result.replace("'", "''");
+        }
+
+        // Add line continuation after initial \n sequence, if not already present
+        if (result.startsWith("\\n") && !result.startsWith("\\n\\\n")) {
+            result = "\\n\\\n" + result.substring(2);
+        }
+
+        return result;
     }
 
 
