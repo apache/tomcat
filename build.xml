@@ -562,6 +562,7 @@
     <include name="org/apache/tomcat/util/scan/LocalStrings.properties" />
 
     <!-- Minimize JNI to what doesn't throw an error -->
+    <include name="org/apache/tomcat/jni/AprStatus.class" />
     <include name="org/apache/tomcat/jni/Library.class" />
     <include name="org/apache/tomcat/jni/LibraryNotFoundError*" />
     <exclude name="org/apache/tomcat/jni" />
