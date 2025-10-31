@@ -19,6 +19,7 @@ package org.apache.coyote.http11.filters;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
 import org.apache.coyote.Response;
@@ -32,7 +33,7 @@ import org.apache.tomcat.util.res.StringManager;
  * Gzip output filter.
  */
 public class GzipOutputFilter implements OutputFilter {
-
+    public static final int DEFAULT_BUFFER_SIZE = 512;
     protected static final Log log = LogFactory.getLog(GzipOutputFilter.class);
     private static final StringManager sm = StringManager.getManager(GzipOutputFilter.class);
 
@@ -56,13 +57,24 @@ public class GzipOutputFilter implements OutputFilter {
      */
     protected final OutputStream fakeOutputStream = new FakeOutputStream();
 
+    /**
+     * Compression level for gzip. Valid values are -1 (default), or 1-9
+     */
+    private int level = Deflater.DEFAULT_COMPRESSION;
+
+    /**
+     * Buffer size for gzip compression stream. Default is Deflater default size 512.
+     */
+    private int bufferSize = DEFAULT_BUFFER_SIZE;
 
     // --------------------------------------------------- OutputBuffer Methods
 
     @Override
     public int doWrite(ByteBuffer chunk) throws IOException {
         if (compressionStream == null) {
-            compressionStream = new GZIPOutputStream(fakeOutputStream, true);
+            compressionStream = new GZIPOutputStream(fakeOutputStream, bufferSize, true) {{
+                this.def.setLevel(level);
+            }};
         }
         int len = chunk.remaining();
         if (chunk.hasArray()) {
@@ -121,7 +133,9 @@ public class GzipOutputFilter implements OutputFilter {
     @Override
     public void end() throws IOException {
         if (compressionStream == null) {
-            compressionStream = new GZIPOutputStream(fakeOutputStream, true);
+            compressionStream = new GZIPOutputStream(fakeOutputStream, bufferSize, true) {{
+                this.def.setLevel(level);
+            }};
         }
         compressionStream.finish();
         compressionStream.close();
@@ -135,7 +149,30 @@ public class GzipOutputFilter implements OutputFilter {
         compressionStream = null;
     }
 
+    /**
+     * Set the compression level for gzip.
+     * @param level The compression level. Valid values are -1 (default), or 1-9.
+     *                  -1 uses the default compression level.
+     *                  1 gives best speed, 9 gives best compression.
+     */
+    public void setLevel(int level) {
+        if (level < -1 || level > 9) {
+            throw new IllegalArgumentException(sm.getString("gzipOutputFilter.invalidLevel", Integer.valueOf(level)));
+        }
+        this.level = level;
+    }
 
+    /**
+     * Set the buffer size for gzip compression stream.
+     *
+     * @param bufferSize The buffer size in bytes. Must be positive.
+     */
+    public void setBufferSize(int bufferSize) {
+        if (bufferSize <= 0) {
+            throw new IllegalArgumentException(sm.getString("gzipOutputFilter.invalidBufferSize", Integer.valueOf(bufferSize)));
+        }
+        this.bufferSize = bufferSize;
+    }
     // ------------------------------------------- FakeOutputStream Inner Class
 
 
