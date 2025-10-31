@@ -39,6 +39,7 @@ import org.apache.coyote.NonPipeliningProcessor;
 import org.apache.coyote.Request;
 import org.apache.coyote.RequestGroupInfo;
 import org.apache.coyote.Response;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.coyote.http11.filters.GzipOutputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
@@ -211,7 +212,15 @@ class StreamProcessor extends AbstractProcessor implements NonPipeliningProcesso
         if (noSendfile && protocol != null && protocol.useCompression(coyoteRequest, coyoteResponse)) {
             // Enable compression. Headers will have been set. Need to configure
             // output filter at this point.
-            stream.addOutputFilter(new GzipOutputFilter());
+            GzipOutputFilter gzipOutputFilter = new GzipOutputFilter();
+            AbstractHttp11Protocol<?> http11Protocol = protocol.getHttp11Protocol();
+
+            if (http11Protocol != null) {
+                gzipOutputFilter.setLevel(http11Protocol.getGzipLevel());
+                gzipOutputFilter.setBufferSize(http11Protocol.getGzipBufferSize());
+            }
+
+            stream.addOutputFilter(gzipOutputFilter);
         }
 
         // Check to see if a response body is present

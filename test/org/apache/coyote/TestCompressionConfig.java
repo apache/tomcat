@@ -19,6 +19,7 @@ package org.apache.coyote;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.zip.Deflater;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -109,5 +110,43 @@ public class TestCompressionConfig {
                 Assert.assertNull(response.getMimeHeaders().getHeader("Content-Encoding"));
             }
         }
+    }
+
+    @Test
+    public void testGzipLevelConfiguration() {
+        CompressionConfig config = new CompressionConfig();
+
+        Assert.assertEquals(-1, config.getGzipLevel());
+
+        config.setGzipLevel(Deflater.BEST_SPEED);
+        Assert.assertEquals(Deflater.BEST_SPEED, config.getGzipLevel());
+
+        config.setGzipLevel(Deflater.BEST_COMPRESSION);
+        Assert.assertEquals(Deflater.BEST_COMPRESSION, config.getGzipLevel());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidGzipLevelLow() {
+        new CompressionConfig().setGzipLevel(-2);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidGzipLevelHigh() {
+        new CompressionConfig().setGzipLevel(10);
+    }
+
+    @Test
+    public void testGzipBufferSizeConfiguration() {
+        CompressionConfig config = new CompressionConfig();
+
+        Assert.assertEquals(512, config.getGzipBufferSize());
+
+        config.setGzipBufferSize(1024);
+        Assert.assertEquals(1024, config.getGzipBufferSize());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testInvalidGzipBufferSize() {
+        new CompressionConfig().setGzipBufferSize(0);
     }
 }

@@ -339,6 +339,22 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         compressionConfig.setCompressionMinSize(compressionMinSize);
     }
 
+    public int getGzipLevel() {
+        return compressionConfig.getGzipLevel();
+    }
+
+    public void setGzipLevel(int gzipLevel) {
+        compressionConfig.setGzipLevel(gzipLevel);
+    }
+
+    public int getGzipBufferSize() {
+        return compressionConfig.getGzipBufferSize();
+    }
+
+    public void setGzipBufferSize(int gzipBufferSize) {
+        compressionConfig.setGzipBufferSize(gzipBufferSize);
+    }
+
 
     public boolean useCompression(Request request, Response response) {
         return compressionConfig.useCompression(request, response);

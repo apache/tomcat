@@ -18,14 +18,10 @@ package org.apache.coyote;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.regex.Pattern;
 
+import org.apache.coyote.http11.filters.GzipOutputFilter;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.util.buf.MessageBytes;
@@ -47,7 +43,8 @@ public class CompressionConfig {
             "text/javascript,application/javascript,application/json,application/xml";
     private String[] compressibleMimeTypes = null;
     private int compressionMinSize = 2048;
-
+    private int gzipLevel = -1;
+    private int gzipBufferSize = GzipOutputFilter.DEFAULT_BUFFER_SIZE;
 
     /**
      * Set compression level.
@@ -162,6 +159,38 @@ public class CompressionConfig {
         return compressionMinSize;
     }
 
+    /**
+     * Set the compression level for gzip.
+     * @param gzipLevel The compression level. Valid values are -1 (default), or 1-9.
+     *                  -1 uses the default compression level.
+     *                  1 gives best speed, 9 gives best compression.
+     */
+    public void setGzipLevel(int gzipLevel) {
+        if (gzipLevel < -1 || gzipLevel > 9) {
+            throw new IllegalArgumentException(sm.getString("compressionConfig.invalidGzipLevel", Integer.valueOf(gzipLevel)));
+        }
+        this.gzipLevel = gzipLevel;
+    }
+
+    public int getGzipLevel() {
+        return gzipLevel;
+    }
+
+    /**
+     * Set the buffer size for gzip compression stream.
+     *
+     * @param gzipBufferSize The buffer size in bytes. Must be positive.
+     */
+    public void setGzipBufferSize(int gzipBufferSize) {
+        if (gzipBufferSize <= 0) {
+            throw new IllegalArgumentException(sm.getString("compressionConfig.invalidGzipBufferSize", Integer.valueOf(gzipBufferSize)));
+        }
+        this.gzipBufferSize = gzipBufferSize;
+    }
+
+    public int getGzipBufferSize() {
+        return gzipBufferSize;
+    }
 
     /**
      * Set Minimum size to trigger compression.
@@ -171,7 +200,6 @@ public class CompressionConfig {
     public void setCompressionMinSize(int compressionMinSize) {
         this.compressionMinSize = compressionMinSize;
     }
-
 
     /**
      * Determines if compression should be enabled for the given response and if it is, sets any necessary headers to

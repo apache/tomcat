@@ -450,6 +450,24 @@
       Units are in bytes.</p>
     </attribute>
 
+    <attribute name="gzipLevel" required="false">
+      <p>If <strong>compression</strong> is set to "on" or "force" then this
+      attribute may be used to configure the compression level for gzip
+      compression. Valid values are <code>-1</code> (default compression)
+      or <code>1</code> through <code>9</code> where <code>1</code> gives
+      beset speed and <code>9</code> gives best compression ratio. If not
+      specified, this attribute defaults to <code>-1</code> (JDK default compression).</p>
+    </attribute>
+
+    <attribute name="gzipBufferSize" required="false">
+      <p>If <strong>compression</strong> is set to "on" or "force" then this
+        attribute may be used to configure the internal buffer size (in bytes)
+        for the gzip compression stream. Larger buffers can improve compression
+        ratios and throughput for bulk responses, while smaller buffers reduce
+        latency for streaming scenarios. If not specified, this attribute
+        defaults to <code>512</code> bytes. </p>
+    </attribute>
+
     <attribute name="connectionLinger" required="false">
       <p>The number of seconds during which the sockets used by this
       <strong>Connector</strong> will linger when they are closed. The default
