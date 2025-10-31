@@ -31,9 +31,9 @@ import org.junit.runners.Parameterized.Parameter;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.core.AprStatus;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
+import org.apache.tomcat.jni.AprStatus;
 import org.apache.tomcat.util.buf.ByteChunk;
 import org.apache.tomcat.util.net.openssl.OpenSSLStatus;
 
