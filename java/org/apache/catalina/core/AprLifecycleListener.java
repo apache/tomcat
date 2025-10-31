@@ -19,6 +19,7 @@ package org.apache.catalina.core;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
@@ -99,9 +100,7 @@ public class AprLifecycleListener implements LifecycleListener {
 
     private static final int FIPS_OFF = 0;
 
-    protected static final Object lock = new Object();
-
-    // Guarded by lock
+    // Guarded APRStatus.getStatusLock()
     private static int referenceCount = 0;
     private boolean instanceInitialized = false;
 
@@ -109,8 +108,12 @@ public class AprLifecycleListener implements LifecycleListener {
     public static boolean isAprAvailable() {
         // https://bz.apache.org/bugzilla/show_bug.cgi?id=48613
         if (org.apache.tomcat.jni.AprStatus.isInstanceCreated()) {
-            synchronized (lock) {
+            Lock writeLock = org.apache.tomcat.jni.AprStatus.getStatusLock().writeLock();
+            writeLock.lock();
+            try {
                 init();
+            } finally {
+                writeLock.unlock();
             }
         }
         return org.apache.tomcat.jni.AprStatus.isAprAvailable();
@@ -131,7 +134,9 @@ public class AprLifecycleListener implements LifecycleListener {
     public void lifecycleEvent(LifecycleEvent event) {
 
         if (Lifecycle.BEFORE_INIT_EVENT.equals(event.getType())) {
-            synchronized (lock) {
+            Lock writeLock = org.apache.tomcat.jni.AprStatus.getStatusLock().writeLock();
+            writeLock.lock();
+            try {
                 instanceInitialized = true;
                 if (!(event.getLifecycle() instanceof Server)) {
                     log.warn(sm.getString("listener.notServer", event.getLifecycle().getClass().getSimpleName()));
@@ -161,9 +166,13 @@ public class AprLifecycleListener implements LifecycleListener {
                     log.fatal(e.getMessage(), e);
                     throw e;
                 }
+            } finally {
+                writeLock.unlock();
             }
         } else if (Lifecycle.AFTER_DESTROY_EVENT.equals(event.getType())) {
-            synchronized (lock) {
+            Lock writeLock = org.apache.tomcat.jni.AprStatus.getStatusLock().writeLock();
+            writeLock.lock();
+            try {
                 // Instance may get destroyed without ever being initialized
                 if (instanceInitialized) {
                     referenceCount--;
@@ -182,6 +191,8 @@ public class AprLifecycleListener implements LifecycleListener {
                     ExceptionUtils.handleThrowable(throwable);
                     log.warn(sm.getString("aprListener.aprDestroy"), throwable);
                 }
+            } finally {
+                writeLock.unlock();
             }
         }
 
