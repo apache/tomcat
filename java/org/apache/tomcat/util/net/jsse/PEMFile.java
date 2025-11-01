@@ -471,7 +471,43 @@ public class PEMFile {
                     break;
                 }
                 case PKCS8: {
-                    keySpec = new PKCS8EncodedKeySpec(source);
+                    // Parse the private key.
+                    Asn1Parser p = new Asn1Parser(source);
+                    p.parseTag(0x30);
+                    p.parseFullLength();
+                    BigInteger version = p.parseInt();
+                    // Private key algorithm
+                    p.parseTag(0x30);
+                    int pkeyalgoLen = p.parseLength();
+                    byte[] pkeyalgo = new byte[pkeyalgoLen];
+                    p.parseBytes(pkeyalgo);
+                    // Private key
+                    p.parseTag(0x04);
+                    int privateKeyLen = p.parseLength();
+                    byte[] privateKey = new byte[privateKeyLen];
+                    p.parseBytes(privateKey);
+                    /* try to parse it (using the openssl specifications) */
+                    /* we try to remove the seed JSSE can't parse */
+                    try {
+                        Asn1Parser otherp = new Asn1Parser(privateKey);
+                        otherp.parseTag(0x30);
+                        otherp.parseFullLength();
+                        //  {SEED + KEY} sequence
+                        byte[] seed = otherp.parseOctetString();
+                        byte[] okey = otherp.parseOctetString();
+                        privateKey = Asn1Writer.writeTag((byte)4, okey);
+                    } catch  (Exception e) {
+                        // Ignore
+                    }
+
+                    // rebuild the key we parsed
+                    // sequence version: + pkeyalgo + private key
+                    byte[] realprivateKey = Asn1Writer.writeSequence(
+                                            Asn1Writer.writeInteger(0),
+                                            Asn1Writer.writeTag((byte)0x30, pkeyalgo),
+                                            Asn1Writer.writeTag((byte)0x04, privateKey));
+
+                    keySpec = new PKCS8EncodedKeySpec(realprivateKey);
                     break;
                 }
                 case RFC5915: {
