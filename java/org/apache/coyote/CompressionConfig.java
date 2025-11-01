@@ -230,6 +230,19 @@ public class CompressionConfig {
     }
 
     /**
+     * Determines if gzip compression should be enabled for the given response and if it is, sets any necessary headers to
+     * mark it as such.
+     *
+     * @param request  The request that triggered the response
+     * @param response The response to consider compressing
+     *
+     * @return {@code true} if compression was enabled for the given response, otherwise {@code false}
+     */
+    public boolean useCompression(Request request, Response response) {
+        return this.useCompression(request, response, "gzip");
+    }
+
+    /**
      * Determines if compression should be enabled for the given response and if it is, sets any necessary headers to
      * mark it as such.
      *
