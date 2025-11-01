@@ -43,6 +43,9 @@ public class CompressionConfig {
             "text/javascript,application/javascript,application/json,application/xml";
     private String[] compressibleMimeTypes = null;
     private int compressionMinSize = 2048;
+    private Set<String> noCompressionEncodings = new HashSet<String>(Arrays.asList(
+        "br", "compress", "dcb", "dcz", "deflate", "gzip", "pack200-gzip", "zstd"
+    ));
     private int gzipLevel = -1;
     private int gzipBufferSize = GzipOutputFilter.DEFAULT_BUFFER_SIZE;
 
@@ -192,6 +195,31 @@ public class CompressionConfig {
         return gzipBufferSize;
     }
 
+    public String getNoCompressionEncodings() {
+        return String.join(",", noCompressionEncodings);
+    }
+
+    /**
+     * Set the list of content encodings that indicate already-compressed content.
+     * When content is already encoded with one of these encodings, compression will not be applied
+     * to prevent double compression.
+     *
+     * @param encodings Comma-separated list of encoding names (e.g., "gzip,br.dflate")
+     */
+    public void setNoCompressionEncodings(String encodings) {
+        Set<String> newEncodings = new HashSet<String>();
+        if (encodings != null && !encodings.isEmpty()) {
+            StringTokenizer tokens = new StringTokenizer(encodings, ",");
+            while (tokens.hasMoreTokens()) {
+                String token = tokens.nextToken().trim();
+                if(!token.isEmpty()) {
+                    newEncodings.add(token);
+                }
+            }
+        }
+        this.noCompressionEncodings = newEncodings;
+    }
+
     /**
      * Set Minimum size to trigger compression.
      *
@@ -207,10 +235,11 @@ public class CompressionConfig {
      *
      * @param request  The request that triggered the response
      * @param response The response to consider compressing
+     * @param encoding The compression encoding to use (e.g., "gzip", "br", "deflate", "zstd")
      *
      * @return {@code true} if compression was enabled for the given response, otherwise {@code false}
      */
-    public boolean useCompression(Request request, Response response) {
+    public boolean useCompression(Request request, Response response, String encoding) {
         // Check if compression is enabled
         if (compressionLevel == 0) {
             return false;
@@ -238,9 +267,7 @@ public class CompressionConfig {
             if (tokens.contains("identity")) {
                 // If identity, do not do content modifications
                 useContentEncoding = false;
-            } else if (tokens.contains("br") || tokens.contains("compress") || tokens.contains("dcb") ||
-                    tokens.contains("dcz") || tokens.contains("deflate") || tokens.contains("gzip") ||
-                    tokens.contains("pack200-gzip") || tokens.contains("zstd")) {
+            } else if (noCompressionEncodings.stream().anyMatch(tokens::contains)) {
                 // Content should not be compressed twice
                 return false;
             }
@@ -263,9 +290,9 @@ public class CompressionConfig {
         }
 
         Enumeration<String> headerValues = request.getMimeHeaders().values("TE");
-        boolean foundGzip = false;
+        boolean foundEncoding = false;
         // TE and accept-encoding seem to have equivalent syntax
-        while (!foundGzip && headerValues.hasMoreElements()) {
+        while (!foundEncoding && headerValues.hasMoreElements()) {
             List<TE> tes;
             try {
                 tes = TE.parse(new StringReader(headerValues.nextElement()));
@@ -275,9 +302,9 @@ public class CompressionConfig {
             }
 
             for (TE te : tes) {
-                if ("gzip".equalsIgnoreCase(te.getEncoding())) {
+                if (encoding.equalsIgnoreCase(te.getEncoding())) {
                     useTransferEncoding = true;
-                    foundGzip = true;
+                    foundEncoding = true;
                     break;
                 }
             }
@@ -296,11 +323,11 @@ public class CompressionConfig {
             // Therefore, set the Vary header to keep proxies happy
             ResponseUtil.addVaryFieldName(responseHeaders, "accept-encoding");
 
-            // Check if user-agent supports gzip encoding
-            // Only interested in whether gzip encoding is supported. Other
+            // Check if user-agent supports the specified encoding
+            // Only interested in whether the encoding is supported. Other
             // encodings and weights can be ignored.
             headerValues = request.getMimeHeaders().values("accept-encoding");
-            while (!foundGzip && headerValues.hasMoreElements()) {
+            while (!foundEncoding && headerValues.hasMoreElements()) {
                 List<AcceptEncoding> acceptEncodings;
                 try {
                     acceptEncodings = AcceptEncoding.parse(new StringReader(headerValues.nextElement()));
@@ -310,15 +337,15 @@ public class CompressionConfig {
                 }
 
                 for (AcceptEncoding acceptEncoding : acceptEncodings) {
-                    if ("gzip".equalsIgnoreCase(acceptEncoding.getEncoding())) {
-                        foundGzip = true;
+                    if (encoding.equalsIgnoreCase(acceptEncoding.getEncoding())) {
+                        foundEncoding = true;
                         break;
                     }
                 }
             }
         }
 
-        if (!foundGzip) {
+        if (!foundEncoding) {
             return false;
         }
 
@@ -343,10 +370,10 @@ public class CompressionConfig {
         response.setContentLength(-1);
         if (useTransferEncoding) {
             // Configure the transfer encoding for compressed content
-            responseHeaders.addValue("Transfer-Encoding").setString("gzip");
+            responseHeaders.addValue("Transfer-Encoding").setString(encoding);
         } else {
             // Configure the content encoding for compressed content
-            responseHeaders.addValue("Content-Encoding").setString("gzip");
+            responseHeaders.addValue("Content-Encoding").setString(encoding);
         }
 
         return true;

@@ -40,6 +40,8 @@ import org.apache.coyote.Request;
 import org.apache.coyote.Response;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.UpgradeToken;
+import org.apache.coyote.http11.filters.GzipOutputFilterFactory;
+import org.apache.coyote.http11.filters.OutputFilterFactory;
 import org.apache.coyote.http11.upgrade.InternalHttpUpgradeHandler;
 import org.apache.coyote.http11.upgrade.UpgradeGroupInfo;
 import org.apache.coyote.http11.upgrade.UpgradeProcessorExternal;
@@ -59,6 +61,7 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
     protected static final StringManager sm = StringManager.getManager(AbstractHttp11Protocol.class);
 
     private final CompressionConfig compressionConfig = new CompressionConfig();
+    private OutputFilterFactory outputFilterFactory = new GzipOutputFilterFactory();
 
     private HttpParser httpParser = null;
 
@@ -355,9 +358,33 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
         compressionConfig.setGzipBufferSize(gzipBufferSize);
     }
 
+    public String getNoCompressionEncodings() {
+        return compressionConfig.getNoCompressionEncodings();
+    }
+
+    public void setNoCompressionEncodings(String encodings) {
+        compressionConfig.setNoCompressionEncodings(encodings);
+    }
+
+    public OutputFilterFactory getOutputFilterFactory() {
+        return outputFilterFactory;
+    }
+
+    public void setOutputFilterFactory(OutputFilterFactory outputFilterFactory) {
+        this.outputFilterFactory = outputFilterFactory;
+    }
+
+    public void setOutputFilterFactory(String className) {
+        try {
+            Class<?> clazz = Class.forName(className);
+            this.outputFilterFactory = (OutputFilterFactory) clazz.getDeclaredConstructor().newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalArgumentException(sm.getString("abstractHttp11Protocol.invalidOutputFilterFactory", className), e);
+        }
+    }
 
     public boolean useCompression(Request request, Response response) {
-        return compressionConfig.useCompression(request, response);
+        return compressionConfig.useCompression(request, response, outputFilterFactory.getEncodingName());
     }
 
 

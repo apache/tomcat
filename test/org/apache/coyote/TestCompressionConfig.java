@@ -17,6 +17,7 @@
 package org.apache.coyote;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.zip.Deflater;
@@ -92,7 +93,7 @@ public class TestCompressionConfig {
             response.getMimeHeaders().addValue("ETag").setString(eTag);
         }
 
-        boolean useCompression = compressionConfig.useCompression(request, response);
+        boolean useCompression = compressionConfig.useCompression(request, response, "gzip");
         Assert.assertEquals(compress, Boolean.valueOf(useCompression));
 
         if (useTE.booleanValue()) {
@@ -148,5 +149,18 @@ public class TestCompressionConfig {
     @Test(expected = IllegalArgumentException.class)
     public void testInvalidGzipBufferSize() {
         new CompressionConfig().setGzipBufferSize(0);
+    }
+
+    @Test
+    public void testNoCompressionEncodings() {
+        CompressionConfig config = new CompressionConfig();
+        String encodings = config.getNoCompressionEncodings();
+        Assert.assertTrue(Arrays.asList("br", "compress", "dcb", "dcz", "deflate", "gzip", "pack200-gzip", "zstd")
+            .stream()
+            .anyMatch(encodings::contains));
+
+        config.setNoCompressionEncodings("br");
+        Assert.assertTrue(encodings.contains("br"));
+        Assert.assertFalse(encodings.contains("gzip"));
     }
 }
