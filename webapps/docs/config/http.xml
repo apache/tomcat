@@ -468,6 +468,20 @@
         defaults to <code>512</code> bytes. </p>
     </attribute>
 
+    <attribute name="noCompressionEncodings" requried="false">
+      <p>A comma-separated list of content encodings that indicate
+      already-compressed content. When the response already has a
+      <code>Content-Encoding</code> header with one of these values, compression
+      will not be applied to prevent double compression. This attribute is only
+      used if <strong>compression</strong> is set to <code>on</code> or
+      <code>force</code>.</p>
+      <p>If not specified, the default values is
+      <code>br,compress,dcb,dcz,deflate,gzip,pack2000-gzip,zstd</code>, which
+      includes all commonly used compression algorithms. This can be customized
+      to support custom compression algorithms when using a custom
+      <code>outputFilterFactory</code>.</p>
+    </attribute>
+
     <attribute name="connectionLinger" required="false">
       <p>The number of seconds during which the sockets used by this
       <strong>Connector</strong> will linger when they are closed. The default
