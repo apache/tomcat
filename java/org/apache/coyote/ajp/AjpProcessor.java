@@ -567,7 +567,7 @@ public class AjpProcessor extends AbstractProcessor {
             // Zero length message.
             return true;
         } else {
-            if (messageLength > message.getBuffer().length) {
+            if (messageLength > (buf.length - Constants.H_SIZE)) {
                 // Message too long for the buffer
                 // Need to trigger a 400 response
                 String msg = sm.getString("ajpprocessor.header.tooLong", Integer.valueOf(messageLength),
