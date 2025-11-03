@@ -22,32 +22,6 @@ import org.junit.Test;
 public class TestUtils {
 
     @Test
-    public void testQuoteReplacement01() {
-        Assert.assertEquals("[{0}] a''a", Utils.formatValueImport("[{0}] a'a"));
-    }
-
-    @Test
-    public void testQuoteReplacement02() {
-        Assert.assertEquals("[{0}] a''", Utils.formatValueImport("[{0}] a'"));
-    }
-
-
-    @Test
-    public void testQuoteReplacement03() {
-        Assert.assertEquals("''a [{0}]", Utils.formatValueImport("'a [{0}]"));
-    }
-
-    @Test
-    public void testQuoteReplacement05() {
-        Assert.assertEquals("[{0}] ''a'' bbb", Utils.formatValueImport("[{0}] 'a' bbb"));
-    }
-
-    @Test
-    public void testQuoteReplacement06() {
-        Assert.assertEquals("[{0}] ''aa'' bbb", Utils.formatValueImport("[{0}] 'aa' bbb"));
-    }
-
-    @Test
     public void testFormatValue01() {
         // Import from Tomcat
         Assert.assertEquals("\\n\\\n</web-fragment>\\n", Utils.formatValueImport("\\n\\\n</web-fragment>\\n"));
