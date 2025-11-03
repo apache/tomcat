@@ -1232,7 +1232,11 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
 
         String path = getRelativePath(req);
 
-        deleteResource(path, req, resp);
+        WebResource resource = resources.getResource(path);
+        if (!checkIfHeaders(req, resp, resource)) {
+            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
+        }
+        deleteResource(path, req, resp, true);
     }
 
 
@@ -2259,27 +2263,6 @@ public class WebdavServlet extends DefaultServlet implements PeriodicEventListen
             return false;
         }
         return true;
-    }
-
-
-    /**
-     * Delete a resource.
-     *
-     * @param path Path of the resource which is to be deleted
-     * @param req  Servlet request
-     * @param resp Servlet response
-     *
-     * @return <code>true</code> if the delete is successful
-     *
-     * @throws IOException If an IO error occurs
-     */
-    private boolean deleteResource(String path, HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        WebResource resource = resources.getResource(path);
-        if (!checkIfHeaders(req, resp, resource)) {
-            resp.setStatus(HttpServletResponse.SC_PRECONDITION_FAILED);
-            return false;
-        }
-        return deleteResource(path, req, resp, true);
     }
 
 
