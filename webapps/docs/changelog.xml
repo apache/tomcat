@@ -327,6 +327,9 @@
       <update>
         Update Maven Resolver Ant Tasks to 1.6.0. (rjung)
       </update>
+      <add>
+        Improvements to Japanese translations provided by tak7iji. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
