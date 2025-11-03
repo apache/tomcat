@@ -123,6 +123,10 @@
         <bug>69866</bug>: Fix a memory leak when using a trust store with the
         OpenSSL provider. Pull request <pr>912</pr> by aogburn. (markt)
       </fix>
+      <fix>
+        Fix AJP message length check. Pull request <pr>916</pr> by Joshua
+        Rogers. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
