@@ -23,13 +23,19 @@ public class TestUtils {
 
     @Test
     public void testFormatValue01() {
-        // Import from Tomcat
-        Assert.assertEquals("\\n\\\n</web-fragment>\\n", Utils.formatValueImport("\\n\\\n</web-fragment>\\n"));
+        // Import from POE
+        Assert.assertEquals("line1\\n\\\nline2\\n\\\nline3", Utils.formatValueImport("line1\nline2\nline3"));
     }
 
     @Test
     public void testFormatValue02() {
-        // Import from POEditor
-        Assert.assertEquals("\\n\\\n</web-fragment>\\n", Utils.formatValueImport("\\n</web-fragment>\\n"));
+        // Import from POE
+        Assert.assertEquals("\\n\\\nline2\\n\\\nline3", Utils.formatValueImport(Utils.PADDING + "\nline2\nline3"));
+    }
+
+    @Test
+    public void testFormatValue03() {
+        // Import from POE
+        Assert.assertEquals("line1\\n\\\n\\tline2\\n\\\n\\tline3", Utils.formatValueImport("line1\n\tline2\n\tline3"));
     }
 }
