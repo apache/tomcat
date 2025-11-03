@@ -2567,7 +2567,7 @@ public class JNDIRealm extends RealmBase {
         try {
             Object o = constructInstance(className);
             if (o instanceof SSLSocketFactory) {
-                return sslSocketFactory;
+                return (SSLSocketFactory) o;
             } else {
                 throw new IllegalArgumentException(sm.getString("jndiRealm.invalidSslSocketFactory", className));
             }

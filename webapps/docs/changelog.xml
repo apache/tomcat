@@ -112,6 +112,10 @@
         individual class path components to avoid a potential
         <code>NullPointerException</code>. Identified by Coverity Scan. (markt)
       </fix>
+      <fix>
+        Fix SSL socket factory configuration in the JNDI realm. Based on pull
+        request <pr>915</pr> by Joshua Rogers. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
