@@ -127,6 +127,10 @@
         Fix potential crash on shutdown when a Connector depends on the Tomcat
         Native library. (markt)
       </fix>
+      <fix>
+        Fix AJP message length check. Pull request <pr>916</pr> by Joshua
+        Rogers. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
