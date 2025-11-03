@@ -108,16 +108,16 @@ public class AprLifecycleListener implements LifecycleListener {
 
     public static boolean isAprAvailable() {
         // https://bz.apache.org/bugzilla/show_bug.cgi?id=48613
-        if (AprStatus.isInstanceCreated()) {
+        if (org.apache.tomcat.jni.AprStatus.isInstanceCreated()) {
             synchronized (lock) {
                 init();
             }
         }
-        return AprStatus.isAprAvailable();
+        return org.apache.tomcat.jni.AprStatus.isAprAvailable();
     }
 
     public AprLifecycleListener() {
-        AprStatus.setInstanceCreated(true);
+        org.apache.tomcat.jni.AprStatus.setInstanceCreated(true);
     }
 
     // ---------------------------------------------- LifecycleListener Methods
@@ -145,7 +145,7 @@ public class AprLifecycleListener implements LifecycleListener {
                     log.info(msg);
                 }
                 initInfoLogMessages.clear();
-                if (AprStatus.isAprAvailable()) {
+                if (org.apache.tomcat.jni.AprStatus.isAprAvailable()) {
                     try {
                         initializeSSL();
                     } catch (Throwable t) {
@@ -172,7 +172,7 @@ public class AprLifecycleListener implements LifecycleListener {
                     // Still being used
                     return;
                 }
-                if (!AprStatus.isAprAvailable()) {
+                if (!org.apache.tomcat.jni.AprStatus.isAprAvailable()) {
                     return;
                 }
                 try {
@@ -188,8 +188,8 @@ public class AprLifecycleListener implements LifecycleListener {
     }
 
     private static void terminateAPR() {
-        AprStatus.setAprInitialized(false);
-        AprStatus.setAprAvailable(false);
+        org.apache.tomcat.jni.AprStatus.setAprInitialized(false);
+        org.apache.tomcat.jni.AprStatus.setAprAvailable(false);
         fipsModeActive = false;
         sslInitialized = false; // Well we cleaned the pool in terminate.
         // There could be unreferenced SSL_CTX still waiting for GC
@@ -298,7 +298,7 @@ public class AprLifecycleListener implements LifecycleListener {
         method = clazz.getMethod(methodName, paramTypes);
         method.invoke(null, paramValues);
 
-        AprStatus.setOpenSSLVersion(SSL.version());
+        org.apache.tomcat.jni.AprStatus.setOpenSSLVersion(SSL.version());
         // OpenSSL 3 onwards uses providers
         boolean usingProviders = tcnMajor > 1 || (tcnVersion > 1233 && (SSL.version() & 0xF0000000L) > 0x20000000);
 
@@ -438,27 +438,26 @@ public class AprLifecycleListener implements LifecycleListener {
     }
 
     public void setUseAprConnector(boolean useAprConnector) {
-        if (useAprConnector != AprStatus.getUseAprConnector()) {
-            AprStatus.setUseAprConnector(useAprConnector);
+        if (useAprConnector != org.apache.tomcat.jni.AprStatus.getUseAprConnector()) {
+            org.apache.tomcat.jni.AprStatus.setUseAprConnector(useAprConnector);
         }
     }
 
     public static boolean getUseAprConnector() {
-        return AprStatus.getUseAprConnector();
+        return org.apache.tomcat.jni.AprStatus.getUseAprConnector();
     }
 
     public void setUseOpenSSL(boolean useOpenSSL) {
-        if (useOpenSSL != AprStatus.getUseOpenSSL()) {
-            AprStatus.setUseOpenSSL(useOpenSSL);
+        if (useOpenSSL != org.apache.tomcat.jni.AprStatus.getUseOpenSSL()) {
+            org.apache.tomcat.jni.AprStatus.setUseOpenSSL(useOpenSSL);
         }
     }
 
     public static boolean getUseOpenSSL() {
-        return AprStatus.getUseOpenSSL();
+        return org.apache.tomcat.jni.AprStatus.getUseOpenSSL();
     }
 
     public static boolean isInstanceCreated() {
-        return AprStatus.isInstanceCreated();
+        return org.apache.tomcat.jni.AprStatus.isInstanceCreated();
     }
-
 }

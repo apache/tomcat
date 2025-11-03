@@ -14,68 +14,71 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.apache.catalina.core;
+package org.apache.tomcat.jni;
 
 /**
  * Holds APR status without the need to load other classes.
- *
- * @deprecated Unused. Use {@link org.apache.tomcat.jni.AprStatus} instead. This class will be removed in Tomcat 12
- *                 onwards.
  */
-@Deprecated
 public class AprStatus {
+    private static volatile boolean aprInitialized = false;
+    private static volatile boolean aprAvailable = false;
+    private static volatile boolean useAprConnector = false;
+    private static volatile boolean useOpenSSL = true;
+    private static volatile boolean instanceCreated = false;
+    private static volatile int openSSLVersion = 0;
 
     public static boolean isAprInitialized() {
-        return org.apache.tomcat.jni.AprStatus.isAprInitialized();
+        return aprInitialized;
     }
 
     public static boolean isAprAvailable() {
-        return org.apache.tomcat.jni.AprStatus.isAprAvailable();
+        return aprAvailable;
     }
 
     public static boolean getUseAprConnector() {
-        return org.apache.tomcat.jni.AprStatus.getUseAprConnector();
+        return useAprConnector;
     }
 
     public static boolean getUseOpenSSL() {
-        return org.apache.tomcat.jni.AprStatus.getUseOpenSSL();
+        return useOpenSSL;
     }
 
     public static boolean isInstanceCreated() {
-        return org.apache.tomcat.jni.AprStatus.isInstanceCreated();
+        return instanceCreated;
     }
 
     public static void setAprInitialized(boolean aprInitialized) {
-        org.apache.tomcat.jni.AprStatus.setAprInitialized(aprInitialized);
+        AprStatus.aprInitialized = aprInitialized;
     }
 
     public static void setAprAvailable(boolean aprAvailable) {
-        org.apache.tomcat.jni.AprStatus.setAprAvailable(aprAvailable);
+        AprStatus.aprAvailable = aprAvailable;
     }
 
     public static void setUseAprConnector(boolean useAprConnector) {
-        org.apache.tomcat.jni.AprStatus.setUseAprConnector(useAprConnector);
+        AprStatus.useAprConnector = useAprConnector;
     }
 
     public static void setUseOpenSSL(boolean useOpenSSL) {
-        org.apache.tomcat.jni.AprStatus.setUseOpenSSL(useOpenSSL);
+        AprStatus.useOpenSSL = useOpenSSL;
     }
 
     public static void setInstanceCreated(boolean instanceCreated) {
-        org.apache.tomcat.jni.AprStatus.setInstanceCreated(instanceCreated);
+        AprStatus.instanceCreated = instanceCreated;
     }
 
     /**
      * @return the openSSLVersion
      */
     public static int getOpenSSLVersion() {
-        return org.apache.tomcat.jni.AprStatus.getOpenSSLVersion();
+        return openSSLVersion;
     }
 
     /**
      * @param openSSLVersion the openSSLVersion to set
      */
     public static void setOpenSSLVersion(int openSSLVersion) {
-        org.apache.tomcat.jni.AprStatus.setOpenSSLVersion(openSSLVersion);
+        AprStatus.openSSLVersion = openSSLVersion;
     }
+
 }
