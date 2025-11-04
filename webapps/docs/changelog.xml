@@ -116,6 +116,14 @@
         Fix SSL socket factory configuration in the JNDI realm. Based on pull
         request <pr>915</pr> by Joshua Rogers. (remm)
       </fix>
+      <update>
+        Add an attribute, <code>digestInRfc3112Order</code>, to
+        <code>MessageDigestCredentialHandler</code> to control the order in
+        which the credential and salt are digested. By default, the current,
+        non-RFC 3112 compliant, order of salt then credential will be used. This
+        default will change in Tomcat 12 to the RFC 3112 compliant order of
+        credential then salt. (markt)
+      </update>
     </changelog>
   </subsection>
   <subsection name="Coyote">
