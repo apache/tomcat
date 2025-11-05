@@ -30,6 +30,10 @@
                description="Should a session always be used once a user is authenticated?"
                type="boolean"/>
 
+    <attribute name="allowSsoReauthentication"
+               description="Should reauthentication from SSO be allowed?"
+               type="boolean"/>
+
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
                type="boolean"/>
@@ -78,6 +82,10 @@
 
     <attribute name="alwaysUseSession"
                description="Should a session always be used once a user is authenticated?"
+               type="boolean"/>
+
+    <attribute name="allowSsoReauthentication"
+               description="Should reauthentication from SSO be allowed?"
                type="boolean"/>
 
     <attribute name="cache"
@@ -253,6 +261,10 @@
          domain="Catalina"
          group="Valve"
          type="org.apache.catalina.authenticator.SSLAuthenticator">
+
+    <attribute name="allowSsoReauthentication"
+               description="Should reauthentication from SSO be allowed?"
+               type="boolean"/>
 
     <attribute name="cache"
                description="Should we cache authenticated Principals if the request is part of an HTTP session?"
