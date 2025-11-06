@@ -4549,7 +4549,7 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
     <mkdir dir="${tomcat.release.verify}" />
 <!--    <chmod dir="${tomcat.release.verify}" perm="700"/>--><!-- To make gpg happy -->
 
-    <exec executable="gpg" failonerror="false"><!-- Not sure why this returns 2 on 'success?' -->
+    <exec executable="${gpg.exec}" failonerror="false"><!-- Not sure why this returns 2 on 'success?' -->
       <arg value="--no-default-keyring" />
       <arg value="--primary-keyring" />
       <arg value="${tomcat.release.verify}/apache-keys"/>
