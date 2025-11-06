@@ -4470,7 +4470,6 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
     <get-release-hash src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
-    <get-release-hash src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}.exe" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}.tar.gz" />
     <get-release-hash src-or-bin="bin" basefile="${final.name}.zip" />
@@ -4481,7 +4480,6 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
     <get-release-signature src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <get-release-signature src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
     <get-release-signature src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
-    <get-release-signature src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
     <get-release-signature src-or-bin="bin" basefile="${final.name}.exe" />
     <get-release-signature src-or-bin="bin" basefile="${final.name}.tar.gz" />
     <get-release-signature src-or-bin="bin" basefile="${final.name}.zip" />
@@ -4492,7 +4490,6 @@ It appears there are no build artifacts to verify. Please run 'ant release' firs
     <compare-hashes num="2"  src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <compare-hashes num="3"  src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
     <compare-hashes num="4"  src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
-    <compare-hashes num="5"  src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
     <compare-hashes num="6"  src-or-bin="bin" basefile="${final.name}.exe" />
     <compare-hashes num="7"  src-or-bin="bin" basefile="${final.name}.tar.gz" />
     <compare-hashes num="8"  src-or-bin="bin" basefile="${final.name}.zip" />
@@ -4509,40 +4506,18 @@ information.
     <compare-signatures num="2"  src-or-bin="bin" basefile="${final.name}-deployer.zip" />
     <compare-signatures num="3"  src-or-bin="bin" basefile="${final.name}-fulldocs.tar.gz" />
     <compare-signatures num="4"  src-or-bin="bin" basefile="${final.name}-windows-x64.zip" />
-    <compare-signatures num="5"  src-or-bin="bin" basefile="${final.name}-windows-x86.zip" />
     <compare-signatures num="6"  src-or-bin="bin" basefile="${final.name}.exe" />
     <compare-signatures num="7"  src-or-bin="bin" basefile="${final.name}.tar.gz" />
     <compare-signatures num="8"  src-or-bin="bin" basefile="${final.name}.zip" />
     <compare-signatures num="9"  src-or-bin="src" basefile="${final-src.name}.tar.gz" />
     <compare-signatures num="10" src-or-bin="src" basefile="${final-src.name}.zip" />
 
-<!--
-<echo>
-reproducible-1=${reproducible-1}
-reproducible-2=${reproducible-2}
-reproducible-3=${reproducible-3}
-reproducible-4=${reproducible-4}
-reproducible-5=${reproducible-5}
-reproducible-6=${reproducible-6}
-reproducible-7=${reproducible-7}
-reproducible-8=${reproducible-8}
-reproducible-9=${reproducible-9}
-reproducible-10=${reproducible-10}
-</echo>
--->
-
     <condition property="reproducible">
       <and>
         <isset property="reproducible-1" />
         <isset property="reproducible-2" />
-<!--
         <isset property="reproducible-3" />
--->
         <isset property="reproducible-4" />
-        <or>
-          <isset property="reproducible-5" />
-          <contains string="${version}" substring="11.0." /><!-- Super hack, Tomcat 11 does not produce x86 binaries. -->
-        </or>
         <isset property="reproducible-6" />
         <isset property="reproducible-7" />
         <isset property="reproducible-8" />
@@ -4553,7 +4528,6 @@ reproducible-10=${reproducible-10}
         <isset property="validsignature-2" />
         <isset property="validsignature-3" />
         <isset property="validsignature-4" />
-        <isset property="validsignature-5" />
         <isset property="validsignature-6" />
         <isset property="validsignature-7" />
         <isset property="validsignature-8" />
