@@ -955,6 +955,14 @@ public class ConnectionPool {
         if (con.isDiscarded()) {
             return true;
         }
+        try {
+            if (con.isClosed()) {
+                return true;
+            }
+        } catch (SQLException e) {
+            log.warn("Unable to check if connection is closed", e);
+            return true;
+        }
         if (isClosed()) {
             return true;
         }
