@@ -155,14 +155,17 @@ public class RewriteValve extends ValveBase {
         InputStream is = null;
 
         // Process configuration file for this valve
+        // Process configuration file for this valve
         if (getContainer() instanceof Context) {
             context = true;
             String webInfResourcePath = "/WEB-INF/" + resourcePath;
             is = ((Context) getContainer()).getServletContext().getResourceAsStream(webInfResourcePath);
-            if (containerLog.isDebugEnabled()) {
-                if (is == null) {
-                    containerLog.debug(sm.getString("rewriteValve.noConfiguration", webInfResourcePath));
-                } else {
+            if (is == null) {
+                if (containerLog.isInfoEnabled()) {
+                    containerLog.info(sm.getString("rewriteValve.noConfiguration", webInfResourcePath));
+                }
+            } else {
+                if (containerLog.isDebugEnabled()) {
                     containerLog.debug(sm.getString("rewriteValve.readConfiguration", webInfResourcePath));
                 }
             }
@@ -172,8 +175,8 @@ public class RewriteValve extends ValveBase {
                 ConfigurationSource.Resource resource = ConfigFileLoader.getSource().getResource(resourceName);
                 is = resource.getInputStream();
             } catch (IOException ioe) {
-                if (containerLog.isDebugEnabled()) {
-                    containerLog.debug(sm.getString("rewriteValve.noConfiguration", resourceName), ioe);
+                if (containerLog.isInfoEnabled()) {
+                    containerLog.info(sm.getString("rewriteValve.noConfiguration", resourceName), ioe);
                 }
             }
         }
