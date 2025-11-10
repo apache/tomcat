@@ -99,6 +99,8 @@ openssl.ffm.3=-DNoop3
 # ----- Release build settings -----
 # Location of GPG executable
 gpg.exec=/path/to/gpg
+# Release artefact signing with gpg
+gpg.sign.files=true
 
 # Code signing of Windows installer
 # See https://infra.apache.org/digicert-use.html for setup instructions
