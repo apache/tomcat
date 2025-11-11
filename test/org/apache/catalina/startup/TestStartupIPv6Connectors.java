@@ -68,6 +68,9 @@ public class TestStartupIPv6Connectors extends TomcatBaseTest {
         while (interfaces.hasMoreElements()) {
             NetworkInterface interf = interfaces.nextElement();
             Enumeration<InetAddress> addresses = interf.getInetAddresses();
+            if (interf.isPointToPoint()) {
+                continue;
+            }
             while (addresses.hasMoreElements()) {
                 InetAddress address = addresses.nextElement();
                 if (address instanceof Inet6Address inet6Address) {
