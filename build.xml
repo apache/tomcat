@@ -2900,6 +2900,7 @@ do.codesigning=true
 
 # Re-use the same GPG executable.
 gpg.exec=${gpg.exec}
+gpg.sign.files=false
 
 # Reproducible builds require the use of the build tools defined below. The
 # vendors (where appropriate) and versions must match exactly for a reproducible
