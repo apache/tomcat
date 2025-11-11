@@ -270,6 +270,10 @@
   <subsection name="Cluster">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Correct a regression in 11.0.11 that broke some clustering
+        configurations. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="WebSocket">
