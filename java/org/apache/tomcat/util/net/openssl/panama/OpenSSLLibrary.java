@@ -425,6 +425,18 @@ public class OpenSSLLibrary {
         return fipsModeActive;
     }
 
+    public static String getVersionString() {
+        if (!OpenSSLStatus.isAvailable()) {
+            return null;
+        }
+
+        try {
+            return OpenSSL_version(0).getString(0);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static List<String> findCiphers(String ciphers) {
         ArrayList<String> ciphersList = new ArrayList<>();
         try (var localArena = Arena.ofConfined()) {
