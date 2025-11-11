@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Clustering">
+    <changelog>
+      <fix>
+        Correct a regression introduced in 10.1.45 that broke some clustering
+        configurations. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.49 (schultz)" rtext="Release in progress">
   <subsection name="Catalina">
