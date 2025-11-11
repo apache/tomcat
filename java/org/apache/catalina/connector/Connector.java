@@ -294,6 +294,16 @@ public class Connector extends LifecycleMBeanBase {
 
     // ------------------------------------------------------------- Properties
 
+    private boolean isAprAvailable = false;
+
+    public boolean isAprAvailable() {
+        return isAprAvailable;
+    }
+
+    public void setAprAvailable(boolean aprAvailable) {
+        isAprAvailable = aprAvailable;
+    }
+
     /**
      * Return a property from the protocol handler.
      *
@@ -1052,18 +1062,14 @@ public class Connector extends LifecycleMBeanBase {
             setParseBodyMethods(getParseBodyMethods());
         }
 
-        if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable() &&
-                protocolHandler instanceof AbstractHttp11Protocol<?> jsseProtocolHandler) {
-            // Use FFM and OpenSSL if available
-            if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
+        if (protocolHandler instanceof AbstractHttp11Protocol<?> jsseProtocolHandler &&
+                jsseProtocolHandler.isSSLEnabled() &&
+                jsseProtocolHandler.getSslImplementationName() == null) {
+            if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable()) {
                 // OpenSSL is compatible with the JSSE configuration, so use it if it is available
                 jsseProtocolHandler
                         .setSslImplementationName("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
-            }
-        } else if (hasAprStatus() && AprStatus.getUseOpenSSL() &&
-                protocolHandler instanceof AbstractHttp11Protocol<?> jsseProtocolHandler) {
-            // Use tomcat-native and OpenSSL otherwise, if available
-            if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
+            } else if (isAprAvailable() && AprStatus.getUseOpenSSL()) {
                 // OpenSSL is compatible with the JSSE configuration, so use it if APR is available
                 jsseProtocolHandler.setSslImplementationName(OpenSSLImplementation.class.getName());
             }
@@ -1074,14 +1080,6 @@ public class Connector extends LifecycleMBeanBase {
             protocolHandler.init();
         } catch (Exception e) {
             throw new LifecycleException(sm.getString("coyoteConnector.protocolHandlerInitializationFailed"), e);
-        }
-    }
-
-    private boolean hasAprStatus() {
-        try {
-            return AprStatus.isAprAvailable();
-        } catch (final Exception | Error e) { // likely java.lang.NoClassDefFoundError: org/apache/tomcat/jni/AprStatus
-            return false;
         }
     }
 

@@ -96,6 +96,9 @@ public abstract class LifecycleBase implements Lifecycle {
         lifecycleListeners.remove(listener);
     }
 
+    protected int lifecycleListenersCount() {
+        return lifecycleListeners.size();
+    }
 
     /**
      * Allow subclasses to fire {@link Lifecycle} events.

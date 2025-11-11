@@ -41,9 +41,11 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.Server;
 import org.apache.catalina.Service;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.NamingResourcesImpl;
 import org.apache.catalina.mbeans.MBeanFactory;
 import org.apache.catalina.startup.Catalina;
@@ -207,6 +209,10 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
      */
     private int periodicEventDelay = 10;
 
+    /**
+     * Is org.apache.catalina.core.AprLifecycleListener registered.
+     */
+    private int hasAprLifecycleListener = 0;
 
     // ------------------------------------------------------------- Properties
 
@@ -451,6 +457,21 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
     // --------------------------------------------------------- Server Methods
 
+    @Override
+    public void addLifecycleListener(LifecycleListener listener) {
+        if (listener instanceof AprLifecycleListener) {
+            hasAprLifecycleListener++;
+        }
+        super.addLifecycleListener(listener);
+    }
+
+    @Override
+    public void removeLifecycleListener(LifecycleListener listener) {
+        if (listener instanceof AprLifecycleListener) {
+            hasAprLifecycleListener--;
+        }
+        super.removeLifecycleListener(listener);
+    }
 
     @Override
     public void addService(Service service) {
@@ -948,6 +969,11 @@ public final class StandardServer extends LifecycleMBeanBase implements Server {
 
         // Initialize our defined Services
         for (Service service : findServices()) {
+            if (hasAprLifecycleListener > 0) {
+                for (Connector connector : service.findConnectors()) {
+                    connector.setAprAvailable(true);
+                }
+            }
             service.init();
         }
     }
