@@ -1060,7 +1060,7 @@ public class Connector extends LifecycleMBeanBase {
                 jsseProtocolHandler
                         .setSslImplementationName("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
             }
-        } else if (AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
+        } else if (hasAprStatus() && AprStatus.getUseOpenSSL() &&
                 protocolHandler instanceof AbstractHttp11Protocol<?> jsseProtocolHandler) {
             // Use tomcat-native and OpenSSL otherwise, if available
             if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
@@ -1077,6 +1077,13 @@ public class Connector extends LifecycleMBeanBase {
         }
     }
 
+    private boolean hasAprStatus() {
+        try {
+            return AprStatus.isAprAvailable();
+        } catch (final Exception | Error e) { // likely java.lang.NoClassDefFoundError: org/apache/tomcat/jni/AprStatus
+            return false;
+        }
+    }
 
     /**
      * Begin processing requests via this Connector.
