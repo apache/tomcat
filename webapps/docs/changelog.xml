@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Clustering">
+    <changelog>
+      <fix>
+        Correct a regression introduced in 11.0.11 that broke some clustering
+        configurations. (markt)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 11.0.14 (markt)" rtext="2025-11-10">
   <subsection name="Catalina">
