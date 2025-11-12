@@ -113,6 +113,14 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Jasper">
+    <changelog>
+      <fix>
+        <bug>69877</bug>: Catch IllegalArgumentException when processing URIs
+        when creating the classpath to handle invalid URIs. (remm)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Clustering">
     <changelog>
       <fix>
