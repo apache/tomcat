@@ -64,29 +64,61 @@ public class TestStartupIPv6Connectors extends TomcatBaseTest {
 
     @BeforeClass
     public static void initializeTestIpv6Addresses() throws Exception {
+        Inet6Address possibleLinkLocalLoopback = null;
+        Inet6Address possibleLinkLocalOnGlobal = null;
+        Inet6Address possibleLinkLocalAny = null;
+
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {
             NetworkInterface interf = interfaces.nextElement();
-            Enumeration<InetAddress> addresses = interf.getInetAddresses();
-            if (interf.isPointToPoint()) {
+            if (!interf.isUp() || interf.isVirtual() || interf.isPointToPoint() || !interf.supportsMulticast()) {
                 continue;
             }
+            Enumeration<InetAddress> addresses = interf.getInetAddresses();
+            boolean globalOnInterface = false;
+            while (addresses.hasMoreElements()) {
+                InetAddress address = addresses.nextElement();
+                if (address instanceof Inet6Address) {
+                    Inet6Address inet6Address = (Inet6Address) address;
+                    if (!inet6Address.isAnyLocalAddress() && !inet6Address.isLoopbackAddress() && !inet6Address.isLinkLocalAddress() && !inet6Address.isMulticastAddress()) {
+                        globalOnInterface = true;
+                        if (!interf.isLoopback()) {
+                            globalAddress = inet6Address.getHostAddress();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Second pass to get link-local results with specific order
+            addresses = interf.getInetAddresses();
             while (addresses.hasMoreElements()) {
                 InetAddress address = addresses.nextElement();
                 if (address instanceof Inet6Address) {
                     Inet6Address inet6Address = (Inet6Address) address;
                     if (inet6Address.isLinkLocalAddress()) {
-                        linklocalAddress = inet6Address.getHostAddress();
-                    }
-                    if (!inet6Address.isAnyLocalAddress() && !inet6Address.isLoopbackAddress() && !inet6Address.isLinkLocalAddress() && !inet6Address.isMulticastAddress()) {
-                        globalAddress = inet6Address.getHostAddress();
-                    }
-                    if (linklocalAddress != null && globalAddress != null) {
-                        return;
+                        if (interf.isLoopback()) {
+                            // Best option for mac
+                            possibleLinkLocalLoopback = inet6Address;
+                        } else if (globalOnInterface && possibleLinkLocalOnGlobal == null) {
+                            // link-local on an interface that also has a global IPv6 (e.g. en0)
+                            possibleLinkLocalOnGlobal = inet6Address;
+                        } else if (possibleLinkLocalAny == null) {
+                            possibleLinkLocalAny = inet6Address;
+                        }
                     }
                 }
             }
         }
+
+        if (possibleLinkLocalLoopback != null) {
+            linklocalAddress = possibleLinkLocalLoopback.getHostAddress();
+        } else if (possibleLinkLocalOnGlobal != null) {
+            linklocalAddress = possibleLinkLocalOnGlobal.getHostAddress();
+        } else if (possibleLinkLocalAny != null) {
+            linklocalAddress = possibleLinkLocalAny.getHostAddress();
+        }
+
     }
 
     private void assertHttpOkOnAddress(String address) throws Exception {
