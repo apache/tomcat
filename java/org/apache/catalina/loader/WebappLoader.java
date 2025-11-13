@@ -354,12 +354,12 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader, Property
             classLoader.setResources(context.getResources());
             classLoader.setDelegate(this.delegate);
 
-            // Configure our repositories
-            setClassPath();
-
             setPermissions();
 
             classLoader.start();
+
+            // Configure our repositories
+            setClassPath();
 
             String contextName = context.getName();
             if (!contextName.startsWith("/")) {
