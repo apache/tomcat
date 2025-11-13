@@ -869,6 +869,8 @@ public class StatusTransformer {
             writer.print("</a>");
 
             writer.print("<p>");
+            writer.print("State: ");
+            writer.print(mBeanServer.getAttribute(objectName, "stateName"));
             Object startTime = mBeanServer.getAttribute(objectName, "startTime");
             writer.print(" Start time: " + new Date(((Long) startTime).longValue()));
             writer.print(" Startup time: ");
@@ -895,6 +897,8 @@ public class StatusTransformer {
         } else if (mode == 2) {
             indent(writer, 2).append('{').println();
             appendJSonValue(indent(writer, 3), "name", JSONFilter.escape(JSONFilter.escape(name))).append(',');
+            appendJSonValue(writer, "state", mBeanServer.getAttribute(objectName, "stateName"));
+            writer.append(',');
             appendJSonValue(writer, "startTime",
                     new Date(((Long) mBeanServer.getAttribute(objectName, "startTime")).longValue()).toString())
                     .append(',');
