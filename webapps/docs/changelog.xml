@@ -304,6 +304,11 @@
   <subsection name="Web applications">
     <changelog>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <fix>
+        Manager: Fix abrupt truncation of the HTML and JSON complete server
+        status output if one or more of the web applications failed to start.
+        (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Other">

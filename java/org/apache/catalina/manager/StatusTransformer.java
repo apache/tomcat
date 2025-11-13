@@ -34,6 +34,7 @@ import javax.management.ObjectName;
 
 import jakarta.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.LifecycleState;
 import org.apache.tomcat.util.json.JSONFilter;
 import org.apache.tomcat.util.security.Escape;
 
@@ -795,6 +796,8 @@ public class StatusTransformer {
             contextName = "";
         }
 
+        Object stateName = mBeanServer.getAttribute(objectName, "stateName");
+
         if (mode == 0) {
 
             writer.print("<h1>");
@@ -803,12 +806,19 @@ public class StatusTransformer {
             writer.print("</a>");
 
             writer.print("<p>");
-            Object startTime = mBeanServer.getAttribute(objectName, "startTime");
-            writer.print(" Start time: " + new Date(((Long) startTime).longValue()));
-            writer.print(" Startup time: ");
-            writer.print(formatTime(mBeanServer.getAttribute(objectName, "startupTime"), false));
-            writer.print(" TLD scan time: ");
-            writer.print(formatTime(mBeanServer.getAttribute(objectName, "tldScanTime"), false));
+            writer.print("State: " + stateName);
+            if (!LifecycleState.FAILED.name().equals(stateName)) {
+                /*
+                 * If in the FAILED state, the context will be an instance of FailedContext so the attributes normally
+                 * requested for a running context won't be available.
+                 */
+                Object startTime = mBeanServer.getAttribute(objectName, "startTime");
+                writer.print(" Start time: " + new Date(((Long) startTime).longValue()));
+                writer.print(" Startup time: ");
+                writer.print(formatTime(mBeanServer.getAttribute(objectName, "startupTime"), false));
+                writer.print(" TLD scan time: ");
+                writer.print(formatTime(mBeanServer.getAttribute(objectName, "tldScanTime"), false));
+            }
             if (managerON != null) {
                 writeManager(writer, managerON, mBeanServer, mode);
             }
@@ -829,11 +839,19 @@ public class StatusTransformer {
         } else if (mode == 2) {
             indent(writer, 2).append('{').println();
             appendJSonValue(indent(writer, 3), "name", JSONFilter.escape(JSONFilter.escape(name))).append(',');
-            appendJSonValue(writer, "startTime",
-                    new Date(((Long) mBeanServer.getAttribute(objectName, "startTime")).longValue()).toString())
-                    .append(',');
-            appendJSonValue(writer, "startupTime", mBeanServer.getAttribute(objectName, "startupTime")).append(',');
-            appendJSonValue(writer, "tldScanTime", mBeanServer.getAttribute(objectName, "tldScanTime"));
+            appendJSonValue(writer, "stateName", stateName);
+            if (!LifecycleState.FAILED.name().equals(stateName)) {
+                /*
+                 * If in the FAILED state, the context will be an instance of FailedContext so the attributes normally
+                 * requested for a running context won't be available.
+                 */
+                writer.append(',');
+                appendJSonValue(writer, "startTime",
+                        new Date(((Long) mBeanServer.getAttribute(objectName, "startTime")).longValue()).toString())
+                        .append(',');
+                appendJSonValue(writer, "startupTime", mBeanServer.getAttribute(objectName, "startupTime")).append(',');
+                appendJSonValue(writer, "tldScanTime", mBeanServer.getAttribute(objectName, "tldScanTime"));
+            }
             if (managerON != null) {
                 writeManager(writer, managerON, mBeanServer, mode);
             }
