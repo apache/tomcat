@@ -136,8 +136,14 @@
   <subsection name="Web Applications">
     <changelog>
       <fix>
-        Fix error while building status JSON for a failed context. (schultz)
+        Manager: Fix abrupt truncation of the HTML and JSON complete server
+        status output if one or more of the web applications failed to start.
+        (schultz)
       </fix>
+      <add>
+        Manager: Include web application state in the HTML and JSON complete
+        server status output. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
