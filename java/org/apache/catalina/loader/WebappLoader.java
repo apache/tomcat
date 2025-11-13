@@ -318,12 +318,12 @@ public class WebappLoader extends LifecycleMBeanBase implements Loader {
                 MigrationUtil.addJakartaEETransformer(classLoader, getJakartaConverter());
             }
 
-            // Configure our repositories
-            setClassPath();
-
             setPermissions();
 
             classLoader.start();
+
+            // Configure our repositories
+            setClassPath();
 
             String contextName = context.getName();
             if (!contextName.startsWith("/")) {
