@@ -133,6 +133,13 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Web Applications">
+    <changelog>
+      <fix>
+        Fix error while building status JSON for a failed context. (schultz)
+      </fix>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 9.0.112 (remm)" rtext="release in progress">
   <subsection name="Catalina">

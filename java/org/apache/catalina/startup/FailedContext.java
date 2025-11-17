@@ -1404,4 +1404,15 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setUseBloomFilterForArchives(boolean useBloomFilterForArchives) {
     }
 
+    public long getStartTime() {
+        return -1;
+    }
+
+    public long getStartupTime() {
+        return -1;
+    }
+
+    public long getTldScanTime() {
+        return -1;
+    }
 }
