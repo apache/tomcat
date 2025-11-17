@@ -1442,4 +1442,15 @@ public class FailedContext extends LifecycleMBeanBase implements Context {
     public void setSuspendWrappedResponseAfterForward(boolean suspendWrappedResponseAfterForward) {
     }
 
+    public long getStartTime() {
+        return -1;
+    }
+
+    public long getStartupTime() {
+        return -1;
+    }
+
+    public long getTldScanTime() {
+        return -1;
+    }
 }
