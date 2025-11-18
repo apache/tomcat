@@ -307,8 +307,12 @@
       <fix>
         Manager: Fix abrupt truncation of the HTML and JSON complete server
         status output if one or more of the web applications failed to start.
-        (markt)
+        (schultz)
       </fix>
+      <add>
+        Manager: Include web application state in the HTML and JSON complete
+        server status output. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Other">
