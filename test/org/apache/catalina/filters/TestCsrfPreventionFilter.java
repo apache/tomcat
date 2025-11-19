@@ -224,7 +224,9 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
                 "/foo/bar",
                 "/foo/bar?",
                 "/foo/bar?csrf",
+                "/foo/bar?csrf&",
                 "/foo/bar?csrf=",
+                "/foo/bar?csrf=&",
                 "/foo/bar?csrf=abc",
                 "/foo/bar?csrf=abc&bar=foo",
                 "/foo/bar?bar=foo&csrf=abc",
@@ -232,6 +234,8 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
                 "/foo/bar?csrfx=foil&bar=foo&csrf=abc&foo=bar",
                 "/foo/bar?csrfx=foil&bar=foo&csrf=abc&foo=bar&csrf=def",
                 "/foo/bar?csrf=&csrf&csrf&csrf&csrf=abc&csrf=",
+                "/foo/bar?xcsrf=&xcsrf&xcsrf&xcsrf&xcsrf=abc&xcsrf=",
+                "/foo/bar?xcsrf=&xcsrf&xcsrf&csrf=foo&xcsrf&xcsrf=abc&csrf=bar&xcsrf=&",
         };
 
         String csrfParameterName = "csrf";
@@ -245,11 +249,6 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
     }
 
     private static String dumbButAccurateCleanse(String url, String csrfParameterName) {
-        if(url.endsWith("?")) {
-            // This is a special case we don't care about too much
-            return url;
-        }
-
         // Get rid of [&csrf=value] with optional =value
         Pattern p = Pattern.compile(Pattern.quote("&") + Pattern.quote(csrfParameterName) + "(=[^&]*)?(&|$)");
 
