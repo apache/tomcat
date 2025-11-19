@@ -580,12 +580,12 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         /**
          * Removes zero or more query parameters from a URL.
-         * 
+         *
          * All instances of the query parameter and any associated values will be
          * removed.
-         * 
+         *
          * @param url The URL whose query parameters should be removed.
-         * 
+         *
          * @param parameterName The name of the parameter to remove.
          *
          * @return The URL without any instances of the query parameter
