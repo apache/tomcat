@@ -592,11 +592,11 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
          * <code>parameterName</code> present.
          */
         public static String removeQueryParameters(String url, String parameterName) {
-            if(null != parameterName) {
+            if (null != parameterName) {
 //                System.out.println("Removing parameter " + parameterName + " from url " + url);
                 // Check for query string
                 int q = url.indexOf('?');
-                if(q > -1) {
+                if (q > -1) {
 //                    System.out.println("Found query string at position " + q);
 
                     // Look for parameter end
@@ -605,24 +605,24 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
                     int iterations = 0;
 
-                    while(-1 < pos) {
+                    while (-1 < pos) {
                         // Process all parameters
 //                        System.out.println(":: url=" + url + ", pos=" + pos + ", start=" + start);
-                        if(++iterations > 100000) {
+                        if (++iterations > 100000) {
                             // Just in case things get out of control
                             throw new IllegalStateException("Way too many loop iterations");
                         }
 
                         int eq = url.indexOf('=', start);
                         int paramNameEnd;
-                        if(-1 == eq || eq > pos) {
+                        if (-1 == eq || eq > pos) {
                             paramNameEnd = pos;
                             // Found no equal sign at all or past next & ; Parameter is all name.
                         } else {
                             // Found this param's equal sign
                             paramNameEnd = eq;
                         }
-                        if(parameterName.equals(url.substring(start, paramNameEnd))) {
+                        if (parameterName.equals(url.substring(start, paramNameEnd))) {
 //                            System.out.println("Removing parameter " + parameterName + " between index " + start + " and " + paramNameEnd);
                             // Remove the parameter
                             url = url.substring(0, start) + url.substring(pos + 1); // +1 to consume the &
@@ -638,19 +638,19 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 //                    System.out.println("Final parameter: " + url.substring(start));
                     pos = url.indexOf('=', start);
 
-                    if(-1 < pos) {
+                    if (-1 < pos) {
                         paramName = url.substring(start, pos);
                     } else {
                         paramName =  url.substring(start);
                         // No value
                     }
-                    if(paramName.equals(parameterName)) {
+                    if (paramName.equals(parameterName)) {
                         // Remove this parameter
 
 //                        System.out.println("Removing final parameter " + parameterName);
                         // Remove any trailing ? or & as well
                         char c = url.charAt(start - 1);
-                        if('?' == c || '&' == c) {
+                        if ('?' == c || '&' == c) {
                             start--;
                         }
 
@@ -658,7 +658,7 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
                     } else {
                         // Remove trailing ? if it's there. Is this worth it?
                         int length = url.length();
-                        if(length == q + 1) {
+                        if (length == q + 1) {
                             url = url.substring(0, length - 1);
                         }
                     }

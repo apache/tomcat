@@ -255,7 +255,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         // Do this iteratively to get everything
         Matcher m = p.matcher(url);
 
-        while(m.find()) {
+        while (m.find()) {
             url = m.replaceFirst("$2");
             m = p.matcher(url);
         }
@@ -263,7 +263,7 @@ public class TestCsrfPreventionFilter extends TomcatBaseTest {
         // Get rid of [?csrf=value] with optional =value
         url = url.replaceAll(Pattern.quote("?") + csrfParameterName + "(=[^&]*)?(&|$)", "?");
 
-        if(url.endsWith("?")) {
+        if (url.endsWith("?")) {
             url = url.substring(0, url.length() - 1);
         }
 
