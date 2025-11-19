@@ -544,6 +544,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public String encodeRedirectURL(String url) {
+            url = removeQueryParameters(url, nonceRequestParameterName);
+
             if (shouldAddNonce(url)) {
                 return addNonce(super.encodeRedirectURL(url));
             } else {
@@ -553,6 +555,8 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
 
         @Override
         public String encodeURL(String url) {
+            url = removeQueryParameters(url, nonceRequestParameterName);
+
             if (shouldAddNonce(url)) {
                 return addNonce(super.encodeURL(url));
             } else {
@@ -572,6 +576,87 @@ public class CsrfPreventionFilter extends CsrfPreventionFilterBase {
             }
 
             return true;
+        }
+
+        public static String removeQueryParameters(String url, String parameterName) {
+            if(null != parameterName) {
+                // Check for query string
+                int q = url.indexOf('?');
+                if(q > -1) {
+//                    System.out.println("Found query string at position " + q);
+                    // Check for parameter name
+                    int pos = url.indexOf(parameterName, q + 1);
+                    int iterations = 0;
+                    while(pos > -1) {
+                        if(++iterations > 100000) {
+                            // Just in case things get out of control
+                            throw new IllegalStateException("Way too many loop iterations");
+                        }
+//                        System.out.println("url is currently: " + url);
+
+                        char c = url.charAt(pos - 1);
+
+                        if(c == '?' || c == '&') {
+//                            System.out.println("Found parameter at position " + pos);
+                            int next = pos + parameterName.length();
+                            if(url.length() > next) {
+//                                System.out.println("URL extends beyond the parameter name " + parameterName);
+                                c = url.charAt(next);
+//                                System.out.println("Next character: " + c);
+                                if(c == '&') {
+//                                    System.out.println("Trailing character is & at position " + next + "; param without value");
+                                    // We have found our parameter without a value
+                                    url = url.substring(0, pos) + url.substring(next + 1);
+                                } else if(c == '=') {
+//                                    System.out.println("Trailing character is = at position " + next + "; param with value");
+                                    // We have found our parameter with a value
+                                    // Get this position before truncating
+                                    next = url.indexOf('&', next);
+                                    if(next > -1) {
+//                                        System.out.println("Found more characters at position " + next);
+                                        // There are more parameters in the URL
+//                                        System.out.println("Substring: 0-" + pos + ", " +(next-1) + "- *");
+                                        url = url.substring(0, pos) + url.substring(next + 1); // Be sure to remove the &
+
+                                        // Set pos appropriately for the next loop iteration
+                                        // pos is currently pointing at what was the start of the parameter name.
+                                        // It should now be pointing to the start of whatever comes next,
+                                        // so let's look forward.
+                                        pos = url.indexOf(parameterName, pos);
+                                    } else {
+//                                        System.out.println("Found no trailing & character");
+                                        // Also remove the trailing '&'
+                                        url = url.substring(0, pos - 1);
+
+                                        // We are done
+                                        break;
+                                    }
+                                } else {
+//                                    System.out.println("Foil: parameter name was a prefix of the actual parameter name; skipping");
+//                                    System.out.println("Foil: " );
+                                    // Skip to the next & or end-of-string
+                                    next = url.indexOf('&');
+                                    if(pos > -1) {
+                                        // Skip the & and find the next parameter
+                                        pos = url.indexOf(parameterName, next + 1);
+                                    } else {
+                                        // We are done
+                                        break;
+                                    }
+                                }
+                            } else {
+//                                System.out.println("Param without suffix; truncating to " + q);
+                                // We have ?name without any suffix. Truncate the query string.
+                                url = url.substring(0, q);
+
+                                // We are done
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            return url;
         }
 
         /*
