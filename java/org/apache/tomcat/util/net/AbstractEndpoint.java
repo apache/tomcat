@@ -444,8 +444,14 @@ public abstract class AbstractEndpoint<S, U> {
             if (keyAlias == null) {
                 keyAlias = SSLUtilBase.DEFAULT_KEY_ALIAS;
             }
-            certificateInfo =
-                    sm.getString("endpoint.tls.info.cert.keystore", certificate.getCertificateKeystoreFile(), keyAlias);
+            String keystoreFile;
+            if (certificate.getCertificateKeystoreInternal() != null) {
+                // Keystore was set directly. Original location is unknown.
+                keystoreFile = sm.getString("endpoint.tls.info.cert.keystore.direct");
+            } else {
+                keystoreFile = certificate.getCertificateKeystoreFile();
+            }
+            certificateInfo = sm.getString("endpoint.tls.info.cert.keystore", keystoreFile, keyAlias);
         }
 
         String trustStoreSource = sslHostConfig.getTruststoreFile();
