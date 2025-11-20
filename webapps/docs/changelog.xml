@@ -117,6 +117,15 @@
       </fix>
     </changelog>
   </subsection>
+  <subsection name="Coyote">
+    <changelog>
+      <fix>
+        Don't log an incorrect certificate <code>KeyStore</code> location when
+        creating a TLS connector if the <code>KeyStore</code> instance has been
+        set directly on the connector. (markt)
+      </fix>
+    </changelog>
+  </subsection>
   <subsection name="Jasper">
     <changelog>
       <fix>
