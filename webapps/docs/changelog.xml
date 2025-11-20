@@ -111,6 +111,10 @@
         <bug>69871</bug>: Increase log level to INFO for missing configuration
         for the rewrite valve. (remm)
       </fix>
+      <fix>
+        Add log warnings for additional Host <code>appBase</code> suspicious
+        values. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
