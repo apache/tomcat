@@ -255,6 +255,11 @@ public class SSLHostConfigCertificate implements Serializable {
     }
 
 
+    KeyStore getCertificateKeystoreInternal() {
+        return certificateKeystore;
+    }
+
+
     public void setCertificateKeyManager(X509KeyManager certificateKeyManager) {
         this.certificateKeyManager = certificateKeyManager;
     }

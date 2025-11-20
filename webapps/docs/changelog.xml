@@ -231,6 +231,11 @@
         <bug>69866</bug>: Fix a memory leak when using a trust store with the
         OpenSSL provider. Pull request <pr>912</pr> by aogburn. (markt)
       </fix>
+      <fix>
+        Don't log an incorrect certificate <code>KeyStore</code> location when
+        creating a TLS connector if the <code>KeyStore</code> instance has been
+        set directly on the connector. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">
