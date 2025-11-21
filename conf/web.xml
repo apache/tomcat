@@ -3743,6 +3743,14 @@
         <mime-type>application/x-sql</mime-type>
     </mime-mapping>
     <mime-mapping>
+        <extension>sqlite</extension>
+        <mime-type>application/vnd.sqlite3</mime-type>
+    </mime-mapping>
+    <mime-mapping>
+        <extension>sqlite3</extension>
+        <mime-type>application/vnd.sqlite3</mime-type>
+    </mime-mapping>
+    <mime-mapping>
         <extension>src</extension>
         <mime-type>application/x-wais-source</mime-type>
     </mime-mapping>

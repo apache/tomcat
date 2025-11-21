@@ -159,6 +159,14 @@
       </add>
     </changelog>
   </subsection>
+  <subsection name="Other">
+    <changelog>
+      <update>
+        Update file extension to media type mappings to align with the current
+        list used by the Apache Web Server (httpd). (markt)
+      </update>
+    </changelog>
+  </subsection>
 </section>
 <section name="Tomcat 10.1.49 (schultz)" rtext="Release in progress">
   <subsection name="Catalina">
