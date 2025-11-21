@@ -314,6 +314,10 @@
         Update Derby to 10.17.1.0. (markt)
       </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
+      <update>
+        Update file extension to media type mappings to align with the current
+        list used by the Apache Web Server (httpd). (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
