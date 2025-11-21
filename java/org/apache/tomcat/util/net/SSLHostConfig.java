@@ -537,6 +537,7 @@ public class SSLHostConfig implements Serializable {
 
     /**
      * Set the enabled named groups.
+     *
      * @param groupsString the case sensitive comma separated list of groups
      */
     public void setGroups(String groupsString) {

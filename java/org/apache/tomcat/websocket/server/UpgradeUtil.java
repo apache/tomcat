@@ -72,9 +72,9 @@ public class UpgradeUtil {
      */
     public static boolean isWebSocketUpgradeRequest(ServletRequest request, ServletResponse response) {
 
-        return ((request instanceof HttpServletRequest) &&
-                (response instanceof HttpServletResponse) && headerContainsToken((HttpServletRequest) request,
-                        Constants.UPGRADE_HEADER_NAME, Constants.UPGRADE_HEADER_VALUE) &&
+        return ((request instanceof HttpServletRequest) && (response instanceof HttpServletResponse) &&
+                headerContainsToken((HttpServletRequest) request, Constants.UPGRADE_HEADER_NAME,
+                        Constants.UPGRADE_HEADER_VALUE) &&
                 Method.GET.equals(((HttpServletRequest) request).getMethod()));
     }
 

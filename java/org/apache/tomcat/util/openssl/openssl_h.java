@@ -3605,7 +3605,8 @@ public class openssl_h {
     }
 
     private static class X509_STORE_CTX_get1_issuer {
-        public static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
+        public static final FunctionDescriptor DESC =
+                FunctionDescriptor.of(openssl_h.C_INT, openssl_h.C_POINTER, openssl_h.C_POINTER, openssl_h.C_POINTER);
 
         public static final MemorySegment ADDR = openssl_h.findOrThrow("X509_STORE_CTX_get1_issuer");
 

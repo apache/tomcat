@@ -83,7 +83,7 @@ public class Asn1Writer {
             result[1] = (byte) (128 + lengthSize);
             int i = lengthSize;
             while (dataSize > 0) {
-                result[i+1] = (byte) (dataSize & 0xFF);
+                result[i + 1] = (byte) (dataSize & 0xFF);
                 dataSize = dataSize >> 8;
                 i--;
             }

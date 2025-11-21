@@ -94,16 +94,16 @@ public class Util {
             case 1002 -> CloseCodes.PROTOCOL_ERROR;
             case 1003 -> CloseCodes.CANNOT_ACCEPT;
             case 1004 ->
-                // Should not be used in a close frame
-                // return CloseCodes.RESERVED;
+                    // Should not be used in a close frame
+                    // return CloseCodes.RESERVED;
                     CloseCodes.PROTOCOL_ERROR;
             case 1005 ->
-                // Should not be used in a close frame
-                // return CloseCodes.NO_STATUS_CODE;
+                    // Should not be used in a close frame
+                    // return CloseCodes.NO_STATUS_CODE;
                     CloseCodes.PROTOCOL_ERROR;
             case 1006 ->
-                // Should not be used in a close frame
-                // return CloseCodes.CLOSED_ABNORMALLY;
+                    // Should not be used in a close frame
+                    // return CloseCodes.CLOSED_ABNORMALLY;
                     CloseCodes.PROTOCOL_ERROR;
             case 1007 -> CloseCodes.NOT_CONSISTENT;
             case 1008 -> CloseCodes.VIOLATED_POLICY;
@@ -111,16 +111,16 @@ public class Util {
             case 1010 -> CloseCodes.NO_EXTENSION;
             case 1011 -> CloseCodes.UNEXPECTED_CONDITION;
             case 1012 ->
-                // Not in RFC6455
-                // return CloseCodes.SERVICE_RESTART;
+                    // Not in RFC6455
+                    // return CloseCodes.SERVICE_RESTART;
                     CloseCodes.PROTOCOL_ERROR;
             case 1013 ->
-                // Not in RFC6455
-                // return CloseCodes.TRY_AGAIN_LATER;
+                    // Not in RFC6455
+                    // return CloseCodes.TRY_AGAIN_LATER;
                     CloseCodes.PROTOCOL_ERROR;
             case 1015 ->
-                // Should not be used in a close frame
-                // return CloseCodes.TLS_HANDSHAKE_FAILURE;
+                    // Should not be used in a close frame
+                    // return CloseCodes.TLS_HANDSHAKE_FAILURE;
                     CloseCodes.PROTOCOL_ERROR;
             default -> CloseCodes.PROTOCOL_ERROR;
         };

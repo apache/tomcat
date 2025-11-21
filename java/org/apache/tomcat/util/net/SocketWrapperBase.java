@@ -1361,7 +1361,7 @@ public abstract class SocketWrapperBase<E> {
                     try {
                         long timeoutExpiry = System.nanoTime() + unit.toNanos(timeout);
                         long timeoutMillis = unit.toMillis(timeout);
-                         // Spurious wake-ups are possible. Keep waiting until state changes or timeout expires.
+                        // Spurious wake-ups are possible. Keep waiting until state changes or timeout expires.
                         while (state.state == CompletionState.PENDING && timeoutMillis > 0) {
                             state.wait(unit.toMillis(timeout));
                             timeoutMillis = (timeoutExpiry - System.nanoTime()) / 1_000_000;

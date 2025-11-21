@@ -1174,7 +1174,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         X509_STORE_CTX_set_error(x509ctx, X509_V_ERR_CERT_REVOKED());
                     } else if (ocspResponse == V_OCSP_CERTSTATUS_UNKNOWN()) {
                         errnum = X509_STORE_CTX_get_error(x509ctx);
-                        if (errnum != X509_V_ERR_UNABLE_TO_GET_CRL() && (errnum == X509_V_ERR_APPLICATION_VERIFICATION() || errnum != 0)) {
+                        if (errnum != X509_V_ERR_UNABLE_TO_GET_CRL() &&
+                                (errnum == X509_V_ERR_APPLICATION_VERIFICATION() || errnum != 0)) {
                             ok = 0;
                         }
                     }
@@ -1207,7 +1208,8 @@ public final class OpenSSLEngine extends SSLEngine implements SSLUtil.ProtocolIn
                         if (openssl_h_Compatibility.OPENSSL && !openssl_h_Compatibility.OPENSSL3) {
                             issuer = openssl_h_Compatibility.X509_STORE_CTX_get0_current_issuer(x509ctx);
                         } else {
-                            MemorySegment x509IssuerPointer = localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
+                            MemorySegment x509IssuerPointer =
+                                    localArena.allocateFrom(ValueLayout.ADDRESS, MemorySegment.NULL);
                             int res = X509_STORE_CTX_get1_issuer(x509IssuerPointer, x509ctx, x509);
                             if (res > 0) {
                                 issuer = x509IssuerPointer.get(ValueLayout.ADDRESS, 0);
