@@ -448,8 +448,8 @@ public class openssl_h_Macros {
         if (openssl_h_Compatibility.BORINGSSL) {
             class Holder {
                 static final String NAME = "SSL_CTX_set1_groups_list";
-                static final FunctionDescriptor DESC = FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER,
-                        openssl_h.C_POINTER);
+                static final FunctionDescriptor DESC =
+                        FunctionDescriptor.of(openssl_h.C_LONG, openssl_h.C_POINTER, openssl_h.C_POINTER);
                 static final MethodHandle MH = Linker.nativeLinker().downcallHandle(openssl_h.findOrThrow(NAME), DESC);
             }
             var mh$ = Holder.MH;

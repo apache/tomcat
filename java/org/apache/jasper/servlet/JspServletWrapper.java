@@ -517,8 +517,7 @@ public class JspServletWrapper {
         try {
             Throwable realException = ex;
             // Unwrap Servlet exception once
-            if (ex instanceof ServletException servletException
-                    && servletException.getRootCause() != null) {
+            if (ex instanceof ServletException servletException && servletException.getRootCause() != null) {
                 realException = servletException.getRootCause();
             }
 

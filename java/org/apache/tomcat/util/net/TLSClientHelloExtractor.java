@@ -204,8 +204,8 @@ public class TLSClientHelloExtractor {
             if (log.isTraceEnabled()) {
                 log.trace("TLS Client Hello: " + clientRequestedCiphers + " Names " + clientRequestedCipherNames +
                         " Protocols " + clientRequestedApplicationProtocols + " sniValue " + sniValue +
-                        " clientRequestedProtocols " + clientRequestedProtocols + " clientSupportedGroups " + clientSupportedGroups +
-                        " clientSignatureSchemes " + clientSignatureSchemes);
+                        " clientRequestedProtocols " + clientRequestedProtocols + " clientSupportedGroups " +
+                        clientSupportedGroups + " clientSignatureSchemes " + clientSignatureSchemes);
             }
             // Whatever happens, return the buffer to its original state
             netInBuffer.limit(limit);

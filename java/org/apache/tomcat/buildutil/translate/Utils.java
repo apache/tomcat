@@ -95,10 +95,10 @@ public class Utils {
     /*
      * This is the formatting applied when importing values to Tomcat from POE.
      *
-     * The values have been read from POE's property files (so the input is the actual value with none of the
-     * escaping required to represent that value in a property file) and are being written back out to individual files
-     * in Tomcat. The padding for blank lines needs to be removed followed by the common formatting required to convert
-     * a property value to the representation of that value in a file.
+     * The values have been read from POE's property files (so the input is the actual value with none of the escaping
+     * required to represent that value in a property file) and are being written back out to individual files in
+     * Tomcat. The padding for blank lines needs to be removed followed by the common formatting required to convert a
+     * property value to the representation of that value in a file.
      */
     static String formatValueImport(String in) {
         String result;

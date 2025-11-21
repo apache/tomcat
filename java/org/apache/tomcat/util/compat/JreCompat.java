@@ -357,8 +357,9 @@ public class JreCompat {
 
     /**
      * TLS groups configuration from JSSE API in Java 20.
+     *
      * @param sslParameters the parameters object
-     * @param names the names of the groups to enable
+     * @param names         the names of the groups to enable
      */
     public void setNamedGroupsMethod(Object sslParameters, String[] names) {
         throw new UnsupportedOperationException(sm.getString("jreCompat.noNamedGroups"));
