@@ -81,7 +81,6 @@ public class TestSecurity2023 extends TomcatBaseTest {
         Assert.assertEquals(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE, status);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     private static int postMultipart(String path, String queryStringParams, int parts) throws IOException, URISyntaxException {
         String urlStr = path + (queryStringParams == null || queryStringParams.isEmpty() ? "" : "?" + queryStringParams);
         String boundary = "--simpleboundary";
