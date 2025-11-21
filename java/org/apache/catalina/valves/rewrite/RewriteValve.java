@@ -569,7 +569,7 @@ public class RewriteValve extends ValveBase {
                     chunk.append(urlStringRewriteDecoded);
                     // Set the new Query String
                     if (queryStringRewriteEncoded == null) {
-                         // No new query string. Therefore the original is retained unless QSD is defined.
+                        // No new query string. Therefore the original is retained unless QSD is defined.
                         if (qsd) {
                             request.getCoyoteRequest().queryString().setChars(MessageBytes.EMPTY_CHAR_ARRAY, 0, 0);
                         }

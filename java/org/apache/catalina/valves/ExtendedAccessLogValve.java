@@ -549,8 +549,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
             } else if ("dns".equals(nextToken)) {
                 return new AccessLogElement() {
                     @Override
-                    public void addElement(CharArrayWriter buf, Request request, Response response,
-                            long time) {
+                    public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                         String value;
                         try {
                             value = InetAddress.getLocalHost().getHostName();
@@ -588,8 +587,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                     } else if ("query".equals(token)) {
                         return new AccessLogElement() {
                             @Override
-                            public void addElement(CharArrayWriter buf, Request request, Response response,
-                                    long time) {
+                            public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                                 String query = request.getQueryString();
                                 if (query != null) {
                                     buf.append(query);
@@ -602,8 +600,7 @@ public class ExtendedAccessLogValve extends AccessLogValve {
                 } else {
                     return new AccessLogElement() {
                         @Override
-                        public void addElement(CharArrayWriter buf, Request request, Response response,
-                                long time) {
+                        public void addElement(CharArrayWriter buf, Request request, Response response, long time) {
                             String query = request.getQueryString();
                             buf.append(request.getRequestURI());
                             if (query != null) {
