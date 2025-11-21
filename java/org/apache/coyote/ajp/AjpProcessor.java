@@ -797,7 +797,7 @@ public class AjpProcessor extends AbstractProcessor {
 
                 // nothing
                 case Constants.SC_A_SSL_CERT ->
-                    // SSL certificate extraction is lazy, moved to JkCoyoteHandler
+                        // SSL certificate extraction is lazy, moved to JkCoyoteHandler
                         requestHeaderMessage.getBytes(certificates);
                 case Constants.SC_A_SSL_CIPHER -> {
                     requestHeaderMessage.getBytes(tmpMB);
