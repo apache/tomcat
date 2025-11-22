@@ -136,12 +136,9 @@ public class HTMLManagerServlet extends ManagerServlet {
                 if (session != null) {
                     session.invalidate();
                 }
-                // Send 401 to clear browser credentials
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setHeader("WWW-Authenticate", "Basic realm=\"" +
-                        smClient.getString("htmlManagerServlet.title") + "\"");
 
                 // Display logout message
+                response.setContentType("text/html; charset=" + Constants.CHARSET);
                 PrintWriter writer = response.getWriter();
                 Object[] args = new Object[1];
                 args[0] = getServletContext().getContextPath();
