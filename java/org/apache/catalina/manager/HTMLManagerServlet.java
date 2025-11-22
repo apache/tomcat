@@ -140,10 +140,10 @@ public class HTMLManagerServlet extends ManagerServlet {
                 // Display logout message
                 response.setContentType("text/html; charset=" + Constants.CHARSET);
                 PrintWriter writer = response.getWriter();
-                Object[] args = new Object[1];
+                Object[] args = new Object[2];
                 args[0] = getServletContext().getContextPath();
                 writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.HTML_HEADER_SECTION, args));
-                args[0] = smClient.getString("htmlManagerServlet.title");
+                args[1] = smClient.getString("htmlManagerServlet.title");
                 writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.BODY_HEADER_SECTION, args));
                 writer.print("<h2>You have been logged out</h2>");
                 writer.print("<p>To log in again, <a href=\"");
