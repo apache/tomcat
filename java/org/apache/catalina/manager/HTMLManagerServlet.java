@@ -129,6 +129,35 @@ public class HTMLManagerServlet extends ManagerServlet {
                 command.equals("/undeploy") || command.equals("/expire") || command.equals("/start") ||
                 command.equals("/stop")) {
             message = smClient.getString("managerServlet.postCommand", command);
+        } else if (command.equals("/logout")) {
+            try {
+                // Invalidate the session
+                HttpSession session = request.getSession(false);
+                if (session != null) {
+                    session.invalidate();
+                }
+                // Send 401 to clear browser credentials
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setHeader("WWW-Authenticate", "Basic realm=\"" +
+                        smClient.getString("htmlManagerServlet.title") + "\"");
+
+                // Display logout message
+                PrintWriter writer = response.getWriter();
+                Object[] args = new Object[1];
+                args[0] = getServletContext().getContextPath();
+                writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.HTML_HEADER_SECTION, args));
+                args[0] = smClient.getString("htmlManagerServlet.title");
+                writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.BODY_HEADER_SECTION, args));
+                writer.print("<h2>You have been logged out</h2>");
+                writer.print("<p>To log in again, <a href=\"");
+                writer.print(response.encodeURL(getServletContext().getContextPath() + "/html"));
+                writer.print("\">click here</a>.</p>");
+                writer.print(org.apache.catalina.manager.Constants.HTML_TAIL_SECTION);
+                return;
+            } catch (Exception e) {
+                log(sm.getString("htmlManagerServlet.error.logout"), e);
+                message = smClient.getString("managerServlet.exception", e.toString());
+            }
         } else {
             message = smClient.getString("managerServlet.unknownCommand", command);
         }
@@ -325,7 +354,7 @@ public class HTMLManagerServlet extends ManagerServlet {
         writer.print(MessageFormat.format(Constants.MESSAGE_SECTION, args));
 
         // Manager Section
-        args = new Object[9];
+        args = new Object[11];
         args[0] = smClient.getString("htmlManagerServlet.manager");
         args[1] = response.encodeURL(getServletContext().getContextPath() + "/html/list");
         args[2] = smClient.getString("htmlManagerServlet.list");
@@ -338,6 +367,8 @@ public class HTMLManagerServlet extends ManagerServlet {
         args[6] = smClient.getString("htmlManagerServlet.helpManager");
         args[7] = response.encodeURL(getServletContext().getContextPath() + "/status");
         args[8] = smClient.getString("statusServlet.title");
+        args[9] = response.encodeURL(getServletContext().getContextPath() + "/html/logout");
+        args[10] = smClient.getString("htmlManagerServlet.logout");
         writer.print(MessageFormat.format(Constants.MANAGER_SECTION, args));
 
         // Apps Header Section
