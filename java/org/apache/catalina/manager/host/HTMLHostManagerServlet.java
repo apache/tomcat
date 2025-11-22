@@ -79,6 +79,32 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
         } else if (command.equals("/add") || command.equals("/remove") || command.equals("/start") ||
                 command.equals("/stop") || command.equals("/persist")) {
             message = smClient.getString("hostManagerServlet.postCommand", command);
+        } else if (command.equals("/logout")) {
+            try {
+                // Invalidate the session
+                jakarta.servlet.http.HttpSession session = request.getSession(false);
+                if (session != null) {
+                    session.invalidate();
+                }
+
+                // Display logout message
+                response.setContentType("text/html; charset=" + Constants.CHARSET);
+                PrintWriter writer = response.getWriter();
+                Object[] args = new Object[2];
+                args[0] = getServletContext().getContextPath();
+                writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.HTML_HEADER_SECTION, args));
+                args[1] = smClient.getString("htmlHostManagerServlet.title");
+                writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.BODY_HEADER_SECTION, args));
+                writer.print("<h2>You have been logged out</h2>");
+                writer.print("<p>To log in again, <a href=\"");
+                writer.print(response.encodeURL(getServletContext().getContextPath() + "/html"));
+                writer.print("\">click here</a>.</p>");
+                writer.print(Constants.HTML_TAIL_SECTION);
+                return;
+            } catch (Exception e) {
+                log(sm.getString("htmlHostManagerServlet.error.logout"), e);
+                message = smClient.getString("hostManagerServlet.exception", e.toString());
+            }
         } else {
             message = smClient.getString("hostManagerServlet.unknownCommand", command);
         }
@@ -260,7 +286,7 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
         writer.print(MessageFormat.format(Constants.MESSAGE_SECTION, args));
 
         // Manager Section
-        args = new Object[9];
+        args = new Object[11];
         args[0] = smClient.getString("htmlHostManagerServlet.manager");
         args[1] = response.encodeURL(getServletContext().getContextPath() + "/html/list");
         args[2] = smClient.getString("htmlHostManagerServlet.list");
@@ -274,6 +300,8 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
         args[6] = smClient.getString("htmlHostManagerServlet.helpManager");
         args[7] = response.encodeURL("/manager/status");
         args[8] = smClient.getString("statusServlet.title");
+        args[9] = response.encodeURL(getServletContext().getContextPath() + "/html/logout");
+        args[10] = smClient.getString("htmlHostManagerServlet.logout");
         writer.print(MessageFormat.format(Constants.MANAGER_SECTION, args));
 
         // Hosts Header Section

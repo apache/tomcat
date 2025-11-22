@@ -38,13 +38,14 @@ public class Constants {
     public static final String MANAGER_SECTION =
             "<table border=\"1\" cellspacing=\"0\" cellpadding=\"3\">\n" +
             "<tr>\n" +
-            " <td colspan=\"4\" class=\"title\">{0}</td>\n" +
+            " <td colspan=\"5\" class=\"title\">{0}</td>\n" +
             "</tr>\n" +
             " <tr>\n" +
             "  <td class=\"row-left\"><a href=\"{1}\">{2}</a></td>\n" +
             "  <td class=\"row-center\"><a href=\"{3}\" " + REL_EXTERNAL + ">{4}</a></td>\n" +
             "  <td class=\"row-center\"><a href=\"{5}\" " + REL_EXTERNAL + ">{6}</a></td>\n" +
-            "  <td class=\"row-right\"><a href=\"{7}\">{8}</a></td>\n" +
+            "  <td class=\"row-center\"><a href=\"{7}\">{8}</a></td>\n" +
+            "  <td class=\"row-right\"><a href=\"{9}\">{10}</a></td>\n" +
             " </tr>\n" +
             "</table>\n" +
             "<br>\n" +
