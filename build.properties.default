@@ -308,10 +308,10 @@ bnd.jar=${bnd.home}/biz.aQute.bnd-${bnd.version}.jar
 bnd.loc=${base-maven.loc}/biz/aQute/bnd/biz.aQute.bnd/${bnd.version}/biz.aQute.bnd-${bnd.version}.jar
 
 # ----- Tomcat Migration Tool for Jakarta EE -----
-migration-lib.version=1.0.9
+migration-lib.version=1.0.10
 migration-lib.checksum.enabled=true
 migration-lib.checksum.algorithm=MD5|SHA-1
-migration-lib.checksum.value=0c41a2032c09d943211be5d41aed3f8f|fe5473b73441e664842086b8496b940cd2c3c054
+migration-lib.checksum.value=264a836032d45f600e01a95b3d5925e3|c86a0981ae313658222fb576595c0546542c4911
 
 migration-lib.home=${base.path}/migration-${migration-lib.version}
 migration-lib.jar=${migration-lib.home}/jakartaee-migration-${migration-lib.version}-shaded.jar
