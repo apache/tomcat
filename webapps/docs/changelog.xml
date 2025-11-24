@@ -170,6 +170,10 @@
         Update file extension to media type mappings to align with the current
         list used by the Apache Web Server (httpd). (markt)
       </update>
+      <update>
+        Update the packaged version of the Tomcat Migration Tool for Jakarta EE
+        to 1.0.10. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
