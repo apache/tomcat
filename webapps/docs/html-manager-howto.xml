@@ -70,14 +70,31 @@ application documentation.
 
 <section name="Manager">
 
-<p>The Manager section has three links:</p>
+<p>The Manager section has four links:</p>
 <ul>
   <li><strong>List Applications</strong> - Redisplay a list of web
       applications.</li>
   <li><strong>HTML Manager Help</strong> - A link to this document.</li>
   <li><strong>Manager Help</strong> - A link to the comprehensive Manager
       App HOW TO.</li>
+  <li><strong>Logout</strong> - Invalidate the current session and clear
+      the authentication state.</li>
 </ul>
+
+<subsection name="Logout">
+
+<p>The Logout link calls <code>HttpServletRequest.logout()</code> to invalidate
+the current session and clear the authentication state for the Manager application.
+After logout, you will see a confirmation page with a link to log in again.</p>
+
+<p><strong>Note:</strong> When using HTTP Basic or Digest authentication,
+browsers cache credentials and automatically re-send them with subsequent requests.
+This means that clicking any Manager link after logout will cause the browser to
+automatically re-authenticate using the cached credentials. To completely clear
+the authentication, you must close all browser windows or switch to form-based
+authentication.</p>
+
+</subsection>
 
 </section>
 

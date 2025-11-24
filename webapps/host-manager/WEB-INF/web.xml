@@ -52,7 +52,7 @@
     <filter-class>org.apache.catalina.filters.CsrfPreventionFilter</filter-class>
     <init-param>
       <param-name>entryPoints</param-name>
-      <param-value>/html,/html/,/html/list,/html/logout,/index.jsp</param-value>
+      <param-value>/html,/html/,/html/list,/html/logout,/index.jsp,/login.jsp,/loginError.jsp</param-value>
     </init-param>
   </filter>
 
@@ -112,8 +112,12 @@
 
   <!-- Define the Login Configuration for this Application -->
   <login-config>
-    <auth-method>BASIC</auth-method>
+    <auth-method>FORM</auth-method>
     <realm-name>Tomcat Host Manager Application</realm-name>
+    <form-login-config>
+      <form-login-page>/login.jsp</form-login-page>
+      <form-error-page>/loginError.jsp</form-error-page>
+    </form-login-config>
   </login-config>
 
   <!-- Security roles referenced by this web application -->

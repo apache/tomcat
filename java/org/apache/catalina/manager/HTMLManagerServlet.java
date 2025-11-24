@@ -131,13 +131,9 @@ public class HTMLManagerServlet extends ManagerServlet {
             message = smClient.getString("managerServlet.postCommand", command);
         } else if (command.equals("/logout")) {
             try {
-                // Invalidate the session
-                HttpSession session = request.getSession(false);
-                if (session != null) {
-                    session.invalidate();
-                }
+                String authType = request.getAuthType();
+                request.logout();
 
-                // Display logout message
                 response.setContentType("text/html; charset=" + Constants.CHARSET);
                 PrintWriter writer = response.getWriter();
                 Object[] args = new Object[2];
@@ -145,10 +141,33 @@ public class HTMLManagerServlet extends ManagerServlet {
                 writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.HTML_HEADER_SECTION, args));
                 args[1] = smClient.getString("htmlManagerServlet.title");
                 writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.BODY_HEADER_SECTION, args));
-                writer.print("<h2>You have been logged out</h2>");
-                writer.print("<p>To log in again, <a href=\"");
-                writer.print(response.encodeURL(getServletContext().getContextPath() + "/html"));
-                writer.print("\">click here</a>.</p>");
+
+                if (HttpServletRequest.BASIC_AUTH.equals(authType) ||
+                    HttpServletRequest.DIGEST_AUTH.equals(authType)) {
+                    writer.print("<h2>");
+                    writer.print(smClient.getString("htmlManagerServlet.logout.title"));
+                    writer.print("</h2>");
+                    writer.print("<p>");
+                    writer.print(smClient.getString("htmlManagerServlet.logout.basicInstructions"));
+                    writer.print("</p>");
+                    writer.print("<p><a href=\"#\" onclick=\"window.close(); return false;\">");
+                    writer.print(smClient.getString("htmlManagerServlet.logout.closeTab"));
+                    writer.print("</a></p>");
+                } else {
+                    writer.print("<h2>");
+                    writer.print(smClient.getString("htmlManagerServlet.logout.title"));
+                    writer.print("</h2>");
+                    writer.print("<p>");
+                    writer.print(smClient.getString("htmlManagerServlet.logout.success"));
+                    writer.print("</p>");
+                    writer.print("<p>");
+                    writer.print(smClient.getString("htmlManagerServlet.logout.login.prompt"));
+                    writer.print(" <a href=\"");
+                    writer.print(response.encodeURL(getServletContext().getContextPath() + "/html"));
+                    writer.print("\">");
+                    writer.print(smClient.getString("htmlManagerServlet.logout.login.link"));
+                    writer.print("</a>.</p>");
+                }
                 writer.print(org.apache.catalina.manager.Constants.HTML_TAIL_SECTION);
                 return;
             } catch (Exception e) {

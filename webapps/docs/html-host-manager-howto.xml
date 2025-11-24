@@ -163,7 +163,25 @@
     <li><strong>Server Status</strong> - A link to the <strong>Manager</strong>
     application. Note that you user must have sufficient permissions to access
     the application.</li>
+    <li><strong>Logout</strong> - Invalidate the current session and clear
+    the authentication state.</li>
   </ul>
+
+  <subsection name="Logout">
+
+  <p>The Logout link calls <code>HttpServletRequest.logout()</code> to invalidate
+  the current session and clear the authentication state for the Host Manager application.
+  After logout, you will see a confirmation page with a link to log in again.</p>
+
+  <p><strong>Note:</strong> When using HTTP Basic or Digest authentication,
+  browsers cache credentials and automatically re-send them with subsequent requests.
+  This means that clicking any Host Manager link after logout will cause the browser to
+  automatically re-authenticate using the cached credentials. To completely clear
+  the authentication, you must close all browser windows or switch to form-based
+  authentication.</p>
+
+  </subsection>
+
   </section>
 
   <section name="Host Name">
