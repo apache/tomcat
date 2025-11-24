@@ -35,7 +35,6 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.coyote.UpgradeProtocol;
 import org.apache.coyote.http11.AbstractHttp11JsseProtocol;
-import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.apache.tomcat.jni.AprStatus;
@@ -1063,7 +1062,7 @@ public class Connector extends LifecycleMBeanBase {
             setParseBodyMethods(getParseBodyMethods());
         }
 
-        if (protocolHandler instanceof AbstractHttp11Protocol) {
+        if (protocolHandler instanceof AbstractHttp11JsseProtocol) {
             AbstractHttp11JsseProtocol<?> jsseProtocolHandler = (AbstractHttp11JsseProtocol<?>) protocolHandler;
             if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
                 // If SSL is enabled and a specific implementation isn't specified, select the correct default.
