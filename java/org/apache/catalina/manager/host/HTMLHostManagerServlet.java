@@ -81,7 +81,6 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
             message = smClient.getString("hostManagerServlet.postCommand", command);
         } else if (command.equals("/logout")) {
             try {
-                String authType = request.getAuthType();
                 request.logout();
 
                 response.setContentType("text/html; charset=" + Constants.CHARSET);
@@ -92,32 +91,19 @@ public class HTMLHostManagerServlet extends HostManagerServlet {
                 args[1] = smClient.getString("htmlHostManagerServlet.title");
                 writer.print(MessageFormat.format(org.apache.catalina.manager.Constants.BODY_HEADER_SECTION, args));
 
-                if (jakarta.servlet.http.HttpServletRequest.BASIC_AUTH.equals(authType) ||
-                    jakarta.servlet.http.HttpServletRequest.DIGEST_AUTH.equals(authType)) {
-                    writer.print("<h2>");
-                    writer.print(smClient.getString("htmlHostManagerServlet.logout.title"));
-                    writer.print("</h2>");
-                    writer.print("<p>");
-                    writer.print(smClient.getString("htmlHostManagerServlet.logout.basicInstructions"));
-                    writer.print("</p>");
-                    writer.print("<p><a href=\"#\" onclick=\"window.close(); return false;\">");
-                    writer.print(smClient.getString("htmlHostManagerServlet.logout.closeTab"));
-                    writer.print("</a></p>");
-                } else {
-                    writer.print("<h2>");
-                    writer.print(smClient.getString("htmlHostManagerServlet.logout.title"));
-                    writer.print("</h2>");
-                    writer.print("<p>");
-                    writer.print(smClient.getString("htmlHostManagerServlet.logout.success"));
-                    writer.print("</p>");
-                    writer.print("<p>");
-                    writer.print(smClient.getString("htmlHostManagerServlet.logout.login.prompt"));
-                    writer.print(" <a href=\"");
-                    writer.print(response.encodeURL(getServletContext().getContextPath() + "/html"));
-                    writer.print("\">");
-                    writer.print(smClient.getString("htmlHostManagerServlet.logout.login.link"));
-                    writer.print("</a>.</p>");
-                }
+                writer.print("<h2>");
+                writer.print(smClient.getString("htmlHostManagerServlet.logout.title"));
+                writer.print("</h2>");
+                writer.print("<p>");
+                writer.print(smClient.getString("htmlHostManagerServlet.logout.success"));
+                writer.print("</p>");
+                writer.print("<p>");
+                writer.print(smClient.getString("htmlHostManagerServlet.logout.login.prompt"));
+                writer.print(" <a href=\"");
+                writer.print(response.encodeURL(getServletContext().getContextPath() + "/html"));
+                writer.print("\">");
+                writer.print(smClient.getString("htmlHostManagerServlet.logout.login.link"));
+                writer.print("</a>.</p>");
                 writer.print(Constants.HTML_TAIL_SECTION);
                 return;
             } catch (Exception e) {
