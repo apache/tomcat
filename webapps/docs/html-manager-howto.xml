@@ -85,14 +85,7 @@ application documentation.
 
 <p>The Logout link calls <code>HttpServletRequest.logout()</code> to invalidate
 the current session and clear the authentication state for the Manager application.
-After logout, you will see a confirmation page with a link to log in again.</p>
-
-<p><strong>Note:</strong> When using HTTP Basic or Digest authentication,
-browsers cache credentials and automatically re-send them with subsequent requests.
-This means that clicking any Manager link after logout will cause the browser to
-automatically re-authenticate using the cached credentials. To completely clear
-the authentication, you must close all browser windows or switch to form-based
-authentication.</p>
+After logout, you will be redirected to the login page.</p>
 
 </subsection>
 
