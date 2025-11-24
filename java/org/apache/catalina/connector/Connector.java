@@ -1063,25 +1063,21 @@ public class Connector extends LifecycleMBeanBase {
             setParseBodyMethods(getParseBodyMethods());
         }
 
-        if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable() &&
-                protocolHandler instanceof AbstractHttp11Protocol) {
-            // Use FFM and OpenSSL if available
+        if (protocolHandler instanceof AbstractHttp11Protocol) {
             AbstractHttp11JsseProtocol<?> jsseProtocolHandler = (AbstractHttp11JsseProtocol<?>) protocolHandler;
             if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
-                // OpenSSL is compatible with the JSSE configuration, so use it if it is available
-                jsseProtocolHandler
-                        .setSslImplementationName("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
-            }
-        } else if (aprStatusPresent && AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL() &&
-                protocolHandler instanceof AbstractHttp11Protocol) {
-            // Use tomcat-native and OpenSSL otherwise, if available
-            AbstractHttp11JsseProtocol<?> jsseProtocolHandler = (AbstractHttp11JsseProtocol<?>) protocolHandler;
-            if (jsseProtocolHandler.isSSLEnabled() && jsseProtocolHandler.getSslImplementationName() == null) {
-                // OpenSSL is compatible with the JSSE configuration, so use it if APR is available
-                jsseProtocolHandler.setSslImplementationName(OpenSSLImplementation.class.getName());
+                // If SSL is enabled and a specific implementation isn't specified, select the correct default.
+                if (JreCompat.isJre22Available() && OpenSSLStatus.getUseOpenSSL() && OpenSSLStatus.isAvailable()) {
+                    // Use FFM and OpenSSL if available
+                    jsseProtocolHandler
+                            .setSslImplementationName("org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation");
+                } else if (aprStatusPresent && AprStatus.isAprAvailable() && AprStatus.getUseOpenSSL()) {
+                    // Use tomcat-native and OpenSSL otherwise, if available
+                    jsseProtocolHandler.setSslImplementationName(OpenSSLImplementation.class.getName());
+                }
+                // Otherwise the default JSSE will be used
             }
         }
-        // Otherwise the default JSSE will be used
 
         try {
             protocolHandler.init();
