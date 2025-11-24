@@ -190,6 +190,11 @@
         Add log warnings for additional Host <code>appBase</code> suspicious
         values. (remm)
       </fix>
+      <fix>
+        Remove hard dependency on tomcat-jni.jar for catalina.jar.
+        <code>org.apache.catalina.Connector</code> no longer requires
+        <code>org.apache.tomcat.jni.AprStatus</code> to be present. (markt)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Coyote">
