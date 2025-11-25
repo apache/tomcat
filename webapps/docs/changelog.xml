@@ -114,6 +114,11 @@
       <update>
         The minimum Java version has been updated to Java 21. (markt)
       </update>
+      <add>
+        Add <code>test.silent</code> property to suppress JUnit console output
+        during test execution. Useful for cleaner console output when running
+        tests with multiple threads. (csutherl)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Catalina">

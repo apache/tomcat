@@ -1942,6 +1942,14 @@
   <property name="junit.formatter.usefile" value="true" />
   <property name="junit.formatter.extension" value=".txt" />
 
+  <!-- Configure JUnit output based on test.silent property -->
+  <condition property="junit.printsummary" value="off" else="yes">
+    <istrue value="${test.silent}"/>
+  </condition>
+  <condition property="junit.showoutput" value="false" else="${test.verbose}">
+    <istrue value="${test.silent}"/>
+  </condition>
+
   <target name="test" description="Runs the JUnit test cases"
           depends="test-nio,coverage-report,test-status" />
 
@@ -2039,7 +2047,7 @@
           enabled="${test.coverage}"
           destfile="${coverage.datafile}"
           >
-        <junit printsummary="yes" fork="yes" dir="." showoutput="${test.verbose}"
+        <junit printsummary="${junit.printsummary}" fork="yes" dir="." showoutput="${junit.showoutput}"
           errorproperty="test.result.error"
           failureproperty="test.result.failure"
           haltonfailure="${test.haltonfailure}"
