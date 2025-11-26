@@ -135,6 +135,9 @@
         creating a TLS connector if the <code>KeyStore</code> instance has been
         set directly on the connector. (markt)
       </fix>
+      <fix>
+        HTTP/0.9 only allows GET as the HTTP method. (remm)
+      </fix>
     </changelog>
   </subsection>
   <subsection name="Jasper">

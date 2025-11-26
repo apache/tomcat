@@ -579,6 +579,21 @@ public class TestHttp11InputBuffer extends TomcatBaseTest {
 
 
     @Test
+    public void testInvalidHttp09Method() {
+
+        String[] request = new String[1];
+        request[0] = "POST /test" + CRLF;
+
+        InvalidClient client = new InvalidClient(request);
+
+        client.doRequest();
+        // The response in that case is HTTP/0.9 so only the body
+        Assert.assertTrue(client.getResponseLine(), client.getResponseLine().contains("400"));
+        Assert.assertTrue(client.isResponseBodyOK());
+    }
+
+
+    @Test
     public void testInvalidEndOfRequestLine01() {
 
         String[] request = new String[1];
