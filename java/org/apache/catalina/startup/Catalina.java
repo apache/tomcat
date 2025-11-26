@@ -343,6 +343,9 @@ public class Catalina {
             } else if (arg.equals("configtest")) {
                 isGenerateCode = false;
                 // NOOP
+            } else if (arg.equals("config-validate")) {
+                isGenerateCode = false;
+                // NOOP
             } else if (arg.equals("stop")) {
                 isGenerateCode = false;
                 // NOOP
@@ -674,16 +677,33 @@ public class Catalina {
 
 
     /**
+     * Load configuration without initializing the server.
+     * Used for configuration validation without binding to ports.
+     */
+    public void loadConfigOnly() {
+        loadInternal(false);
+    }
+
+    /**
      * Start a new server instance.
      */
     public void load() {
+        loadInternal(true);
+    }
 
+    /**
+     * Internal load method that handles both config-only and full initialization.
+     *
+     * @param initServer if true, initialize the server and bind to ports;
+     *                   if false, only parse configuration
+     */
+    private void loadInternal(boolean initServer) {
         if (loaded) {
             return;
         }
         loaded = true;
 
-        long t1 = System.nanoTime();
+        long t1 = initServer ? System.nanoTime() : 0;
 
         // Before digester - it may be needed
         initNaming();
@@ -699,23 +719,25 @@ public class Catalina {
         getServer().setCatalinaHome(Bootstrap.getCatalinaHomeFile());
         getServer().setCatalinaBase(Bootstrap.getCatalinaBaseFile());
 
-        // Stream redirection
-        initStreams();
+        if (initServer) {
+            // Stream redirection
+            initStreams();
 
-        // Start the new server
-        try {
-            getServer().init();
-        } catch (LifecycleException e) {
-            if (throwOnInitFailure) {
-                throw new Error(e);
-            } else {
-                log.error(sm.getString("catalina.initError"), e);
+            // Start the new server
+            try {
+                getServer().init();
+            } catch (LifecycleException e) {
+                if (throwOnInitFailure) {
+                    throw new Error(e);
+                } else {
+                    log.error(sm.getString("catalina.initError"), e);
+                }
             }
-        }
 
-        if (log.isInfoEnabled()) {
-            log.info(sm.getString("catalina.init",
-                    Long.toString(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1))));
+            if (log.isInfoEnabled()) {
+                log.info(sm.getString("catalina.init",
+                        Long.toString(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t1))));
+            }
         }
     }
 
@@ -728,6 +750,20 @@ public class Catalina {
         try {
             if (arguments(args)) {
                 load();
+            }
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
+    }
+
+    /*
+     * Load configuration only using arguments
+     */
+    public void loadConfigOnly(String[] args) {
+
+        try {
+            if (arguments(args)) {
+                loadConfigOnly();
             }
         } catch (Exception e) {
             e.printStackTrace(System.out);
@@ -855,6 +891,69 @@ public class Catalina {
 
         System.out.println(sm.getString("catalina.usage"));
 
+    }
+
+    /**
+     * Run configuration validation tests.
+     *
+     * @return exit code (0 = success, 1 = errors found)
+     */
+    public int configtest() {
+        if (server == null) {
+            return 1;
+        }
+
+        try {
+
+            // Run validators
+            org.apache.catalina.startup.validator.ValidatorRegistry registry =
+                    new org.apache.catalina.startup.validator.ValidatorRegistry();
+            org.apache.catalina.startup.validator.ValidationResult result =
+                    registry.validate(server);
+
+            // Print results
+            System.out.println();
+            System.out.println("Configuration Validation Results");
+            System.out.println("=================================");
+            System.out.println();
+
+            if (!result.hasFindings()) {
+                System.out.println("No issues found. Configuration is valid.");
+                return 0;
+            }
+
+            // Group findings by severity
+            java.util.List<org.apache.catalina.startup.validator.ValidationResult.Finding> findings =
+                    result.getFindings();
+
+            for (org.apache.catalina.startup.validator.ValidationResult.Finding finding : findings) {
+                System.out.println(finding.toString());
+            }
+
+            System.out.println();
+            System.out.println("Summary: " + result.getErrorCount() + " error(s), " +
+                    result.getWarningCount() + " warning(s), " +
+                    result.getInfoCount() + " info message(s)");
+            System.out.println();
+
+            if (result.getErrorCount() > 0) {
+                System.out.println("Configuration test FAILED.");
+                System.out.println("Configuration error detected!");
+                return 1;
+            } else {
+                if (result.getWarningCount() > 0) {
+                    System.out.println("Configuration test PASSED (with warnings).");
+                } else {
+                    System.out.println("Configuration test PASSED.");
+                }
+                return 0;
+            }
+
+        } catch (Exception e) {
+            log.error(sm.getString("catalina.configTestError"), e);
+            e.printStackTrace();
+            return 1;
+        }
     }
 
 
