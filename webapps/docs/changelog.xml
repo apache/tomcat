@@ -195,6 +195,12 @@
         <code>org.apache.catalina.Connector</code> no longer requires
         <code>org.apache.tomcat.jni.AprStatus</code> to be present. (markt)
       </fix>
+      <add>
+        Add the ability to use a custom function to generate the client
+        identifier in the <code>CrawlerSessionManagerValve</code>. This is only
+        available programmatically. Pull request <pr>902</pr> by Brian Matzon.
+        (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Coyote">
