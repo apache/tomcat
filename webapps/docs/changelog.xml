@@ -229,6 +229,9 @@
         allowing to restrict which groups can be enabled on the SSL engine.
         (remm)
       </update>
+      <update>
+        Remove support for HTTP 0.9. (markt)
+      </update>
       <!-- Entries for backport and removal before 12.0.0-M1 below this line -->
       <fix>
         Don't log an incorrect certificate <code>KeyStore</code> location when
