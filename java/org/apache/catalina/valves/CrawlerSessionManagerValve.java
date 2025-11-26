@@ -168,8 +168,9 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     /**
      * Specify the clientIdentifier function that will be used to identify unique clients. The default is to use
-     * the client IP address, optionally combined with the host name and context name
-     * @param clientIdentifierFunction
+     * the client IP address, optionally combined with the host name and context name.
+     *
+     * @param clientIdentifierFunction The new function used to build identifiers for clients.
      */
     public void setClientIdentifierFunction(Function<Request, String> clientIdentifierFunction) {
         this.clientIdentifierFunction = clientIdentifierFunction;
