@@ -184,6 +184,8 @@ public class TestCrawlerSessionManagerValve {
             String contextPath, String userAgent) {
         Request request = EasyMock.createMock(Request.class);
         EasyMock.expect(request.getRemoteAddr()).andReturn(ip);
+        EasyMock.expect(request.getRemoteAddr()).andReturn(ip);
+        EasyMock.expect(request.getHost()).andReturn(simpleHostWithName(hostname));
         EasyMock.expect(request.getHost()).andReturn(simpleHostWithName(hostname));
         EasyMock.expect(request.getContext()).andReturn(simpleContextWithName(contextPath));
         IExpectationSetters<HttpSession> setter = EasyMock.expect(request.getSession(false)).andReturn(null);
