@@ -61,7 +61,7 @@ public class CrawlerSessionManagerValve extends ValveBase {
 
     private boolean isContextAware = true;
 
-    private Function<Request, String> clientIdentifierFunction = this::getClientIdentifier;
+    private Function<Request,String> clientIdentifierFunction = this::getClientIdentifier;
 
 
     /**
@@ -167,12 +167,12 @@ public class CrawlerSessionManagerValve extends ValveBase {
     }
 
     /**
-     * Specify the clientIdentifier function that will be used to identify unique clients. The default is to use
-     * the client IP address, optionally combined with the host name and context name.
+     * Specify the clientIdentifier function that will be used to identify unique clients. The default is to use the
+     * client IP address, optionally combined with the host name and context name.
      *
      * @param clientIdentifierFunction The new function used to build identifiers for clients.
      */
-    public void setClientIdentifierFunction(Function<Request, String> clientIdentifierFunction) {
+    public void setClientIdentifierFunction(Function<Request,String> clientIdentifierFunction) {
         this.clientIdentifierFunction = clientIdentifierFunction;
     }
 
