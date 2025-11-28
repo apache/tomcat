@@ -529,7 +529,16 @@ as for the property "test.name".
  This is configured by setting "test.threads" property. The recommended
  value is one thread per core.
 
- 6. Optional support is provided for the Cobertura code coverage tool.
+ 6. Test output can be suppressed for cleaner console output, especially useful
+ when running tests with multiple threads:
+
+        ant test -Dtest.silent=true
+
+ This suppresses JUnit console output while still saving all test results to
+ individual log files in output/build/logs. The test-status target will still
+ display a summary of any failures or skipped tests.
+
+ 7. Optional support is provided for the Cobertura code coverage tool.
 
 NOTE: Cobertura is licensed under GPL v2 with parts of it being under
       Apache License v1.1. See https://cobertura.github.io/cobertura/ for details.
