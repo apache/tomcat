@@ -1372,7 +1372,9 @@
     <p>The <em>Single Sign On Valve</em> is utilized when you wish to give users
     the ability to sign on to any one of the web applications associated with
     your virtual host, and then have their identity recognized by all other
-    web applications on the same virtual host.</p>
+    web applications on the same virtual host. The SSO Valve caches the
+    authenticated Principal and authentication type and provides them to all web
+    applications.</p>
 
     <p>See the <a href="host.html#Single_Sign_On">Single Sign On</a> special
     feature on the <strong>Host</strong> element for more information.</p>
@@ -1394,12 +1396,21 @@
 
       <attribute name="requireReauthentication" required="false">
         <p>Default false. Flag to determine whether each request needs to be
-        reauthenticated to the security <strong>Realm</strong>. If "true", this
-        Valve uses cached security credentials (username and password) to
-        reauthenticate to the <strong>Realm</strong> each request associated
-        with an SSO session.  If "false", the Valve can itself authenticate
-        requests based on the presence of a valid SSO cookie, without
-        rechecking with the <strong>Realm</strong>.</p>
+        reauthenticated to the security <strong>Realm</strong>. This is required
+        if the Realm or the authentication process provides additional
+        information (beyond added an authenticated Principal) to the request
+        that is required by a web application.</p>
+        <p>If "true", this Valve uses cached security credentials (username and
+        password) to reauthenticate to the <strong>Realm</strong> each request
+        associated with an SSO session where the web application is configured
+        with BASIC, FORM or SPNEGO authentication. Web applications using DIGEST
+        or CLIENT-CERT authentication will reauthenticate using the standard
+        authentication process for the authenticator. Therefore, it only makes
+        sense to use the SSO Valve with this attribute set to "true" if there
+        are two or more web applications using BASIC, FORM or SPNEGO.</p>
+        <p>If "false", the Valve can itself authenticate requests based on the
+        presence of a valid SSO cookie, without rechecking with the
+        <strong>Realm</strong>.</p>
       </attribute>
 
       <attribute name="cookieDomain" required="false">
