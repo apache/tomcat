@@ -264,14 +264,18 @@ public class DigestAuthenticator extends AuthenticatorBase {
     @Override
     protected boolean doAuthenticate(Request request, HttpServletResponse response) throws IOException {
 
-        // NOTE: We don't try to reauthenticate using any existing SSO session,
-        // because that will only work if the original authentication was
-        // BASIC or FORM, which are less secure than the DIGEST auth-type
-        // specified for this webapp
-        //
-        // Change to true below to allow previous FORM or BASIC authentications
-        // to authenticate users for this webapp
-        // TODO make this a configurable attribute (in SingleSignOn??)
+        /*
+         * Reauthentication using the cached user name and password (if any) is not enabled for DIGEST authentication.
+         * This was an historical design decision made because DIGEST authentication is viewed as more secure than
+         * BASIC/FORM.
+         *
+         * However, reauthentication was introduced to handle the case where the Realm took additional actions on
+         * authentication. Reauthenticating with the cached user name and password should be sufficient for DIGEST in
+         * that scenario. However, the original behaviour to reauthenticate has been retained in case of any (very
+         * unlikely) backwards compatibility issues.
+         *
+         * TODO: Make the reauthentication behaviour configurable per authenticator.
+         */
         if (checkForCachedAuthentication(request, response, false)) {
             return true;
         }
