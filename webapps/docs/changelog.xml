@@ -171,6 +171,10 @@
         Manager: Include web application state in the HTML and JSON complete
         server status output. (markt)
       </add>
+      <add>
+        Documentation: Expand the documentation to better explain when OCSP is
+        supported and when it is not. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="jdbc-pool">

@@ -1352,14 +1352,14 @@
   respectively, to pass correct information to the servlets.</p>
 
   <p>The NIO and NIO2 connectors use either the JSSE Java SSL implementation or
-  an OpenSSL implementation, whereas the APR/native connector uses OpenSSL only.
+  an OpenSSL implementation whereas the APR/native connector uses OpenSSL only.
   Prior to Tomcat 8.5, different configuration attributes were used for JSSE and
   OpenSSL. From Tomcat 8.5 onwards, and as far as possible, common configuration
-  attributes are used for both JSSE and OpenSSL. Also if using the JSSE OpenSSL
-  implementation, configuration can be set using either the JSSE or APR
-  attributes (note: but not both types within the same configuration). This is
-  to aid simpler switching between connector implementations for SSL
-  connectors.</p>
+  attributes are used for both JSSE and OpenSSL. You cannot mix JSSE specific
+  configuration attributes and OpenSSL specific configuration attributes on the
+  same NIO or NIO2 connector. However, you may use either the JSSE or the OpenSSL
+  configuration style with the NIO and NIO2 connectors with either the JSSE or
+  OpenSSL implementations.</p>
 
   <p>Each secure connector must define at least one
   <strong>SSLHostConfig</strong>. The names of the

@@ -454,19 +454,36 @@ mailing list</a>.</p>
 </section>
 
 <section name="Using OCSP Certificates">
-<p>To use Online Certificate Status Protocol (OCSP) with Apache Tomcat, ensure
-  you have downloaded, installed, and configured the
-  <a href="https://tomcat.apache.org/download-native.cgi">
-    Tomcat Native Connector</a>.
-Furthermore, if you use the Windows platform, ensure you download the
-ocsp-enabled connector.</p>
+<p>Tomcat supports the Online Certificate Status Protocol (OCSP) to verify the
+status of client provided certificates for a sub-set of connector
+configurations.</p>
+
 <p>To use OCSP, you require the following:</p>
 
 <ul>
   <li>OCSP-enabled certificates</li>
-  <li>Tomcat with SSL APR connector</li>
+  <li>Tomcat with an OCSP enabled connector</li>
   <li>Configured OCSP responder</li>
 </ul>
+
+<p>OCSP is currently implemented for the following connector configurations:</p>
+
+<ul>
+  <li>NIO or NIO2 HTTP connector with the
+      <code>org.apache.tomcat.util.net.openssl.OpenSSLImplementation</code>,
+      a Tomcat Native build where OCSP is enabled and using the OpenSSL style
+      configuration.</li>
+  <li>NIO or NIO2 HTTP connector with the
+      <code>org.apache.tomcat.util.net.openssl.panama.OpenSSLImplementation</code>,
+      and using the OpenSSL style configuration. This uses FFM so Java 22 or
+      later is also required.</li>
+  <li>APR/native HTTP connector with a Tomcat Native build where OCSP is
+      enabled.</li>
+</ul>
+
+<p>OCSP is not supported if the
+<code>org.apache.tomcat.util.net.jsse.JSSEImplementation</code> is used or if
+the JSSE configuraton style is used.</p>
 
 <subsection name="Generating OCSP-Enabled Certificates">
 <p>Apache Tomcat requires the OCSP-enabled certificate to have the OCSP
