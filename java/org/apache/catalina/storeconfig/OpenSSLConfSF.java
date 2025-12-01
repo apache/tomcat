@@ -17,6 +17,7 @@
 package org.apache.catalina.storeconfig;
 
 import java.io.PrintWriter;
+import java.util.Set;
 
 import org.apache.tomcat.util.net.openssl.OpenSSLConf;
 import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
@@ -25,6 +26,8 @@ import org.apache.tomcat.util.net.openssl.OpenSSLConfCmd;
  * Store OpenSSLConf
  */
 public class OpenSSLConfSF extends StoreFactoryBase {
+
+    private static final Set<String> INTERNAL_COMMANDS = Set.of(OpenSSLConfCmd.NO_OCSP_CHECK);
 
     /**
      * Store nested OpenSSLConfCmd elements.
@@ -36,9 +39,13 @@ public class OpenSSLConfSF extends StoreFactoryBase {
             throws Exception {
         if (aOpenSSLConf instanceof OpenSSLConf openSslConf) {
             // Store nested <OpenSSLConfCmd> elements
-            OpenSSLConfCmd[] openSSLConfCmds = openSslConf.getCommands().toArray(new OpenSSLConfCmd[0]);
-            storeElementArray(aWriter, indent + 2, openSSLConfCmds);
+            for (OpenSSLConfCmd openSSLConfCmd : openSslConf.getCommands()) {
+                // Don't store the internal commands that are created from other SslHostConfig attributes.
+                if (INTERNAL_COMMANDS.contains(openSSLConfCmd.getName())) {
+                    continue;
+                }
+                storeElement(aWriter, indent + 2, openSSLConfCmd);
+            }
         }
     }
-
 }

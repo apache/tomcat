@@ -21,11 +21,22 @@ import java.io.Serializable;
 
 public class OpenSSLConfCmd implements Serializable {
 
+    // Tomcat / Tomcat Native custom commands. Used internally by Tomcat. Not intended for direct use by users.
+    public static final String NO_OCSP_CHECK = "NO_OCSP_CHECK";
+
     @Serial
     private static final long serialVersionUID = 1L;
 
     private String name = null;
     private String value = null;
+
+    public OpenSSLConfCmd() {
+    }
+
+    public OpenSSLConfCmd(String name, String value) {
+        this.name = name;
+        this.value = value;
+    }
 
     public String getName() {
         return name;

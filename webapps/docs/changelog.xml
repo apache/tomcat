@@ -279,6 +279,11 @@
         <code>SSLHostConfig</code> to configure the TLSv1.3 cipher suites.
         (markt)
       </add>
+      <add>
+        Add OCSP support to JSSE based TLS connectors and make the use of OCSP
+        configurable per connector for both JSSE and OpenSSL based TLS
+        implementations. (markt)
+      </add>
     </changelog>
   </subsection>
   <subsection name="Jasper">
