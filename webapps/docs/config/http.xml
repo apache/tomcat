@@ -1437,6 +1437,14 @@
       documentation for the default value.</p>
     </attribute>
 
+    <attribute name="ocspEnabled" required="false">
+      <p>If enabled, client certificates with an OCSP responder URI in the
+      Authority Information Access extension will be validated using that OCSP
+      responder.</p>
+      <p>If not specified, the default value of <code>false</code> will be
+      used.</p>
+    </attribute>
+
     <attribute name="protocols" required="false">
       <p>The names of the protocols to support when communicating with clients.
       This should be a list of any combination of the following:

@@ -353,7 +353,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 log.trace(sm.getString("opensslconf.checkCommand", name, value));
             }
             try (var localArena = Arena.ofConfined()) {
-                if (name.equals("NO_OCSP_CHECK")) {
+                if (name.equals(OpenSSLConfCmd.NO_OCSP_CHECK)) {
                     ok = true;
                 } else {
                     int code = SSL_CONF_cmd_value_type(state.confCtx, localArena.allocateFrom(name));
@@ -422,7 +422,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 log.trace(sm.getString("opensslconf.applyCommand", name, value));
             }
             try (var localArena = Arena.ofConfined()) {
-                if (name.equals("NO_OCSP_CHECK")) {
+                if (name.equals(OpenSSLConfCmd.NO_OCSP_CHECK)) {
                     noOcspCheck = Boolean.parseBoolean(value);
                     rc = 1;
                 } else {
@@ -549,7 +549,7 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 case REQUIRED -> SSL_VERIFY_FAIL_IF_NO_PEER_CERT();
             };
 
-            if (value == OPTIONAL_NO_CA) {
+            if (value == OPTIONAL_NO_CA || !sslHostConfig.getOcspEnabled()) {
                 noOcspCheck = true;
             }
 
