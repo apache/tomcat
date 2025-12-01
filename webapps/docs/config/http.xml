@@ -315,6 +315,15 @@
       The default value is <code>false</code>.</p>
     </attribute>
 
+    <attribute name="strictSni" required="false">
+      <p>Set this attribute to <code>true</code> to verify that the
+      <code>SSLHostConfig</code> configuration associated with the SNI host name
+      is the same as the <code>SSLHostConfig</code> configuration associated
+      with the HTTP protocol virtual host name in use. Non matching requests
+      will be rejected.
+      The default value is <code>true</code>.</p>
+    </attribute>
+
     <attribute name="URIEncoding" required="false">
       <p>This specifies the character encoding used to decode the URI bytes,
       after %xx decoding the URL. The default value is <code>UTF-8</code>.</p>

@@ -760,6 +760,11 @@ public class Http11Processor extends AbstractProcessor {
         // Validate host name and extract port if present
         parseHost(hostValueMB);
 
+        // Match host name with SNI if required
+        if (!protocol.checkSni(socketWrapper.getSniHostName(), request.serverName().toString())) {
+            badRequest("http11processor.request.sni");
+        }
+
         if (!getErrorState().isIoAllowed()) {
             getAdapter().log(request, response, 0);
         }
