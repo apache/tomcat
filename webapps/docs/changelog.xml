@@ -353,6 +353,9 @@
       <update>
         Update Commons Daemon to 1.5.0. (markt)
       </update>
+      <update>
+        Update Byte Buddy to 1.18.2. (markt)
+      </update>
     </changelog>
   </subsection>
 </section>
