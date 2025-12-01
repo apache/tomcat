@@ -197,19 +197,29 @@ public abstract class SimpleHttpClient {
         return redirectUri;
     }
 
-    public void connect(int connectTimeout, int soTimeout)
-           throws UnknownHostException, IOException {
+    public void connect(Socket socket, int connectTimeout, int soTimeout, boolean connect) throws UnknownHostException, IOException {
         final String encoding = "ISO-8859-1";
         SocketAddress addr = new InetSocketAddress("localhost", port);
-        socket = new Socket();
+        this.socket = socket;
         socket.setSoTimeout(soTimeout);
-        socket.connect(addr,connectTimeout);
+        if (connect) {
+            socket.connect(addr, connectTimeout);
+        }
         OutputStream os = createOutputStream(socket);
         writer = new OutputStreamWriter(os, encoding);
         InputStream is = socket.getInputStream();
         Reader r = new InputStreamReader(is, encoding);
         reader = new BufferedReader(r);
     }
+
+    public void connect(int connectTimeout, int soTimeout) throws UnknownHostException, IOException {
+        connect(new Socket(), 10000, 10000, true);
+    }
+
+    public void connect(Socket socket) throws UnknownHostException, IOException {
+        connect(socket, 10000, 10000, false);
+    }
+
     public void connect() throws UnknownHostException, IOException {
         connect(10000, 10000);
     }
