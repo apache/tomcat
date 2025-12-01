@@ -86,6 +86,8 @@ public abstract class SocketWrapperBase<E> {
     protected int remotePort = -1;
     protected volatile ServletConnection servletConnection = null;
 
+    protected String sniHostName = null;
+
     /**
      * Used to record the first IOException that occurs during non-blocking read/writes that can't be usefully
      * propagated up the stack since there is no user code or appropriate container code in the stack to handle it.
@@ -207,6 +209,20 @@ public abstract class SocketWrapperBase<E> {
 
     public void setNegotiatedProtocol(String negotiatedProtocol) {
         this.negotiatedProtocol = negotiatedProtocol;
+    }
+
+    /**
+     * @return the sniHostName
+     */
+    public String getSniHostName() {
+        return this.sniHostName;
+    }
+
+    /**
+     * @param sniHostName the SNI host name to set
+     */
+    public void setSniHostName(String sniHostName) {
+        this.sniHostName = sniHostName;
     }
 
     /**
