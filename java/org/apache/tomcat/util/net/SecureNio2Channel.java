@@ -410,6 +410,7 @@ public class SecureNio2Channel extends Nio2Channel {
         switch (extractor.getResult()) {
             case COMPLETE:
                 hostName = extractor.getSNIValue();
+                socketWrapper.setSniHostName(hostName);
                 clientRequestedApplicationProtocols = extractor.getClientRequestedApplicationProtocols();
                 //$FALL-THROUGH$ to set the client requested ciphers
             case NOT_PRESENT:
