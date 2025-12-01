@@ -102,8 +102,18 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
         boolean success = false;
         try {
             // Create OpenSSLConfCmd context if used
-            OpenSSLConf openSslConf = sslHostConfig.getOpenSslConf();
-            if (openSslConf != null) {
+            if (sslHostConfig.getOpenSslConf() == null && sslHostConfig.getTrustManagerClassName() == null &&
+                    sslHostConfig.getTruststore() == null) {
+                /*
+                 * If an instance of OpenSSLConf is required, it must be created here so the reference can be placed in
+                 * the (immutable) OpenSSLState record.
+                 *
+                 * If OpenSSL managed trust is used, an instance of OpenSSLConf is required to pass OCSP configuration
+                 * parameters to Tomcat Native. Create one if one hasn't already been created.
+                 */
+                sslHostConfig.setOpenSslConf(new OpenSSLConf());
+            }
+            if (sslHostConfig.getOpenSslConf() != null) {
                 try {
                     if (log.isTraceEnabled()) {
                         log.trace(sm.getString("openssl.makeConf"));
@@ -364,6 +374,8 @@ public class OpenSSLContext implements org.apache.tomcat.util.net.SSLContext {
                 SSLContext.setCACertificate(state.ctx,
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificateFile()),
                         SSLHostConfig.adjustRelativePath(sslHostConfig.getCaCertificatePath()));
+                sslHostConfig.getOpenSslConf().addCmd(new OpenSSLConfCmd(OpenSSLConfCmd.NO_OCSP_CHECK,
+                        Boolean.toString(!sslHostConfig.getOcspEnabled())));
             }
 
             if (negotiableProtocols != null && !negotiableProtocols.isEmpty()) {
