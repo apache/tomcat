@@ -505,6 +505,11 @@ class Stream extends AbstractNonZeroStream implements HeaderEmitter {
         } else {
             coyoteRequest.serverName().setString(value);
         }
+        // Match host name with SNI if required
+        if (!handler.getProtocol().getHttp11Protocol().checkSni(handler.getSniHostName(), coyoteRequest.serverName().getString())) {
+            throw new HpackException(sm.getString("stream.host.sni", getConnectionId(), getIdAsString(), value,
+                    handler.getSniHostName()));
+        }
     }
 
 
