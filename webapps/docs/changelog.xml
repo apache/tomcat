@@ -201,6 +201,9 @@
       <update>
         Update Checkstyle to 12.2.0. (markt)
       </update>
+      <add>
+        Improvements to Spanish translations provided by White Vogel. (markt)
+      </add>
     </changelog>
   </subsection>
 </section>
